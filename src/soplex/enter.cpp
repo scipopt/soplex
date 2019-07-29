@@ -1486,7 +1486,7 @@ bool SPxSolverBase<Real>::enter(SPxId& enterId, bool polish)
    else if(!polish && leaveVal < infinity && leaveVal > -infinity)
    {
       assert(rep() == COLUMN);
-      assert(leaveVal == -enterMax);
+      assert(EQ(leaveVal, -enterMax));
 
       this->change(-1, enterId, enterVec);
 
