@@ -105,9 +105,9 @@ LDFLAGS		=
 ARFLAGS		=	cr
 DFLAGS		=	-MM
 
-# TODO need to move the -lboost argument to the correct variable. This would work though
-GMP_LDFLAGS	= -lgmp -lmpfr -lboost_program_options
+GMP_LDFLAGS	= -lgmp -lmpfr
 GMP_CPPFLAGS	=
+BOOST_LDFLAGS = -lboost_program_options
 
 SOPLEXDIR	=	$(realpath .)
 SRCDIR		=	src
@@ -380,6 +380,10 @@ else
 GMP_LDFLAGS	=
 GMP_CPPFLAGS	=
 endif
+
+# For boost program options
+LDFLAGS += $(BOOST_LDFLAGS)
+
 
 ZLIBDEP		:=	$(SRCDIR)/depend.zlib
 ZLIBSRC		:=	$(shell cat $(ZLIBDEP))
