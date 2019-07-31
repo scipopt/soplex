@@ -1,3 +1,9 @@
+next bugfix release
+===================
+
+fixed bugs:
+- enable initial/crash basis methods again
+
 10 July 2019 - Release 4.0.2
 ============================
 
@@ -7,7 +13,6 @@ fixed bugs:
 - ensure basis status is set correctly when aborting a solve early
 - fix memory leak when copying SoPlex
 - correct getBasisInverseCol for row representation
-- enable generation of start/initial basis again
 
 code quality:
 - merge SoPlex::hasDual() and SoPlex::hasPrimal() into SoPlex::hasSol() and mark old methods deprecated
