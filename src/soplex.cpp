@@ -6553,6 +6553,7 @@ bool SoPlexBase<Real>::setIntParam(const IntParam param, const int value, const 
          return false;
       }
 
+      _solver.setStarter(_starter, false);
       break;
 
    // type of pricer
