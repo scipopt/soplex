@@ -1,5 +1,4 @@
 next Release
-============
 
 interface & parameters:
 - show number of violations in log to improve understanding of solving progress
@@ -51,6 +50,9 @@ interface & parameters:
 - Renamed `SPxSolverBase<R>::getDualfarkas` to `SPxSolverBase<R>::getDualFarkas`
   (for consistency.) Note that there is a method with the same name in
   `SoPlexBase<R>`.
+
+fixed bugs:
+- use center value for very close bounds in singleton postsolver
 
 10 July 2019 - Release 4.0.2
 ============================

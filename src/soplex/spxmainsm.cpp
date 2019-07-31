@@ -841,9 +841,9 @@ void SPxMainSM<Real>::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVe
       }
       else
       {
-         assert(EQrel(m_lower, m_upper));
+         assert(EQrel(m_lower, m_upper, eps()));
 
-         x[m_j]        = m_lower;
+         x[m_j]        = (m_lower + m_upper) / 2.0;
          cStatus[m_j]  = SPxSolverBase<Real>::FIXED;
       }
    }
