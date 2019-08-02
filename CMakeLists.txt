@@ -112,6 +112,15 @@ if(GMP_FOUND)
     set(libs ${libs} ${GMP_LIBRARIES})
 endif()
 
+if(MPFR)
+  find_package(MPFR)
+  if(MPFR_FOUND)
+    include_directories(${MPFR_INCLUDE_DIRS})
+    set(libs ${libs} ${MPFR_LIBRARIES})
+  endif()
+endif()
+
+
 # Made with: https://stackoverflow.com/a/3917033/4223038
 if(Boost)
   # Technically the version 1.70.0 is not needed for program_option, but for the
