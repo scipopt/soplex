@@ -189,7 +189,7 @@ SPxSolver::Status SPxSolver::solve()
       /**@todo != REGULAR is not enough. Also OPTIMAL/DUAL/PRIMAL should
        * be tested and acted accordingly.
        */
-      if(thestarter != 0 && status() != REGULAR)   // no basis and no starter.
+      if(thestarter != 0 && status() != REGULAR && theLP->status() == NO_PROBLEM)   // no basis and no starter.
          thestarter->generate(*this);              // generate start basis.
 
       init();
