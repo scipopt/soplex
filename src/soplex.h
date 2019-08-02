@@ -2423,5 +2423,9 @@ private:
 /* Backwards compatibility */
 typedef SoPlexBase<Real> SoPlex;
 
+  template <>
+  bool SoPlexBase<Real>::parseSettingsString(const std::string str, boost::any val);
+
+
 }
 #endif // _SOPLEX_H_

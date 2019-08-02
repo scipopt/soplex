@@ -313,27 +313,28 @@ namespace soplex
         case 2:                 // iterative refinement
           runSoPlex<Real>(vm);
           break;
-        case 3:                 // soplex mpf
-          using namespace boost::multiprecision;
+          // TODO: Will be uncommented after merging soplex-mpf into master
+        // case 3:                 // soplex mpf
+        //   using namespace boost::multiprecision;
 
 
-          // et_off means the expression templates options is turned off. TODO:
-          // The documentation also mentions about static vs dynamic memory
-          // allocation for the mpfr types. Is it relevant here? I probably also
-          // need to have the mpfr_float_eto in the global soplex namespace
-          using mpfr_float_eto = number<mpfr_float_backend<0>, et_off>;
-          using mpfr_debug = number<debug_adaptor<mpfr_float_backend<0>>, et_off>;
+        //   // et_off means the expression templates options is turned off. TODO:
+        //   // The documentation also mentions about static vs dynamic memory
+        //   // allocation for the mpfr types. Is it relevant here? I probably also
+        //   // need to have the mpfr_float_eto in the global soplex namespace
+        //   using mpfr_float_eto = number<mpfr_float_backend<0>, et_off>;
+        //   using mpfr_debug = number<debug_adaptor<mpfr_float_backend<0>>, et_off>;
 
-          if(!vm.count("mpfdebug"))
-            {
-              mpfr_float_eto::default_precision(precision);
-              runSoPlex<mpfr_float_eto>(vm);
-            }
-          else
-            {
-              mpfr_debug::default_precision(precision);
-              runSoPlex<mpfr_debug>(vm);
-            }
+        //   if(!vm.count("mpfdebug"))
+        //     {
+        //       mpfr_float_eto::default_precision(precision);
+        //       runSoPlex<mpfr_float_eto>(vm);
+        //     }
+        //   else
+        //     {
+        //       mpfr_debug::default_precision(precision);
+        //       runSoPlex<mpfr_debug>(vm);
+        //     }
 
           break;
         default:
