@@ -522,7 +522,10 @@ void SPxSolverBase<Real>::changeBounds(int i, const Real& newLower, const Real& 
                                        bool scale)
 {
    changeLower(i, newLower, scale);
-   changeUpper(i, newUpper, scale);
+   if(EQ(newLower, newUpper))
+      changeUpper(i, newLower, scale);
+   else
+      changeUpper(i, newUpper, scale);
 }
 
 template <>
@@ -804,7 +807,10 @@ void SPxSolverBase<Real>::changeRange(int i, const Real& newLhs, const Real& new
    Real oldRhs = rhs(i);
 
    SPxLP::changeLhs(i, newLhs, scale);
-   SPxLP::changeRhs(i, newRhs, scale);
+   if(EQ(newLhs, newRhs))
+      SPxLP::changeRhs(i, newLhs, scale);
+   else
+      SPxLP::changeRhs(i, newRhs, scale);
 
    if(SPxBasisBase<Real>::status() > SPxBasisBase<Real>::NO_PROBLEM)
    {
