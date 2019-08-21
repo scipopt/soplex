@@ -54,6 +54,7 @@ interface & parameters:
 fixed bugs:
 - use center value for very close bounds in singleton postsolver
 - enable initial/crash basis methods again
+- adjust bounds if they are equal within epsilon
 
 10 July 2019 - Release 4.0.2
 ============================
