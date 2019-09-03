@@ -370,6 +370,8 @@ if check_test:
     testfile = open(testname,'r')
     printedMissing = False
     for testline in testfile:
+        if testline.startswith('#'):
+            continue
         linesplit = testline.split('/')
         linesplit = linesplit[len(linesplit) - 1].rstrip(' \n').rstrip('.gz').rstrip('.GZ').rstrip('.z').rstrip('.Z')
         linesplit = linesplit.split('.')
