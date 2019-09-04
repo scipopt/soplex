@@ -7908,7 +7908,14 @@ void SoPlex::_addColReal(Real obj, Real lower, const SVectorReal& lpcol, Real up
    if(_isRealLPLoaded)
       _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
    else if(_hasBasis)
-      _basisStatusRows.append(SPxSolver::BASIC);
+   {
+      if(lower > -realParam(SoPlex::INFTY))
+         _basisStatusCols.append(SPxSolver::ON_LOWER);
+      else if(upper < realParam(SoPlex::INFTY))
+         _basisStatusCols.append(SPxSolver::ON_UPPER);
+      else
+         _basisStatusCols.append(SPxSolver::ZERO);
+   }
 
    _rationalLUSolver.clear();
 }
