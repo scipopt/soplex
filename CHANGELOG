@@ -7,6 +7,7 @@ fixed bugs:
 - ensure basis status is set correctly when aborting a solve early
 - fix memory leak when copying SoPlex
 - correct getBasisInverseCol for row representation
+- fix adjustment of basis information in internal method SoPlex::_addColReal() called by SoPlex::addColRational()
 
 code quality:
 - merge SoPlex::hasDual() and SoPlex::hasPrimal() into SoPlex::hasSol() and mark old methods deprecated
