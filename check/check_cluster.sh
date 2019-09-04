@@ -251,7 +251,7 @@ do
         # check queue type
         if test  "$QUEUETYPE" = "srun"
         then
-            sbatch --job-name=SPX-$SHORTFILENAME --mem=$HARDMEMLIMIT -p $CLUSTERQUEUE -A $ACCOUNT --time=${HARDTIMELIMIT} ${NICE} ${EXCLUSIVE} --output=/dev/null runcluster.sh
+            sbatch --job-name=SPX-$SHORTFILENAME --mem=$HARDMEMLIMIT -p $CLUSTERQUEUE -A $ACCOUNT --time=${HARDTIMELIMIT} ${NICE} ${EXCLUSIVE} --cpu-freq=highm1 --output=/dev/null runcluster.sh
         else
             # -V to copy all environment variables
             qsub -l walltime=$HARDTIMELIMIT -l mem=$HARDMEMLIMIT -l nodes=1:ppn=$PPN -N SOPLEX$SHORTFILENAME -V -q $CLUSTERQUEUE -o /dev/null -e /dev/null runcluster.sh

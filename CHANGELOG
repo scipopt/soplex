@@ -1,5 +1,12 @@
-Bugfix
-======
+next bugfix release
+===================
+
+fixed bugs:
+- use center value for very close bounds in singleton postsolver
+- enable initial/crash basis methods again
+
+10 July 2019 - Release 4.0.2
+============================
 
 fixed bugs:
 - resolve compiler warning about data loss during implicit type conversion for timers
