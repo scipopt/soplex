@@ -342,7 +342,7 @@ SoPlexBase<Real>::Settings::BoolParam::BoolParam()
    /// try to enforce that the optimal solution is a basic solutiong
    name[SoPlexBase<Real>::FORCEBASIC] = "forcebasic";
    description[SoPlexBase<Real>::FORCEBASIC] =
-      "try to enforce that the optimal solution is a basic solutiong";
+      "try to enforce that the optimal solution is a basic solution";
    defaultValue[SoPlexBase<Real>::FORCEBASIC] = false;
 }
 

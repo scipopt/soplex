@@ -427,8 +427,15 @@ int main(int argc, char* argv[])
    // initialize EGlib's GMP memory management before any rational numbers are created
    EGlpNumStart();
 
-   return parseArgs(argc, argv);
+   auto retVal = parseArgs(argc, argv);
 
+   // because EGlpNumClear() calls mpq_clear() for all mpq_t variables, we need to destroy all objects of class Rational
+   // beforehand; hence all Rational objects and all data that uses Rational objects must be allocated dynamically via
+   // spx_alloc() and freed here; disabling the list memory is crucial
+   Rational::disableListMem();
+   EGlpNumClear();
+
+   return retVal;
 }
 
 
@@ -715,12 +722,14 @@ int soplex::runSoPlex(const po::variables_map& vm)
       // no LP file given: exit after saving settings
       if(lpfilename.empty())
         {
-          if(!loadsetname.empty() || !savesetname.empty() || !diffsetname.empty())
+          // This means that soplex didn't have any of the required parameters
+          if(loadsetname.empty() && savesetname.empty() && diffsetname.empty())
             {
               MSG_INFO1( soplex.spxout, soplex.spxout << "\n" );
+              BOOST_THROW_EXCEPTION(std::invalid_argument("No lpfile, settings file, save settings file or diff settings file"));
             }
 
-          BOOST_THROW_EXCEPTION(std::invalid_argument("No lpfile, settings file, save settings file or diff settings file"));
+          return 0;
         }
 
       // measure time for reading LP file and basis file
@@ -838,13 +847,6 @@ int soplex::runSoPlex(const po::variables_map& vm)
       std::cout<<"Generic exception: "<<boost::current_exception_diagnostic_information()<<"\n";
       returnValue = 1;
     }
-
-
-  // because EGlpNumClear() calls mpq_clear() for all mpq_t variables, we need to destroy all objects of class Rational
-  // beforehand; hence all Rational objects and all data that uses Rational objects must be allocated dynamically via
-  // spx_alloc() and freed here; disabling the list memory is crucial
-  Rational::disableListMem();
-  EGlpNumClear();
 
   return returnValue;
 }

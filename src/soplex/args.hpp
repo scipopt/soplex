@@ -104,7 +104,7 @@ namespace soplex
     // Problem: Usually the descriptors should be just readbas. But how do I
     // print something like readbas=<basfile>?
     general.add_options()
-      ("lpfile", po::value<std::string>()->required(), "the lp file, specifying \"--lpfile\" is optional")
+      ("lpfile", po::value<std::string>(), "the lp file, specifying \"--lpfile\" is optional")
       ("readbas", po::value<std::string>(),  "read starting basis from file")
       ("writebas", po::value<std::string>(), "write terminal basis to file")
       ("writefile", po::value<std::string>(), "write LP to file in LP or MPS format depending on extension")
@@ -143,9 +143,10 @@ namespace soplex
        "choose ratio tester (0 - textbook, 1 - harris, 2 - fast, 3 - boundflipping)");
 
     display.add_options()
-      ("verbosity,v", po::value<int>()->default_value(3)->notifier(in({0, 3, 5}, "verbosity")),
-       "set verbosity to <level> (0 - error, 3 - normal, 5 - high)") // fix the
-                                                                     // default
+      ("verbosity,v", po::value<int>()->default_value(3)->notifier(in({0, 1, 2, 3, 4, 5}, "verbosity")),
+       "set verbosity to <level> (0 - error, 3 - normal, 5 - high)")
+      // Although the option says verbosity can be 0, 3, 5. In the program
+      // verbosity 4 is also used.
       ("printprimal,x",  "print primal solution")
       ("printdualmult,y", "print dual multipliers")
       ("printprimratsol,X", "print primal solution in rational numbers")
@@ -173,7 +174,8 @@ namespace soplex
       ("bool:rowboundflips", po::value<bool>()->default_value(false), "use bound flipping also for row representation?")
       ("bool:persistentscaling", po::value<bool>()->default_value(true), "should persistent scaling be used?")
       ("bool:fullperturbation", po::value<bool>()->default_value(false), "should perturbation be applied to the entire problem?")
-      ("bool:ensureray", po::value<bool>()->default_value(false), "re-optimize the original problem to get a proof (ray) of infeasibility/unboundedness?");
+      ("bool:ensureray", po::value<bool>()->default_value(false), "re-optimize the original problem to get a proof (ray) of infeasibility/unboundedness?")
+      ("bool:forcebasic", po::value<bool>()->default_value(false), "try to enforce that the optimal solution is a basic solution");
 
     intParam.add_options()
       ("int:objsense", po::value<int>()->default_value(1)->notifier(in({-1, 1}, "int:objsense")), "objective sense (-1 - minimize, +1 - maximize)")
@@ -204,7 +206,8 @@ namespace soplex
       ("int:decomp_maxaddedrows", po::value<int>()->default_value(500)->notifier(args::checkRange(1, INT_MAX, "int:decomp_maxaddedrows")), "maximum number of rows that are added to the reduced problem when using the decomposition based simplex")
       ("int:decomp_displayfreq", po::value<int>()->default_value(50)->notifier(args::checkRange(1, INT_MAX, "int:decomp_displayfreq")), "the frequency that the decomposition based simplex status output is displayed.")
       ("int:decomp_verbosity", po::value<int>()->default_value(0)->notifier(args::checkRange(0, 5, "int:decomp_verbosity")), "the verbosity of decomposition based simplex (0 - error, 1 - warning, 2 - debug, 3 - normal, 4 - high, 5 - full).")
-      ("int:printbasismetric", po::value<int>()->default_value(-1)->notifier(args::checkRange(-1, 3, "int:printbasismetric")), "print basis metric during the solve (-1 - off, 0 - condition estimate , 1 - trace, 2 - determinant, 3 - condition)");
+      ("int:printbasismetric", po::value<int>()->default_value(-1)->notifier(args::checkRange(-1, 3, "int:printbasismetric")), "print basis metric during the solve (-1 - off, 0 - condition estimate , 1 - trace, 2 - determinant, 3 - condition)")
+      ("int:STATTIMER", po::value<int>()->default_value(1)->notifier(args::checkRange(0, 2, "int:STATTIMER")), "measure for statistics, e.g. factorization time (0 - off, 1 - user time, 2 - wallclock time)");
 
     realParam.add_options()
       ("real:feastol", po::value<double>()->default_value(1e-6)->notifier(args::checkRange(0.0, 0.1, "real:feastol")),"primal feasibility tolerance")
@@ -230,7 +233,8 @@ namespace soplex
   ("real:refac_update_fill", po::value<double>()->default_value(5.0)->notifier(args::checkRange(1.0, 100.0, "real:refac_update_fill")), "refactor threshold for fill-in in current factor update compared to fill-in in last factorization")
   ("real:refac_mem_factor", po::value<double>()->default_value(1.5)->notifier(args::checkRange(1.0, 10.0, "real:refac_mem_factor")), "refactor threshold for memory growth in factorization since last refactorization")
   ("real:leastsq_acrcy", po::value<double>()->default_value(1000.0)->notifier(args::checkRange(1.0, DEFAULT_INFINITY, "real:leastsq_acrcy")), "accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)")
-  ("real:obj_offset", po::value<double>()->default_value(0.0)->notifier(args::checkRange(-DEFAULT_INFINITY, DEFAULT_INFINITY, "real:obj_offset")), "objective offset to be used");
+      ("real:obj_offset", po::value<double>()->default_value(0.0)->notifier(args::checkRange(-DEFAULT_INFINITY, DEFAULT_INFINITY, "real:obj_offset")), "objective offset to be used")
+       ("real:min_markowitz", po::value<double>()->default_value(0.01)->notifier(args::checkRange(0.0001, 0.9999, "real:min_markowitz")), "minimal Markowitz threshold in LU factorization");
 
   po::options_description mpf("Multiprecision float solve");
   mpf.add_options()
