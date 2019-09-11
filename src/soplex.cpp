@@ -577,7 +577,8 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
 
    /// measure time spent in solving steps, e.g. factorization time
    name[SoPlexBase<Real>::STATTIMER] = "STATTIMER";
-   description[SoPlexBase<Real>::STATTIMER] = "measure for statistics, e.g. factorization time (0 - off, 1 - user time, 2 - wallclock time)";
+   description[SoPlexBase<Real>::STATTIMER] =
+      "measure for statistics, e.g. factorization time (0 - off, 1 - user time, 2 - wallclock time)";
    lower[SoPlexBase<Real>::STATTIMER] = 0;
    upper[SoPlexBase<Real>::STATTIMER] = 2;
    defaultValue[SoPlexBase<Real>::STATTIMER] = 1;
@@ -5014,7 +5015,7 @@ bool SoPlexBase<Real>::getBasisInverseColReal(int c, Real* coef, int* inds, int*
          // this column of B^-1 is just a unit column
          for(int i = 0; i < numRows(); i++)
          {
-            if(bind[i] < 0 && -bind[i]-1 == c)
+            if(bind[i] < 0 && -bind[i] - 1 == c)
                coef[i] = 1.0;
          }
       }
@@ -5046,6 +5047,7 @@ bool SoPlexBase<Real>::getBasisInverseColReal(int c, Real* coef, int* inds, int*
                for(int i = 0; i < size; i++)
                {
                   int idx = bind[x.index(i)];
+
                   if(idx < 0)
                   {
                      idx = -idx - 1;
@@ -7268,128 +7270,137 @@ bool SoPlexBase<Real>::loadSettingsFile(const char* filename)
 template <>
 bool SoPlexBase<Real>::parseSettingsString(const std::string str, boost::any val)
 {
-  if(str.empty())
-    {
+   if(str.empty())
+   {
       return false;
-    }
+   }
 
-  // check whether we have a bool parameter
-  if(str.substr(0, 4) == "bool")
-    {
-      for( int param = 0; ; param++ )
-        {
-          if( param >= BOOLPARAM_COUNT )
-            {
-              MSG_INFO1( spxout, spxout << "Error parsing setting string: unknown parameter name <" << str << ">.\n" );
-              return false;
-            }
-          // It is 5 because the string will be "bool:whatever", there is a
-          // colon TODO This is not an efficient way to search. Worst case
-          // O(N^2), where N is the number of parameters. A more efficient way
-          // is to do the using a std::map or an std::unordered_map. Instead of
-          // O(N^2), it would be O(N) or O(N.log N)
-          else if(str.substr(5) == _currentSettings->boolParam.name[param])
-            {
-              // If the any_cast throws then it would be caught inside
-              // soplexmain.cpp
-              setBoolParam((BoolParam)param, boost::any_cast<bool>(val));
-              break;
-            }
-        }
-
-      return true;
-    }
-
-  // check whether we have an integer parameter
-  if(str.substr(0, 3) == "int")
-    {
-      for( int param = 0; ; param++ )
-        {
-          if( param >= INTPARAM_COUNT )
-            {
-              MSG_INFO1( spxout, spxout << "Error parsing setting string: unknown parameter name <" << str << ">.\n" );
-              return false;
-            }
-          else if(str.substr(4) == _currentSettings->intParam.name[param])
-            {
-              // TODO The setIntParam will check for the range of values, but I
-              // think this is un-necessary because the program options library
-              // will do this, in a better way. The if else condition is
-              // redundant, except if it gets values from SCIP.
-              if(setIntParam((SoPlexBase<Real>::IntParam)param, boost::any_cast<int>(val), false))
-                break;
-              else
-                {
-                  MSG_INFO1( spxout, spxout << "Error parsing setting string: invalid value <" << boost::any_cast<int>(val) << "> for int parameter <" <<str << ">.\n" );
-                  return false;
-                }
-            }
-        }
+   // check whether we have a bool parameter
+   if(str.substr(0, 4) == "bool")
+   {
+      for(int param = 0; ; param++)
+      {
+         if(param >= BOOLPARAM_COUNT)
+         {
+            MSG_INFO1(spxout, spxout << "Error parsing setting string: unknown parameter name <" << str <<
+                      ">.\n");
+            return false;
+         }
+         // It is 5 because the string will be "bool:whatever", there is a
+         // colon TODO This is not an efficient way to search. Worst case
+         // O(N^2), where N is the number of parameters. A more efficient way
+         // is to do the using a std::map or an std::unordered_map. Instead of
+         // O(N^2), it would be O(N) or O(N.log N)
+         else if(str.substr(5) == _currentSettings->boolParam.name[param])
+         {
+            // If the any_cast throws then it would be caught inside
+            // soplexmain.cpp
+            setBoolParam((BoolParam)param, boost::any_cast<bool>(val));
+            break;
+         }
+      }
 
       return true;
-    }
+   }
 
-  // check whether we have a R parameter
-  if( str.substr(0, 4) == "real")
-    {
-      for( int param = 0; ; param++ )
-        {
-          if( param >= REALPARAM_COUNT )
+   // check whether we have an integer parameter
+   if(str.substr(0, 3) == "int")
+   {
+      for(int param = 0; ; param++)
+      {
+         if(param >= INTPARAM_COUNT)
+         {
+            MSG_INFO1(spxout, spxout << "Error parsing setting string: unknown parameter name <" << str <<
+                      ">.\n");
+            return false;
+         }
+         else if(str.substr(4) == _currentSettings->intParam.name[param])
+         {
+            // TODO The setIntParam will check for the range of values, but I
+            // think this is un-necessary because the program options library
+            // will do this, in a better way. The if else condition is
+            // redundant, except if it gets values from SCIP.
+            if(setIntParam((SoPlexBase<Real>::IntParam)param, boost::any_cast<int>(val), false))
+               break;
+            else
             {
-              MSG_INFO1( spxout, spxout << "Error parsing setting string: unknown parameter name <" << boost::any_cast<Real>(val) << ">.\n" );
-              return false;
+               MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << boost::any_cast<int>
+                         (val) << "> for int parameter <" << str << ">.\n");
+               return false;
             }
-          else if(str.substr(5) == SoPlexBase<Real>::_currentSettings->realParam.name[param])
-            {
-              Real value = boost::any_cast<Real>(val);
-
-              if( setRealParam((SoPlexBase<Real>::RealParam)param, value) )
-                break;
-              else
-                {
-                  MSG_INFO1( spxout, spxout << "Error parsing setting string: invalid value <" << value << "> for R parameter <" << str << ">.\n" );
-                  return false;
-                }
-            }
-        }
+         }
+      }
 
       return true;
-    }
+   }
+
+   // check whether we have a R parameter
+   if(str.substr(0, 4) == "real")
+   {
+      for(int param = 0; ; param++)
+      {
+         if(param >= REALPARAM_COUNT)
+         {
+            MSG_INFO1(spxout, spxout << "Error parsing setting string: unknown parameter name <" <<
+                      boost::any_cast<Real>(val) << ">.\n");
+            return false;
+         }
+         else if(str.substr(5) == SoPlexBase<Real>::_currentSettings->realParam.name[param])
+         {
+            Real value = boost::any_cast<Real>(val);
+
+            if(setRealParam((SoPlexBase<Real>::RealParam)param, value))
+               break;
+            else
+            {
+               MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << value <<
+                         "> for R parameter <" << str << ">.\n");
+               return false;
+            }
+         }
+      }
+
+      return true;
+   }
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
-  // check whether we have a rational parameter
-  // Note that so far SoPlex doesn't define any rational Params.
-  if(str.substr(0, 8) == "rational")
-    {
-      for( int param = 0; ; param++ )
-        {
-          if( param >= RATIONALPARAM_COUNT )
-            {
-              MSG_INFO1( spxout, spxout << "Error parsing setting string: unknown parameter name <" << paramName << ">.\n" );
-              return false;
-            }
-          else if(str.substr(9) == rationalParam.name[param])
-            {
-              Rational value;
 
-              auto tmpStr = boost::any_cast<std::string>(val);
-              const char* paramValueString = tmpStr.c_str();
+   // check whether we have a rational parameter
+   // Note that so far SoPlex doesn't define any rational Params.
+   if(str.substr(0, 8) == "rational")
+   {
+      for(int param = 0; ; param++)
+      {
+         if(param >= RATIONALPARAM_COUNT)
+         {
+            MSG_INFO1(spxout, spxout << "Error parsing setting string: unknown parameter name <" << paramName <<
+                      ">.\n");
+            return false;
+         }
+         else if(str.substr(9) == rationalParam.name[param])
+         {
+            Rational value;
 
-              if( readStringRational(paramValueString, value) && setRationalParam((RationalParam)param, value) )
-                break;
-              else
-                {
-                  MSG_INFO1( spxout, spxout << "Error parsing setting string: invalid value <" << paramValueString << "> for rational parameter <" << paramName << ">.\n" );
-                  return false;
-                }
+            auto tmpStr = boost::any_cast<std::string>(val);
+            const char* paramValueString = tmpStr.c_str();
+
+            if(readStringRational(paramValueString, value) && setRationalParam((RationalParam)param, value))
+               break;
+            else
+            {
+               MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << paramValueString <<
+                         "> for rational parameter <" << paramName << ">.\n");
+               return false;
             }
-        }
+         }
+      }
 
       return true;
-    }
+   }
+
 #endif
 
-  return false;
+   return false;
 }
 
 /// set statistic timers to a certain type, used to turn off statistic time measurement

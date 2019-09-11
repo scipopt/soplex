@@ -27,24 +27,25 @@ namespace soplex
 template <>
 bool Validation<Real>::updateExternalSolution(const std::string& solution)
 {
-  validate = true;
-  validatesolution = solution;
+   validate = true;
+   validatesolution = solution;
 
-  if(solution == "+infinity")
-    {
+   if(solution == "+infinity")
+   {
       return true;
-    }
-  else if(solution == "-infinity")
-    {
+   }
+   else if(solution == "-infinity")
+   {
       return false;
-    }
-  else
-    {
+   }
+   else
+   {
       // This will throw boost::bad_lexical cast if bad cast. Will be caught
       // by the catch in soplexmain.cpp
       boost::lexical_cast<double>(solution);
-    }
-  return true;
+   }
+
+   return true;
 }
 
 
@@ -53,9 +54,9 @@ bool Validation<Real>::updateExternalSolution(const std::string& solution)
 template <>
 bool Validation<Real>::updateValidationTolerance(const std::string& tolerance)
 {
-  // Will throw boost::bad_lexical_cast if conversion fails
-  validatetolerance = boost::lexical_cast<double>(tolerance);
-  return true;
+   // Will throw boost::bad_lexical_cast if conversion fails
+   validatetolerance = boost::lexical_cast<double>(tolerance);
+   return true;
 }
 
 
@@ -80,18 +81,18 @@ void Validation<Real>::validateSolveReal(SoPlexBase<Real>& soplex)
    std::ostream& os = soplex.spxout.getStream(SPxOut::INFO1);
 
    if(validatesolution == "+infinity")
-     {
-       sol = soplex.realParam(SoPlexBase<Real>::INFTY);
-     }
+   {
+      sol = soplex.realParam(SoPlexBase<Real>::INFTY);
+   }
    else if(validatesolution == "-infinity")
-     {
-       sol = -soplex.realParam(SoPlexBase<Real>::INFTY);
-     }
+   {
+      sol = -soplex.realParam(SoPlexBase<Real>::INFTY);
+   }
    else
-     {
-       // This will not throw here because it was checked in updateExternalSolution()
-       sol = boost::lexical_cast<double>(validatesolution);
-     }
+   {
+      // This will not throw here because it was checked in updateExternalSolution()
+      sol = boost::lexical_cast<double>(validatesolution);
+   }
 
    objViolation = spxAbs(sol - soplex.objValueReal());
 

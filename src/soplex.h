@@ -1545,7 +1545,7 @@ public:
    bool loadSettingsFile(const char* filename);
 
    /// parses one setting string and returns true on success; note that string is modified
-  bool parseSettingsString(const std::string str, boost::any val);
+   bool parseSettingsString(const std::string str, boost::any val);
 
    ///@}
 
@@ -2414,7 +2414,7 @@ private:
 
    //@}
 
-  // For argument parsing
+   // For argument parsing
    template <class S>
    friend int runSoPlex(const boost::program_options::variables_map& vm);
 
@@ -2423,8 +2423,8 @@ private:
 /* Backwards compatibility */
 typedef SoPlexBase<Real> SoPlex;
 
-  template <>
-  bool SoPlexBase<Real>::parseSettingsString(const std::string str, boost::any val);
+template <>
+bool SoPlexBase<Real>::parseSettingsString(const std::string str, boost::any val);
 
 
 }

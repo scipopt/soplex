@@ -33,18 +33,18 @@ public:
    /// should the soplex solution be validated?
    bool           validate;
 
-      /// external solution used for validation
-      std::string          validatesolution;
+   /// external solution used for validation
+   std::string          validatesolution;
 
    /// tolerance used for validation
    double         validatetolerance;
 
-      /// default constructor
-      Validation()
-        {
-          validate = false;
-          validatetolerance = 1e-5;
-        }
+   /// default constructor
+   Validation()
+   {
+      validate = false;
+      validatetolerance = 1e-5;
+   }
 
    /// default destructor
    ~Validation()
@@ -52,11 +52,11 @@ public:
       ;
    }
 
-      /// updates the external solution used for validation
-      bool updateExternalSolution(const std::string& solution);
+   /// updates the external solution used for validation
+   bool updateExternalSolution(const std::string& solution);
 
-      /// updates the tolerance used for validation
-      bool updateValidationTolerance(const std::string& tolerance);
+   /// updates the tolerance used for validation
+   bool updateValidationTolerance(const std::string& tolerance);
 
    /// validates the soplex solution using the external solution
    void validateSolveReal(SoPlexBase<R>& soplex);
