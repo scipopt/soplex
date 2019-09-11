@@ -291,8 +291,9 @@ GCCWARN		=	-pedantic -Wall -W -Wpointer-arith -Wcast-align -Wwrite-strings \
 			-Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder \
 			-Woverloaded-virtual -Wsign-promo -Wsynth -Wundef \
 			-Wcast-qual \
-			-Wmissing-declarations \
 			-Wno-unused-parameter -Wno-strict-overflow -Wno-long-long
+			# -Wmissing-declarations
+
 #			-Wold-style-cast
 #			-Weffc++
 
