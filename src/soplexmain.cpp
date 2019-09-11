@@ -439,6 +439,13 @@ int main(int argc, char* argv[])
 }
 
 
+template <>
+typename SoPlexBase<Real>::Settings::IntParam SoPlexBase<Real>::Settings::intParam;
+
+template <>
+typename SoPlexBase<Real>::Settings::RealParam SoPlexBase<Real>::Settings::realParam;
+
+
 // Runs SoPlex with the parsed boost variables map
 template <class R>
 int soplex::runSoPlex(const po::variables_map& vm)
