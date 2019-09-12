@@ -84,7 +84,7 @@ auto checkRange(const T& min, const T& max, const std::string& str) -> std::func
 
 
 // Parses the command line arguments
-auto parseArgs(int argc, char* argv[]) -> int
+auto parseArgsAndRun(int argc, char* argv[]) -> int
 {
 
    // Two helper functions to check if a command line argument lies in a range

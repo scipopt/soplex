@@ -423,7 +423,7 @@ int main(int argc, char* argv[])
    // initialize EGlib's GMP memory management before any rational numbers are created
    EGlpNumStart();
 
-   auto retVal = parseArgs(argc, argv);
+   auto retVal = parseArgsAndRun(argc, argv);
 
    // because EGlpNumClear() calls mpq_clear() for all mpq_t variables, we need to destroy all objects of class Rational
    // beforehand; hence all Rational objects and all data that uses Rational objects must be allocated dynamically via
