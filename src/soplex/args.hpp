@@ -459,6 +459,15 @@ auto parseArgs(int argc, char* argv[]) -> int
       // initializer_list
       po::notify(vm);
 
+      /* One of these has to be present for soplex to do something meaningful. */
+      /* Help is displayed otherwise */
+      if(!vm.count("lpfile") && !vm.count("diffset") && !vm.count("diffset") && !vm.count("loadset"))
+      {
+         std::cout << "Missing input file.\n\n";
+         std::cout << liteOpt;
+         return 0;
+      }
+
       switch(solvemode)
       {
       case 0:                 // floating point
