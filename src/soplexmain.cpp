@@ -26,10 +26,6 @@
 #include <fstream>
 #include <memory>
 
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/mpfr.hpp>
-#include <boost/multiprecision/debug_adaptor.hpp> // For debuging mpf numbers
-
 #include <boost/program_options.hpp>
 #include <exception>
 #include <boost/exception/diagnostic_information.hpp>

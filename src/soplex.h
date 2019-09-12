@@ -62,13 +62,8 @@
 
 #include "soplex/spxlpbase.h"
 
-// For multiple precision
-#include <boost/multiprecision/mpfr.hpp>
 #include <boost/any.hpp>
 #include <boost/program_options.hpp>
-
-// An alias for boost multiprecision
-namespace mpf = boost::multiprecision;
 
 #define DEFAULT_RANDOM_SEED   0   // used to suppress output when the seed was not changed
 

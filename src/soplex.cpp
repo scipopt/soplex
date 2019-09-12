@@ -7334,7 +7334,7 @@ bool SoPlexBase<Real>::parseSettingsString(const std::string str, boost::any val
       return true;
    }
 
-   // check whether we have a R parameter
+   // check whether we have a Real parameter
    if(str.substr(0, 4) == "real")
    {
       for(int param = 0; ; param++)
