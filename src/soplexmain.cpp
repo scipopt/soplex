@@ -679,7 +679,7 @@ int soplex::runSoPlex(const po::variables_map& vm)
 
       for(int i = 0; i < SoPlexBase<R>::BOOLPARAM_COUNT; ++i)
       {
-         const auto str = "int:" + soplex._currentSettings->boolParam.name[i];
+         const auto str = "bool:" + soplex._currentSettings->boolParam.name[i];
 
          if(vm.count(str))
          {

@@ -209,7 +209,7 @@ auto parseArgs(int argc, char* argv[]) -> int
     "should LP be transformed to equality form before a rational solve?")
    ("bool:testdualinf", po::value<bool>()->default_value(false),
     "should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?")
-   ("bool:ratfac", po::value<bool>()->default_value(false),
+   ("bool:ratfac", po::value<bool>()->default_value(true),
     "should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?")
    ("bool:decompositiondualsimplex", po::value<bool>()->default_value(false),
     "should the decomposition based dual simplex be used to solve the LP?")

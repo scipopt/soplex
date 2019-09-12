@@ -7295,7 +7295,14 @@ bool SoPlexBase<Real>::parseSettingsString(const std::string str, boost::any val
          {
             // If the any_cast throws then it would be caught inside
             // soplexmain.cpp
-            setBoolParam((BoolParam)param, boost::any_cast<bool>(val));
+
+            auto value = boost::any_cast<bool>(val);
+
+            if(value != _currentSettings->boolParam.defaultValue[param])
+            {
+               setBoolParam((BoolParam)param, value);
+            }
+
             break;
          }
       }
@@ -7320,14 +7327,22 @@ bool SoPlexBase<Real>::parseSettingsString(const std::string str, boost::any val
             // think this is un-necessary because the program options library
             // will do this, in a better way. The if else condition is
             // redundant, except if it gets values from SCIP.
-            if(setIntParam((SoPlexBase<Real>::IntParam)param, boost::any_cast<int>(val), false))
-               break;
-            else
+
+            auto value = boost::any_cast<int>(val);
+
+            if(value != _currentSettings->intParam.defaultValue[param])
             {
-               MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << boost::any_cast<int>
-                         (val) << "> for int parameter <" << str << ">.\n");
-               return false;
+               if(setIntParam((SoPlexBase<Real>::IntParam)param, boost::any_cast<int>(val), false))
+                  break;
+               else
+               {
+                  MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << boost::any_cast<int>
+                            (val) << "> for int parameter <" << str << ">.\n");
+                  return false;
+               }
             }
+
+            break;
          }
       }
 
@@ -7347,16 +7362,21 @@ bool SoPlexBase<Real>::parseSettingsString(const std::string str, boost::any val
          }
          else if(str.substr(5) == SoPlexBase<Real>::_currentSettings->realParam.name[param])
          {
-            Real value = boost::any_cast<Real>(val);
+            auto value = boost::any_cast<Real>(val);
 
-            if(setRealParam((SoPlexBase<Real>::RealParam)param, value))
-               break;
-            else
+            if(value != _currentSettings->realParam.defaultValue[param])
             {
-               MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << value <<
-                         "> for R parameter <" << str << ">.\n");
-               return false;
+               if(setRealParam((SoPlexBase<Real>::RealParam)param, value))
+                  break;
+               else
+               {
+                  MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << value <<
+                            "> for R parameter <" << str << ">.\n");
+                  return false;
+               }
             }
+
+            break;
          }
       }
 
