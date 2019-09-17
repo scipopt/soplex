@@ -17,6 +17,10 @@
  * @brief Code for argument parsing
  */
 
+#ifndef _ARGS_HPP_
+#define _ARGS_HPP_
+
+
 
 /* Notes: If we need to add new parameters to things for Settings class. say,
    BoolParam:
@@ -84,7 +88,7 @@ auto checkRange(const T& min, const T& max, const std::string& str) -> std::func
 
 
 // Parses the command line arguments
-auto parseArgsAndRun(int argc, char* argv[]) -> int
+inline auto parseArgsAndRun(int argc, char* argv[]) -> int
 {
 
    // Two helper functions to check if a command line argument lies in a range
@@ -525,3 +529,5 @@ auto parseArgsAndRun(int argc, char* argv[]) -> int
 }
 
 } // namespace soplex ends here
+
+#endif // _ARGS_HPP_
