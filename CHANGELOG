@@ -50,6 +50,9 @@ interface & parameters:
 - Renamed `SPxSolverBase<R>::getDualfarkas` to `SPxSolverBase<R>::getDualFarkas`
   (for consistency.) Note that there is a method with the same name in
   `SoPlexBase<R>`.
+- Rewrote the code for command line argument parsing. Current code uses Boost Program Options.
+- Some of the memory allocation from heap (using spx_alloc) changed to static memory.
+- Improvements in exception handling in `src/soplexmain.cpp`
 
 fixed bugs:
 - use center value for very close bounds in singleton postsolver

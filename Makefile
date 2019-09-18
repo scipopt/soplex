@@ -105,8 +105,9 @@ LDFLAGS		=
 ARFLAGS		=	cr
 DFLAGS		=	-MM
 
-GMP_LDFLAGS	=	-lgmp
+GMP_LDFLAGS	= -lgmp -lmpfr
 GMP_CPPFLAGS	=
+BOOST_LDFLAGS = -lboost_program_options
 
 SOPLEXDIR	=	$(realpath .)
 SRCDIR		=	src
@@ -379,6 +380,10 @@ else
 GMP_LDFLAGS	=
 GMP_CPPFLAGS	=
 endif
+
+# For boost program options
+LDFLAGS += $(BOOST_LDFLAGS)
+
 
 ZLIBDEP		:=	$(SRCDIR)/depend.zlib
 ZLIBSRC		:=	$(shell cat $(ZLIBDEP))

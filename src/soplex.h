@@ -60,6 +60,11 @@
 
 #include "soplex/sol.h"
 
+#include "soplex/spxlpbase.h"
+
+#include <boost/any.hpp>
+#include <boost/program_options.hpp>
+
 #define DEFAULT_RANDOM_SEED   0   // used to suppress output when the seed was not changed
 
 ///@todo implement automatic rep switch, based on row/col dim
@@ -1535,7 +1540,7 @@ public:
    bool loadSettingsFile(const char* filename);
 
    /// parses one setting string and returns true on success; note that string is modified
-   bool parseSettingsString(char* line);
+   bool parseSettingsString(const std::string str, boost::any val);
 
    ///@}
 
@@ -2402,11 +2407,20 @@ private:
    /// function to retrieve the column status for the original problem basis from the reduced and complementary problems
    void getOriginalProblemBasisColStatus(int& nNonBasicCols);
 
-   ///@}
+   //@}
+
+   // For argument parsing
+   template <class S>
+   friend int runSoPlex(const boost::program_options::variables_map& vm);
+
 };
 
 /* Backwards compatibility */
 typedef SoPlexBase<Real> SoPlex;
+
+template <>
+bool SoPlexBase<Real>::parseSettingsString(const std::string str, boost::any val);
+
 
 }
 #endif // _SOPLEX_H_

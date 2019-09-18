@@ -22,6 +22,8 @@ include(CPack)
 option(ZLIB "Use ZLIB" ON)
 option(GMP "Use GMP" ON)
 option(STATIC_GMP "Prefer static GMP lib" OFF)
+option(MPFR "Use MPFR" ON)
+option(Boost "Use Boost" ON)
 option(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS "Export all symbols into the DLL" ON)
 option(MT "use static runtime libraries for Visual Studio compiler" OFF)
 option(SANITIZE_ADDRESS "should the address sanitizer be enabled in debug mode if available" OFF)
@@ -110,9 +112,35 @@ if(GMP_FOUND)
     set(libs ${libs} ${GMP_LIBRARIES})
 endif()
 
+if(MPFR)
+  find_package(MPFR)
+  if(MPFR_FOUND)
+    include_directories(${MPFR_INCLUDE_DIRS})
+    set(libs ${libs} ${MPFR_LIBRARIES})
+  endif()
+endif()
+
+
+# Made with: https://stackoverflow.com/a/3917033/4223038
+if(Boost)
+  # Technically the version 1.70.0 is not needed for program_option, but for the
+  # multiprecision, but it's header only, this is one way to guarantee that the
+  # user has the right version.
+
+  # TODO: The value of boost version should be decided in the future. It would
+  # be nice to check if the version is at least 1.70.0 and issue a warning if it
+  # isn't.
+  find_package(Boost 1.58.0 COMPONENTS program_options REQUIRED) # Refer to comments in cmake/Modules/FindBoost.cmake
+  if(BOOST_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    set(libs ${libs} ${Boost_LIBRARIES})
+  endif()
+endif()
+
+
 # enable all warnings and explicitly switch on colored output for ninja
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wno-strict-overflow")
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -lboost_program_options -Wall -Wno-strict-overflow")
     if(CMAKE_GENERATOR STREQUAL "Ninja")
         set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always")
     endif()
