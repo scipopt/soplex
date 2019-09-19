@@ -141,7 +141,7 @@ public:
       if( (VectorBase<S>*)this != &vec )
       {
         val.clear();
-        val.reserve(vec.val.size());
+        val.reserve(vec.dim());
 
         for(auto& v: vec.val)
            {
@@ -244,9 +244,9 @@ public:
    //@{
 
    /// Dimension of vector.
-  auto dim() const -> decltype(val.size())
+  int dim() const
    {
-     return val.size();
+     return int(val.size());
    }
 
    /// Return \p n 'th value by reference.
@@ -490,9 +490,9 @@ public:
   // This used to be VectorBase's way of having std::vector's capacity. This
   // represents the maximum number of elements the std::vector can have without,
   // needing any more resizing. Bigger than size, mostly.
-  std::size_t memSize() const
+  int memSize() const
   {
-    return val.capacity();
+    return int(val.capacity());
   }
 
   /// Resets \ref soplex::VectorBase "VectorBase"'s dimension to \p newdim.
@@ -530,11 +530,11 @@ public:
   // For operations such as vec1 - vec2
   const VectorBase<R> operator-(const VectorBase<R>& vec) const
   {
-    assert(vec.dim() == val.size());
+    assert(vec.dim() == dim());
     VectorBase<R> res;
-    res.val.reserve(val.size());
+    res.val.reserve(dim());
 
-    auto dimen = val.size();
+    auto dimen = dim();
 
     for(decltype(dimen) i = 0; i < dimen; i++)
       {
@@ -547,11 +547,11 @@ public:
   // Addition
   const VectorBase<R> operator+(const VectorBase<R>& v) const
   {
-    assert(v.dim() == val.size());
+    assert(v.dim() == dim());
     VectorBase<R> res;
-    res.val.reserve(val.size());
+    res.val.reserve(dim());
 
-    auto dimen = val.size();
+    auto dimen = dim();
 
     for(decltype(dimen) i = 0; i < dimen; i++)
       {
@@ -566,7 +566,7 @@ public:
   {
     VectorBase<R> res;
 
-    res.val.reserve(vec.val.size());
+    res.val.reserve(vec.dim());
 
     for(auto& v: vec.val)
       {
