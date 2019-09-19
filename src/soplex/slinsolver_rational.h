@@ -136,9 +136,9 @@ public:
    */
    //@{
    /// Solves \f$Ax=b\f$.
-   virtual void solveRight (VectorRational& x, const VectorRational& b) /* const */ = 0;
+   virtual void solveRight(VectorRational& x, const VectorRational& b) /* const */ = 0;
    /// Solves \f$Ax=b\f$.
-   virtual void solveRight (SSVectorRational& x, const SVectorRational& b) /* const */ = 0;
+   virtual void solveRight(SSVectorRational& x, const SVectorRational& b) /* const */ = 0;
 
    /** @brief Solves \f$Ax=b\f$.
        Possibly sets up internal data structures suitable for an optimized
@@ -150,7 +150,7 @@ public:
    virtual void solve2right4update(SSVectorRational& x,
                                    VectorRational& y,
                                    const SVectorRational& b,
-                                   SSVectorRational& d ) = 0;
+                                   SSVectorRational& d) = 0;
    /// Solves \f$Ax=b\f$, \f$Ay=d\f$ and \f$Az=e\f$.
    virtual void solve3right4update(SSVectorRational& x,
                                    VectorRational& y,
@@ -159,17 +159,17 @@ public:
                                    SSVectorRational& d,
                                    SSVectorRational& e) = 0;
    /// solves \f$x^TA=b^T\f$.
-   virtual void solveLeft (VectorRational& x, const VectorRational& b) /* const */ = 0;
+   virtual void solveLeft(VectorRational& x, const VectorRational& b) /* const */ = 0;
    /// solves \f$x^TA=b^T\f$.
-   virtual void solveLeft (SSVectorRational& x, const SVectorRational& b) /* const */ = 0;
+   virtual void solveLeft(SSVectorRational& x, const SVectorRational& b) /* const */ = 0;
    /// solves \f$x^TA=b^T\f$ and \f$x^TA=rhs2^T\f$ internally using \f$rhs2\f$.
-   virtual void solveLeft (SSVectorRational& x,
-                           VectorRational& two,
-                           const SVectorRational& b,
-                           SSVectorRational& rhs2) /* const */ = 0;
+   virtual void solveLeft(SSVectorRational& x,
+                          VectorRational& two,
+                          const SVectorRational& b,
+                          SSVectorRational& rhs2) /* const */ = 0;
    /// solves \f$x^TA=b^T\f$, \f$y^TA=d^T\f$ and \f$z^TA=e^T\f$
-   virtual void solveLeft (SSVectorRational& x, VectorRational& y, VectorRational& z,
-                           const SVectorRational& b, SSVectorRational& d, SSVectorRational& e) = 0;
+   virtual void solveLeft(SSVectorRational& x, VectorRational& y, VectorRational& z,
+                          const SVectorRational& b, SSVectorRational& d, SSVectorRational& e) = 0;
    //@}
 
 

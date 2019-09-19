@@ -39,7 +39,7 @@ namespace soplex
    matrix must be first #load%ed to an #SLinSolver object as an array of
    pointers to the \em column \ref SVectorBase<R> "SVectors" of this matrix.
 */
-  template <class R>
+template <class R>
 class SLinSolver
 {
 public:
@@ -107,7 +107,7 @@ public:
        optional parameter \p eta to the solution of #solveRight() if
        readily  availabble. This may improve on the performance of the update.
    */
-   virtual Status change(int idx, const SVectorBase<R>& subst, const SSVectorBase<R> * eta = 0) = 0;
+   virtual Status change(int idx, const SVectorBase<R>& subst, const SSVectorBase<R>* eta = 0) = 0;
 
    /// consistency check.
    virtual bool isConsistent() const = 0;
@@ -137,62 +137,62 @@ public:
    */
    //@{
    /// Solves \f$Ax=b\f$.
-   virtual void solveRight (VectorBase<R>& x, const VectorBase<R>& b) /* const */ = 0;
+   virtual void solveRight(VectorBase<R>& x, const VectorBase<R>& b) /* const */ = 0;
    /// Solves \f$Ax=b\f$.
-   virtual void solveRight (SSVectorBase<R> & x, const SSVectorBase<R> & b) /* const */ = 0;
-   virtual void solveRight (SSVectorBase<R> & x, const SVectorBase<R>& b) /* const */ = 0;
+   virtual void solveRight(SSVectorBase<R>& x, const SSVectorBase<R>& b) /* const */ = 0;
+   virtual void solveRight(SSVectorBase<R>& x, const SVectorBase<R>& b) /* const */ = 0;
 
    /** @brief Solves \f$Ax=b\f$.
        Possibly sets up internal data structures suitable for an optimized
        subsequent change() call with \f$b\f$ as entering column.
    */
-   virtual void solveRight4update(SSVectorBase<R> & x, const SVectorBase<R>& b) = 0;
+   virtual void solveRight4update(SSVectorBase<R>& x, const SVectorBase<R>& b) = 0;
 
    /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.
-   virtual void solve2right4update(SSVectorBase<R> & x,
+   virtual void solve2right4update(SSVectorBase<R>& x,
                                    VectorBase<R>& y,
                                    const SVectorBase<R>& b,
-                                   SSVectorBase<R> & d ) = 0;
+                                   SSVectorBase<R>& d) = 0;
    /// sparse version of solving two systems of equations
-   virtual void solve2right4update(SSVectorBase<R> & x,
-                                   SSVectorBase<R> & y,
+   virtual void solve2right4update(SSVectorBase<R>& x,
+                                   SSVectorBase<R>& y,
                                    const SVectorBase<R>& b,
-                                   SSVectorBase<R> & d ) = 0;
+                                   SSVectorBase<R>& d) = 0;
    /// Solves \f$Ax=b\f$, \f$Ay=d\f$ and \f$Az=e\f$.
-   virtual void solve3right4update(SSVectorBase<R> & x,
+   virtual void solve3right4update(SSVectorBase<R>& x,
                                    VectorBase<R>& y,
                                    VectorBase<R>& z,
                                    const SVectorBase<R>& b,
-                                   SSVectorBase<R> & d,
-                                   SSVectorBase<R> & e) = 0;
+                                   SSVectorBase<R>& d,
+                                   SSVectorBase<R>& e) = 0;
    /// sparse version of solving three systems of equations
-   virtual void solve3right4update(SSVectorBase<R> & x,
-                                   SSVectorBase<R> & y,
-                                   SSVectorBase<R> & z,
+   virtual void solve3right4update(SSVectorBase<R>& x,
+                                   SSVectorBase<R>& y,
+                                   SSVectorBase<R>& z,
                                    const SVectorBase<R>& b,
-                                   SSVectorBase<R> & d,
-                                   SSVectorBase<R> & e) = 0;
+                                   SSVectorBase<R>& d,
+                                   SSVectorBase<R>& e) = 0;
    /// solves \f$x^TA=b^T\f$.
-   virtual void solveLeft (VectorBase<R>& x, const VectorBase<R>& b) /* const */ = 0;
-   virtual void solveLeft (SSVectorBase<R> & x, const SSVectorBase<R> & b) /* const */ = 0;
+   virtual void solveLeft(VectorBase<R>& x, const VectorBase<R>& b) /* const */ = 0;
+   virtual void solveLeft(SSVectorBase<R>& x, const SSVectorBase<R>& b) /* const */ = 0;
    /// sparse version of solving one system of equations with transposed basis matrix
-   virtual void solveLeft (SSVectorBase<R> & x, const SVectorBase<R>& b) /* const */ = 0;
+   virtual void solveLeft(SSVectorBase<R>& x, const SVectorBase<R>& b) /* const */ = 0;
    /// solves \f$x^TA=b^T\f$ and \f$x^TA=rhs2^T\f$ internally using \f$rhs2\f$.
-   virtual void solveLeft (SSVectorBase<R> & x,
-                           VectorBase<R>& two,
-                           const SVectorBase<R>& b,
-                           SSVectorBase<R> & rhs2) /* const */ = 0;
+   virtual void solveLeft(SSVectorBase<R>& x,
+                          VectorBase<R>& two,
+                          const SVectorBase<R>& b,
+                          SSVectorBase<R>& rhs2) /* const */ = 0;
    /// sparse version of solving two systems of equations with transposed basis matrix
-   virtual void solveLeft (SSVectorBase<R> & x,
-                           SSVectorBase<R> & two,
-                           const SVectorBase<R>& b,
-                           SSVectorBase<R> & rhs2) /* const */ = 0;
+   virtual void solveLeft(SSVectorBase<R>& x,
+                          SSVectorBase<R>& two,
+                          const SVectorBase<R>& b,
+                          SSVectorBase<R>& rhs2) /* const */ = 0;
    /// solves \f$x^TA=b^T\f$, \f$y^TA=d^T\f$ and \f$z^TA=e^T\f$
-   virtual void solveLeft (SSVectorBase<R> & x, VectorBase<R>& y, VectorBase<R>& z,
-                           const SVectorBase<R>& b, SSVectorBase<R> & d, SSVectorBase<R> & e) = 0;
+   virtual void solveLeft(SSVectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& z,
+                          const SVectorBase<R>& b, SSVectorBase<R>& d, SSVectorBase<R>& e) = 0;
    /// sparse version of solving three systems of equations with transposed basis matrix
-   virtual void solveLeft (SSVectorBase<R> & x, SSVectorBase<R> & y, SSVectorBase<R> & z,
-                           const SVectorBase<R>& b, SSVectorBase<R> & d, SSVectorBase<R> & e) = 0;
+   virtual void solveLeft(SSVectorBase<R>& x, SSVectorBase<R>& y, SSVectorBase<R>& z,
+                          const SVectorBase<R>& b, SSVectorBase<R>& d, SSVectorBase<R>& e) = 0;
    //@}
 
 

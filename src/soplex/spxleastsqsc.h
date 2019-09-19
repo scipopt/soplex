@@ -34,8 +34,8 @@ namespace soplex
    This SPxScaler implementation performs least squares scaling as suggested by Curtis and Reid in:
    On the Automatic Scaling of Matrices for Gaussian Elimination (1972).
 */
-  template <class R>
-  class SPxLeastSqSC : public SPxScaler<R>
+template <class R>
+class SPxLeastSqSC : public SPxScaler<R>
 {
 public:
 
@@ -47,12 +47,12 @@ public:
    /// copy constructor
    SPxLeastSqSC(const SPxLeastSqSC& old);
    /// assignment operator
-   SPxLeastSqSC& operator=(const SPxLeastSqSC& );
+   SPxLeastSqSC& operator=(const SPxLeastSqSC&);
    /// destructor
    virtual ~SPxLeastSqSC()
    {}
    /// clone function for polymorphism
-  inline virtual SPxScaler<R>* clone() const
+   inline virtual SPxScaler<R>* clone() const
    {
       return new SPxLeastSqSC(*this);
    }
@@ -71,7 +71,7 @@ public:
    /**@name Scaling */
    //@{
    /// Scale the loaded SPxLP.
-  virtual void scale(SPxLPBase<R>& lp, bool persistent = true);
+   virtual void scale(SPxLPBase<R>& lp, bool persistent = true);
 
 
 protected:

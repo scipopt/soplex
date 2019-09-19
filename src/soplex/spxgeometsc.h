@@ -32,8 +32,8 @@ namespace soplex
    This SPxScaler implementation performs geometric mean scaling of the
    LPs rows and columns.
 */
-  template <class R>
-  class SPxGeometSC : public SPxScaler<R>
+template <class R>
+class SPxGeometSC : public SPxScaler<R>
 {
 protected:
 
@@ -52,16 +52,17 @@ public:
    /**@name Construction / destruction */
    //@{
    /// default constructor (this scaler makes no use of inherited members m_colFirst and m_doBoth)
-   explicit SPxGeometSC(bool equilibrate = false, int maxIters = 8, R minImpr = 0.85, R goodEnough = 1e3);
+   explicit SPxGeometSC(bool equilibrate = false, int maxIters = 8, R minImpr = 0.85,
+                        R goodEnough = 1e3);
    /// copy constructor
    SPxGeometSC(const SPxGeometSC& old);
    /// assignment operator
-   SPxGeometSC& operator=(const SPxGeometSC& );
+   SPxGeometSC& operator=(const SPxGeometSC&);
    /// destructor
    virtual ~SPxGeometSC()
    {}
    /// clone function for polymorphism
-  inline virtual SPxScaler<R>* clone() const override
+   inline virtual SPxScaler<R>* clone() const override
    {
       return new SPxGeometSC(*this);
    }

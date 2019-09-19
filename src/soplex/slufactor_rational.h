@@ -72,7 +72,8 @@ protected:
    bool       usetup;             ///< TRUE iff update vector has been setup
    UpdateType uptype;             ///< the current \ref soplex::SLUFactor<R>::UpdateType "UpdateType".
    SSVectorRational   eta;        ///<
-   SSVectorRational   forest;     ///< ? Update vector set up by solveRight4update() and solve2right4update()
+   SSVectorRational
+   forest;     ///< ? Update vector set up by solveRight4update() and solve2right4update()
    Rational       lastThreshold;  ///< pivoting threshold of last factorization
    //@}
 
@@ -125,12 +126,12 @@ public:
    /// sets minimum Markowitz threshold.
    void setMarkowitz(const Rational& m)
    {
-      if( m < 0.01 )
+      if(m < 0.01)
       {
          minThreshold = 0.01;
          lastThreshold = 0.01;
       }
-      else if( m > 0.99 )
+      else if(m > 0.99)
       {
          minThreshold = 0.99;
          lastThreshold = 0.99;
@@ -191,13 +192,14 @@ public:
    /**@name Solve */
    //@{
    /// Solves \f$Ax=b\f$.
-   void solveRight (VectorRational& x, const VectorRational& b);
+   void solveRight(VectorRational& x, const VectorRational& b);
    /// Solves \f$Ax=b\f$.
-   void solveRight (SSVectorRational& x, const SVectorRational& b);
+   void solveRight(SSVectorRational& x, const SVectorRational& b);
    /// Solves \f$Ax=b\f$.
    void solveRight4update(SSVectorRational& x, const SVectorRational& b);
    /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.
-   void solve2right4update(SSVectorRational& x, VectorRational& y, const SVectorRational& b, SSVectorRational& d);
+   void solve2right4update(SSVectorRational& x, VectorRational& y, const SVectorRational& b,
+                           SSVectorRational& d);
    /// Solves \f$Ax=b\f$, \f$Ay=d\f$ and \f$Az=e\f$.
    void solve3right4update(SSVectorRational& x, VectorRational& y, VectorRational& z,
                            const SVectorRational& b, SSVectorRational& d, SSVectorRational& e);
@@ -206,7 +208,8 @@ public:
    /// Solves \f$Ax=b\f$.
    void solveLeft(SSVectorRational& x, const SVectorRational& b);
    /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.
-   void solveLeft(SSVectorRational& x, VectorRational& y, const SVectorRational& b, SSVectorRational& d);
+   void solveLeft(SSVectorRational& x, VectorRational& y, const SVectorRational& b,
+                  SSVectorRational& d);
    /// Solves \f$Ax=b\f$, \f$Ay=d\f$ and \f$Az=e\f$.
    void solveLeft(SSVectorRational& x, VectorRational& y, VectorRational& z,
                   const SVectorRational& b, SSVectorRational& d, SSVectorRational& e);

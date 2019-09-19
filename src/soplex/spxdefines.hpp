@@ -40,98 +40,98 @@ namespace soplex
 template <class R>
 inline bool EQ(R a, R b, R eps = Param::epsilon())
 {
-  return spxAbs(a - b) <= eps;
+   return spxAbs(a - b) <= eps;
 }
 
 /// returns \c true iff |a-b| > eps
 template <class R>
 inline bool NE(R a, R b, R eps = Param::epsilon())
 {
-  return spxAbs(a - b) > eps;
+   return spxAbs(a - b) > eps;
 }
 
 /// returns \c true iff a < b + eps
 template <class R>
 inline bool LT(R a, R b, R eps = Param::epsilon())
 {
-  return (a - b) < -eps;
+   return (a - b) < -eps;
 }
 
 /// returns \c true iff a <= b + eps
 template <class R>
 inline bool LE(R a, R b, R eps = Param::epsilon())
 {
-  return (a - b) < eps;
+   return (a - b) < eps;
 }
 
 /// returns \c true iff a > b + eps
 template <class R>
 inline bool GT(R a, R b, R eps = Param::epsilon())
 {
-  return (a - b) > eps;
+   return (a - b) > eps;
 }
 
 /// returns \c true iff a >= b + eps
 template <class R>
 inline bool GE(R a, R b, R eps = Param::epsilon())
 {
-  return (a - b) > -eps;
+   return (a - b) > -eps;
 }
 
 /// returns \c true iff |a| <= eps
 template <class R>
 inline bool isZero(R a, R eps = Param::epsilon())
 {
-  return spxAbs(a) <= eps;
+   return spxAbs(a) <= eps;
 }
 
 /// returns \c true iff |a| > eps
 template <class R>
 inline bool isNotZero(R a, R eps = Param::epsilon())
 {
-  return spxAbs(a) > eps;
+   return spxAbs(a) > eps;
 }
 
 /// returns \c true iff |relDiff(a,b)| <= eps
 template <class R>
 inline bool EQrel(R a, R b, R eps = Param::epsilon())
 {
-  return spxAbs(relDiff(a, b)) <= eps;
+   return spxAbs(relDiff(a, b)) <= eps;
 }
 
 /// returns \c true iff |relDiff(a,b)| > eps
 template <class R>
 inline bool NErel(R a, R b, R eps = Param::epsilon())
 {
-  return spxAbs(relDiff(a, b)) > eps;
+   return spxAbs(relDiff(a, b)) > eps;
 }
 
 /// returns \c true iff relDiff(a,b) <= -eps
 template <class R>
 inline bool LTrel(R a, R b, R eps = Param::epsilon())
 {
-  return relDiff(a, b) <= -eps;
+   return relDiff(a, b) <= -eps;
 }
 
 /// returns \c true iff relDiff(a,b) <= eps
 template <class R>
 inline bool LErel(R a, R b, R eps = Param::epsilon())
 {
-  return relDiff(a, b) <= eps;
+   return relDiff(a, b) <= eps;
 }
 
 /// returns \c true iff relDiff(a,b) > eps
 template <class R>
 inline bool GTrel(R a, R b, R eps = Param::epsilon())
 {
-  return relDiff(a, b) > eps;
+   return relDiff(a, b) > eps;
 }
 
 /// returns \c true iff relDiff(a,b) > -eps
 template <class R>
 inline bool GErel(R a, R b, R eps = Param::epsilon())
 {
-  return relDiff(a, b) > -eps;
+   return relDiff(a, b) > -eps;
 }
 
 // Instantiation for Real

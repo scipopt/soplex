@@ -47,18 +47,18 @@
 namespace soplex
 {
 
-  // Overloaded EQ function
-  bool EQ(int a, int b);
+// Overloaded EQ function
+bool EQ(int a, int b);
 
-  // wrapped frexp function
-  template <typename T, boost::multiprecision::expression_template_option eto>
-  boost::multiprecision::number<T, eto> spxFrexp(boost::multiprecision::number<T, eto> y, int* exp)
-  {
-    using namespace std;
-    using namespace boost::math::tools;
+// wrapped frexp function
+template <typename T, boost::multiprecision::expression_template_option eto>
+boost::multiprecision::number<T, eto> spxFrexp(boost::multiprecision::number<T, eto> y, int* exp)
+{
+   using namespace std;
+   using namespace boost::math::tools;
 
-    return frexp(y, exp);
-  }
+   return frexp(y, exp);
+}
 
 
 #define SOPLEX_VERSION         400
@@ -170,36 +170,37 @@ extern bool msginconsistent(const char* name, const char* file, int line);
  *-----------------------------------------------------------------------------
  */
 
-  // Overloaded spxLdexp
-  template <typename T, boost::multiprecision::expression_template_option eto>
-  boost::multiprecision::number<T> spxLdexp(boost::multiprecision::number<T, eto> x, int exp)
-  {
-    return boost::multiprecision::ldexp(x,exp);
-  }
+// Overloaded spxLdexp
+template <typename T, boost::multiprecision::expression_template_option eto>
+boost::multiprecision::number<T> spxLdexp(boost::multiprecision::number<T, eto> x, int exp)
+{
+   return boost::multiprecision::ldexp(x, exp);
+}
 
-  // Overloaded function to return the square-root
-  template <typename T>
-  boost::multiprecision::number<T> spxSqrt(boost::multiprecision::number<T> a)
-  {
-    return boost::multiprecision::sqrt(a);
-  }
+// Overloaded function to return the square-root
+template <typename T>
+boost::multiprecision::number<T> spxSqrt(boost::multiprecision::number<T> a)
+{
+   return boost::multiprecision::sqrt(a);
+}
 
-  // the nextafter function
-  template <typename T, boost::multiprecision::expression_template_option eto>
-  boost::multiprecision::number<T, eto> spxNextafter(boost::multiprecision::number<T, eto> x, boost::multiprecision::number<T, eto> y)
-  {
-    using namespace std;
-    using namespace boost::math;
+// the nextafter function
+template <typename T, boost::multiprecision::expression_template_option eto>
+boost::multiprecision::number<T, eto> spxNextafter(boost::multiprecision::number<T, eto> x,
+      boost::multiprecision::number<T, eto> y)
+{
+   using namespace std;
+   using namespace boost::math;
 
-    // Turns out that nextafter is not supported in the mpfr library? The mpfr
-    // library does a different function named nextabove. Probably a
-    // replacement? I've made an issue about this.
+   // Turns out that nextafter is not supported in the mpfr library? The mpfr
+   // library does a different function named nextabove. Probably a
+   // replacement? I've made an issue about this.
    // return nextafter(x,y);
 
-    // @todo Temporarily, I'm returning 0
-    assert(false);
-    return 0;
-  }
+   // @todo Temporarily, I'm returning 0
+   assert(false);
+   return 0;
+}
 
 #ifdef WITH_LONG_DOUBLE
 
@@ -262,11 +263,11 @@ p#define REAL_FORMAT "f"
 #endif
 #define DEFAULT_INFINITY   1e100
 
-  /// returns square root
-  inline Real spxSqrt(Real a)
-  {
-    return std::sqrt(a);
-  }
+/// returns square root
+inline Real spxSqrt(Real a)
+{
+   return std::sqrt(a);
+}
 
 #else
 
@@ -346,16 +347,16 @@ public:
    //@}
 };
 
-  // A generic version of spxAbs. It would be nice if we could replace spxAbs
-  // with std::abs. Currently there are different versions of spxAbs under
-  // compile time #if. It's better to make this an overloaded function. Even
-  // better, replace it by std::abs since types from boost/multiprecision would
-  // need no extra modification.
-  template <class R>
-  R spxAbs(R a)
-  {
-    return abs(a);
-  }
+// A generic version of spxAbs. It would be nice if we could replace spxAbs
+// with std::abs. Currently there are different versions of spxAbs under
+// compile time #if. It's better to make this an overloaded function. Even
+// better, replace it by std::abs since types from boost/multiprecision would
+// need no extra modification.
+template <class R>
+R spxAbs(R a)
+{
+   return abs(a);
+}
 
 #ifdef WITH_LONG_DOUBLE
 /// returns |a|
@@ -368,14 +369,14 @@ inline Real spxAbs(Real a)
 /// returns square root
 inline Real spxSqrt(Real a)
 {
-  return std::sqrt(a);
+   return std::sqrt(a);
 }
 
 // Returns the square root
 template <typename T>
 boost::multiprecision::number<T> spxSqrt(boost::multiprecision::number<T> a)
 {
-  return boost::multiprecision::sqrt(a);
+   return boost::multiprecision::sqrt(a);
 }
 
 
@@ -383,14 +384,14 @@ boost::multiprecision::number<T> spxSqrt(boost::multiprecision::number<T> a)
 
 inline Real spxNextafter(Real x, Real y)
 {
-   return nextafterl(x,y);
+   return nextafterl(x, y);
 }
 
 
 /// returns x * 2^exp
 inline Real spxLdexp(Real x, int exp)
 {
-   return ldexpl(x,exp);
+   return ldexpl(x, exp);
 }
 
 #else
@@ -404,16 +405,16 @@ inline Real spxAbs(Real a)
 /// returns square root
 inline Real spxSqrt(Real a)
 {
-  return std::sqrt(a);
+   return std::sqrt(a);
 }
 
 // returns the next representable value after x in the direction of y
 inline Real spxNextafter(Real x, Real y)
 {
 #ifndef _MSC_VER
-   return nextafter(x,y);
+   return nextafter(x, y);
 #else
-   return _nextafter(x,y);
+   return _nextafter(x, y);
 #endif
 }
 
@@ -439,12 +440,13 @@ inline Real maxAbs(Real a, Real b)
 // }
 
 template <typename T>
-inline boost::multiprecision::number<T, boost::multiprecision::et_off> maxAbs(boost::multiprecision::number<T> a, boost::multiprecision::number<T> b)
+inline boost::multiprecision::number<T, boost::multiprecision::et_off> maxAbs(
+   boost::multiprecision::number<T> a, boost::multiprecision::number<T> b)
 {
-  const Real absa = spxAbs(a);
-  const Real absb = spxAbs(b);
+   const Real absa = spxAbs(a);
+   const Real absb = spxAbs(b);
 
-  return absa > absb ? absa : absb;
+   return absa > absb ? absa : absb;
 }
 
 
@@ -455,9 +457,10 @@ inline Real relDiff(Real a, Real b)
 }
 
 template <typename T>
-inline boost::multiprecision::number<T> relDiff(boost::multiprecision::number<T> a, boost::multiprecision::number<T> b)
+inline boost::multiprecision::number<T> relDiff(boost::multiprecision::number<T> a,
+      boost::multiprecision::number<T> b)
 {
-  return (a - b) / (maxAbs(a, b) > 1.0 ? maxAbs(a, b) : 1.0);
+   return (a - b) / (maxAbs(a, b) > 1.0 ? maxAbs(a, b) : 1.0);
 }
 
 /// safe version of snprintf
@@ -466,7 +469,7 @@ inline int spxSnprintf(
    size_t                len,                /**< length of the string to copy */
    const char*           s,                  /**< source string */
    ...                                       /**< further parameters */
-   )
+)
 {
    va_list ap;
    int n;
@@ -483,17 +486,20 @@ inline int spxSnprintf(
 #endif
    va_end(ap);
 
-   if( n < 0 || (size_t) n >= len )
+   if(n < 0 || (size_t) n >= len)
    {
 #ifndef NDEBUG
-      if( n < 0 )
+
+      if(n < 0)
       {
-         MSG_ERROR( std::cerr << "vsnprintf returned " << n << " while reading: " << s << std::endl; )
+         MSG_ERROR(std::cerr << "vsnprintf returned " << n << " while reading: " << s << std::endl;)
       }
+
 #endif
-      t[len-1] = '\0';
-      n = (int) len-1;
+      t[len - 1] = '\0';
+      n = (int) len - 1;
    }
+
    return n;
 }
 

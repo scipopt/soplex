@@ -265,18 +265,20 @@ public:
    }
 
    ///
-   void add(const R& pobj, const R& plower, const SVectorBase<R>& pcolVector, const R& pupper, const int& pscaleExp = 0)
+   void add(const R& pobj, const R& plower, const SVectorBase<R>& pcolVector, const R& pupper,
+            const int& pscaleExp = 0)
    {
       DataKey k;
       add(k, pobj, plower, pcolVector, pupper, pscaleExp);
    }
 
    /// Adds LPColBase consisting of objective value \p obj, lower bound \p lower, column vector \p colVector and upper bound \p upper to LPColSetBase.
-   void add(DataKey& newkey, const R& obj, const R& newlower, const SVectorBase<R>& newcolVector, const R& newupper, const int& newscaleExp = 0)
+   void add(DataKey& newkey, const R& obj, const R& newlower, const SVectorBase<R>& newcolVector,
+            const R& newupper, const int& newscaleExp = 0)
    {
       SVSetBase<R>::add(newkey, newcolVector);
 
-      if( num() > low.dim() )
+      if(num() > low.dim())
       {
          low.reDim(num());
          up.reDim(num());
@@ -292,7 +294,8 @@ public:
 
    /// Adds LPColBase consisting of left hand side \p lhs, column vector \p colVector, and right hand side \p rhs to LPColSetBase.
    template < class S >
-   void add(const S* obj, const S* lowerValue, const S* colValues, const int* colIndices, int colSize, const S* upperValue)
+   void add(const S* obj, const S* lowerValue, const S* colValues, const int* colIndices, int colSize,
+            const S* upperValue)
    {
       DataKey k;
       add(k, obj, lowerValue, colValues, colIndices, colSize, upperValue);
@@ -301,11 +304,12 @@ public:
    /// Adds LPColBase consisting of left hand side \p lhs, column vector \p colVector, and right hand side \p rhs to
    /// LPColSetBase, with DataKey \p key.
    template < class S >
-   void add(DataKey& newkey, const S* objValue, const S* lowerValue, const S* colValues, const int* colIndices, int colSize, const S* upperValue)
+   void add(DataKey& newkey, const S* objValue, const S* lowerValue, const S* colValues,
+            const int* colIndices, int colSize, const S* upperValue)
    {
       SVSetBase<R>::add(newkey, colValues, colIndices, colSize);
 
-      if( num() > low.dim() )
+      if(num() > low.dim())
       {
          low.reDim(num());
          up.reDim(num());
@@ -324,7 +328,7 @@ public:
 
       SVSetBase<R>::add(newset);
 
-      if( num() > low.dim() )
+      if(num() > low.dim())
       {
          low.reDim(num());
          up.reDim(num());
@@ -332,7 +336,7 @@ public:
          scaleExp.reSize(num());
       }
 
-      for( int j = 0; i < num(); ++i, ++j )
+      for(int j = 0; i < num(); ++i, ++j)
       {
          low[i] = newset.lower(j);
          up[i] = newset.upper(j);
@@ -348,7 +352,7 @@ public:
 
       add(newset);
 
-      for( int j = 0; i < num(); ++i, ++j )
+      for(int j = 0; i < num(); ++i, ++j)
          keys[j] = key(i);
    }
 
@@ -384,16 +388,18 @@ public:
    }
 
    ///
-   SVectorBase<R>& create(int pnonzeros = 0, const R& pobj = 1, const R& plw = 0, const R& pupp = 1, const int& pscaleExp = 0)
+   SVectorBase<R>& create(int pnonzeros = 0, const R& pobj = 1, const R& plw = 0, const R& pupp = 1,
+                          const int& pscaleExp = 0)
    {
       DataKey k;
       return create(k, pnonzeros, pobj, plw, pupp, pscaleExp);
    }
 
    /// Creates new LPColBase with specified arguments and returns a reference to its column vector.
-   SVectorBase<R>& create(DataKey& newkey, int nonzeros = 0, const R& obj = 1, const R& newlow = 0, const R& newup = 1, const int& newscaleExp = 0)
+   SVectorBase<R>& create(DataKey& newkey, int nonzeros = 0, const R& obj = 1, const R& newlow = 0,
+                          const R& newup = 1, const int& newscaleExp = 0)
    {
-      if( num() + 1 > low.dim() )
+      if(num() + 1 > low.dim())
       {
          low.reDim(num() + 1);
          up.reDim(num() + 1);
@@ -447,9 +453,9 @@ public:
 
       SVSetBase<R>::remove(perm);
 
-      for( int i = 0; i < n; ++i )
+      for(int i = 0; i < n; ++i)
       {
-         if( perm[i] >= 0 && perm[i] != i )
+         if(perm[i] >= 0 && perm[i] != i)
          {
             low[perm[i]] = low[i];
             up[perm[i]] = up[i];
@@ -478,9 +484,9 @@ public:
 
       int j = num();
 
-      for( int i = 0; i < j; ++i )
+      for(int i = 0; i < j; ++i)
       {
-         if( perm[i] >= 0 && perm[i] != i )
+         if(perm[i] >= 0 && perm[i] != i)
          {
             low[perm[i]] = low[i];
             up[perm[i]] = up[i];
@@ -557,11 +563,14 @@ public:
    bool isConsistent() const
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-      if( low.dim() != object.dim() )
+
+      if(low.dim() != object.dim())
          return MSGinconsistent("LPColSetBase");
-      if( low.dim() != up.dim() )
+
+      if(low.dim() != up.dim())
          return MSGinconsistent("LPColSetBase");
-      if( low.dim() != num() )
+
+      if(low.dim() != num())
          return MSGinconsistent("LPColSetBase");
 
       return low.isConsistent() && up.isConsistent() && SVSetBase<R>::isConsistent();
@@ -591,7 +600,7 @@ public:
    /// Assignment operator.
    LPColSetBase<R>& operator=(const LPColSetBase<R>& rs)
    {
-      if( this != &rs )
+      if(this != &rs)
       {
          SVSetBase<R>::operator=(rs);
          low = rs.low;
@@ -609,7 +618,7 @@ public:
    template < class S >
    LPColSetBase<R>& operator=(const LPColSetBase<S>& rs)
    {
-      if( this != (const LPColSetBase<R>*)(&rs) )
+      if(this != (const LPColSetBase<R>*)(&rs))
       {
          SVSetBase<R>::operator=(rs);
          low = rs.low;

@@ -41,7 +41,7 @@ namespace soplex
    starting basis. If more than one call of method #primal() or #dual()
    occurred only the most recent one is valid for generating the starting base.
 */
-  template <class R>
+template <class R>
 class SPxVectorST : public SPxWeightST<R>
 {
 private:
@@ -81,7 +81,7 @@ public:
       this->m_name = "vector";
    }
    /// copy constructor
-   SPxVectorST( const SPxVectorST& old)
+   SPxVectorST(const SPxVectorST& old)
       : SPxWeightST<R>(old)
       , state(old.state)
       , vec(old.vec)
@@ -89,7 +89,7 @@ public:
       assert(this->isConsistent());
    }
    /// assignment operator
-   SPxVectorST& operator=( const SPxVectorST& rhs)
+   SPxVectorST& operator=(const SPxVectorST& rhs)
    {
       if(this != &rhs)
       {

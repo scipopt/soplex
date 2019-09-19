@@ -32,19 +32,22 @@ namespace soplex
    This SPxScaler implementation performs equilibrium scaling of the
    LPs rows and columns.
 */
-  template <class R>
-  class SPxEquiliSC : public SPxScaler<R>
+template <class R>
+class SPxEquiliSC : public SPxScaler<R>
 {
 public:
    /// compute equilibrium scaling vector rounded to power of two
-  static void computeEquiExpVec(const SVSetBase<R>* vecset, const DataArray<int>& coScaleExp, DataArray<int>& scaleExp);
+   static void computeEquiExpVec(const SVSetBase<R>* vecset, const DataArray<int>& coScaleExp,
+                                 DataArray<int>& scaleExp);
 
    /// compute equilibrium scaling vector rounded to power of two
-  static void computeEquiExpVec(const SVSetBase<R>* vecset, const std::vector<R>& coScaleVal, DataArray<int>& scaleExp);
+   static void computeEquiExpVec(const SVSetBase<R>* vecset, const std::vector<R>& coScaleVal,
+                                 DataArray<int>& scaleExp);
 
    /// compute equilibrium scaling rounded to power of 2 for existing R scaling factors (preRowscale, preColscale)
-   static void computePostequiExpVecs(const SPxLPBase<R>& lp, const std::vector<R>& preRowscale, const std::vector<R>& preColscale,
-         DataArray<int>& rowscaleExp, DataArray<int>& colscaleExp);
+   static void computePostequiExpVecs(const SPxLPBase<R>& lp, const std::vector<R>& preRowscale,
+                                      const std::vector<R>& preColscale,
+                                      DataArray<int>& rowscaleExp, DataArray<int>& colscaleExp);
    //-------------------------------------
    /**@name Construction / destruction */
    //@{
@@ -53,14 +56,14 @@ public:
    /// copy constructor
    SPxEquiliSC(const SPxEquiliSC& old);
    /// assignment operator
-   SPxEquiliSC& operator=(const SPxEquiliSC& );
+   SPxEquiliSC& operator=(const SPxEquiliSC&);
    /// destructor
    virtual ~SPxEquiliSC()
    {}
    /// clone function for polymorphism
-  inline virtual SPxScaler<R>* clone() const override
+   inline virtual SPxScaler<R>* clone() const override
    {
-     return new SPxEquiliSC<R>(*this);
+      return new SPxEquiliSC<R>(*this);
    }
    //@}
 

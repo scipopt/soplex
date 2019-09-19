@@ -28,8 +28,8 @@
 // DVectorBase has been replaced by VectorBase.
 namespace soplex
 {
-  typedef VectorBase< Real > DVector;
-  typedef VectorBase< Real > DVectorReal;
-  typedef VectorBase< Rational > DVectorRational;
+typedef VectorBase< Real > DVector;
+typedef VectorBase< Real > DVectorReal;
+typedef VectorBase< Rational > DVectorRational;
 } // namespace soplex
 #endif // _DVECTOR_H_

@@ -36,17 +36,17 @@ static const Real verySparseFactor = 0.001;
 static const Real verySparseFactor4right = 0.2;
 
 /* generic heap management */
-static void enQueueMax( int* heap, int* size, int elem )
+static void enQueueMax(int* heap, int* size, int elem)
 {
    int i, j;
 
-   j = ( *size )++;
+   j = (*size)++;
 
-   while ( j > 0 )
+   while(j > 0)
    {
-      i = ( j - 1 ) / 2;
+      i = (j - 1) / 2;
 
-      if ( elem > heap[i] )
+      if(elem > heap[i])
       {
          heap[j] = heap[i];
          j = i;
@@ -58,32 +58,33 @@ static void enQueueMax( int* heap, int* size, int elem )
    heap[j] = elem;
 
 #ifdef SOPLEX_DEBUG
-// no NDEBUG define, since this block is really expensive
-   for ( i = 1; i < *size; ++i )
-      for ( j = 0; j < i; ++j )
-         assert( heap[i] != heap[j] );
+
+   // no NDEBUG define, since this block is really expensive
+   for(i = 1; i < *size; ++i)
+      for(j = 0; j < i; ++j)
+         assert(heap[i] != heap[j]);
 
 #endif  /* SOPLEX_DEBUG */
 }
 
-static int deQueueMax( int* heap, int* size )
+static int deQueueMax(int* heap, int* size)
 {
    int e, elem;
    int i, j, s;
    int e1, e2;
 
    elem = *heap;
-   e = heap[s = --( *size )];
+   e = heap[s = --(*size)];
    --s;
 
-   for ( j = 0, i = 1; i < s; i = 2 * j + 1 )
+   for(j = 0, i = 1; i < s; i = 2 * j + 1)
    {
       e1 = heap[i];
       e2 = heap[i + 1];
 
-      if ( e1 > e2 )
+      if(e1 > e2)
       {
-         if ( e < e1 )
+         if(e < e1)
          {
             heap[j] = e1;
             j = i;
@@ -96,7 +97,7 @@ static int deQueueMax( int* heap, int* size )
       }
       else
       {
-         if ( e < e2 )
+         if(e < e2)
          {
             heap[j] = e2;
             j = i + 1;
@@ -109,7 +110,7 @@ static int deQueueMax( int* heap, int* size )
       }
    }
 
-   if ( i < *size && e < heap[i] )
+   if(i < *size && e < heap[i])
    {
       heap[j] = heap[i];
       j = i;
@@ -120,17 +121,17 @@ static int deQueueMax( int* heap, int* size )
    return elem;
 }
 
-static void enQueueMin( int* heap, int* size, int elem )
+static void enQueueMin(int* heap, int* size, int elem)
 {
    int i, j;
 
-   j = ( *size )++;
+   j = (*size)++;
 
-   while ( j > 0 )
+   while(j > 0)
    {
-      i = ( j - 1 ) / 2;
+      i = (j - 1) / 2;
 
-      if ( elem < heap[i] )
+      if(elem < heap[i])
       {
          heap[j] = heap[i];
          j = i;
@@ -142,32 +143,33 @@ static void enQueueMin( int* heap, int* size, int elem )
    heap[j] = elem;
 
 #ifdef SOPLEX_DEBUG
-// no NDEBUG define, since this block is really expensive
-   for ( i = 1; i < *size; ++i )
-      for ( j = 0; j < i; ++j )
-         assert( heap[i] != heap[j] );
+
+   // no NDEBUG define, since this block is really expensive
+   for(i = 1; i < *size; ++i)
+      for(j = 0; j < i; ++j)
+         assert(heap[i] != heap[j]);
 
 #endif  /* SOPLEX_DEBUG */
 }
 
-static int deQueueMin( int* heap, int* size )
+static int deQueueMin(int* heap, int* size)
 {
    int e, elem;
    int i, j, s;
    int e1, e2;
 
    elem = *heap;
-   e = heap[s = --( *size )];
+   e = heap[s = --(*size)];
    --s;
 
-   for ( j = 0, i = 1; i < s; i = 2 * j + 1 )
+   for(j = 0, i = 1; i < s; i = 2 * j + 1)
    {
       e1 = heap[i];
       e2 = heap[i + 1];
 
-      if ( e1 < e2 )
+      if(e1 < e2)
       {
-         if ( e > e1 )
+         if(e > e1)
          {
             heap[j] = e1;
             j = i;
@@ -180,7 +182,7 @@ static int deQueueMin( int* heap, int* size )
       }
       else
       {
-         if ( e > e2 )
+         if(e > e2)
          {
             heap[j] = e2;
             j = i + 1;
@@ -193,7 +195,7 @@ static int deQueueMin( int* heap, int* size )
       }
    }
 
-   if ( i < *size && e > heap[i] )
+   if(i < *size && e > heap[i])
    {
       heap[j] = heap[i];
       j = i;
@@ -206,44 +208,44 @@ static int deQueueMin( int* heap, int* size )
 
 /************************************************************/
 CLUFactorRational::Temp::Temp()
-      : s_mark( 0 )
-      , s_cact( 0 )
-      , stage( 0 )
-      , pivot_col( 0 )
-      , pivot_colNZ( 0 )
-      , pivot_row( 0 )
-      , pivot_rowNZ( 0 )
+   : s_mark(0)
+   , s_cact(0)
+   , stage(0)
+   , pivot_col(0)
+   , pivot_colNZ(0)
+   , pivot_row(0)
+   , pivot_rowNZ(0)
 {}
 
-void CLUFactorRational::Temp::init( int p_dim )
+void CLUFactorRational::Temp::init(int p_dim)
 {
    s_max.reDim(p_dim);
-   spx_realloc( s_cact, p_dim );
-   spx_realloc( s_mark, p_dim );
+   spx_realloc(s_cact, p_dim);
+   spx_realloc(s_mark, p_dim);
    stage = 0;
 }
 
 void CLUFactorRational::Temp::clear()
 {
-   if ( s_mark != 0 )
-      spx_free( s_mark );
+   if(s_mark != 0)
+      spx_free(s_mark);
 
-   if ( s_cact != 0 )
-      spx_free( s_cact );
+   if(s_cact != 0)
+      spx_free(s_cact);
 
    s_max.reDim(0);
 
-   if ( pivot_col != 0 )
-      spx_free( pivot_col );
+   if(pivot_col != 0)
+      spx_free(pivot_col);
 
-   if ( pivot_colNZ != 0 )
-      spx_free( pivot_colNZ );
+   if(pivot_colNZ != 0)
+      spx_free(pivot_colNZ);
 
-   if ( pivot_row != 0 )
-      spx_free( pivot_row );
+   if(pivot_row != 0)
+      spx_free(pivot_row);
 
-   if ( pivot_rowNZ != 0 )
-      spx_free( pivot_rowNZ );
+   if(pivot_rowNZ != 0)
+      spx_free(pivot_rowNZ);
 }
 
 CLUFactorRational::Temp::~Temp()
@@ -255,19 +257,19 @@ CLUFactorRational::Temp::~Temp()
 void CLUFactorRational::initPerm()
 {
 
-   for ( int i = 0; i < thedim; ++i )
+   for(int i = 0; i < thedim; ++i)
       row.orig[i] = row.perm[i] = col.orig[i] = col.perm[i] = -1;
 }
 
 /*****************************************************************************/
 
-void CLUFactorRational::setPivot( const int p_stage,
-                          const int p_col,
-                          const int p_row,
-                          const Rational& val )
+void CLUFactorRational::setPivot(const int p_stage,
+                                 const int p_col,
+                                 const int p_row,
+                                 const Rational& val)
 {
-   assert( row.perm[p_row] < 0 );
-   assert( col.perm[p_col] < 0 );
+   assert(row.perm[p_row] < 0);
+   assert(col.perm[p_col] < 0);
 
    row.orig[p_stage] = p_row;
    col.orig[p_stage] = p_col;
@@ -275,8 +277,8 @@ void CLUFactorRational::setPivot( const int p_stage,
    col.perm[p_col]   = p_stage;
    diag[p_row]       = 1.0 / val;
 
-   if ( spxAbs( diag[p_row] ) > maxabs )
-      maxabs = spxAbs( diag[p_row] );
+   if(spxAbs(diag[p_row]) > maxabs)
+      maxabs = spxAbs(diag[p_row]);
 }
 
 /*****************************************************************************/
@@ -286,42 +288,42 @@ void CLUFactorRational::setPivot( const int p_stage,
 void CLUFactorRational::packRows()
 {
    int n, i, j, l_row;
-   Dring *ring, *list;
+   Dring* ring, *list;
 
-   int *l_ridx = u.row.idx;
+   int* l_ridx = u.row.idx;
    VectorRational& l_rval = u.row.val;
-   int *l_rlen = u.row.len;
-   int *l_rmax = u.row.max;
-   int *l_rbeg = u.row.start;
+   int* l_rlen = u.row.len;
+   int* l_rmax = u.row.max;
+   int* l_rbeg = u.row.start;
 
    n = 0;
-   list = &( u.row.list );
+   list = &(u.row.list);
 
-   for ( ring = list->next; ring != list; ring = ring->next )
+   for(ring = list->next; ring != list; ring = ring->next)
    {
       l_row = ring->idx;
 
-      if ( l_rbeg[l_row] != n )
+      if(l_rbeg[l_row] != n)
       {
          do
          {
             l_row = ring->idx;
             i = l_rbeg[l_row];
-            assert( l_rlen[l_row] <= l_rmax[l_row] );
+            assert(l_rlen[l_row] <= l_rmax[l_row]);
             l_rbeg[l_row] = n;
             l_rmax[l_row] = l_rlen[l_row];
             j = i + l_rlen[l_row];
 
-            for ( ; i < j; ++i, ++n )
+            for(; i < j; ++i, ++n)
             {
-               assert( n <= i );
+               assert(n <= i);
                l_ridx[n] = l_ridx[i];
                l_rval[n] = l_rval[i];
             }
 
             ring = ring->next;
          }
-         while ( ring != list );
+         while(ring != list);
 
          goto terminatePackRows;
       }
@@ -344,22 +346,22 @@ terminatePackRows:
 void CLUFactorRational::forestPackColumns()
 {
    int n, i, j, colno;
-   Dring *ring, *list;
+   Dring* ring, *list;
 
    VectorRational& cval = u.col.val;
-   int *cidx = u.col.idx;
-   int *clen = u.col.len;
-   int *cmax = u.col.max;
-   int *cbeg = u.col.start;
+   int* cidx = u.col.idx;
+   int* clen = u.col.len;
+   int* cmax = u.col.max;
+   int* cbeg = u.col.start;
 
    n = 0;
    list = &u.col.list;
 
-   for ( ring = list->next; ring != list; ring = ring->next )
+   for(ring = list->next; ring != list; ring = ring->next)
    {
       colno = ring->idx;
 
-      if ( cbeg[colno] != n )
+      if(cbeg[colno] != n)
       {
          do
          {
@@ -369,7 +371,7 @@ void CLUFactorRational::forestPackColumns()
             cmax[colno] = clen[colno];
             j = i + clen[colno];
 
-            for ( ; i < j; ++i )
+            for(; i < j; ++i)
             {
                cval[n] = cval[i];
                cidx[n++] = cidx[i];
@@ -377,7 +379,7 @@ void CLUFactorRational::forestPackColumns()
 
             ring = ring->next;
          }
-         while ( ring != list );
+         while(ring != list);
 
          goto terminatePackColumns;
       }
@@ -396,28 +398,28 @@ terminatePackColumns :
 /*
  *      Make row of fac large enough to hold len nonzeros.
  */
-void CLUFactorRational::remaxRow( int p_row, int len )
+void CLUFactorRational::remaxRow(int p_row, int len)
 {
-   assert( u.row.max[p_row] < len );
+   assert(u.row.max[p_row] < len);
 
-   if ( u.row.elem[p_row].next == &( u.row.list ) ) /* last in row file */
+   if(u.row.elem[p_row].next == &(u.row.list))      /* last in row file */
    {
       int delta = len - u.row.max[p_row];
 
-      if ( delta > u.row.val.dim() - u.row.used )
+      if(delta > u.row.val.dim() - u.row.used)
       {
          packRows();
          delta = len - u.row.max[p_row];  // packRows() changes u.row.max[] !
 
-         if ( u.row.val.dim() < rowMemMult * u.row.used + len )
-            minRowMem( 2 * u.row.used + len );
+         if(u.row.val.dim() < rowMemMult * u.row.used + len)
+            minRowMem(2 * u.row.used + len);
 
          /* minRowMem(rowMemMult * u.row.used + len); */
       }
 
-      assert( delta <= u.row.val.dim() - u.row.used
+      assert(delta <= u.row.val.dim() - u.row.used
 
-              && "ERROR: could not allocate memory for row file" );
+             && "ERROR: could not allocate memory for row file");
 
       u.row.used += delta;
       u.row.max[p_row] = len;
@@ -426,23 +428,23 @@ void CLUFactorRational::remaxRow( int p_row, int len )
    {
       int i, j, k;
       VectorRational& val = u.row.val;
-      Dring *ring;
+      Dring* ring;
 
-      if ( len > u.row.val.dim() - u.row.used )
+      if(len > u.row.val.dim() - u.row.used)
       {
          packRows();
 
-         if ( u.row.val.dim() < rowMemMult * u.row.used + len )
-            minRowMem( 2 * u.row.used + len );
+         if(u.row.val.dim() < rowMemMult * u.row.used + len)
+            minRowMem(2 * u.row.used + len);
 
          /* minRowMem(rowMemMult * u.row.used + len);*/
       }
 
-      assert( len <= u.row.val.dim() - u.row.used
+      assert(len <= u.row.val.dim() - u.row.used
 
-              && "ERROR: could not allocate memory for row file" );
+             && "ERROR: could not allocate memory for row file");
 
-      int *idx = u.row.idx;
+      int* idx = u.row.idx;
       j = u.row.used;
       i = u.row.start[p_row];
       k = u.row.len[p_row] + i;
@@ -451,20 +453,20 @@ void CLUFactorRational::remaxRow( int p_row, int len )
 
       u.row.max[u.row.elem[p_row].prev->idx] += u.row.max[p_row];
       u.row.max[p_row] = len;
-      removeDR( u.row.elem[p_row] );
+      removeDR(u.row.elem[p_row]);
       ring = u.row.list.prev;
-      init2DR( u.row.elem[p_row], *ring );
+      init2DR(u.row.elem[p_row], *ring);
 
-      for ( ; i < k; ++i, ++j )
+      for(; i < k; ++i, ++j)
       {
          val[j] = val[i];
          idx[j] = idx[i];
       }
    }
 
-   assert( u.row.start[u.row.list.prev->idx] + u.row.max[u.row.list.prev->idx]
+   assert(u.row.start[u.row.list.prev->idx] + u.row.max[u.row.list.prev->idx]
 
-           == u.row.used );
+          == u.row.used);
 }
 
 /*************************************************************************/
@@ -474,21 +476,21 @@ void CLUFactorRational::remaxRow( int p_row, int len )
 void CLUFactorRational::packColumns()
 {
    int n, i, j, l_col;
-   Dring *ring, *list;
+   Dring* ring, *list;
 
-   int *l_cidx = u.col.idx;
-   int *l_clen = u.col.len;
-   int *l_cmax = u.col.max;
-   int *l_cbeg = u.col.start;
+   int* l_cidx = u.col.idx;
+   int* l_clen = u.col.len;
+   int* l_cmax = u.col.max;
+   int* l_cbeg = u.col.start;
 
    n = 0;
-   list = &( u.col.list );
+   list = &(u.col.list);
 
-   for ( ring = list->next; ring != list; ring = ring->next )
+   for(ring = list->next; ring != list; ring = ring->next)
    {
       l_col = ring->idx;
 
-      if ( l_cbeg[l_col] != n )
+      if(l_cbeg[l_col] != n)
       {
          do
          {
@@ -498,12 +500,12 @@ void CLUFactorRational::packColumns()
             l_cmax[l_col] = l_clen[l_col];
             j = i + l_clen[l_col];
 
-            for ( ; i < j; ++i )
+            for(; i < j; ++i)
                l_cidx[n++] = l_cidx[i];
 
             ring = ring->next;
          }
-         while ( ring != list );
+         while(ring != list);
 
          goto terminatePackColumns;
       }
@@ -522,28 +524,28 @@ terminatePackColumns :
 /*
  *      Make column col of fac large enough to hold len nonzeros.
  */
-void CLUFactorRational::remaxCol( int p_col, int len )
+void CLUFactorRational::remaxCol(int p_col, int len)
 {
-   assert( u.col.max[p_col] < len );
+   assert(u.col.max[p_col] < len);
 
-   if ( u.col.elem[p_col].next == &( u.col.list ) ) /* last in column file */
+   if(u.col.elem[p_col].next == &(u.col.list))      /* last in column file */
    {
       int delta = len - u.col.max[p_col];
 
-      if ( delta > u.col.size - u.col.used )
+      if(delta > u.col.size - u.col.used)
       {
          packColumns();
          delta = len - u.col.max[p_col];
 
-         if ( u.col.size < colMemMult * u.col.used + len )
-            minColMem( 2 * u.col.used + len );
+         if(u.col.size < colMemMult * u.col.used + len)
+            minColMem(2 * u.col.used + len);
 
          /* minColMem(colMemMult * u.col.used + len); */
       }
 
-      assert( delta <= u.col.size - u.col.used
+      assert(delta <= u.col.size - u.col.used
 
-              && "ERROR: could not allocate memory for column file" );
+             && "ERROR: could not allocate memory for column file");
 
       u.col.used += delta;
       u.col.max[p_col] = len;
@@ -552,22 +554,22 @@ void CLUFactorRational::remaxCol( int p_col, int len )
    else                        /* column must be moved to end of column file */
    {
       int i, j, k;
-      int *idx;
-      Dring *ring;
+      int* idx;
+      Dring* ring;
 
-      if ( len > u.col.size - u.col.used )
+      if(len > u.col.size - u.col.used)
       {
          packColumns();
 
-         if ( u.col.size < colMemMult * u.col.used + len )
-            minColMem( 2 * u.col.used + len );
+         if(u.col.size < colMemMult * u.col.used + len)
+            minColMem(2 * u.col.used + len);
 
          /* minColMem(colMemMult * u.col.used + len); */
       }
 
-      assert( len <= u.col.size - u.col.used
+      assert(len <= u.col.size - u.col.used
 
-              && "ERROR: could not allocate memory for column file" );
+             && "ERROR: could not allocate memory for column file");
 
       j = u.col.used;
       i = u.col.start[p_col];
@@ -577,13 +579,13 @@ void CLUFactorRational::remaxCol( int p_col, int len )
 
       u.col.max[u.col.elem[p_col].prev->idx] += u.col.max[p_col];
       u.col.max[p_col] = len;
-      removeDR( u.col.elem[p_col] );
+      removeDR(u.col.elem[p_col]);
       ring = u.col.list.prev;
-      init2DR( u.col.elem[p_col], *ring );
+      init2DR(u.col.elem[p_col], *ring);
 
       idx = u.col.idx;
 
-      for ( ; i < k; ++i )
+      for(; i < k; ++i)
          idx[j++] = idx[i];
    }
 }
@@ -591,26 +593,26 @@ void CLUFactorRational::remaxCol( int p_col, int len )
 /*
  *      Make column col of fac large enough to hold len nonzeros.
  */
-void CLUFactorRational::forestReMaxCol( int p_col, int len )
+void CLUFactorRational::forestReMaxCol(int p_col, int len)
 {
-   assert( u.col.max[p_col] < len );
+   assert(u.col.max[p_col] < len);
 
-   if ( u.col.elem[p_col].next == &( u.col.list ) ) /* last in column file */
+   if(u.col.elem[p_col].next == &(u.col.list))      /* last in column file */
    {
       int delta = len - u.col.max[p_col];
 
-      if ( delta > u.col.size - u.col.used )
+      if(delta > u.col.size - u.col.used)
       {
          forestPackColumns();
          delta = len - u.col.max[p_col];
 
-         if ( u.col.size < colMemMult * u.col.used + len )
-            forestMinColMem( int( colMemMult * u.col.used + len ) );
+         if(u.col.size < colMemMult * u.col.used + len)
+            forestMinColMem(int(colMemMult * u.col.used + len));
       }
 
-      assert( delta <= u.col.size - u.col.used
+      assert(delta <= u.col.size - u.col.used
 
-              && "ERROR: could not allocate memory for column file" );
+             && "ERROR: could not allocate memory for column file");
 
       u.col.used += delta;
       u.col.max[p_col] = len;
@@ -619,21 +621,21 @@ void CLUFactorRational::forestReMaxCol( int p_col, int len )
    else                        /* column must be moved to end of column file */
    {
       int i, j, k;
-      int *idx = u.col.idx;
+      int* idx = u.col.idx;
       VectorRational& val = u.col.val;
-      Dring *ring;
+      Dring* ring;
 
-      if ( len > u.col.size - u.col.used )
+      if(len > u.col.size - u.col.used)
       {
          forestPackColumns();
 
-         if ( u.col.size < colMemMult * u.col.used + len )
-            forestMinColMem( int( colMemMult * u.col.used + len ) );
+         if(u.col.size < colMemMult * u.col.used + len)
+            forestMinColMem(int(colMemMult * u.col.used + len));
       }
 
-      assert( len <= u.col.size - u.col.used
+      assert(len <= u.col.size - u.col.used
 
-              && "ERROR: could not allocate memory for column file" );
+             && "ERROR: could not allocate memory for column file");
 
       j = u.col.used;
       i = u.col.start[p_col];
@@ -643,11 +645,11 @@ void CLUFactorRational::forestReMaxCol( int p_col, int len )
 
       u.col.max[u.col.elem[p_col].prev->idx] += u.col.max[p_col];
       u.col.max[p_col] = len;
-      removeDR( u.col.elem[p_col] );
+      removeDR(u.col.elem[p_col]);
       ring = u.col.list.prev;
-      init2DR( u.col.elem[p_col], *ring );
+      init2DR(u.col.elem[p_col], *ring);
 
-      for ( ; i < k; ++i )
+      for(; i < k; ++i)
       {
          val[j] = val[i];
          idx[j++] = idx[i];
@@ -687,30 +689,30 @@ void CLUFactorRational::forestReMaxCol( int p_col, int len )
  *         much cleaner.
  */
 
-void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int *nonz )
+void CLUFactorRational::forestUpdate(int p_col, Rational* p_work, int num, int* nonz)
 {
    int i, j, k, h, m, n;
    int ll, c, r, rowno;
    Rational x;
 
-   int *lbeg = l.start;
+   int* lbeg = l.start;
 
    VectorRational& cval = u.col.val;
-   int *cidx = u.col.idx;
-   int *cmax = u.col.max;
-   int *clen = u.col.len;
-   int *cbeg = u.col.start;
+   int* cidx = u.col.idx;
+   int* cmax = u.col.max;
+   int* clen = u.col.len;
+   int* cbeg = u.col.start;
 
    VectorRational& rval = u.row.val;
-   int *ridx = u.row.idx;
-   int *rmax = u.row.max;
-   int *rlen = u.row.len;
-   int *rbeg = u.row.start;
+   int* ridx = u.row.idx;
+   int* rmax = u.row.max;
+   int* rlen = u.row.len;
+   int* rbeg = u.row.start;
 
-   int *rperm = row.perm;
-   int *rorig = row.orig;
-   int *cperm = col.perm;
-   int *corig = col.orig;
+   int* rperm = row.perm;
+   int* rorig = row.orig;
+   int* cperm = col.perm;
+   int* corig = col.orig;
 
    Rational l_maxabs = maxabs;
    int dim = thedim;
@@ -721,16 +723,16 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
    i = clen[p_col];
    nzCnt -= i;
 
-   for ( i += j - 1; i >= j; --i )
+   for(i += j - 1; i >= j; --i)
    {
       m = cidx[i];          // remove column p_col from row m
       k = rbeg[m];
-      h = --( rlen[m] ) + k;  // decrease length of row m
+      h = --(rlen[m]) + k;    // decrease length of row m
 
-      while ( ridx[k] != p_col )
+      while(ridx[k] != p_col)
          ++k;
 
-      assert( k <= h );     // k is the position of p_col, h is last position
+      assert(k <= h);       // k is the position of p_col, h is last position
 
       ridx[k] = ridx[h];    // store last index at the position of p_col
 
@@ -743,17 +745,17 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
     *       Distinguish between optimized call (num > 0, nonz != 0) and
     *       non-optimized one.
     */
-   assert( num ); // otherwise the assert( nonz != 0 ) below should fail
+   assert(num);   // otherwise the assert( nonz != 0 ) below should fail
 
-   if ( num )
+   if(num)
    {
       // Optimized call.
-      assert( nonz != 0 );
+      assert(nonz != 0);
 
       clen[p_col] = 0;
 
-      if ( num > cmax[p_col] )
-         forestReMaxCol( p_col, num );
+      if(num > cmax[p_col])
+         forestReMaxCol(p_col, num);
 
       cidx = u.col.idx;
 
@@ -763,50 +765,50 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
 
       r = 0;
 
-      for ( j = 0; j < num; ++j )
+      for(j = 0; j < num; ++j)
       {
          i = nonz[j];
          x = p_work[i];
          p_work[i] = 0;
 
-         if ( x != 0 )
+         if(x != 0)
          {
-            if ( spxAbs( x ) > l_maxabs )
-               l_maxabs = spxAbs( x );
+            if(spxAbs(x) > l_maxabs)
+               l_maxabs = spxAbs(x);
 
             /* insert to column file */
-            assert( k - cbeg[p_col] < cmax[p_col] );
+            assert(k - cbeg[p_col] < cmax[p_col]);
 
             cval[k] = x;
 
             cidx[k++] = i;
 
             /* insert to row file */
-            if ( rmax[i] <= rlen[i] )
+            if(rmax[i] <= rlen[i])
             {
-               remaxRow( i, rlen[i] + 1 );
+               remaxRow(i, rlen[i] + 1);
                rval = u.row.val;
                ridx = u.row.idx;
             }
 
-            h = rbeg[i] + ( rlen[i] )++;
+            h = rbeg[i] + (rlen[i])++;
 
             rval[h] = x;
             ridx[h] = p_col;
 
             /* check permuted row index */
 
-            if ( rperm[i] > r )
+            if(rperm[i] > r)
                r = rperm[i];
          }
       }
 
-      nzCnt += ( clen[p_col] = k - cbeg[p_col] );
+      nzCnt += (clen[p_col] = k - cbeg[p_col]);
    }
    else
    {
       // Non-optimized call: We have to access all elements of p_work.
-      assert( nonz == 0 );
+      assert(nonz == 0);
 
       /*
        *      clen[col] = 0;
@@ -818,21 +820,21 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
       j = k + cmax[p_col];
       r = 0;
 
-      for ( i = 0; i < dim; ++i )
+      for(i = 0; i < dim; ++i)
       {
          x = p_work[i];
          p_work[i] = 0;
 
-         if ( x != 0 )
+         if(x != 0)
          {
-            if ( spxAbs( x ) > l_maxabs )
-               l_maxabs = spxAbs( x );
+            if(spxAbs(x) > l_maxabs)
+               l_maxabs = spxAbs(x);
 
             /* insert to column file */
-            if ( k >= j )
+            if(k >= j)
             {
                clen[p_col] = k - cbeg[p_col];
-               forestReMaxCol( p_col, dim - i );
+               forestReMaxCol(p_col, dim - i);
                cidx = u.col.idx;
                cval = u.col.val;
                k = cbeg[p_col];
@@ -840,35 +842,35 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
                k += clen[p_col];
             }
 
-            assert( k - cbeg[p_col] < cmax[p_col] );
+            assert(k - cbeg[p_col] < cmax[p_col]);
 
             cval[k] = x;
             cidx[k++] = i;
 
             /* insert to row file */
 
-            if ( rmax[i] <= rlen[i] )
+            if(rmax[i] <= rlen[i])
             {
-               remaxRow( i, rlen[i] + 1 );
+               remaxRow(i, rlen[i] + 1);
                rval = u.row.val;
                ridx = u.row.idx;
             }
 
-            h = rbeg[i] + ( rlen[i] )++;
+            h = rbeg[i] + (rlen[i])++;
 
             rval[h] = x;
             ridx[h] = p_col;
 
             /* check permuted row index */
 
-            if ( rperm[i] > r )
+            if(rperm[i] > r)
                r = rperm[i];
          }
       }
 
-      nzCnt += ( clen[p_col] = k - cbeg[p_col] );
+      nzCnt += (clen[p_col] = k - cbeg[p_col]);
 
-      if ( cbeg[p_col] + cmax[p_col] == u.col.used )
+      if(cbeg[p_col] + cmax[p_col] == u.col.used)
       {
          u.col.used -= cmax[p_col];
          cmax[p_col] = clen[p_col];
@@ -878,7 +880,7 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
 
    c = cperm[p_col];
 
-   if ( r > c )                       /* Forest Tomlin update */
+   if(r > c)                          /* Forest Tomlin update */
    {
       /*      update permutations
        */
@@ -891,7 +893,7 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
 
       rorig[r] = j;
 
-      for ( i = c; i <= r; ++i )
+      for(i = c; i <= r; ++i)
          rperm[rorig[i]] = i;
 
       j = corig[c];
@@ -903,7 +905,7 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
 
       corig[r] = j;
 
-      for ( i = c; i <= r; ++i )
+      for(i = c; i <= r; ++i)
          cperm[corig[i]] = i;
 
 
@@ -915,7 +917,7 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
 
       nzCnt -= i;
 
-      if ( i < verySparseFactor * ( dim - c ) ) // few nonzeros to be eliminated
+      if(i < verySparseFactor * (dim - c))      // few nonzeros to be eliminated
       {
          /**
           *          The following assert is obviously violated if this method is called
@@ -926,20 +928,20 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
           *                sort the nonzeros or something, for which it only needs
           *                some empty vector of size num.
           */
-         assert( nonz != 0 );
+         assert(nonz != 0);
 
          /*  move row r from U to p_work
           */
          num = 0;
 
-         for ( i += j - 1; i >= j; --i )
+         for(i += j - 1; i >= j; --i)
          {
             k = ridx[i];
             p_work[k] = rval[i];
-            enQueueMin( nonz, &num, cperm[k] );
-            m = --( clen[k] ) + cbeg[k];
+            enQueueMin(nonz, &num, cperm[k]);
+            m = --(clen[k]) + cbeg[k];
 
-            for ( h = m; cidx[h] != rowno; --h )
+            for(h = m; cidx[h] != rowno; --h)
                ;
 
             cidx[h] = cidx[m];
@@ -950,31 +952,31 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
 
          /*  Eliminate row r from U to L file
           */
-         ll = makeLvec( r - c, rowno );
+         ll = makeLvec(r - c, rowno);
 
          VectorRational& lval = l.val;
-         int *lidx = l.idx;
+         int* lidx = l.idx;
 
-         assert(( num == 0 ) || ( nonz != 0 ) );
+         assert((num == 0) || (nonz != 0));
 
          /* for(i = c; i < r; ++i)       */
-         while ( num )
+         while(num)
          {
 #ifndef NDEBUG
             // The numbers seem to be often 1e-100, is this ok ?
 
-            for ( i = 0; i < num; ++i )
-               assert( p_work[corig[nonz[i]]] != 0 );
+            for(i = 0; i < num; ++i)
+               assert(p_work[corig[nonz[i]]] != 0);
 
 #endif // NDEBUG
-            i = deQueueMin( nonz, &num );
+            i = deQueueMin(nonz, &num);
 
-            if ( i == r )
+            if(i == r)
                break;
 
             k = corig[i];
 
-            assert( p_work[k] != 0 );
+            assert(p_work[k] != 0);
 
             n = rorig[i];
 
@@ -988,20 +990,20 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
 
             ll++;
 
-            if ( spxAbs( x ) > l_maxabs )
-               l_maxabs = spxAbs( x );
+            if(spxAbs(x) > l_maxabs)
+               l_maxabs = spxAbs(x);
 
             j = rbeg[n];
 
             m = rlen[n] + j;
 
-            for ( ; j < m; ++j )
+            for(; j < m; ++j)
             {
                int jj = ridx[j];
                Rational y = p_work[jj];
 
-               if ( y == 0 )
-                  enQueueMin( nonz, &num, cperm[jj] );
+               if(y == 0)
+                  enQueueMin(nonz, &num, cperm[jj]);
 
                y -= x * rval[j];
 
@@ -1010,18 +1012,18 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
             }
          }
 
-         if ( lbeg[l.firstUnused - 1] == ll )
-            ( l.firstUnused )--;
+         if(lbeg[l.firstUnused - 1] == ll)
+            (l.firstUnused)--;
          else
             lbeg[l.firstUnused] = ll;
 
 
          /*  Set diagonal value
           */
-         if ( i != r )
+         if(i != r)
          {
             stat = SLinSolverRational::SINGULAR;
-            throw SPxStatusException( "XFORE01 The loaded matrix is singular" );
+            throw SPxStatusException("XFORE01 The loaded matrix is singular");
          }
 
          k = corig[r];
@@ -1034,10 +1036,10 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
          /*  make row large enough to fit all nonzeros.
           */
 
-         if ( rmax[rowno] < num )
+         if(rmax[rowno] < num)
          {
             rlen[rowno] = 0;
-            remaxRow( rowno, num );
+            remaxRow(rowno, num);
             rval = u.row.val;
             ridx = u.row.idx;
          }
@@ -1048,7 +1050,7 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
           */
          n = rbeg[rowno];
 
-         for ( i = 0; i < num; ++i )
+         for(i = 0; i < num; ++i)
          {
             j = corig[nonz[i]];
             x = p_work[j];
@@ -1059,10 +1061,10 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
             // above elimination code, since the corresponding column index would
             // be enqueued for further elimination again and agian.
 
-            if ( x != 0 )
+            if(x != 0)
             {
-               if ( spxAbs( x ) > l_maxabs )
-                  l_maxabs = spxAbs( x );
+               if(spxAbs(x) > l_maxabs)
+                  l_maxabs = spxAbs(x);
 
                ridx[n] = j;
 
@@ -1072,9 +1074,9 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
 
                ++n;
 
-               if ( clen[j] >= cmax[j] )
+               if(clen[j] >= cmax[j])
                {
-                  forestReMaxCol( j, clen[j] + 1 );
+                  forestReMaxCol(j, clen[j] + 1);
                   cidx = u.col.idx;
                   cval = u.col.val;
                }
@@ -1091,13 +1093,13 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
       {
          /*  move row r from U to p_work
           */
-         for ( i += j - 1; i >= j; --i )
+         for(i += j - 1; i >= j; --i)
          {
             k = ridx[i];
             p_work[k] = rval[i];
-            m = --( clen[k] ) + cbeg[k];
+            m = --(clen[k]) + cbeg[k];
 
-            for ( h = m; cidx[h] != rowno; --h )
+            for(h = m; cidx[h] != rowno; --h)
                ;
 
             cidx[h] = cidx[m];
@@ -1108,16 +1110,16 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
 
          /*  Eliminate row r from U to L file
           */
-         ll = makeLvec( r - c, rowno );
+         ll = makeLvec(r - c, rowno);
 
          VectorRational& lval = l.val;
-         int *lidx = l.idx;
+         int* lidx = l.idx;
 
-         for ( i = c; i < r; ++i )
+         for(i = c; i < r; ++i)
          {
             k = corig[i];
 
-            if ( p_work[k] != 0 )
+            if(p_work[k] != 0)
             {
                n = rorig[i];
                x = p_work[k] * diag[n];
@@ -1126,20 +1128,20 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
                p_work[k] = 0;
                ll++;
 
-               if ( spxAbs( x ) > l_maxabs )
-                  l_maxabs = spxAbs( x );
+               if(spxAbs(x) > l_maxabs)
+                  l_maxabs = spxAbs(x);
 
                j = rbeg[n];
 
                m = rlen[n] + j;
 
-               for ( ; j < m; ++j )
+               for(; j < m; ++j)
                   p_work[ridx[j]] -= x * rval[j];
             }
          }
 
-         if ( lbeg[l.firstUnused - 1] == ll )
-            ( l.firstUnused )--;
+         if(lbeg[l.firstUnused - 1] == ll)
+            (l.firstUnused)--;
          else
             lbeg[l.firstUnused] = ll;
 
@@ -1150,10 +1152,10 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
 
          x = p_work[k];
 
-         if ( x == 0 )
+         if(x == 0)
          {
             stat = SLinSolverRational::SINGULAR;
-            throw SPxStatusException( "XFORE02 The loaded matrix is singular" );
+            throw SPxStatusException("XFORE02 The loaded matrix is singular");
             //            return;
          }
 
@@ -1167,14 +1169,14 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
           */
          n = 0;
 
-         for ( i = r + 1; i < dim; ++i )
-            if ( p_work[corig[i]] != 0 )
+         for(i = r + 1; i < dim; ++i)
+            if(p_work[corig[i]] != 0)
                n++;
 
-         if ( rmax[rowno] < n )
+         if(rmax[rowno] < n)
          {
             rlen[rowno] = 0;
-            remaxRow( rowno, n );
+            remaxRow(rowno, n);
             rval = u.row.val;
             ridx = u.row.idx;
          }
@@ -1185,15 +1187,15 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
           */
          n = rbeg[rowno];
 
-         for ( i = r + 1; i < dim; ++i )
+         for(i = r + 1; i < dim; ++i)
          {
             j = corig[i];
             x = p_work[j];
 
-            if ( x != 0 )
+            if(x != 0)
             {
-               if ( spxAbs( x ) > l_maxabs )
-                  l_maxabs = spxAbs( x );
+               if(spxAbs(x) > l_maxabs)
+                  l_maxabs = spxAbs(x);
 
                ridx[n] = j;
 
@@ -1203,9 +1205,9 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
 
                ++n;
 
-               if ( clen[j] >= cmax[j] )
+               if(clen[j] >= cmax[j])
                {
-                  forestReMaxCol( j, clen[j] + 1 );
+                  forestReMaxCol(j, clen[j] + 1);
                   cidx = u.col.idx;
                   cval = u.col.val;
                }
@@ -1220,51 +1222,50 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
       }
    }
 
-   else
-      if ( r == c )
-      {
-         /*  Move diagonal element to diag.  Note, that it must be the last
-          *  element, since it has just been inserted above.
-          */
-         rowno = rorig[r];
-         i = rbeg[rowno] + --( rlen[rowno] );
-         diag[rowno] = 1 / rval[i];
+   else if(r == c)
+   {
+      /*  Move diagonal element to diag.  Note, that it must be the last
+       *  element, since it has just been inserted above.
+       */
+      rowno = rorig[r];
+      i = rbeg[rowno] + --(rlen[rowno]);
+      diag[rowno] = 1 / rval[i];
 
-         for ( j = i = --( clen[p_col] ) + cbeg[p_col]; cidx[i] != rowno; --i )
-            ;
+      for(j = i = --(clen[p_col]) + cbeg[p_col]; cidx[i] != rowno; --i)
+         ;
 
-         cidx[i] = cidx[j];
+      cidx[i] = cidx[j];
 
-         cval[i] = cval[j];
-      }
-      else /* r < c */
-      {
-         stat = SLinSolverRational::SINGULAR;
-         throw SPxStatusException( "XFORE03 The loaded matrix is singular" );
-         //      return;
-      }
+      cval[i] = cval[j];
+   }
+   else /* r < c */
+   {
+      stat = SLinSolverRational::SINGULAR;
+      throw SPxStatusException("XFORE03 The loaded matrix is singular");
+      //      return;
+   }
 
    maxabs = l_maxabs;
 
-   assert( isConsistent() );
+   assert(isConsistent());
    stat = SLinSolverRational::OK;
 }
 
-void CLUFactorRational::update( int p_col, Rational* p_work, const int* p_idx, int num )
+void CLUFactorRational::update(int p_col, Rational* p_work, const int* p_idx, int num)
 {
    int ll, i, j;
    Rational x, rezi;
 
-   assert( p_work[p_col] != 0 );
+   assert(p_work[p_col] != 0);
    rezi = 1 / p_work[p_col];
    p_work[p_col] = 0;
 
-   ll = makeLvec( num, p_col );
+   ll = makeLvec(num, p_col);
    //   ll = fac->makeLvec(num, col);
    VectorRational& lval = l.val;
    int* lidx = l.idx;
 
-   for ( i = num - 1; ( j = p_idx[i] ) != p_col; --i )
+   for(i = num - 1; (j = p_idx[i]) != p_col; --i)
    {
       lidx[ll] = j;
       lval[ll] = rezi * p_work[j];
@@ -1277,7 +1278,7 @@ void CLUFactorRational::update( int p_col, Rational* p_work, const int* p_idx, i
    lval[ll] = 1 - rezi;
    ++ll;
 
-   for ( --i; i >= 0; --i )
+   for(--i; i >= 0; --i)
    {
       j = p_idx[i];
       lidx[ll] = j;
@@ -1285,8 +1286,8 @@ void CLUFactorRational::update( int p_col, Rational* p_work, const int* p_idx, i
       p_work[j] = 0;
       ++ll;
 
-      if ( spxAbs( x ) > maxabs )
-         maxabs = spxAbs( x );
+      if(spxAbs(x) > maxabs)
+         maxabs = spxAbs(x);
    }
 
    stat = SLinSolverRational::OK;
@@ -1296,19 +1297,19 @@ void CLUFactorRational::updateNoClear(
    int p_col,
    const Rational* p_work,
    const int* p_idx,
-   int num )
+   int num)
 {
    int ll, i, j;
    Rational x, rezi;
 
-   assert( p_work[p_col] != 0 );
+   assert(p_work[p_col] != 0);
    rezi = 1 / p_work[p_col];
-   ll = makeLvec( num, p_col );
+   ll = makeLvec(num, p_col);
    //ll = fac->makeLvec(num, col);
    VectorRational& lval = l.val;
    int* lidx = l.idx;
 
-   for ( i = num - 1; ( j = p_idx[i] ) != p_col; --i )
+   for(i = num - 1; (j = p_idx[i]) != p_col; --i)
    {
       lidx[ll] = j;
       lval[ll] = rezi * p_work[j];
@@ -1320,15 +1321,15 @@ void CLUFactorRational::updateNoClear(
    lval[ll] = 1 - rezi;
    ++ll;
 
-   for ( --i; i >= 0; --i )
+   for(--i; i >= 0; --i)
    {
       j = p_idx[i];
       lidx[ll] = j;
       lval[ll] = x = rezi * p_work[j];
       ++ll;
 
-      if ( spxAbs( x ) > maxabs )
-         maxabs = spxAbs( x );
+      if(spxAbs(x) > maxabs)
+         maxabs = spxAbs(x);
    }
 
    stat = SLinSolverRational::OK;
@@ -1360,16 +1361,16 @@ void CLUFactorRational::updateNoClear(
  *      Initialize row and column file of working matrix and
  *      mark column singletons.
  */
-void CLUFactorRational::initFactorMatrix( const SVectorRational** vec )
+void CLUFactorRational::initFactorMatrix(const SVectorRational** vec)
 {
 
    Rational x;
    int m;
    int tot;
-   Dring *rring, *lastrring;
-   Dring *cring, *lastcring;
-   const SVectorRational *psv;
-   int *sing = temp.s_mark;
+   Dring* rring, *lastrring;
+   Dring* cring, *lastcring;
+   const SVectorRational* psv;
+   int* sing = temp.s_mark;
 
    /*  Initialize:
     *  - column file thereby remembering column singletons in |sing|.
@@ -1377,40 +1378,39 @@ void CLUFactorRational::initFactorMatrix( const SVectorRational** vec )
     *  - total number of nonzeros
     */
 
-   for ( int i = 0; i < thedim; i++ )
+   for(int i = 0; i < thedim; i++)
       u.row.max[i] = u.row.len[i] = 0;
 
    tot = 0;
 
-   for ( int i = 0; i < thedim; i++ )
+   for(int i = 0; i < thedim; i++)
    {
       int k;
 
       psv = vec[i];
       k = psv->size();
 
-      if ( k > 1 )
+      if(k > 1)
       {
          tot += k;
 
-         for ( int j = 0; j < k; ++j )
-            u.row.max[psv->index( j )]++;
+         for(int j = 0; j < k; ++j)
+            u.row.max[psv->index(j)]++;
       }
-      else
-         if ( k == 0 )
-         {
-            stat = SLinSolverRational::SINGULAR;
-            return;
-         }
+      else if(k == 0)
+      {
+         stat = SLinSolverRational::SINGULAR;
+         return;
+      }
    }
 
    /*  Resize nonzero memory if necessary
     */
-   minRowMem( int( rowMemMult * tot ) );
+   minRowMem(int(rowMemMult * tot));
 
-   minColMem( int( colMemMult * tot ) );
+   minColMem(int(colMemMult * tot));
 
-   minLMem( int( lMemMult * tot ) );
+   minLMem(int(lMemMult * tot));
 
 
    /*  Initialize:
@@ -1422,7 +1422,7 @@ void CLUFactorRational::initFactorMatrix( const SVectorRational** vec )
 
    rring = u.row.elem;
 
-   lastrring = &( u.row.list );
+   lastrring = &(u.row.list);
 
    lastrring->idx = thedim;
 
@@ -1430,7 +1430,7 @@ void CLUFactorRational::initFactorMatrix( const SVectorRational** vec )
 
    cring = u.col.elem;
 
-   lastcring = &( u.col.list );
+   lastcring = &(u.col.list);
 
    lastcring->idx = thedim;
 
@@ -1438,7 +1438,7 @@ void CLUFactorRational::initFactorMatrix( const SVectorRational** vec )
 
    m = 0;
 
-   for ( int i = 0; i < thedim; i++ )
+   for(int i = 0; i < thedim; i++)
    {
       u.row.start[i] = m;
       m += u.row.max[i];
@@ -1461,10 +1461,10 @@ void CLUFactorRational::initFactorMatrix( const SVectorRational** vec )
    u.row.max[thedim]       = 0;
    u.row.used = m;
 
-   lastrring->next = &( u.row.list );
+   lastrring->next = &(u.row.list);
    lastrring->next->prev = lastrring;
 
-   lastcring->next = &( u.col.list );
+   lastcring->next = &(u.col.list);
    lastcring->next->prev = lastcring;
 
    /*  Copy matrix to row and column file
@@ -1475,7 +1475,7 @@ void CLUFactorRational::initFactorMatrix( const SVectorRational** vec )
 
    initMaxabs = 0;
 
-   for ( int i = 0; i < thedim; i++ )
+   for(int i = 0; i < thedim; i++)
    {
       int nnonzeros;
 
@@ -1485,97 +1485,96 @@ void CLUFactorRational::initFactorMatrix( const SVectorRational** vec )
       /* check whether number of nonzeros above tolerance is 0, 1 or >= 2 */
       nnonzeros = 0;
 
-      for ( int j = 0; j < psv->size() && nnonzeros <= 1; j++ )
+      for(int j = 0; j < psv->size() && nnonzeros <= 1; j++)
       {
-         if ( psv->value(j) != 0 )
+         if(psv->value(j) != 0)
             nnonzeros++;
       }
 
       /* basis is singular due to empty column */
-      if ( nnonzeros == 0 )
+      if(nnonzeros == 0)
       {
          stat = SLinSolverRational::SINGULAR;
          return;
       }
 
       /* exclude column singletons */
-      else
-         if ( nnonzeros == 1 )
+      else if(nnonzeros == 1)
+      {
+         int j;
+
+         /* find nonzero */
+
+         for(j = 0; psv->value(j) == 0; j++)
+            ;
+
+         assert(j < psv->size());
+
+         /* basis is singular due to two linearly dependent column singletons */
+         if(row.perm[psv->index(j)] >= 0)
          {
-            int j;
-
-            /* find nonzero */
-
-            for ( j = 0; psv->value(j) == 0; j++ )
-               ;
-
-            assert( j < psv->size() );
-
-            /* basis is singular due to two linearly dependent column singletons */
-            if ( row.perm[psv->index( j )] >= 0 )
-            {
-               stat = SLinSolverRational::SINGULAR;
-               return;
-            }
-
-            /* update maximum absolute nonzero value */
-            x = psv->value( j );
-
-            if ( spxAbs( x ) > initMaxabs )
-               initMaxabs = spxAbs( x );
-
-            /* permute to front and mark as singleton */
-            setPivot( temp.stage, i, psv->index( j ), x );
-
-            sing[temp.stage] = i;
-
-            temp.stage++;
-
-            /* set column length to zero */
-            temp.s_cact[i] = u.col.len[i] = u.col.max[i] = 0;
+            stat = SLinSolverRational::SINGULAR;
+            return;
          }
+
+         /* update maximum absolute nonzero value */
+         x = psv->value(j);
+
+         if(spxAbs(x) > initMaxabs)
+            initMaxabs = spxAbs(x);
+
+         /* permute to front and mark as singleton */
+         setPivot(temp.stage, i, psv->index(j), x);
+
+         sing[temp.stage] = i;
+
+         temp.stage++;
+
+         /* set column length to zero */
+         temp.s_cact[i] = u.col.len[i] = u.col.max[i] = 0;
+      }
 
       /* add to active matrix if not a column singleton */
-         else
+      else
+      {
+         int end;
+         int k;
+
+         /* go through all nonzeros in column */
+         assert(nnonzeros >= 2);
+         nnonzeros = 0;
+
+         for(int j = 0; j < psv->size(); j++)
          {
-            int end;
-            int k;
+            x = psv->value(j);
 
-            /* go through all nonzeros in column */
-            assert( nnonzeros >= 2 );
-            nnonzeros = 0;
-
-            for ( int j = 0; j < psv->size(); j++ )
+            if(x != 0)
             {
-               x = psv->value( j );
+               /* add to column array */
+               k = psv->index(j);
+               u.col.idx[m] = k;
+               m++;
 
-               if ( x != 0 )
-               {
-                  /* add to column array */
-                  k = psv->index( j );
-                  u.col.idx[m] = k;
-                  m++;
+               /* add to row array */
+               end = u.row.start[k] + u.row.len[k];
+               u.row.idx[end] = i;
+               u.row.val[end] = x;
+               u.row.len[k]++;
 
-                  /* add to row array */
-                  end = u.row.start[k] + u.row.len[k];
-                  u.row.idx[end] = i;
-                  u.row.val[end] = x;
-                  u.row.len[k]++;
+               /* update maximum absolute nonzero value */
 
-                  /* update maximum absolute nonzero value */
+               if(spxAbs(x) > initMaxabs)
+                  initMaxabs = spxAbs(x);
 
-                  if ( spxAbs( x ) > initMaxabs )
-                     initMaxabs = spxAbs( x );
-
-                  nnonzeros++;
-               }
+               nnonzeros++;
             }
-
-            assert( nnonzeros >= 2 );
-
-            /* set column length */
-            temp.s_cact[i] = u.col.len[i] = u.col.max[i] = nnonzeros;
          }
+
+         assert(nnonzeros >= 2);
+
+         /* set column length */
+         temp.s_cact[i] = u.col.len[i] = u.col.max[i] = nnonzeros;
+      }
    }
 
    u.col.used = m;
@@ -1593,10 +1592,10 @@ void CLUFactorRational::colSingletons()
    int i, j, k, n;
    int len;
    int p_col, p_row, newrow;
-   int *idx;
-   int *rorig = row.orig;
-   int *rperm = row.perm;
-   int *sing = temp.s_mark;
+   int* idx;
+   int* rorig = row.orig;
+   int* rperm = row.perm;
+   int* sing = temp.s_mark;
 
 
    /*  Iteratively update column counts due to removed column singletons
@@ -1605,41 +1604,41 @@ void CLUFactorRational::colSingletons()
     *  until no more can be found.
     */
 
-   for ( i = 0; i < temp.stage; ++i )
+   for(i = 0; i < temp.stage; ++i)
    {
       p_row = rorig[i];
-      assert( p_row >= 0 );
-      idx = &( u.row.idx[u.row.start[p_row]] );
+      assert(p_row >= 0);
+      idx = &(u.row.idx[u.row.start[p_row]]);
       len = u.row.len[p_row];
 
-      for ( j = 0; j < len; ++j )
+      for(j = 0; j < len; ++j)
       {
          /*  Move pivotal nonzeros to front of column.
           */
          p_col = idx[j];
-         assert( temp.s_cact[p_col] > 0 );
+         assert(temp.s_cact[p_col] > 0);
 
          n = u.col.start[p_col] + u.col.len[p_col] - temp.s_cact[p_col];
 
-         for ( k = n; u.col.idx[k] != p_row; ++k )
+         for(k = n; u.col.idx[k] != p_row; ++k)
             ;
 
-         assert( k < u.col.start[p_col] + u.col.len[p_col] );
+         assert(k < u.col.start[p_col] + u.col.len[p_col]);
 
          u.col.idx[k] = u.col.idx[n];
 
          u.col.idx[n] = p_row;
 
-         n = --( temp.s_cact[p_col] );        /* column nonzeros of ACTIVE matrix */
+         n = --(temp.s_cact[p_col]);          /* column nonzeros of ACTIVE matrix */
 
-         if ( n == 1 )                /* Here is another singleton */
+         if(n == 1)                   /* Here is another singleton */
          {
             newrow = u.col.idx[--u.col.len[p_col] + u.col.start[p_col]];
 
             /*      Ensure, matrix not singular
              */
 
-            if ( rperm[newrow] >= 0 )
+            if(rperm[newrow] >= 0)
             {
                stat = SLinSolverRational::SINGULAR;
                return;
@@ -1647,14 +1646,14 @@ void CLUFactorRational::colSingletons()
 
             /*      Find singleton in row.
              */
-            n = u.row.start[newrow] + ( --( u.row.len[newrow] ) );
+            n = u.row.start[newrow] + (--(u.row.len[newrow]));
 
-            for ( k = n; u.row.idx[k] != p_col; --k )
+            for(k = n; u.row.idx[k] != p_col; --k)
                ;
 
             /*      Remove singleton from column.
              */
-            setPivot( temp.stage, p_col, newrow, u.row.val[k] );
+            setPivot(temp.stage, p_col, newrow, u.row.val[k]);
 
             sing[temp.stage++] = p_col;
 
@@ -1664,16 +1663,15 @@ void CLUFactorRational::colSingletons()
 
             u.row.idx[k] = u.row.idx[n];
          }
-         else
-            if ( n == 0 )
-            {
-               stat = SLinSolverRational::SINGULAR;
-               return;
-            }
+         else if(n == 0)
+         {
+            stat = SLinSolverRational::SINGULAR;
+            return;
+         }
       }
    }
 
-   assert( temp.stage <= thedim );
+   assert(temp.stage <= thedim);
 }
 
 
@@ -1686,17 +1684,17 @@ void CLUFactorRational::rowSingletons()
    Rational pval;
    int i, j, k, ll, r;
    int p_row, p_col, len, rs, lk;
-   int *idx;
-   int *rperm = row.perm;
-   int *sing = temp.s_mark;
+   int* idx;
+   int* rperm = row.perm;
+   int* sing = temp.s_mark;
 
    /*  Mark row singletons
     */
    rs = temp.stage;
 
-   for ( i = 0; i < thedim; ++i )
+   for(i = 0; i < thedim; ++i)
    {
-      if ( rperm[i] < 0 && u.row.len[i] == 1 )
+      if(rperm[i] < 0 && u.row.len[i] == 1)
          sing[temp.stage++] = i;
    }
 
@@ -1704,7 +1702,7 @@ void CLUFactorRational::rowSingletons()
     *  thereby marking newly arising ones
     *  until no more can be found.
     */
-   for ( ; rs < temp.stage; ++rs )
+   for(; rs < temp.stage; ++rs)
    {
       /*      Move pivot element from row file to diag
        */
@@ -1712,33 +1710,33 @@ void CLUFactorRational::rowSingletons()
       j = u.row.start[p_row];
       p_col = u.row.idx[j];
       pval = u.row.val[j];
-      setPivot( rs, p_col, p_row, pval );
+      setPivot(rs, p_col, p_row, pval);
       u.row.len[p_row] = 0;
 
       /*      Remove pivot column form workingmatrix
        *      thereby building up L vector.
        */
-      idx = &( u.col.idx[u.col.start[p_col]] );
+      idx = &(u.col.idx[u.col.start[p_col]]);
       i = temp.s_cact[p_col];                /* nr. nonzeros of new L vector */
-      lk = makeLvec( i - 1, p_row );
+      lk = makeLvec(i - 1, p_row);
       len = u.col.len[p_col];
-      i = ( u.col.len[p_col] -= i );       /* remove pivot column from U */
+      i = (u.col.len[p_col] -= i);         /* remove pivot column from U */
 
-      for ( ; i < len; ++i )
+      for(; i < len; ++i)
       {
          r = idx[i];
 
-         if ( r != p_row )
+         if(r != p_row)
          {
             /*      Find pivot column in row.
              */
-            ll = --( u.row.len[r] );
+            ll = --(u.row.len[r]);
             k = u.row.start[r] + ll;
 
-            for ( j = k; u.row.idx[j] != p_col; --j )
+            for(j = k; u.row.idx[j] != p_col; --j)
                ;
 
-            assert( k >= u.row.start[r] );
+            assert(k >= u.row.start[r]);
 
             /*      Initialize L vector
              */
@@ -1756,14 +1754,13 @@ void CLUFactorRational::rowSingletons()
 
             /*      Check new row length.
              */
-            if ( ll == 1 )
+            if(ll == 1)
                sing[temp.stage++] = r;
-            else
-               if ( ll == 0 )
-               {
-                  stat = SLinSolverRational::SINGULAR;
-                  return;
-               }
+            else if(ll == 0)
+            {
+               stat = SLinSolverRational::SINGULAR;
+               return;
+            }
          }
       }
    }
@@ -1779,70 +1776,70 @@ void CLUFactorRational::rowSingletons()
 void CLUFactorRational::initFactorRings()
 {
    int i;
-   int *rperm = row.perm;
-   int *cperm = col.perm;
-   CLUFactorRational::Pring *ring;
+   int* rperm = row.perm;
+   int* cperm = col.perm;
+   CLUFactorRational::Pring* ring;
 
-   assert( thedim >= 0 );
-   spx_alloc( temp.pivot_col,   thedim + 1 );
-   spx_alloc( temp.pivot_colNZ, thedim + 1 );
-   spx_alloc( temp.pivot_row,   thedim + 1 );
-   spx_alloc( temp.pivot_rowNZ, thedim + 1 );
+   assert(thedim >= 0);
+   spx_alloc(temp.pivot_col,   thedim + 1);
+   spx_alloc(temp.pivot_colNZ, thedim + 1);
+   spx_alloc(temp.pivot_row,   thedim + 1);
+   spx_alloc(temp.pivot_rowNZ, thedim + 1);
 
-   for ( i = thedim - temp.stage; i >= 0; --i )
+   for(i = thedim - temp.stage; i >= 0; --i)
    {
-      initDR( temp.pivot_colNZ[i] );
-      initDR( temp.pivot_rowNZ[i] );
+      initDR(temp.pivot_colNZ[i]);
+      initDR(temp.pivot_rowNZ[i]);
    }
 
-   for ( i = 0; i < thedim; ++i )
+   for(i = 0; i < thedim; ++i)
    {
-      if ( rperm[i] < 0 )
+      if(rperm[i] < 0)
       {
-         if ( u.row.len[i] <= 0 )
+         if(u.row.len[i] <= 0)
          {
             stat = SLinSolverRational::SINGULAR;
             return;
          }
 
-         ring = &( temp.pivot_rowNZ[u.row.len[i]] );
+         ring = &(temp.pivot_rowNZ[u.row.len[i]]);
 
-         init2DR( temp.pivot_row[i], *ring );
+         init2DR(temp.pivot_row[i], *ring);
          temp.pivot_row[i].idx = i;
          temp.s_max[i] = -1;
       }
 
-      if ( cperm[i] < 0 )
+      if(cperm[i] < 0)
       {
-         if ( temp.s_cact[i] <= 0 )
+         if(temp.s_cact[i] <= 0)
          {
             stat = SLinSolverRational::SINGULAR;
             return;
          }
 
-         ring = &( temp.pivot_colNZ[temp.s_cact[i]] );
+         ring = &(temp.pivot_colNZ[temp.s_cact[i]]);
 
-         init2DR( temp.pivot_col[i], *ring );
+         init2DR(temp.pivot_col[i], *ring);
          temp.pivot_col[i].idx = i;
          temp.s_mark[i] = 0;
       }
    }
 }
 
-void CLUFactorRational::freeFactorRings( void )
+void CLUFactorRational::freeFactorRings(void)
 {
 
-   if ( temp.pivot_col )
-      spx_free( temp.pivot_col );
+   if(temp.pivot_col)
+      spx_free(temp.pivot_col);
 
-   if ( temp.pivot_colNZ )
-      spx_free( temp.pivot_colNZ );
+   if(temp.pivot_colNZ)
+      spx_free(temp.pivot_colNZ);
 
-   if ( temp.pivot_row )
-      spx_free( temp.pivot_row );
+   if(temp.pivot_row)
+      spx_free(temp.pivot_row);
 
-   if ( temp.pivot_rowNZ )
-      spx_free( temp.pivot_rowNZ );
+   if(temp.pivot_rowNZ)
+      spx_free(temp.pivot_rowNZ);
 }
 
 
@@ -1856,41 +1853,41 @@ void CLUFactorRational::eliminateRowSingletons()
    int len, lk;
    int pcol, prow;
    Rational pval;
-   int *idx;
-   CLUFactorRational::Pring *sing;
+   int* idx;
+   CLUFactorRational::Pring* sing;
 
-   for ( sing = temp.pivot_rowNZ[1].prev; sing != &( temp.pivot_rowNZ[1] ); sing = sing->prev )
+   for(sing = temp.pivot_rowNZ[1].prev; sing != &(temp.pivot_rowNZ[1]); sing = sing->prev)
    {
       prow = sing->idx;
       i = u.row.start[prow];
       pcol = u.row.idx[i];
       pval = u.row.val[i];
-      setPivot( temp.stage++, pcol, prow, pval );
+      setPivot(temp.stage++, pcol, prow, pval);
       u.row.len[prow] = 0;
-      removeDR( temp.pivot_col[pcol] );
+      removeDR(temp.pivot_col[pcol]);
 
       /*      Eliminate pivot column and build L vector.
        */
       i = temp.s_cact[pcol];
 
-      if ( i > 1 )
+      if(i > 1)
       {
-         idx = &( u.col.idx[u.col.start[pcol]] );
+         idx = &(u.col.idx[u.col.start[pcol]]);
          len = u.col.len[pcol];
-         lk = makeLvec( i - 1, prow );
+         lk = makeLvec(i - 1, prow);
          i = u.col.len[pcol] -= i;
 
-         for ( ; ( r = idx[i] ) != prow; ++i )
+         for(; (r = idx[i]) != prow; ++i)
          {
             /*      Find pivot column in row.
              */
-            ll = --( u.row.len[r] );
+            ll = --(u.row.len[r]);
             k = u.row.start[r] + ll;
 
-            for ( j = k; u.row.idx[j] != pcol; --j )
+            for(j = k; u.row.idx[j] != pcol; --j)
                ;
 
-            assert( j >= u.row.start[r] );
+            assert(j >= u.row.start[r]);
 
             /*      Initialize L vector
              */
@@ -1908,30 +1905,30 @@ void CLUFactorRational::eliminateRowSingletons()
 
             /*      Move column to appropriate nonzero ring.
              */
-            removeDR( temp.pivot_row[r] );
+            removeDR(temp.pivot_row[r]);
 
-            init2DR( temp.pivot_row[r], temp.pivot_rowNZ[ll] );
+            init2DR(temp.pivot_row[r], temp.pivot_rowNZ[ll]);
 
-            assert( row.perm[r] < 0 );
+            assert(row.perm[r] < 0);
 
             temp.s_max[r] = -1;
          }
 
          /* skip pivot element */
-         assert( i < len && "ERROR: pivot column does not contain pivot row" );
+         assert(i < len && "ERROR: pivot column does not contain pivot row");
 
-         for ( ++i; i < len; ++i )
+         for(++i; i < len; ++i)
          {
             /*      Find pivot column in row.
              */
             r = idx[i];
-            ll = --( u.row.len[r] );
+            ll = --(u.row.len[r]);
             k = u.row.start[r] + ll;
 
-            for ( j = k; u.row.idx[j] != pcol; --j )
+            for(j = k; u.row.idx[j] != pcol; --j)
                ;
 
-            assert( j >= u.row.start[r] );
+            assert(j >= u.row.start[r]);
 
             /*      Initialize L vector
              */
@@ -1949,11 +1946,11 @@ void CLUFactorRational::eliminateRowSingletons()
 
             /*      Move column to appropriate nonzero ring.
              */
-            removeDR( temp.pivot_row[r] );
+            removeDR(temp.pivot_row[r]);
 
-            init2DR( temp.pivot_row[r], temp.pivot_rowNZ[ll] );
+            init2DR(temp.pivot_row[r], temp.pivot_rowNZ[ll]);
 
-            assert( row.perm[r] < 0 );
+            assert(row.perm[r] < 0);
 
             temp.s_max[r] = -1;
          }
@@ -1962,7 +1959,7 @@ void CLUFactorRational::eliminateRowSingletons()
          u.col.len[pcol] -= i;
    }
 
-   initDR( temp.pivot_rowNZ[1] );  /* Remove all row singletons from list */
+   initDR(temp.pivot_rowNZ[1]);    /* Remove all row singletons from list */
 }
 
 
@@ -1975,26 +1972,26 @@ void CLUFactorRational::eliminateColSingletons()
 {
    int i, j, k, m, c;
    int pcol, prow;
-   CLUFactorRational::Pring *sing;
+   CLUFactorRational::Pring* sing;
 
-   for ( sing = temp.pivot_colNZ[1].prev;
-         sing != &( temp.pivot_colNZ[1] );
-         sing = sing->prev )
+   for(sing = temp.pivot_colNZ[1].prev;
+         sing != &(temp.pivot_colNZ[1]);
+         sing = sing->prev)
    {
       /*      Find pivot value
        */
       pcol = sing->idx;
-      j = --( u.col.len[pcol] ) + u.col.start[pcol]; /* remove pivot column */
+      j = --(u.col.len[pcol]) + u.col.start[pcol];   /* remove pivot column */
       prow = u.col.idx[j];
-      removeDR( temp.pivot_row[prow] );
+      removeDR(temp.pivot_row[prow]);
 
-      j = --( u.row.len[prow] ) + u.row.start[prow];
+      j = --(u.row.len[prow]) + u.row.start[prow];
 
-      for ( i = j; ( c = u.row.idx[i] ) != pcol; --i )
+      for(i = j; (c = u.row.idx[i]) != pcol; --i)
       {
-         m = u.col.len[c] + u.col.start[c] - ( temp.s_cact[c] )--;
+         m = u.col.len[c] + u.col.start[c] - (temp.s_cact[c])--;
 
-         for ( k = m; u.col.idx[k] != prow; ++k )
+         for(k = m; u.col.idx[k] != prow; ++k)
             ;
 
          u.col.idx[k] = u.col.idx[m];
@@ -2003,16 +2000,16 @@ void CLUFactorRational::eliminateColSingletons()
 
          m = temp.s_cact[c];
 
-         removeDR( temp.pivot_col[c] );
+         removeDR(temp.pivot_col[c]);
 
-         init2DR( temp.pivot_col[c], temp.pivot_colNZ[m] );
+         init2DR(temp.pivot_col[c], temp.pivot_colNZ[m]);
 
-         assert( col.perm[c] < 0 );
+         assert(col.perm[c] < 0);
       }
 
       /*      remove pivot element from pivot row
        */
-      setPivot( temp.stage++, pcol, prow, u.row.val[i] );
+      setPivot(temp.stage++, pcol, prow, u.row.val[i]);
 
       u.row.idx[i] = u.row.idx[j];
 
@@ -2020,12 +2017,12 @@ void CLUFactorRational::eliminateColSingletons()
 
       j = u.row.start[prow];
 
-      for ( --i; i >= j; --i )
+      for(--i; i >= j; --i)
       {
          c = u.row.idx[i];
-         m = u.col.len[c] + u.col.start[c] - ( temp.s_cact[c] )--;
+         m = u.col.len[c] + u.col.start[c] - (temp.s_cact[c])--;
 
-         for ( k = m; u.col.idx[k] != prow; ++k )
+         for(k = m; u.col.idx[k] != prow; ++k)
             ;
 
          u.col.idx[k] = u.col.idx[m];
@@ -2034,21 +2031,21 @@ void CLUFactorRational::eliminateColSingletons()
 
          m = temp.s_cact[c];
 
-         removeDR( temp.pivot_col[c] );
+         removeDR(temp.pivot_col[c]);
 
-         init2DR( temp.pivot_col[c], temp.pivot_colNZ[m] );
+         init2DR(temp.pivot_col[c], temp.pivot_colNZ[m]);
 
-         assert( col.perm[c] < 0 );
+         assert(col.perm[c] < 0);
       }
    }
 
-   initDR( temp.pivot_colNZ[1] );  /* Remove all column singletons from list */
+   initDR(temp.pivot_colNZ[1]);    /* Remove all column singletons from list */
 }
 
 /*
  * No singletons available: Select pivot elements.
  */
-void CLUFactorRational::selectPivots( const Rational& threshold )
+void CLUFactorRational::selectPivots(const Rational& threshold)
 {
    int ii;
    int i;
@@ -2070,18 +2067,18 @@ void CLUFactorRational::selectPivots( const Rational& threshold )
 
    candidates = thedim - temp.stage - 1;
 
-   if ( candidates > 4 )
+   if(candidates > 4)
       candidates = 4;
 
    num = 0;
 
    count = 2;
 
-   for ( ;; )
+   for(;;)
    {
       ii = -1;
 
-      if ( temp.pivot_rowNZ[count].next != &( temp.pivot_rowNZ[count] ) )
+      if(temp.pivot_rowNZ[count].next != &(temp.pivot_rowNZ[count]))
       {
          rw = temp.pivot_rowNZ[count].next->idx;
          beg = u.row.start[rw];
@@ -2091,13 +2088,13 @@ void CLUFactorRational::selectPivots( const Rational& threshold )
           *  (compute it if necessary).
           */
 
-         if( temp.s_max[rw] < 0 )
+         if(temp.s_max[rw] < 0)
          {
-            l_maxabs = spxAbs( u.row.val[len] );
+            l_maxabs = spxAbs(u.row.val[len]);
 
-            for ( i = len - 1; i >= beg; --i )
-               if ( l_maxabs < spxAbs( u.row.val[i] ) )
-                  l_maxabs = spxAbs( u.row.val[i] );
+            for(i = len - 1; i >= beg; --i)
+               if(l_maxabs < spxAbs(u.row.val[i]))
+                  l_maxabs = spxAbs(u.row.val[i]);
 
             temp.s_max[rw] = l_maxabs;               /* ##### */
          }
@@ -2110,143 +2107,142 @@ void CLUFactorRational::selectPivots( const Rational& threshold )
           */
          mkwtz = thedim + 1;
 
-         for ( i = len; i >= beg; --i )
+         for(i = len; i >= beg; --i)
          {
             k = u.row.idx[i];
             j = temp.s_cact[k];
             x = u.row.val[i];
 
-            if ( j < mkwtz && spxAbs( x ) > l_maxabs )
+            if(j < mkwtz && spxAbs(x) > l_maxabs)
             {
                mkwtz = j;
                cl = k;
                ii = i;
 
-               if ( j <= count )            /* ##### */
+               if(j <= count)               /* ##### */
                   break;
             }
          }
       }
-      else
-         if ( temp.pivot_colNZ[count].next != &( temp.pivot_colNZ[count] ) )
+      else if(temp.pivot_colNZ[count].next != &(temp.pivot_colNZ[count]))
+      {
+         cl = temp.pivot_colNZ[count].next->idx;
+         beg = u.col.start[cl];
+         len = u.col.len[cl] + beg - 1;
+         beg = len - temp.s_cact[cl] + 1;
+         assert(count == temp.s_cact[cl]);
+
+         /*  select pivot element with lowest markowitz number in column
+          */
+         mkwtz = thedim + 1;
+
+         for(i = len; i >= beg; --i)
          {
-            cl = temp.pivot_colNZ[count].next->idx;
-            beg = u.col.start[cl];
-            len = u.col.len[cl] + beg - 1;
-            beg = len - temp.s_cact[cl] + 1;
-            assert( count == temp.s_cact[cl] );
+            k = u.col.idx[i];
+            j = u.row.len[k];
 
-            /*  select pivot element with lowest markowitz number in column
-             */
-            mkwtz = thedim + 1;
-
-            for ( i = len; i >= beg; --i )
+            if(j < mkwtz)
             {
-               k = u.col.idx[i];
-               j = u.row.len[k];
-
-               if ( j < mkwtz )
+               /*  ensure that element (cl,k) is stable.
+                */
+               if(temp.s_max[k] > 0)
                {
-                  /*  ensure that element (cl,k) is stable.
+                  /*  case 1: l_maxabs is known
                    */
-                  if ( temp.s_max[k] > 0 )
+                  for(m = u.row.start[k], kk = m + u.row.len[k] - 1;
+                        kk >= m; --kk)
                   {
-                     /*  case 1: l_maxabs is known
-                      */
-                     for ( m = u.row.start[k], kk = m + u.row.len[k] - 1;
-                           kk >= m; --kk )
+                     if(u.row.idx[kk] == cl)
                      {
-                        if ( u.row.idx[kk] == cl )
-                        {
-                           x = u.row.val[kk];
-                           ll = kk;
-                           break;
-                        }
-                     }
-
-                     l_maxabs = temp.s_max[k];
-                  }
-                  else
-                  {
-                     /*  case 2: l_maxabs needs to be computed
-                      */
-                     m = u.row.start[k];
-                     l_maxabs = spxAbs( u.row.val[m] );
-
-                     for ( kk = m + u.row.len[k] - 1; kk >= m; --kk )
-                     {
-                        if ( l_maxabs < spxAbs( u.row.val[kk] ) )
-                           l_maxabs = spxAbs( u.row.val[kk] );
-
-                        if ( u.row.idx[kk] == cl )
-                        {
-                           x = u.row.val[kk];
-                           ll = kk;
-                           break;
-                        }
-                     }
-
-                     for ( --kk; kk > m; --kk )
-                     {
-                        if ( l_maxabs < spxAbs( u.row.val[kk] ) )
-                           l_maxabs = spxAbs( u.row.val[kk] );
-                     }
-
-                     temp.s_max[k] = l_maxabs;
-                  }
-
-                  l_maxabs *= threshold;
-
-                  if ( spxAbs( x ) > l_maxabs )
-                  {
-                     mkwtz = j;
-                     rw = k;
-                     ii = ll;
-
-                     if ( j <= count + 1 )
+                        x = u.row.val[kk];
+                        ll = kk;
                         break;
+                     }
                   }
+
+                  l_maxabs = temp.s_max[k];
+               }
+               else
+               {
+                  /*  case 2: l_maxabs needs to be computed
+                   */
+                  m = u.row.start[k];
+                  l_maxabs = spxAbs(u.row.val[m]);
+
+                  for(kk = m + u.row.len[k] - 1; kk >= m; --kk)
+                  {
+                     if(l_maxabs < spxAbs(u.row.val[kk]))
+                        l_maxabs = spxAbs(u.row.val[kk]);
+
+                     if(u.row.idx[kk] == cl)
+                     {
+                        x = u.row.val[kk];
+                        ll = kk;
+                        break;
+                     }
+                  }
+
+                  for(--kk; kk > m; --kk)
+                  {
+                     if(l_maxabs < spxAbs(u.row.val[kk]))
+                        l_maxabs = spxAbs(u.row.val[kk]);
+                  }
+
+                  temp.s_max[k] = l_maxabs;
+               }
+
+               l_maxabs *= threshold;
+
+               if(spxAbs(x) > l_maxabs)
+               {
+                  mkwtz = j;
+                  rw = k;
+                  ii = ll;
+
+                  if(j <= count + 1)
+                     break;
                }
             }
          }
-         else
-         {
-            ++count;
-            continue;
-         }
+      }
+      else
+      {
+         ++count;
+         continue;
+      }
 
-      assert( cl >= 0 );
+      assert(cl >= 0);
 
-      removeDR( temp.pivot_col[cl] );
-      initDR( temp.pivot_col[cl] );
+      removeDR(temp.pivot_col[cl]);
+      initDR(temp.pivot_col[cl]);
 
-      if ( ii >= 0 )
+      if(ii >= 0)
       {
          /*  Initialize selected pivot element
           */
-         CLUFactorRational::Pring *pr;
+         CLUFactorRational::Pring* pr;
          temp.pivot_row[rw].pos = ii - u.row.start[rw];
-         temp.pivot_row[rw].mkwtz = mkwtz = ( mkwtz - 1 ) * ( count - 1 );
+         temp.pivot_row[rw].mkwtz = mkwtz = (mkwtz - 1) * (count - 1);
          // ??? mkwtz originally was long,
          // maybe to avoid an overflow in this instruction?
 
-         for ( pr = temp.pivots.next; pr->idx >= 0; pr = pr->next )
+         for(pr = temp.pivots.next; pr->idx >= 0; pr = pr->next)
          {
-            if ( pr->idx == rw || pr->mkwtz >= mkwtz )
+            if(pr->idx == rw || pr->mkwtz >= mkwtz)
                break;
          }
 
          pr = pr->prev;
 
-         if ( pr->idx != rw )
+         if(pr->idx != rw)
          {
-            removeDR( temp.pivot_row[rw] );
-            init2DR( temp.pivot_row[rw], *pr );
+            removeDR(temp.pivot_row[rw]);
+            init2DR(temp.pivot_row[rw], *pr);
          }
 
          num++;
 
-         if ( num >= candidates )
+         if(num >= candidates)
             break;
       }
    }
@@ -2261,33 +2257,33 @@ void CLUFactorRational::selectPivots( const Rational& threshold )
     }
     */
 
-   assert( row.perm[rw] < 0 );
+   assert(row.perm[rw] < 0);
 
-   assert( col.perm[cl] < 0 );
+   assert(col.perm[cl] < 0);
 }
 
 
 /*
  *      Perform L and update loop for row r
  */
-int CLUFactorRational::updateRow( int r,
-                          int lv,
-                          int prow,
-                          int pcol,
-                          const Rational& pval )
+int CLUFactorRational::updateRow(int r,
+                                 int lv,
+                                 int prow,
+                                 int pcol,
+                                 const Rational& pval)
 {
    int fill;
    Rational x, lx;
    int c, i, j, k, ll, m, n;
 
    n = u.row.start[r];
-   m = --( u.row.len[r] ) + n;
+   m = --(u.row.len[r]) + n;
 
    /*  compute L vector entry and
     *  and remove pivot column form row file
     */
 
-   for ( j = m; u.row.idx[j] != pcol; --j )
+   for(j = m; u.row.idx[j] != pcol; --j)
       ;
 
    lx = u.row.val[j] / pval;
@@ -2308,11 +2304,11 @@ int CLUFactorRational::updateRow( int r,
     */
    fill = u.row.len[prow];
 
-   for ( j = m - 1; j >= n; --j )
+   for(j = m - 1; j >= n; --j)
    {
       c = u.row.idx[j];
 
-      if ( temp.s_mark[c] )
+      if(temp.s_mark[c])
       {
          /*  count fill elements.
           */
@@ -2323,7 +2319,7 @@ int CLUFactorRational::updateRow( int r,
           */
          x = u.row.val[j] -= work[c] * lx;
 
-         if ( x == 0 )
+         if(x == 0)
          {
             /* Eliminate zero from row r
              */
@@ -2334,10 +2330,10 @@ int CLUFactorRational::updateRow( int r,
 
             /* Eliminate zero from column c
              */
-            --( temp.s_cact[c] );
-            k = --( u.col.len[c] ) + u.col.start[c];
+            --(temp.s_cact[c]);
+            k = --(u.col.len[c]) + u.col.start[c];
 
-            for ( i = k; u.col.idx[i] != r; --i )
+            for(i = k; u.col.idx[i] != r; --i)
                ;
 
             u.col.idx[i] = u.col.idx[k];
@@ -2350,22 +2346,22 @@ int CLUFactorRational::updateRow( int r,
     */
    ll = u.row.len[r];
 
-   if ( ll + fill > u.row.max[r] )
-      remaxRow( r, ll + fill );
+   if(ll + fill > u.row.max[r])
+      remaxRow(r, ll + fill);
 
    ll += u.row.start[r];
 
    /*  fill creating update loop (II)
     */
-   for ( j = u.row.start[prow], m = j + u.row.len[prow]; j < m; ++j )
+   for(j = u.row.start[prow], m = j + u.row.len[prow]; j < m; ++j)
    {
       c = u.row.idx[j];
 
-      if ( temp.s_mark[c] )
+      if(temp.s_mark[c])
       {
          x = - work[c] * lx;
 
-         if ( x != 0 )
+         if(x != 0)
          {
             /* produce fill element in row r
              */
@@ -2377,10 +2373,10 @@ int CLUFactorRational::updateRow( int r,
             /* produce fill element in column c
              */
 
-            if ( u.col.len[c] >= u.col.max[c] )
-               remaxCol( c, u.col.len[c] + 1 );
+            if(u.col.len[c] >= u.col.max[c])
+               remaxCol(c, u.col.len[c] + 1);
 
-            u.col.idx[u.col.start[c] + ( u.col.len[c] )++] = r;
+            u.col.idx[u.col.start[c] + (u.col.len[c])++] = r;
 
             temp.s_cact[c]++;
          }
@@ -2391,11 +2387,11 @@ int CLUFactorRational::updateRow( int r,
 
    /*  move row to appropriate list.
     */
-   removeDR( temp.pivot_row[r] );
+   removeDR(temp.pivot_row[r]);
 
-   init2DR( temp.pivot_row[r], temp.pivot_rowNZ[u.row.len[r]] );
+   init2DR(temp.pivot_row[r], temp.pivot_rowNZ[u.row.len[r]]);
 
-   assert( row.perm[r] < 0 );
+   assert(row.perm[r] < 0);
 
    temp.s_max[r] = -1;
 
@@ -2405,14 +2401,14 @@ int CLUFactorRational::updateRow( int r,
 /*
  *      Eliminate pivot element
  */
-void CLUFactorRational::eliminatePivot( int prow, int pos )
+void CLUFactorRational::eliminatePivot(int prow, int pos)
 {
    int i, j, k, m = -1;
    int lv = -1;  // This value should never be used.
    int pcol;
    Rational pval;
    int pbeg = u.row.start[prow];
-   int plen = --( u.row.len[prow] );
+   int plen = --(u.row.len[prow]);
    int pend = pbeg + plen;
 
 
@@ -2420,37 +2416,37 @@ void CLUFactorRational::eliminatePivot( int prow, int pos )
    i = pbeg + pos;
    pcol = u.row.idx[i];
    pval = u.row.val[i];
-   removeDR( temp.pivot_col[pcol] );
-   initDR( temp.pivot_col[pcol] );
+   removeDR(temp.pivot_col[pcol]);
+   initDR(temp.pivot_col[pcol]);
 
    /*  remove pivot from pivot row     */
    u.row.idx[i] = u.row.idx[pend];
    u.row.val[i] = u.row.val[pend];
 
    /*  set pivot element and construct L vector */
-   setPivot( temp.stage++, pcol, prow, pval );
+   setPivot(temp.stage++, pcol, prow, pval);
 
    /**@todo If this test failes, lv has no value. I suppose that in this
     *       case none of the loops below that uses lv is executed.
     *       But this is unproven.
     */
 
-   if ( temp.s_cact[pcol] - 1 > 0 )
-      lv = makeLvec( temp.s_cact[pcol] - 1, prow );
+   if(temp.s_cact[pcol] - 1 > 0)
+      lv = makeLvec(temp.s_cact[pcol] - 1, prow);
 
    /*  init working vector,
     *  remove pivot row from working matrix
     *  and remove columns from list.
     */
-   for ( i = pbeg; i < pend; ++i )
+   for(i = pbeg; i < pend; ++i)
    {
       j = u.row.idx[i];
       temp.s_mark[j] = 1;
       work[j] = u.row.val[i];
-      removeDR( temp.pivot_col[j] );
+      removeDR(temp.pivot_col[j]);
       m = u.col.start[j] + u.col.len[j] - temp.s_cact[j];
 
-      for ( k = m; u.col.idx[k] != prow; ++k )
+      for(k = m; u.col.idx[k] != prow; ++k)
          ;
 
       u.col.idx[k] = u.col.idx[m];
@@ -2462,23 +2458,23 @@ void CLUFactorRational::eliminatePivot( int prow, int pos )
 
    /*  perform L and update loop
     */
-   for ( i = u.col.len[pcol] - temp.s_cact[pcol];
-         ( m = u.col.idx[u.col.start[pcol] + i] ) != prow;
-         ++i )
+   for(i = u.col.len[pcol] - temp.s_cact[pcol];
+         (m = u.col.idx[u.col.start[pcol] + i]) != prow;
+         ++i)
    {
-      assert( row.perm[m] < 0 );
-      assert( lv >= 0 );
-      updateRow( m, lv++, prow, pcol, pval );
+      assert(row.perm[m] < 0);
+      assert(lv >= 0);
+      updateRow(m, lv++, prow, pcol, pval);
    }
 
    /*  skip pivot row  */
 
    m = u.col.len[pcol];
 
-   for ( ++i; i < m; ++i )
+   for(++i; i < m; ++i)
    {
-      assert( lv >= 0 );
-      updateRow( u.col.idx[u.col.start[pcol] + i], lv++, prow, pcol, pval );
+      assert(lv >= 0);
+      updateRow(u.col.idx[u.col.start[pcol] + i], lv++, prow, pcol, pval);
    }
 
    /*  remove pivot column from column file.
@@ -2487,13 +2483,13 @@ void CLUFactorRational::eliminatePivot( int prow, int pos )
 
    /*  clear working vector and reinsert columns to lists
     */
-   for ( i = u.row.start[prow], pend = i + plen; i < pend; ++i )
+   for(i = u.row.start[prow], pend = i + plen; i < pend; ++i)
    {
       j = u.row.idx[i];
       work[j] = 0;
       temp.s_mark[j] = 0;
-      init2DR( temp.pivot_col[j], temp.pivot_colNZ[temp.s_cact[j]] );
-      assert( col.perm[j] < 0 );
+      init2DR(temp.pivot_col[j], temp.pivot_colNZ[temp.s_cact[j]]);
+      assert(col.perm[j] < 0);
    }
 }
 
@@ -2501,12 +2497,12 @@ void CLUFactorRational::eliminatePivot( int prow, int pos )
 /*
  *      Factorize nucleus.
  */
-void CLUFactorRational::eliminateNucleus( const Rational& threshold )
+void CLUFactorRational::eliminateNucleus(const Rational& threshold)
 {
    int r, c;
-   CLUFactorRational::Pring *pivot;
+   CLUFactorRational::Pring* pivot;
 
-   if ( stat == SLinSolverRational::SINGULAR )
+   if(stat == SLinSolverRational::SINGULAR)
       return;
 
    temp.pivots.mkwtz = -1;
@@ -2515,75 +2511,74 @@ void CLUFactorRational::eliminateNucleus( const Rational& threshold )
 
    temp.pivots.pos = -1;
 
-   while ( temp.stage < thedim - 1 )
+   while(temp.stage < thedim - 1)
    {
 #ifndef NDEBUG
       int i;
       // CLUFactorRationalIsConsistent(fac);
 
-      for ( i = 0; i < thedim; ++i )
-         if ( col.perm[i] < 0 )
-            assert( temp.s_mark[i] == 0 );
+      for(i = 0; i < thedim; ++i)
+         if(col.perm[i] < 0)
+            assert(temp.s_mark[i] == 0);
 
 #endif
 
-      if ( temp.pivot_rowNZ[1].next != &( temp.pivot_rowNZ[1] ) )
+      if(temp.pivot_rowNZ[1].next != &(temp.pivot_rowNZ[1]))
       {
-         if( timeLimitReached() )
+         if(timeLimitReached())
             return;
 
          /* row singleton available */
          eliminateRowSingletons();
       }
+      else if(temp.pivot_colNZ[1].next != &(temp.pivot_colNZ[1]))
+      {
+         if(timeLimitReached())
+            return;
+
+         /* column singleton available */
+         eliminateColSingletons();
+      }
       else
-         if ( temp.pivot_colNZ[1].next != &( temp.pivot_colNZ[1] ) )
+      {
+         initDR(temp.pivots);
+         selectPivots(threshold);
+
+         assert(temp.pivots.next != &temp.pivots &&
+                "ERROR: no pivot element selected");
+
+         for(pivot = temp.pivots.next; pivot != &temp.pivots;
+               pivot = pivot->next)
          {
-            if( timeLimitReached() )
+            if(timeLimitReached())
                return;
 
-            /* column singleton available */
-            eliminateColSingletons();
+            eliminatePivot(pivot->idx, pivot->pos);
          }
-         else
-         {
-            initDR( temp.pivots );
-            selectPivots( threshold );
+      }
 
-            assert( temp.pivots.next != &temp.pivots &&
-                    "ERROR: no pivot element selected" );
-
-            for ( pivot = temp.pivots.next; pivot != &temp.pivots;
-                  pivot = pivot->next )
-            {
-               if( timeLimitReached() )
-                  return;
-
-               eliminatePivot( pivot->idx, pivot->pos );
-            }
-         }
-
-      if ( temp.pivot_rowNZ->next != temp.pivot_rowNZ ||
-            temp.pivot_colNZ->next != temp.pivot_colNZ )
+      if(temp.pivot_rowNZ->next != temp.pivot_rowNZ ||
+            temp.pivot_colNZ->next != temp.pivot_colNZ)
       {
          stat = SLinSolverRational::SINGULAR;
          return;
       }
    }
 
-   if ( temp.stage < thedim )
+   if(temp.stage < thedim)
    {
       /*      Eliminate remaining element.
        *      Note, that this must be both, column and row singleton.
        */
-      assert( temp.pivot_rowNZ[1].next != &( temp.pivot_rowNZ[1] ) &&
-              "ERROR: one row must be left" );
-      assert( temp.pivot_colNZ[1].next != &( temp.pivot_colNZ[1] ) &&
-              "ERROR: one col must be left" );
+      assert(temp.pivot_rowNZ[1].next != &(temp.pivot_rowNZ[1]) &&
+             "ERROR: one row must be left");
+      assert(temp.pivot_colNZ[1].next != &(temp.pivot_colNZ[1]) &&
+             "ERROR: one col must be left");
       r = temp.pivot_rowNZ[1].next->idx;
       c = temp.pivot_colNZ[1].next->idx;
       u.row.len[r] = 0;
       u.col.len[c]--;
-      setPivot( temp.stage, c, r, u.row.val[u.row.start[r]] );
+      setPivot(temp.stage, c, r, u.row.val[u.row.start[r]]);
    }
 }
 
@@ -2596,12 +2591,12 @@ int CLUFactorRational::setupColVals()
 
    u.col.val.reDim(u.col.size);
 
-   for ( i = 0; i < thedim; i++ )
+   for(i = 0; i < thedim; i++)
       u.col.len[i] = 0;
 
    maxabs = 0;
 
-   for ( i = 0; i < thedim; i++ )
+   for(i = 0; i < thedim; i++)
    {
       int     k   = u.row.start[i];
       int*    idx = &u.row.idx[k];
@@ -2610,23 +2605,23 @@ int CLUFactorRational::setupColVals()
 
       n += len;
 
-      while ( len-- > 0 )
+      while(len-- > 0)
       {
-         assert(( *idx >= 0 ) && ( *idx < thedim ) );
+         assert((*idx >= 0) && (*idx < thedim));
 
          k = u.col.start[*idx] + u.col.len[*idx];
 
-         assert(( k >= 0 ) && ( k < u.col.size ) );
+         assert((k >= 0) && (k < u.col.size));
 
          u.col.len[*idx]++;
 
-         assert( u.col.len[*idx] <= u.col.max[*idx] );
+         assert(u.col.len[*idx] <= u.col.max[*idx]);
 
          u.col.idx[k] = i;
          u.col.val[k] = *val;
 
-         if ( spxAbs( *val ) > maxabs )
-            maxabs = spxAbs( *val );
+         if(spxAbs(*val) > maxabs)
+            maxabs = spxAbs(*val);
 
          idx++;
 
@@ -2662,27 +2657,27 @@ void CLUFactorRational::setupRowVals()
    beg   = l.start;
    mem   = beg[vecs];
 
-   if ( l.ridx )
-      spx_free( l.ridx );
+   if(l.ridx)
+      spx_free(l.ridx);
 
-   if ( l.rbeg )
-      spx_free( l.rbeg );
+   if(l.rbeg)
+      spx_free(l.rbeg);
 
-   if ( l.rorig )
-      spx_free( l.rorig );
+   if(l.rorig)
+      spx_free(l.rorig);
 
-   if ( l.rperm )
-      spx_free( l.rperm );
+   if(l.rperm)
+      spx_free(l.rperm);
 
    l.rval.reDim(mem);
 
-   spx_alloc( l.ridx, mem );
+   spx_alloc(l.ridx, mem);
 
-   spx_alloc( l.rbeg, thedim + 1 );
+   spx_alloc(l.rbeg, thedim + 1);
 
-   spx_alloc( l.rorig, thedim );
+   spx_alloc(l.rorig, thedim);
 
-   spx_alloc( l.rperm, thedim );
+   spx_alloc(l.rperm, thedim);
 
    l_ridx = l.ridx;
 
@@ -2698,7 +2693,7 @@ void CLUFactorRational::setupRowVals()
 
    rrperm = row.perm;
 
-   for ( i = thedim; i--; *l_rbeg++ = 0 )
+   for(i = thedim; i--; *l_rbeg++ = 0)
    {
       *rorig++ = *rrorig++;
       *rperm++ = *rrperm++;
@@ -2708,40 +2703,40 @@ void CLUFactorRational::setupRowVals()
 
    l_rbeg = l.rbeg + 1;
 
-   for ( i = mem; i--; )
+   for(i = mem; i--;)
       l_rbeg[*idx++]++;
 
    idx = l.idx;
 
-   for ( m = 0, i = thedim; i--; l_rbeg++ )
+   for(m = 0, i = thedim; i--; l_rbeg++)
    {
       j = *l_rbeg;
       *l_rbeg = m;
       m += j;
    }
 
-   assert( m == mem );
+   assert(m == mem);
 
    l_rbeg = l.rbeg + 1;
 
-   for ( i = j = 0; i < vecs; ++i )
+   for(i = j = 0; i < vecs; ++i)
    {
       m = l_row[i];
-      assert( idx == &l.idx[l.start[i]] );
+      assert(idx == &l.idx[l.start[i]]);
 
-      for ( ; j < beg[i + 1]; j++ )
+      for(; j < beg[i + 1]; j++)
       {
          k = l_rbeg[*idx++]++;
-         assert( k < mem );
+         assert(k < mem);
          l_ridx[k] = m;
          l_rval[k] = val[validx];
          validx++; // was l_rval[k] = *val++; with Rational* val
       }
    }
 
-   assert( l.rbeg[thedim] == mem );
+   assert(l.rbeg[thedim] == mem);
 
-   assert( l.rbeg[0] == 0 );
+   assert(l.rbeg[0] == 0);
 }
 
 #endif
@@ -2751,9 +2746,9 @@ void CLUFactorRational::setupRowVals()
 void CLUFactorRational::factor(
    const SVectorRational** vec,         ///< Array of column vector pointers
    const Rational& threshold            ///< pivoting threshold
-   )
+)
 {
-   MSG_DEBUG( std::cout << "CLUFactorRational::factor()\n" );
+   MSG_DEBUG(std::cout << "CLUFactorRational::factor()\n");
 
    factorTime->start();
 
@@ -2763,39 +2758,39 @@ void CLUFactorRational::factor(
    l.firstUpdate = 0;
    l.firstUnused = 0;
 
-   temp.init( thedim );
+   temp.init(thedim);
    initPerm();
 
-   initFactorMatrix( vec );
+   initFactorMatrix(vec);
 
-   if ( stat )
+   if(stat)
       goto TERMINATE;
 
-   if( timeLimitReached() )
+   if(timeLimitReached())
       goto TERMINATE;
 
    //   initMaxabs = initMaxabs;
 
    colSingletons();
 
-   if ( stat != SLinSolverRational::OK )
+   if(stat != SLinSolverRational::OK)
       goto TERMINATE;
 
-   if( timeLimitReached() )
+   if(timeLimitReached())
       goto TERMINATE;
 
    rowSingletons();
 
-   if ( stat != SLinSolverRational::OK )
+   if(stat != SLinSolverRational::OK)
       goto TERMINATE;
 
-   if ( temp.stage < thedim )
+   if(temp.stage < thedim)
    {
-      if( timeLimitReached() )
+      if(timeLimitReached())
          goto TERMINATE;
 
       initFactorRings();
-      eliminateNucleus( threshold );
+      eliminateNucleus(threshold);
       freeFactorRings();
    }
 
@@ -2803,7 +2798,7 @@ TERMINATE:
 
    l.firstUpdate = l.firstUnused;
 
-   if ( stat == SLinSolverRational::OK )
+   if(stat == SLinSolverRational::OK)
    {
 #ifdef WITH_L_ROWS
       setupRowVals();
@@ -2825,31 +2820,31 @@ void CLUFactorRational::dump() const
    /*  Dump U:
     */
 
-   for ( i = 0; i < thedim; ++i )
+   for(i = 0; i < thedim; ++i)
    {
-      if ( row.perm[i] >= 0 )
+      if(row.perm[i] >= 0)
          std::cout << "DCLUFA01 diag[" << i << "]: [" << col.orig[row.perm[i]]
-         << "] = " << diag[i] << std::endl;
+                   << "] = " << diag[i] << std::endl;
 
-      for ( j = 0; j < u.row.len[i]; ++j )
+      for(j = 0; j < u.row.len[i]; ++j)
          std::cout << "DCLUFA02   u[" << i << "]: ["
-         << u.row.idx[u.row.start[i] + j] << "] = "
-         << u.row.val[u.row.start[i] + j] << std::endl;
+                   << u.row.idx[u.row.start[i] + j] << "] = "
+                   << u.row.val[u.row.start[i] + j] << std::endl;
    }
 
    /*  Dump L:
     */
-   for ( i = 0; i < thedim; ++i )
+   for(i = 0; i < thedim; ++i)
    {
-      for ( j = 0; j < l.firstUnused; ++j )
-         if ( col.orig[row.perm[l.row[j]]] == i )
+      for(j = 0; j < l.firstUnused; ++j)
+         if(col.orig[row.perm[l.row[j]]] == i)
          {
             std::cout << "DCLUFA03 l[" << i << "]" << std::endl;
 
-            for ( k = l.start[j]; k < l.start[j + 1]; ++k )
+            for(k = l.start[j]; k < l.start[j + 1]; ++k)
                std::cout << "DCLUFA04   l[" << k - l.start[j]
-               << "]:  [" << l.idx[k]
-               << "] = "  << l.val[k] << std::endl;
+                         << "]:  [" << l.idx[k]
+                         << "] = "  << l.val[k] << std::endl;
 
             break;
          }
@@ -2862,13 +2857,14 @@ void CLUFactorRational::dump() const
 /*
  *      Ensure that row memory is at least size.
  */
-void CLUFactorRational::minRowMem( int size )
+void CLUFactorRational::minRowMem(int size)
 {
-   if ( u.row.val.dim() < size )
+   if(u.row.val.dim() < size)
    {
       u.row.val.reDim(size);
-      spx_realloc( u.row.idx, size );
+      spx_realloc(u.row.idx, size);
    }
+
    assert(u.row.val.dim() >= size);
 }
 
@@ -2876,46 +2872,46 @@ void CLUFactorRational::minRowMem( int size )
 /*
  *      Ensure that column memory is at least size.
  */
-void CLUFactorRational::minColMem( int size )
+void CLUFactorRational::minColMem(int size)
 {
 
-   if ( u.col.size < size )
+   if(u.col.size < size)
    {
       u.col.size = size;
-      spx_realloc( u.col.idx, size );
+      spx_realloc(u.col.idx, size);
    }
 }
 
-void CLUFactorRational::forestMinColMem( int size )
+void CLUFactorRational::forestMinColMem(int size)
 {
 
-   if ( u.col.size < size )
+   if(u.col.size < size)
    {
       u.col.size = size;
-      spx_realloc( u.col.idx, size );
+      spx_realloc(u.col.idx, size);
       u.col.val.reDim(size);
    }
 }
 
-void CLUFactorRational::minLMem( int size )
+void CLUFactorRational::minLMem(int size)
 {
 
-   if ( size > l.val.dim() )
+   if(size > l.val.dim())
    {
-      int newsize = int( 0.2 * l.val.dim() + size );
+      int newsize = int(0.2 * l.val.dim() + size);
       l.val.reDim(newsize);
-      spx_realloc( l.idx, l.val.dim() );
+      spx_realloc(l.idx, l.val.dim());
    }
 }
 
 
-int CLUFactorRational::makeLvec( int p_len, int p_row )
+int CLUFactorRational::makeLvec(int p_len, int p_row)
 {
 
-   if ( l.firstUnused >= l.startSize )
+   if(l.firstUnused >= l.startSize)
    {
       l.startSize += 100;
-      spx_realloc( l.start, l.startSize );
+      spx_realloc(l.start, l.startSize);
    }
 
    int* p_lrow = l.row;
@@ -2923,14 +2919,14 @@ int CLUFactorRational::makeLvec( int p_len, int p_row )
    int* p_lbeg = l.start;
    int first   = p_lbeg[l.firstUnused];
 
-   assert( p_len > 0 && "ERROR: no empty columns allowed in L vectors" );
+   assert(p_len > 0 && "ERROR: no empty columns allowed in L vectors");
 
-   minLMem( first + p_len );
+   minLMem(first + p_len);
    p_lrow[l.firstUnused] = p_row;
-   l.start[++( l.firstUnused )] = first + p_len;
+   l.start[++(l.firstUnused)] = first + p_len;
 
-   assert( l.start[l.firstUnused] <= l.val.dim() );
-   assert( l.firstUnused <= l.startSize );
+   assert(l.start[l.firstUnused] <= l.val.dim());
+   assert(l.firstUnused <= l.startSize);
    return first;
 }
 
@@ -2941,131 +2937,131 @@ bool CLUFactorRational::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
    int              i, j, k, ll;
-   Dring            *ring;
-   CLUFactorRational::Pring *pring;
+   Dring*            ring;
+   CLUFactorRational::Pring* pring;
 
    /*  Consistency only relevant for real factorizations
     */
 
-   if ( stat )
+   if(stat)
       return true;
 
    /*  Test column ring list consistency.
     */
    i = 0;
 
-   for ( ring = u.col.list.next; ring != &( u.col.list ); ring = ring->next )
+   for(ring = u.col.list.next; ring != &(u.col.list); ring = ring->next)
    {
-      assert( ring->idx >= 0 );
-      assert( ring->idx < thedim );
-      assert( ring->prev->next == ring );
+      assert(ring->idx >= 0);
+      assert(ring->idx < thedim);
+      assert(ring->prev->next == ring);
 
-      if ( ring != u.col.list.next )
+      if(ring != u.col.list.next)
       {
-         assert( u.col.start[ring->prev->idx] + u.col.max[ring->prev->idx]
-                 == u.col.start[ring->idx] );
+         assert(u.col.start[ring->prev->idx] + u.col.max[ring->prev->idx]
+                == u.col.start[ring->idx]);
       }
 
       ++i;
    }
 
-   assert( i == thedim );
+   assert(i == thedim);
 
-   assert( u.col.start[ring->prev->idx] + u.col.max[ring->prev->idx]
-           == u.col.used );
+   assert(u.col.start[ring->prev->idx] + u.col.max[ring->prev->idx]
+          == u.col.used);
 
 
    /*  Test row ring list consistency.
     */
    i = 0;
 
-   for ( ring = u.row.list.next; ring != &( u.row.list ); ring = ring->next )
+   for(ring = u.row.list.next; ring != &(u.row.list); ring = ring->next)
    {
-      assert( ring->idx >= 0 );
-      assert( ring->idx < thedim );
-      assert( ring->prev->next == ring );
-      assert( u.row.start[ring->prev->idx] + u.row.max[ring->prev->idx]
-              == u.row.start[ring->idx] );
+      assert(ring->idx >= 0);
+      assert(ring->idx < thedim);
+      assert(ring->prev->next == ring);
+      assert(u.row.start[ring->prev->idx] + u.row.max[ring->prev->idx]
+             == u.row.start[ring->idx]);
       ++i;
    }
 
-   assert( i == thedim );
+   assert(i == thedim);
 
-   assert( u.row.start[ring->prev->idx] + u.row.max[ring->prev->idx]
-           == u.row.used );
+   assert(u.row.start[ring->prev->idx] + u.row.max[ring->prev->idx]
+          == u.row.used);
 
 
    /*  Test consistency of individual svectors.
     */
 
-   for ( i = 0; i < thedim; ++i )
+   for(i = 0; i < thedim; ++i)
    {
-      assert( u.row.max[i] >= u.row.len[i] );
-      assert( u.col.max[i] >= u.col.len[i] );
+      assert(u.row.max[i] >= u.row.len[i]);
+      assert(u.col.max[i] >= u.col.len[i]);
    }
 
 
    /*  Test consistency of column file to row file of U
     */
-   for ( i = 0; i < thedim; ++i )
+   for(i = 0; i < thedim; ++i)
    {
-      for ( j = u.row.start[i] + u.row.len[i] - 1; j >= u.row.start[i]; j-- )
+      for(j = u.row.start[i] + u.row.len[i] - 1; j >= u.row.start[i]; j--)
       {
          k = u.row.idx[j];
 
-         for ( ll = u.col.start[k] + u.col.len[k] - 1; ll >= u.col.start[k]; ll-- )
+         for(ll = u.col.start[k] + u.col.len[k] - 1; ll >= u.col.start[k]; ll--)
          {
-            if ( u.col.idx[ll] == i )
+            if(u.col.idx[ll] == i)
                break;
          }
 
-         assert( u.col.idx[ll] == i );
+         assert(u.col.idx[ll] == i);
 
-         if ( row.perm[i] < 0 )
+         if(row.perm[i] < 0)
          {
-            assert( col.perm[k] < 0 );
+            assert(col.perm[k] < 0);
          }
          else
          {
-            assert( col.perm[k] < 0 || col.perm[k] > row.perm[i] );
+            assert(col.perm[k] < 0 || col.perm[k] > row.perm[i]);
          }
       }
    }
 
    /*  Test consistency of row file to column file of U
     */
-   for ( i = 0; i < thedim; ++i )
+   for(i = 0; i < thedim; ++i)
    {
-      for ( j = u.col.start[i] + u.col.len[i] - 1; j >= u.col.start[i]; j-- )
+      for(j = u.col.start[i] + u.col.len[i] - 1; j >= u.col.start[i]; j--)
       {
          k = u.col.idx[j];
 
-         for ( ll = u.row.start[k] + u.row.len[k] - 1; ll >= u.row.start[k]; ll-- )
+         for(ll = u.row.start[k] + u.row.len[k] - 1; ll >= u.row.start[k]; ll--)
          {
-            if ( u.row.idx[ll] == i )
+            if(u.row.idx[ll] == i)
                break;
          }
 
-         assert( u.row.idx[ll] == i );
+         assert(u.row.idx[ll] == i);
 
-         assert( col.perm[i] < 0 || row.perm[k] < col.perm[i] );
+         assert(col.perm[i] < 0 || row.perm[k] < col.perm[i]);
       }
    }
 
    /*  Test consistency of nonzero count lists
     */
-   if ( temp.pivot_colNZ && temp.pivot_rowNZ )
+   if(temp.pivot_colNZ && temp.pivot_rowNZ)
    {
-      for ( i = 0; i < thedim - temp.stage; ++i )
+      for(i = 0; i < thedim - temp.stage; ++i)
       {
-         for ( pring = temp.pivot_rowNZ[i].next; pring != &( temp.pivot_rowNZ[i] ); pring = pring->next )
+         for(pring = temp.pivot_rowNZ[i].next; pring != &(temp.pivot_rowNZ[i]); pring = pring->next)
          {
-            assert( row.perm[pring->idx] < 0 );
+            assert(row.perm[pring->idx] < 0);
          }
 
-         for ( pring = temp.pivot_colNZ[i].next; pring != &( temp.pivot_colNZ[i] ); pring = pring->next )
+         for(pring = temp.pivot_colNZ[i].next; pring != &(temp.pivot_colNZ[i]); pring = pring->next)
          {
-            assert( col.perm[pring->idx] < 0 );
+            assert(col.perm[pring->idx] < 0);
          }
       }
    }
@@ -3075,10 +3071,10 @@ bool CLUFactorRational::isConsistent() const
    return true;
 }
 
-void CLUFactorRational::solveUright( Rational* wrk, Rational* vec )
+void CLUFactorRational::solveUright(Rational* wrk, Rational* vec)
 {
 
-   for ( int i = thedim - 1; i >= 0; i-- )
+   for(int i = thedim - 1; i >= 0; i--)
    {
       int  r = row.orig[i];
       int  c = col.orig[i];
@@ -3086,27 +3082,27 @@ void CLUFactorRational::solveUright( Rational* wrk, Rational* vec )
 
       vec[r] = 0;
 
-      if ( x != 0 )
+      if(x != 0)
          //if (isNotZero(x))
       {
-         if( timeLimitReached() )
+         if(timeLimitReached())
             return;
 
-         for ( int j = u.col.start[c]; j < u.col.start[c] + u.col.len[c]; j++ )
+         for(int j = u.col.start[c]; j < u.col.start[c] + u.col.len[c]; j++)
             vec[u.col.idx[j]] -= x * u.col.val[j];
       }
    }
 }
 
-int CLUFactorRational::solveUrightEps( Rational* vec, int* nonz, Rational* rhs )
+int CLUFactorRational::solveUrightEps(Rational* vec, int* nonz, Rational* rhs)
 {
    int i, j, r, c, n;
-   int *rorig, *corig;
-   int *cidx, *clen, *cbeg;
+   int* rorig, *corig;
+   int* cidx, *clen, *cbeg;
    Rational x;
 
-   int *idx;
-   Rational *val;
+   int* idx;
+   Rational* val;
 
    rorig = row.orig;
    corig = col.orig;
@@ -3118,12 +3114,12 @@ int CLUFactorRational::solveUrightEps( Rational* vec, int* nonz, Rational* rhs )
 
    n = 0;
 
-   for ( i = thedim - 1; i >= 0; --i )
+   for(i = thedim - 1; i >= 0; --i)
    {
       r = rorig[i];
       x = diag[r] * rhs[r];
 
-      if ( x != 0 )
+      if(x != 0)
       {
          c = corig[i];
          vec[c] = x;
@@ -3132,19 +3128,20 @@ int CLUFactorRational::solveUrightEps( Rational* vec, int* nonz, Rational* rhs )
          idx = &cidx[cbeg[c]];
          j = clen[c];
 
-         while ( j-- > 0 )
-            rhs[*idx++] -= x * ( *val++ );
+         while(j-- > 0)
+            rhs[*idx++] -= x * (*val++);
       }
    }
 
    return n;
 }
 
-void CLUFactorRational::solveUright2( Rational* p_work1, Rational* vec1, Rational* p_work2, Rational* vec2 )
+void CLUFactorRational::solveUright2(Rational* p_work1, Rational* vec1, Rational* p_work2,
+                                     Rational* vec2)
 {
    int i, j, r, c;
-   int *rorig, *corig;
-   int *cidx, *clen, *cbeg;
+   int* rorig, *corig;
+   int* cidx, *clen, *cbeg;
    Rational x1, x2;
 
    int* idx;
@@ -3158,7 +3155,7 @@ void CLUFactorRational::solveUright2( Rational* p_work1, Rational* vec1, Rationa
    clen = u.col.len;
    cbeg = u.col.start;
 
-   for ( i = thedim - 1; i >= 0; --i )
+   for(i = thedim - 1; i >= 0; --i)
    {
       r = rorig[i];
       c = corig[i];
@@ -3166,46 +3163,45 @@ void CLUFactorRational::solveUright2( Rational* p_work1, Rational* vec1, Rationa
       p_work2[c] = x2 = diag[r] * vec2[r];
       vec1[r] = vec2[r] = 0;
 
-      if ( x1 != 0 && x2 != 0 )
+      if(x1 != 0 && x2 != 0)
       {
          val = &cval[cbeg[c]];
          idx = &cidx[cbeg[c]];
          j = clen[c];
 
-         while ( j-- > 0 )
+         while(j-- > 0)
          {
-            vec1[*idx] -= x1 * ( *val );
-            vec2[*idx++] -= x2 * ( *val++ );
+            vec1[*idx] -= x1 * (*val);
+            vec2[*idx++] -= x2 * (*val++);
          }
       }
-      else
-         if ( x1 != 0 )
-         {
-            val = &cval[cbeg[c]];
-            idx = &cidx[cbeg[c]];
-            j = clen[c];
+      else if(x1 != 0)
+      {
+         val = &cval[cbeg[c]];
+         idx = &cidx[cbeg[c]];
+         j = clen[c];
 
-            while ( j-- > 0 )
-               vec1[*idx++] -= x1 * ( *val++ );
-         }
-         else
-            if ( x2 != 0 )
-            {
-               val = &cval[cbeg[c]];
-               idx = &cidx[cbeg[c]];
-               j = clen[c];
+         while(j-- > 0)
+            vec1[*idx++] -= x1 * (*val++);
+      }
+      else if(x2 != 0)
+      {
+         val = &cval[cbeg[c]];
+         idx = &cidx[cbeg[c]];
+         j = clen[c];
 
-               while ( j-- > 0 )
-                  vec2[*idx++] -= x2 * ( *val++ );
-            }
+         while(j-- > 0)
+            vec2[*idx++] -= x2 * (*val++);
+      }
    }
 }
 
-int CLUFactorRational::solveUright2eps( Rational* p_work1, Rational* vec1, Rational* p_work2, Rational* vec2, int* nonz )
+int CLUFactorRational::solveUright2eps(Rational* p_work1, Rational* vec1, Rational* p_work2,
+                                       Rational* vec2, int* nonz)
 {
    int i, j, r, c, n;
-   int *rorig, *corig;
-   int *cidx, *clen, *cbeg;
+   int* rorig, *corig;
+   int* cidx, *clen, *cbeg;
    bool notzero1, notzero2;
    Rational x1, x2;
 
@@ -3222,7 +3218,7 @@ int CLUFactorRational::solveUright2eps( Rational* p_work1, Rational* vec1, Ratio
 
    n = 0;
 
-   for ( i = thedim - 1; i >= 0; --i )
+   for(i = thedim - 1; i >= 0; --i)
    {
       c = corig[i];
       r = rorig[i];
@@ -3232,7 +3228,7 @@ int CLUFactorRational::solveUright2eps( Rational* p_work1, Rational* vec1, Ratio
       notzero1 = x1 != 0 ? 1 : 0;
       notzero2 = x2 != 0 ? 1 : 0;
 
-      if ( notzero1 && notzero2 )
+      if(notzero1 && notzero2)
       {
          *nonz++ = c;
          n++;
@@ -3240,54 +3236,52 @@ int CLUFactorRational::solveUright2eps( Rational* p_work1, Rational* vec1, Ratio
          idx = &cidx[cbeg[c]];
          j = clen[c];
 
-         while ( j-- > 0 )
+         while(j-- > 0)
          {
-            vec1[*idx] -= x1 * ( *val );
-            vec2[*idx++] -= x2 * ( *val++ );
+            vec1[*idx] -= x1 * (*val);
+            vec2[*idx++] -= x2 * (*val++);
          }
       }
+      else if(notzero1)
+      {
+         p_work2[c] = 0;
+         *nonz++ = c;
+         n++;
+         val = &cval[cbeg[c]];
+         idx = &cidx[cbeg[c]];
+         j = clen[c];
+
+         while(j-- > 0)
+            vec1[*idx++] -= x1 * (*val++);
+      }
+      else if(notzero2)
+      {
+         p_work1[c] = 0;
+         val = &cval[cbeg[c]];
+         idx = &cidx[cbeg[c]];
+         j = clen[c];
+
+         while(j-- > 0)
+            vec2[*idx++] -= x2 * (*val++);
+      }
       else
-         if ( notzero1 )
-         {
-            p_work2[c] = 0;
-            *nonz++ = c;
-            n++;
-            val = &cval[cbeg[c]];
-            idx = &cidx[cbeg[c]];
-            j = clen[c];
-
-            while ( j-- > 0 )
-               vec1[*idx++] -= x1 * ( *val++ );
-         }
-         else
-            if ( notzero2 )
-            {
-               p_work1[c] = 0;
-               val = &cval[cbeg[c]];
-               idx = &cidx[cbeg[c]];
-               j = clen[c];
-
-               while ( j-- > 0 )
-                  vec2[*idx++] -= x2 * ( *val++ );
-            }
-            else
-            {
-               p_work1[c] = 0;
-               p_work2[c] = 0;
-            }
+      {
+         p_work1[c] = 0;
+         p_work2[c] = 0;
+      }
    }
 
    return n;
 }
 
-void CLUFactorRational::solveLright( Rational* vec )
+void CLUFactorRational::solveLright(Rational* vec)
 {
    int i, j, k;
    int end;
    Rational x;
-   Rational *val;
-   int *lrow, *lidx, *idx;
-   int *lbeg;
+   Rational* val;
+   int* lrow, *lidx, *idx;
+   int* lbeg;
 
    VectorRational& lval = l.val;
    lidx = l.idx;
@@ -3296,61 +3290,62 @@ void CLUFactorRational::solveLright( Rational* vec )
 
    end = l.firstUpdate;
 
-   for ( i = 0; i < end; ++i )
+   for(i = 0; i < end; ++i)
    {
-      if (( x = vec[lrow[i]] ) != 0 )
+      if((x = vec[lrow[i]]) != 0)
       {
-         if( timeLimitReached() )
+         if(timeLimitReached())
             return;
 
-         MSG_DEBUG( std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl; )
+         MSG_DEBUG(std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl;)
 
          k = lbeg[i];
-         idx = &( lidx[k] );
-         val = &( lval[k] );
+         idx = &(lidx[k]);
+         val = &(lval[k]);
 
-         for ( j = lbeg[i + 1]; j > k; --j )
+         for(j = lbeg[i + 1]; j > k; --j)
          {
-            MSG_DEBUG( std::cout << "                         -> y" << *idx << " -= " << x << " * " << *val << " = " << x * ( *val ) << "    -> " << vec[*idx] - x * ( *val ) << std::endl; )
-            vec[*idx++] -= x * ( *val++ );
+            MSG_DEBUG(std::cout << "                         -> y" << *idx << " -= " << x << " * " << *val <<
+                      " = " << x * (*val) << "    -> " << vec[*idx] - x * (*val) << std::endl;)
+            vec[*idx++] -= x * (*val++);
          }
       }
    }
 
-   if ( l.updateType )                   /* Forest-Tomlin Updates */
+   if(l.updateType)                      /* Forest-Tomlin Updates */
    {
-      MSG_DEBUG( std::cout << "performing FT updates..." << std::endl; )
+      MSG_DEBUG(std::cout << "performing FT updates..." << std::endl;)
 
       end = l.firstUnused;
 
-      for ( ; i < end; ++i )
+      for(; i < end; ++i)
       {
          x = 0;
          k = lbeg[i];
-         idx = &( lidx[k] );
-         val = &( lval[k] );
+         idx = &(lidx[k]);
+         val = &(lval[k]);
 
-         for ( j = lbeg[i + 1]; j > k; --j )
-            x += vec[*idx++] * ( *val++ );
+         for(j = lbeg[i + 1]; j > k; --j)
+            x += vec[*idx++] * (*val++);
 
          vec[lrow[i]] -= x;
 
-         MSG_DEBUG( std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl; )
+         MSG_DEBUG(std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl;)
       }
 
-      MSG_DEBUG( std::cout << "finished FT updates." << std::endl; )
+      MSG_DEBUG(std::cout << "finished FT updates." << std::endl;)
    }
 }
 
-void CLUFactorRational::solveLright2( Rational* vec1, Rational* vec2 )
+void CLUFactorRational::solveLright2(Rational* vec1, Rational* vec2)
 {
    int i, j, k;
    int end;
    Rational x2;
    Rational x1;
-   Rational *val;
-   int *lrow, *lidx, *idx;
-   int *lbeg;
+   Rational* val;
+   int* lrow, *lidx, *idx;
+   int* lbeg;
 
    VectorRational& lval = l.val;
    lidx = l.idx;
@@ -3359,61 +3354,59 @@ void CLUFactorRational::solveLright2( Rational* vec1, Rational* vec2 )
 
    end = l.firstUpdate;
 
-   for ( i = 0; i < end; ++i )
+   for(i = 0; i < end; ++i)
    {
       x1 = vec1[lrow[i]];
       x2 = vec2[lrow[i]];
 
-      if ( x1 != 0 && x2 != 0 )
+      if(x1 != 0 && x2 != 0)
       {
          k = lbeg[i];
-         idx = &( lidx[k] );
-         val = &( lval[k] );
+         idx = &(lidx[k]);
+         val = &(lval[k]);
 
-         for ( j = lbeg[i + 1]; j > k; --j )
+         for(j = lbeg[i + 1]; j > k; --j)
          {
-            vec1[*idx] -= x1 * ( *val );
-            vec2[*idx++] -= x2 * ( *val++ );
+            vec1[*idx] -= x1 * (*val);
+            vec2[*idx++] -= x2 * (*val++);
          }
       }
-      else
-         if ( x1 != 0 )
-         {
-            k = lbeg[i];
-            idx = &( lidx[k] );
-            val = &( lval[k] );
+      else if(x1 != 0)
+      {
+         k = lbeg[i];
+         idx = &(lidx[k]);
+         val = &(lval[k]);
 
-            for ( j = lbeg[i + 1]; j > k; --j )
-               vec1[*idx++] -= x1 * ( *val++ );
-         }
-         else
-            if ( x2 != 0 )
-            {
-               k = lbeg[i];
-               idx = &( lidx[k] );
-               val = &( lval[k] );
+         for(j = lbeg[i + 1]; j > k; --j)
+            vec1[*idx++] -= x1 * (*val++);
+      }
+      else if(x2 != 0)
+      {
+         k = lbeg[i];
+         idx = &(lidx[k]);
+         val = &(lval[k]);
 
-               for ( j = lbeg[i + 1]; j > k; --j )
-                  vec2[*idx++] -= x2 * ( *val++ );
-            }
+         for(j = lbeg[i + 1]; j > k; --j)
+            vec2[*idx++] -= x2 * (*val++);
+      }
    }
 
-   if ( l.updateType )                   /* Forest-Tomlin Updates */
+   if(l.updateType)                      /* Forest-Tomlin Updates */
    {
       end = l.firstUnused;
 
-      for ( ; i < end; ++i )
+      for(; i < end; ++i)
       {
          x1 = 0;
          x2 = 0;
          k = lbeg[i];
-         idx = &( lidx[k] );
-         val = &( lval[k] );
+         idx = &(lidx[k]);
+         val = &(lval[k]);
 
-         for ( j = lbeg[i + 1]; j > k; --j )
+         for(j = lbeg[i + 1]; j > k; --j)
          {
-            x1 += vec1[*idx] * ( *val );
-            x2 += vec2[*idx++] * ( *val++ );
+            x1 += vec1[*idx] * (*val);
+            x2 += vec2[*idx++] * (*val++);
          }
 
          vec1[lrow[i]] -= x1;
@@ -3423,16 +3416,16 @@ void CLUFactorRational::solveLright2( Rational* vec1, Rational* vec2 )
    }
 }
 
-void CLUFactorRational::solveUpdateRight( Rational* vec )
+void CLUFactorRational::solveUpdateRight(Rational* vec)
 {
    int i, j, k;
    int end;
    Rational x;
-   Rational *val;
-   int *lrow, *lidx, *idx;
-   int *lbeg;
+   Rational* val;
+   int* lrow, *lidx, *idx;
+   int* lbeg;
 
-   assert( !l.updateType );             /* no Forest-Tomlin Updates */
+   assert(!l.updateType);               /* no Forest-Tomlin Updates */
 
    VectorRational& lval = l.val;
    lidx = l.idx;
@@ -3441,32 +3434,32 @@ void CLUFactorRational::solveUpdateRight( Rational* vec )
 
    end = l.firstUnused;
 
-   for ( i = l.firstUpdate; i < end; ++i )
+   for(i = l.firstUpdate; i < end; ++i)
    {
-      if (( x = vec[lrow[i]] ) != 0 )
+      if((x = vec[lrow[i]]) != 0)
       {
          k = lbeg[i];
-         idx = &( lidx[k] );
-         val = &( lval[k] );
+         idx = &(lidx[k]);
+         val = &(lval[k]);
 
-         for ( j = lbeg[i + 1]; j > k; --j )
-            vec[*idx++] -= x * ( *val++ );
+         for(j = lbeg[i + 1]; j > k; --j)
+            vec[*idx++] -= x * (*val++);
       }
    }
 }
 
-void CLUFactorRational::solveUpdateRight2( Rational* vec1, Rational* vec2 )
+void CLUFactorRational::solveUpdateRight2(Rational* vec1, Rational* vec2)
 {
    int i, j, k;
    int end;
    Rational x1, x2;
-   int *lrow, *lidx;
-   int *lbeg;
+   int* lrow, *lidx;
+   int* lbeg;
 
    int* idx;
    Rational* val;
 
-   assert( !l.updateType );             /* no Forest-Tomlin Updates */
+   assert(!l.updateType);               /* no Forest-Tomlin Updates */
 
    VectorRational& lval = l.val;
    lidx = l.idx;
@@ -3475,56 +3468,54 @@ void CLUFactorRational::solveUpdateRight2( Rational* vec1, Rational* vec2 )
 
    end = l.firstUnused;
 
-   for ( i = l.firstUpdate; i < end; ++i )
+   for(i = l.firstUpdate; i < end; ++i)
    {
       x1 = vec1[lrow[i]];
       x2 = vec2[lrow[i]];
 
-      if ( x1 != 0 && x2 != 0 )
+      if(x1 != 0 && x2 != 0)
       {
          k = lbeg[i];
-         idx = &( lidx[k] );
-         val = &( lval[k] );
+         idx = &(lidx[k]);
+         val = &(lval[k]);
 
-         for ( j = lbeg[i + 1]; j > k; --j )
+         for(j = lbeg[i + 1]; j > k; --j)
          {
-            vec1[*idx] -= x1 * ( *val );
-            vec2[*idx++] -= x2 * ( *val++ );
+            vec1[*idx] -= x1 * (*val);
+            vec2[*idx++] -= x2 * (*val++);
          }
       }
-      else
-         if ( x1 != 0 )
-         {
-            k = lbeg[i];
-            idx = &( lidx[k] );
-            val = &( lval[k] );
+      else if(x1 != 0)
+      {
+         k = lbeg[i];
+         idx = &(lidx[k]);
+         val = &(lval[k]);
 
-            for ( j = lbeg[i + 1]; j > k; --j )
-               vec1[*idx++] -= x1 * ( *val++ );
-         }
-         else
-            if ( x2 != 0 )
-            {
-               k = lbeg[i];
-               idx = &( lidx[k] );
-               val = &( lval[k] );
+         for(j = lbeg[i + 1]; j > k; --j)
+            vec1[*idx++] -= x1 * (*val++);
+      }
+      else if(x2 != 0)
+      {
+         k = lbeg[i];
+         idx = &(lidx[k]);
+         val = &(lval[k]);
 
-               for ( j = lbeg[i + 1]; j > k; --j )
-                  vec2[*idx++] -= x2 * ( *val++ );
-            }
+         for(j = lbeg[i + 1]; j > k; --j)
+            vec2[*idx++] -= x2 * (*val++);
+      }
    }
 }
 
-int CLUFactorRational::solveRight4update( Rational* vec, int* nonz,
-                                           Rational* rhs, Rational* forest, int* forestNum, int* forestIdx )
+int CLUFactorRational::solveRight4update(Rational* vec, int* nonz,
+      Rational* rhs, Rational* forest, int* forestNum, int* forestIdx)
 {
-   solveLright( rhs );
+   solveLright(rhs);
 
-   if ( forest )
+   if(forest)
    {
       int n = 0;
 
-      for ( int i = 0; i < thedim; i++ )
+      for(int i = 0; i < thedim; i++)
       {
          forestIdx[n] = i;
          forest[i]    = rhs[i];
@@ -3534,41 +3525,41 @@ int CLUFactorRational::solveRight4update( Rational* vec, int* nonz,
       *forestNum = n;
    }
 
-   if ( !l.updateType )          /* no Forest-Tomlin Updates */
+   if(!l.updateType)             /* no Forest-Tomlin Updates */
    {
-      solveUright( vec, rhs );
-      solveUpdateRight( vec );
+      solveUright(vec, rhs);
+      solveUpdateRight(vec);
       return 0;
    }
    else
-      return solveUrightEps( vec, nonz, rhs );
+      return solveUrightEps(vec, nonz, rhs);
 }
 
-void CLUFactorRational::solveRight( Rational* vec, Rational* rhs )
+void CLUFactorRational::solveRight(Rational* vec, Rational* rhs)
 {
-   solveLright( rhs );
-   solveUright( vec, rhs );
+   solveLright(rhs);
+   solveUright(vec, rhs);
 
-   if ( !l.updateType )          /* no Forest-Tomlin Updates */
-      solveUpdateRight( vec );
+   if(!l.updateType)             /* no Forest-Tomlin Updates */
+      solveUpdateRight(vec);
 }
 
-int CLUFactorRational::solveRight2update( Rational* vec1,
-                                  Rational* vec2,
-                                  Rational* rhs1,
-                                  Rational* rhs2,
-                                  int* nonz,
-                                  Rational* forest,
-                                  int* forestNum,
-                                  int* forestIdx )
+int CLUFactorRational::solveRight2update(Rational* vec1,
+      Rational* vec2,
+      Rational* rhs1,
+      Rational* rhs2,
+      int* nonz,
+      Rational* forest,
+      int* forestNum,
+      int* forestIdx)
 {
-   solveLright2( rhs1, rhs2 );
+   solveLright2(rhs1, rhs2);
 
-   if ( forest )
+   if(forest)
    {
       int n = 0;
 
-      for ( int i = 0; i < thedim; i++ )
+      for(int i = 0; i < thedim; i++)
       {
          forestIdx[n] = i;
          forest[i]    = rhs1[i];
@@ -3578,43 +3569,43 @@ int CLUFactorRational::solveRight2update( Rational* vec1,
       *forestNum = n;
    }
 
-   if ( !l.updateType )         /* no Forest-Tomlin Updates */
+   if(!l.updateType)            /* no Forest-Tomlin Updates */
    {
-      solveUright2( vec1, rhs1, vec2, rhs2 );
-      solveUpdateRight2( vec1, vec2 );
+      solveUright2(vec1, rhs1, vec2, rhs2);
+      solveUpdateRight2(vec1, vec2);
       return 0;
    }
    else
-      return solveUright2eps( vec1, rhs1, vec2, rhs2, nonz );
+      return solveUright2eps(vec1, rhs1, vec2, rhs2, nonz);
 }
 
 void CLUFactorRational::solveRight2(
    Rational* vec1,
    Rational* vec2,
    Rational* rhs1,
-   Rational* rhs2 )
+   Rational* rhs2)
 {
-   solveLright2( rhs1, rhs2 );
+   solveLright2(rhs1, rhs2);
 
-   if ( l.updateType )           /* Forest-Tomlin Updates */
-      solveUright2( vec1, rhs1, vec2, rhs2 );
+   if(l.updateType)              /* Forest-Tomlin Updates */
+      solveUright2(vec1, rhs1, vec2, rhs2);
    else
    {
-      solveUright2( vec1, rhs1, vec2, rhs2 );
-      solveUpdateRight2( vec1, vec2 );
+      solveUright2(vec1, rhs1, vec2, rhs2);
+      solveUpdateRight2(vec1, vec2);
    }
 }
 
 /*****************************************************************************/
-void CLUFactorRational::solveUleft( Rational* p_work, Rational* vec )
+void CLUFactorRational::solveUleft(Rational* p_work, Rational* vec)
 {
-   for ( int i = 0; i < thedim; ++i )
+   for(int i = 0; i < thedim; ++i)
    {
       int  c  = col.orig[i];
       int  r  = row.orig[i];
 
-      assert( c >= 0 );  // Inna/Tobi: otherwise, vec[c] would be strange...
-      assert( r >= 0 );  // Inna/Tobi: otherwise, diag[r] would be strange...
+      assert(c >= 0);    // Inna/Tobi: otherwise, vec[c] would be strange...
+      assert(r >= 0);    // Inna/Tobi: otherwise, diag[r] would be strange...
 
       Rational x  = vec[c];
 
@@ -3623,9 +3614,9 @@ void CLUFactorRational::solveUleft( Rational* p_work, Rational* vec )
 
       vec[c]  = 0;
 
-      if ( x != 0 )
+      if(x != 0)
       {
-         if( timeLimitReached() )
+         if(timeLimitReached())
             return;
 
          //         ASSERT_WARN( "WSOLVE03", spxAbs( diag[r] ) < 1e40 );
@@ -3637,7 +3628,7 @@ void CLUFactorRational::solveUleft( Rational* p_work, Rational* vec )
 
          int end = u.row.start[r] + u.row.len[r];
 
-         for ( int m = u.row.start[r]; m < end; m++ )
+         for(int m = u.row.start[r]; m < end; m++)
          {
             //            ASSERT_WARN( "WSOLVE05", spxAbs( u.row.val[m] ) < 1e40 );
             //            ASSERT_WARN( "WSOLVE06", spxAbs( vec[u.row.idx[m]] ) < R(infinity) );
@@ -3652,14 +3643,15 @@ void CLUFactorRational::solveUleft( Rational* p_work, Rational* vec )
 
 
 
-void CLUFactorRational::solveUleft2( Rational* p_work1, Rational* vec1, Rational* p_work2, Rational* vec2 )
+void CLUFactorRational::solveUleft2(Rational* p_work1, Rational* vec1, Rational* p_work2,
+                                    Rational* vec2)
 {
    Rational x1;
    Rational x2;
    int i, k, r, c;
-   int *rorig, *corig;
-   int *ridx, *rlen, *rbeg, *idx;
-   Rational *val;
+   int* rorig, *corig;
+   int* ridx, *rlen, *rbeg, *idx;
+   Rational* val;
 
    rorig = row.orig;
    corig = col.orig;
@@ -3669,14 +3661,14 @@ void CLUFactorRational::solveUleft2( Rational* p_work1, Rational* vec1, Rational
    rlen = u.row.len;
    rbeg = u.row.start;
 
-   for ( i = 0; i < thedim; ++i )
+   for(i = 0; i < thedim; ++i)
    {
       c = corig[i];
       r = rorig[i];
       x1 = vec1[c];
       x2 = vec2[c];
 
-      if (( x1 != 0 ) && ( x2 != 0 ) )
+      if((x1 != 0) && (x2 != 0))
       {
          x1 *= diag[r];
          x2 *= diag[r];
@@ -3686,50 +3678,48 @@ void CLUFactorRational::solveUleft2( Rational* p_work1, Rational* vec1, Rational
          idx = &ridx[k];
          val = &rval[k];
 
-         for ( int m = rlen[r]; m != 0; --m )
+         for(int m = rlen[r]; m != 0; --m)
          {
-            vec1[*idx] -= x1 * ( *val );
-            vec2[*idx] -= x2 * ( *val++ );
+            vec1[*idx] -= x1 * (*val);
+            vec2[*idx] -= x2 * (*val++);
             idx++;
          }
       }
-      else
-         if ( x1 != 0 )
-         {
-            x1 *= diag[r];
-            p_work1[r] = x1;
-            k = rbeg[r];
-            idx = &ridx[k];
-            val = &rval[k];
+      else if(x1 != 0)
+      {
+         x1 *= diag[r];
+         p_work1[r] = x1;
+         k = rbeg[r];
+         idx = &ridx[k];
+         val = &rval[k];
 
-            for ( int m = rlen[r]; m != 0; --m )
-               vec1[*idx++] -= x1 * ( *val++ );
-         }
-         else
-            if ( x2 != 0 )
-            {
-               x2 *= diag[r];
-               p_work2[r] = x2;
-               k = rbeg[r];
-               idx = &ridx[k];
-               val = &rval[k];
+         for(int m = rlen[r]; m != 0; --m)
+            vec1[*idx++] -= x1 * (*val++);
+      }
+      else if(x2 != 0)
+      {
+         x2 *= diag[r];
+         p_work2[r] = x2;
+         k = rbeg[r];
+         idx = &ridx[k];
+         val = &rval[k];
 
-               for ( int m = rlen[r]; m != 0; --m )
-                  vec2[*idx++] -= x2 * ( *val++ );
-            }
+         for(int m = rlen[r]; m != 0; --m)
+            vec2[*idx++] -= x2 * (*val++);
+      }
    }
 }
 
-int CLUFactorRational::solveLleft2forest( Rational* vec1, int* /* nonz */, Rational* vec2 )
+int CLUFactorRational::solveLleft2forest(Rational* vec1, int* /* nonz */, Rational* vec2)
 {
    int i;
    int j;
    int k;
    int end;
    Rational x1, x2;
-   Rational *val;
-   int *lidx, *idx, *lrow;
-   int *lbeg;
+   Rational* val;
+   int* lidx, *idx, *lrow;
+   int* lbeg;
 
    VectorRational& lval = l.val;
    lidx = l.idx;
@@ -3738,24 +3728,24 @@ int CLUFactorRational::solveLleft2forest( Rational* vec1, int* /* nonz */, Ratio
 
    end = l.firstUpdate;
 
-   for ( i = l.firstUnused - 1; i >= end; --i )
+   for(i = l.firstUnused - 1; i >= end; --i)
    {
       j = lrow[i];
       x1 = vec1[j];
       x2 = vec2[j];
 
-      if ( x1 != 0 )
+      if(x1 != 0)
       {
-         if ( x2 != 0 )
+         if(x2 != 0)
          {
             k = lbeg[i];
             val = &lval[k];
             idx = &lidx[k];
 
-            for ( j = lbeg[i + 1]; j > k; --j )
+            for(j = lbeg[i + 1]; j > k; --j)
             {
-               vec1[*idx] -= x1 * ( *val );
-               vec2[*idx++] -= x2 * ( *val++ );
+               vec1[*idx] -= x1 * (*val);
+               vec2[*idx++] -= x2 * (*val++);
             }
          }
          else
@@ -3764,35 +3754,34 @@ int CLUFactorRational::solveLleft2forest( Rational* vec1, int* /* nonz */, Ratio
             val = &lval[k];
             idx = &lidx[k];
 
-            for ( j = lbeg[i + 1]; j > k; --j )
-               vec1[*idx++] -= x1 * ( *val++ );
+            for(j = lbeg[i + 1]; j > k; --j)
+               vec1[*idx++] -= x1 * (*val++);
          }
       }
-      else
-         if ( x2 != 0 )
-         {
-            k = lbeg[i];
-            val = &lval[k];
-            idx = &lidx[k];
+      else if(x2 != 0)
+      {
+         k = lbeg[i];
+         val = &lval[k];
+         idx = &lidx[k];
 
-            for ( j = lbeg[i + 1]; j > k; --j )
-               vec2[*idx++] -= x2 * ( *val++ );
-         }
+         for(j = lbeg[i + 1]; j > k; --j)
+            vec2[*idx++] -= x2 * (*val++);
+      }
    }
 
    return 0;
 }
 
-void CLUFactorRational::solveLleft2( Rational* vec1, int* /* nonz */, Rational* vec2 )
+void CLUFactorRational::solveLleft2(Rational* vec1, int* /* nonz */, Rational* vec2)
 {
    int i, j, k, r;
    int x1not0, x2not0;
    Rational x1, x2;
 
-   Rational *val;
-   int *ridx, *idx;
-   int *rbeg;
-   int *rorig;
+   Rational* val;
+   int* ridx, *idx;
+   int* rbeg;
+   int* rorig;
 
    ridx  = l.ridx;
    VectorRational& rval = l.rval;
@@ -3807,7 +3796,7 @@ void CLUFactorRational::solveLleft2( Rational* vec1, int* /* nonz */, Rational* 
 
    i = l.firstUpdate - 1;
 
-   for ( ; i >= 0; --i )
+   for(; i >= 0; --i)
    {
       k = lbeg[i];
       val = &lval[k];
@@ -3815,10 +3804,10 @@ void CLUFactorRational::solveLleft2( Rational* vec1, int* /* nonz */, Rational* 
       x1 = 0;
       x2 = 0;
 
-      for ( j = lbeg[i + 1]; j > k; --j )
+      for(j = lbeg[i + 1]; j > k; --j)
       {
-         x1 += vec1[*idx] * ( *val );
-         x2 += vec2[*idx++] * ( *val++ );
+         x1 += vec1[*idx] * (*val);
+         x2 += vec2[*idx++] * (*val++);
       }
 
       vec1[lrow[i]] -= x1;
@@ -3827,67 +3816,66 @@ void CLUFactorRational::solveLleft2( Rational* vec1, int* /* nonz */, Rational* 
    }
 
 #else
-   for ( i = thedim; i--; )
+
+   for(i = thedim; i--;)
    {
       r = rorig[i];
       x1 = vec1[r];
       x2 = vec2[r];
-      x1not0 = ( x1 != 0 );
-      x2not0 = ( x2 != 0 );
+      x1not0 = (x1 != 0);
+      x2not0 = (x2 != 0);
 
-      if ( x1not0 && x2not0 )
+      if(x1not0 && x2not0)
       {
          k = rbeg[r];
          j = rbeg[r + 1] - k;
          val = &rval[k];
          idx = &ridx[k];
 
-         while ( j-- > 0 )
+         while(j-- > 0)
          {
-            assert( row.perm[*idx] < i );
+            assert(row.perm[*idx] < i);
             vec1[*idx] -= x1 * *val;
             vec2[*idx++] -= x2 * *val++;
          }
       }
-      else
-         if ( x1not0 )
+      else if(x1not0)
+      {
+         k = rbeg[r];
+         j = rbeg[r + 1] - k;
+         val = &rval[k];
+         idx = &ridx[k];
+
+         while(j-- > 0)
          {
-            k = rbeg[r];
-            j = rbeg[r + 1] - k;
-            val = &rval[k];
-            idx = &ridx[k];
-
-            while ( j-- > 0 )
-            {
-               assert( row.perm[*idx] < i );
-               vec1[*idx++] -= x1 * *val++;
-            }
+            assert(row.perm[*idx] < i);
+            vec1[*idx++] -= x1 * *val++;
          }
-         else
-            if ( x2not0 )
-            {
-               k = rbeg[r];
-               j = rbeg[r + 1] - k;
-               val = &rval[k];
-               idx = &ridx[k];
+      }
+      else if(x2not0)
+      {
+         k = rbeg[r];
+         j = rbeg[r + 1] - k;
+         val = &rval[k];
+         idx = &ridx[k];
 
-               while ( j-- > 0 )
-               {
-                  assert( row.perm[*idx] < i );
-                  vec2[*idx++] -= x2 * *val++;
-               }
-            }
+         while(j-- > 0)
+         {
+            assert(row.perm[*idx] < i);
+            vec2[*idx++] -= x2 * *val++;
+         }
+      }
    }
 
 #endif
 }
 
-int CLUFactorRational::solveLleftForest( Rational* vec, int* /* nonz */ )
+int CLUFactorRational::solveLleftForest(Rational* vec, int* /* nonz */)
 {
    int i, j, k, end;
    Rational x;
-   Rational *val;
-   int *idx, *lidx, *lrow, *lbeg;
+   Rational* val;
+   int* idx, *lidx, *lrow, *lbeg;
 
    VectorRational& lval = l.val;
    lidx = l.idx;
@@ -3896,26 +3884,26 @@ int CLUFactorRational::solveLleftForest( Rational* vec, int* /* nonz */ )
 
    end = l.firstUpdate;
 
-   for ( i = l.firstUnused - 1; i >= end; --i )
+   for(i = l.firstUnused - 1; i >= end; --i)
    {
-      if (( x = vec[lrow[i]] ) != 0 )
+      if((x = vec[lrow[i]]) != 0)
       {
-         if( timeLimitReached() )
+         if(timeLimitReached())
             return 0;
 
          k = lbeg[i];
          val = &lval[k];
          idx = &lidx[k];
 
-         for ( j = lbeg[i + 1]; j > k; --j )
-            vec[*idx++] -= x * ( *val++ );
+         for(j = lbeg[i + 1]; j > k; --j)
+            vec[*idx++] -= x * (*val++);
       }
    }
 
    return 0;
 }
 
-void CLUFactorRational::solveLleft( Rational* vec )
+void CLUFactorRational::solveLleft(Rational* vec)
 {
 
 #ifndef WITH_L_ROWS
@@ -3926,9 +3914,9 @@ void CLUFactorRational::solveLleft( Rational* vec )
    int*  lrow  = l.row;
    int*  lbeg  = l.start;
 
-   for ( int i = l.firstUpdate - 1; i >= 0; --i )
+   for(int i = l.firstUpdate - 1; i >= 0; --i)
    {
-      if( timeLimitReached() )
+      if(timeLimitReached())
          return;
 
       int k = lbeg[i];
@@ -3936,28 +3924,29 @@ void CLUFactorRational::solveLleft( Rational* vec )
       idx = &lidx[k];
       x = 0;
 
-      for ( int j = lbeg[i + 1]; j > k; --j )
-         x += vec[*idx++] * ( *val++ );
+      for(int j = lbeg[i + 1]; j > k; --j)
+         x += vec[*idx++] * (*val++);
 
       vec[lrow[i]] -= x;
    }
 
 #else
-   for ( int i = thedim - 1; i >= 0; --i )
+
+   for(int i = thedim - 1; i >= 0; --i)
    {
       int  r = l.rorig[i];
       Rational x = vec[r];
 
-      if ( x != 0 )
+      if(x != 0)
       {
-         if( timeLimitReached() )
+         if(timeLimitReached())
             return;
 
-         for ( int k = l.rbeg[r]; k < l.rbeg[r + 1]; k++ )
+         for(int k = l.rbeg[r]; k < l.rbeg[r + 1]; k++)
          {
             int j = l.ridx[k];
 
-            assert( l.rperm[j] < i );
+            assert(l.rperm[j] < i);
 
             vec[j] -= x * l.rval[k];
          }
@@ -3967,14 +3956,14 @@ void CLUFactorRational::solveLleft( Rational* vec )
 #endif // WITH_L_ROWS
 }
 
-int CLUFactorRational::solveLleftEps( Rational* vec, int* nonz )
+int CLUFactorRational::solveLleftEps(Rational* vec, int* nonz)
 {
    int i, j, k, n;
    int r;
    Rational x;
-   Rational *val;
-   int *ridx, *idx;
-   int *rbeg;
+   Rational* val;
+   int* ridx, *idx;
+   int* rbeg;
    int* rorig;
 
    ridx = l.ridx;
@@ -3988,26 +3977,27 @@ int CLUFactorRational::solveLleftEps( Rational* vec, int* nonz )
    int*  lrow = l.row;
    int*  lbeg = l.start;
 
-   for ( i = l.firstUpdate - 1; i >= 0; --i )
+   for(i = l.firstUpdate - 1; i >= 0; --i)
    {
       k = lbeg[i];
       val = &lval[k];
       idx = &lidx[k];
       x = 0;
 
-      for ( j = lbeg[i + 1]; j > k; --j )
-         x += vec[*idx++] * ( *val++ );
+      for(j = lbeg[i + 1]; j > k; --j)
+         x += vec[*idx++] * (*val++);
 
       vec[lrow[i]] -= x;
    }
 
 #else
-   for ( i = thedim; i--; )
+
+   for(i = thedim; i--;)
    {
       r = rorig[i];
       x = vec[r];
 
-      if ( x != 0 )
+      if(x != 0)
       {
          *nonz++ = r;
          n++;
@@ -4016,9 +4006,9 @@ int CLUFactorRational::solveLleftEps( Rational* vec, int* nonz )
          val = &rval[k];
          idx = &ridx[k];
 
-         while ( j-- > 0 )
+         while(j-- > 0)
          {
-            assert( row.perm[*idx] < i );
+            assert(row.perm[*idx] < i);
             vec[*idx++] -= x * *val++;
          }
       }
@@ -4031,55 +4021,55 @@ int CLUFactorRational::solveLleftEps( Rational* vec, int* nonz )
    return n;
 }
 
-void CLUFactorRational::solveUpdateLeft( Rational* vec )
+void CLUFactorRational::solveUpdateLeft(Rational* vec)
 {
    int i, j, k, end;
    Rational x;
-   Rational *val;
-   int *lrow, *lidx, *idx;
-   int *lbeg;
+   Rational* val;
+   int* lrow, *lidx, *idx;
+   int* lbeg;
 
    VectorRational& lval = l.val;
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;
 
-   assert( !l.updateType );             /* Forest-Tomlin Updates */
+   assert(!l.updateType);               /* Forest-Tomlin Updates */
 
    end = l.firstUpdate;
 
-   for ( i = l.firstUnused - 1; i >= end; --i )
+   for(i = l.firstUnused - 1; i >= end; --i)
    {
       k = lbeg[i];
       val = &lval[k];
       idx = &lidx[k];
       x = 0;
 
-      for ( j = lbeg[i + 1]; j > k; --j )
-         x += vec[*idx++] * ( *val++ );
+      for(j = lbeg[i + 1]; j > k; --j)
+         x += vec[*idx++] * (*val++);
 
       vec[lrow[i]] -= x;
    }
 }
 
-void CLUFactorRational::solveUpdateLeft2( Rational* vec1, Rational* vec2 )
+void CLUFactorRational::solveUpdateLeft2(Rational* vec1, Rational* vec2)
 {
    int i, j, k, end;
    Rational x1, x2;
-   Rational *val;
-   int *lrow, *lidx, *idx;
-   int *lbeg;
+   Rational* val;
+   int* lrow, *lidx, *idx;
+   int* lbeg;
 
    VectorRational& lval = l.val;
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;
 
-   assert( !l.updateType );             /* Forest-Tomlin Updates */
+   assert(!l.updateType);               /* Forest-Tomlin Updates */
 
    end = l.firstUpdate;
 
-   for ( i = l.firstUnused - 1; i >= end; --i )
+   for(i = l.firstUnused - 1; i >= end; --i)
    {
       k = lbeg[i];
       val = &lval[k];
@@ -4087,10 +4077,10 @@ void CLUFactorRational::solveUpdateLeft2( Rational* vec1, Rational* vec2 )
       x1 = 0;
       x2 = 0;
 
-      for ( j = lbeg[i + 1]; j > k; --j )
+      for(j = lbeg[i + 1]; j > k; --j)
       {
-         x1 += vec1[*idx] * ( *val );
-         x2 += vec2[*idx++] * ( *val++ );
+         x1 += vec1[*idx] * (*val);
+         x2 += vec2[*idx++] * (*val++);
       }
 
       vec1[lrow[i]] -= x1;
@@ -4099,15 +4089,15 @@ void CLUFactorRational::solveUpdateLeft2( Rational* vec1, Rational* vec2 )
    }
 }
 
-int CLUFactorRational::solveUpdateLeft( Rational* vec, int* nonz, int n )
+int CLUFactorRational::solveUpdateLeft(Rational* vec, int* nonz, int n)
 {
    int i, j, k, end;
    Rational x, y;
-   Rational *val;
-   int *lrow, *lidx, *idx;
-   int *lbeg;
+   Rational* val;
+   int* lrow, *lidx, *idx;
+   int* lbeg;
 
-   assert( !l.updateType );             /* no Forest-Tomlin Updates! */
+   assert(!l.updateType);               /* no Forest-Tomlin Updates! */
 
    VectorRational& lval = l.val;
    lidx = l.idx;
@@ -4116,29 +4106,29 @@ int CLUFactorRational::solveUpdateLeft( Rational* vec, int* nonz, int n )
 
    end = l.firstUpdate;
 
-   for ( i = l.firstUnused - 1; i >= end; --i )
+   for(i = l.firstUnused - 1; i >= end; --i)
    {
       k = lbeg[i];
-      assert( k >= 0 && k < l.val.dim() );
+      assert(k >= 0 && k < l.val.dim());
       val = &lval[k];
       idx = &lidx[k];
       x = 0;
 
-      for ( j = lbeg[i + 1]; j > k; --j )
+      for(j = lbeg[i + 1]; j > k; --j)
       {
-         assert( *idx >= 0 && *idx < thedim );
-         x += vec[*idx++] * ( *val++ );
+         assert(*idx >= 0 && *idx < thedim);
+         x += vec[*idx++] * (*val++);
       }
 
       k = lrow[i];
 
       y = vec[k];
 
-      if ( y == 0 )
+      if(y == 0)
       {
          y = -x;
 
-         if ( y != 0 )
+         if(y != 0)
          {
             nonz[n++] = k;
             vec[k] = y;
@@ -4155,37 +4145,37 @@ int CLUFactorRational::solveUpdateLeft( Rational* vec, int* nonz, int n )
    return n;
 }
 
-void CLUFactorRational::solveLeft( Rational* vec, Rational* rhs )
+void CLUFactorRational::solveLeft(Rational* vec, Rational* rhs)
 {
 
-   if ( !l.updateType )          /* no Forest-Tomlin Updates */
+   if(!l.updateType)             /* no Forest-Tomlin Updates */
    {
-      solveUpdateLeft( rhs );
-      solveUleft( vec, rhs );
-      solveLleft( vec );
+      solveUpdateLeft(rhs);
+      solveUleft(vec, rhs);
+      solveLleft(vec);
    }
    else
    {
-      solveUleft( vec, rhs );
-      solveLleftForest( vec, 0 );
-      solveLleft( vec );
+      solveUleft(vec, rhs);
+      solveLleftForest(vec, 0);
+      solveLleft(vec);
    }
 }
 
-int CLUFactorRational::solveLeftEps( Rational* vec, Rational* rhs, int* nonz )
+int CLUFactorRational::solveLeftEps(Rational* vec, Rational* rhs, int* nonz)
 {
 
-   if ( !l.updateType )          /* no Forest-Tomlin Updates */
+   if(!l.updateType)             /* no Forest-Tomlin Updates */
    {
-      solveUpdateLeft( rhs );
-      solveUleft( vec, rhs );
-      return solveLleftEps( vec, nonz );
+      solveUpdateLeft(rhs);
+      solveUleft(vec, rhs);
+      return solveLleftEps(vec, nonz);
    }
    else
    {
-      solveUleft( vec, rhs );
-      solveLleftForest( vec, nonz );
-      return solveLleftEps( vec, nonz );
+      solveUleft(vec, rhs);
+      solveLleftForest(vec, nonz);
+      return solveLleftEps(vec, nonz);
    }
 }
 
@@ -4194,33 +4184,33 @@ int CLUFactorRational::solveLeft2(
    int* nonz,
    Rational* vec2,
    Rational* rhs1,
-   Rational* rhs2 )
+   Rational* rhs2)
 {
 
-   if ( !l.updateType )          /* no Forest-Tomlin Updates */
+   if(!l.updateType)             /* no Forest-Tomlin Updates */
    {
-      solveUpdateLeft2( rhs1, rhs2 );
-      solveUleft2( vec1, rhs1, vec2, rhs2 );
-      solveLleft2( vec1, nonz, vec2 );
+      solveUpdateLeft2(rhs1, rhs2);
+      solveUleft2(vec1, rhs1, vec2, rhs2);
+      solveLleft2(vec1, nonz, vec2);
       return 0;
    }
    else
    {
-      solveUleft2( vec1, rhs1, vec2, rhs2 );
-      solveLleft2forest( vec1, nonz, vec2 );
-      solveLleft2( vec1, nonz, vec2 );
+      solveUleft2(vec1, rhs1, vec2, rhs2);
+      solveLleft2forest(vec1, nonz, vec2);
+      solveLleft2(vec1, nonz, vec2);
       return 0;
    }
 }
 
-int CLUFactorRational::solveUleft( Rational* vec, int* vecidx,
-                                    Rational* rhs, int* rhsidx, int rhsn )
+int CLUFactorRational::solveUleft(Rational* vec, int* vecidx,
+                                  Rational* rhs, int* rhsidx, int rhsn)
 {
    Rational x, y;
    int i, j, k, n, r, c;
-   int *rorig, *corig, *cperm;
-   int *ridx, *rlen, *rbeg, *idx;
-   Rational *val;
+   int* rorig, *corig, *cperm;
+   int* ridx, *rlen, *rbeg, *idx;
+   Rational* val;
 
    rorig = row.orig;
    corig = col.orig;
@@ -4229,8 +4219,8 @@ int CLUFactorRational::solveUleft( Rational* vec, int* vecidx,
    /*  move rhsidx to a heap
     */
 
-   for ( i = 0; i < rhsn; )
-      enQueueMin( rhsidx, &i, cperm[rhsidx[i]] );
+   for(i = 0; i < rhsn;)
+      enQueueMin(rhsidx, &i, cperm[rhsidx[i]]);
 
    ridx = u.row.idx;
 
@@ -4242,46 +4232,46 @@ int CLUFactorRational::solveUleft( Rational* vec, int* vecidx,
 
    n = 0;
 
-   while ( rhsn > 0 )
+   while(rhsn > 0)
    {
-      i = deQueueMin( rhsidx, &rhsn );
-      assert( i >= 0 && i < thedim );
+      i = deQueueMin(rhsidx, &rhsn);
+      assert(i >= 0 && i < thedim);
       c = corig[i];
-      assert( c >= 0 && c < thedim );
+      assert(c >= 0 && c < thedim);
       x = rhs[c];
       rhs[c] = 0;
 
-      if ( x != 0 )
+      if(x != 0)
       {
          r = rorig[i];
-         assert( r >= 0 && r < thedim );
+         assert(r >= 0 && r < thedim);
          vecidx[n++] = r;
          x *= diag[r];
          vec[r] = x;
          k = rbeg[r];
-         assert( k >= 0 && k < u.row.val.dim() );
+         assert(k >= 0 && k < u.row.val.dim());
          idx = &ridx[k];
          val = &rval[k];
 
-         for ( int m = rlen[r]; m; --m )
+         for(int m = rlen[r]; m; --m)
          {
             j = *idx++;
-            assert( j >= 0 && j < thedim );
+            assert(j >= 0 && j < thedim);
             y = rhs[j];
 
-            if ( y == 0 )
+            if(y == 0)
             {
-               y = -x * ( *val++ );
+               y = -x * (*val++);
 
-               if ( y != 0 )
+               if(y != 0)
                {
                   rhs[j] = y;
-                  enQueueMin( rhsidx, &rhsn, cperm[j] );
+                  enQueueMin(rhsidx, &rhsn, cperm[j]);
                }
             }
             else
             {
-               y -= x * ( *val++ );
+               y -= x * (*val++);
                //               rhs[j] = ( y != 0 ) ? y : MARKER;
                rhs[j] = y;
             }
@@ -4293,13 +4283,13 @@ int CLUFactorRational::solveUleft( Rational* vec, int* vecidx,
 }
 
 
-void CLUFactorRational::solveUleftNoNZ( Rational* vec, Rational* rhs, int* rhsidx, int rhsn )
+void CLUFactorRational::solveUleftNoNZ(Rational* vec, Rational* rhs, int* rhsidx, int rhsn)
 {
    Rational x, y;
    int i, j, k, r, c;
-   int *rorig, *corig, *cperm;
-   int *ridx, *rlen, *rbeg, *idx;
-   Rational *val;
+   int* rorig, *corig, *cperm;
+   int* ridx, *rlen, *rbeg, *idx;
+   Rational* val;
 
    rorig = row.orig;
    corig = col.orig;
@@ -4308,8 +4298,8 @@ void CLUFactorRational::solveUleftNoNZ( Rational* vec, Rational* rhs, int* rhsid
    /*  move rhsidx to a heap
     */
 
-   for ( i = 0; i < rhsn; )
-      enQueueMin( rhsidx, &i, cperm[rhsidx[i]] );
+   for(i = 0; i < rhsn;)
+      enQueueMin(rhsidx, &i, cperm[rhsidx[i]]);
 
    ridx = u.row.idx;
 
@@ -4319,45 +4309,45 @@ void CLUFactorRational::solveUleftNoNZ( Rational* vec, Rational* rhs, int* rhsid
 
    rbeg = u.row.start;
 
-   while ( rhsn > 0 )
+   while(rhsn > 0)
    {
-      i = deQueueMin( rhsidx, &rhsn );
-      assert( i >= 0 && i < thedim );
+      i = deQueueMin(rhsidx, &rhsn);
+      assert(i >= 0 && i < thedim);
       c = corig[i];
-      assert( c >= 0 && c < thedim );
+      assert(c >= 0 && c < thedim);
       x = rhs[c];
       rhs[c] = 0;
 
-      if ( x != 0 )
+      if(x != 0)
       {
          r = rorig[i];
-         assert( r >= 0 && r < thedim );
+         assert(r >= 0 && r < thedim);
          x *= diag[r];
          vec[r] = x;
          k = rbeg[r];
-         assert( k >= 0 && k < u.row.val.dim() );
+         assert(k >= 0 && k < u.row.val.dim());
          idx = &ridx[k];
          val = &rval[k];
 
-         for ( int m = rlen[r]; m; --m )
+         for(int m = rlen[r]; m; --m)
          {
             j = *idx++;
-            assert( j >= 0 && j < thedim );
+            assert(j >= 0 && j < thedim);
             y = rhs[j];
 
-            if ( y == 0 )
+            if(y == 0)
             {
-               y = -x * ( *val++ );
+               y = -x * (*val++);
 
-               if ( y != 0 )
+               if(y != 0)
                {
                   rhs[j] = y;
-                  enQueueMin( rhsidx, &rhsn, cperm[j] );
+                  enQueueMin(rhsidx, &rhsn, cperm[j]);
                }
             }
             else
             {
-               y -= x * ( *val++ );
+               y -= x * (*val++);
                //               rhs[j] = ( y != 0 ) ? y : MARKER;
                rhs[j] = y;
             }
@@ -4367,12 +4357,12 @@ void CLUFactorRational::solveUleftNoNZ( Rational* vec, Rational* rhs, int* rhsid
 }
 
 
-int CLUFactorRational::solveLleftForest( Rational* vec, int* nonz, int n )
+int CLUFactorRational::solveLleftForest(Rational* vec, int* nonz, int n)
 {
    int i, j, k, end;
    Rational x, y;
-   Rational *val;
-   int *idx, *lidx, *lrow, *lbeg;
+   Rational* val;
+   int* idx, *lidx, *lrow, *lbeg;
 
    VectorRational& lval = l.val;
    lidx = l.idx;
@@ -4380,28 +4370,28 @@ int CLUFactorRational::solveLleftForest( Rational* vec, int* nonz, int n )
    lbeg = l.start;
    end = l.firstUpdate;
 
-   for ( i = l.firstUnused - 1; i >= end; --i )
+   for(i = l.firstUnused - 1; i >= end; --i)
    {
-      assert( i >= 0 && i < l.val.dim() );
+      assert(i >= 0 && i < l.val.dim());
 
-      if (( x = vec[lrow[i]] ) != 0 )
+      if((x = vec[lrow[i]]) != 0)
       {
          k = lbeg[i];
-         assert( k >= 0 && k < l.val.dim() );
+         assert(k >= 0 && k < l.val.dim());
          val = &lval[k];
          idx = &lidx[k];
 
-         for ( j = lbeg[i + 1]; j > k; --j )
+         for(j = lbeg[i + 1]; j > k; --j)
          {
             int m = *idx++;
-            assert( m >= 0 && m < thedim );
+            assert(m >= 0 && m < thedim);
             y = vec[m];
 
-            if ( y == 0 )
+            if(y == 0)
             {
-               y = -x * ( *val++ );
+               y = -x * (*val++);
 
-               if ( y != 0 )
+               if(y != 0)
                {
                   vec[m] = y;
                   nonz[n++] = m;
@@ -4409,7 +4399,7 @@ int CLUFactorRational::solveLleftForest( Rational* vec, int* nonz, int n )
             }
             else
             {
-               y -= x * ( *val++ );
+               y -= x * (*val++);
 
             }
          }
@@ -4420,12 +4410,12 @@ int CLUFactorRational::solveLleftForest( Rational* vec, int* nonz, int n )
 }
 
 
-void CLUFactorRational::solveLleftForestNoNZ( Rational* vec )
+void CLUFactorRational::solveLleftForestNoNZ(Rational* vec)
 {
    int i, j, k, end;
    Rational x;
-   Rational *val;
-   int *idx, *lidx, *lrow, *lbeg;
+   Rational* val;
+   int* idx, *lidx, *lrow, *lbeg;
 
    VectorRational& lval = l.val;
    lidx = l.idx;
@@ -4433,36 +4423,36 @@ void CLUFactorRational::solveLleftForestNoNZ( Rational* vec )
    lbeg = l.start;
    end = l.firstUpdate;
 
-   for ( i = l.firstUnused - 1; i >= end; --i )
+   for(i = l.firstUnused - 1; i >= end; --i)
    {
-      if (( x = vec[lrow[i]] ) != 0 )
+      if((x = vec[lrow[i]]) != 0)
       {
-         assert( i >= 0 && i < l.val.dim() );
+         assert(i >= 0 && i < l.val.dim());
          k = lbeg[i];
-         assert( k >= 0 && k < l.val.dim() );
+         assert(k >= 0 && k < l.val.dim());
          val = &lval[k];
          idx = &lidx[k];
 
-         for ( j = lbeg[i + 1]; j > k; --j )
+         for(j = lbeg[i + 1]; j > k; --j)
          {
-            assert( *idx >= 0 && *idx < thedim );
-            vec[*idx++] -= x * ( *val++ );
+            assert(*idx >= 0 && *idx < thedim);
+            vec[*idx++] -= x * (*val++);
          }
       }
    }
 }
 
 
-int CLUFactorRational::solveLleft( Rational* vec, int* nonz, int rn )
+int CLUFactorRational::solveLleft(Rational* vec, int* nonz, int rn)
 {
    int i, j, k, n;
    int r;
    Rational x, y;
-   Rational *val;
-   int *ridx, *idx;
-   int *rbeg;
-   int *rorig, *rperm;
-   int *last;
+   Rational* val;
+   int* ridx, *idx;
+   int* rbeg;
+   int* rorig, *rperm;
+   int* last;
 
    ridx  = l.ridx;
    VectorRational& rval  = l.rval;
@@ -4479,56 +4469,57 @@ int CLUFactorRational::solveLleft( Rational* vec, int* nonz, int rn )
    int*    lrow = l.row;
    int*    lbeg = l.start;
 
-   for ( ; i >= 0; --i )
+   for(; i >= 0; --i)
    {
       k   = lbeg[i];
       val = &lval[k];
       idx = &lidx[k];
       x   = 0;
 
-      for ( j = lbeg[i + 1]; j > k; --j )
-         x += vec[*idx++] * ( *val++ );
+      for(j = lbeg[i + 1]; j > k; --j)
+         x += vec[*idx++] * (*val++);
 
       vec[lrow[i]] -= x;
    }
 
 #else
+
    /*  move rhsidx to a heap
     */
-   for ( i = 0; i < rn; )
-      enQueueMax( nonz, &i, rperm[nonz[i]] );
+   for(i = 0; i < rn;)
+      enQueueMax(nonz, &i, rperm[nonz[i]]);
 
    last = nonz + thedim;
 
-   while ( rn > 0 )
+   while(rn > 0)
    {
-      i = deQueueMax( nonz, &rn );
+      i = deQueueMax(nonz, &rn);
       r = rorig[i];
       x = vec[r];
 
-      if ( x != 0 )
+      if(x != 0)
       {
-         *( --last ) = r;
+         *(--last) = r;
          n++;
          k = rbeg[r];
          j = rbeg[r + 1] - k;
          val = &rval[k];
          idx = &ridx[k];
 
-         while ( j-- > 0 )
+         while(j-- > 0)
          {
-            assert( l.rperm[*idx] < i );
+            assert(l.rperm[*idx] < i);
             int m = *idx++;
             y = vec[m];
 
-            if ( y == 0 )
+            if(y == 0)
             {
                y = -x * *val++;
 
-               if ( y != 0 )
+               if(y != 0)
                {
                   vec[m] = y;
-                  enQueueMax( nonz, &rn, rperm[m] );
+                  enQueueMax(nonz, &rn, rperm[m]);
                }
             }
             else
@@ -4543,7 +4534,7 @@ int CLUFactorRational::solveLleft( Rational* vec, int* nonz, int rn )
          vec[r] = 0;
    }
 
-   for ( i = 0; i < n; ++i )
+   for(i = 0; i < n; ++i)
       *nonz++ = *last++;
 
 #endif
@@ -4552,14 +4543,14 @@ int CLUFactorRational::solveLleft( Rational* vec, int* nonz, int rn )
 }
 
 
-void CLUFactorRational::solveLleftNoNZ( Rational* vec )
+void CLUFactorRational::solveLleftNoNZ(Rational* vec)
 {
    int i, j, k;
    int r;
    Rational x;
-   Rational *val;
-   int *ridx, *idx;
-   int *rbeg;
+   Rational* val;
+   int* ridx, *idx;
+   int* rbeg;
    int* rorig;
 
    ridx = l.ridx;
@@ -4574,41 +4565,42 @@ void CLUFactorRational::solveLleftNoNZ( Rational* vec )
    int*    lbeg = l.start;
 
    i = l.firstUpdate - 1;
-   assert( i < thedim );
+   assert(i < thedim);
 
-   for ( ; i >= 0; --i )
+   for(; i >= 0; --i)
    {
       k = lbeg[i];
-      assert( k >= 0 && k < l.val.dim() );
+      assert(k >= 0 && k < l.val.dim());
       val = &lval[k];
       idx = &lidx[k];
       x = 0;
 
-      for ( j = lbeg[i + 1]; j > k; --j )
+      for(j = lbeg[i + 1]; j > k; --j)
       {
-         assert( *idx >= 0 && *idx < thedim );
-         x += vec[*idx++] * ( *val++ );
+         assert(*idx >= 0 && *idx < thedim);
+         x += vec[*idx++] * (*val++);
       }
 
       vec[lrow[i]] -= x;
    }
 
 #else
-   for ( i = thedim; i--; )
+
+   for(i = thedim; i--;)
    {
       r = rorig[i];
       x = vec[r];
 
-      if ( x != 0 )
+      if(x != 0)
       {
          k = rbeg[r];
          j = rbeg[r + 1] - k;
          val = &rval[k];
          idx = &ridx[k];
 
-         while ( j-- > 0 )
+         while(j-- > 0)
          {
-            assert( l.rperm[*idx] < i );
+            assert(l.rperm[*idx] < i);
             vec[*idx++] -= x * *val++;
          }
       }
@@ -4617,14 +4609,14 @@ void CLUFactorRational::solveLleftNoNZ( Rational* vec )
 #endif
 }
 
-int CLUFactorRational::vSolveLright( Rational* vec, int* ridx, int rn )
+int CLUFactorRational::vSolveLright(Rational* vec, int* ridx, int rn)
 {
    int i, j, k, n;
    int end;
    Rational x;
-   Rational *val;
-   int *lrow, *lidx, *idx;
-   int *lbeg;
+   Rational* val;
+   int* lrow, *lidx, *idx;
+   int* lbeg;
 
    VectorRational& lval = l.val;
    lidx = l.idx;
@@ -4633,47 +4625,47 @@ int CLUFactorRational::vSolveLright( Rational* vec, int* ridx, int rn )
 
    end = l.firstUpdate;
 
-   for ( i = 0; i < end; ++i )
+   for(i = 0; i < end; ++i)
    {
       x = vec[lrow[i]];
 
-      if ( x != 0 )
+      if(x != 0)
       {
          k = lbeg[i];
-         idx = &( lidx[k] );
-         val = &( lval[k] );
+         idx = &(lidx[k]);
+         val = &(lval[k]);
 
-         for ( j = lbeg[i + 1]; j > k; --j )
+         for(j = lbeg[i + 1]; j > k; --j)
          {
-            assert( *idx >= 0 && *idx < thedim );
+            assert(*idx >= 0 && *idx < thedim);
             ridx[rn] = n = *idx++;
-            rn += ( vec[n] == 0 ) ? 1 : 0;
-            vec[n] -= x * ( *val++ );
+            rn += (vec[n] == 0) ? 1 : 0;
+            vec[n] -= x * (*val++);
             //            vec[n] += ( vec[n] == 0 ) ? MARKER : 0;
          }
       }
    }
 
-   if ( l.updateType )                   /* Forest-Tomlin Updates */
+   if(l.updateType)                      /* Forest-Tomlin Updates */
    {
       end = l.firstUnused;
 
-      for ( ; i < end; ++i )
+      for(; i < end; ++i)
       {
          x = 0;
          k = lbeg[i];
-         idx = &( lidx[k] );
-         val = &( lval[k] );
+         idx = &(lidx[k]);
+         val = &(lval[k]);
 
-         for ( j = lbeg[i + 1]; j > k; --j )
+         for(j = lbeg[i + 1]; j > k; --j)
          {
-            assert( *idx >= 0 && *idx < thedim );
-            x += vec[*idx++] * ( *val++ );
+            assert(*idx >= 0 && *idx < thedim);
+            x += vec[*idx++] * (*val++);
          }
 
          ridx[rn] = j = lrow[i];
 
-         rn += ( vec[j] == 0 ) ? 1 : 0;
+         rn += (vec[j] == 0) ? 1 : 0;
          vec[j] -= x;
          //         vec[j] += ( vec[j] == 0 ) ? MARKER : 0;
       }
@@ -4682,16 +4674,16 @@ int CLUFactorRational::vSolveLright( Rational* vec, int* ridx, int rn )
    return rn;
 }
 
-void CLUFactorRational::vSolveLright2( Rational* vec, int* ridx, int* rnptr,
-                                        Rational* vec2, int* ridx2, int* rn2ptr )
+void CLUFactorRational::vSolveLright2(Rational* vec, int* ridx, int* rnptr,
+                                      Rational* vec2, int* ridx2, int* rn2ptr)
 {
    int i, j, k, n;
    int end;
    Rational x, y;
    Rational x2, y2;
-   Rational *val;
-   int *lrow, *lidx, *idx;
-   int *lbeg;
+   Rational* val;
+   int* lrow, *lidx, *idx;
+   int* lbeg;
 
    int rn = *rnptr;
    int rn2 = *rn2ptr;
@@ -4703,30 +4695,30 @@ void CLUFactorRational::vSolveLright2( Rational* vec, int* ridx, int* rnptr,
 
    end = l.firstUpdate;
 
-   for ( i = 0; i < end; ++i )
+   for(i = 0; i < end; ++i)
    {
       j = lrow[i];
       x2 = vec2[j];
       x = vec[j];
 
-      if ( x != 0 )
+      if(x != 0)
       {
          k = lbeg[i];
-         idx = &( lidx[k] );
-         val = &( lval[k] );
+         idx = &(lidx[k]);
+         val = &(lval[k]);
 
-         if ( x2 != 0 )
+         if(x2 != 0)
          {
-            for ( j = lbeg[i + 1]; j > k; --j )
+            for(j = lbeg[i + 1]; j > k; --j)
             {
-               assert( *idx >= 0 && *idx < thedim );
+               assert(*idx >= 0 && *idx < thedim);
                ridx[rn] = ridx2[rn2] = n = *idx++;
                y = vec[n];
                y2 = vec2[n];
-               rn += ( y == 0 ) ? 1 : 0;
-               rn2 += ( y2 == 0 ) ? 1 : 0;
-               y -= x * ( *val );
-               y2 -= x2 * ( *val++ );
+               rn += (y == 0) ? 1 : 0;
+               rn2 += (y2 == 0) ? 1 : 0;
+               y -= x * (*val);
+               y2 -= x2 * (*val++);
                //               vec[n] = y + ( y == 0 ? MARKER : 0 );
                //               vec2[n] = y2 + ( y2 == 0 ? MARKER : 0 );
                vec[n] = y;
@@ -4735,60 +4727,59 @@ void CLUFactorRational::vSolveLright2( Rational* vec, int* ridx, int* rnptr,
          }
          else
          {
-            for ( j = lbeg[i + 1]; j > k; --j )
+            for(j = lbeg[i + 1]; j > k; --j)
             {
-               assert( *idx >= 0 && *idx < thedim );
+               assert(*idx >= 0 && *idx < thedim);
                ridx[rn] = n = *idx++;
                y = vec[n];
-               rn += ( y == 0 ) ? 1 : 0;
-               y -= x * ( *val++ );
+               rn += (y == 0) ? 1 : 0;
+               y -= x * (*val++);
                //               vec[n] = y + ( y == 0 ? MARKER : 0 );
                vec[n] = y;
             }
          }
       }
-      else
-         if ( x2 != 0 )
-         {
-            k = lbeg[i];
-            idx = &( lidx[k] );
-            val = &( lval[k] );
+      else if(x2 != 0)
+      {
+         k = lbeg[i];
+         idx = &(lidx[k]);
+         val = &(lval[k]);
 
-            for ( j = lbeg[i + 1]; j > k; --j )
-            {
-               assert( *idx >= 0 && *idx < thedim );
-               ridx2[rn2] = n = *idx++;
-               y2 = vec2[n];
-               rn2 += ( y2 == 0 ) ? 1 : 0;
-               y2 -= x2 * ( *val++ );
-               //               vec2[n] = y2 + ( y2 == 0 ? MARKER : 0 );
-               vec2[n] = y2;
-            }
+         for(j = lbeg[i + 1]; j > k; --j)
+         {
+            assert(*idx >= 0 && *idx < thedim);
+            ridx2[rn2] = n = *idx++;
+            y2 = vec2[n];
+            rn2 += (y2 == 0) ? 1 : 0;
+            y2 -= x2 * (*val++);
+            //               vec2[n] = y2 + ( y2 == 0 ? MARKER : 0 );
+            vec2[n] = y2;
          }
+      }
    }
 
-   if ( l.updateType )                   /* Forest-Tomlin Updates */
+   if(l.updateType)                      /* Forest-Tomlin Updates */
    {
       end = l.firstUnused;
 
-      for ( ; i < end; ++i )
+      for(; i < end; ++i)
       {
          x = x2 = 0;
          k = lbeg[i];
-         idx = &( lidx[k] );
-         val = &( lval[k] );
+         idx = &(lidx[k]);
+         val = &(lval[k]);
 
-         for ( j = lbeg[i + 1]; j > k; --j )
+         for(j = lbeg[i + 1]; j > k; --j)
          {
-            assert( *idx >= 0 && *idx < thedim );
-            x += vec[*idx] * ( *val );
-            x2 += vec2[*idx++] * ( *val++ );
+            assert(*idx >= 0 && *idx < thedim);
+            x += vec[*idx] * (*val);
+            x2 += vec2[*idx++] * (*val++);
          }
 
          ridx[rn] = ridx2[rn2] = j = lrow[i];
 
-         rn += ( vec[j] == 0 ) ? 1 : 0;
-         rn2 += ( vec2[j] == 0 ) ? 1 : 0;
+         rn += (vec[j] == 0) ? 1 : 0;
+         rn2 += (vec2[j] == 0) ? 1 : 0;
          vec[j] -= x;
          vec2[j] -= x2;
          //         vec[j] += ( vec[j] == 0 ) ? MARKER : 0;
@@ -4801,18 +4792,18 @@ void CLUFactorRational::vSolveLright2( Rational* vec, int* ridx, int* rnptr,
    *rn2ptr = rn2;
 }
 
-void CLUFactorRational::vSolveLright3( Rational* vec, int* ridx, int* rnptr,
-                                        Rational* vec2, int* ridx2, int* rn2ptr,
-                                        Rational* vec3, int* ridx3, int* rn3ptr)
+void CLUFactorRational::vSolveLright3(Rational* vec, int* ridx, int* rnptr,
+                                      Rational* vec2, int* ridx2, int* rn2ptr,
+                                      Rational* vec3, int* ridx3, int* rn3ptr)
 {
    int i, j, k, n;
    int end;
    Rational x, y;
    Rational x2, y2;
    Rational x3, y3;
-   Rational *val;
-   int *lrow, *lidx, *idx;
-   int *lbeg;
+   Rational* val;
+   int* lrow, *lidx, *idx;
+   int* lbeg;
 
    int rn = *rnptr;
    int rn2 = *rn2ptr;
@@ -4825,37 +4816,37 @@ void CLUFactorRational::vSolveLright3( Rational* vec, int* ridx, int* rnptr,
 
    end = l.firstUpdate;
 
-   for ( i = 0; i < end; ++i )
+   for(i = 0; i < end; ++i)
    {
       j = lrow[i];
       x3 = vec3[j];
       x2 = vec2[j];
       x = vec[j];
 
-      if ( x != 0 )
+      if(x != 0)
       {
          k = lbeg[i];
-         idx = &( lidx[k] );
-         val = &( lval[k] );
+         idx = &(lidx[k]);
+         val = &(lval[k]);
 
-         if ( x2 != 0 )
+         if(x2 != 0)
          {
-            if ( x3 != 0 )
+            if(x3 != 0)
             {
                // case 1: all three vectors are nonzero at j
-               for ( j = lbeg[i + 1]; j > k; --j )
+               for(j = lbeg[i + 1]; j > k; --j)
                {
-                  assert( *idx >= 0 && *idx < thedim );
+                  assert(*idx >= 0 && *idx < thedim);
                   ridx[rn] = ridx2[rn2] = ridx3[rn3] = n = *idx++;
                   y = vec[n];
                   y2 = vec2[n];
                   y3 = vec3[n];
-                  rn += ( y == 0 ) ? 1 : 0;
-                  rn2 += ( y2 == 0 ) ? 1 : 0;
-                  rn3 += ( y3 == 0 ) ? 1 : 0;
-                  y -= x * ( *val );
-                  y2 -= x2 * ( *val );
-                  y3 -= x3 * ( *val++ );
+                  rn += (y == 0) ? 1 : 0;
+                  rn2 += (y2 == 0) ? 1 : 0;
+                  rn3 += (y3 == 0) ? 1 : 0;
+                  y -= x * (*val);
+                  y2 -= x2 * (*val);
+                  y3 -= x3 * (*val++);
                   //                  vec[n] = y + ( y == 0 ? MARKER : 0 );
                   //                  vec2[n] = y2 + ( y2 == 0 ? MARKER : 0 );
                   //                  vec3[n] = y3 + ( y3 == 0 ? MARKER : 0 );
@@ -4867,16 +4858,16 @@ void CLUFactorRational::vSolveLright3( Rational* vec, int* ridx, int* rnptr,
             else
             {
                // case 2: 1 and 2 are nonzero at j
-               for ( j = lbeg[i + 1]; j > k; --j )
+               for(j = lbeg[i + 1]; j > k; --j)
                {
-                  assert( *idx >= 0 && *idx < thedim );
+                  assert(*idx >= 0 && *idx < thedim);
                   ridx[rn] = ridx2[rn2] = n = *idx++;
                   y = vec[n];
                   y2 = vec2[n];
-                  rn += ( y == 0 ) ? 1 : 0;
-                  rn2 += ( y2 == 0 ) ? 1 : 0;
-                  y -= x * ( *val );
-                  y2 -= x2 * ( *val++ );
+                  rn += (y == 0) ? 1 : 0;
+                  rn2 += (y2 == 0) ? 1 : 0;
+                  y -= x * (*val);
+                  y2 -= x2 * (*val++);
                   //                  vec[n] = y + ( y == 0 ? MARKER : 0 );
                   //vec2[n] = y2 + ( y2 == 0 ? MARKER : 0 );
                   vec[n] = y;
@@ -4884,127 +4875,124 @@ void CLUFactorRational::vSolveLright3( Rational* vec, int* ridx, int* rnptr,
                }
             }
          }
-         else
-            if ( x3 != 0 )
-            {
-               // case 3: 1 and 3 are nonzero at j
-               for ( j = lbeg[i + 1]; j > k; --j )
-               {
-                  assert( *idx >= 0 && *idx < thedim );
-                  ridx[rn] = ridx3[rn3] = n = *idx++;
-                  y = vec[n];
-                  y3 = vec3[n];
-                  rn += ( y == 0 ) ? 1 : 0;
-                  rn3 += ( y3 == 0 ) ? 1 : 0;
-                  y -= x * ( *val );
-                  y3 -= x3 * ( *val++ );
-                  //                  vec[n] = y + ( y == 0 ? MARKER : 0 );
-                  //                  vec3[n] = y3 + ( y3 == 0 ? MARKER : 0 );
-                  vec[n] = y;
-                  vec3[n] = y3;
-               }
-            }
-            else
-            {
-               // case 4: only 1 is nonzero at j
-               for ( j = lbeg[i + 1]; j > k; --j )
-               {
-                  assert( *idx >= 0 && *idx < thedim );
-                  ridx[rn] = n = *idx++;
-                  y = vec[n];
-                  rn += ( y == 0 ) ? 1 : 0;
-                  y -= x * ( *val++ );
-                  //                  vec[n] = y + ( y == 0 ? MARKER : 0 );
-                  vec[n] = y;
-               }
-            }
-      }
-      else
-         if ( x2 != 0 )
+         else if(x3 != 0)
          {
-            k = lbeg[i];
-            idx = &( lidx[k] );
-            val = &( lval[k] );
-
-            if ( x3 != 0 )
+            // case 3: 1 and 3 are nonzero at j
+            for(j = lbeg[i + 1]; j > k; --j)
             {
-               // case 5: 2 and 3 are nonzero at j
-               for ( j = lbeg[i + 1]; j > k; --j )
-               {
-                  assert( *idx >= 0 && *idx < thedim );
-                  ridx2[rn2] = ridx3[rn3] = n = *idx++;
-                  y2 = vec2[n];
-                  y3 = vec3[n];
-                  rn2 += ( y2 == 0 ) ? 1 : 0;
-                  rn3 += ( y3 == 0 ) ? 1 : 0;
-                  y2 -= x2 * ( *val );
-                  y3 -= x3 * ( *val++ );
-                  //                  vec2[n] = y2 + ( y2 == 0 ? MARKER : 0 );
-                  //                  vec3[n] = y3 + ( y3 == 0 ? MARKER : 0 );
-                  vec2[n] = y2;
-                  vec3[n] = y3;
-               }
-            }
-            else
-            {
-               // case 6: only 2 is nonzero at j
-               for ( j = lbeg[i + 1]; j > k; --j )
-               {
-                  assert( *idx >= 0 && *idx < thedim );
-                  ridx2[rn2] = n = *idx++;
-                  y2 = vec2[n];
-                  rn2 += ( y2 == 0 ) ? 1 : 0;
-                  y2 -= x2 * ( *val++ );
-                  //                  vec2[n] = y2 + ( y2 == 0 ? MARKER : 0 );
-                  vec2[n] = y2;
-               }
+               assert(*idx >= 0 && *idx < thedim);
+               ridx[rn] = ridx3[rn3] = n = *idx++;
+               y = vec[n];
+               y3 = vec3[n];
+               rn += (y == 0) ? 1 : 0;
+               rn3 += (y3 == 0) ? 1 : 0;
+               y -= x * (*val);
+               y3 -= x3 * (*val++);
+               //                  vec[n] = y + ( y == 0 ? MARKER : 0 );
+               //                  vec3[n] = y3 + ( y3 == 0 ? MARKER : 0 );
+               vec[n] = y;
+               vec3[n] = y3;
             }
          }
          else
-            if ( x3 != 0 )
+         {
+            // case 4: only 1 is nonzero at j
+            for(j = lbeg[i + 1]; j > k; --j)
             {
-               // case 7: only 3 is nonzero at j
-               k = lbeg[i];
-               idx = &( lidx[k] );
-               val = &( lval[k] );
-
-               for ( j = lbeg[i + 1]; j > k; --j )
-               {
-                  assert( *idx >= 0 && *idx < thedim );
-                  ridx3[rn3] = n = *idx++;
-                  y3 = vec3[n];
-                  rn3 += ( y3 == 0 ) ? 1 : 0;
-                  y3 -= x3 * ( *val++ );
-                  //                  vec3[n] = y3 + ( y3 == 0 ? MARKER : 0 );
-                  vec3[n] = y3;
-               }
+               assert(*idx >= 0 && *idx < thedim);
+               ridx[rn] = n = *idx++;
+               y = vec[n];
+               rn += (y == 0) ? 1 : 0;
+               y -= x * (*val++);
+               //                  vec[n] = y + ( y == 0 ? MARKER : 0 );
+               vec[n] = y;
             }
+         }
+      }
+      else if(x2 != 0)
+      {
+         k = lbeg[i];
+         idx = &(lidx[k]);
+         val = &(lval[k]);
+
+         if(x3 != 0)
+         {
+            // case 5: 2 and 3 are nonzero at j
+            for(j = lbeg[i + 1]; j > k; --j)
+            {
+               assert(*idx >= 0 && *idx < thedim);
+               ridx2[rn2] = ridx3[rn3] = n = *idx++;
+               y2 = vec2[n];
+               y3 = vec3[n];
+               rn2 += (y2 == 0) ? 1 : 0;
+               rn3 += (y3 == 0) ? 1 : 0;
+               y2 -= x2 * (*val);
+               y3 -= x3 * (*val++);
+               //                  vec2[n] = y2 + ( y2 == 0 ? MARKER : 0 );
+               //                  vec3[n] = y3 + ( y3 == 0 ? MARKER : 0 );
+               vec2[n] = y2;
+               vec3[n] = y3;
+            }
+         }
+         else
+         {
+            // case 6: only 2 is nonzero at j
+            for(j = lbeg[i + 1]; j > k; --j)
+            {
+               assert(*idx >= 0 && *idx < thedim);
+               ridx2[rn2] = n = *idx++;
+               y2 = vec2[n];
+               rn2 += (y2 == 0) ? 1 : 0;
+               y2 -= x2 * (*val++);
+               //                  vec2[n] = y2 + ( y2 == 0 ? MARKER : 0 );
+               vec2[n] = y2;
+            }
+         }
+      }
+      else if(x3 != 0)
+      {
+         // case 7: only 3 is nonzero at j
+         k = lbeg[i];
+         idx = &(lidx[k]);
+         val = &(lval[k]);
+
+         for(j = lbeg[i + 1]; j > k; --j)
+         {
+            assert(*idx >= 0 && *idx < thedim);
+            ridx3[rn3] = n = *idx++;
+            y3 = vec3[n];
+            rn3 += (y3 == 0) ? 1 : 0;
+            y3 -= x3 * (*val++);
+            //                  vec3[n] = y3 + ( y3 == 0 ? MARKER : 0 );
+            vec3[n] = y3;
+         }
+      }
    }
 
-   if ( l.updateType )                   /* Forest-Tomlin Updates */
+   if(l.updateType)                      /* Forest-Tomlin Updates */
    {
       end = l.firstUnused;
 
-      for ( ; i < end; ++i )
+      for(; i < end; ++i)
       {
          x = x2 = x3 = 0;
          k = lbeg[i];
-         idx = &( lidx[k] );
-         val = &( lval[k] );
+         idx = &(lidx[k]);
+         val = &(lval[k]);
 
-         for ( j = lbeg[i + 1]; j > k; --j )
+         for(j = lbeg[i + 1]; j > k; --j)
          {
-            assert( *idx >= 0 && *idx < thedim );
-            x += vec[*idx] * ( *val );
-            x2 += vec2[*idx] * ( *val );
-            x3 += vec3[*idx++] * ( *val++ );
+            assert(*idx >= 0 && *idx < thedim);
+            x += vec[*idx] * (*val);
+            x2 += vec2[*idx] * (*val);
+            x3 += vec3[*idx++] * (*val++);
          }
 
          ridx[rn] = ridx2[rn2] = ridx3[rn3] = j = lrow[i];
 
-         rn += ( vec[j] == 0 ) ? 1 : 0;
-         rn2 += ( vec2[j] == 0 ) ? 1 : 0;
-         rn3 += ( vec3[j] == 0 ) ? 1 : 0;
+         rn += (vec[j] == 0) ? 1 : 0;
+         rn2 += (vec2[j] == 0) ? 1 : 0;
+         rn3 += (vec3[j] == 0) ? 1 : 0;
          vec[j] -= x;
          vec2[j] -= x2;
          vec3[j] -= x3;
@@ -5020,17 +5008,17 @@ void CLUFactorRational::vSolveLright3( Rational* vec, int* ridx, int* rnptr,
    *rn3ptr = rn3;
 }
 
-int CLUFactorRational::vSolveUright( Rational* vec, int* vidx,
-                                      Rational* rhs, int* ridx, int rn )
+int CLUFactorRational::vSolveUright(Rational* vec, int* vidx,
+                                    Rational* rhs, int* ridx, int rn)
 {
    int i, j, k, r, c, n;
-   int *rorig, *corig;
-   int *rperm;
-   int *cidx, *clen, *cbeg;
+   int* rorig, *corig;
+   int* rperm;
+   int* cidx, *clen, *cbeg;
    Rational x, y;
 
-   int *idx;
-   Rational *val;
+   int* idx;
+   Rational* val;
 
    rorig = row.orig;
    corig = col.orig;
@@ -5043,76 +5031,77 @@ int CLUFactorRational::vSolveUright( Rational* vec, int* vidx,
 
    n = 0;
 
-   while ( rn > 0 )
+   while(rn > 0)
    {
       /*      Find nonzero with highest permuted row index and setup i and r
        */
-      i = deQueueMax( ridx, &rn );
-      assert( i >= 0 && i < thedim );
+      i = deQueueMax(ridx, &rn);
+      assert(i >= 0 && i < thedim);
       r = rorig[i];
-      assert( r >= 0 && r < thedim );
+      assert(r >= 0 && r < thedim);
 
       x = diag[r] * rhs[r];
       rhs[r] = 0;
 
-      if ( x != 0 )
+      if(x != 0)
       {
          c = corig[i];
-         assert( c >= 0 && c < thedim );
+         assert(c >= 0 && c < thedim);
          vidx[n++] = c;
          vec[c] = x;
          val = &cval[cbeg[c]];
          idx = &cidx[cbeg[c]];
          j = clen[c];
 
-         while ( j-- > 0 )
+         while(j-- > 0)
          {
-            assert( *idx >= 0 && *idx < thedim );
+            assert(*idx >= 0 && *idx < thedim);
             k = *idx++;
-            assert( k >= 0 && k < thedim );
+            assert(k >= 0 && k < thedim);
             y = rhs[k];
 
-            if ( y == 0 )
+            if(y == 0)
             {
-               y = -x * ( *val++ );
+               y = -x * (*val++);
 
-               if ( y != 0 )
+               if(y != 0)
                {
                   rhs[k] = y;
-                  enQueueMax( ridx, &rn, rperm[k] );
+                  enQueueMax(ridx, &rn, rperm[k]);
                }
             }
             else
             {
-               y -= x * ( *val++ );
+               y -= x * (*val++);
                //               y += ( y == 0 ) ? MARKER : 0;
                rhs[k] = y;
             }
          }
 
-         if ( rn > i*verySparseFactor4right )
-         {                                   /* continue with dense case */
-            for ( i = *ridx; i >= 0; --i )
+         if(rn > i * verySparseFactor4right)
+         {
+            /* continue with dense case */
+            for(i = *ridx; i >= 0; --i)
             {
                r = rorig[i];
-               assert( r >= 0 && r < thedim );
+               assert(r >= 0 && r < thedim);
                x = diag[r] * rhs[r];
                rhs[r] = 0;
 
-               if ( x != 0 )
+               if(x != 0)
                {
                   c = corig[i];
-                  assert( c >= 0 && c < thedim );
+                  assert(c >= 0 && c < thedim);
                   vidx[n++] = c;
                   vec[c] = x;
                   val = &cval[cbeg[c]];
                   idx = &cidx[cbeg[c]];
                   j = clen[c];
 
-                  while ( j-- > 0 )
+                  while(j-- > 0)
                   {
-                     assert( *idx >= 0 && *idx < thedim );
-                     rhs[*idx++] -= x * ( *val++ );
+                     assert(*idx >= 0 && *idx < thedim);
+                     rhs[*idx++] -= x * (*val++);
                   }
                }
             }
@@ -5126,16 +5115,16 @@ int CLUFactorRational::vSolveUright( Rational* vec, int* vidx,
 }
 
 
-void CLUFactorRational::vSolveUrightNoNZ( Rational* vec, Rational* rhs, int* ridx, int rn )
+void CLUFactorRational::vSolveUrightNoNZ(Rational* vec, Rational* rhs, int* ridx, int rn)
 {
    int i, j, k, r, c;
-   int *rorig, *corig;
-   int *rperm;
-   int *cidx, *clen, *cbeg;
+   int* rorig, *corig;
+   int* rperm;
+   int* cidx, *clen, *cbeg;
    Rational x, y;
 
-   int *idx;
-   Rational *val;
+   int* idx;
+   Rational* val;
 
    rorig = row.orig;
    corig = col.orig;
@@ -5146,19 +5135,20 @@ void CLUFactorRational::vSolveUrightNoNZ( Rational* vec, Rational* rhs, int* rid
    clen = u.col.len;
    cbeg = u.col.start;
 
-   while ( rn > 0 )
+   while(rn > 0)
    {
-      if ( rn > *ridx * verySparseFactor4right )
-      {                                       /* continue with dense case */
-         for ( i = *ridx; i >= 0; --i )
+      if(rn > *ridx * verySparseFactor4right)
+      {
+         /* continue with dense case */
+         for(i = *ridx; i >= 0; --i)
          {
-            assert( i >= 0 && i < thedim );
+            assert(i >= 0 && i < thedim);
             r = rorig[i];
-            assert( r >= 0 && r < thedim );
+            assert(r >= 0 && r < thedim);
             x = diag[r] * rhs[r];
             rhs[r] = 0;
 
-            if ( x != 0 )
+            if(x != 0)
             {
                c = corig[i];
                vec[c] = x;
@@ -5166,10 +5156,10 @@ void CLUFactorRational::vSolveUrightNoNZ( Rational* vec, Rational* rhs, int* rid
                idx = &cidx[cbeg[c]];
                j = clen[c];
 
-               while ( j-- > 0 )
+               while(j-- > 0)
                {
-                  assert( *idx >= 0 && *idx < thedim );
-                  rhs[*idx++] -= x * ( *val++ );
+                  assert(*idx >= 0 && *idx < thedim);
+                  rhs[*idx++] -= x * (*val++);
                }
             }
          }
@@ -5179,19 +5169,19 @@ void CLUFactorRational::vSolveUrightNoNZ( Rational* vec, Rational* rhs, int* rid
 
       /*      Find nonzero with highest permuted row index and setup i and r
        */
-      i = deQueueMax( ridx, &rn );
+      i = deQueueMax(ridx, &rn);
 
-      assert( i >= 0 && i < thedim );
+      assert(i >= 0 && i < thedim);
 
       r = rorig[i];
 
-      assert( r >= 0 && r < thedim );
+      assert(r >= 0 && r < thedim);
 
       x = diag[r] * rhs[r];
 
       rhs[r] = 0;
 
-      if ( x != 0 )
+      if(x != 0)
       {
          c = corig[i];
          vec[c] = x;
@@ -5199,25 +5189,25 @@ void CLUFactorRational::vSolveUrightNoNZ( Rational* vec, Rational* rhs, int* rid
          idx = &cidx[cbeg[c]];
          j = clen[c];
 
-         while ( j-- > 0 )
+         while(j-- > 0)
          {
             k = *idx++;
-            assert( k >= 0 && k < thedim );
+            assert(k >= 0 && k < thedim);
             y = rhs[k];
 
-            if ( y == 0 )
+            if(y == 0)
             {
-               y = -x * ( *val++ );
+               y = -x * (*val++);
 
-               if ( y != 0 )
+               if(y != 0)
                {
                   rhs[k] = y;
-                  enQueueMax( ridx, &rn, rperm[k] );
+                  enQueueMax(ridx, &rn, rperm[k]);
                }
             }
             else
             {
-               y -= x * ( *val++ );
+               y -= x * (*val++);
                //               y += ( y == 0 ) ? MARKER : 0;
                rhs[k] = y;
             }
@@ -5227,18 +5217,18 @@ void CLUFactorRational::vSolveUrightNoNZ( Rational* vec, Rational* rhs, int* rid
 }
 
 
-int CLUFactorRational::vSolveUright2( Rational* vec, int* vidx, Rational* rhs, int* ridx, int rn,
-                                       Rational* vec2, Rational* rhs2, int* ridx2, int rn2 )
+int CLUFactorRational::vSolveUright2(Rational* vec, int* vidx, Rational* rhs, int* ridx, int rn,
+                                     Rational* vec2, Rational* rhs2, int* ridx2, int rn2)
 {
    int i, j, k, r, c, n;
-   int *rorig, *corig;
-   int *rperm;
-   int *cidx, *clen, *cbeg;
+   int* rorig, *corig;
+   int* rperm;
+   int* cidx, *clen, *cbeg;
    Rational x, y;
    Rational x2, y2;
 
-   int *idx;
-   Rational *val;
+   int* idx;
+   Rational* val;
 
    rorig = row.orig;
    corig = col.orig;
@@ -5251,38 +5241,35 @@ int CLUFactorRational::vSolveUright2( Rational* vec, int* vidx, Rational* rhs, i
 
    n = 0;
 
-   while ( rn + rn2 > 0 )
+   while(rn + rn2 > 0)
    {
       /*      Find nonzero with highest permuted row index and setup i and r
        */
-      if ( rn <= 0 )
-         i = deQueueMax( ridx2, &rn2 );
+      if(rn <= 0)
+         i = deQueueMax(ridx2, &rn2);
+      else if(rn2 <= 0)
+         i = deQueueMax(ridx, &rn);
+      else if(*ridx2 > *ridx)
+         i = deQueueMax(ridx2, &rn2);
+      else if(*ridx2 < *ridx)
+         i = deQueueMax(ridx, &rn);
       else
-         if ( rn2 <= 0 )
-            i = deQueueMax( ridx, &rn );
-         else
-            if ( *ridx2 > *ridx )
-               i = deQueueMax( ridx2, &rn2 );
-            else
-               if ( *ridx2 < *ridx )
-                  i = deQueueMax( ridx, &rn );
-               else
-               {
-                  (void) deQueueMax( ridx, &rn );
-                  i = deQueueMax( ridx2, &rn2 );
-               }
+      {
+         (void) deQueueMax(ridx, &rn);
+         i = deQueueMax(ridx2, &rn2);
+      }
 
-      assert( i >= 0 && i < thedim );
+      assert(i >= 0 && i < thedim);
 
       r = rorig[i];
-      assert( r >= 0 && r < thedim );
+      assert(r >= 0 && r < thedim);
 
       x = diag[r] * rhs[r];
       x2 = diag[r] * rhs2[r];
       rhs[r] = 0;
       rhs2[r] = 0;
 
-      if ( x != 0 )
+      if(x != 0)
       {
          c = corig[i];
          vidx[n++] = c;
@@ -5292,46 +5279,46 @@ int CLUFactorRational::vSolveUright2( Rational* vec, int* vidx, Rational* rhs, i
          idx = &cidx[cbeg[c]];
          j = clen[c];
 
-         if ( x2 != 0 )
+         if(x2 != 0)
          {
-            while ( j-- > 0 )
+            while(j-- > 0)
             {
                k = *idx++;
-               assert( k >= 0 && k < thedim );
+               assert(k >= 0 && k < thedim);
                y2 = rhs2[k];
 
-               if ( y2 == 0 )
+               if(y2 == 0)
                {
-                  y2 = -x2 * ( *val );
+                  y2 = -x2 * (*val);
 
-                  if ( y2 != 0 )
+                  if(y2 != 0)
                   {
                      rhs2[k] = y2;
-                     enQueueMax( ridx2, &rn2, rperm[k] );
+                     enQueueMax(ridx2, &rn2, rperm[k]);
                   }
                }
                else
                {
-                  y2 -= x2 * ( *val );
+                  y2 -= x2 * (*val);
                   //                  rhs2[k] = ( y2 != 0 ) ? y2 : MARKER;
                   rhs2[k] = y2;
                }
 
                y = rhs[k];
 
-               if ( y == 0 )
+               if(y == 0)
                {
-                  y = -x * ( *val++ );
+                  y = -x * (*val++);
 
-                  if ( y != 0 )
+                  if(y != 0)
                   {
                      rhs[k] = y;
-                     enQueueMax( ridx, &rn, rperm[k] );
+                     enQueueMax(ridx, &rn, rperm[k]);
                   }
                }
                else
                {
-                  y -= x * ( *val++ );
+                  y -= x * (*val++);
                   //                  y += ( y == 0 ) ? MARKER : 0;
                   rhs[k] = y;
                }
@@ -5339,130 +5326,129 @@ int CLUFactorRational::vSolveUright2( Rational* vec, int* vidx, Rational* rhs, i
          }
          else
          {
-            while ( j-- > 0 )
+            while(j-- > 0)
             {
                k = *idx++;
-               assert( k >= 0 && k < thedim );
+               assert(k >= 0 && k < thedim);
                y = rhs[k];
 
-               if ( y == 0 )
+               if(y == 0)
                {
-                  y = -x * ( *val++ );
+                  y = -x * (*val++);
 
-                  if ( y != 0 )
+                  if(y != 0)
                   {
                      rhs[k] = y;
-                     enQueueMax( ridx, &rn, rperm[k] );
+                     enQueueMax(ridx, &rn, rperm[k]);
                   }
                }
                else
                {
-                  y -= x * ( *val++ );
+                  y -= x * (*val++);
                   //                  y += ( y == 0 ) ? MARKER : 0;
                   rhs[k] = y;
                }
             }
          }
       }
-      else
-         if ( x2 != 0 )
+      else if(x2 != 0)
+      {
+         c = corig[i];
+         assert(c >= 0 && c < thedim);
+         vec2[c] = x2;
+         val = &cval[cbeg[c]];
+         idx = &cidx[cbeg[c]];
+         j = clen[c];
+
+         while(j-- > 0)
          {
-            c = corig[i];
-            assert( c >= 0 && c < thedim );
-            vec2[c] = x2;
-            val = &cval[cbeg[c]];
-            idx = &cidx[cbeg[c]];
-            j = clen[c];
+            k = *idx++;
+            assert(k >= 0 && k < thedim);
+            y2 = rhs2[k];
 
-            while ( j-- > 0 )
+            if(y2 == 0)
             {
-               k = *idx++;
-               assert( k >= 0 && k < thedim );
-               y2 = rhs2[k];
+               y2 = -x2 * (*val++);
 
-               if ( y2 == 0 )
+               if(y2 != 0)
                {
-                  y2 = -x2 * ( *val++ );
-
-                  if ( y2 != 0 )
-                  {
-                     rhs2[k] = y2;
-                     enQueueMax( ridx2, &rn2, rperm[k] );
-                  }
-               }
-               else
-               {
-                  y2 -= x2 * ( *val++ );
-                  //                  rhs2[k] = ( y2 != 0 ) ? y2 : MARKER;
                   rhs2[k] = y2;
+                  enQueueMax(ridx2, &rn2, rperm[k]);
                }
             }
+            else
+            {
+               y2 -= x2 * (*val++);
+               //                  rhs2[k] = ( y2 != 0 ) ? y2 : MARKER;
+               rhs2[k] = y2;
+            }
          }
+      }
 
-      if ( rn + rn2 > i*verySparseFactor4right )
-      {                                       /* continue with dense case */
-         if ( *ridx > *ridx2 )
+      if(rn + rn2 > i * verySparseFactor4right)
+      {
+         /* continue with dense case */
+         if(*ridx > *ridx2)
             i = *ridx;
          else
             i = *ridx2;
 
-         for ( ; i >= 0; --i )
+         for(; i >= 0; --i)
          {
-            assert( i < thedim );
+            assert(i < thedim);
             r = rorig[i];
-            assert( r >= 0 && r < thedim );
+            assert(r >= 0 && r < thedim);
             x = diag[r] * rhs[r];
             x2 = diag[r] * rhs2[r];
             rhs[r] = 0;
             rhs2[r] = 0;
 
-            if ( x2 != 0 )
+            if(x2 != 0)
             {
                c = corig[i];
-               assert( c >= 0 && c < thedim );
+               assert(c >= 0 && c < thedim);
                vec2[c] = x2;
                val = &cval[cbeg[c]];
                idx = &cidx[cbeg[c]];
                j = clen[c];
 
-               if ( x != 0 )
+               if(x != 0)
                {
                   vidx[n++] = c;
                   vec[c] = x;
 
-                  while ( j-- > 0 )
+                  while(j-- > 0)
                   {
-                     assert( *idx >= 0 && *idx < thedim );
-                     rhs[*idx] -= x * ( *val );
-                     rhs2[*idx++] -= x2 * ( *val++ );
+                     assert(*idx >= 0 && *idx < thedim);
+                     rhs[*idx] -= x * (*val);
+                     rhs2[*idx++] -= x2 * (*val++);
                   }
                }
                else
                {
-                  while ( j-- > 0 )
+                  while(j-- > 0)
                   {
-                     assert( *idx >= 0 && *idx < thedim );
-                     rhs2[*idx++] -= x2 * ( *val++ );
+                     assert(*idx >= 0 && *idx < thedim);
+                     rhs2[*idx++] -= x2 * (*val++);
                   }
                }
             }
-            else
-               if ( x != 0 )
-               {
-                  c = corig[i];
-                  assert( c >= 0 && c < thedim );
-                  vidx[n++] = c;
-                  vec[c] = x;
-                  val = &cval[cbeg[c]];
-                  idx = &cidx[cbeg[c]];
-                  j = clen[c];
+            else if(x != 0)
+            {
+               c = corig[i];
+               assert(c >= 0 && c < thedim);
+               vidx[n++] = c;
+               vec[c] = x;
+               val = &cval[cbeg[c]];
+               idx = &cidx[cbeg[c]];
+               j = clen[c];
 
-                  while ( j-- > 0 )
-                  {
-                     assert( *idx >= 0 && *idx < thedim );
-                     rhs[*idx++] -= x * ( *val++ );
-                  }
+               while(j-- > 0)
+               {
+                  assert(*idx >= 0 && *idx < thedim);
+                  rhs[*idx++] -= x * (*val++);
                }
+            }
          }
 
          break;
@@ -5472,16 +5458,16 @@ int CLUFactorRational::vSolveUright2( Rational* vec, int* vidx, Rational* rhs, i
    return n;
 }
 
-int CLUFactorRational::vSolveUpdateRight( Rational* vec, int* ridx, int n )
+int CLUFactorRational::vSolveUpdateRight(Rational* vec, int* ridx, int n)
 {
    int i, j, k;
    int end;
    Rational x, y;
-   Rational *val;
-   int *lrow, *lidx, *idx;
-   int *lbeg;
+   Rational* val;
+   int* lrow, *lidx, *idx;
+   int* lbeg;
 
-   assert( !l.updateType );             /* no Forest-Tomlin Updates */
+   assert(!l.updateType);               /* no Forest-Tomlin Updates */
 
    VectorRational& lval = l.val;
    lidx = l.idx;
@@ -5489,25 +5475,25 @@ int CLUFactorRational::vSolveUpdateRight( Rational* vec, int* ridx, int n )
    lbeg = l.start;
    end = l.firstUnused;
 
-   for ( i = l.firstUpdate; i < end; ++i )
+   for(i = l.firstUpdate; i < end; ++i)
    {
-      assert( i >= 0 && i < thedim );
+      assert(i >= 0 && i < thedim);
       x = vec[lrow[i]];
 
-      if ( x != 0 )
+      if(x != 0)
       {
          k = lbeg[i];
-         assert( k >= 0 && k < l.val.dim() );
-         idx = &( lidx[k] );
-         val = &( lval[k] );
+         assert(k >= 0 && k < l.val.dim());
+         idx = &(lidx[k]);
+         val = &(lval[k]);
 
-         for ( j = lbeg[i + 1]; j > k; --j )
+         for(j = lbeg[i + 1]; j > k; --j)
          {
             int m = ridx[n] = *idx++;
-            assert( m >= 0 && m < thedim );
+            assert(m >= 0 && m < thedim);
             y = vec[m];
-            n += ( y == 0 ) ? 1 : 0;
-            y = y - x * ( *val++ );
+            n += (y == 0) ? 1 : 0;
+            y = y - x * (*val++);
             //            vec[m] = ( y != 0 ) ? y : MARKER;
             vec[m] = y;
          }
@@ -5517,16 +5503,16 @@ int CLUFactorRational::vSolveUpdateRight( Rational* vec, int* ridx, int n )
    return n;
 }
 
-void CLUFactorRational::vSolveUpdateRightNoNZ( Rational* vec )
+void CLUFactorRational::vSolveUpdateRightNoNZ(Rational* vec)
 {
    int i, j, k;
    int end;
    Rational x;
-   Rational *val;
-   int *lrow, *lidx, *idx;
-   int *lbeg;
+   Rational* val;
+   int* lrow, *lidx, *idx;
+   int* lbeg;
 
-   assert( !l.updateType );             /* no Forest-Tomlin Updates */
+   assert(!l.updateType);               /* no Forest-Tomlin Updates */
 
    VectorRational& lval = l.val;
    lidx = l.idx;
@@ -5534,37 +5520,38 @@ void CLUFactorRational::vSolveUpdateRightNoNZ( Rational* vec )
    lbeg = l.start;
    end = l.firstUnused;
 
-   for ( i = l.firstUpdate; i < end; ++i )
+   for(i = l.firstUpdate; i < end; ++i)
    {
-      assert( i >= 0 && i < thedim );
+      assert(i >= 0 && i < thedim);
 
-      if (( x = vec[lrow[i]] ) != 0 )
+      if((x = vec[lrow[i]]) != 0)
       {
          k = lbeg[i];
-         assert( k >= 0 && k < l.val.dim() );
-         idx = &( lidx[k] );
-         val = &( lval[k] );
+         assert(k >= 0 && k < l.val.dim());
+         idx = &(lidx[k]);
+         val = &(lval[k]);
 
-         for ( j = lbeg[i + 1]; j > k; --j )
+         for(j = lbeg[i + 1]; j > k; --j)
          {
-            assert( *idx >= 0 && *idx < thedim );
-            vec[*idx++] -= x * ( *val++ );
+            assert(*idx >= 0 && *idx < thedim);
+            vec[*idx++] -= x * (*val++);
          }
       }
    }
 }
 
 
-int CLUFactorRational::vSolveRight4update( Rational* vec, int* idx,                             /* result */
-                                            Rational* rhs, int* ridx, int rn,                    /* rhs    */
-                                            Rational* forest, int* forestNum, int* forestIdx )
+int CLUFactorRational::vSolveRight4update(Rational* vec,
+      int* idx,                              /* result */
+      Rational* rhs, int* ridx, int rn,                    /* rhs    */
+      Rational* forest, int* forestNum, int* forestIdx)
 {
-   rn = vSolveLright( rhs, ridx, rn );
+   rn = vSolveLright(rhs, ridx, rn);
 
    /*  turn index list into a heap
     */
 
-   if ( forest )
+   if(forest)
    {
       Rational x;
       int i, j, k;
@@ -5573,15 +5560,15 @@ int CLUFactorRational::vSolveRight4update( Rational* vec, int* idx,             
 
       rperm = row.perm;
 
-      for ( i = j = 0; i < rn; ++i )
+      for(i = j = 0; i < rn; ++i)
       {
          k = ridx[i];
-         assert( k >= 0 && k < thedim );
+         assert(k >= 0 && k < thedim);
          x = rhs[k];
 
-         if ( x != 0 )
+         if(x != 0)
          {
-            enQueueMax( ridx, &j, rperm[*it++ = k] );
+            enQueueMax(ridx, &j, rperm[*it++ = k]);
             forest[k] = x;
          }
          else
@@ -5598,14 +5585,14 @@ int CLUFactorRational::vSolveRight4update( Rational* vec, int* idx,             
 
       rperm = row.perm;
 
-      for ( i = j = 0; i < rn; ++i )
+      for(i = j = 0; i < rn; ++i)
       {
          k = ridx[i];
-         assert( k >= 0 && k < thedim );
+         assert(k >= 0 && k < thedim);
          x = rhs[k];
 
-         if ( x != 0 )
-            enQueueMax( ridx, &j, rperm[k] );
+         if(x != 0)
+            enQueueMax(ridx, &j, rperm[k]);
          else
             rhs[k] = 0;
       }
@@ -5613,26 +5600,27 @@ int CLUFactorRational::vSolveRight4update( Rational* vec, int* idx,             
       rn = j;
    }
 
-   rn = vSolveUright( vec, idx, rhs, ridx, rn );
+   rn = vSolveUright(vec, idx, rhs, ridx, rn);
 
-   if ( !l.updateType )          /* no Forest-Tomlin Updates */
-      rn = vSolveUpdateRight( vec, idx, rn );
+   if(!l.updateType)             /* no Forest-Tomlin Updates */
+      rn = vSolveUpdateRight(vec, idx, rn);
 
    return rn;
 }
 
-int CLUFactorRational::vSolveRight4update2( Rational* vec, int* idx,                             /* result1 */
-                                             Rational* rhs, int* ridx, int rn,                    /* rhs1    */
-                                             Rational* vec2,                                      /* result2 */
-                                             Rational* rhs2, int* ridx2, int rn2,                 /* rhs2    */
-                                             Rational* forest, int* forestNum, int* forestIdx )
+int CLUFactorRational::vSolveRight4update2(Rational* vec,
+      int* idx,                              /* result1 */
+      Rational* rhs, int* ridx, int rn,                    /* rhs1    */
+      Rational* vec2,                                      /* result2 */
+      Rational* rhs2, int* ridx2, int rn2,                 /* rhs2    */
+      Rational* forest, int* forestNum, int* forestIdx)
 {
-   vSolveLright2( rhs, ridx, &rn, rhs2, ridx2, &rn2 );
+   vSolveLright2(rhs, ridx, &rn, rhs2, ridx2, &rn2);
 
    /*  turn index list into a heap
     */
 
-   if ( forest )
+   if(forest)
    {
       Rational x;
       int i, j, k;
@@ -5641,15 +5629,15 @@ int CLUFactorRational::vSolveRight4update2( Rational* vec, int* idx,            
 
       rperm = row.perm;
 
-      for ( i = j = 0; i < rn; ++i )
+      for(i = j = 0; i < rn; ++i)
       {
          k = ridx[i];
-         assert( k >= 0 && k < thedim );
+         assert(k >= 0 && k < thedim);
          x = rhs[k];
 
-         if ( x != 0 )
+         if(x != 0)
          {
-            enQueueMax( ridx, &j, rperm[*it++ = k] );
+            enQueueMax(ridx, &j, rperm[*it++ = k]);
             forest[k] = x;
          }
          else
@@ -5666,14 +5654,14 @@ int CLUFactorRational::vSolveRight4update2( Rational* vec, int* idx,            
 
       rperm = row.perm;
 
-      for ( i = j = 0; i < rn; ++i )
+      for(i = j = 0; i < rn; ++i)
       {
          k = ridx[i];
-         assert( k >= 0 && k < thedim );
+         assert(k >= 0 && k < thedim);
          x = rhs[k];
 
-         if ( x != 0 )
-            enQueueMax( ridx, &j, rperm[k] );
+         if(x != 0)
+            enQueueMax(ridx, &j, rperm[k]);
          else
             rhs[k] = 0;
       }
@@ -5681,7 +5669,7 @@ int CLUFactorRational::vSolveRight4update2( Rational* vec, int* idx,            
       rn = j;
    }
 
-   if ( rn2 > thedim*verySparseFactor4right )
+   if(rn2 > thedim * verySparseFactor4right)
    {
       ridx2[0] = thedim - 1;
       /* ridx2[1] = thedim - 2; */
@@ -5696,16 +5684,16 @@ int CLUFactorRational::vSolveRight4update2( Rational* vec, int* idx,            
       /*      maxabs = 1;    */
       rperm = row.perm;
 
-      for ( i = j = 0; i < rn2; ++i )
+      for(i = j = 0; i < rn2; ++i)
       {
          k = ridx2[i];
-         assert( k >= 0 && k < thedim );
+         assert(k >= 0 && k < thedim);
          x = rhs2[k];
 
-         if ( x == 0 )
+         if(x == 0)
          {
             /*              maxabs = (maxabs < -x) ? -x : maxabs;  */
-            enQueueMax( ridx2, &j, rperm[k] );
+            enQueueMax(ridx2, &j, rperm[k]);
          }
          else
             rhs2[k] = 0;
@@ -5715,41 +5703,42 @@ int CLUFactorRational::vSolveRight4update2( Rational* vec, int* idx,            
 
    }
 
-   rn = vSolveUright( vec, idx, rhs, ridx, rn );
+   rn = vSolveUright(vec, idx, rhs, ridx, rn);
 
-   vSolveUrightNoNZ( vec2, rhs2, ridx2, rn2 );
+   vSolveUrightNoNZ(vec2, rhs2, ridx2, rn2);
 
    /*
     *  rn = vSolveUright2(vec, idx, rhs, ridx, rn, vec2, rhs2, ridx2, rn2 );
     */
 
-   if ( !l.updateType )          /* no Forest-Tomlin Updates */
+   if(!l.updateType)             /* no Forest-Tomlin Updates */
    {
-      rn = vSolveUpdateRight( vec, idx, rn );
-      vSolveUpdateRightNoNZ( vec2 );
+      rn = vSolveUpdateRight(vec, idx, rn);
+      vSolveUpdateRightNoNZ(vec2);
    }
 
    return rn;
 }
 
-int CLUFactorRational::vSolveRight4update3( Rational* vec, int* idx,                             /* result1 */
-                                             Rational* rhs, int* ridx, int rn,                    /* rhs1    */
-                                             Rational* vec2,                                      /* result2 */
-                                             Rational* rhs2, int* ridx2, int rn2,                 /* rhs2    */
-                                             Rational* vec3,                                      /* result3 */
-                                             Rational* rhs3, int* ridx3, int rn3,                 /* rhs3    */
-                                             Rational* forest, int* forestNum, int* forestIdx )
+int CLUFactorRational::vSolveRight4update3(Rational* vec,
+      int* idx,                              /* result1 */
+      Rational* rhs, int* ridx, int rn,                    /* rhs1    */
+      Rational* vec2,                                      /* result2 */
+      Rational* rhs2, int* ridx2, int rn2,                 /* rhs2    */
+      Rational* vec3,                                      /* result3 */
+      Rational* rhs3, int* ridx3, int rn3,                 /* rhs3    */
+      Rational* forest, int* forestNum, int* forestIdx)
 {
 
-   vSolveLright3( rhs, ridx, &rn, rhs2, ridx2, &rn2, rhs3, ridx3, &rn3 );
-   assert( rn >= 0 && rn <= thedim );
-   assert( rn2 >= 0 && rn2 <= thedim );
-   assert( rn3 >= 0 && rn3 <= thedim );
+   vSolveLright3(rhs, ridx, &rn, rhs2, ridx2, &rn2, rhs3, ridx3, &rn3);
+   assert(rn >= 0 && rn <= thedim);
+   assert(rn2 >= 0 && rn2 <= thedim);
+   assert(rn3 >= 0 && rn3 <= thedim);
 
    /*  turn index list into a heap
     */
 
-   if ( forest )
+   if(forest)
    {
       Rational x;
       int i, j, k;
@@ -5758,15 +5747,15 @@ int CLUFactorRational::vSolveRight4update3( Rational* vec, int* idx,            
 
       rperm = row.perm;
 
-      for ( i = j = 0; i < rn; ++i )
+      for(i = j = 0; i < rn; ++i)
       {
          k = ridx[i];
-         assert( k >= 0 && k < thedim );
+         assert(k >= 0 && k < thedim);
          x = rhs[k];
 
-         if ( x != 0 )
+         if(x != 0)
          {
-            enQueueMax( ridx, &j, rperm[*it++ = k] );
+            enQueueMax(ridx, &j, rperm[*it++ = k]);
             forest[k] = x;
          }
          else
@@ -5783,14 +5772,14 @@ int CLUFactorRational::vSolveRight4update3( Rational* vec, int* idx,            
 
       rperm = row.perm;
 
-      for ( i = j = 0; i < rn; ++i )
+      for(i = j = 0; i < rn; ++i)
       {
          k = ridx[i];
-         assert( k >= 0 && k < thedim );
+         assert(k >= 0 && k < thedim);
          x = rhs[k];
 
-         if ( x != 0 )
-            enQueueMax( ridx, &j, rperm[k] );
+         if(x != 0)
+            enQueueMax(ridx, &j, rperm[k]);
          else
             rhs[k] = 0;
       }
@@ -5798,7 +5787,7 @@ int CLUFactorRational::vSolveRight4update3( Rational* vec, int* idx,            
       rn = j;
    }
 
-   if ( rn2 > thedim*verySparseFactor4right )
+   if(rn2 > thedim * verySparseFactor4right)
    {
       ridx2[0] = thedim - 1;
    }
@@ -5810,15 +5799,15 @@ int CLUFactorRational::vSolveRight4update3( Rational* vec, int* idx,            
 
       rperm = row.perm;
 
-      for ( i = j = 0; i < rn2; ++i )
+      for(i = j = 0; i < rn2; ++i)
       {
          k = ridx2[i];
-         assert( k >= 0 && k < thedim );
+         assert(k >= 0 && k < thedim);
          x = rhs2[k];
 
-         if ( x == 0 )
+         if(x == 0)
          {
-            enQueueMax( ridx2, &j, rperm[k] );
+            enQueueMax(ridx2, &j, rperm[k]);
          }
          else
             rhs2[k] = 0;
@@ -5827,7 +5816,7 @@ int CLUFactorRational::vSolveRight4update3( Rational* vec, int* idx,            
       rn2 = j;
    }
 
-   if ( rn3 > thedim*verySparseFactor4right )
+   if(rn3 > thedim * verySparseFactor4right)
    {
       ridx3[0] = thedim - 1;
    }
@@ -5839,15 +5828,15 @@ int CLUFactorRational::vSolveRight4update3( Rational* vec, int* idx,            
 
       rperm = row.perm;
 
-      for ( i = j = 0; i < rn3; ++i )
+      for(i = j = 0; i < rn3; ++i)
       {
          k = ridx3[i];
-         assert( k >= 0 && k < thedim );
+         assert(k >= 0 && k < thedim);
          x = rhs3[k];
 
-         if ( x == 0 )
+         if(x == 0)
          {
-            enQueueMax( ridx3, &j, rperm[k] );
+            enQueueMax(ridx3, &j, rperm[k]);
          }
          else
             rhs3[k] = 0;
@@ -5856,28 +5845,28 @@ int CLUFactorRational::vSolveRight4update3( Rational* vec, int* idx,            
       rn3 = j;
    }
 
-   rn = vSolveUright( vec, idx, rhs, ridx, rn );
+   rn = vSolveUright(vec, idx, rhs, ridx, rn);
 
-   vSolveUrightNoNZ( vec2, rhs2, ridx2, rn2 );
-   vSolveUrightNoNZ( vec3, rhs3, ridx3, rn3 );
+   vSolveUrightNoNZ(vec2, rhs2, ridx2, rn2);
+   vSolveUrightNoNZ(vec3, rhs3, ridx3, rn3);
 
-   if ( !l.updateType )          /* no Forest-Tomlin Updates */
+   if(!l.updateType)             /* no Forest-Tomlin Updates */
    {
-      rn = vSolveUpdateRight( vec, idx, rn );
-      vSolveUpdateRightNoNZ( vec2 );
-      vSolveUpdateRightNoNZ( vec3 );
+      rn = vSolveUpdateRight(vec, idx, rn);
+      vSolveUpdateRightNoNZ(vec2);
+      vSolveUpdateRightNoNZ(vec3);
    }
 
    return rn;
 }
 
-void CLUFactorRational::vSolveRightNoNZ( Rational* vec2,                         /* result2 */
-                                          Rational* rhs2, int* ridx2, int rn2 )   /* rhs2    */
+void CLUFactorRational::vSolveRightNoNZ(Rational* vec2,                          /* result2 */
+                                        Rational* rhs2, int* ridx2, int rn2)    /* rhs2    */
 {
-   rn2 = vSolveLright( rhs2, ridx2, rn2 );
-   assert( rn2 >= 0 && rn2 <= thedim );
+   rn2 = vSolveLright(rhs2, ridx2, rn2);
+   assert(rn2 >= 0 && rn2 <= thedim);
 
-   if ( rn2 > thedim*verySparseFactor4right )
+   if(rn2 > thedim * verySparseFactor4right)
    {
       *ridx2 = thedim - 1;
    }
@@ -5891,16 +5880,16 @@ void CLUFactorRational::vSolveRightNoNZ( Rational* vec2,                        
       /*      maxabs = 1;    */
       rperm = row.perm;
 
-      for ( i = j = 0; i < rn2; ++i )
+      for(i = j = 0; i < rn2; ++i)
       {
          k = ridx2[i];
-         assert( k >= 0 && k < thedim );
+         assert(k >= 0 && k < thedim);
          x = rhs2[k];
 
-         if ( x == 0 )
+         if(x == 0)
          {
             /*              maxabs = (maxabs < -x) ? -x : maxabs;  */
-            enQueueMax( ridx2, &j, rperm[k] );
+            enQueueMax(ridx2, &j, rperm[k]);
          }
          else
             rhs2[k] = 0;
@@ -5909,108 +5898,108 @@ void CLUFactorRational::vSolveRightNoNZ( Rational* vec2,                        
       rn2 = j;
    }
 
-   vSolveUrightNoNZ( vec2, rhs2, ridx2, rn2 );
+   vSolveUrightNoNZ(vec2, rhs2, ridx2, rn2);
 
-   if ( !l.updateType )          /* no Forest-Tomlin Updates */
-      vSolveUpdateRightNoNZ( vec2 );
+   if(!l.updateType)             /* no Forest-Tomlin Updates */
+      vSolveUpdateRightNoNZ(vec2);
 }
 
-int CLUFactorRational::vSolveLeft( Rational* vec, int* idx,                     /* result */
-                                    Rational* rhs, int* ridx, int rn )           /* rhs    */
+int CLUFactorRational::vSolveLeft(Rational* vec, int* idx,                      /* result */
+                                  Rational* rhs, int* ridx, int rn)            /* rhs    */
 {
 
-   if ( !l.updateType )          /* no Forest-Tomlin Updates */
+   if(!l.updateType)             /* no Forest-Tomlin Updates */
    {
-      rn = solveUpdateLeft( rhs, ridx, rn );
-      rn = solveUleft( vec, idx, rhs, ridx, rn );
+      rn = solveUpdateLeft(rhs, ridx, rn);
+      rn = solveUleft(vec, idx, rhs, ridx, rn);
    }
    else
    {
-      rn = solveUleft( vec, idx, rhs, ridx, rn );
-      rn = solveLleftForest( vec, idx, rn );
+      rn = solveUleft(vec, idx, rhs, ridx, rn);
+      rn = solveLleftForest(vec, idx, rn);
    }
 
-   return solveLleft( vec, idx, rn );
+   return solveLleft(vec, idx, rn);
 }
 
-int CLUFactorRational::vSolveLeft2( Rational* vec, int* idx,                      /* result */
-                                     Rational* rhs, int* ridx, int rn,             /* rhs    */
-                                     Rational* vec2,                               /* result2 */
-                                     Rational* rhs2, int* ridx2, int rn2 )         /* rhs2    */
+int CLUFactorRational::vSolveLeft2(Rational* vec, int* idx,                       /* result */
+                                   Rational* rhs, int* ridx, int rn,             /* rhs    */
+                                   Rational* vec2,                               /* result2 */
+                                   Rational* rhs2, int* ridx2, int rn2)          /* rhs2    */
 {
 
-   if ( !l.updateType )          /* no Forest-Tomlin Updates */
+   if(!l.updateType)             /* no Forest-Tomlin Updates */
    {
-      rn = solveUpdateLeft( rhs, ridx, rn );
-      rn = solveUleft( vec, idx, rhs, ridx, rn );
-      rn2 = solveUpdateLeft( rhs2, ridx2, rn2 );
-      solveUleftNoNZ( vec2, rhs2, ridx2, rn2 );
+      rn = solveUpdateLeft(rhs, ridx, rn);
+      rn = solveUleft(vec, idx, rhs, ridx, rn);
+      rn2 = solveUpdateLeft(rhs2, ridx2, rn2);
+      solveUleftNoNZ(vec2, rhs2, ridx2, rn2);
    }
    else
    {
-      rn = solveUleft( vec, idx, rhs, ridx, rn );
-      rn = solveLleftForest( vec, idx, rn );
-      solveUleftNoNZ( vec2, rhs2, ridx2, rn2 );
-      solveLleftForestNoNZ( vec2 );
+      rn = solveUleft(vec, idx, rhs, ridx, rn);
+      rn = solveLleftForest(vec, idx, rn);
+      solveUleftNoNZ(vec2, rhs2, ridx2, rn2);
+      solveLleftForestNoNZ(vec2);
    }
 
-   rn = solveLleft( vec, idx, rn );
+   rn = solveLleft(vec, idx, rn);
 
-   solveLleftNoNZ( vec2 );
+   solveLleftNoNZ(vec2);
 
    return rn;
 }
 
-int CLUFactorRational::vSolveLeft3( Rational* vec, int* idx,                      /* result */
-                                     Rational* rhs, int* ridx, int rn,             /* rhs    */
-                                     Rational* vec2,                               /* result2 */
-                                     Rational* rhs2, int* ridx2, int rn2,          /* rhs2    */
-                                     Rational* vec3,                               /* result3 */
-                                     Rational* rhs3, int* ridx3, int rn3 )         /* rhs3    */
+int CLUFactorRational::vSolveLeft3(Rational* vec, int* idx,                       /* result */
+                                   Rational* rhs, int* ridx, int rn,             /* rhs    */
+                                   Rational* vec2,                               /* result2 */
+                                   Rational* rhs2, int* ridx2, int rn2,          /* rhs2    */
+                                   Rational* vec3,                               /* result3 */
+                                   Rational* rhs3, int* ridx3, int rn3)          /* rhs3    */
 {
 
-   if ( !l.updateType )          /* no Forest-Tomlin Updates */
+   if(!l.updateType)             /* no Forest-Tomlin Updates */
    {
-      rn = solveUpdateLeft( rhs, ridx, rn );
-      rn = solveUleft( vec, idx, rhs, ridx, rn );
-      rn2 = solveUpdateLeft( rhs2, ridx2, rn2 );
-      solveUleftNoNZ( vec2, rhs2, ridx2, rn2 );
-      rn3 = solveUpdateLeft( rhs3, ridx3, rn3 );
-      solveUleftNoNZ( vec3, rhs3, ridx3, rn3 );
+      rn = solveUpdateLeft(rhs, ridx, rn);
+      rn = solveUleft(vec, idx, rhs, ridx, rn);
+      rn2 = solveUpdateLeft(rhs2, ridx2, rn2);
+      solveUleftNoNZ(vec2, rhs2, ridx2, rn2);
+      rn3 = solveUpdateLeft(rhs3, ridx3, rn3);
+      solveUleftNoNZ(vec3, rhs3, ridx3, rn3);
    }
    else
    {
-      rn = solveUleft( vec, idx, rhs, ridx, rn );
-      rn = solveLleftForest( vec, idx, rn );
-      solveUleftNoNZ( vec2, rhs2, ridx2, rn2 );
-      solveLleftForestNoNZ( vec2 );
-      solveUleftNoNZ( vec3, rhs3, ridx3, rn3 );
-      solveLleftForestNoNZ( vec3 );
+      rn = solveUleft(vec, idx, rhs, ridx, rn);
+      rn = solveLleftForest(vec, idx, rn);
+      solveUleftNoNZ(vec2, rhs2, ridx2, rn2);
+      solveLleftForestNoNZ(vec2);
+      solveUleftNoNZ(vec3, rhs3, ridx3, rn3);
+      solveLleftForestNoNZ(vec3);
    }
 
-   rn = solveLleft( vec, idx, rn );
+   rn = solveLleft(vec, idx, rn);
 
-   solveLleftNoNZ( vec2 );
-   solveLleftNoNZ( vec3 );
+   solveLleftNoNZ(vec2);
+   solveLleftNoNZ(vec3);
 
    return rn;
 }
 
-void CLUFactorRational::vSolveLeftNoNZ( Rational* vec2,                            /* result2 */
-                                         Rational* rhs2, int* ridx2, int rn2 )      /* rhs2    */
+void CLUFactorRational::vSolveLeftNoNZ(Rational* vec2,                             /* result2 */
+                                       Rational* rhs2, int* ridx2, int rn2)       /* rhs2    */
 {
 
-   if ( !l.updateType )          /* no Forest-Tomlin Updates */
+   if(!l.updateType)             /* no Forest-Tomlin Updates */
    {
-      rn2 = solveUpdateLeft( rhs2, ridx2, rn2 );
-      solveUleftNoNZ( vec2, rhs2, ridx2, rn2 );
+      rn2 = solveUpdateLeft(rhs2, ridx2, rn2);
+      solveUleftNoNZ(vec2, rhs2, ridx2, rn2);
    }
    else
    {
-      solveUleftNoNZ( vec2, rhs2, ridx2, rn2 );
-      solveLleftForestNoNZ( vec2 );
+      solveUleftNoNZ(vec2, rhs2, ridx2, rn2);
+      solveLleftForestNoNZ(vec2);
    }
 
-   solveLleftNoNZ( vec2 );
+   solveLleftNoNZ(vec2);
 }
 } // namespace soplex

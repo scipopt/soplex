@@ -40,7 +40,7 @@ namespace soplex
 
    See SPxPricer for a class documentation.
 */
-  template <class R>
+template <class R>
 class SPxHybridPR : public SPxPricer<R>
 {
    //-------------------------------------
@@ -82,9 +82,9 @@ public:
    /// calls entered4 on the current pricer
    virtual void entered4(SPxId id, int n);
    /// calls addedVecs(n) on all pricers
-   virtual void addedVecs (int n);
+   virtual void addedVecs(int n);
    /// calls addedCoVecs(n) on all pricers
-   virtual void addedCoVecs (int n);
+   virtual void addedCoVecs(int n);
    //@}
 
    //-------------------------------------
@@ -129,7 +129,7 @@ public:
       }
    }
    /// assignment operator
-   SPxHybridPR& operator=( const SPxHybridPR& rhs)
+   SPxHybridPR& operator=(const SPxHybridPR& rhs)
    {
       if(this != &rhs)
       {
@@ -138,6 +138,7 @@ public:
          parmult = rhs.parmult;
          devex = rhs.devex;
          hybridFactor = rhs.hybridFactor;
+
          if(rhs.thepricer == &rhs.steep)
          {
             thepricer = &steep;

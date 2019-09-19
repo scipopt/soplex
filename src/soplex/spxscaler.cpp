@@ -31,14 +31,15 @@ namespace soplex
 
 
 template <>
-int SPxScaler<Rational>::computeScaleExp(const SVectorBase<Rational>& vec, const DataArray<int>& oldScaleExp) const
+int SPxScaler<Rational>::computeScaleExp(const SVectorBase<Rational>& vec,
+      const DataArray<int>& oldScaleExp) const
 {
-  // This should never be called.
-  // Refer to issue 164 in soplex gitlab
+   // This should never be called.
+   // Refer to issue 164 in soplex gitlab
 
-  assert(false);
+   assert(false);
 
-  return 0;
+   return 0;
 }
 
 } // namespace soplex

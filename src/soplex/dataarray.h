@@ -65,22 +65,22 @@ template <typename T>
 class DataArray
 {
 private:
-  // A boost container vector is used instead of std::vector. This is because
-  // std::vector<bool> is not consistent with the rest of the std::vectors<T>.
-  // Namely, the current code needs the operator[] for DataArray<bool>.
-  boost::container::vector<T>  data;              ///< the array of elements
+   // A boost container vector is used instead of std::vector. This is because
+   // std::vector<bool> is not consistent with the rest of the std::vectors<T>.
+   // Namely, the current code needs the operator[] for DataArray<bool>.
+   boost::container::vector<T>  data;              ///< the array of elements
 
 public:
 
    /// reference \p n 'th element.
-  T& operator[](int n)
+   T& operator[](int n)
    {
       assert(n >= 0);
       return data[n];
    }
 
    /// reference \p n 'th const element.
-  const T& operator[](int n) const
+   const T& operator[](int n) const
    {
       assert(n >= 0);
       return data[n];
@@ -104,67 +104,67 @@ public:
    /// reference last const element.
    const T& last() const
    {
-     return data.back();
+      return data.back();
    }
 
    /// get a C pointer to the data.
    T* get_ptr()
    {
-     return data.data();
+      return data.data();
    }
    /// get a const C pointer to the data.
    const T* get_const_ptr() const
    {
-     return data.data();
+      return data.data();
    }
 
    /// append element \p t.
    void append(const T& t)
    {
-     data.push_back(t);
+      data.push_back(t);
    }
    /// append \p n elements with value \p t.
    void append(int n, const T& t)
    {
-     data.insert(data.end(), n, t);
+      data.insert(data.end(), n, t);
    }
    /// append \p n elements from \p t.
    void append(int n, const T t[])
    {
-     data.insert(data.end(), t, t+n);
+      data.insert(data.end(), t, t + n);
    }
    /// append all elements from \p t.
    void append(const DataArray<T>& t)
    {
-     data.insert(data.end(), t.data.begin(), t.data.end());
+      data.insert(data.end(), t.data.begin(), t.data.end());
    }
 
    /// insert \p n elements with value \p t before \p i 'the element.
    void insert(int i, int n, const T& t)
    {
-      if (n > 0)
+      if(n > 0)
       {
-        data.insert(data.begin() + i - 1, n, t);
+         data.insert(data.begin() + i - 1, n, t);
       }
    }
 
    /// insert \p n elements from \p t before \p i 'the element.
    void insert(int i, int n, const T t[])
    {
-      if (n > 0)
+      if(n > 0)
       {
-        // Inserts the elements of t (using legacy iterators, i.e., pointers)
-        // before data's i th position.
-        data.insert(data.begin() + i - 1, t, t + n);
+         // Inserts the elements of t (using legacy iterators, i.e., pointers)
+         // before data's i th position.
+         data.insert(data.begin() + i - 1, t, t + n);
       }
    }
 
    /// insert all elements from \p t before \p i 'th element.
    void insert(int i, const DataArray<T>& t)
    {
-      if (t.size())
+      if(t.size())
       {
-        data.insert(data.begin() + i - 1, t.data.begin(), t.data.end());
+         data.insert(data.begin() + i - 1, t.data.begin(), t.data.end());
       }
    }
 
@@ -188,13 +188,13 @@ public:
    /// remove all elements.
    void clear()
    {
-     data.clear();
+      data.clear();
    }
 
    /// return nr. of elements.
-  int size() const
+   int size() const
    {
-     return int(data.size());
+      return int(data.size());
    }
 
    /// reset size to \p newsize.
@@ -204,18 +204,18 @@ public:
        also memory will be reallocated.
        @param newsize the new number of elements the array can hold.
     */
-  void reSize(int newsize)
+   void reSize(int newsize)
    {
-     if (newsize > int(data.capacity()))
+      if(newsize > int(data.capacity()))
          reMax(newsize, newsize);
-      else if (newsize < 0)
-        {
-          data.clear();
-        }
+      else if(newsize < 0)
+      {
+         data.clear();
+      }
       else
-        {
-          data.resize(newsize);
-        }
+      {
+         data.resize(newsize);
+      }
    }
 
    /// return maximum number of elements.
@@ -223,9 +223,9 @@ public:
        elements, up to max() elements could be added without need to
        reallocated free store.
     */
-  int max() const
+   int max() const
    {
-     return int(data.capacity());
+      return int(data.capacity());
    }
 
    /// reset maximum number of elements.
@@ -240,38 +240,44 @@ public:
     */
    void reMax(int newMax = 1, int newSize = -1)
    {
-      if (newSize >= 0)
-        {
-          data.resize(newSize);
-        }
-      if (newMax < newSize)
+      if(newSize >= 0)
+      {
+         data.resize(newSize);
+      }
+
+      if(newMax < newSize)
          newMax = newSize;
-      if (newMax < 1)
+
+      if(newMax < 1)
          newMax = 1;
-      if (newMax == int(data.capacity()))
+
+      if(newMax == int(data.capacity()))
          return;
+
       int themax = newMax;
-      if (newSize <= 0)
+
+      if(newSize <= 0)
       {
          /* no data needs to be copied so do a clean free and alloc */
          data.clear();
          data.resize(themax);
       }
       else
-        {
-          data.resize(themax);
-        }
+      {
+         data.resize(themax);
+      }
    }
    /// assignment operator
    DataArray& operator=(const DataArray& rhs)
    {
-      if (this != &rhs)
+      if(this != &rhs)
       {
          reSize(rhs.size());
          data = rhs.data;
 
          assert(isConsistent());
       }
+
       return *this;
    }
 
@@ -285,8 +291,8 @@ public:
    DataArray(const DataArray& old)
    {
       data.reserve(max());
-          data = old.data;
-        }
+      data = old.data;
+   }
 
    /// default constructor.
    /** The constructor allocates an Array containing \p size uninitialized
@@ -296,34 +302,34 @@ public:
        @param p_size number of uninitialised elements.
        @param p_max  maximum number of elements the array can hold.
     */
-  explicit DataArray(int p_size = 0, int p_max = 0)
+   explicit DataArray(int p_size = 0, int p_max = 0)
    {
-     // p_size number of uninitialized elements.
-     //
-     // That is, the operator[] is valid on for 0...(p_size -1) whereas, even
-     // though the internal array can handle 0...(p_max -1) elements, the
-     // operator[] on beyond (p_size -1) would give an exception.
-     data.reserve(p_max);
-     data.resize(p_size);
-     // The underlying array will have at least p_max number of elements,
-     // though.
+      // p_size number of uninitialized elements.
+      //
+      // That is, the operator[] is valid on for 0...(p_size -1) whereas, even
+      // though the internal array can handle 0...(p_max -1) elements, the
+      // operator[] on beyond (p_size -1) would give an exception.
+      data.reserve(p_max);
+      data.resize(p_size);
+      // The underlying array will have at least p_max number of elements,
+      // though.
    }
 
    /// destructor
    ~DataArray()
    {
-     ;
+      ;
    }
 
-  void push_back(const T& val)
-  {
-    data.push_back(val);
-  }
+   void push_back(const T& val)
+   {
+      data.push_back(val);
+   }
 
-  void push_back(T&& val)
-  {
-    data.push_back(val);
-  }
+   void push_back(T&& val)
+   {
+      data.push_back(val);
+   }
 };
 
 } // namespace soplex

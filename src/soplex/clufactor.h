@@ -36,7 +36,7 @@ namespace soplex
  * This class implements a sparse LU factorization with either
  * FOREST-TOMLIN or ETA updates, using dynamic Markowitz pivoting.
  */
-  template <class R>
+template <class R>
 class CLUFactor
 {
 public:
@@ -87,7 +87,7 @@ protected:
    {
    public:
       int*    s_mark;       ///< marker
-     std::vector<R>   s_max;        ///< maximum absolute value per row (or -1)
+      std::vector<R>   s_max;        ///< maximum absolute value per row (or -1)
       int*    s_cact;       ///< lengths of columns of active submatrix
       int     stage;        ///< stage of the structure
       Pring   pivots;       ///< ring of selected pivot rows
@@ -102,8 +102,8 @@ protected:
       void clear();         ///< clears the structure
 
    private:
-      Temp( const Temp& );             ///< blocked copy constructor
-      Temp& operator= ( const Temp& ); ///< blocked assignment operator
+      Temp(const Temp&);               ///< blocked copy constructor
+      Temp& operator= (const Temp&);   ///< blocked assignment operator
    };
 
    /// Data structures for saving the row and column permutations.
@@ -125,7 +125,7 @@ protected:
          Dring* elem;        ///< %Array of ring elements.
          int    size;        ///< size of arrays val and idx
          int    used;        ///< used entries of arrays idx and val
-        std::vector<R>  val;         ///< hold nonzero values
+         std::vector<R>  val;         ///< hold nonzero values
          int*   idx;         ///< hold column indices of nonzeros
          int*   start;       ///< starting positions in val and idx
          int*   len;         ///< used nonzeros per row vectors
@@ -140,16 +140,16 @@ protected:
          Dring list;         /*!< \brief Double linked ringlist of VectorBase<R>
                                 indices in the order they appear
                                 in the column file                  */
-         Dring *elem;        ///< %Array of ring elements.
+         Dring* elem;        ///< %Array of ring elements.
          int size;           ///< size of array idx
          int used;           ///< used entries of array idx
-         int *idx;           ///< hold row indices of nonzeros
-        std::vector<R> val;          /*!< \brief hold nonzero values: this is only initialized
+         int* idx;           ///< hold row indices of nonzeros
+         std::vector<R> val;          /*!< \brief hold nonzero values: this is only initialized
                                 in the end of the factorization with DEFAULT
                                 updates.                            */
-         int *start;         ///< starting positions in val and idx
-         int *len;           ///< used nonzeros per column VectorBase<R>
-         int *max;           /*!< \brief maximum available nonzeros per colunn:
+         int* start;         ///< starting positions in val and idx
+         int* len;           ///< used nonzeros per column VectorBase<R>
+         int* max;           /*!< \brief maximum available nonzeros per colunn:
                                start[i] + max[i] == start[elem[i].next->idx]
                                len[i] <= max[i].                    */
       } col;
@@ -160,24 +160,24 @@ protected:
    struct L
    {
       int  size;           ///< size of arrays val and idx
-     std::vector<R> val;           ///< values of L vectors
-      int  *idx;           ///< indices of L vectors
+      std::vector<R> val;           ///< values of L vectors
+      int*  idx;           ///< indices of L vectors
       int  startSize;      ///< size of array start
       int  firstUpdate;    ///< number of first update L VectorBase<R>
       int  firstUnused;    ///< number of first unused L VectorBase<R>
-      int  *start;         ///< starting positions in val and idx
-      int  *row;           ///< column indices of L vectors
+      int*  start;         ///< starting positions in val and idx
+      int*  row;           ///< column indices of L vectors
       int  updateType;     ///< type of updates to be used.
 
       /* The following arrays have length |firstUpdate|, since they keep
        * rows of the L-vectors occuring during the factorization (without
        * updates), only:
        */
-     std::vector<R> rval;          ///< values of rows of L
-      int  *ridx;          ///< indices of rows of L
-      int  *rbeg;          ///< start of rows in rval and ridx
-      int  *rorig;         ///< original row permutation
-      int  *rperm;         ///< original row permutation
+      std::vector<R> rval;          ///< values of rows of L
+      int*  ridx;          ///< indices of rows of L
+      int*  rbeg;          ///< start of rows in rval and ridx
+      int*  rorig;         ///< original row permutation
+      int*  rperm;         ///< original row permutation
    };
    //@}
 
@@ -264,18 +264,18 @@ private:
    void vSolveLright(R* vec, int* ridx, int& rn, R eps);
    ///
    void vSolveLright2(R* vec, int* ridx, int& rn, R eps,
-      R* vec2, int* ridx2, int& rn2, R eps2);
+                      R* vec2, int* ridx2, int& rn2, R eps2);
    ///
    void vSolveLright3(R* vec, int* ridx, int& rn, R eps,
-      R* vec2, int* ridx2, int& rn2, R eps2,
-      R* vec3, int* ridx3, int& rn3, R eps3);
+                      R* vec2, int* ridx2, int& rn2, R eps2,
+                      R* vec3, int* ridx3, int& rn3, R eps3);
    ///
    int vSolveUright(R* vec, int* vidx, R* rhs, int* ridx, int rn, R eps);
    ///
    void vSolveUrightNoNZ(R* vec, R* rhs, int* ridx, int rn, R eps);
    ///
    int vSolveUright2(R* vec, int* vidx, R* rhs, int* ridx, int rn, R eps,
-      R* vec2, R* rhs2, int* ridx2, int rn2, R eps2);
+                     R* vec2, R* rhs2, int* ridx2, int rn2, R eps2);
    ///
    int vSolveUpdateRight(R* vec, int* ridx, int n, R eps);
    ///
@@ -305,7 +305,7 @@ private:
    ///
    void initPerm();
    ///
-   void initFactorMatrix(const SVectorBase<R>** vec, const R eps );
+   void initFactorMatrix(const SVectorBase<R>** vec, const R eps);
    ///
    void minLMem(int size);
    ///
@@ -363,12 +363,12 @@ protected:
    void solveLright(R* vec);
    ///
    int  solveRight4update(R* vec, int* nonz, R eps, R* rhs,
-      R* forest, int* forestNum, int* forestIdx);
+                          R* forest, int* forestNum, int* forestIdx);
    ///
    void solveRight(R* vec, R* rhs);
    ///
    int  solveRight2update(R* vec1, R* vec2, R* rhs1,
-      R* rhs2, int* nonz, R eps, R* forest, int* forestNum, int* forestIdx);
+                          R* rhs2, int* nonz, R eps, R* forest, int* forestNum, int* forestIdx);
    ///
    void solveRight2(R* vec1, R* vec2, R* rhs1, R* rhs2);
    ///
@@ -380,16 +380,16 @@ protected:
 
    ///
    int vSolveRight4update(R eps,
-      R* vec, int* idx,               /* result       */
-      R* rhs, int* ridx, int rn,      /* rhs & Forest */
-      R* forest, int* forestNum, int* forestIdx);
+                          R* vec, int* idx,               /* result       */
+                          R* rhs, int* ridx, int rn,      /* rhs & Forest */
+                          R* forest, int* forestNum, int* forestIdx);
    ///
    int vSolveRight4update2(R eps,
-      R* vec, int* idx,              /* result1 */
-      R* rhs, int* ridx, int rn,     /* rhs1    */
-      R* vec2, R eps2,            /* result2 */
-      R* rhs2, int* ridx2, int rn2,  /* rhs2    */
-      R* forest, int* forestNum, int* forestIdx);
+                           R* vec, int* idx,              /* result1 */
+                           R* rhs, int* ridx, int rn,     /* rhs1    */
+                           R* vec2, R eps2,            /* result2 */
+                           R* rhs2, int* ridx2, int rn2,  /* rhs2    */
+                           R* forest, int* forestNum, int* forestIdx);
    /// sparse version of above method
    void vSolveRight4update2sparse(
       R eps, R* vec, int* idx,    /* result1 */
@@ -399,13 +399,13 @@ protected:
       R* forest, int* forestNum, int* forestIdx);
    ///
    int vSolveRight4update3(R eps,
-      R* vec, int* idx,              /* result1 */
-      R* rhs, int* ridx, int rn,     /* rhs1    */
-      R* vec2, R eps2,            /* result2 */
-      R* rhs2, int* ridx2, int rn2,  /* rhs2    */
-      R* vec3, R eps3,            /* result3 */
-      R* rhs3, int* ridx3, int rn3,  /* rhs3    */
-      R* forest, int* forestNum, int* forestIdx);
+                           R* vec, int* idx,              /* result1 */
+                           R* rhs, int* ridx, int rn,     /* rhs1    */
+                           R* vec2, R eps2,            /* result2 */
+                           R* rhs2, int* ridx2, int rn2,  /* rhs2    */
+                           R* vec3, R eps3,            /* result3 */
+                           R* rhs3, int* ridx3, int rn3,  /* rhs3    */
+                           R* forest, int* forestNum, int* forestIdx);
    /// sparse version of above method
    void vSolveRight4update3sparse(
       R eps, R* vec, int* idx,    /* result1 */
@@ -417,21 +417,21 @@ protected:
       R* forest, int* forestNum, int* forestIdx);
    ///
    void vSolveRightNoNZ(R* vec, R eps,    /* result */
-      R* rhs, int* ridx, int rn);            /* rhs    */
+                        R* rhs, int* ridx, int rn);            /* rhs    */
    ///
    int vSolveLeft(R eps,
-      R* vec, int* idx,                      /* result */
-      R* rhs, int* ridx, int rn);            /* rhs    */
+                  R* vec, int* idx,                      /* result */
+                  R* rhs, int* ridx, int rn);            /* rhs    */
    ///
    void vSolveLeftNoNZ(R eps,
-      R* vec,                           /* result */
-      R* rhs, int* ridx, int rn);       /* rhs    */
+                       R* vec,                           /* result */
+                       R* rhs, int* ridx, int rn);       /* rhs    */
    ///
    int vSolveLeft2(R eps,
-      R* vec, int* idx,                     /* result */
-      R* rhs, int* ridx, int rn,            /* rhs    */
-      R* vec2,                              /* result2 */
-      R* rhs2, int* ridx2, int rn2);        /* rhs2    */
+                   R* vec, int* idx,                     /* result */
+                   R* rhs, int* ridx, int rn,            /* rhs    */
+                   R* vec2,                              /* result2 */
+                   R* rhs2, int* ridx2, int rn2);        /* rhs2    */
    /// sparse version of solving 2 systems of equations
    void vSolveLeft2sparse(R eps,
                           R* vec, int* idx,                     /* result */
@@ -455,7 +455,7 @@ protected:
                           R* vec3, int* idx3,                   /* result2 */
                           R* rhs3, int* ridx3, int& rn3);       /* rhs2    */
 
-   void forestUpdate(int col, R* work, int num, int *nonz);
+   void forestUpdate(int col, R* work, int num, int* nonz);
 
    void update(int p_col, R* p_work, const int* p_idx, int num);
    void updateNoClear(int p_col, const R* p_work, const int* p_idx, int num);

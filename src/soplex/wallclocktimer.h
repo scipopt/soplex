@@ -45,7 +45,7 @@ private:
    /// convert wallclock time to secounds.
    Real wall2sec(long s, long us) const
    {
-      return (Real)s+ 0.000001 * (Real)us;
+      return (Real)s + 0.000001 * (Real)us;
    }
 
    //@}

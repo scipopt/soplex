@@ -70,12 +70,13 @@ public:
       : info(p_info)
       , idx(p_idx)
    {
-      assert( p_info <= 1 && p_info >= -1 );
+      assert(p_info <= 1 && p_info >= -1);
    }
    /// Assignment operator.
    DataKey& operator=(const DataKey& rhs)
    {
-      if ( this != &rhs ) {
+      if(this != &rhs)
+      {
          info = rhs.info;
          idx  = rhs.idx;
       }

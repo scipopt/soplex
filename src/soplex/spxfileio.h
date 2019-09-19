@@ -38,9 +38,9 @@
 namespace soplex
 {
 #ifdef SOPLEX_WITH_ZLIB
-   typedef gzstream::igzstream spxifstream;
+typedef gzstream::igzstream spxifstream;
 #else
-   typedef std::ifstream spxifstream;
+typedef std::ifstream spxifstream;
 #endif // SOPLEX_WITH_ZLIB
 
 } // namespace soplex

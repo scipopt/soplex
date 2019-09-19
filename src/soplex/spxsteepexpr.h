@@ -37,7 +37,7 @@ namespace soplex
 
    See SPxPricer for a class documentation.
 */
-  template <class R>
+template <class R>
 class SPxSteepExPR : public SPxSteepPR<R>
 {
 
@@ -48,18 +48,18 @@ public:
    //@{
    ///
    SPxSteepExPR()
-     : SPxSteepPR<R>("SteepEx", SPxSteepPR<R>::EXACT)
+      : SPxSteepPR<R>("SteepEx", SPxSteepPR<R>::EXACT)
    {
       assert(this->isConsistent());
    }
    /// copy constructor
-   SPxSteepExPR( const SPxSteepExPR& old)
+   SPxSteepExPR(const SPxSteepExPR& old)
       : SPxSteepPR<R>(old)
    {
       assert(this->isConsistent());
    }
    /// assignment operator
-   SPxSteepExPR& operator=( const SPxSteepExPR& rhs)
+   SPxSteepExPR& operator=(const SPxSteepExPR& rhs)
    {
       if(this != &rhs)
       {

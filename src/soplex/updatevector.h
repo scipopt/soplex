@@ -49,8 +49,8 @@ namespace soplex
     sparse updates, by providing an IdxSet idx() containing the
     nonzero indices of \f$\delta\f$.
 */
-  template <class R>
-  class UpdateVector : public VectorBase<R>
+template <class R>
+class UpdateVector : public VectorBase<R>
 {
 private:
 
@@ -70,7 +70,7 @@ public:
    explicit
    UpdateVector<R>(int p_dim /*=0*/, R p_eps /*=1e-16*/)
       : VectorBase<R> (p_dim)
-      , theval (0)
+      , theval(0)
       , thedelta(p_dim, p_eps)
    {
       assert(isConsistent());
@@ -79,12 +79,12 @@ public:
    ~UpdateVector<R>()
    {}
    /// copy constructor
-   UpdateVector<R>( const UpdateVector<R>& );
+   UpdateVector<R>(const UpdateVector<R>&);
    /// assignment from VectorBase<R>
    UpdateVector<R>& operator=(const VectorBase<R>& rhs)
    {
-      if ( this != & rhs )
-        VectorBase<R>::operator=(rhs);
+      if(this != & rhs)
+         VectorBase<R>::operator=(rhs);
 
       assert(isConsistent());
 
@@ -143,7 +143,7 @@ public:
    /// clear VectorBase<R> and update vector
    void clear()
    {
-     VectorBase<R>::clear();
+      VectorBase<R>::clear();
       clearUpdate();
    }
 
@@ -157,7 +157,7 @@ public:
    /// reset dimension
    void reDim(int newdim)
    {
-     VectorBase<R>::reDim(newdim);
+      VectorBase<R>::reDim(newdim);
       thedelta.reDim(newdim);
    }
    //@}

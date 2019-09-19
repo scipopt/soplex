@@ -37,8 +37,8 @@ namespace soplex
  * This class implements a SLinSolver interface by using the sparse LU
  * factorization implemented in CLUFactor.
  */
-  template <class R>
-  class SLUFactor : public SLinSolver<R>, protected CLUFactor<R>
+template <class R>
+class SLUFactor : public SLinSolver<R>, protected CLUFactor<R>
 {
 public:
 
@@ -52,7 +52,7 @@ public:
       FOREST_TOMLIN  ///<
    };
    /// for convenience
-  using Status = typename SLinSolver<R>::Status;
+   using Status = typename SLinSolver<R>::Status;
    //@}
 
 private:
@@ -72,7 +72,8 @@ protected:
    bool       usetup;        ///< TRUE iff update vector has been setup
    UpdateType uptype;        ///< the current \ref soplex::SLUFactor<R>::UpdateType "UpdateType".
    SSVectorBase<R>    eta;           ///<
-   SSVectorBase<R>    forest;        ///< ? Update VectorBase<R> set up by solveRight4update() and solve2right4update()
+   SSVectorBase<R>
+   forest;        ///< ? Update VectorBase<R> set up by solveRight4update() and solve2right4update()
    R       lastThreshold; ///< pivoting threshold of last factorization
    //@}
 
@@ -100,7 +101,7 @@ protected:
    ///
    void freeAll();
    ///
-   void changeEta(int idx, SSVectorBase<R> & eta);
+   void changeEta(int idx, SSVectorBase<R>& eta);
    //@}
 
 
@@ -127,10 +128,10 @@ public:
    /// sets minimum Markowitz threshold.
    void setMarkowitz(R m)
    {
-      if( m < 0.01 )
+      if(m < 0.01)
          m = 0.01;
 
-      if( m > 0.99 )
+      if(m > 0.99)
          m = 0.99;
 
       minThreshold = m;
@@ -165,7 +166,7 @@ public:
    ///
    const char* getName() const
    {
-     return (uptype == SLUFactor<R>::ETA) ? "SLU-Eta" : "SLU-Forest-Tomlin";
+      return (uptype == SLUFactor<R>::ETA) ? "SLU-Eta" : "SLU-Forest-Tomlin";
    }
    ///
    Status status() const
@@ -192,54 +193,57 @@ public:
    /**@name Solve */
    //@{
    /// Solves \f$Ax=b\f$.
-   void solveRight (VectorBase<R>& x, const VectorBase<R>& b);
-   void solveRight(SSVectorBase<R> & x, const SSVectorBase<R> & b)
+   void solveRight(VectorBase<R>& x, const VectorBase<R>& b);
+   void solveRight(SSVectorBase<R>& x, const SSVectorBase<R>& b)
    {
       x.unSetup();
       solveRight((VectorBase<R>&) x, (const VectorBase<R>&) b);
    }
    /// Solves \f$Ax=b\f$.
-   void solveRight (SSVectorBase<R> & x, const SVectorBase<R>& b);
+   void solveRight(SSVectorBase<R>& x, const SVectorBase<R>& b);
    /// Solves \f$Ax=b\f$.
-   void solveRight4update(SSVectorBase<R> & x, const SVectorBase<R>& b);
+   void solveRight4update(SSVectorBase<R>& x, const SVectorBase<R>& b);
    /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.
-   void solve2right4update(SSVectorBase<R> & x, VectorBase<R>& y, const SVectorBase<R>& b, SSVectorBase<R> & d);
+   void solve2right4update(SSVectorBase<R>& x, VectorBase<R>& y, const SVectorBase<R>& b,
+                           SSVectorBase<R>& d);
    /// Sparse version of solving two systems of equations
-   void solve2right4update(SSVectorBase<R> & x, SSVectorBase<R> & y, const SVectorBase<R>& b, SSVectorBase<R> & d);
+   void solve2right4update(SSVectorBase<R>& x, SSVectorBase<R>& y, const SVectorBase<R>& b,
+                           SSVectorBase<R>& d);
    /// Solves \f$Ax=b\f$, \f$Ay=d\f$ and \f$Az=e\f$.
-   void solve3right4update(SSVectorBase<R> & x, VectorBase<R>& y, VectorBase<R>& z,
-                           const SVectorBase<R>& b, SSVectorBase<R> & d, SSVectorBase<R> & e);
+   void solve3right4update(SSVectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& z,
+                           const SVectorBase<R>& b, SSVectorBase<R>& d, SSVectorBase<R>& e);
    /// sparse version of solving three systems of equations
-   void solve3right4update(SSVectorBase<R> & x, SSVectorBase<R> & y, SSVectorBase<R> & z,
-                           const SVectorBase<R>& b, SSVectorBase<R> & d, SSVectorBase<R> & e);
+   void solve3right4update(SSVectorBase<R>& x, SSVectorBase<R>& y, SSVectorBase<R>& z,
+                           const SVectorBase<R>& b, SSVectorBase<R>& d, SSVectorBase<R>& e);
    /// sparse version of solving one system of equations with transposed basis matrix
    void solveLeft(VectorBase<R>& x, const VectorBase<R>& b);
-   void solveLeft(SSVectorBase<R> & x, const SSVectorBase<R> & b)
+   void solveLeft(SSVectorBase<R>& x, const SSVectorBase<R>& b)
    {
       x.unSetup();
       solveLeft((VectorBase<R>&) x, (const VectorBase<R>&) b);
    }
    /// Solves \f$Ax=b\f$.
-   void solveLeft(SSVectorBase<R> & x, const SVectorBase<R>& b);
+   void solveLeft(SSVectorBase<R>& x, const SVectorBase<R>& b);
    /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.
-   void solveLeft(SSVectorBase<R> & x, VectorBase<R>& y, const SVectorBase<R>& b, SSVectorBase<R> & d);
+   void solveLeft(SSVectorBase<R>& x, VectorBase<R>& y, const SVectorBase<R>& b, SSVectorBase<R>& d);
    /// sparse version of solving two systems of equations with transposed basis matrix
-   void solveLeft(SSVectorBase<R> & x, SSVectorBase<R> & two, const SVectorBase<R>& b, SSVectorBase<R> & rhs2);
+   void solveLeft(SSVectorBase<R>& x, SSVectorBase<R>& two, const SVectorBase<R>& b,
+                  SSVectorBase<R>& rhs2);
    /// Solves \f$Ax=b\f$, \f$Ay=d\f$ and \f$Az=e\f$.
-   void solveLeft(SSVectorBase<R> & x, VectorBase<R>& y, VectorBase<R>& z,
-                  const SVectorBase<R>& b, SSVectorBase<R> & d, SSVectorBase<R> & e);
+   void solveLeft(SSVectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& z,
+                  const SVectorBase<R>& b, SSVectorBase<R>& d, SSVectorBase<R>& e);
    /// sparse version of solving three systems of equations with transposed basis matrix
-   void solveLeft(SSVectorBase<R> & x, SSVectorBase<R> & y, SSVectorBase<R> & z,
-                  const SVectorBase<R>& b, SSVectorBase<R> & d, SSVectorBase<R> & e);
+   void solveLeft(SSVectorBase<R>& x, SSVectorBase<R>& y, SSVectorBase<R>& z,
+                  const SVectorBase<R>& b, SSVectorBase<R>& d, SSVectorBase<R>& e);
    ///
-   Status change(int idx, const SVectorBase<R>& subst, const SSVectorBase<R> * eta = 0);
+   Status change(int idx, const SVectorBase<R>& subst, const SSVectorBase<R>* eta = 0);
    //@}
 
    //--------------------------------
    /**@name Miscellaneous */
    //@{
    /// time spent in factorizations
-  // @todo fix the return type from of the type form Real to a cpp time (Refactoring) TODO
+   // @todo fix the return type from of the type form Real to a cpp time (Refactoring) TODO
    Real getFactorTime() const
    {
       return this->factorTime->time();
@@ -255,7 +259,7 @@ public:
       return this->factorCount;
    }
    /// time spent in solves
-  // @todo fix the return type of time to a cpp time type TODO
+   // @todo fix the return type of time to a cpp time type TODO
    Real getSolveTime() const
    {
       return solveTime->time();
@@ -291,9 +295,9 @@ public:
    /// default constructor.
    SLUFactor<R>();
    /// assignment operator.
-  SLUFactor<R>& operator=(const SLUFactor<R>& old);
+   SLUFactor<R>& operator=(const SLUFactor<R>& old);
    /// copy constructor.
-  SLUFactor<R>(const SLUFactor<R>& old);
+   SLUFactor<R>(const SLUFactor<R>& old);
    /// destructor.
    virtual ~SLUFactor<R>();
    /// clone function for polymorphism
@@ -309,7 +313,7 @@ private:
    /**@name Private helpers */
    //@{
    /// used to implement the assignment operator
-  void assign(const SLUFactor<R>& old);
+   void assign(const SLUFactor<R>& old);
    //@}
 };
 

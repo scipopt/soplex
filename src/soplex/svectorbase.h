@@ -42,8 +42,8 @@ public:
    template < class S >
    Nonzero<R>& operator=(const Nonzero<S>& vec)
    {
-     // todo: is the cast really necessary? Previous code worked without a cast
-     val = (R) vec.val;
+      // todo: is the cast really necessary? Previous code worked without a cast
+      val = (R) vec.val;
       idx = vec.idx;
       return *this;
    }
@@ -67,7 +67,7 @@ public:
 // specialized assignment operator
 template <>
 template < class S >
-   Nonzero<Real>& Nonzero<Real>::operator=(const Nonzero<S>& vec)
+Nonzero<Real>& Nonzero<Real>::operator=(const Nonzero<S>& vec)
 {
    val = Real(vec.val);
    idx = vec.idx;
@@ -170,13 +170,13 @@ public:
       int d = -1;
       int n = size();
 
-      while( n-- )
+      while(n--)
       {
          d = (d > e->idx) ? d : e->idx;
          e++;
       }
 
-      return d+1;
+      return d + 1;
    }
 
    /// Position of index \p i.
@@ -185,13 +185,13 @@ public:
     */
    int pos(int i) const
    {
-      if( m_elem != 0 )
+      if(m_elem != 0)
       {
          int n = size();
 
-         for( int p = 0; p < n; ++p )
+         for(int p = 0; p < n; ++p)
          {
-            if( m_elem[p].idx == i )
+            if(m_elem[p].idx == i)
             {
                assert(index(p) == i);
                return p;
@@ -207,7 +207,7 @@ public:
    {
       int n = pos(i);
 
-      if( n >= 0 )
+      if(n >= 0)
          return m_elem[n].val;
 
       return 0;
@@ -273,13 +273,13 @@ public:
       assert(m_elem != 0);
       assert(size() < max());
 
-      if( v != 0.0 )
+      if(v != 0.0)
       {
          int n = size();
 
          m_elem[n].idx = i;
          m_elem[n].val = v;
-         set_size( n + 1 );
+         set_size(n + 1);
 
          assert(size() <= max());
       }
@@ -294,7 +294,7 @@ public:
       int n = size();
 
       m_elem[n].idx = i;
-      set_size( n + 1 );
+      set_size(n + 1);
 
       assert(size() <= max());
    }
@@ -310,25 +310,27 @@ public:
    {
       assert(n + size() <= max());
 
-      if( n <= 0 )
+      if(n <= 0)
          return;
 
       int newnnz = 0;
 
       Nonzero<R>* e = m_elem + size();
 
-      while( n-- )
+      while(n--)
       {
-         if( *v != 0.0 )
+         if(*v != 0.0)
          {
             e->idx = *i;
             e->val = *v;
             e++;
             ++newnnz;
          }
+
          i++;
          v++;
       }
+
       set_size(size() + newnnz);
    }
 
@@ -338,25 +340,27 @@ public:
    {
       assert(n + size() <= max());
 
-      if( n <= 0 )
+      if(n <= 0)
          return;
 
       int newnnz = 0;
 
       Nonzero<R>* e = m_elem + size();
 
-      while( n-- )
+      while(n--)
       {
-         if( *v != R(0.0) )
+         if(*v != R(0.0))
          {
             e->idx = *i;
             e->val = *v;
             e++;
             ++newnnz;
          }
+
          i++;
          v++;
       }
+
       set_size(size() + newnnz);
    }
 
@@ -365,22 +369,24 @@ public:
    {
       assert(n + size() <= max());
 
-      if( n <= 0 )
+      if(n <= 0)
          return;
 
       int newnnz = 0;
 
       Nonzero<R>* ee = m_elem + size();
 
-      while( n-- )
+      while(n--)
       {
-         if( e->val != 0.0 )
+         if(e->val != 0.0)
          {
             *ee++ = *e;
             ++newnnz;
          }
+
          e++;
       }
+
       set_size(size() + newnnz);
    }
 
@@ -400,11 +406,12 @@ public:
       Nonzero<R>* r = &m_elem[n];
 
       set_size(size() - cpy);
+
       do
       {
          *r++ = *e--;
       }
-      while( --cpy );
+      while(--cpy);
    }
 
    /// Remove \p n 'th nonzero.
@@ -415,7 +422,8 @@ public:
 
       int newsize = size() - 1;
       set_size(newsize);
-      if( n < newsize )
+
+      if(n < newsize)
          m_elem[n] = m_elem[newsize];
    }
 
@@ -428,7 +436,7 @@ public:
    /// Sort nonzeros to increasing indices.
    void sort()
    {
-      if( m_elem != 0 )
+      if(m_elem != 0)
       {
          Nonzero<R> dummy;
          Nonzero<R>* w;
@@ -436,19 +444,20 @@ public:
          Nonzero<R>* s = &(m_elem[0]);
          Nonzero<R>* e = s + size();
 
-         for( l = s, w = s + 1; w < e; l = w, ++w )
+         for(l = s, w = s + 1; w < e; l = w, ++w)
          {
-            if( l->idx > w->idx )
+            if(l->idx > w->idx)
             {
                dummy = *w;
 
                do
                {
                   l[1] = *l;
-                  if( l-- == s )
+
+                  if(l-- == s)
                      break;
                }
-               while( l->idx > dummy.idx );
+               while(l->idx > dummy.idx);
 
                l[1] = dummy;
             }
@@ -467,9 +476,9 @@ public:
    {
       R maxi = 0;
 
-      for( int i = size() - 1; i >= 0; --i )
+      for(int i = size() - 1; i >= 0; --i)
       {
-         if( spxAbs(m_elem[i].val) > maxi )
+         if(spxAbs(m_elem[i].val) > maxi)
             maxi = spxAbs(m_elem[i].val);
       }
 
@@ -483,9 +492,9 @@ public:
    {
       R mini = R(infinity);
 
-      for( int i = size() - 1; i >= 0; --i )
+      for(int i = size() - 1; i >= 0; --i)
       {
-         if( spxAbs(m_elem[i].val) < mini )
+         if(spxAbs(m_elem[i].val) < mini)
             mini = spxAbs(m_elem[i].val);
       }
 
@@ -497,7 +506,7 @@ public:
    /// Floating point approximation of euclidian norm (without any approximation guarantee).
    R length() const
    {
-     return std::sqrt(R(length2()));
+      return std::sqrt(R(length2()));
    }
 
    /// Squared norm.
@@ -507,7 +516,7 @@ public:
       int n = size();
       const Nonzero<R>* e = m_elem;
 
-      while( n-- )
+      while(n--)
       {
          x += e->val * e->val;
          e++;
@@ -524,7 +533,7 @@ public:
 
       assert(x != 0);
 
-      while( n-- )
+      while(n--)
       {
          e->val *= x;
          e++;
@@ -543,37 +552,45 @@ public:
       R x = 0;
       int n = size();
       int m = w.size();
-      if( n == 0 || m == 0 )
+
+      if(n == 0 || m == 0)
          return x;
+
       int i = 0;
       int j = 0;
       Element* e = m_elem;
       typename SVectorBase<S>::Element wj = w.element(j);
 
-      while( true )
+      while(true)
       {
-         if( e->idx == wj.idx )
+         if(e->idx == wj.idx)
          {
             x += e->val * wj.val;
             i++;
             j++;
-            if( i == n || j == m )
-              break;
+
+            if(i == n || j == m)
+               break;
+
             e++;
             wj = w.element(j);
          }
-         else if( e->idx < wj.idx )
+         else if(e->idx < wj.idx)
          {
             i++;
-            if( i == n )
-              break;
+
+            if(i == n)
+               break;
+
             e++;
          }
          else
          {
             j++;
-            if( j == m )
-              break;
+
+            if(j == m)
+               break;
+
             wj = w.element(j);
          }
       }
@@ -605,7 +622,7 @@ public:
    /// Assignment operator.
    SVectorBase<R>& operator=(const SVectorBase<R>& sv)
    {
-      if( this != &sv )
+      if(this != &sv)
       {
          assert(max() >= sv.size());
 
@@ -614,14 +631,16 @@ public:
          Nonzero<R>* e = m_elem;
          const Nonzero<R>* s = sv.m_elem;
 
-         while( i-- )
+         while(i--)
          {
             assert(e != 0);
-            if( s->val != 0.0 )
+
+            if(s->val != 0.0)
             {
                *e++ = *s;
                ++nnz;
             }
+
             ++s;
          }
 
@@ -635,7 +654,7 @@ public:
    template < class S >
    SVectorBase<R>& operator=(const SVectorBase<S>& sv)
    {
-      if( this != (const SVectorBase<R>*)(&sv) )
+      if(this != (const SVectorBase<R>*)(&sv))
       {
          assert(max() >= sv.size());
 
@@ -644,14 +663,16 @@ public:
          Nonzero<R>* e = m_elem;
          const Nonzero<S>* s = sv.m_elem;
 
-         while( i-- )
+         while(i--)
          {
             assert(e != 0);
-            if( s->val != 0.0 )
+
+            if(s->val != 0.0)
             {
                *e++ = *s;
                ++nnz;
             }
+
             ++s;
          }
 
@@ -664,11 +685,11 @@ public:
    /// scale and assign
    SVectorBase<Real>& scaleAssign(int scaleExp, const SVectorBase<Real>& sv)
    {
-      if( this != &sv )
+      if(this != &sv)
       {
          assert(max() >= sv.size());
 
-         for( int i = 0; i < sv.size(); ++i )
+         for(int i = 0; i < sv.size(); ++i)
          {
             m_elem[i].val = spxLdexp(sv.value(i), scaleExp);
             m_elem[i].idx = sv.index(i);
@@ -681,15 +702,16 @@ public:
    }
 
    /// scale and assign
-   SVectorBase<Real>& scaleAssign(const int* scaleExp, const SVectorBase<Real>& sv, bool negateExp = false)
+   SVectorBase<Real>& scaleAssign(const int* scaleExp, const SVectorBase<Real>& sv,
+                                  bool negateExp = false)
    {
-      if( this != &sv )
+      if(this != &sv)
       {
          assert(max() >= sv.size());
 
-         if( negateExp )
+         if(negateExp)
          {
-            for( int i = 0; i < sv.size(); ++i )
+            for(int i = 0; i < sv.size(); ++i)
             {
                m_elem[i].val = spxLdexp(sv.value(i), -scaleExp[sv.index(i)]);
                m_elem[i].idx = sv.index(i);
@@ -697,7 +719,7 @@ public:
          }
          else
          {
-            for( int i = 0; i < sv.size(); ++i )
+            for(int i = 0; i < sv.size(); ++i)
             {
                m_elem[i].val = spxLdexp(sv.value(i), scaleExp[sv.index(i)]);
                m_elem[i].idx = sv.index(i);
@@ -718,7 +740,8 @@ public:
       assert(max() >= rowSize);
 
       int i;
-      for( i = 0; i < rowSize && i < max(); i++ )
+
+      for(i = 0; i < rowSize && i < max(); i++)
       {
          m_elem[i].val = rowValues[i];
          m_elem[i].idx = rowIndices[i];
@@ -780,24 +803,26 @@ public:
    bool isConsistent() const
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-      if( m_elem != 0 )
+
+      if(m_elem != 0)
       {
          const int my_size = size();
          const int my_max = max();
 
-         if( my_size < 0 || my_max < 0 || my_size > my_max )
+         if(my_size < 0 || my_max < 0 || my_size > my_max)
             return MSGinconsistent("SVectorBase");
 
-         for( int i = 1; i < my_size; ++i )
+         for(int i = 1; i < my_size; ++i)
          {
-            for( int j = 0; j < i; ++j )
+            for(int j = 0; j < i; ++j)
             {
                // allow trailing zeros
-               if( m_elem[i].idx == m_elem[j].idx && m_elem[i].val != 0 )
+               if(m_elem[i].idx == m_elem[j].idx && m_elem[i].val != 0)
                   return MSGinconsistent("SVectorBase");
             }
          }
       }
+
 #endif
 
       return true;
@@ -816,37 +841,45 @@ Real SVectorBase<Real>::operator*(const SVectorBase<S>& w) const
    Real x = 0;
    int n = size();
    int m = w.size();
-   if( n == 0 || m == 0 )
+
+   if(n == 0 || m == 0)
       return x;
+
    int i = 0;
    int j = 0;
    SVectorBase<Real>::Element* e = m_elem;
    typename SVectorBase<S>::Element wj = w.element(j);
 
-   while( true )
+   while(true)
    {
-      if( e->idx == wj.idx )
+      if(e->idx == wj.idx)
       {
          x += e->val * Real(wj.val);
          i++;
          j++;
-         if( i == n || j == m )
+
+         if(i == n || j == m)
             break;
+
          e++;
          wj = w.element(j);
       }
-      else if( e->idx < wj.idx )
+      else if(e->idx < wj.idx)
       {
          i++;
-         if( i == n )
+
+         if(i == n)
             break;
+
          e++;
       }
       else
       {
          j++;
-         if( j == m )
+
+         if(j == m)
             break;
+
          wj = w.element(j);
       }
    }

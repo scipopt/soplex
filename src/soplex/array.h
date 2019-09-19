@@ -121,7 +121,8 @@ public:
    {
       assert(i <= num);
       assert(num >= 0);
-      if (n > 0)
+
+      if(n > 0)
       {
          T* newdata = 0;
          int k;
@@ -130,27 +131,28 @@ public:
          assert(newdata != 0);
 
          // copy front segment to new array
-         for( k = 0; k < i; ++k )
+         for(k = 0; k < i; ++k)
          {
-            new (&(newdata[k])) T();
+            new(&(newdata[k])) T();
             newdata[k] = data[k];
             data[k].~T();
          }
 
          // call constructor for new elements
-         for( ; k < i+n; ++k )
-            new (&(newdata[k])) T();
+         for(; k < i + n; ++k)
+            new(&(newdata[k])) T();
 
          // copy rear segment to new array
-         for( k = i; k < num; ++k )
+         for(k = i; k < num; ++k)
          {
-            new (&(newdata[n + k])) T();
+            new(&(newdata[n + k])) T();
             newdata[n + k] = data[k];
             data[k].~T();
          }
 
-         if( data )
+         if(data)
             spx_free(data);
+
          data = newdata;
          num += n;
       }
@@ -160,7 +162,8 @@ public:
    void insert(int i, int n, const T* p_array)
    {
       insert(i, n);
-      for (n--; n >= 0; --n)
+
+      for(n--; n >= 0; --n)
          data[n + i] = p_array[n];
    }
 
@@ -169,7 +172,8 @@ public:
    {
       int n = p_array.size();
       insert(i, n);
-      for (n--; n >= 0; --n)
+
+      for(n--; n >= 0; --n)
          data[n + i] = p_array.data[n];
    }
 
@@ -181,7 +185,8 @@ public:
    void remove(int n = 0, int m = 1)
    {
       assert(n >= 0 && m >= 0);
-      if (m > 0 && n < num)
+
+      if(m > 0 && n < num)
       {
          T* newdata = 0;
          int k;
@@ -189,27 +194,27 @@ public:
          assert(num == size());
          m -= (n + m <= num) ? 0 : n + m - num;
 
-         if( num > m )
+         if(num > m)
          {
             spx_alloc(newdata, num - m);
             assert(newdata != 0);
 
             // copy rear segment to new array
-            for( k = num - 1; k >= n + m; --k )
+            for(k = num - 1; k >= n + m; --k)
             {
-               new (&(newdata[k - m])) T();
+               new(&(newdata[k - m])) T();
                newdata[k - m] = data[k];
                data[k].~T();
             }
 
             // call destructor for old elements
-            for( ; k >= n; --k )
+            for(; k >= n; --k)
                data[k].~T();
 
             // copy front segment to new array
-            for( ; k >= 0; --k )
+            for(; k >= 0; --k)
             {
-               new (&(newdata[k])) T();
+               new(&(newdata[k])) T();
                newdata[k] = data[k];
                data[k].~T();
             }
@@ -220,7 +225,7 @@ public:
             assert(n == 0);
 
             // call destructor for old elements
-            for( k = m - 1; k >= 0; --k )
+            for(k = m - 1; k >= 0; --k)
                data[k].~T();
          }
 
@@ -237,13 +242,15 @@ public:
    void clear()
    {
       // call destructors of all elements
-      while( num > 0 )
+      while(num > 0)
       {
          --num;
          data[num].~T();
       }
-      if( data )
+
+      if(data)
          spx_free(data);
+
       assert(num == 0);
    }
 
@@ -256,9 +263,9 @@ public:
    /// reset the number of elements.
    void reSize(int newsize)
    {
-      if (newsize < num)
+      if(newsize < num)
          remove(newsize, num - newsize);
-      else if (newsize > num)
+      else if(newsize > num)
          append(newsize - num);
    }
    //@}
@@ -273,13 +280,16 @@ public:
     */
    Array<T>& operator=(const Array<T>& rhs)
    {
-      if (this != &rhs)
+      if(this != &rhs)
       {
          reSize(rhs.size());
-         for (int i = 0; i < num; ++i)
+
+         for(int i = 0; i < num; ++i)
             data[i] = rhs.data[i];
+
          assert(Array::isConsistent());
       }
+
       return *this;
    }
 
@@ -292,16 +302,18 @@ public:
    {
       assert(n >= 0);
       num = n;
-      if (num > 0)
+
+      if(num > 0)
       {
          int k;
 
          spx_alloc(data, num);
          assert(data != 0);
 
-         for( k = 0; k < num; ++k )
-            new (&(data[k])) T();
+         for(k = 0; k < num; ++k)
+            new(&(data[k])) T();
       }
+
       assert(Array::isConsistent());
    }
 
@@ -309,7 +321,7 @@ public:
    Array(const Array<T>& old)
       : num(old.num)
    {
-      if (num > 0)
+      if(num > 0)
       {
          int k;
 
@@ -317,26 +329,28 @@ public:
          spx_alloc(data, num);
          assert(data != 0);
 
-         for( k = 0; k < num; ++k )
+         for(k = 0; k < num; ++k)
          {
-            new (&(data[k])) T();
+            new(&(data[k])) T();
             data[k] = old.data[k];
          }
       }
       else
          data = 0;
+
       assert(Array::isConsistent());
    }
 
    /// destructor
    ~Array()
    {
-      while( num > 0 )
+      while(num > 0)
       {
          --num;
          data[num].~T();
       }
-      if( data )
+
+      if(data)
          spx_free(data);
    }
 
@@ -344,8 +358,10 @@ public:
    bool isConsistent() const
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-      if (num < 0 || (num > 0 && data == 0))
+
+      if(num < 0 || (num > 0 && data == 0))
          return MSGinconsistent("Array");
+
 #endif
 
       return true;

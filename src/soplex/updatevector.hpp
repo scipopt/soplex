@@ -18,10 +18,10 @@
 namespace soplex
 {
 
-  template <class R>
+template <class R>
 UpdateVector<R>& UpdateVector<R>::operator=(const UpdateVector<R>& rhs)
 {
-   if (this != &rhs)
+   if(this != &rhs)
    {
       theval   = rhs.theval;
       thedelta = rhs.thedelta;
@@ -29,23 +29,25 @@ UpdateVector<R>& UpdateVector<R>::operator=(const UpdateVector<R>& rhs)
 
       assert(UpdateVector<R>::isConsistent());
    }
+
    return *this;
 }
 
-  template <class R>
-UpdateVector<R>::UpdateVector( const UpdateVector<R>& base)
-   : VectorBase<R>( base )
+template <class R>
+UpdateVector<R>::UpdateVector(const UpdateVector<R>& base)
+   : VectorBase<R>(base)
    , theval(base.theval)
    , thedelta(base.thedelta)
 {
    assert(UpdateVector<R>::isConsistent());
 }
 
-  template <class R>
+template <class R>
 bool UpdateVector<R>::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-   if (dim() != thedelta.dim())
+
+   if(dim() != thedelta.dim())
       return MSGinconsistent("UpdateVector");
 
    return VectorBase<R>::isConsistent() && thedelta.isConsistent();

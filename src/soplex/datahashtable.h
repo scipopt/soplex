@@ -110,7 +110,7 @@ private:
    /// current number of entries in the hash table
    int m_used;
    /// pointer to hash function (mapping: \a HashItem -> int)
-   int (*m_hashfun) (const HashItem*);
+   int (*m_hashfun)(const HashItem*);
    /// memory is \ref soplex::DataHashTable::reMax() "reMax()"ed by this factor if a new element does't fit
    Real m_memfactor;
    /// some prime numbers for fast access
@@ -166,7 +166,7 @@ public:
    {
       assert(!has(h));
 
-      if (m_used >= m_elem.size() * HASHTABLE_FILLFACTOR)
+      if(m_used >= m_elem.size() * HASHTABLE_FILLFACTOR)
          reMax(int(m_memfactor * m_used) + 1);
 
       assert(m_used < m_elem.size());
@@ -174,8 +174,8 @@ public:
       decltype(m_elem.size()) i;
 
       for(i = (*m_hashfun)(&h) % m_elem.size();
-          m_elem[i].stat == Elem::USED;
-          i = (i + m_hashsize) % m_elem.size())
+            m_elem[i].stat == Elem::USED;
+            i = (i + m_hashsize) % m_elem.size())
          ;
 
       assert(m_elem[i].stat != Elem::USED);
@@ -203,6 +203,7 @@ public:
    {
       for(int i = 0; i < m_elem.size(); i++)
          m_elem[i].stat = Elem::FREE;
+
       m_used = 0;
    }
    /// reset size of the DataHashTable.
@@ -211,7 +212,7 @@ public:
     *  If \p newHashSize < 1, a new hash size is computed automatically.
     *  Otherwise, the specified value will be taken.
     */
-   void reMax (int newSize = -1, int newHashSize = 0)
+   void reMax(int newSize = -1, int newHashSize = 0)
    {
       DataArray< Elem > save(m_elem);
 
@@ -222,7 +223,7 @@ public:
       m_hashsize = (newHashSize < 1) ? autoHashSize() : newHashSize;
 
       for(int i = 0; i < save.size(); i++)
-         if (save[i].stat == Elem::USED)
+         if(save[i].stat == Elem::USED)
             add(save[i].item, save[i].info);
    }
    //@}
@@ -238,14 +239,16 @@ public:
 
       for(int i = 0; i < m_elem.size(); i++)
       {
-         if (m_elem[i].stat == Elem::USED)
+         if(m_elem[i].stat == Elem::USED)
          {
             total++;
-            if (!has(m_elem[i].item))
+
+            if(!has(m_elem[i].item))
                return MSGinconsistent("DataHashTable");
          }
       }
-      if (total != m_used)
+
+      if(total != m_used)
          return MSGinconsistent("DataHashTable");
 
       return m_elem.isConsistent();
@@ -381,15 +384,15 @@ private:
       int right = nprimes - 1;
       int middle;
 
-      while( left <= right)
+      while(left <= right)
       {
          middle = (left + right) / 2;
 
-         if( oldsize < primes[middle])
+         if(oldsize < primes[middle])
          {
             right = middle - 1;
          }
-         else if( oldsize > primes[middle])
+         else if(oldsize > primes[middle])
          {
             left = middle + 1;
          }
@@ -405,11 +408,11 @@ private:
    }
 
    /// automatically computes a good \ref soplex::DataHashTable::m_hashsize "m_hashsize".
-      /** Computes a good #m_hashsize as the product of all prime numbers
-       *  not divisors of the number of elements that are <=
-       *  the maximum divisor of the number of elemens.
-       *  @return good value for #m_hashsize
-       */
+   /** Computes a good #m_hashsize as the product of all prime numbers
+    *  not divisors of the number of elements that are <=
+    *  the maximum divisor of the number of elemens.
+    *  @return good value for #m_hashsize
+    */
    int autoHashSizeold() const
    {
       DataArray< bool > prime(m_elem.size());
@@ -417,21 +420,21 @@ private:
       int maxsize  = m_elem.size();
       int i;
 
-      for (i = 2; i < maxsize; i++)
+      for(i = 2; i < maxsize; i++)
          prime[i] = true;
 
-      for (i = 2; i < maxsize; ++i)
+      for(i = 2; i < maxsize; ++i)
       {
-         if (prime[i])
+         if(prime[i])
          {
-            for (int j = i; j < maxsize; j += i)
+            for(int j = i; j < maxsize; j += i)
                prime[j] = false;
 
-            if (m_elem.size() % i != 0)
+            if(m_elem.size() % i != 0)
             {
                hashsize *= i;
 
-               if (hashsize > maxsize)
+               if(hashsize > maxsize)
                {
                   hashsize /= i;
                   break;
@@ -439,6 +442,7 @@ private:
             }
          }
       }
+
       return hashsize;
    }
 
@@ -454,7 +458,7 @@ private:
     */
    int index(const HashItem& h) const
    {
-      if (m_used == 0)
+      if(m_used == 0)
          return -1;
 
       assert(m_elem.size() > 0);
@@ -464,15 +468,16 @@ private:
 
       while(m_elem[i].stat != Elem::FREE)
       {
-         if (  (m_elem[i].stat == Elem::USED)
-            && (m_elem[i].item == h))
+         if((m_elem[i].stat == Elem::USED)
+               && (m_elem[i].item == h))
             return i;
 
          i = (i + m_hashsize) % m_elem.size();
 
-         if (i == j)
+         if(i == j)
             break;
       }
+
       return -1;
    }
    //@}

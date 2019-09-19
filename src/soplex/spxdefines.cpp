@@ -26,96 +26,96 @@
 
 namespace soplex
 {
-  // Overloaded EQ function
-  bool EQ(int a, int b)
-  {
-    return (a == b);
-  }
+// Overloaded EQ function
+bool EQ(int a, int b)
+{
+   return (a == b);
+}
 
-  THREADLOCAL const Real infinity                 = DEFAULT_INFINITY;
+THREADLOCAL const Real infinity                 = DEFAULT_INFINITY;
 
-  THREADLOCAL Real Param::s_epsilon               = DEFAULT_EPS_ZERO;
+THREADLOCAL Real Param::s_epsilon               = DEFAULT_EPS_ZERO;
 
-  THREADLOCAL Real Param::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
+THREADLOCAL Real Param::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
 
-  THREADLOCAL Real Param::s_epsilon_update        = DEFAULT_EPS_UPDATE;
+THREADLOCAL Real Param::s_epsilon_update        = DEFAULT_EPS_UPDATE;
 
-  THREADLOCAL Real Param::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
+THREADLOCAL Real Param::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
 
-  void Param::setEpsilonFactorization(Real eps)
-  {
-    s_epsilon_factorization = eps;
-  }
+void Param::setEpsilonFactorization(Real eps)
+{
+   s_epsilon_factorization = eps;
+}
 
-  Real Param::epsilon()
-  {
-    return (s_epsilon);
-  }
+Real Param::epsilon()
+{
+   return (s_epsilon);
+}
 
-  void Param::setEpsilon(Real eps)
-  {
-    s_epsilon = eps;
-  }
+void Param::setEpsilon(Real eps)
+{
+   s_epsilon = eps;
+}
 
 
-  Real Param::epsilonFactorization()
-  {
-    return s_epsilon_factorization;
-  }
+Real Param::epsilonFactorization()
+{
+   return s_epsilon_factorization;
+}
 
-  Real Param::epsilonUpdate()
-  {
-    return s_epsilon_update;
-  }
+Real Param::epsilonUpdate()
+{
+   return s_epsilon_update;
+}
 
-  void Param::setEpsilonUpdate(Real eps)
-  {
-    s_epsilon_update = eps;
-  }
+void Param::setEpsilonUpdate(Real eps)
+{
+   s_epsilon_update = eps;
+}
 
-  Real Param::epsilonPivot()
-  {
-    return s_epsilon_pivot;
-  }
+Real Param::epsilonPivot()
+{
+   return s_epsilon_pivot;
+}
 
-  void Param::setEpsilonPivot(Real eps)
-  {
-    s_epsilon_pivot = eps;
-  }
+void Param::setEpsilonPivot(Real eps)
+{
+   s_epsilon_pivot = eps;
+}
 
-  bool msginconsistent(const char* name, const char* file, int line)
-  {
+bool msginconsistent(const char* name, const char* file, int line)
+{
    assert(name != 0);
    assert(file != 0);
    assert(line >= 0);
 
-   MSG_ERROR( std::cerr << file << "(" << line << ") "
-   << "Inconsistency detected in " << name << std::endl; )
+   MSG_ERROR(std::cerr << file << "(" << line << ") "
+             << "Inconsistency detected in " << name << std::endl;)
 
    return 0;
-  }
+}
 
-  template <>
-  Real spxFrexp(Real y, int* exp)
-  {
-    return frexp(y, exp);
-  }
+template <>
+Real spxFrexp(Real y, int* exp)
+{
+   return frexp(y, exp);
+}
 
-  // @todo: write a boost version of the following function. Check whether this
-  // function gets called from the Scalers, if not, we can have a general
-  // version of the function in spxdefines.hpp
-  Real spxLdexp(Real x, int exp)
-  {
-    return ldexp(x,exp);
-  }
+// @todo: write a boost version of the following function. Check whether this
+// function gets called from the Scalers, if not, we can have a general
+// version of the function in spxdefines.hpp
+Real spxLdexp(Real x, int exp)
+{
+   return ldexp(x, exp);
+}
 
-  Rational spxLdexp(Rational x, int exp)
-  {
-    // This call shouldn't happen. This is a dummy function to deal with the
-    // Rational Scalar issue.
-    assert(false);
-    return 0;
-  }
+Rational spxLdexp(Rational x, int exp)
+{
+   // This call shouldn't happen. This is a dummy function to deal with the
+   // Rational Scalar issue.
+   assert(false);
+   return 0;
+}
 
 
 

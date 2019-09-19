@@ -116,20 +116,23 @@ public:
    LPRowBase<R>(const SVectorBase<R>& p_rowVector, Type p_type, const R& p_value, const R& p_obj = 0)
       : object(p_obj), vec(p_rowVector)
    {
-      switch( p_type )
+      switch(p_type)
       {
       case LESS_EQUAL:
          left = R(-infinity);
          right = p_value;
          break;
+
       case EQUAL:
          left = p_value;
          right = p_value;
          break;
+
       case GREATER_EQUAL:
          left = p_value;
          right = R(infinity);
          break;
+
       default:
          throw SPxInternalCodeException("XLPROW03 This should never happen.");
       }
@@ -150,13 +153,13 @@ public:
    /// Gets type of row.
    Type type() const
    {
-      if( rhs() >= R(infinity) )
+      if(rhs() >= R(infinity))
          return GREATER_EQUAL;
 
-      if( lhs() <= R(-infinity) )
+      if(lhs() <= R(-infinity))
          return LESS_EQUAL;
 
-      if( lhs() == rhs() )
+      if(lhs() == rhs())
          return EQUAL;
 
       return RANGE;
@@ -165,24 +168,29 @@ public:
    /// Sets type of (in)equality.
    void setType(Type p_type)
    {
-      switch( p_type )
+      switch(p_type)
       {
       case LESS_EQUAL:
          left = R(-infinity);
          break;
+
       case EQUAL:
-         if( lhs() > R(-infinity) )
+         if(lhs() > R(-infinity))
             right = lhs();
          else
             left = rhs();
+
          break;
+
       case GREATER_EQUAL:
          right = R(infinity);
          break;
+
       case RANGE:
-         MSG_ERROR( std::cerr << "ELPROW01 RANGE not supported in LPRow::setType()"
-            << std::endl; )
-            throw SPxInternalCodeException("XLPROW01 This should never happen.");
+         MSG_ERROR(std::cerr << "ELPROW01 RANGE not supported in LPRow::setType()"
+                   << std::endl;)
+         throw SPxInternalCodeException("XLPROW01 This should never happen.");
+
       default:
          throw SPxInternalCodeException("XLPROW02 This should never happen.");
       }

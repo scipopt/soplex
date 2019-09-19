@@ -102,8 +102,8 @@ protected:
       void clear();         ///< clears the structure
 
    private:
-      Temp( const Temp& );             ///< blocked copy constructor
-      Temp& operator= ( const Temp& ); ///< blocked assignment operator
+      Temp(const Temp&);               ///< blocked copy constructor
+      Temp& operator= (const Temp&);   ///< blocked assignment operator
    };
 
    /// Data structures for saving the row and column permutations.
@@ -262,18 +262,18 @@ private:
    int vSolveLright(Rational* vec, int* ridx, int rn);
    ///
    void vSolveLright2(Rational* vec, int* ridx, int* rnptr,
-      Rational* vec2, int* ridx2, int* rn2ptr);
+                      Rational* vec2, int* ridx2, int* rn2ptr);
    ///
    void vSolveLright3(Rational* vec, int* ridx, int* rnptr,
-      Rational* vec2, int* ridx2, int* rn2ptr,
-      Rational* vec3, int* ridx3, int* rn3ptr);
+                      Rational* vec2, int* ridx2, int* rn2ptr,
+                      Rational* vec3, int* ridx3, int* rn3ptr);
    ///
    int vSolveUright(Rational* vec, int* vidx, Rational* rhs, int* ridx, int rn);
    ///
    void vSolveUrightNoNZ(Rational* vec, Rational* rhs, int* ridx, int rn);
    ///
    int vSolveUright2(Rational* vec, int* vidx, Rational* rhs, int* ridx, int rn,
-      Rational* vec2, Rational* rhs2, int* ridx2, int rn2);
+                     Rational* vec2, Rational* rhs2, int* ridx2, int rn2);
    ///
    int vSolveUpdateRight(Rational* vec, int* ridx, int n);
    ///
@@ -303,7 +303,7 @@ private:
    ///
    void initPerm();
    ///
-   void initFactorMatrix(const SVectorRational** vec );
+   void initFactorMatrix(const SVectorRational** vec);
    ///
    void minLMem(int size);
    ///
@@ -353,7 +353,7 @@ private:
    ///
    bool timeLimitReached()
    {
-      if( timeLimit >= 0.0 && factorTime->time() >= timeLimit )
+      if(timeLimit >= 0.0 && factorTime->time() >= timeLimit)
       {
          stat = SLinSolverRational::TIME;
          return true;
@@ -372,12 +372,12 @@ protected:
    void solveLright(Rational* vec);
    ///
    int  solveRight4update(Rational* vec, int* nonz, Rational* rhs,
-      Rational* forest, int* forestNum, int* forestIdx);
+                          Rational* forest, int* forestNum, int* forestIdx);
    ///
    void solveRight(Rational* vec, Rational* rhs);
    ///
    int  solveRight2update(Rational* vec1, Rational* vec2, Rational* rhs1,
-      Rational* rhs2, int* nonz, Rational* forest, int* forestNum, int* forestIdx);
+                          Rational* rhs2, int* nonz, Rational* forest, int* forestNum, int* forestIdx);
    ///
    void solveRight2(Rational* vec1, Rational* vec2, Rational* rhs1, Rational* rhs2);
    ///
@@ -410,7 +410,7 @@ protected:
       Rational* forest, int* forestNum, int* forestIdx);
    ///
    void vSolveRightNoNZ(Rational* vec2,              /* result2 */
-      Rational* rhs2, int* ridx2, int rn2);          /* rhs2    */
+                        Rational* rhs2, int* ridx2, int rn2);          /* rhs2    */
    ///
    int vSolveLeft(
       Rational* vec, int* idx,                      /* result */
@@ -433,7 +433,7 @@ protected:
                    Rational* vec3,                              /* result3 */
                    Rational* rhs3, int* ridx3, int rn3);        /* rhs3    */
 
-   void forestUpdate(int col, Rational* work, int num, int *nonz);
+   void forestUpdate(int col, Rational* work, int num, int* nonz);
 
    void update(int p_col, Rational* p_work, const int* p_idx, int num);
    void updateNoClear(int p_col, const Rational* p_work, const int* p_idx, int num);

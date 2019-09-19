@@ -22,45 +22,46 @@
 
 #include "soplex.h"
 
-namespace soplex {
+namespace soplex
+{
 
-  template <class R>
-    class Validation
-    {
-    public:
+template <class R>
+class Validation
+{
+public:
 
-      /// should the soplex solution be validated?
-      bool           validate;
+   /// should the soplex solution be validated?
+   bool           validate;
 
-      /// external solution used for validation
-      char*          validatesolution;
+   /// external solution used for validation
+   char*          validatesolution;
 
-      /// tolerance used for validation
-      R         validatetolerance;
+   /// tolerance used for validation
+   R         validatetolerance;
 
-      /// default constructor
-      Validation()
-        {
-          validate = false;
-          validatetolerance = 1e-5;
-          validatesolution = 0;
-        }
+   /// default constructor
+   Validation()
+   {
+      validate = false;
+      validatetolerance = 1e-5;
+      validatesolution = 0;
+   }
 
-      /// default destructor
-      ~Validation()
-        {
-          ;
-        }
+   /// default destructor
+   ~Validation()
+   {
+      ;
+   }
 
-      /// updates the external solution used for validation
-      bool updateExternalSolution(char* solution);
+   /// updates the external solution used for validation
+   bool updateExternalSolution(char* solution);
 
-      /// updates the tolerance used for validation
-      bool updateValidationTolerance(char* tolerance);
+   /// updates the tolerance used for validation
+   bool updateValidationTolerance(char* tolerance);
 
-      /// validates the soplex solution using the external solution
-      void validateSolveReal(SoPlexBase<R>& soplex);
-    };
+   /// validates the soplex solution using the external solution
+   void validateSolveReal(SoPlexBase<R>& soplex);
+};
 
 } /* namespace soplex */
 

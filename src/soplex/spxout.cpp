@@ -19,45 +19,47 @@
 
 namespace soplex
 {
-   /// constructor
-   SPxOut::SPxOut()
-      : m_verbosity( ERROR )
-      , m_streams(0)
-   {
-      spx_alloc(m_streams, INFO3+1);
-      m_streams = new (m_streams) std::ostream*[INFO3+1];
-      m_streams[ ERROR ] = m_streams[ WARNING ] = &std::cerr;
-      for ( int i = DEBUG; i <= INFO3; ++i )
-         m_streams[ i ] = &std::cout;
-   }
+/// constructor
+SPxOut::SPxOut()
+   : m_verbosity(ERROR)
+   , m_streams(0)
+{
+   spx_alloc(m_streams, INFO3 + 1);
+   m_streams = new(m_streams) std::ostream*[INFO3 + 1];
+   m_streams[ ERROR ] = m_streams[ WARNING ] = &std::cerr;
 
-   //---------------------------------------------------
+   for(int i = DEBUG; i <= INFO3; ++i)
+      m_streams[ i ] = &std::cout;
+}
 
-   // destructor
-   SPxOut::~SPxOut()
-   {
-      spx_free(m_streams);
-   }
+//---------------------------------------------------
 
-   SPxOut& SPxOut::operator=(const SPxOut& base)
-   {
-      m_verbosity = base.m_verbosity;
+// destructor
+SPxOut::~SPxOut()
+{
+   spx_free(m_streams);
+}
 
-      for ( int i = DEBUG; i <= INFO3; ++i )
-         m_streams[ i ] = base.m_streams[ i ];
+SPxOut& SPxOut::operator=(const SPxOut& base)
+{
+   m_verbosity = base.m_verbosity;
 
-      return *this;
-   }
+   for(int i = DEBUG; i <= INFO3; ++i)
+      m_streams[ i ] = base.m_streams[ i ];
 
-   SPxOut::SPxOut(const SPxOut& rhs)
-   {
-      m_verbosity = rhs.m_verbosity;
-      m_streams = 0;
-      spx_alloc(m_streams, INFO3+1);
-      m_streams = new (m_streams) std::ostream*[INFO3+1];
-      m_streams[ ERROR ] = m_streams[ WARNING ] = rhs.m_streams[ERROR];
-      for ( int i = DEBUG; i <= INFO3; ++i )
-         m_streams[ i ] = rhs.m_streams[ i ];
-   }
+   return *this;
+}
+
+SPxOut::SPxOut(const SPxOut& rhs)
+{
+   m_verbosity = rhs.m_verbosity;
+   m_streams = 0;
+   spx_alloc(m_streams, INFO3 + 1);
+   m_streams = new(m_streams) std::ostream*[INFO3 + 1];
+   m_streams[ ERROR ] = m_streams[ WARNING ] = rhs.m_streams[ERROR];
+
+   for(int i = DEBUG; i <= INFO3; ++i)
+      m_streams[ i ] = rhs.m_streams[ i ];
+}
 
 } // namespace soplex

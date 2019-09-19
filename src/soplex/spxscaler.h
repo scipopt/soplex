@@ -73,7 +73,7 @@ class SPxLPBase;
 
 */
 
-  template <class R>
+template <class R>
 class SPxScaler
 {
 protected:
@@ -102,25 +102,26 @@ public:
    /// compute a single scaling vector , e.g. of a newly added row
    virtual int computeScaleExp(const SVectorBase<R>& vec, const DataArray<int>& oldScaleExp) const;
 
-  // The following is now redundant because of the above function.
+   // The following is now redundant because of the above function.
    // virtual int computeScaleExp(const SVectorBase<Rational>& vec, const DataArray<int>& oldScaleExp) const;
 
    /// applies m_colscale and m_rowscale to the \p lp.
    virtual void applyScaling(SPxLPBase<R>& lp);
 
 
-  template <class T>
-  friend std::ostream& operator<<(std::ostream& s, const SPxScaler<T>& sc);
+   template <class T>
+   friend std::ostream& operator<<(std::ostream& s, const SPxScaler<T>& sc);
 
    //-------------------------------------
    /**@name Construction / destruction */
    //@{
    /// constructor
-   explicit SPxScaler(const char* name, bool colFirst = false, bool doBoth = true, SPxOut* spxout = NULL);
+   explicit SPxScaler(const char* name, bool colFirst = false, bool doBoth = true,
+                      SPxOut* spxout = NULL);
    /// copy constructor
-   SPxScaler(const SPxScaler& );
+   SPxScaler(const SPxScaler&);
    /// assignment operator
-   SPxScaler& operator=(const SPxScaler& );
+   SPxScaler& operator=(const SPxScaler&);
    /// destructor.
    virtual ~SPxScaler();
    /// clone function for polymorphism
@@ -159,7 +160,7 @@ public:
    /// returns scaling factor for row \p i
    virtual int getRowScaleExp(int i) const;
    /// gets unscaled column \p i
-  virtual void getColUnscaled(const SPxLPBase<R>& lp, int i, DSVectorBase<R>& vec) const;
+   virtual void getColUnscaled(const SPxLPBase<R>& lp, int i, DSVectorBase<R>& vec) const;
    /// returns maximum absolute value of unscaled column \p i
    virtual R getColMaxAbsUnscaled(const SPxLPBase<R>& lp, int i) const;
    /// returns minumum absolute value of unscaled column \p i
@@ -167,17 +168,17 @@ public:
    /// returns unscaled upper bound \p i
    virtual R upperUnscaled(const SPxLPBase<R>& lp, int i) const;
    /// returns unscaled upper bound vector of \p lp
-  virtual void getUpperUnscaled(const SPxLPBase<R>& lp, VectorBase<R>& vec) const;
+   virtual void getUpperUnscaled(const SPxLPBase<R>& lp, VectorBase<R>& vec) const;
    /// returns unscaled lower bound \p i
    virtual R lowerUnscaled(const SPxLPBase<R>& lp, int i) const;
    /// gets unscaled lower bound vector
-  virtual void getLowerUnscaled(const SPxLPBase<R>& lp, VectorBase<R>& vec) const;
+   virtual void getLowerUnscaled(const SPxLPBase<R>& lp, VectorBase<R>& vec) const;
    /// returns unscaled objective function coefficient of \p i
    virtual R maxObjUnscaled(const SPxLPBase<R>& lp, int i) const;
    /// gets unscaled objective function
-  virtual void getMaxObjUnscaled(const SPxLPBase<R>& lp, VectorBase<R>& vec) const;
+   virtual void getMaxObjUnscaled(const SPxLPBase<R>& lp, VectorBase<R>& vec) const;
    /// returns unscaled row \p i
-  virtual void getRowUnscaled(const SPxLPBase<R>& lp, int i, DSVectorBase<R>& vec) const;
+   virtual void getRowUnscaled(const SPxLPBase<R>& lp, int i, DSVectorBase<R>& vec) const;
    /// returns maximum absolute value of unscaled row \p i
    virtual R getRowMaxAbsUnscaled(const SPxLPBase<R>& lp, int i) const;
    /// returns minimum absolute value of unscaled row \p i
