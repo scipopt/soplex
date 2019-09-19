@@ -73,14 +73,14 @@ private:
 public:
 
    /// reference \p n 'th element.
-  T& operator[](decltype(data.size()) n)
+  T& operator[](int n)
    {
       assert(n >= 0);
       return data[n];
    }
 
    /// reference \p n 'th const element.
-  const T& operator[](decltype(data.size()) n) const
+  const T& operator[](int n) const
    {
       assert(n >= 0);
       return data[n];
@@ -192,9 +192,9 @@ public:
    }
 
    /// return nr. of elements.
-  decltype(data.size()) size() const
+  int size() const
    {
-     return data.size();
+     return int(data.size());
    }
 
    /// reset size to \p newsize.
@@ -204,9 +204,9 @@ public:
        also memory will be reallocated.
        @param newsize the new number of elements the array can hold.
     */
-  void reSize(decltype(data.size()) newsize)
+  void reSize(int newsize)
    {
-     if (newsize > data.capacity())
+     if (newsize > int(data.capacity()))
          reMax(newsize, newsize);
       else if (newsize < 0)
         {
@@ -223,9 +223,9 @@ public:
        elements, up to max() elements could be added without need to
        reallocated free store.
     */
-  auto max() const -> decltype(data.capacity())
+  int max() const
    {
-     return data.capacity();
+     return int(data.capacity());
    }
 
    /// reset maximum number of elements.
@@ -248,7 +248,7 @@ public:
          newMax = newSize;
       if (newMax < 1)
          newMax = 1;
-      if (newMax == data.capacity())
+      if (newMax == int(data.capacity()))
          return;
       int themax = newMax;
       if (newSize <= 0)
@@ -296,7 +296,7 @@ public:
        @param p_size number of uninitialised elements.
        @param p_max  maximum number of elements the array can hold.
     */
-  explicit DataArray(decltype(data.size()) p_size = 0, decltype(data.size()) p_max = 0)
+  explicit DataArray(int p_size = 0, int p_max = 0)
    {
      // p_size number of uninitialized elements.
      //
