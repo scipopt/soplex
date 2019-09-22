@@ -1076,7 +1076,7 @@ void SPxSolverBase<R>::setType(Type tp)
       , thePricing(FULL)
       , theRep(p_rep)
       , polishObj(POLISH_OFF)
-      , theTime(0)
+      , theTime(nullptr)
       , timerType(ttype)
       , theCumulativeTime(0.0)
       , maxIters(-1)
@@ -1138,6 +1138,11 @@ void SPxSolverBase<R>::setType(Type tp)
       , integerVariables(0)
    {
       theTime = TimerFactory::createTimer(timerType);
+
+      multTimeSparse = TimerFactory::createTimer(timerType);
+      multTimeFull = TimerFactory::createTimer(timerType);
+      multTimeColwise = TimerFactory::createTimer(timerType);
+      multTimeUnsetup = TimerFactory::createTimer(timerType);
 
       setDelta(DEFAULT_BND_VIOL);
 
