@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -60,7 +60,7 @@ private:
 
    //-------------------------------------
    /**@name Private helpers */
-   //@{
+   ///@{
    /// set entering/leaving algorithm
    void setupWeights(typename SPxSolverBase<R>::Type);
    /// build up vector of pricing values for later use
@@ -94,7 +94,7 @@ public:
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    SPxDevexPR()
       : SPxPricer<R>("Devex")
@@ -126,11 +126,11 @@ public:
    {
       return new SPxDevexPR(*this);
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    /// sets the solver
    virtual void load(SPxSolverBase<R>* base);
    /// set entering/leaving algorithm
@@ -149,14 +149,14 @@ public:
    virtual void addedVecs(int n);
    /// \p n covectors have been added to loaded LP.
    virtual void addedCoVecs(int n);
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Consistency check */
-   //@{
+   ///@{
    /// consistency check
    virtual bool isConsistent() const;
-   //@}
+   ///@}
 };
 
 } // namespace soplex

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -65,7 +65,7 @@ public:
 
    //------------------------------------
    /**@name Constructors / destructors */
-   //@{
+   ///@{
    /// default constructor.
    explicit
    UpdateVector<R>(int p_dim /*=0*/, R p_eps /*=1e-16*/)
@@ -97,7 +97,7 @@ public:
 
    //------------------------------------
    /**@name Access */
-   //@{
+   ///@{
    /// update multiplicator \f$\alpha\f$, writeable
    R& value()
    {
@@ -125,11 +125,11 @@ public:
    {
       return thedelta.indices();
    }
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Modification */
-   //@{
+   ///@{
    /// Perform the update
    /**  Add \c value() * \c delta() to the UpdateVector<R>. Only the indices
     *  in idx() are affected. For all other indices, delta() is asumed
@@ -160,14 +160,14 @@ public:
       VectorBase<R>::reDim(newdim);
       thedelta.reDim(newdim);
    }
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Consistency check */
-   //@{
+   ///@{
    ///
    bool isConsistent() const;
-   //@}
+   ///@}
 };
 
 

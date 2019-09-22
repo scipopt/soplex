@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -67,7 +67,7 @@ public:
 
    //-----------------------------------
    /**@name Output control types */
-   //@{
+   ///@{
    /// Verbosity level
    typedef enum
    {
@@ -88,11 +88,11 @@ public:
       /// verbosity level
       Verbosity v_;
    };
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// constructor
    SPxOut();
    /// destructor
@@ -105,7 +105,7 @@ public:
 
    //-----------------------------------
    /**@name Verbosity */
-   //@{
+   ///@{
    ///
    virtual void
    setVerbosity(const Verbosity& v)
@@ -120,11 +120,11 @@ public:
       return m_verbosity;
    }
 
-   //@}
+   ///@}
 
    //----------------------------------------
    /**@name Wrappers for the current stream */
-   //@{
+   ///@{
    ///
    inline bool good() const
    {
@@ -140,11 +140,11 @@ public:
    {
       return getCurrentStream().precision();
    }
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Getting / setting streams */
-   //@{
+   ///@{
    /// Sets the stream for the specified verbosity level.
    virtual void
    setStream(const Verbosity& verbosity,
@@ -178,18 +178,18 @@ public:
    {
       stream << std::setprecision(precision) << std::fixed;
    }
-   //@}
+   ///@}
 
 private:
 
    //-----------------------------------
    /**@name Private data */
-   //@{
+   ///@{
    /// verbosity level
    Verbosity               m_verbosity;
    /// array of pointers to internal streams, indexed by verbosity level
    std::ostream**          m_streams;
-   //@}
+   ///@}
 };
 
 // ---------------------------------------------------------
@@ -230,7 +230,7 @@ operator<< (SPxOut& stream,
    stream.setVerbosity(verbosity.v_);
    return stream;
 }
-//@}
+///@}
 
 //--------------------------------------------------------
 /**@name Output of standard manipulators and other types

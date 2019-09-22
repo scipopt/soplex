@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -48,16 +48,16 @@ private:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Data */
-   //@{
+   ///@{
 
    /// Memory.
    Nonzero<R>* theelem;
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Private helpers */
-   //@{
+   ///@{
 
    /// Allocate memory for \p n nonzeros.
    void allocMem(int n)
@@ -82,13 +82,13 @@ private:
       }
    }
 
-   //@}
+   ///@}
 
 public:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Construction, assignment, and destruction */
-   //@{
+   ///@{
 
    /// Default constructor.
    /** Creates a DSVectorBase ready to hold \p n nonzeros. However, the memory is automatically enlarged, if more
@@ -208,11 +208,11 @@ public:
       }
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Modification */
-   //@{
+   ///@{
 
    /// Append nonzeros of \p sv.
    template < class S >
@@ -284,11 +284,11 @@ public:
       SVectorBase<R>::set_size(siz);
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Utilities */
-   //@{
+   ///@{
 
    /// Consistency check.
    bool isConsistent() const
@@ -303,7 +303,7 @@ public:
       return true;
    }
 
-   //@}
+   ///@}
 };
 
 

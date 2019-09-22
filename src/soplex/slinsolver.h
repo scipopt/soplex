@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -46,7 +46,7 @@ public:
 
    //---------------------------------------
    /**@name Types */
-   //@{
+   ///@{
    /// status flags of the SLinSolver class.
    enum Status
    {
@@ -63,11 +63,11 @@ public:
       /// An error has occurred.
       ERROR    = 8
    };
-   //@}
+   ///@}
 
    //---------------------------------------
    /**@name Miscellaneous */
-   //@{
+   ///@{
    /// returns the name of the SLinSolver.
    virtual const char* getName() const = 0;
 
@@ -114,7 +114,7 @@ public:
 
    /// get number of factorizations
    virtual int getFactorCount() const = 0;
-   //@}
+   ///@}
 
 
    /**@name Solving linear systems
@@ -135,7 +135,7 @@ public:
       The result vector(s) are allways given as the first parameter(s). Two
       types of result vectors are supported, VectorBase<R> and SSVectorBase<R> .
    */
-   //@{
+   ///@{
    /// Solves \f$Ax=b\f$.
    virtual void solveRight(VectorBase<R>& x, const VectorBase<R>& b) /* const */ = 0;
    /// Solves \f$Ax=b\f$.
@@ -198,7 +198,7 @@ public:
 
    //---------------------------------------
    /**@name Constructors / Destructors */
-   //@{
+   ///@{
    /// default constructor
    SLinSolver()
       : spxout(0)

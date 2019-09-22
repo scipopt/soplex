@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -69,13 +69,13 @@ private:
    void computeCP(int start, int end);
    /// compute weights for rows.
    void computeRP(int start, int end);
-   //@}
+   ///@}
 
 public:
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    SPxWeightPR()
       : SPxPricer<R>("Weight")
@@ -141,11 +141,11 @@ public:
    {
       return new SPxWeightPR(*this);
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    /// sets the solver
    virtual void load(SPxSolverBase<R>* base);
    /// set entering/leaving algorithm
@@ -168,14 +168,14 @@ public:
    virtual void removedVecs(const int perm[]);
    /// \p n covectors have been removed from the loaded LP.
    virtual void removedCoVecs(const int perm[]);
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Consistency check */
-   //@{
+   ///@{
    /// checks for consistency
    virtual bool isConsistent() const;
-   //@}
+   ///@}
 };
 } // namespace soplex
 

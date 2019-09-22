@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -44,7 +44,7 @@ protected:
 
    //-------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    /// the solver
    SPxSolverBase<R>*  thesolver;
    /// name of the ratio tester
@@ -53,13 +53,13 @@ protected:
    typename SPxSolverBase<R>::Type m_type;
    /// allowed bound violation
    R delta;
-   //@}
+   ///@}
 
 public:
 
    //-------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    /// get name of ratio tester.
    virtual const char* getName() const
    {
@@ -99,11 +99,11 @@ public:
    {
       return delta;
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Entering / leaving */
-   //@{
+   ///@{
    /// selects index to leave the basis.
    /** Method #selectLeave() is called by the loaded SoPlex solver when
        computing the entering simplex algorithm. Its task is to select and
@@ -113,14 +113,14 @@ public:
        \ref SPxSolverBase<R>::lbBound() "lbBound()" and
        \ref SPxSolverBase<R>::ubBound() "ubBound()" within
        \ref SPxSolverBase<R>::entertol() "entertol()".
-       fVec().delta() is the VectorBase<R> by
+       fVec().delta() is the vector by
        which fVec() will be updated in this simplex step. Its nonzero
        indices are stored in sorted order in fVec().idx().
 
        If \p val > 0, \p val is the maximum allowed update value for fVec(),
        otherwise the minimum. Method #selectLeave() must chose \p val of the
        same sign as passed, such that updating fVec() by \p val yields a
-       new VectorBase<R> that satisfies all basic bounds (within entertol). The
+       new vector that satisfies all basic bounds (within entertol). The
        returned index, must be the index of an element of fVec(), that
        reaches one of its bounds with this update.
    */
@@ -148,7 +148,7 @@ public:
        If \p val > 0, \p val is the maximum allowed update value for pVec()
        and coPvec(), otherwise the minimum. Method #selectEnter() must
        chose \p val of the same sign as passed, such that updating pVec()
-       and coPvec() by \p val yields a new VectorBase<R> that satisfies all basic
+       and coPvec() by \p val yields a new vector that satisfies all basic
        bounds (within leavetol). The returned Id must be the Id of an
        element of pVec() or coPvec(), that reaches one of its bounds
        with this update.
@@ -161,11 +161,11 @@ public:
    */
    virtual void setType(typename SPxSolverBase<R>::Type)
    {}
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    explicit SPxRatioTester(const char* name)
       : thesolver(0)
@@ -201,7 +201,7 @@ public:
    }
    /// clone function for polymorphism
    virtual SPxRatioTester* clone() const = 0;
-   //@}
+   ///@}
 
 };
 

@@ -22,85 +22,80 @@ namespace soplex
 {
 
 template <class R>
-bool Validation<R>::updateExternalSolution(char* solution)
+bool Validation<R>::updateExternalSolution(const std::string& solution)
 {
    validate = true;
    validatesolution = solution;
 
-   if(strncmp(solution, "+infinity", 9) == 0)
+   if(solution == "+infinity")
+   {
       return true;
-   else if(strncmp(solution, "-infinity", 9) == 0)
-      return true;
+   }
+   else if(solution == "-infinity")
+   {
+      return false;
+   }
    else
    {
-      char* tailptr;
-      strtod(solution, &tailptr);
-
-      if(*tailptr)
-      {
-         //conversion failed because the input wasn't a number
-         return false;
-      }
+      // This will throw boost::bad_lexical cast if bad cast. Will be caught
+      // by the catch in soplexmain.cpp
+      boost::lexical_cast<double>(solution);
    }
 
    return true;
 }
-
 
 
 /// updates the tolerance used for validation
 template <class R>
-bool Validation<R>::updateValidationTolerance(char* tolerance)
+bool Validation<R>::updateValidationTolerance(const std::string& tolerance)
 {
-   char* tailptr;
-   validatetolerance = strtod(tolerance, &tailptr);
-
-   if(*tailptr)
-   {
-      //conversion failed because the input wasn't a number
-      return false;
-   }
-
+   // Will throw boost::bad_lexical_cast if conversion fails
+   validatetolerance = boost::lexical_cast<double>(tolerance);
    return true;
 }
 
-
-/// validates the soplex solution using the external solution
 template <class R>
 void Validation<R>::validateSolveReal(SoPlexBase<R>& soplex)
 {
    bool passedValidation = true;
    std::string reason = "";
-   R objViolation = 0.0;
-   R maxBoundViolation = 0.0;
-   R maxRowViolation = 0.0;
-   R maxRedCostViolation = 0.0;
-   R maxDualViolation = 0.0;
-   R sumBoundViolation = 0.0;
-   R sumRowViolation = 0.0;
-   R sumRedCostViolation = 0.0;
-   R sumDualViolation = 0.0;
-   R sol;
+   Real objViolation = 0.0;
+   Real maxBoundViolation = 0.0;
+   Real maxRowViolation = 0.0;
+   Real maxRedCostViolation = 0.0;
+   Real maxDualViolation = 0.0;
+   Real sumBoundViolation = 0.0;
+   Real sumRowViolation = 0.0;
+   Real sumRedCostViolation = 0.0;
+   Real sumDualViolation = 0.0;
+   Real sol;
 
    std::ostream& os = soplex.spxout.getStream(SPxOut::INFO1);
 
-   if(strncmp(validatesolution, "+infinity", 9) == 0)
-      sol =  soplex.realParam(SoPlexBase<R>::INFTY);
-   else if(strncmp(validatesolution, "-infinity", 9) == 0)
-      sol =  -soplex.realParam(SoPlexBase<R>::INFTY);
+   if(validatesolution == "+infinity")
+   {
+      sol = soplex.realParam(SoPlexBase<R>::INFTY);
+   }
+   else if(validatesolution == "-infinity")
+   {
+      sol = -soplex.realParam(SoPlexBase<R>::INFTY);
+   }
    else
    {
-      sol = atof(validatesolution);
+      // This will not throw here because it was checked in updateExternalSolution()
+      sol = boost::lexical_cast<double>(validatesolution);
    }
 
    objViolation = spxAbs(sol - soplex.objValueReal());
 
    // skip check in case presolving detected infeasibility/unboundedness
    if(SPxSolverBase<R>::INForUNBD == soplex.status() &&
-         (sol == soplex.realParam(SoPlexBase<R>::INFTY) || sol == -soplex.realParam(SoPlexBase<R>::INFTY)))
+         (sol == soplex.realParam(SoPlexBase<R>::INFTY)
+          || sol == -soplex.realParam(SoPlexBase<R>::INFTY)))
       objViolation = 0.0;
 
-   if(! EQ(objViolation, R(0.0), validatetolerance))
+   if(! EQ(objViolation, 0.0, validatetolerance))
    {
       passedValidation = false;
       reason += "Objective Violation; ";

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -51,7 +51,7 @@ private:
 
    //-------------------------------------
    /**@name Private types */
-   //@{
+   ///@{
    /// Helper structure.
    struct SPxParMultPr_Tmp
    {
@@ -60,11 +60,11 @@ private:
       ///
       R test;
    };
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Helper data */
-   //@{
+   ///@{
    ///
    DataArray < SPxParMultPr_Tmp > pricSet;
    ///
@@ -77,13 +77,13 @@ private:
    int last;
    /// Set size for partial pricing.
    int partialSize;
-   //@}
+   ///@}
 
 public:
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    SPxParMultPR()
       : SPxPricer<R>("ParMult")
@@ -127,11 +127,11 @@ public:
    {
       return new SPxParMultPR(*this);
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Interface */
-   //@{
+   ///@{
    /// set the solver
    virtual void load(SPxSolverBase<R>* solver);
    /// set entering or leaving algorithm
@@ -140,7 +140,7 @@ public:
    virtual int selectLeave();
    ///
    virtual SPxId selectEnter();
-   //@}
+   ///@}
 
 };
 

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -59,13 +59,13 @@ class SPxLPBase;
    A basis \f$ B' = [(A',I)P]_{[1:m][1:m] }\f$ (with P being a permutation matrix)
    for the scaled problem corresponds to the basis
    \f$ B = R^{-1} [(A',I)P]_{[1:m][1:m]} [P^{T} \tilde{C}^{-1} P]_{[1:m][1:m] } \f$. In
-   this equation, \f$ \tilde{C} \f$is of the form
+   this equation, \f$ \tilde{C} \f$ is of the form
 
    \f[
     \begin{array}{cc}
          C & 0 \\
          O & R^{-1}
-   \end{array}$
+   \end{array}
     \f]
 
    Note that in SoPlex only scaling factors \f$ 2^k, k \in \mathbb{Z} \f$ are used.
@@ -80,18 +80,18 @@ protected:
 
    //-------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    const char*        m_name;      ///< Name of the scaler
    DataArray < int >* m_activeColscaleExp; ///< pointer to currently active column scaling factors
    DataArray < int >* m_activeRowscaleExp; ///< pointer to currently active row scaling factors
    bool               m_colFirst;  ///< do column scaling first
    bool               m_doBoth;    ///< do columns and rows
    SPxOut*            spxout;      ///< message handler
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Protected helpers */
-   //@{
+   ///@{
 
    /// clear and setup scaling arrays in the LP
    virtual void setup(SPxLPBase<R>& lp);
@@ -114,7 +114,7 @@ public:
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// constructor
    explicit SPxScaler(const char* name, bool colFirst = false, bool doBoth = true,
                       SPxOut* spxout = NULL);
@@ -126,11 +126,11 @@ public:
    virtual ~SPxScaler();
    /// clone function for polymorphism
    virtual SPxScaler* clone() const = 0;
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    /// get name of scaler
    virtual const char* getName() const;
    /// set scaling order
@@ -146,11 +146,11 @@ public:
    virtual void setRealParam(R param, const char* name = "realparam");
    /// set int parameter
    virtual void setIntParam(int param, const char* name = "intparam");
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Scaling */
-   //@{
+   ///@{
    /// scale SPxLP.
    virtual void scale(SPxLPBase<R>& lp, bool persistent = true) = 0;
    /// unscale SPxLP
@@ -237,10 +237,10 @@ public:
 
    //-------------------------------------
    /**@name Debugging */
-   //@{
+   ///@{
    /// consistency check
    virtual bool isConsistent() const;
-   //@}
+   ///@}
 };
 } // namespace soplex
 

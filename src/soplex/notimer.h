@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -33,7 +33,7 @@ public:
 
    //------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    NoTimer()
       : Timer()
@@ -50,11 +50,11 @@ public:
 
    virtual ~NoTimer()
    {}
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Control */
-   //@{
+   ///@{
    /// initialize timer
    virtual void reset()
    {}
@@ -74,11 +74,11 @@ public:
    {
       return OFF;
    }
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Access */
-   //@{
+   ///@{
    virtual Real time() const
    {
       return 0.0;
@@ -89,7 +89,7 @@ public:
       return 0.0;
    }
 
-   //@}
+   ///@}
 };
 } // namespace soplex
 #endif // _NO_TIMER_H_

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -39,7 +39,7 @@ protected:
 
    //-------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    const bool postequilibration;  ///< equilibrate after geometric scaling?
    const int  m_maxIterations;    ///< maximum number of scaling iterations.
    const R m_minImprovement;   ///< improvement necessary to carry on. (Bixby said Fourer said in MP 23, 274 ff. that 0.9 is a good value)
@@ -50,7 +50,7 @@ public:
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor (this scaler makes no use of inherited members m_colFirst and m_doBoth)
    explicit SPxGeometSC(bool equilibrate = false, int maxIters = 8, R minImpr = 0.85,
                         R goodEnough = 1e3);
@@ -66,7 +66,7 @@ public:
    {
       return new SPxGeometSC(*this);
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Scaling */

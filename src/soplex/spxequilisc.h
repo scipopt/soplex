@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -50,7 +50,7 @@ public:
                                       DataArray<int>& rowscaleExp, DataArray<int>& colscaleExp);
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor (this scaler makes no use of inherited member m_colFirst)
    explicit SPxEquiliSC(bool doBoth = true);
    /// copy constructor
@@ -65,11 +65,11 @@ public:
    {
       return new SPxEquiliSC<R>(*this);
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Scaling */
-   //@{
+   ///@{
    /// Scale the loaded SPxLP.
    virtual void scale(SPxLPBase<R>& lp, bool persistent = false) override;
    //@}

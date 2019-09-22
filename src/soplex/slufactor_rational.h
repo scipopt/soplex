@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -44,7 +44,7 @@ public:
 
    //--------------------------------
    /**@name Types */
-   //@{
+   ///@{
    /// Specifies how to perform \ref soplex::SLUFactorRational::change "change" method.
    enum UpdateType
    {
@@ -53,7 +53,7 @@ public:
    };
    /// for convenience
    typedef SLinSolverRational::Status Status;
-   //@}
+   ///@}
 
 private:
 
@@ -62,24 +62,24 @@ private:
    //@{
    VectorRational    vec;           ///< Temporary vector
    SSVectorRational   ssvec;         ///< Temporary semi-sparse vector
-   //@}
+   ///@}
 
 protected:
 
    //--------------------------------
    /**@name Protected data */
-   //@{
+   ///@{
    bool       usetup;             ///< TRUE iff update vector has been setup
    UpdateType uptype;             ///< the current \ref soplex::SLUFactor<R>::UpdateType "UpdateType".
    SSVectorRational   eta;        ///<
    SSVectorRational
    forest;     ///< ? Update vector set up by solveRight4update() and solve2right4update()
    Rational       lastThreshold;  ///< pivoting threshold of last factorization
-   //@}
+   ///@}
 
    //--------------------------------
    /**@name Control Parameters */
-   //@{
+   ///@{
    /// minimum threshold to use.
    Rational minThreshold;
    /// minimum stability to achieve by setting threshold.
@@ -89,25 +89,25 @@ protected:
    Timer::TYPE timerType;
    /// Number of solves
    int     solveCount;
-   //@}
+   ///@}
 
 protected:
 
    //--------------------------------
    /**@name Protected helpers */
-   //@{
+   ///@{
    ///
    void freeAll();
    ///
    void changeEta(int idx, SSVectorRational& eta);
-   //@}
+   ///@}
 
 
 public:
 
    //--------------------------------
    /**@name Update type */
-   //@{
+   ///@{
    /// returns the current update type uptype.
    UpdateType utype() const
    {
@@ -148,14 +148,14 @@ public:
    {
       return lastThreshold;
    }
-   //@}
+   ///@}
 
    //--------------------------------
    /**@name Derived from SLinSolverRational
       See documentation of \ref soplex::SLinSolverRational "SLinSolverRational" for a
       documentation of these methods.
    */
-   //@{
+   ///@{
    ///
    void clear();
    ///
@@ -184,13 +184,13 @@ public:
    std::string statistics() const;
    ///
    Status load(const SVectorRational* vec[], int dim);
-   //@}
+   ///@}
 
 public:
 
    //--------------------------------
    /**@name Solve */
-   //@{
+   ///@{
    /// Solves \f$Ax=b\f$.
    void solveRight(VectorRational& x, const VectorRational& b);
    /// Solves \f$Ax=b\f$.
@@ -215,11 +215,11 @@ public:
                   const SVectorRational& b, SSVectorRational& d, SSVectorRational& e);
    ///
    Status change(int idx, const SVectorRational& subst, const SSVectorRational* eta = 0);
-   //@}
+   ///@}
 
    //--------------------------------
    /**@name Miscellaneous */
-   //@{
+   ///@{
    /// time spent in factorizations
    Real getFactorTime() const
    {
@@ -268,11 +268,11 @@ public:
 
    /// consistency check.
    bool isConsistent() const;
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Constructors / Destructors */
-   //@{
+   ///@{
    /// default constructor.
    SLUFactorRational();
    /// assignment operator.
@@ -286,16 +286,16 @@ public:
    {
       return new SLUFactorRational(*this);
    }
-   //@}
+   ///@}
 
 private:
 
    //------------------------------------
    /**@name Private helpers */
-   //@{
+   ///@{
    /// used to implement the assignment operator
    void assign(const SLUFactorRational& old);
-   //@}
+   ///@}
 };
 
 } // namespace soplex

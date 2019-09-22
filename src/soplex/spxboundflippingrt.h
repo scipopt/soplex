@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -52,7 +52,7 @@ class SPxBoundFlippingRT : public SPxFastRT<R>
 {
 private:
    /**@name substructures */
-   //@{
+   ///@{
    /** enumerator to remember which vector we have been searching to find a breakpoint
     */
    enum BreakpointSource
@@ -93,11 +93,11 @@ private:
          return i.val - j.val;
       }
    };
-   //@}
+   ///@}
 
    /**@name Data
     */
-   //@{
+   ///@{
    bool                  enableBoundFlips;   /**< enable or disable long steps in BoundFlippingRT */
    bool                  enableRowBoundFlips;/**< enable bound flips also for row representation */
    R
@@ -184,7 +184,7 @@ public:
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    SPxBoundFlippingRT()
       : SPxFastRT<R>("Bound Flipping")
@@ -229,11 +229,11 @@ public:
    {
       return new SPxBoundFlippingRT(*this);
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Select enter/leave */
-   //@{
+   ///@{
    ///
    virtual int selectLeave(
       R&              val,
@@ -256,7 +256,7 @@ public:
    {
       enableRowBoundFlips = bf;
    }
-   //@}
+   ///@}
 };
 
 } // namespace soplex

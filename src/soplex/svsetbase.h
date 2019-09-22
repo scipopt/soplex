@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -84,18 +84,18 @@ private:
 
       // ---------------------------------------------------------------------------------------------------------------
       /**@name Data */
-      //@{
+      ///@{
 
       DLPSV* thenext; ///< next SVectorBase
       DLPSV* theprev; ///< previous SVectorBase
 
-      //@}
+      ///@}
 
    public:
 
       // ---------------------------------------------------------------------------------------------------------------
       /**@name Construction / destruction */
-      //@{
+      ///@{
 
       /// Default constructor.
       DLPSV()
@@ -107,11 +107,11 @@ private:
          : SVectorBase<R>(copy)
       {}
 
-      //@}
+      ///@}
 
       // ---------------------------------------------------------------------------------------------------------------
       /**@name Successor / predecessor */
-      //@{
+      ///@{
 
       /// Next SVectorBase.
       DLPSV*& next()
@@ -137,31 +137,31 @@ private:
          return theprev;
       }
 
-      //@}
+      ///@}
    };
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Data */
-   //@{
+   ///@{
 
    DataSet < DLPSV > set;  ///< %set of SVectorBase%s
    IdList < DLPSV > list;  ///< doubly linked list for non-zero management
    int unusedMem;  ///< an estimate of the unused memory (the difference of max() and size() summed up over all vectors) due to deleteVec() and xtend()
    int numUnusedMemUpdates;  ///< counter for how often unusedMem has been updated since last exact value
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Control Parameters */
-   //@{
+   ///@{
 
    double factor;          ///< sparse vector memory enlargment factor
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Helpers */
-   //@{
+   ///@{
 
    /// count size of unused memory exactly
    void countUnusedMem()
@@ -298,13 +298,13 @@ private:
       list.remove(ps);
    }
 
-   //@}
+   ///@}
 
 public:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Extension */
-   //@{
+   ///@{
 
    /// Adds \p svec to the %set.
    /** This includes copying its nonzeros to the sets nonzero memory and creating an additional SVectorBase entry in
@@ -594,11 +594,11 @@ public:
       svec.add(n, idx, val);
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Shrinking */
-   //@{
+   ///@{
 
    /// Removes the vector with key \p removekey from the %set.
    /** @pre \p removekey must be a key from SVSetBase
@@ -719,11 +719,11 @@ public:
       numUnusedMemUpdates = 0;
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Access */
-   //@{
+   ///@{
 
    /// Gets SVectorBase by number, writeable.
    SVectorBase<R>& operator[](int n)
@@ -749,11 +749,11 @@ public:
       return set[k];
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Inquiry */
-   //@{
+   ///@{
 
    /// Current number of SVectorBase%s.
    int num() const
@@ -809,11 +809,11 @@ public:
       return set.has(static_cast<const DLPSV*>(svec));
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Memory Management */
-   //@{
+   ///@{
 
    /// Used nonzero memory.
    int memSize() const
@@ -923,11 +923,11 @@ public:
       numUnusedMemUpdates = 0;
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Miscellaneous */
-   //@{
+   ///@{
 
    /// Resets maximum number of SVectorBase%s.
    void reMax(int newmax = 0)
@@ -962,11 +962,11 @@ public:
 #endif
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Constructors / destructors */
-   //@{
+   ///@{
 
    /// Default constructor.
    explicit
@@ -1061,7 +1061,7 @@ public:
       assert(SVSetBase::isConsistent());
    }
 
-   //@}
+   ///@}
 };
 
 } // namespace soplex

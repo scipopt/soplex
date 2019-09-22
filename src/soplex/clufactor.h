@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -43,7 +43,7 @@ public:
 
    //----------------------------------------
    /**@name Public types */
-   //@{
+   ///@{
    /** Doubly linked ring structure for garbage collection of column or
     *  row file in working matrix.
     */
@@ -75,13 +75,13 @@ public:
       Pring(const Pring&);             ///< blocked copy constructor
       Pring& operator= (const Pring&); ///< blocked assignment operator
    };
-   //@}
+   ///@}
 
 protected:
 
    //----------------------------------------
    /**@name Protected types */
-   //@{
+   ///@{
    /// Temporary data structures.
    class Temp
    {
@@ -148,7 +148,7 @@ protected:
                                 in the end of the factorization with DEFAULT
                                 updates.                            */
          int* start;         ///< starting positions in val and idx
-         int* len;           ///< used nonzeros per column VectorBase<R>
+         int* len;           ///< used nonzeros per column vector
          int* max;           /*!< \brief maximum available nonzeros per colunn:
                                start[i] + max[i] == start[elem[i].next->idx]
                                len[i] <= max[i].                    */
@@ -163,8 +163,8 @@ protected:
       std::vector<R> val;           ///< values of L vectors
       int*  idx;           ///< indices of L vectors
       int  startSize;      ///< size of array start
-      int  firstUpdate;    ///< number of first update L VectorBase<R>
-      int  firstUnused;    ///< number of first unused L VectorBase<R>
+      int  firstUpdate;    ///< number of first update L vector
+      int  firstUnused;    ///< number of first unused L vector
       int*  start;         ///< starting positions in val and idx
       int*  row;           ///< column indices of L vectors
       int  updateType;     ///< type of updates to be used.
@@ -179,7 +179,7 @@ protected:
       int*  rorig;         ///< original row permutation
       int*  rperm;         ///< original row permutation
    };
-   //@}
+   ///@}
 
    //----------------------------------------
    /**@name Protected data */
@@ -206,15 +206,15 @@ protected:
 
    Timer*  factorTime;        ///< Time spent in factorizations
    int     factorCount;       ///< Number of factorizations
-   //@}
+   ///@}
 
 private:
 
    //----------------------------------------
    /**@name Private data */
-   //@{
+   ///@{
    Temp    temp;              ///< Temporary storage
-   //@}
+   ///@}
 
    //----------------------------------------
    /**@name Solving
@@ -225,7 +225,7 @@ private:
       "Eps" in the end consider elements smaller then the passed epsilon
       as zero.
    */
-   //@{
+   ///@{
    ///
    void solveUright(R* wrk, R* vec) const;
    ///
@@ -352,13 +352,13 @@ private:
    void remaxRow(int p_row, int len);
    ///
    int makeLvec(int p_len, int p_row);
-   //@}
+   ///@}
 
 protected:
 
    //----------------------------------------
    /**@name Solver methods */
-   //@{
+   ///@{
    ///
    void solveLright(R* vec);
    ///
@@ -468,13 +468,13 @@ protected:
 
    //----------------------------------------
    /**@name Debugging */
-   //@{
+   ///@{
    ///
    void dump() const;
 
    ///
    bool isConsistent() const;
-   //@}
+   ///@}
 };
 
 } // namespace soplex

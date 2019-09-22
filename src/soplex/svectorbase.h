@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -22,6 +22,7 @@
 #include <iostream>
 #include <assert.h>
 #include <math.h>
+#include "soplex/stablesum.h"
 
 namespace soplex
 {
@@ -133,13 +134,13 @@ private:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Data */
-   //@{
+   ///@{
 
    Nonzero<R>* m_elem;
    int memsize;
    int memused;
 
-   //@}
+   ///@}
 
 public:
 
@@ -147,7 +148,7 @@ public:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Access */
-   //@{
+   ///@{
 
    /// Number of used indices.
    int size() const
@@ -465,11 +466,11 @@ public:
       }
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Arithmetic operations */
-   //@{
+   ///@{
 
    /// Maximum absolute value, i.e., R(infinity) norm.
    R maxAbs() const
@@ -549,7 +550,7 @@ public:
    template < class S >
    R operator*(const SVectorBase<S>& w) const
    {
-      R x = 0;
+      StableSum<R> x;
       int n = size();
       int m = w.size();
 
@@ -598,11 +599,11 @@ public:
       return x;
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Constructions, destruction, and assignment */
-   //@{
+   ///@{
 
    /// Default constructor.
    /** The constructor expects one memory block where to store the nonzero elements. This must be passed to the
@@ -756,11 +757,11 @@ public:
    template < class S >
    SVectorBase<R>& operator=(const SSVectorBase<S>& sv);
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Memory */
-   //@{
+   ///@{
 
    /// get pointer to internal memory.
    Nonzero<R>* mem() const
@@ -793,11 +794,11 @@ public:
       set_max(n);
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Utilities */
-   //@{
+   ///@{
 
    /// Consistency check.
    bool isConsistent() const
@@ -828,7 +829,7 @@ public:
       return true;
    }
 
-   //@}
+   ///@}
 };
 
 
@@ -838,12 +839,12 @@ template <>
 template < class S >
 Real SVectorBase<Real>::operator*(const SVectorBase<S>& w) const
 {
-   Real x = 0;
+   StableSum<Real> x;
    int n = size();
    int m = w.size();
 
    if(n == 0 || m == 0)
-      return x;
+      return Real(0);
 
    int i = 0;
    int j = 0;

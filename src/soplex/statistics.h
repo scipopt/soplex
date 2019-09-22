@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -36,8 +36,9 @@ class SoPlexBase<R>::Statistics
 
 public:
 
-   //**@name Construction, resetting, printing */
-   //@{
+
+   ///@name Construction, resetting, printing
+   ///@{
 
    /// default constructor
    Statistics(Timer::TYPE ttype = Timer::USER_TIME);
@@ -79,11 +80,12 @@ public:
    /// prints statistics
    void print(std::ostream& os);
 
-   //@}
+
+   ///@}
 
 
-   //**@name Data */
-   //@{
+   ///@name Data
+   ///@{
 
    Timer* readingTime; ///< reading time not included in solving time
    Timer* solvingTime; ///< solving time
@@ -94,6 +96,16 @@ public:
    Timer* rationalTime; ///< time for rational LP solving (included in solving time)
    Timer* reconstructionTime; ///< time for rational reconstructions
    Timer::TYPE timerType; ///< type of timer (user or wallclock)
+
+   Real multTimeSparse; ///< time for computing A*x exploiting sparsity (setupPupdate(), PRICE step)
+   Real multTimeFull; ///< time for computing A*x ignoring sparsity (setupPupdate(), PRICE step)
+   Real multTimeColwise; ///< time for computing A*x columnwise (setupPupdate(), PRICE step)
+   Real multTimeUnsetup; ///< time for computing A*x w/o sparsity information (setupPupdate(), PRICE step)
+   int multSparseCalls; ///< number of products A*x exploiting sparsity (setupPupdate(), PRICE step)
+   int multFullCalls; ///< number of products A*x ignoring sparsity (setupPupdate(), PRICE step)
+   int multColwiseCalls; ///< number of products A*x columnwise (setupPupdate(), PRICE step)
+   int multUnsetupCalls; ///< number of products A*x w/o sparsity information (setupPupdate(), PRICE step)
+
    Real luFactorizationTimeReal; ///< time for factorizing bases matrices in real precision
    Real luSolveTimeReal; ///< time for solving linear systems in real precision
    Real luFactorizationTimeRational; ///< time for factorizing bases matrices in rational precision
@@ -139,6 +151,7 @@ public:
    R finalBasisCondition;  ///< condition number estimate of the optimal basis matrix
 
    //@}
+
 };
 } // namespace soplex
 

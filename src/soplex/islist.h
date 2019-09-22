@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -47,15 +47,15 @@ protected:
 
    //--------------------------
    /**@name Data */
-   //@{
+   ///@{
    IsElement<T>* the_next;       ///< pointer to next element in the IsList.
-   //@}
+   ///@}
 
 public:
 
    //---------------------------------
    /**@name Successor */
-   //@{
+   ///@{
    ///
    IsElement<T>*& next()
    {
@@ -66,11 +66,11 @@ public:
    {
       return the_next;
    }
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Constructors / destructors */
-   //@{
+   ///@{
 
    /// default constructor.
    IsElement()
@@ -122,7 +122,7 @@ public:
 
    //--------------------------
    /**@name Extension */
-   //@{
+   ///@{
    /// appends \p elem to IsList.
    void append(T* elem)
    {
@@ -211,11 +211,11 @@ public:
             the_last = list.last();
       }
    }
-   //@}
+   ///@}
 
    //--------------------------
    /**@name Removal */
-   //@{
+   ///@{
    /// removes the successor of \p after from an IsList.
    void remove_next(T* after)
    {
@@ -308,11 +308,11 @@ public:
 
       the_first = the_last = 0;
    }
-   //@}
+   ///@}
 
    //--------------------------
    /**@name Access */
-   //@{
+   ///@{
    /// returns the IsList's first element.
    T* first() const
    {
@@ -395,11 +395,11 @@ public:
 
       return part;
    }
-   //@}
+   ///@}
 
    //--------------------------
    /**@name Miscellaneous */
-   //@{
+   ///@{
    /// adjusts list pointers to a new memory address.
    /** This method is of a rather technical nature. If all list elements
        are taken form one array of elements, in certain circumstances the
@@ -441,11 +441,11 @@ public:
 
       return true;
    }
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Constructors / Destructors */
-   //@{
+   ///@{
    /// default constructor.
    /** The default constructor may be used to setup a (sub-)list, by
        specifying a \p first and \p last element. Then \p last must be a
@@ -471,7 +471,7 @@ public:
    {
       clear(destroyElements);
    }
-   //@}
+   ///@}
 };
 
 } // namespace soplex

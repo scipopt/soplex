@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -55,7 +55,7 @@ public:
 
    //-------------------------------------
    /**@name Constructors / destructors */
-   //@{
+   ///@{
    /// default constructor
    SPxAutoPR()
       : SPxPricer<R>("Auto")
@@ -106,11 +106,11 @@ public:
    {
       return new SPxAutoPR(*this);
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    /// set max number of iterations before switching pricers
    void setSwitchIters(int iters);
    /// clear the data
@@ -131,7 +131,7 @@ public:
    virtual void left4(int n, SPxId id);
    ///
    virtual void entered4(SPxId id, int n);
-   //@}
+   ///@}
 };
 } // namespace soplex
 

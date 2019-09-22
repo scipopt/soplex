@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -894,7 +894,7 @@ extern "C" int CPXgetx(
    if ((start < 0) || (start > end) || (end > spx->nCols()))
       return CPXERR_BAD_ARGUMENT;
 
-   Vector tmp(spx->nCols());
+   DVector tmp(spx->nCols());
    spx->getPrimalSol(tmp);
 
    for(int i = start; i <= end; i++)
@@ -916,7 +916,7 @@ extern "C" int CPXgetpi(
    if ((start < 0) || (start > end) || (end > spx->nRows()))
       return CPXERR_BAD_ARGUMENT;
 
-   Vector tmp(spx->nRows());
+   DVector tmp(spx->nRows());
    spx->getDualSol(tmp);
 
    for(int i = start; i <= end; i++)

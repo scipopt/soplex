@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -48,14 +48,14 @@ private:
 
    //-------------------------------------
    /**@name Types */
-   //@{
+   ///@{
    /// specifies whether to work on the primal, the dual, or not at all.
    enum { NONE, PVEC, DVEC } state;
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    /// the current (approximate) primal or dual vector
    VectorBase<R> vec;
    //@}
@@ -64,16 +64,16 @@ protected:
 
    //-------------------------------------
    /**@name Protected helpers */
-   //@{
+   ///@{
    /// sets up variable weights.
    void setupWeights(SPxSolverBase<R>& base);
-   //@}
+   ///@}
 
 public:
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor.
    SPxVectorST()
       : state(NONE)
@@ -110,11 +110,11 @@ public:
    {
       return new SPxVectorST(*this);
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Modification */
-   //@{
+   ///@{
    /// sets up primal solution vector.
    void primal(const VectorBase<R>& v)
    {
@@ -127,7 +127,7 @@ public:
       vec = v;
       state = DVEC;
    }
-   //@}
+   ///@}
 
 };
 

@@ -3,7 +3,7 @@
 #*                  This file is part of the class library                   *#
 #*       SoPlex --- the Sequential object-oriented simPlex.                  *#
 #*                                                                           *#
-#*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            *#
+#*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            *#
 #*                            fuer Informationstechnik Berlin                *#
 #*                                                                           *#
 #*  SoPlex is distributed under the terms of the ZIB Academic Licence.       *#
@@ -43,7 +43,7 @@ include make/make.detecthost
 # default settings
 #-----------------------------------------------------------------------------
 
-VERSION		:=	4.0.0.3
+VERSION		:=	4.0.2.4
 SPXGITHASH	=
 
 VERBOSE		=	false
@@ -107,6 +107,7 @@ DFLAGS		=	-MM
 
 GMP_LDFLAGS	= -lgmp -lmpfr
 GMP_CPPFLAGS	=
+BOOST_LDFLAGS = -lboost_program_options
 
 SOPLEXDIR	=	$(realpath .)
 SRCDIR		=	src
@@ -191,6 +192,7 @@ LIBHEADER	=	soplex/array.h \
 				soplex/spxweightst.h \
 				soplex/ssvectorbase.h \
 				soplex/ssvector.h \
+				soplex/stablesum.h \
 				soplex/statistics.h \
 				soplex/svectorbase.h \
 				soplex/svector.h \
@@ -338,6 +340,10 @@ else
 GMP_LDFLAGS	=
 GMP_CPPFLAGS	=
 endif
+
+# For boost program options
+LDFLAGS += $(BOOST_LDFLAGS)
+
 
 ZLIBDEP		:=	$(SRCDIR)/depend.zlib
 ZLIBSRC		:=	$(shell cat $(ZLIBDEP))

@@ -19,7 +19,7 @@ make -j -C ../
 
 if [ "$HTML_FILE_EXTENSION" = "" ]
 then
-    HTML_FILE_EXTENSION=shtml
+    HTML_FILE_EXTENSION=html
 fi
 
 cd inc

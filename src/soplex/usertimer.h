@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -32,24 +32,24 @@ private:
 
    //------------------------------------
    /**@name number of ticks per second */
-   //@{
+   ///@{
    static const long ticks_per_sec;  ///< ticks per secound, should be constant
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Data */
-   //@{
-   mutable long uAccount;      ///< user time
-   mutable long uTicks;        ///< user ticks
+   ///@{
+   mutable clock_t uAccount;      ///< user time
+   mutable clock_t uTicks;        ///< user ticks
 
    mutable Real lasttime;
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Internal helpers */
-   //@{
+   ///@{
    /// convert ticks to secounds.
-   Real ticks2sec(long ticks) const
+   Real ticks2sec(clock_t ticks) const
    {
       return (Real(ticks) * 1000.0 / Real(ticks_per_sec)) / 1000.0;
    }
@@ -57,13 +57,13 @@ private:
    /// get actual user ticks from the system.
    void updateTicks() const;
 
-   //@}
+   ///@}
 
 public:
 
    //------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    UserTimer()
       : Timer(), uAccount(0), uTicks(0), lasttime(0.0)
@@ -88,11 +88,11 @@ public:
 
    virtual ~UserTimer()
    {}
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Control */
-   //@{
+   ///@{
    /// initialize timer, set timing accounts to zero.
    virtual void reset()
    {
@@ -112,15 +112,15 @@ public:
    {
       return USER_TIME;
    }
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Access */
-   //@{
+   ///@{
    virtual Real time() const;
 
    virtual Real lastTime() const;
-   //@}
+   ///@}
 };
 } // namespace soplex
 #endif // _USER_TIMER_H_

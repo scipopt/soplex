@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -42,7 +42,7 @@ public:
 
    //----------------------------------------
    /**@name Public types */
-   //@{
+   ///@{
    /** Doubly linked ring structure for garbage collection of column or
     *  row file in working matrix.
     */
@@ -75,13 +75,13 @@ public:
       Pring(const Pring&);             ///< blocked copy constructor
       Pring& operator= (const Pring&); ///< blocked assignment operator
    };
-   //@}
+   ///@}
 
 protected:
 
    //----------------------------------------
    /**@name Protected types */
-   //@{
+   ///@{
    /// Temporary data structures.
    class Temp
    {
@@ -177,11 +177,11 @@ protected:
       int*   rorig;         ///< original row permutation
       int*   rperm;         ///< original row permutation
    };
-   //@}
+   ///@}
 
    //----------------------------------------
    /**@name Protected data */
-   //@{
+   ///@{
    SLinSolverRational::Status stat;   ///< Status indicator.
 
    int     thedim;            ///< dimension of factorized matrix
@@ -205,15 +205,15 @@ protected:
    Timer*  factorTime;        ///< Time spent in factorizations
    int     factorCount;       ///< Number of factorizations
    Real    timeLimit;         ///< Time limit on factorization or solves
-   //@}
+   ///@}
 
 private:
 
    //----------------------------------------
    /**@name Private data */
-   //@{
+   ///@{
    Temp    temp;              ///< Temporary storage
-   //@}
+   ///@}
 
    //----------------------------------------
    /**@name Solving
@@ -224,7 +224,7 @@ private:
       "Eps" in the end consider elements smaller then the passed epsilon
       as zero.
    */
-   //@{
+   ///@{
    ///
    void solveUright(Rational* wrk, Rational* vec);
    ///
@@ -361,13 +361,13 @@ private:
       else
          return false;
    }
-   //@}
+   ///@}
 
 protected:
 
    //----------------------------------------
    /**@name Solver methods */
-   //@{
+   ///@{
    ///
    void solveLright(Rational* vec);
    ///
@@ -441,17 +441,17 @@ protected:
    ///
    void factor(const SVectorRational** vec,   ///< Array of column vector pointers
                const Rational& threshold);           ///< pivoting threshold
-   //@}
+   ///@}
 
    //----------------------------------------
    /**@name Debugging */
-   //@{
+   ///@{
    ///
    void dump() const;
 
    ///
    bool isConsistent() const;
-   //@}
+   ///@}
 };
 
 } // namespace soplex

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -46,7 +46,6 @@
 
 namespace soplex
 {
-
 // Overloaded EQ function
 bool EQ(int a, int b);
 
@@ -60,11 +59,10 @@ boost::multiprecision::number<T, eto> spxFrexp(boost::multiprecision::number<T, 
    return frexp(y, exp);
 }
 
-
-#define SOPLEX_VERSION         400
-#define SOPLEX_SUBVERSION        3
-#define SOPLEX_APIVERSION        8
-#define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2018 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)"
+#define SOPLEX_VERSION         402
+#define SOPLEX_SUBVERSION        4
+#define SOPLEX_APIVERSION        10
+#define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2019 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)"
 
 /*-----------------------------------------------------------------------------
  * Assertion Macros etc.
@@ -312,7 +310,7 @@ private:
 
    //------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    /// default allowed additive zero: 1.0 + EPS_ZERO == 1.0
    THREADLOCAL static Real s_epsilon;
    /// epsilon for factorization
@@ -321,13 +319,13 @@ private:
    THREADLOCAL static Real s_epsilon_update;
    /// epsilon for pivot zero tolerance in factorization
    THREADLOCAL static Real s_epsilon_pivot;
-   //@}
+   ///@}
 
 public:
 
    //------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    ///
    static Real epsilon();
    ///
@@ -344,7 +342,7 @@ public:
    static Real epsilonPivot();
    ///
    static void setEpsilonPivot(Real eps);
-   //@}
+   ///@}
 };
 
 // A generic version of spxAbs. It would be nice if we could replace spxAbs

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -44,7 +44,7 @@ class SPxFastRT : public SPxRatioTester<R>
 protected:
    //-------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    /// parameter for computing minimum stability requirement
    R minStab;
    /// |value| < epsilon is considered 0.
@@ -53,11 +53,11 @@ protected:
    R fastDelta;
    /// flag used in methods minSelect/maxSelect to retrieve correct basis status
    bool iscoid;
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Private helpers */
-   //@{
+   ///@{
    /// resets tolerances (epsilon).
    void resetTols();
    /// relaxes stability requirements.
@@ -168,7 +168,7 @@ public:
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    SPxFastRT()
       : SPxRatioTester<R>("Fast")
@@ -215,11 +215,11 @@ public:
    {
       return new SPxFastRT(*this);
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    ///
    virtual void load(SPxSolverBase<R>* solver);
    ///
@@ -242,7 +242,7 @@ public:
    {
       return fastDelta;
    }
-   //@}
+   ///@}
 };
 } // namespace soplex
 

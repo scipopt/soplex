@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1996      Roland Wunderling                              */
-/*                  1996-2018 Konrad-Zuse-Zentrum                            */
+/*                  1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -28,6 +28,7 @@
 #include "algorithm"
 
 #include "soplex/spxdefines.h"
+#include "soplex/stablesum.h"
 
 namespace soplex
 {
@@ -88,18 +89,18 @@ protected:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Data */
-   //@{
+   ///@{
 
    /// Values of vector.
    std::vector<R> val;
 
-   //@}
+   ///@}
 
 public:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Construction and assignment */
-   //@{
+   ///@{
 
    /// Constructor.
    /** There is no default constructor since the storage for a VectorBase must be provided externally.  Storage must be
@@ -157,12 +158,9 @@ public:
    {
       if(this != &vec)
       {
-
          val.reserve(vec.dim());
 
          val = vec.val;
-
-         assert(isConsistent());
       }
 
       return *this;
@@ -240,11 +238,11 @@ public:
    template < class S >
    VectorBase<R>& assign(const SSVectorBase<S>& vec);
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Access */
-   //@{
+   ///@{
 
    /// Dimension of vector.
    int dim() const
@@ -272,11 +270,11 @@ public:
       return (vec1.val == vec2.val);
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Arithmetic operations */
-   //@{
+   ///@{
 
    /// Set vector to 0.
    // TODO: is this set to zero actually useful? Can't I just do a val.clear()?
@@ -454,11 +452,11 @@ public:
    template < class S, class T >
    VectorBase<R>& multAdd(const S& x, const SSVectorBase<T>& vec);
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Utilities */
-   //@{
+   ///@{
 
    /// Conversion to C-style pointer.
    /** This function serves for using a VectorBase in an C-style function. It returns a pointer to the first value of
@@ -524,7 +522,6 @@ public:
    }
 
 
-
    /// Resets \ref soplex::VectorBase "VectorBase"'s memory size to \p newsize.
    void reSize(int newsize)
    {
@@ -535,7 +532,6 @@ public:
       // there will not be any (internal) resizes.
       val.reserve(newsize);
    }
-
 
    // For operations such as vec1 - vec2
    const VectorBase<R> operator-(const VectorBase<R>& vec) const

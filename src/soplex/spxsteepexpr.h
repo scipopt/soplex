@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -45,7 +45,7 @@ public:
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    ///
    SPxSteepExPR()
       : SPxSteepPR<R>("SteepEx", SPxSteepPR<R>::EXACT)
@@ -78,7 +78,7 @@ public:
    {
       return new SPxSteepExPR(*this);
    }
-   //@}
+   ///@}
 };
 
 } // namespace soplex

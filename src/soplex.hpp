@@ -3546,10 +3546,9 @@ bool SoPlexBase<R>::isPrimalFeasible() const
           && _solRational.isPrimalFeasible());
 }
 
-
-/// is a primal feasible solution available?
+/// is a solution available (not necessarily feasible)?
 template <class R>
-bool SoPlexBase<R>::hasPrimal() const
+bool SoPlexBase<R>::hasSol() const
 {
    return _hasSolReal || _hasSolRational;
 }
@@ -3572,11 +3571,12 @@ bool SoPlexBase<R>::isDualFeasible() const
 }
 
 /// is a dual feasible solution available?
-template <class R>
-bool SoPlexBase<R>::hasDual() const
-{
-   return _hasSolReal || _hasSolRational;
-}
+// This is depreciated in an new commit. TODO Need to double check
+// template <class R>
+// bool SoPlexBase<R>::hasDual() const
+// {
+//    return _hasSolReal || _hasSolRational;
+// }
 
 /// is Farkas proof of infeasibility available?
 template <class R>
@@ -8458,172 +8458,44 @@ bool SoPlexBase<R>::loadSettingsFile(const char* filename)
    return !readError;
 }
 
-
 /// parses one setting string and returns true on success
 template <class R>
-bool SoPlexBase<R>::parseSettingsString(char* string)
+bool SoPlexBase<R>::parseSettingsString(const std::string str, boost::any val)
 {
-   assert(string != 0);
-
-   if(string == 0)
+   if(str.empty())
    {
       return false;
-   }
-
-   char parseString[SET_MAX_LINE_LEN];
-   spxSnprintf(parseString, SET_MAX_LINE_LEN - 1, "%s", string);
-
-   char* line = parseString;
-
-   // find the start of the parameter type
-   while(*line == ' ' || *line == '\t' || *line == '\r')
-      line++;
-
-   if(*line == '\0' || *line == '\n' || *line == '#')
-      return true;
-
-   char* paramTypeString = line;
-
-   // find the end of the parameter type
-   while(*line != ' ' && *line != '\t' && *line != '\r' && *line != '\n' && *line != '#'
-         && *line != '\0' && *line != ':')
-      line++;
-
-   if(*line == ':')
-   {
-      *line = '\0';
-      line++;
-   }
-   else
-   {
-      *line = '\0';
-      line++;
-
-      // search for the ':' char in the line
-      while(*line == ' ' || *line == '\t' || *line == '\r')
-         line++;
-
-      if(*line != ':')
-      {
-         MSG_INFO1(spxout, spxout <<
-                   "Error parsing setting string: no ':' separating parameter type and name.\n");
-         return false;
-      }
-
-      line++;
-   }
-
-   // find the start of the parameter name
-   while(*line == ' ' || *line == '\t' || *line == '\r')
-      line++;
-
-   if(*line == '\0' || *line == '\n' || *line == '#')
-   {
-      MSG_INFO1(spxout, spxout << "Error parsing setting string: no parameter name.\n");
-      return false;
-   }
-
-   char* paramName = line;
-
-   // find the end of the parameter name
-   while(*line != ' ' && *line != '\t' && *line != '\r' && *line != '\n' && *line != '#'
-         && *line != '\0' && *line != '=')
-      line++;
-
-   if(*line == '=')
-   {
-      *line = '\0';
-      line++;
-   }
-   else
-   {
-      *line = '\0';
-      line++;
-
-      // search for the '=' char in the line
-      while(*line == ' ' || *line == '\t' || *line == '\r')
-         line++;
-
-      if(*line != '=')
-      {
-         MSG_INFO1(spxout, spxout << "Error parsing setting string: no '=' after parameter name.\n");
-         return false;
-      }
-
-      line++;
-   }
-
-   // find the start of the parameter value string
-   while(*line == ' ' || *line == '\t' || *line == '\r')
-      line++;
-
-   if(*line == '\0' || *line == '\n' || *line == '#')
-   {
-      MSG_INFO1(spxout, spxout << "Error parsing setting string: no parameter value.\n");
-      return false;
-   }
-
-   char* paramValueString = line;
-
-   // find the end of the parameter value string
-   while(*line != ' ' && *line != '\t' && *line != '\r' && *line != '\n' && *line != '#'
-         && *line != '\0')
-      line++;
-
-   if(*line != '\0')
-   {
-      // check, if the rest of the line is clean
-      *line = '\0';
-      line++;
-
-      while(*line == ' ' || *line == '\t' || *line == '\r')
-         line++;
-
-      if(*line != '\0' && *line != '\n' && *line != '#')
-      {
-         MSG_INFO1(spxout, spxout << "Error parsing setting string: additional character '" << *line <<
-                   "' after parameter value.\n");
-         return false;
-      }
    }
 
    // check whether we have a bool parameter
-   if(strncmp(paramTypeString, "bool", 4) == 0)
+   if(str.substr(0, 4) == "bool")
    {
       for(int param = 0; ; param++)
       {
          if(param >= BOOLPARAM_COUNT)
          {
-            MSG_INFO1(spxout, spxout << "Error parsing setting string: unknown parameter name <" << paramName <<
+            MSG_INFO1(spxout, spxout << "Error parsing setting string: unknown parameter name <" << str <<
                       ">.\n");
             return false;
          }
-         else if(strncmp(paramName, _currentSettings->boolParam.name[param].c_str(), SET_MAX_LINE_LEN) == 0)
+         // It is 5 because the string will be "bool:whatever", there is a
+         // colon TODO This is not an efficient way to search. Worst case
+         // O(N^2), where N is the number of parameters. A more efficient way
+         // is to do the using a std::map or an std::unordered_map. Instead of
+         // O(N^2), it would be O(N) or O(N.log N)
+         else if(str.substr(5) == _currentSettings->boolParam.name[param])
          {
-            if(strncasecmp(paramValueString, "true", 4) == 0
-                  || strncasecmp(paramValueString, "TRUE", 4) == 0
-                  || strncasecmp(paramValueString, "t", 4) == 0
-                  || strncasecmp(paramValueString, "T", 4) == 0
-                  || strtol(paramValueString, NULL, 4) == 1)
+            // If the any_cast throws then it would be caught inside
+            // soplexmain.cpp
+
+            auto value = boost::any_cast<bool>(val);
+
+            if(value != _currentSettings->boolParam.defaultValue[param])
             {
-               setBoolParam((BoolParam)param, true);
-               break;
+               setBoolParam((BoolParam)param, value);
             }
-            else if(strncasecmp(paramValueString, "false", 5) == 0
-                    || strncasecmp(paramValueString, "FALSE", 5) == 0
-                    || strncasecmp(paramValueString, "f", 5) == 0
-                    || strncasecmp(paramValueString, "F", 5) == 0
-                    || strtol(paramValueString, NULL, 5) == 0)
-            {
-               setBoolParam((BoolParam)param, false);
-               break;
-            }
-            else
-            {
-               MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << paramValueString <<
-                         "> for bool parameter <" << paramName << ">.\n");
-               return false;
-            }
+
+            break;
          }
       }
 
@@ -8631,68 +8503,72 @@ bool SoPlexBase<R>::parseSettingsString(char* string)
    }
 
    // check whether we have an integer parameter
-   if(strncmp(paramTypeString, "int", 3) == 0)
+   if(str.substr(0, 3) == "int")
    {
       for(int param = 0; ; param++)
       {
          if(param >= INTPARAM_COUNT)
          {
-            MSG_INFO1(spxout, spxout << "Error parsing setting string: unknown parameter name <" << paramName <<
+            MSG_INFO1(spxout, spxout << "Error parsing setting string: unknown parameter name <" << str <<
                       ">.\n");
             return false;
          }
-         else if(strncmp(paramName, _currentSettings->intParam.name[param].c_str(), SET_MAX_LINE_LEN) == 0)
+         else if(str.substr(4) == _currentSettings->intParam.name[param])
          {
-            int value;
-            value = std::stoi(paramValueString);
+            // TODO The setIntParam will check for the range of values, but I
+            // think this is un-necessary because the program options library
+            // will do this, in a better way. The if else condition is
+            // redundant, except if it gets values from SCIP.
 
-            if(setIntParam((SoPlexBase<R>::IntParam)param, value, false))
-               break;
-            else
+            auto value = boost::any_cast<int>(val);
+
+            if(value != _currentSettings->intParam.defaultValue[param])
             {
-               MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << paramValueString <<
-                         "> for int parameter <" << paramName << ">.\n");
-               return false;
+               if(setIntParam((SoPlexBase<R>::IntParam)param, boost::any_cast<int>(val), false))
+                  break;
+               else
+               {
+                  MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << boost::any_cast<int>
+                            (val) << "> for int parameter <" << str << ">.\n");
+                  return false;
+               }
             }
+
+            break;
          }
       }
 
       return true;
    }
 
-   // check whether we have a R parameter
-   if(strncmp(paramTypeString, "real", 4) == 0)
+   // check whether we have a Real parameter
+   if(str.substr(0, 4) == "real")
    {
       for(int param = 0; ; param++)
       {
          if(param >= REALPARAM_COUNT)
          {
-            MSG_INFO1(spxout, spxout << "Error parsing setting string: unknown parameter name <" << paramName <<
-                      ">.\n");
+            MSG_INFO1(spxout, spxout << "Error parsing setting string: unknown parameter name <" <<
+                      boost::any_cast<R>(val) << ">.\n");
             return false;
          }
-         else if(strncmp(paramName, SoPlexBase<R>::_currentSettings->realParam.name[param].c_str(),
-                         SET_MAX_LINE_LEN) == 0)
+         else if(str.substr(5) == SoPlexBase<R>::_currentSettings->realParam.name[param])
          {
-            R value;
-#ifdef WITH_LONG_DOUBLE
-            value = std::stold(paramValueString);
-#else
-#ifdef WITH_FLOAT
-            value = std::stof(paramValueString);
-#else
-            value = std::stod(paramValueString);
-#endif
-#endif
+            auto value = boost::any_cast<R>(val);
 
-            if(setRealParam((SoPlexBase<R>::RealParam)param, value))
-               break;
-            else
+            if(value != _currentSettings->realParam.defaultValue[param])
             {
-               MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << paramValueString <<
-                         "> for R parameter <" << paramName << ">.\n");
-               return false;
+               if(setRealParam((SoPlexBase<R>::RealParam)param, value))
+                  break;
+               else
+               {
+                  MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << value <<
+                            "> for R parameter <" << str << ">.\n");
+                  return false;
+               }
             }
+
+            break;
          }
       }
 
@@ -8702,7 +8578,8 @@ bool SoPlexBase<R>::parseSettingsString(char* string)
 #ifdef SOPLEX_WITH_RATIONALPARAM
 
    // check whether we have a rational parameter
-   if(strncmp(paramTypeString, "rational", 8) == 0)
+   // Note that so far SoPlex doesn't define any rational Params.
+   if(str.substr(0, 8) == "rational")
    {
       for(int param = 0; ; param++)
       {
@@ -8712,10 +8589,12 @@ bool SoPlexBase<R>::parseSettingsString(char* string)
                       ">.\n");
             return false;
          }
-         else if(strncmp(paramName, _currentSettings->rationalParam.name[param].c_str(),
-                         SET_MAX_LINE_LEN) == 0)
+         else if(str.substr(9) == rationalParam.name[param])
          {
             Rational value;
+
+            auto tmpStr = boost::any_cast<std::string>(val);
+            const char* paramValueString = tmpStr.c_str();
 
             if(readStringRational(paramValueString, value) && setRationalParam((RationalParam)param, value))
                break;
@@ -8733,38 +8612,8 @@ bool SoPlexBase<R>::parseSettingsString(char* string)
 
 #endif
 
-   // check whether we have the random seed
-   if(strncmp(paramTypeString, "uint", 4) == 0)
-   {
-      if(strncmp(paramName, "random_seed", 11) == 0)
-      {
-         unsigned int value;
-         unsigned long parseval;
-
-         parseval = std::stoul(paramValueString);
-
-         if(parseval > UINT_MAX)
-         {
-            value = UINT_MAX;
-            MSG_WARNING(spxout, spxout << "Converting number greater than UINT_MAX to uint.\n");
-         }
-         else
-            value = (unsigned int) parseval;
-
-         setRandomSeed(value);
-         return true;
-      }
-
-      MSG_INFO1(spxout, spxout << "Error parsing setting string for uint parameter <random_seed>.\n");
-      return false;
-   }
-
-   MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid parameter type <" <<
-             paramTypeString << "> for parameter <" << paramName << ">.\n");
-
    return false;
 }
-
 
 
 /// writes settings file; returns true on success

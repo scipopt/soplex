@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -52,7 +52,7 @@ class SPxSolverBase;
    @brief   Simplex basis.
    @ingroup Algo
 
-   Consider the linear program as provided from class SPxLPBase<R>:
+   Consider the linear program as provided from class SPxLP:
    \f[
    \begin{array}{rl}
    \hbox{max}  & c^T x                 \\
@@ -108,8 +108,8 @@ public:
    public:
 
       //------------------------------------
-      //**@name Status */
-      //@{
+      ///@name Status
+      ///@{
       /// Status of a variable.
       /** A basis is described by assigning a Status to all of the LP
           variables and covariables. This assignment is maintained by the
@@ -196,7 +196,7 @@ public:
          D_ON_BOTH   = D_ON_LOWER + D_ON_UPPER,  ///< dual variable has two bounds
          D_UNDEFINED = 8    ///< primal or dual variable is undefined
       };
-      //@}
+      ///@}
 
       friend SPxBasisBase<R>;
       template <class T> friend std::ostream& operator<< (std::ostream& os,
@@ -205,19 +205,19 @@ public:
    private:
 
       //------------------------------------
-      //**@name Data */
-      //@{
+      ///@name Data
+      ///@{
       DataArray < Status > rowstat;   ///< status of rows.
       DataArray < Status > colstat;   ///< status of columns.
       DataArray < Status >* stat;     ///< basis' status.
       DataArray < Status >* costat;   ///< cobasis' status.
-      //@}
+      ///@}
 
    public:
 
       //------------------------------------
-      //**@name Access / modification */
-      //@{
+      ///@name Access / modification
+      ///@{
       /// returns number of columns.
       int nCols() const
       {
@@ -300,21 +300,21 @@ public:
       }
       /// resets dimensions.
       void reSize(int rowDim, int colDim);
-      //@}
+      ///@}
 
       //------------------------------------
-      //**@name Debugging */
-      //@{
+      ///@name Debugging
+      ///@{
       /// Prints out status.
       void dump() const;
 
       /// consistency check.
       bool isConsistent() const;
-      //@}
+      ///@}
 
       //------------------------------------
-      //**@name Construction / destruction */
-      //@{
+      ///@name Construction / destruction
+      ///@{
       /// default constructor
       Desc()
          : stat(0)
@@ -326,7 +326,7 @@ public:
       Desc(const Desc& old);
       /// assignment operator
       Desc& operator=(const Desc& rhs);
-      //@}
+      ///@}
    };
 
 protected:
@@ -360,7 +360,7 @@ protected:
    bool factorized;
 
    /// number of updates before refactorization.
-   /** When a VectorBase<R> of the basis matrix is exchanged by a call to method
+   /** When a vector of the basis matrix is exchanged by a call to method
        #change(), the LU factorization of the matrix is updated
        accordingly. However, after atmost #maxUpdates updates of the
        factorization, it is recomputed in order to regain numerical
@@ -376,7 +376,7 @@ protected:
    R   nonzeroFactor;
 
    /// allowed increase in relative fill before refactorization
-   /** When the R relative fill is bigger than fillFactor times lastFill
+   /** When the real relative fill is bigger than fillFactor times lastFill
     *  the Basis will be refactorized.
     */
    R   fillFactor;
@@ -527,7 +527,7 @@ public:
       return lastin;
    }
 
-   /// returns SPxId of last VectorBase<R> that left the basis.
+   /// returns SPxId of last vector that left the basis.
    inline SPxId lastLeft() const
    {
       return lastout;
@@ -580,21 +580,21 @@ public:
        - \f$x \leftarrow x^TB\f$  in the rowwise case.
 
        Both can be seen uniformly as multiplying the basis matrix \p B with
-       a VectorBase<R> \p x aligned the same way as the \em vectors of \p B.
+       a vector \p x aligned the same way as the \em vectors of \p B.
    */
    VectorBase<R>& multBaseWith(VectorBase<R>& x) const;
 
    /// Basis-vector product
    void multBaseWith(SSVectorBase<R>& x, SSVectorBase<R>& result) const;
 
-   /// VectorBase<R>-basis product.
+   /// Vector-basis product.
    /** Depending on the representation, for a #SPxBasisBase B,
        B.multWithBase(x) computes
        - \f$x \leftarrow x^TB\f$  in the columnwise case and
        - \f$x \leftarrow Bx\f$    in the rowwise case.
 
        Both can be seen uniformly as multiplying the basis matrix \p B with
-       a VectorBase<R> \p x aligned the same way as the \em covectors of \p B.
+       a vector \p x aligned the same way as the \em covectors of \p B.
    */
    VectorBase<R>& multWithBase(VectorBase<R>& x) const;
 
@@ -666,7 +666,7 @@ public:
        - \f$x \leftarrow rhs^TB^{-1}\f$     in the rowwise case.
 
        Both can be seen uniformly as solving a linear system with the basis
-       matrix \p B and a right handside VectorBase<R> \p x aligned the same way as
+       matrix \p B and a right handside vector \p x aligned the same way as
        the \em vectors of \p B.
    */
    void solve4update(SSVectorBase<R>& x, const SVectorBase<R>& rhs)
@@ -729,7 +729,7 @@ public:
        - \f$x \leftarrow B^{-1}rhs\f$       in the rowwise case.
 
        Both can be seen uniformly as solving a linear system with the basis
-       matrix \p B and a right handside VectorBase<R> \p x aligned the same way as
+       matrix \p B and a right handside vector \p x aligned the same way as
        the \em covectors of \p B.
    */
    void coSolve(VectorBase<R>& x, const VectorBase<R>& rhs)
@@ -828,7 +828,7 @@ public:
    /**@name Miscellaneous */
    //@{
    /// performs basis update.
-   /** Changes the \p i 'th VectorBase<R> of the basis with the VectorBase<R> associated to
+   /** Changes the \p i 'th vector of the basis with the vector associated to
        \p id. This includes:
        - updating the factorization, or recomputing it from scratch by
        calling   \ref soplex::SPxSolverBase<R>::factorize()   "factorize()",
@@ -842,12 +842,12 @@ public:
        cannot know about how to set up the status of the involved variables
        correctly.
 
-       A VectorBase<R> \p enterVec may be passed for a fast ETA update of the LU
+       A vector \p enterVec may be passed for a fast ETA update of the LU
        factorization associated to the basis. It must be initialized with
-       the solution VectorBase<R> \f$x\f$ of the right linear system \f$Bx = b\f$
-       with the entering VectorBase<R> as right-hand side VectorBase<R> \f$b\f$, where \f$B\f$
+       the solution vector \f$x\f$ of the right linear system \f$Bx = b\f$
+       with the entering vector as right-hand side vector \f$b\f$, where \f$B\f$
        denotes the basis matrix. This can be computed using method #solve().
-       When using FAST updates, a VectorBase<R> \p eta may be passed for
+       When using FAST updates, a vector \p eta may be passed for
        improved performance. It must be initialized by a call to
        factor->solveRightUpdate() as described in SLinSolver. The
        implementation hidden behind FAST updates depends on the

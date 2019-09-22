@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -55,7 +55,7 @@ public:
 
    //-------------------------------------
    /**@name Constructors / destructors */
-   //@{
+   ///@{
    /// default constructor
    SPxDantzigPR()
       : SPxPricer<R>("Dantzig")
@@ -82,17 +82,17 @@ public:
    {
       return new SPxDantzigPR(*this);
    }
-   //@}
+   ///@}
 
 
    //-------------------------------------
    /**@name Select enter/leave */
-   //@{
+   ///@{
    ///
    virtual int selectLeave();
    ///
    virtual SPxId selectEnter();
-   //@}
+   ///@}
 };
 } // namespace soplex
 

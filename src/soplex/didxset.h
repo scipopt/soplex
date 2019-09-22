@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -45,7 +45,7 @@ public:
 
    //-----------------------------------
    /**@name Adding */
-   //@{
+   ///@{
    /// adds \p n uninitialized indices.
    void add(int n)
    {
@@ -90,11 +90,11 @@ public:
     *  only.
     */
    void setMax(int newmax = 1);
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor. \p n gives the initial size of the index space.
    explicit DIdxSet(int n = 8);
 
@@ -128,7 +128,7 @@ public:
    }
    /// destructor.
    virtual ~DIdxSet();
-   //@}
+   ///@}
 };
 
 } // namespace soplex

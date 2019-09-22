@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -80,7 +80,7 @@ class SPxMainSM;
  *  \f]
  *  suitable for solving with SoPlex. This includes:
  *  - SVSetBase%s for both columns and rows
- *  - objective VectorBase<R>
+ *  - objective Vector
  *  - upper and lower bound Vectors for variables (\f$l_c\f$ and \f$u_c\f$)
  *  - upper and lower bound Vectors for inequalities (\f$l_r\f$ and \f$u_r\f$)
  *
@@ -90,7 +90,7 @@ class SPxMainSM;
  *
  *  Further, equality constraints are modeled by \f$l_r = u_r\f$.  Analogously, fixed variables have \f$l_c = u_c\f$.
  *
- *  #SPxLPBase%s are saved as an SVSetBase<R> , both for columns and rows. Note that this is redundant but eases the access.
+ *  #SPxLPBase%s are saved as an SVSet, both for columns and rows. Note that this is redundant but eases the access.
  */
 
 
@@ -109,7 +109,7 @@ public:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Types */
-   //@{
+   ///@{
 
    /// Optimization sense.
    enum SPxSense
@@ -118,7 +118,7 @@ public:
       MINIMIZE = -1
    };
 
-   //@}
+   ///@}
 
 private:
 
@@ -132,7 +132,7 @@ private:
    SPxScaler<R>*
    lp_scaler;             ///< points to the scaler if the lp has been scaled, to nullptr otherwise
 
-   //@}
+   ///@}
 
 public:
 
@@ -341,7 +341,7 @@ public:
    /// Returns left hand side of row with identifier \p id.
    R lhsUnscaled(const SPxRowId& id) const;
 
-   /// Returns the inequality type of the \p i'th LPRowBase<R>.
+   /// Returns the inequality type of the \p i'th LPRow.
    typename LPRowBase<R>::Type rowType(int i) const
    {
       return LPRowSetBase<R>::type(i);
@@ -1343,7 +1343,7 @@ public:
          << "    max. abs. value : " << R(maxAbsNzo()) << "\n";
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Manipulation */

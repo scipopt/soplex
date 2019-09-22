@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -45,7 +45,7 @@ class SPxHybridPR : public SPxPricer<R>
 {
    //-------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    /// steepest edge pricer
    SPxSteepPR<R>   steep;
    /// partial multiple pricer
@@ -62,7 +62,7 @@ public:
 
    //-------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    /// sets the epsilon
    virtual void setEpsilon(R eps);
    /// sets the solver
@@ -89,14 +89,14 @@ public:
 
    //-------------------------------------
    /**@name Consistency check */
-   //@{
+   ///@{
    /// consistency check
    virtual bool isConsistent() const;
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    SPxHybridPR()
       : SPxPricer<R>("Hybrid")
@@ -167,7 +167,7 @@ public:
    {
       return new SPxHybridPR(*this);
    }
-   //@}
+   ///@}
 };
 
 } // namespace soplex

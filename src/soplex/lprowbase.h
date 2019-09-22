@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -50,20 +50,20 @@ private:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Data */
-   //@{
+   ///@{
 
    R left;                 ///< left-hand side of the constraint
    R right;                ///< right-hand side of the constraint
    R object;               ///< objective coefficient of corresponding slack variable s = vec times primal
    DSVectorBase<R> vec;    ///< the row vector
 
-   //@}
+   ///@}
 
 public:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Types */
-   //@{
+   ///@{
 
    /// (In)Equality type of an LP row.
    /** #LPRowBase%s may be of one of the following Types. This datatype may be used for constructing new #LPRowBase%s in the
@@ -77,11 +77,11 @@ public:
       RANGE                ///< \f$\lambda \le a^Tx \le \rho\f$.
    };
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
 
    /// Constructs LPRowBase with a vector ready to hold \p defDim nonzeros.
    explicit LPRowBase<R>(int defDim = 0)
@@ -144,11 +144,11 @@ public:
    ~LPRowBase()
    {}
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
 
    /// Gets type of row.
    Type type() const
@@ -255,11 +255,11 @@ public:
       vec = p_vec;
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Consistency check */
-   //@{
+   ///@{
 
    /// Checks consistency.
    bool isConsistent() const
@@ -271,7 +271,7 @@ public:
 #endif
    }
 
-   //@}
+   ///@}
 };
 
 } // namespace soplex

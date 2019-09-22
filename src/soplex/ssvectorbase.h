@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -26,6 +26,8 @@
 #include "soplex/vectorbase.h"
 #include "soplex/idxset.h"
 #include "soplex/spxalloc.h"
+#include "soplex/timer.h"
+#include "soplex/stablesum.h"
 
 namespace soplex
 {
@@ -52,7 +54,7 @@ private:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Data */
-   //@{
+   ///@{
 
    /// Is the SSVectorBase set up?
    bool setupStatus;
@@ -71,7 +73,7 @@ private:
       spx_realloc(idx, len);
    }
 
-   //@}
+   ///@}
 
 public:
 
@@ -92,7 +94,7 @@ public:
     *  - forceSetup(): This method sets the status to ``setup'' without verifying that the IdxSet correctly contains all
     *                  nonzero indices. It may be used when the nonzero indices have been computed externally.
     */
-   //@{
+   ///@{
 
    /// Only used in slufactor.hpp.
    R* get_ptr()
@@ -163,11 +165,11 @@ public:
       setupStatus = true;
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Methods for setup SSVectorBases */
-   //@{
+   ///@{
 
    /// Returns index of the \p n 'th nonzero element.
    int index(int n) const
@@ -276,11 +278,11 @@ public:
       assert(isConsistent());
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Methods independent of the Status */
-   //@{
+   ///@{
 
    /// Returns \p i 'th value.
    R operator[](int i) const
@@ -327,11 +329,11 @@ public:
       return *this;
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Arithmetic operations */
-   //@{
+   ///@{
 
    /// Addition.
    template < class S >
@@ -431,7 +433,7 @@ public:
    {
       setup();
 
-      R x = R(0);
+      StableSum<R> x;
       int i = size() - 1;
       int j = w.size() - 1;
 
@@ -500,7 +502,8 @@ public:
 
    /// Assigns SSVectorBase to \f$A \cdot x\f$ for a setup \p x.
    template < class S, class T >
-   SSVectorBase<R>& assign2product4setup(const SVSetBase<S>& A, const SSVectorBase<T>& x);
+   SSVectorBase<R>& assign2product4setup(const SVSetBase<S>& A, const SSVectorBase<T>& x,
+                                         Timer* timeSparse, Timer* timeFull, int& nCallsSparse, int& nCallsFull);
 
 public:
 
@@ -551,11 +554,11 @@ public:
       return spxSqrt(R(length2()));
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Miscellaneous */
-   //@{
+   ///@{
 
    /// Dimension of VectorBase.
    int dim() const
@@ -649,11 +652,11 @@ public:
 #endif
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Constructors / Destructors */
-   //@{
+   ///@{
 
    /// Default constructor.
    explicit SSVectorBase<R>(int p_dim, R p_eps = Param::epsilon())
@@ -884,13 +887,13 @@ public:
          spx_free(idx);
    }
 
-   //@}
+   ///@}
 
 private:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Private helpers */
-   //@{
+   ///@{
 
    /// Assignment helper.
    template < class S, class T >
@@ -904,7 +907,7 @@ private:
    template < class S, class T >
    SSVectorBase<R>& assign2productFull(const SVSetBase<S>& A, const SSVectorBase<T>& x);
 
-   //@}
+   ///@}
 };
 
 } // namespace soplex

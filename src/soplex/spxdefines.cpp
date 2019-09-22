@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -42,10 +42,18 @@ THREADLOCAL Real Param::s_epsilon_update        = DEFAULT_EPS_UPDATE;
 
 THREADLOCAL Real Param::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
 
-void Param::setEpsilonFactorization(Real eps)
+bool msginconsistent(const char* name, const char* file, int line)
 {
-   s_epsilon_factorization = eps;
+   assert(name != 0);
+   assert(file != 0);
+   assert(line >= 0);
+
+   MSG_ERROR(std::cerr << file << "(" << line << ") "
+             << "Inconsistency detected in " << name << std::endl;)
+
+   return 0;
 }
+
 
 Real Param::epsilon()
 {
@@ -62,6 +70,12 @@ Real Param::epsilonFactorization()
 {
    return s_epsilon_factorization;
 }
+
+void Param::setEpsilonFactorization(Real eps)
+{
+   s_epsilon_factorization = eps;
+}
+
 
 Real Param::epsilonUpdate()
 {
@@ -83,17 +97,6 @@ void Param::setEpsilonPivot(Real eps)
    s_epsilon_pivot = eps;
 }
 
-bool msginconsistent(const char* name, const char* file, int line)
-{
-   assert(name != 0);
-   assert(file != 0);
-   assert(line >= 0);
-
-   MSG_ERROR(std::cerr << file << "(" << line << ") "
-             << "Inconsistency detected in " << name << std::endl;)
-
-   return 0;
-}
 
 template <>
 Real spxFrexp(Real y, int* exp)

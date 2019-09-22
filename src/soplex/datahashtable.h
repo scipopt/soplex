@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -79,7 +79,7 @@ private:
 
    //-----------------------------------
    /**@name Types */
-   //@{
+   ///@{
    /// template class for elements stored in the hash table
    template < class ElemHashItem, class ElemInfo >
    class Element
@@ -98,11 +98,11 @@ private:
       } stat;
    };
    typedef Element< HashItem, Info > Elem;
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Data */
-   //@{
+   ///@{
    /// stores all elements of the hash table
    DataArray < Elem > m_elem;
    /// increment added to hash index, if allready used
@@ -118,13 +118,13 @@ private:
    /// number of stored prime numbers
    int nprimes;
 
-   //@}
+   ///@}
 
 public:
 
    //-----------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    /// Is item \p h present in DataHashTable?
    bool has(const HashItem& h) const
    {
@@ -226,11 +226,11 @@ public:
          if(save[i].stat == Elem::USED)
             add(save[i].item, save[i].info);
    }
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Debugging */
-   //@{
+   ///@{
    /// checks whether DataHashTable is consistent
    bool isConsistent() const
    {
@@ -256,11 +256,11 @@ public:
       return true;
 #endif
    }
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor.
    /** Allocates a DataHashTable for \p maxsize entries using \p hashfun
     *  as hash function. If \p hashsize > 0, #m_hashsize is set to the
@@ -365,13 +365,13 @@ public:
       assert(m_memfactor > 1.0);
       assert(isConsistent());
    }
-   //@}
+   ///@}
 
 private:
 
    //-----------------------------------
    /**@name Helpers */
-   //@{
+   ///@{
    /// determine a good \ref soplex::DataHashTable::m_hashsize "m_hashsize".
    /** Determine next larger prime number for new #m_hashsize
     *  @return good value for #m_hashsize
@@ -480,7 +480,7 @@ private:
 
       return -1;
    }
-   //@}
+   ///@}
 
 };
 

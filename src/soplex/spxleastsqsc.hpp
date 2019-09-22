@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -117,7 +117,9 @@ static inline void updateRes(
    else
       resvec *= eprev;
 
-   tmpvec.assign2product4setup(facset, resvecprev);
+   int dummy1 = 0;
+   int dummy2 = 0;
+   tmpvec.assign2product4setup(facset, resvecprev, 0, 0, dummy1, dummy2);
    tmpvec.setup();
    resvec += tmpvec;
 
@@ -312,8 +314,10 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    assert(colscale1.isSetup());
    assert(colscale2.isSetup());
 
-   // compute first residual VectorBase<R> r0
-   resncols = collogs - tmpcols.assign2product4setup(facnrows, rowlogs);
+   // compute first residual vector r0
+   int dummy1 = 0;
+   int dummy2 = 0;
+   resncols = collogs - tmpcols.assign2product4setup(facnrows, rowlogs, 0, 0, dummy1, dummy2);
 
    resncols.setup();
    resnrows.setup();

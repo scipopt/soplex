@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -74,9 +74,9 @@ public:
 
       //------------------------------
       /**@name Private Data */
-      //@{
+      ///@{
       static const char deflt;     ///< default zero string.
-      //@}
+      ///@}
 
    public:
 
@@ -88,7 +88,7 @@ public:
 
       //------------------------------
       /**@name Friends */
-      //@{
+      ///@{
       /// equality operator.
       friend int operator==(const Name& n1, const Name& n2)
       {
@@ -99,21 +99,21 @@ public:
       {
          return out << n.name;
       }
-      //@}
+      ///@}
 
       //------------------------------
       /**@name Debugging */
-      //@{
+      ///@{
       /// consistency check.
       bool isConsistent() const
       {
          return (name != 0);
       }
-      //@}
+      ///@}
 
       //------------------------------------
       /**@name Constructors / destructors */
-      //@{
+      ///@{
       /// default constructor.
       Name()
          : name(&deflt)
@@ -128,14 +128,14 @@ public:
       Name(const char* str)
          : name(str)
       {}
-      //@}
+      ///@}
    };
 
 private:
 
    //------------------------------
    /**@name Data */
-   //@{
+   ///@{
    DataSet < int > set;  ///< name set.
    char* mem;            ///< string memory
    int memmax;           ///< size of string memory
@@ -145,13 +145,13 @@ private:
        detailed description of the concept of Keys.
    */
    DataHashTable < Name, DataKey > hashtab;  ///< hashtable for names
-   //@}
+   ///@}
 
 public:
 
    //------------------------------
    /**@name Inquiry */
-   //@{
+   ///@{
    /// returns \p num 'th name of NameSet.
    const char* operator[](int pnum) const
    {
@@ -246,11 +246,11 @@ public:
    {
       return set.has(pkey);
    }
-   //@}
+   ///@}
 
    //----------------------------
    /**@name Extension */
-   //@{
+   ///@{
    ///
    void add(const char* str);
    /// adds name \p str to NameSet.
@@ -260,12 +260,12 @@ public:
    void add(const NameSet& set);
    /// adds all names in \p set to NameSet.
    void add(DataKey key[], const NameSet& nset);
-   //@}
+   ///@}
 
 
    //----------------------------
    /**@name Shrinking */
-   //@{
+   ///@{
    /// removes name with DataKey \p key from NameSet.
    void remove(const DataKey& key);
 
@@ -289,12 +289,12 @@ public:
 
    /// removes all names from NameSet.
    void clear();
-   //@}
+   ///@}
 
 
    //----------------------------
    /**@name Memory Control */
-   //@{
+   ///@{
    /// resets max() to \p newmax.
    void reMax(int newmax = 0);
 
@@ -303,12 +303,12 @@ public:
 
    /// garbage collection.
    void memPack();
-   //@}
+   ///@}
 
 
    //----------------------------
    /**@name Control Parameters */
-   //@{
+   ///@{
    /// memory extension factor for entries.
    /** When more than max() names are added to a NameSet, it is
        automatically resized to fit the additional names. Parameter
@@ -324,18 +324,18 @@ public:
        factor by which this memory is extended to do so.
     */
    Real memFactor;
-   //@}
+   ///@}
 
    //----------------------------
    /**@name Miscellaneous */
-   //@{
+   ///@{
    /// consistency check.
    bool isConsistent() const;
-   //@}
+   ///@}
 
    //--------------------------------------
    /**@name Constructors / Destructors */
-   //@{
+   ///@{
    /// default constructor.
    /** @param      max     start value for max()
     *  @param      mmax    start value for memMax()
@@ -350,19 +350,19 @@ public:
 
    /// destructor.
    ~NameSet();
-   //@}
+   ///@}
 
 private:
 
    //--------------------------------------
    /**@name Blocked */
-   //@{
+   ///@{
    /// copy constructor.
    NameSet(const NameSet& old);
 
    /// assignment operator.
    NameSet& operator=(const NameSet& rhs);
-   //@}
+   ///@}
 };
 
 extern std::ostream& operator<<(std::ostream& s, const NameSet& nset);

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -68,7 +68,7 @@ protected:
 
    //--------------------------------
    /**@name Protected data */
-   //@{
+   ///@{
    bool       usetup;        ///< TRUE iff update vector has been setup
    UpdateType uptype;        ///< the current \ref soplex::SLUFactor<R>::UpdateType "UpdateType".
    SSVectorBase<R>    eta;           ///<
@@ -79,7 +79,7 @@ protected:
 
    //--------------------------------
    /**@name Control Parameters */
-   //@{
+   ///@{
    /// minimum threshold to use.
    R minThreshold;
    /// minimum stability to achieve by setting threshold.
@@ -91,13 +91,13 @@ protected:
    Timer::TYPE timerType;
    /// Number of solves
    int     solveCount;
-   //@}
+   ///@}
 
 protected:
 
    //--------------------------------
    /**@name Protected helpers */
-   //@{
+   ///@{
    ///
    void freeAll();
    ///
@@ -109,7 +109,7 @@ public:
 
    //--------------------------------
    /**@name Update type */
-   //@{
+   ///@{
    /// returns the current update type uptype.
    UpdateType utype() const
    {
@@ -128,11 +128,11 @@ public:
    /// sets minimum Markowitz threshold.
    void setMarkowitz(R m)
    {
-      if(m < 0.01)
-         m = 0.01;
+      if(m < 0.0001)
+         m = 0.0001;
 
-      if(m > 0.99)
-         m = 0.99;
+      if(m > 0.9999)
+         m = 0.9999;
 
       minThreshold = m;
       lastThreshold = m;
@@ -143,14 +143,14 @@ public:
    {
       return lastThreshold;
    }
-   //@}
+   ///@}
 
    //--------------------------------
    /**@name Derived from SLinSolver
       See documentation of \ref soplex::SLinSolver "SLinSolver" for a
       documentation of these methods.
    */
-   //@{
+   ///@{
    ///
    void clear();
    ///
@@ -191,7 +191,7 @@ public:
 
    //--------------------------------
    /**@name Solve */
-   //@{
+   ///@{
    /// Solves \f$Ax=b\f$.
    void solveRight(VectorBase<R>& x, const VectorBase<R>& b);
    void solveRight(SSVectorBase<R>& x, const SSVectorBase<R>& b)
@@ -241,7 +241,7 @@ public:
 
    //--------------------------------
    /**@name Miscellaneous */
-   //@{
+   ///@{
    /// time spent in factorizations
    // @todo fix the return type from of the type form Real to a cpp time (Refactoring) TODO
    Real getFactorTime() const
@@ -282,16 +282,22 @@ public:
       this->factorCount = 0;
       solveCount = 0;
    }
+   void changeTimer(const Timer::TYPE ttype)
+   {
+      solveTime = TimerFactory::switchTimer(solveTime, ttype);
+      this->factorTime = TimerFactory::switchTimer(this->factorTime, ttype);
+      timerType = ttype;
+   }
    /// prints the LU factorization to stdout.
    void dump() const;
 
    /// consistency check.
    bool isConsistent() const;
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Constructors / Destructors */
-   //@{
+   ///@{
    /// default constructor.
    SLUFactor<R>();
    /// assignment operator.
@@ -305,13 +311,13 @@ public:
    {
       return new SLUFactor<R>(*this);
    }
-   //@}
+   ///@}
 
 private:
 
    //------------------------------------
    /**@name Private helpers */
-   //@{
+   ///@{
    /// used to implement the assignment operator
    void assign(const SLUFactor<R>& old);
    //@}
