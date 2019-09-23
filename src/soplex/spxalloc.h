@@ -46,13 +46,7 @@ namespace soplex
  */
 
 template <class T>
-inline void spx_alloc(T& p)   // workaround for a default
-{
-   spx_alloc<T, std::size_t>(p, 1);
-}
-
-template <class T, typename size_type>
-inline void spx_alloc(T& p, size_type n)
+inline void spx_alloc(T& p, int n = 1)
 {
    assert(p == 0);
    assert(n >= 0);
