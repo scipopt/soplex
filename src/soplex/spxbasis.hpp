@@ -1395,7 +1395,7 @@ SPxBasisBase<R>::~SPxBasisBase<R>()
       factor = 0;
    }
 
-   spx_free(theTime);
+   delete(theTime);
 }
 
 template <class R>

@@ -1346,10 +1346,8 @@ SLUFactor<R>::~SLUFactor<R>()
 {
    freeAll();
 
-   solveTime->~Timer();
-   this->factorTime->~Timer();
-   spx_free(solveTime);
-   spx_free(this->factorTime);
+   delete solveTime;
+   delete this->factorTime;
 }
 
 template <class R>

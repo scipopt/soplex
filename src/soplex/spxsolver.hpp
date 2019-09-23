@@ -1180,8 +1180,7 @@ void SPxSolverBase<R>::setType(Type tp)
 
       // free timer
       assert(theTime);
-      theTime->~Timer();
-      spx_free(theTime);
+      delete theTime;
    }
 
 

@@ -157,9 +157,8 @@ public:
    /// destructor.
    virtual ~SPxSimplifier()
    {
-      m_name = 0;
-      m_timeUsed->~Timer();
-      spx_free(m_timeUsed);
+      m_name = nullptr;
+      delete m_timeUsed;
    }
    /// clone function for polymorphism
    virtual SPxSimplifier* clone() const = 0;
