@@ -112,14 +112,6 @@ Real spxLdexp(Real x, int exp)
    return ldexp(x, exp);
 }
 
-Rational spxLdexp(Rational x, int exp)
-{
-   // This call shouldn't happen. This is a dummy function to deal with the
-   // Rational Scalar issue.
-   assert(false);
-   return 0;
-}
-
 
 
 

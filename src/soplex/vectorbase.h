@@ -601,9 +601,8 @@ Rational VectorBase<Rational>::operator*(const VectorBase<Rational>& vec) const
    x *= vec.val[0];
 
    auto dimen = dim();
-   auto vDimen = vec.dim();
 
-   for(decltype(dimen) i = 1; i < dimen && i < vDimen; i++)
+   for(decltype(dimen) i = 1; i < dimen; i++)
       x.addProduct(val[i], vec.val[i]);
 
    return x;

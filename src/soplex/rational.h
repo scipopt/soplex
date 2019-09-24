@@ -319,70 +319,6 @@ public:
 
    ///@}
 
-   friend int compareRational(const Rational& r, const Rational& s);
-   friend bool operator!=(const Rational& r, const Rational& s);
-   friend bool operator==(const Rational& r, const Rational& s);
-   friend bool operator<(const Rational& r, const Rational& s);
-   friend bool operator<=(const Rational& r, const Rational& s);
-   friend bool operator>(const Rational& r, const Rational& s);
-   friend bool operator>=(const Rational& r, const Rational& s);
-
-   friend bool operator!=(const Rational& r, const double& s);
-   friend bool operator==(const Rational& r, const double& s);
-   friend bool operator<(const Rational& r, const double& s);
-   friend bool operator<=(const Rational& r, const double& s);
-   friend bool operator>(const Rational& r, const double& s);
-   friend bool operator>=(const Rational& r, const double& s);
-
-   friend bool operator!=(const double& r, const Rational& s);
-   friend bool operator==(const double& r, const Rational& s);
-   friend bool operator<(const double& r, const Rational& s);
-   friend bool operator<=(const double& r, const Rational& s);
-   friend bool operator>(const double& r, const Rational& s);
-   friend bool operator>=(const double& r, const Rational& s);
-
-   friend bool operator!=(const Rational& r, const long double& s);
-   friend bool operator==(const Rational& r, const long double& s);
-   friend bool operator<(const Rational& r, const long double& s);
-   friend bool operator<=(const Rational& r, const long double& s);
-   friend bool operator>(const Rational& r, const long double& s);
-   friend bool operator>=(const Rational& r, const long double& s);
-
-   friend bool operator!=(const long double& r, const Rational& s);
-   friend bool operator==(const long double& r, const Rational& s);
-   friend bool operator<(const long double& r, const Rational& s);
-   friend bool operator<=(const long double& r, const Rational& s);
-   friend bool operator>(const long double& r, const Rational& s);
-   friend bool operator>=(const long double& r, const Rational& s);
-
-   friend Rational operator+(const double& d, const Rational& r);
-   friend Rational operator-(const double& d, const Rational& r);
-   friend Rational operator*(const double& d, const Rational& r);
-   friend Rational operator/(const double& d, const Rational& r);
-
-   friend bool operator!=(const Rational& r, const int& s);
-   friend bool operator==(const Rational& r, const int& s);
-   friend bool operator<(const Rational& r, const int& s);
-   friend bool operator<=(const Rational& r, const int& s);
-   friend bool operator>(const Rational& r, const int& s);
-   friend bool operator>=(const Rational& r, const int& s);
-
-   friend bool operator!=(const int& r, const Rational& s);
-   friend bool operator==(const int& r, const Rational& s);
-   friend bool operator<(const int& r, const Rational& s);
-   friend bool operator<=(const int& r, const Rational& s);
-   friend bool operator>(const int& r, const Rational& s);
-   friend bool operator>=(const int& r, const Rational& s);
-
-   friend Rational operator+(const int& d, const Rational& r);
-   friend Rational operator-(const int& d, const Rational& r);
-   friend Rational operator*(const int& d, const Rational& r);
-   friend Rational operator/(const int& d, const Rational& r);
-
-   friend Rational spxAbs(const Rational& r);
-   friend int sign(const Rational& r);
-   friend Rational operator-(const Rational& q);
-
    ///@name Friends
    ///@{
 
@@ -1011,6 +947,24 @@ Rational::Rational(const boost::multiprecision::number<T, eto>& q)
 }
 
 #endif  // SOPLEX_WITH_GMP
+
+// A dummy function to deal with the rational scalar issue. This will never be
+// called
+inline Rational spxFrexp(Rational r, int* d)
+{
+  assert(false);
+  return Rational(0);
+}
+
+// same as before
+inline Rational spxLdexp(Rational x, int exp)
+{
+  // This call shouldn't happen. This is a dummy function to deal with the
+  // Rational Scalar issue.
+  assert(false);
+  return 0;
+}
+
 
 
 //@}
