@@ -133,7 +133,6 @@ if(Boost)
   find_package(Boost 1.58.0 COMPONENTS program_options REQUIRED) # Refer to comments in cmake/Modules/FindBoost.cmake
   if(BOOST_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
-    set(libs ${libs} ${Boost_LIBRARIES})
   endif()
 endif()
 
