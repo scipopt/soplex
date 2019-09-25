@@ -117,8 +117,6 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
 
 
    int solvemode = 1;
-   unsigned int precision = 100;
-
 
    // a special case for working with ./soplex file.mps, i.e., without
    // explicitly doing ./soplex --lpfile=file.mps
@@ -387,19 +385,13 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
    ("real:min_markowitz", po::value<double>()->default_value(0.01)->notifier(args::checkRange(0.0001,
          0.9999, "real:min_markowitz")), "minimal Markowitz threshold in LU factorization");
 
-   po::options_description mpf("Multiprecision float solve");
-   mpf.add_options()
-   ("precision", po::value<unsigned int>(&precision)->default_value(100u),
-    "Minimum precision (number of decimal digits) of mpf float")
-   ("mpfdebug", "Run templated multi-precision SoPlex with boost debug adaptor");
-
    po::options_description allOpt("Allowed options");
-   allOpt.add(generic).add(general).add(lt).add(algo).add(display).add(mpf).add(intParam).add(
+   allOpt.add(generic).add(general).add(lt).add(algo).add(display).add(intParam).add(
       realParam).add(boolParam);
 
    // This will contain a subsection of the options, i.e., without intParam, realParam, boolParam and rationalParam
    po::options_description liteOpt("Allowed options");
-   liteOpt.add(generic).add(general).add(lt).add(algo).add(display).add(mpf);
+   liteOpt.add(generic).add(general).add(lt).add(algo).add(display);
 
    try
    {
@@ -479,28 +471,6 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
       case 2:                 // iterative refinement
          runSoPlex<Real>(vm);
          break;
-         // TODO: Will be uncommented after merging soplex-mpf into master
-         // case 3:                 // soplex mpf
-         //   using namespace boost::multiprecision;
-
-
-         //   // et_off means the expression templates options is turned off. TODO:
-         //   // The documentation also mentions about static vs dynamic memory
-         //   // allocation for the mpfr types. Is it relevant here? I probably also
-         //   // need to have the mpfr_float_eto in the global soplex namespace
-         //   using mpfr_float_eto = number<mpfr_float_backend<0>, et_off>;
-         //   using mpfr_debug = number<debug_adaptor<mpfr_float_backend<0>>, et_off>;
-
-         //   if(!vm.count("mpfdebug"))
-         //     {
-         //       mpfr_float_eto::default_precision(precision);
-         //       runSoPlex<mpfr_float_eto>(vm);
-         //     }
-         //   else
-         //     {
-         //       mpfr_debug::default_precision(precision);
-         //       runSoPlex<mpfr_debug>(vm);
-         //     }
 
          break;
 
