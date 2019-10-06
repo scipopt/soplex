@@ -155,7 +155,7 @@ void SoPlexBase<R>::Statistics::print(std::ostream& os)
    Real solTime = solvingTime->time();
    Real totTime = readingTime->time() + solTime;
    Real otherTime = solTime - syncTime->time() - transformTime->time() - preprocessingTime->time() -
-                 simplexTime->time() - rationalTime->time();
+                    simplexTime->time() - rationalTime->time();
 
    R avgPrimalDegeneracy = iterationsPrimal > 0 ? sumPrimalDegen / iterationsPrimal : 0.0;
    R avgDualDegeneracy = (iterations - iterationsPrimal) > 0 ?

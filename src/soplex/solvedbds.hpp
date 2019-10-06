@@ -891,7 +891,8 @@ void SoPlexBase<R>::_decompSimplifyAndSolve(SPxSolverBase<R>& solver, SLUFactor<
       bool fromScratch, bool applyPreprocessing)
 {
    if(realParam(SoPlexBase<R>::TIMELIMIT) < realParam(SoPlexBase<R>::INFTY))
-     solver.setTerminationTime(Real(realParam(SoPlexBase<R>::TIMELIMIT)) - _statistics->solvingTime->time());
+      solver.setTerminationTime(Real(realParam(SoPlexBase<R>::TIMELIMIT)) -
+                                _statistics->solvingTime->time());
 
    solver.changeObjOffset(realParam(SoPlexBase<R>::OBJ_OFFSET));
    _statistics->preprocessingTime->start();

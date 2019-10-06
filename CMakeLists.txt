@@ -22,7 +22,6 @@ include(CPack)
 option(ZLIB "Use ZLIB" ON)
 option(GMP "Use GMP" ON)
 option(STATIC_GMP "Prefer static GMP lib" OFF)
-option(MPFR "Use MPFR" ON)
 option(Boost "Use Boost" ON)
 option(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS "Export all symbols into the DLL" ON)
 option(MT "use static runtime libraries for Visual Studio compiler" OFF)
@@ -123,14 +122,6 @@ if(MPFR)
   endif()
 endif()
 
-if(MPFR)
-  find_package(MPFR)
-  if(MPFR_FOUND)
-    include_directories(${MPFR_INCLUDE_DIRS})
-    set(libs ${libs} ${MPFR_LIBRARIES})
-  endif()
-endif()
-
 
 # Made with: https://stackoverflow.com/a/3917033/4223038
 if(Boost)
@@ -144,7 +135,6 @@ if(Boost)
   find_package(Boost 1.58.0 COMPONENTS program_options REQUIRED) # Refer to comments in cmake/Modules/FindBoost.cmake
   if(BOOST_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
-    set(libs ${libs} ${Boost_LIBRARIES})
   endif()
 endif()
 

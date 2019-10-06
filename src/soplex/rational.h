@@ -695,8 +695,8 @@ public:
    }
 
    /// constructor from boost number
-  // Also should satisfy SOPLEX_WITH_GMP
-  #ifdef SOPLEX_WITH_MPFR
+   // Also should satisfy SOPLEX_WITH_GMP
+#ifdef SOPLEX_WITH_MPFR
    template <typename T, boost::multiprecision::expression_template_option eto>
    Private(const boost::multiprecision::number<T, eto>& q)
       : theprev(0)
@@ -706,7 +706,7 @@ public:
       mpq_init(privatevalue);
       mpq_set(privatevalue, tmp.backend().data());
    }
-  #endif
+#endif
 
    /// destructor
    ~Private()
@@ -962,17 +962,17 @@ Rational::Rational(const boost::multiprecision::number<T, eto>& q)
 // called
 inline Rational spxFrexp(Rational r, int* d)
 {
-  assert(false);
-  return Rational(0);
+   assert(false);
+   return Rational(0);
 }
 
 // same as before
 inline Rational spxLdexp(Rational x, int exp)
 {
-  // This call shouldn't happen. This is a dummy function to deal with the
-  // Rational Scalar issue.
-  assert(false);
-  return 0;
+   // This call shouldn't happen. This is a dummy function to deal with the
+   // Rational Scalar issue.
+   assert(false);
+   return 0;
 }
 
 

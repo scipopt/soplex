@@ -7695,9 +7695,10 @@ void SoPlexBase<R>::_solveRealLPAndRecordStatistics()
       _solver.setTerminationIter(-1);
 
    if(realParam(SoPlexBase<R>::TIMELIMIT) < realParam(SoPlexBase<R>::INFTY))
-     _solver.setTerminationTime(Real(realParam(SoPlexBase<R>::TIMELIMIT)) - _statistics->solvingTime->time());
+      _solver.setTerminationTime(Real(realParam(SoPlexBase<R>::TIMELIMIT)) -
+                                 _statistics->solvingTime->time());
    else
-     _solver.setTerminationTime(Real(realParam(SoPlexBase<R>::INFTY)));
+      _solver.setTerminationTime(Real(realParam(SoPlexBase<R>::INFTY)));
 
    // ensure that tolerances are not too small
    if(_solver.feastol() < 1e-12)
