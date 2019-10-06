@@ -106,7 +106,7 @@ LDFLAGS		=
 ARFLAGS		=	cr
 DFLAGS		=	-MM
 
-GMP_LDFLAGS	= -lgmp
+GMP_LDFLAGS	= -lgmp -lmpfr
 GMP_CPPFLAGS	=
 BOOST_LDFLAGS = -lboost_program_options
 

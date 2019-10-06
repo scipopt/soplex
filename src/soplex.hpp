@@ -6532,9 +6532,9 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
       {
          for(int i = 0; i < _realLP->rhs().dim(); i++)
          {
-            if((GE(_realLP->rhs()[i], realParam(SoPlexBase<R>::INFTY)) != (_rationalLP->rhs()[i] >=
+            if((GE(_realLP->rhs()[i], R(realParam(SoPlexBase<R>::INFTY))) != (_rationalLP->rhs()[i] >=
                   _rationalPosInfty))
-                  || (LT(_realLP->rhs()[i], realParam(SoPlexBase<R>::INFTY))
+                  || (LT(_realLP->rhs()[i], R(realParam(SoPlexBase<R>::INFTY)))
                       && _rationalLP->rhs()[i] < _rationalPosInfty
                       && !_rationalLP->rhs()[i].isAdjacentTo((double)_realLP->rhs()[i])))
             {
@@ -6560,9 +6560,9 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
       {
          for(int i = 0; i < _realLP->lhs().dim(); i++)
          {
-            if((LE(_realLP->lhs()[i], -realParam(SoPlexBase<R>::INFTY)) != (_rationalLP->lhs()[i] <=
+            if((LE(_realLP->lhs()[i], R(-realParam(SoPlexBase<R>::INFTY))) != (_rationalLP->lhs()[i] <=
                   _rationalNegInfty))
-                  || (GT(_realLP->lhs()[i], -realParam(SoPlexBase<R>::INFTY))
+                  || (GT(_realLP->lhs()[i], R(-realParam(SoPlexBase<R>::INFTY)))
                       && _rationalLP->lhs()[i] > _rationalNegInfty
                       && !_rationalLP->lhs()[i].isAdjacentTo((double)_realLP->lhs()[i])))
             {
@@ -6614,9 +6614,9 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
       {
          for(int i = 0; i < _realLP->upper().dim(); i++)
          {
-            if((GE(_realLP->upper()[i], realParam(SoPlexBase<R>::INFTY)) != (_rationalLP->upper()[i] >=
+            if((GE(_realLP->upper()[i], R(realParam(SoPlexBase<R>::INFTY))) != (_rationalLP->upper()[i] >=
                   _rationalPosInfty))
-                  || (LT(_realLP->upper()[i], realParam(SoPlexBase<R>::INFTY))
+                  || (LT(_realLP->upper()[i], R(realParam(SoPlexBase<R>::INFTY)))
                       && _rationalLP->upper()[i] < _rationalPosInfty
                       && !_rationalLP->upper()[i].isAdjacentTo((double)_realLP->upper()[i])))
             {
@@ -6642,9 +6642,9 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
       {
          for(int i = 0; i < _realLP->lower().dim(); i++)
          {
-            if((LE(_realLP->lower()[i], -realParam(SoPlexBase<R>::INFTY)) != (_rationalLP->lower()[i] <=
+            if((LE(_realLP->lower()[i], R(-realParam(SoPlexBase<R>::INFTY))) != (_rationalLP->lower()[i] <=
                   _rationalNegInfty))
-                  || (GT(_realLP->lower()[i], -realParam(SoPlexBase<R>::INFTY))
+                  || (GT(_realLP->lower()[i], R(-realParam(SoPlexBase<R>::INFTY)))
                       && _rationalLP->lower()[i] > _rationalNegInfty
                       && !_rationalLP->lower()[i].isAdjacentTo((double)_realLP->lower()[i])))
             {
