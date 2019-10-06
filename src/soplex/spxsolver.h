@@ -2028,9 +2028,9 @@ public:
    /** Limits and status inquiry */
    ///@{
    /// set time limit.
-   virtual void setTerminationTime(R time = R(infinity));
+   virtual void setTerminationTime(Real time = infinity);
    /// return time limit.
-   virtual R terminationTime() const;
+   virtual Real terminationTime() const;
    /// set iteration limit.
    virtual void setTerminationIter(int iteration = -1);
    /// return iteration limit.
@@ -2181,7 +2181,7 @@ public:
    }
 
    /// time spent in last call to method solve().
-   R time() const
+   Real time() const
    {
       return theTime->time();
    }
@@ -2191,13 +2191,13 @@ public:
    bool isTimeLimitReached(const bool forceCheck = false);
 
    /// the maximum runtime
-   R getMaxTime()
+   Real getMaxTime()
    {
       return maxTime;
    }
 
    /// cumulative time spent in all calls to method solve().
-   R cumulativeTime() const
+   Real cumulativeTime() const
    {
       return theCumulativeTime;
    }

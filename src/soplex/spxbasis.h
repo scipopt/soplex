@@ -924,7 +924,7 @@ public:
    bool isConsistent() const;
 
    /// time spent in updates
-   R getTotalUpdateTime() const
+   Real getTotalUpdateTime() const
    {
       return theTime->time();
    }

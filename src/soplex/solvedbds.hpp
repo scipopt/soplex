@@ -891,7 +891,7 @@ void SoPlexBase<R>::_decompSimplifyAndSolve(SPxSolverBase<R>& solver, SLUFactor<
       bool fromScratch, bool applyPreprocessing)
 {
    if(realParam(SoPlexBase<R>::TIMELIMIT) < realParam(SoPlexBase<R>::INFTY))
-      solver.setTerminationTime(realParam(SoPlexBase<R>::TIMELIMIT) - _statistics->solvingTime->time());
+     solver.setTerminationTime(Real(realParam(SoPlexBase<R>::TIMELIMIT)) - _statistics->solvingTime->time());
 
    solver.changeObjOffset(realParam(SoPlexBase<R>::OBJ_OFFSET));
    _statistics->preprocessingTime->start();
@@ -3638,7 +3638,7 @@ void SoPlexBase<R>::printDecompDisplayLine(SPxSolverBase<R>& solver,
 }
 if(force || (_decompDisplayLine % displayFreq == 0))
 {
-   R currentTime = _statistics->solvingTime->time();
+   Real currentTime = _statistics->solvingTime->time();
       (solver.type() == SPxSolverBase<R>::LEAVE) ? spxout << "  L  |" : spxout << "  E  |";
       spxout << std::fixed << std::setw(7) << std::setprecision(1) << currentTime << " |";
       spxout << std::scientific << std::setprecision(2);
@@ -3999,7 +3999,7 @@ bool SoPlexBase<R>::decompTerminate(R timeLimit)
    if(maxTime < 0 || maxTime >= R(infinity))
       return false;
 
-   R currentTime = _statistics->solvingTime->time();
+   Real currentTime = _statistics->solvingTime->time();
 
    if(currentTime >= maxTime)
    {

@@ -152,9 +152,9 @@ void SoPlexBase<R>::Statistics::clearSolvingData()
 template <class R>
 void SoPlexBase<R>::Statistics::print(std::ostream& os)
 {
-   R solTime = solvingTime->time();
-   R totTime = readingTime->time() + solTime;
-   R otherTime = solTime - syncTime->time() - transformTime->time() - preprocessingTime->time() -
+   Real solTime = solvingTime->time();
+   Real totTime = readingTime->time() + solTime;
+   Real otherTime = solTime - syncTime->time() - transformTime->time() - preprocessingTime->time() -
                  simplexTime->time() - rationalTime->time();
 
    R avgPrimalDegeneracy = iterationsPrimal > 0 ? sumPrimalDegen / iterationsPrimal : 0.0;

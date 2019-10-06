@@ -1681,7 +1681,7 @@ void SPxSolverBase<R>::setType(Type tp)
 
 
    template <class R>
-   void SPxSolverBase<R>::setTerminationTime(R p_time)
+   void SPxSolverBase<R>::setTerminationTime(Real p_time)
    {
       if(p_time < 0.0)
          p_time = 0.0;
@@ -1690,7 +1690,7 @@ void SPxSolverBase<R>::setType(Type tp)
    }
 
    template <class R>
-   R SPxSolverBase<R>::terminationTime() const
+   Real SPxSolverBase<R>::terminationTime() const
    {
       return maxTime;
    }
@@ -1724,14 +1724,14 @@ void SPxSolverBase<R>::setType(Type tp)
       // check if the expensive system call to update the time should be skipped again
       if(forceCheck || nCallsToTimelim < NINITCALLS ||  nClckSkipsLeft <= 0)
       {
-         R currtime = time();
+         Real currtime = time();
 
          if(currtime >= maxTime)
             return true;
 
          // determine the number of times the clock can be skipped again.
          int nClckSkips = MAXNCLCKSKIPS;
-         R avgtimeinterval = (currtime + cumulativeTime()) / (R)(nCallsToTimelim);
+         Real avgtimeinterval = (currtime + cumulativeTime()) / (Real)(nCallsToTimelim);
 
          // it would not be safe to skip the clock so many times since we are approaching the time limit
          if(SAFETYFACTOR * (maxTime - currtime) / (avgtimeinterval + 1e-6) < nClckSkips)

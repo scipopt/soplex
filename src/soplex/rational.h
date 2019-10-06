@@ -30,9 +30,17 @@
 
 #include "soplex/spxalloc.h"
 #include "boost/multiprecision/number.hpp"
+
+#ifdef SOPLEX_WITH_MPFR
 #include "boost/multiprecision/mpfr.hpp"
 #include "boost/multiprecision/gmp.hpp"
+#endif
 
+#ifdef SOPLEX_WITH_CPPMPF
+// Note: If SOPLEX_WITH_GMP is not available, then SOPLEX_WITH_MPFR does not
+// make much sense in the Rational class. So this code doesn't make much sense
+#include "boost/multiprecision/cpp_dec_float.hpp"
+#endif
 
 #ifdef SOPLEX_WITH_GMP
 #include "gmp.h"
@@ -687,6 +695,8 @@ public:
    }
 
    /// constructor from boost number
+  // Also should satisfy SOPLEX_WITH_GMP
+  #ifdef SOPLEX_WITH_MPFR
    template <typename T, boost::multiprecision::expression_template_option eto>
    Private(const boost::multiprecision::number<T, eto>& q)
       : theprev(0)
@@ -696,7 +706,7 @@ public:
       mpq_init(privatevalue);
       mpq_set(privatevalue, tmp.backend().data());
    }
-
+  #endif
 
    /// destructor
    ~Private()

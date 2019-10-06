@@ -51,7 +51,7 @@ template <class R>
 bool Validation<R>::updateValidationTolerance(const std::string& tolerance)
 {
    // Will throw boost::bad_lexical_cast if conversion fails
-   validatetolerance = boost::lexical_cast<double>(tolerance);
+   validatetolerance = boost::lexical_cast<R>(tolerance);
    return true;
 }
 
@@ -60,16 +60,16 @@ void Validation<R>::validateSolveReal(SoPlexBase<R>& soplex)
 {
    bool passedValidation = true;
    std::string reason = "";
-   Real objViolation = 0.0;
-   Real maxBoundViolation = 0.0;
-   Real maxRowViolation = 0.0;
-   Real maxRedCostViolation = 0.0;
-   Real maxDualViolation = 0.0;
-   Real sumBoundViolation = 0.0;
-   Real sumRowViolation = 0.0;
-   Real sumRedCostViolation = 0.0;
-   Real sumDualViolation = 0.0;
-   Real sol;
+   R objViolation = 0.0;
+   R maxBoundViolation = 0.0;
+   R maxRowViolation = 0.0;
+   R maxRedCostViolation = 0.0;
+   R maxDualViolation = 0.0;
+   R sumBoundViolation = 0.0;
+   R sumRowViolation = 0.0;
+   R sumRedCostViolation = 0.0;
+   R sumDualViolation = 0.0;
+   R sol;
 
    std::ostream& os = soplex.spxout.getStream(SPxOut::INFO1);
 
@@ -84,7 +84,7 @@ void Validation<R>::validateSolveReal(SoPlexBase<R>& soplex)
    else
    {
       // This will not throw here because it was checked in updateExternalSolution()
-      sol = boost::lexical_cast<double>(validatesolution);
+      sol = boost::lexical_cast<R>(validatesolution);
    }
 
    objViolation = spxAbs(sol - soplex.objValueReal());
@@ -95,7 +95,7 @@ void Validation<R>::validateSolveReal(SoPlexBase<R>& soplex)
           || sol == -soplex.realParam(SoPlexBase<R>::INFTY)))
       objViolation = 0.0;
 
-   if(! EQ(objViolation, 0.0, validatetolerance))
+   if(! EQ(objViolation, R(0.0), validatetolerance))
    {
       passedValidation = false;
       reason += "Objective Violation; ";

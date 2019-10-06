@@ -842,7 +842,7 @@ public:
    int numIterations() const;
 
    /// time spent in last call to solve
-   R solveTime() const;
+   Real solveTime() const;
 
    /// statistical information in form of a string
    std::string statisticString() const;
@@ -1453,11 +1453,11 @@ public:
          /// array of descriptions for real parameters
          std::string description[SoPlexBase<R>::REALPARAM_COUNT];
          /// array of default values for real parameters
-         R defaultValue[SoPlexBase<R>::REALPARAM_COUNT];
+         Real defaultValue[SoPlexBase<R>::REALPARAM_COUNT];
          /// array of lower bounds for real parameter values
-         R lower[SoPlexBase<R>::REALPARAM_COUNT];
+         Real lower[SoPlexBase<R>::REALPARAM_COUNT];
          /// array of upper bounds for real parameter values
-         R upper[SoPlexBase<R>::REALPARAM_COUNT];
+         Real upper[SoPlexBase<R>::REALPARAM_COUNT];
       } realParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
@@ -1485,7 +1485,7 @@ public:
       int _intParamValues[SoPlexBase<R>::INTPARAM_COUNT];
 
       /// array of current real parameter values
-      R _realParamValues[SoPlexBase<R>::REALPARAM_COUNT];
+      Real _realParamValues[SoPlexBase<R>::REALPARAM_COUNT];
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
       /// array of current rational parameter values
@@ -1511,7 +1511,7 @@ public:
    int intParam(const IntParam param) const;
 
    /// returns real parameter value
-   R realParam(const RealParam param) const;
+   Real realParam(const RealParam param) const;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
    /// returns rational parameter value
@@ -1528,7 +1528,7 @@ public:
    bool setIntParam(const IntParam param, const int value, const bool init = true);
 
    /// sets real parameter value; returns true on success
-   bool setRealParam(const RealParam param, const R value, const bool init = true);
+   bool setRealParam(const RealParam param, const Real value, const bool init = true);
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
    /// sets rational parameter value; returns true on success

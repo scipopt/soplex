@@ -5341,7 +5341,7 @@ int SoPlexBase<R>::numIterations() const
 
 /// time spent in last call to solve
 template <class R>
-R SoPlexBase<R>::solveTime() const
+Real SoPlexBase<R>::solveTime() const
 {
    return _statistics->solvingTime->time();
 }
@@ -5440,7 +5440,7 @@ int SoPlexBase<R>::intParam(const IntParam param) const
 
 /// returns real parameter value
 template <class R>
-R SoPlexBase<R>::realParam(const RealParam param) const
+Real SoPlexBase<R>::realParam(const RealParam param) const
 {
    assert(param >= 0);
    assert(param < REALPARAM_COUNT);
@@ -5965,7 +5965,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
 
 /// sets real parameter value; returns true on success
 template <class R>
-bool SoPlexBase<R>::setRealParam(const RealParam param, const R value, const bool init)
+bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const bool init)
 {
    assert(param >= 0);
    assert(param < REALPARAM_COUNT);
@@ -5979,7 +5979,7 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const R value, const boo
       return false;
 
    // required to set a different feastol or opttol
-   R tmp_value = value;
+   Real tmp_value = value;
 
    switch(param)
    {
@@ -7695,9 +7695,9 @@ void SoPlexBase<R>::_solveRealLPAndRecordStatistics()
       _solver.setTerminationIter(-1);
 
    if(realParam(SoPlexBase<R>::TIMELIMIT) < realParam(SoPlexBase<R>::INFTY))
-      _solver.setTerminationTime(realParam(SoPlexBase<R>::TIMELIMIT) - _statistics->solvingTime->time());
+     _solver.setTerminationTime(Real(realParam(SoPlexBase<R>::TIMELIMIT)) - _statistics->solvingTime->time());
    else
-      _solver.setTerminationTime(realParam(SoPlexBase<R>::INFTY));
+     _solver.setTerminationTime(Real(realParam(SoPlexBase<R>::INFTY)));
 
    // ensure that tolerances are not too small
    if(_solver.feastol() < 1e-12)
@@ -8549,12 +8549,12 @@ bool SoPlexBase<R>::parseSettingsString(const std::string str, boost::any val)
          if(param >= REALPARAM_COUNT)
          {
             MSG_INFO1(spxout, spxout << "Error parsing setting string: unknown parameter name <" <<
-                      boost::any_cast<R>(val) << ">.\n");
+                      boost::any_cast<Real>(val) << ">.\n");
             return false;
          }
          else if(str.substr(5) == SoPlexBase<R>::_currentSettings->realParam.name[param])
          {
-            auto value = boost::any_cast<R>(val);
+            auto value = boost::any_cast<Real>(val);
 
             if(value != _currentSettings->realParam.defaultValue[param])
             {
@@ -9014,7 +9014,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::optimize()
    // decide whether to solve the rational LP with iterative refinement or call the standard floating-point solver
    else if(intParam(SoPlexBase<R>::SOLVEMODE) == SOLVEMODE_REAL
            || (intParam(SoPlexBase<R>::SOLVEMODE) == SOLVEMODE_AUTO
-               && GE(realParam(SoPlexBase<R>::FEASTOL), R(1e-9)) && GE(realParam(SoPlexBase<R>::OPTTOL), R(1e-9))))
+               && GE(realParam(SoPlexBase<R>::FEASTOL), 1e-9) && GE(realParam(SoPlexBase<R>::OPTTOL), 1e-9)))
    {
       // ensure that tolerances are reasonable for the floating-point solver
       if(realParam(SoPlexBase<R>::FEASTOL) < _currentSettings->realParam.lower[SoPlexBase<R>::FPFEASTOL])
