@@ -63,8 +63,13 @@
 
 #include "soplex/spxlpbase.h"
 
+#ifdef SOPLEX_WITH_MPFR
 // For multiple precision
 #include <boost/multiprecision/mpfr.hpp>
+#endif
+#ifdef SOPLEX_WITH_CPPMPF
+#include <boost/multiprecision/cpp_dec_float.hpp>
+#endif
 
 // An alias for boost multiprecision
 namespace mpf = boost::multiprecision;

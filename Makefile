@@ -71,6 +71,7 @@ CONTINUE	=	false
 OPENSOURCE	=	true
 
 GMP		=	true
+MPFR = true
 ZLIB		=	true
 EGLIB		=	false
 
@@ -338,6 +339,13 @@ LDFLAGS	+= $(GMP_LDFLAGS)
 else
 GMP_LDFLAGS	=
 GMP_CPPFLAGS	=
+endif
+
+ifeq ($(MPFR),true)
+CPPFLAGS += -DSOPLEX_WITH_MPFR
+LDFLAGS += -lmpfr
+else
+# Flags for cpp mpf
 endif
 
 # For boost program options
