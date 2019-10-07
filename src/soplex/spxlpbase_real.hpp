@@ -496,7 +496,7 @@ R SPxLPBase<R>::lowerUnscaled(const SPxColId& id) const
 
 
 /// Is there a possible column name at the beginning of \p s ?
-static bool LPFisColName(const char* s)
+static inline bool LPFisColName(const char* s)
 {
    // strchr() gives a true for the null char.
    if(*s == '\0')

@@ -34,7 +34,7 @@ static const Real verySparseFactor4right = 0.2;
 static const Real verySparseFactor4left  = 0.1;
 
 /* generic heap management */
-static void enQueueMax(int* heap, int* size, int elem)
+static inline void enQueueMax(int* heap, int* size, int elem)
 {
    int i, j;
 
@@ -65,7 +65,7 @@ static void enQueueMax(int* heap, int* size, int elem)
 #endif  /* SOPLEX_DEBUG */
 }
 
-static int deQueueMax(int* heap, int* size)
+static inline int deQueueMax(int* heap, int* size)
 {
    int e, elem;
    int i, j, s;
@@ -119,7 +119,7 @@ static int deQueueMax(int* heap, int* size)
    return elem;
 }
 
-static void enQueueMin(int* heap, int* size, int elem)
+static inline void enQueueMin(int* heap, int* size, int elem)
 {
    int i, j;
 
@@ -150,7 +150,7 @@ static void enQueueMin(int* heap, int* size, int elem)
 #endif  /* SOPLEX_DEBUG */
 }
 
-static int deQueueMin(int* heap, int* size)
+static inline int deQueueMin(int* heap, int* size)
 {
    int e, elem;
    int i, j, s;
