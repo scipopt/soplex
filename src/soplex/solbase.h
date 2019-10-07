@@ -34,8 +34,6 @@
 #include "soplex/basevectors.h"
 #include "soplex/spxsolver.h" // needed for basis information
 
-#include "boost/multiprecision/gmp.hpp"
-
 namespace soplex
 {
 /**@class   SolBase
