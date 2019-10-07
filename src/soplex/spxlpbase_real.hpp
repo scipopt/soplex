@@ -64,14 +64,14 @@ static inline bool LPFisSpace(int c)
 }
 
 /// Is there a number at the beginning of \p s ?
-static bool LPFisValue(const char* s)
+static inline bool LPFisValue(const char* s)
 {
    return ((*s >= '0') && (*s <= '9')) || (*s == '+') || (*s == '-') || (*s == '.');
 }
 
 
 /// Is there a comparison operator at the beginning of \p s ?
-static bool LPFisSense(const char* s)
+static inline bool LPFisSense(const char* s)
 {
    return (*s == '<') || (*s == '>') || (*s == '=');
 }
@@ -508,7 +508,7 @@ static bool LPFisColName(const char* s)
 }
 
 
-static bool LPFisInfinity(const char* s)
+static inline bool LPFisInfinity(const char* s)
 {
    return ((s[0] == '-') || (s[0] == '+'))
           && (tolower(s[1]) == 'i')
@@ -518,7 +518,7 @@ static bool LPFisInfinity(const char* s)
 
 
 
-static bool LPFisFree(const char* s)
+static inline bool LPFisFree(const char* s)
 {
    return (tolower(s[0]) == 'f')
           && (tolower(s[1]) == 'r')
@@ -672,7 +672,7 @@ static int LPFreadColName(char*& pos, NameSet* colnames, LPColSetBase<R>& colset
 
 
 /// Read the next <,>,=,==,<=,=<,>=,=> and advance \p pos.
-static int LPFreadSense(char*& pos)
+static inline int LPFreadSense(char*& pos)
 {
    assert(LPFisSense(pos));
 
@@ -696,7 +696,7 @@ static int LPFreadSense(char*& pos)
 /// Is the \p keyword present in \p buf ? If yes, advance \p pos.
 /** \p keyword should be lower case. It can contain optional sections which are enclosed in '[' ']' like "min[imize]".
  */
-static bool LPFhasKeyword(char*& pos, const char* keyword)
+static inline bool LPFhasKeyword(char*& pos, const char* keyword)
 {
    int i;
    int k;
@@ -745,7 +745,7 @@ static bool LPFhasKeyword(char*& pos, const char* keyword)
 
 
 /// If \p buf start with "name:" store the name in \p rownames and advance \p pos.
-static bool LPFhasRowName(char*& pos, NameSet* rownames)
+static inline bool LPFhasRowName(char*& pos, NameSet* rownames)
 {
    const char* s = strchr(pos, ':');
 
@@ -1371,7 +1371,7 @@ syntax_error:
 // ---------------------------------------------------------------------------------------------------------------------
 
 /// Process NAME section.
-static void MPSreadName(MPSInput& mps, SPxOut* spxout)
+static inline void MPSreadName(MPSInput& mps, SPxOut* spxout)
 {
    do
    {
@@ -1407,7 +1407,7 @@ static void MPSreadName(MPSInput& mps, SPxOut* spxout)
 
 
 /// Process OBJSEN section. This Section is an ILOG extension.
-static void MPSreadObjsen(MPSInput& mps)
+static inline void MPSreadObjsen(MPSInput& mps)
 {
    do
    {
@@ -1443,7 +1443,7 @@ static void MPSreadObjsen(MPSInput& mps)
 
 
 /// Process OBJNAME section. This Section is an ILOG extension.
-static void MPSreadObjname(MPSInput& mps)
+static inline void MPSreadObjname(MPSInput& mps)
 {
    do
    {
