@@ -26,7 +26,7 @@
 
 namespace soplex
 {
-static const char* makename(bool doBoth)
+static inline const char* makename(bool doBoth)
 {
    return doBoth ? "bi-Equilibrium" : "uni-Equilibrium";
 }
