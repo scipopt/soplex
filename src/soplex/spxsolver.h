@@ -2098,7 +2098,7 @@ public:
    }
 
    /// setting the solver status external from the solve loop.
-   void setSolverStatus(SPxSolverBase<R>::Status stat)
+   void setSolverStatus(typename SPxSolverBase<R>::Status stat)
    {
       m_status = stat;
    }

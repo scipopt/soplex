@@ -1875,7 +1875,7 @@ void SPxSolverBase<R>::setType(Type tp)
 
    template <class R>
    typename SPxBasisBase<R>::Desc::Status
-   SPxSolverBase<R>::varStatusToBasisStatusCol(int col, SPxSolverBase<R>::VarStatus stat) const
+   SPxSolverBase<R>::varStatusToBasisStatusCol(int col, typename SPxSolverBase<R>::VarStatus stat) const
    {
       typename SPxBasisBase<R>::Desc::Status cstat;
 

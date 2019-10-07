@@ -67,7 +67,7 @@ SPxBasisBase<R>::Desc::Desc(const Desc& old)
 }
 
 template <class R>
-typename SPxBasisBase<R>::Desc& SPxBasisBase<R>::Desc::operator=(const SPxBasisBase<R>::Desc& rhs)
+typename SPxBasisBase<R>::Desc& SPxBasisBase<R>::Desc::operator=(const typename SPxBasisBase<R>::Desc& rhs)
 {
    if(this != &rhs)
    {

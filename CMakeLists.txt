@@ -110,18 +110,21 @@ if(GMP_FOUND)
     add_definitions(-DSOPLEX_WITH_GMP)
     include_directories(${GMP_INCLUDE_DIRS})
     set(libs ${libs} ${GMP_LIBRARIES})
-  endif()
+endif()
 
 if(MPFR)
   find_package(MPFR)
-  if(MPFR_FOUND)
+endif()
+if(MPFR_FOUND)
+    message("SoPlex with Boost MPFR libraries.")
     add_definitions(-DSOPLEX_WITH_MPFR)
     include_directories(${MPFR_INCLUDE_DIRS})
     set(libs ${libs} ${MPFR_LIBRARIES})
-  else()
+else()
+    message("SoPlex with Boost CPP multiprecision libraries.")
     add_definitions(-DSOPLEX_WITH_CPPMPF)
-  endif()
 endif()
+
 
 
 # Made with: https://stackoverflow.com/a/3917033/4223038
