@@ -510,16 +510,17 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
          // TODO: This is a temporary fix. The precision is fixed. Need to
          // figure out how to have arbitrary precision set from compile time.
          using cpp_float = number<cpp_dec_float<50>, et_off>;
-         using cpp_float_debug = number<debug_adaptor<cpp_dec_float<50>>, et_off>;
+         // using cpp_float_debug = number<debug_adaptor<cpp_dec_float<50>>, et_off>;
 
-         if(!vm.count("mpfdebug"))
+         // TODO temporary fix. The code for debug adaptor is not present.
+         if(true)// !vm.count("mpfdebug"))
          {
             runSoPlex<cpp_float>(vm);
          }
-         else
-         {
-            runSoPlex<cpp_float_debug>(vm);
-         }
+         // else
+         // {
+         //    runSoPlex<cpp_float_debug>(vm);
+         // }
 
 #endif  // SOPLEX_WITH_CPPMPF
 
