@@ -192,7 +192,7 @@ static void initConstVecs(
 }
 
 /* return name of scaler */
-static const char* makename()
+static inline const char* makename()
 {
    return "Least squares";
 }
