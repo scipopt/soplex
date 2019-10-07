@@ -6868,7 +6868,7 @@ typename SoPlexBase<R>::RangeType SoPlexBase<R>::_rangeTypeRational(const Ration
 
 /// switches RANGETYPE_LOWER to RANGETYPE_UPPER and vice versa
 template <class R>
-typename SoPlexBase<R>::RangeType SoPlexBase<R>::_switchRangeType(const SoPlexBase<R>::RangeType&
+typename SoPlexBase<R>::RangeType SoPlexBase<R>::_switchRangeType(const typename SoPlexBase<R>::RangeType&
       rangeType) const
 {
    if(rangeType == RANGETYPE_LOWER)
