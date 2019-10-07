@@ -176,8 +176,8 @@ boost::multiprecision::number<T> spxLdexp(boost::multiprecision::number<T, eto> 
 }
 
 // Overloaded function to return the square-root
-template <typename T>
-boost::multiprecision::number<T> spxSqrt(boost::multiprecision::number<T> a)
+template <typename T, boost::multiprecision::expression_template_option ep>
+boost::multiprecision::number<T, ep> spxSqrt(boost::multiprecision::number<T, ep> a)
 {
    return boost::multiprecision::sqrt(a);
 }
@@ -437,9 +437,9 @@ inline Real maxAbs(Real a, Real b)
 //   return absa > absb ? absa : absb;
 // }
 
-template <typename T>
-inline boost::multiprecision::number<T, boost::multiprecision::et_off> maxAbs(
-   boost::multiprecision::number<T> a, boost::multiprecision::number<T> b)
+template <typename T, boost::multiprecision::expression_template_option et>
+inline boost::multiprecision::number<T, et> maxAbs(
+   boost::multiprecision::number<T, et> a, boost::multiprecision::number<T, et> b)
 {
    const Real absa = spxAbs(a);
    const Real absb = spxAbs(b);
@@ -454,9 +454,9 @@ inline Real relDiff(Real a, Real b)
    return (a - b) / (maxAbs(a, b) > 1.0 ? maxAbs(a, b) : 1.0);
 }
 
-template <typename T>
-inline boost::multiprecision::number<T> relDiff(boost::multiprecision::number<T> a,
-      boost::multiprecision::number<T> b)
+template <typename T, boost::multiprecision::expression_template_option et>
+inline boost::multiprecision::number<T, et> relDiff(boost::multiprecision::number<T, et> a,
+      boost::multiprecision::number<T, et> b)
 {
    return (a - b) / (maxAbs(a, b) > 1.0 ? maxAbs(a, b) : 1.0);
 }
