@@ -210,6 +210,26 @@ LIBHEADER	=	soplex/array.h \
 				soplex/vector.h \
 				soplex/wallclocktimer.h \
 				soplex.h
+LIBOBJ = soplex/clufactor_rational.o \
+				soplex/didxset.o \
+				soplex/gzstream.o \
+				soplex/idxset.o \
+				soplex/mpsinput.o \
+				soplex/nameset.o \
+				soplex/rational.o \
+				soplex/ratrecon.o \
+				soplex/slufactor_rational.o \
+				soplex/spxdefines.o \
+				soplex/spxgithash.o \
+				soplex/spxid.o \
+				soplex/spxlpbase_rational.o \
+				soplex/spxlpbase_real.o \
+				soplex/spxout.o \
+				soplex/spxscaler.o \
+				soplex/usertimer.o \
+				soplex/wallclocktimer.o \
+				soplex.o
+
 BINOBJ		=	soplexmain.o
 EXAMPLEOBJ	=	example.o
 REPOSIT		=	# template repository, explicitly empty  #spxproof.o

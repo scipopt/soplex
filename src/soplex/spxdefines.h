@@ -428,21 +428,12 @@ inline Real maxAbs(Real a, Real b)
 }
 
 /// returns max(|a|,|b|)
-// template <typename T>
-// inline boost::multiprecision::number<T> maxAbs(boost::multiprecision::number<T> a, boost::multiprecision::number<T> b)
-// {
-//   const Real absa = spxAbs(a);
-//   const Real absb = spxAbs(b);
-
-//   return absa > absb ? absa : absb;
-// }
-
 template <typename T, boost::multiprecision::expression_template_option et>
 inline boost::multiprecision::number<T, et> maxAbs(
    boost::multiprecision::number<T, et> a, boost::multiprecision::number<T, et> b)
 {
-   const Real absa = spxAbs(a);
-   const Real absb = spxAbs(b);
+   const auto absa = spxAbs(a);
+   const auto absb = spxAbs(b);
 
    return absa > absb ? absa : absb;
 }
