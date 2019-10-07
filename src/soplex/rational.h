@@ -106,9 +106,11 @@ public:
    Rational(const mpq_t& q);
 #endif
 
+#ifdef SOPLEX_WITH_MPFR
    // constructor from boost number
    template <typename T, boost::multiprecision::expression_template_option eto>
    Rational(const boost::multiprecision::number<T, eto>& q);
+#endif
 
    /// destructor
    ~Rational();
@@ -153,9 +155,11 @@ public:
    // assignment operator from boost multiprecision number The operator should
    // convert the boost number to mpq_t
 
+#ifdef SOPLEX_WITH_MPFR
    // Note: the function is only implemented in the #if part
    template <typename T, boost::multiprecision::expression_template_option eto>
    Rational& operator=(const boost::multiprecision::number<T, eto>& q);
+#endif
 
    //@}
 
