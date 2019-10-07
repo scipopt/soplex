@@ -159,8 +159,6 @@ public:
 
    //@}
 
-   /// provides read-only access to underlying mpq_t
-   const mpq_t* getMpqPtr() const;
 
    //**@name Typecasts */
    //@{
@@ -172,6 +170,9 @@ public:
    operator boost::multiprecision::number<T, eto>() const;
 
 #ifdef SOPLEX_WITH_GMP
+   /// provides read-only access to underlying mpq_t
+   const mpq_t* getMpqPtr() const;
+
    /// provides read-only access to underlying mpq_t
    const mpq_t& getMpqRef() const;
 
