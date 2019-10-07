@@ -2199,9 +2199,9 @@ static void MPSwriteRecord(
    const char*    indicator,
    const char*    name,
    SPxOut* spxout,
-   const char*    name1  = 0,
+   const char*    name1  = nullptr,
    const Rational value1 = 0,
-   const char*    name2  = 0,
+   const char*    name2  = nullptr,
    const Rational value2 = 0
 )
 {

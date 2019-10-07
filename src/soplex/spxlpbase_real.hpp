@@ -2407,9 +2407,9 @@ static void MPSwriteRecord(
    std::ostream&  os,
    const char*    indicator,
    const char*    name,
-   const char*    name1  = 0,
+   const char*    name1  = nullptr,
    const R     value1 = 0.0,
-   const char*    name2  = 0,
+   const char*    name2  = nullptr,
    const R     value2 = 0.0
 )
 {
@@ -2419,15 +2419,15 @@ static void MPSwriteRecord(
                (name == 0)      ? "" : name);
    os << buf;
 
-   if(name1 != 0)
+   if(name1 != nullptr)
    {
-      spxSnprintf(buf, sizeof(buf), "%-8.8s  %.15" REAL_FORMAT, name1, value1);
-      os << buf;
+     spxSnprintf(buf, sizeof(buf), "%-8.8s ", name1);
+     os << buf << value2;
 
-      if(name2 != 0)
+      if(name2 != nullptr)
       {
-         spxSnprintf(buf, sizeof(buf), "   %-8.8s  %.15" REAL_FORMAT, name2, value2);
-         os << buf;
+        spxSnprintf(buf, sizeof(buf), "   %-8.8s ", name2);
+        os << buf << name2;
       }
    }
 
