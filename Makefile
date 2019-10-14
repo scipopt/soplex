@@ -476,7 +476,7 @@ example:	$(LIBOBJFILES) $(EXAMPLEOBJFILES) | $(BINDIR) $(EXAMPLEOBJDIR)
 
 .PHONY: makelibfile
 makelibfile:	preprocess
-		@$(MAKE) $(LIBFILE)
+		@$(MAKE) $(LIBFILE) $(LIBLINK) $(LIBSHORTLINK)
 
 $(LIBFILE):	$(LIBOBJFILES) | $(LIBDIR) $(LIBOBJDIR)
 		@echo "-> generating library $@"
