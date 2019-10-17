@@ -1048,7 +1048,6 @@ Rational::Rational(const boost::multiprecision::number<T, eto>& q)
 template <typename T, boost::multiprecision::expression_template_option eto>
 Rational::Rational(const boost::multiprecision::number<T, eto>& q)
 {
-  assert(unusedPrivateList.length() == 0);
   dpointer = 0;
   spx_alloc(dpointer);
   new(dpointer) Private(q);
