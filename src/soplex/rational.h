@@ -106,11 +106,9 @@ public:
    Rational(const mpq_t& q);
 #endif
 
-#ifdef SOPLEX_WITH_MPFR
    // constructor from boost number
    template <typename T, boost::multiprecision::expression_template_option eto>
    Rational(const boost::multiprecision::number<T, eto>& q);
-#endif
 
    /// destructor
    ~Rational();
@@ -155,12 +153,9 @@ public:
    // assignment operator from boost multiprecision number The operator should
    // convert the boost number to mpq_t
 
-#ifdef SOPLEX_WITH_MPFR
    // Note: the function is only implemented in the #if part
    template <typename T, boost::multiprecision::expression_template_option eto>
    Rational& operator=(const boost::multiprecision::number<T, eto>& q);
-#endif
-
    //@}
 
 
@@ -808,7 +803,7 @@ public:
          mpq_set_d(privatevalue, r);
 
       return *this;
-   }
+    }
 
    /// assignment operator from int
    Private& operator=(const int& i)
@@ -898,6 +893,91 @@ public:
       return thenext;
    }
 };
+#else  // SOPLEX_WITH_GMP
+
+/// Defines the "Pimpl"-class Private
+class Rational::Private
+{
+
+public:
+
+   /// value
+   long double privatevalue;
+
+  template <typename T, boost::multiprecision::expression_template_option eto>
+  Private(const boost::multiprecision::number<T, eto>& q)
+  {
+    privatevalue = (long double)q;
+  }
+
+  template <typename T, boost::multiprecision::expression_template_option eto>
+  Private& operator=(const boost::multiprecision::number<T, eto>& q)
+  {
+    privatevalue = (long double)q;
+    return *this;
+  }
+
+
+   /// default constructor
+   Private()
+   {
+      privatevalue = 0;
+   }
+
+   /// copy constructor
+   Private(const Private& p)
+   {
+      *this = p;
+   }
+
+   /// constructor from long double
+   Private(const long double& r)
+   {
+      privatevalue = r;
+   }
+
+   /// constructor from double
+   Private(const double& r)
+   {
+      privatevalue = r;
+   }
+
+   /// constructor from int
+   Private(const int& i)
+   {
+      privatevalue = i;
+   }
+
+   /// assignment operator
+   Private& operator=(const Private& p)
+   {
+      this->privatevalue = p.privatevalue;
+      return *this;
+   }
+
+   /// assignment operator from long double
+   Private& operator=(const long double& r)
+   {
+      this->privatevalue = r;
+      return *this;
+   }
+
+   /// assignment operator from double
+   Private& operator=(const double& r)
+   {
+      this->privatevalue = (long double)(r);
+      return *this;
+   }
+
+   /// assignment operator from int
+   Private& operator=(const int& i)
+   {
+      this->privatevalue = (long double)(i);
+      return *this;
+   }
+};
+#endif // SOPLEX_WITH_GMP
+
 
 
 // Definitions related to boost number and SoPlex Rational. This is still
@@ -926,6 +1006,8 @@ Rational::operator boost::multiprecision::number<T,  eto>() const
 // Constructor from boost number. Code is exactly same as that of construction
 // of Rational from mpq_t, basically a wrapper around the assignment operator
 // (=) of the Private class; calls the boost number assignment operator.
+
+#ifdef SOPLEX_WITH_MPFR
 template <typename T, boost::multiprecision::expression_template_option eto>
 Rational::Rational(const boost::multiprecision::number<T, eto>& q)
 {
@@ -960,8 +1042,20 @@ Rational::Rational(const boost::multiprecision::number<T, eto>& q)
    assert(dpointer != 0);
 
 }
+#endif  // SOPLEX_WITH_CPPMPF
 
-#endif  // SOPLEX_WITH_GMP
+#ifdef SOPLEX_WITH_CPPMPF
+template <typename T, boost::multiprecision::expression_template_option eto>
+Rational::Rational(const boost::multiprecision::number<T, eto>& q)
+{
+  assert(unusedPrivateList.length() == 0);
+  dpointer = 0;
+  spx_alloc(dpointer);
+  new(dpointer) Private(q);
+
+  assert(dpointer != 0);
+}
+#endif // SOPLEX_WITH_CPPMPF
 
 // A dummy function to deal with the rational scalar issue. This will never be
 // called
