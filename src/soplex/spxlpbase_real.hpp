@@ -31,7 +31,9 @@
 
 namespace soplex
 {
-// For reference to functions inside spxlpbase_rational.cpp
+  // Some instantiations to avoid linking issues in (mostly) windows and linux.
+  // These functions are defined in spxlpbase_rational.cpp
+
 template <>
 void SPxLPBase<Rational>::writeMPS(
    std::ostream&  p_output,          ///< output stream.
@@ -55,7 +57,31 @@ void SPxLPBase<Rational>::writeLPF(
    const DIdxSet* p_intvars          ///< integer variables
 ) const;
 
+  template <>
+  bool SPxLPBase<Rational>::readMPS(
+                                    std::istream& p_input,           ///< input stream.
+                                    NameSet*      p_rnames,          ///< row names.
+                                    NameSet*      p_cnames,          ///< column names.
+                                    DIdxSet*      p_intvars);         ///< integer variables.
 
+  template < >
+  void SPxLPBase<Rational>::buildDualProblem(SPxLPBase<Rational>& dualLP, SPxRowId primalRowIds[],
+                                             SPxColId primalColIds[],
+                                             SPxRowId dualRowIds[], SPxColId dualColIds[], int* nprimalrows, int* nprimalcols, int* ndualrows,                                             int* ndualcols);
+
+  template<>
+  void SPxLPBase<Rational>::computeDualActivity(const VectorBase<Rational>& dual,
+                                                VectorBase<Rational>& activity, const bool unscaled) const;
+
+  template<>
+  void SPxLPBase<Rational>::computePrimalActivity(const VectorBase<Rational>& primal,
+                                                  VectorBase<Rational>& activity, const bool unscaled) const;
+
+  template<>
+  Rational SPxLPBase<Rational>::maxAbsNzo(bool /* unscaled */) const;
+
+  template<>
+  Rational SPxLPBase<Rational>::minAbsNzo(bool /* unscaled */) const;
 
 /// Is \p c a \c space, \c tab, \c nl or \c cr ?
 static inline bool LPFisSpace(int c)
