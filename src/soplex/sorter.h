@@ -91,9 +91,9 @@ void SPxQuicksort(T* keys, int end, COMPARATOR& compare, int start = 0, bool typ
       int mid;
 
       /* select pivot element */
-      mid = (start + end) / 2;  // @todo potential integer overflow mid = end +
-      // (start - end)/2 is better. Even better is
-      // using std::sort or a sort from boost
+      mid = start + (end - start)/2; // Instead of (start + end)/2 because the
+                                     // latter can overflow if start + end >
+                                     // INT_MAX
       pivotkey = keys[mid];
 
       /* partition the array into elements < pivot [start,hi] and elements >= pivot [lo,end] */
