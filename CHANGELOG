@@ -62,8 +62,9 @@ interface & parameters:
   2. The class can handle the additional functionality `DVectorBase<T>`, e.g., `memSize()`, `reSize()`, `scaleAssign(,,).`
   3. internal member `int dimen` removed. `val.size()` or `VectorBase<R>::dim()` is a replacement.
   4. Replaced calls to memcpy and memmove with `std::copy().` Former functions are not compatible with `boost::multiprecision::number`.
-- Removed DVectorBase. Replaced by VectorBase.
-- DataArray is now a wrapper around `std::vector.`
+  5. Defined move constructor and move assignment.
+- Removed DVectorBase. Replaced by VectorBase. The alias DVector is replaced by the alias Vector.
+- DataArray is now a wrapper around `std::vector`, also has move constructor and move assignment.
 - The following internal objects of the CLUFactor class was changed from a raw pointer to a std::vector
   1. `u.col.val`, `u.row.val`
   2. `l.val`, `l.rval`

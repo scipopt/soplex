@@ -84,16 +84,6 @@ public:
    {
       assert(n >= 0);
       return data[n];
-      // return data.at(n); The data.at won't work because of the following
-      // reason.
-      //
-      // 1. data.at checks if n < data.size(). size is 0 at the beginning. 2.
-      // The old alloc pointers worked by allocating a block of memory, then
-      // leaving it to a different function to do the assignment. I haven't
-      // changed this style of code right now, but I think ideally this isn't
-      // how std::vector should be used. The same comment applies to the
-      // previous non-const function too.
-
    }
 
    /// reference last element.
@@ -281,6 +271,13 @@ public:
       return *this;
    }
 
+  // Move assignment for Dataarray
+  DataArray& operator=(const DataArray&& rhs)
+  {
+    data = std::move(rhs.data);
+    return *this;
+  }
+
    /// consistency check
    bool isConsistent() const
    {
@@ -314,6 +311,11 @@ public:
       // The underlying array will have at least p_max number of elements,
       // though.
    }
+
+  // The move constructors
+  DataArray(DataArray&& other) noexcept: data(std::move(other.data))
+  {
+  }
 
    /// destructor
    ~DataArray()

@@ -133,6 +133,15 @@ public:
       this->operator=(vec);
    }
 
+  // The move constructor
+  VectorBase<R>(const VectorBase<R> && vec)noexcept: val(std::move(vec.val))
+  {
+  }
+
+  VectorBase<R>(const VectorBase<R> &vec): val(vec.val)
+  {
+  }
+
 
    /// Assignment operator.
    // Supports assignment from a Rational vector to Real and vice versa
@@ -165,6 +174,13 @@ public:
 
       return *this;
    }
+
+  /// Move assignment operator
+  VectorBase<R>& operator=(const VectorBase<R>&& vec)
+  {
+    val = std::move(vec.val);
+    return *this;
+  }
 
    /// scale and assign
    VectorBase<R>& scaleAssign(int scaleExp, const VectorBase<R>& vec)
