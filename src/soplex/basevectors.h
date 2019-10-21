@@ -1151,7 +1151,6 @@ std::ostream& operator<<(std::ostream& s, const VectorBase<R>& vec)
 
 
 
-// TODO: Look into this. Should this exist?
 /// Subtraction.
 template < class R >
 inline
@@ -1195,7 +1194,6 @@ DSVectorBase<R> operator*(R x, const SVectorBase<R>& v)
 
 
 
-// TODO: Look into how this may be rewritten
 template < class R >
 inline
 std::istream& operator>>(std::istream& s, VectorBase<R>& vec)

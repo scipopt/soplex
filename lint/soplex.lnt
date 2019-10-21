@@ -54,7 +54,7 @@
        -esym(1704,Vector::Vector) // Vector has no (private) default constructor
 -esym(1526,Vector::Vector) // correctly not implemented
 -esym(1510,Vector) // Vector has no destructor, this is ok
--esym(1509,DVector) // base class destructor for class 'Vector' is not virtual
+-esym(1509,DVector) // base class destructor for class 'DVector' is not virtual
 
 // timer.h
 -esym(1401,Timer::uTicks) // no need to be initialised

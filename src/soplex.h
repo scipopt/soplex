@@ -90,7 +90,6 @@ namespace mpf = boost::multiprecision;
 
 ///@todo interface rational reconstruction code for rational vectors
 ///@todo integrate rational reconstruction into IR loop
-///@todo templatize SPxSolver and necessary components (SLUFactor<R>, pricer, ratiotester)
 ///@todo integrate rational SPxSolver and distinguish between original and transformed rational LP
 ///@todo rational scalers
 ///@todo rational simplifier
@@ -874,7 +873,7 @@ public:
                  DIdxSet* intVars = 0);
 
    /// Templated write function
-   /// R
+   /// Real
    /// writes real LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
    /// marked as integer; returns true on success

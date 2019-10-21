@@ -71,7 +71,7 @@ interface & parameters:
   3. `diag`
   4. `s_max`
 - Replaced several instances of "`spx_alloc` an object, then `spx_realloc` the object" with using `std::vector`. Because `realloc` is not guaranteed to work on objects with non-trivial copy constructors, in particular, with `boost::multiprecision::number.`
-- SoPlex can now do multiprecision solve, i.e., `SoPlex<R>` with `R = boost::multiprecision::number<T>` will work.
+- SoPlex can now do multiprecision solve, i.e., `SoPlex<R>` with `R = boost::multiprecision::number<T>` will work. In particular, for Linux and Mac, SoPlex can do multiprecision solve with `mpfr_float` and on windows with `cpp_float`.
 
 fixed bugs:
 - use center value for very close bounds in singleton postsolver

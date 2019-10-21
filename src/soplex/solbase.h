@@ -279,10 +279,6 @@ private:
          _primal = sol._primal;
          _slacks = sol._slacks;
 
-         // @todo Converting between Rational and boost type. The boost number
-         // doesn't have a constructor that accepts Rational. But I've defined a
-         // cast between Rational and boost::number<T>. Need to make sure if the
-         // following line actually works. No compilation errors!
          _objVal = R(sol._objVal);
 
          _hasPrimalRay = sol._hasPrimalRay;

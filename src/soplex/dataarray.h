@@ -278,12 +278,6 @@ public:
     return *this;
   }
 
-   /// consistency check
-   bool isConsistent() const
-   {
-      return true;
-   }
-
    /// copy constructor
    DataArray(const DataArray& old)
    {
