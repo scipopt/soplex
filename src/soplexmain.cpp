@@ -36,19 +36,6 @@
 #include "soplex/statistics.h"
 #include "soplex/args.hpp"      // For argument parsing
 
-#include "boost/multiprecision/number.hpp"
-
-#ifdef SOPLEX_WITH_MPFR
-// For multiple precision
-#include <boost/multiprecision/mpfr.hpp>
-#endif
-#ifdef SOPLEX_WITH_CPPMPF
-#include <boost/multiprecision/cpp_dec_float.hpp>
-#endif
-
-#include "boost/multiprecision/debug_adaptor.hpp" // For debuging mpf numbers
-
-
 
 #ifdef SOPLEX_WITH_EGLIB
 extern "C" {

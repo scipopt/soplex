@@ -54,6 +54,18 @@
 
 #include <soplex/spxdefines.h>  // For access to some constants
 
+#include "boost/multiprecision/number.hpp"
+
+#ifdef SOPLEX_WITH_MPFR
+// For multiple precision
+#include <boost/multiprecision/mpfr.hpp>
+#include "boost/multiprecision/debug_adaptor.hpp" // For debuging mpf numbers
+#endif
+#ifdef SOPLEX_WITH_CPPMPF
+#include <boost/multiprecision/cpp_dec_float.hpp>
+#endif
+
+
 namespace po = boost::program_options;
 
 namespace soplex
@@ -507,21 +519,10 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
 #endif  // SOPLEX_WITH_MPFR
 
 #ifdef SOPLEX_WITH_CPPMPF
-         // TODO: This is a temporary fix. The precision is fixed. Need to
-         // figure out how to have arbitrary precision set from compile time.
+         // TODO: Figure out how precision is set
          using cpp_float = number<cpp_dec_float<50>, et_off>;
-         using cpp_float_debug = number<debug_adaptor<cpp_dec_float<50>>, et_off>;
 
-         // TODO temporary fix. The code for debug adaptor is not present.
-         if(!vm.count("mpfdebug"))
-         {
-            runSoPlex<cpp_float>(vm);
-         }
-         else
-         {
-            runSoPlex<cpp_float_debug>(vm);
-         }
-
+         runSoPlex<cpp_float>(vm);
 #endif  // SOPLEX_WITH_CPPMPF
 
       default:
