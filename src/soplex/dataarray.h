@@ -268,8 +268,6 @@ public:
       {
          reSize(rhs.size());
          data = rhs.data;
-
-         assert(isConsistent());
       }
 
       return *this;
