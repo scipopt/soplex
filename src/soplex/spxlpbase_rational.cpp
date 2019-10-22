@@ -153,49 +153,6 @@ Rational SPxLPBase<Rational>::minAbsNzo(bool /* unscaled */) const
 
 #define LPF_MAX_LINE_LEN  8192     ///< maximum length of a line (8190 + \\n + \\0)
 
-
-// /// Is there a possible column name at the beginning of \p s ?
-// static bool LPFisColName(const char* s)
-// {
-//    // strchr() gives a true for the null char.
-//    if( *s == '\0' )
-//       return false;
-
-//    return ((*s >= 'A') && (*s <= 'Z'))
-//       || ((*s >= 'a') && (*s <= 'z'))
-//       || (strchr("!\"#$%&()/,;?@_'`{}|~", *s) != 0);
-// }
-
-
-
-// /// Is there a comparison operator at the beginning of \p s ?
-// static bool LPFisSense(const char* s)
-// {
-//    return (*s == '<') || (*s == '>') || (*s == '=');
-// }
-
-
-
-// static bool LPFisInfinity(const char* s)
-// {
-//    return ((s[0] == '-') || (s[0] == '+'))
-//       && (tolower(s[1]) == 'i')
-//       && (tolower(s[2]) == 'n')
-//       && (tolower(s[3]) == 'f');
-// }
-
-
-
-// static bool LPFisFree(const char* s)
-// {
-//    return (tolower(s[0]) == 'f')
-//       && ( tolower(s[1]) == 'r')
-//       && ( tolower(s[2]) == 'e')
-//       && ( tolower(s[3]) == 'e');
-// }
-
-
-
 /// Read the next number and advance \p pos.
 /** If only a sign is encountered, the number is assumed to be \c sign * 1.  This routine will not catch malformatted
  *  numbers like .e10 !

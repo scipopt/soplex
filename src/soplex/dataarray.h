@@ -163,10 +163,14 @@ public:
    {
       assert(n < size() && n >= 0);
 
-      // TODO: This one removes exactly m elements. Verify if this was what was
-      // originally wanted.
-      data.erase(data.begin() + n, data.begin() + n + m);
-
+      if(n + m < size())
+        {
+          data.erase(data.begin() + n, data.begin() + n + m);
+        }
+      else
+        {
+          data.erase(data.begin() + n, data.end());
+        }
    }
    /// remove \p m last elements.
    void removeLast(int m = 1)

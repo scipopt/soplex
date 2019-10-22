@@ -240,7 +240,7 @@ typedef float Real;
 
 #ifndef REAL
 #define REAL(x)  x
-p#define REAL_FORMAT "f"
+#define REAL_FORMAT "f"
 #endif
 /// default allowed bound violation
 #ifndef DEFAULT_BND_VIOL

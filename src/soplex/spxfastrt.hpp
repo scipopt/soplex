@@ -30,7 +30,7 @@
   The algorithms operates in two phases. In a first phase, the maximum value
   |val| is determined, when infeasibility within |delta| is allowed. In the second
   phase, between all variables with value < |val| the one is selected which
-  has the largest update VectorBase<R> component. However, this may not
+  has the largest update Vector component. However, this may not
   always yield an improvement. In that case, we shift the variable towards
   infeasibility and retry. This avoids cycling in the shifted LP.
 */
@@ -104,7 +104,7 @@ R SPxFastRT<R>::minStability(R maxabs)
  * Ph.D. thesis page 57 as follows: It uses \f$\delta_i = d_i - s_i - \delta\f$ if \f$d_i > s_i\f$.
  *
  * This change leads to the following behavior of the source code. Consider the first case (x >
- * epsilon, u < R(infinity)): If u - vec[i] <= 0, vec[i] violates the upper bound. In the Harris ratio
+ * epsilon, u < infinity): If u - vec[i] <= 0, vec[i] violates the upper bound. In the Harris ratio
  * test, we would compute (u - vec[i] + delta)/upd[i]. The code computes instead delta/upd[i].
  */
 template <class R>
@@ -196,7 +196,7 @@ int SPxFastRT<R>::maxDelta(
    }
    else
    {
-      /* In this case, the indices of the semi-sparse VectorBase<R> update.delta() are not set up and are filled below. */
+      /* In this case, the indices of the semi-sparse Vector update.delta() are not set up and are filled below. */
       int* l_idx = update.delta().altIndexMem();
       R* uval = update.delta().altValues();
       const R* uend = uval + update.dim();

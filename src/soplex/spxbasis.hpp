@@ -767,7 +767,7 @@ void SPxBasisBase<R>::printMatrixMTX(int number)
    FILE* basisfile;
    basisfile = fopen(filename, "w");
    // print marker necessary for reading the file in Matlab
-   fprintf(basisfile, "%%%%MatrixMarket matrix coordinate R general\n");
+   fprintf(basisfile, "%%%%MatrixMarket matrix coordinate Real general\n");
    // print matrix information
    fprintf(basisfile, "%d %d %d\n", dim, dim, nnz);
 
