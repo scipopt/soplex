@@ -1333,7 +1333,7 @@ private:
    typename SPxSimplifier<R>::Result m_result;     ///< result of the simplification.
    R                            m_cutoffbound;  ///< the cutoff bound that is found by heuristics
    R                            m_pseudoobj;    ///< the pseudo objective function value
-   //@}
+   ///@}
 
 private:
    //------------------------------------
@@ -1559,7 +1559,7 @@ public:
 
    //------------------------------------
    //**@name LP simplification */
-   //@{
+   ///@{
    /// simplify SPxLPBase<R> \p lp with identical primal and dual feasibility tolerance.
    virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, R eps, R delta)
    {
@@ -1641,7 +1641,7 @@ public:
 private:
    //------------------------------------
    //**@name Types */
-   //@{
+   ///@{
    /// comparator for class SVectorBase<R>::Element: compare nonzeros according to value
    struct ElementCompare
    {

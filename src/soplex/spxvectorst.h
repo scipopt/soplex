@@ -58,7 +58,7 @@ private:
    ///@{
    /// the current (approximate) primal or dual vector
    VectorBase<R> vec;
-   //@}
+   ///@}
 
 protected:
 

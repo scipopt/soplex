@@ -72,7 +72,7 @@ public:
    ///@{
    /// Scale the loaded SPxLP.
    virtual void scale(SPxLPBase<R>& lp, bool persistent = false) override;
-   //@}
+   ///@}
 };
 } // namespace soplex
 

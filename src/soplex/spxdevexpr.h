@@ -47,7 +47,7 @@ private:
 
    //-------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    R  last;           ///< penalty, selected at last iteration.
    DataArray<typename SPxPricer<R>::IdxElement>
    prices;   ///< temporary array of precomputed pricing values
@@ -88,7 +88,7 @@ private:
    SPxId selectEnterHyperDim(R& best, R feastol);
    /// implementation of hyper sparse pricing in the entering Simplex
    SPxId selectEnterHyperCoDim(R& best, R feastol);
-   //@}
+   ///@}
 
 public:
 

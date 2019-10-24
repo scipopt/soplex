@@ -95,7 +95,7 @@ protected:
 
    /// clear and setup scaling arrays in the LP
    virtual void setup(SPxLPBase<R>& lp);
-   //@}
+   ///@}
 
 public:
 
@@ -233,7 +233,7 @@ public:
    virtual R maxRowRatio(const SPxLPBase<R>& lp) const;
    /// round vector entries to power of 2
    void computeExpVec(const std::vector<R>& vec, DataArray<int>& vecExp);
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Debugging */

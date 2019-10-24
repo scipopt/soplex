@@ -66,7 +66,7 @@ public:
       the main binary, except for the ones indicated by "// *".
       Parts of the default settings are also realized in the constructor below.
    */
-   //@{
+   ///@{
    static const SLUFactor<Real>::UpdateType update = SLUFactor<Real>::FOREST_TOMLIN;
    static const Real delta;
    static const Real timelimit;
@@ -75,22 +75,22 @@ public:
    static const Real epsilon_update;
    static const int verbose = SPxOut::ERROR;
    static const int precision = 12;
-   //@}
+   ///@}
 
 private:
    //------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    SLUFactor<Real> _solver;              ///< sparse LU factorization
    SPxSteepPR _pricer;             ///< steepest edge pricer
    SPxFastRT _ratiotester;         ///< Harris fast ratio tester
-   //@}
+   ///@}
 
 public:
 
    //------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// Default constructor.
    explicit
    TestSolver( const SPxSolver::Type type_,
@@ -114,7 +114,7 @@ public:
 
       assert( isConsistent() );
    }
-   //@}
+   ///@}
 };
 
 //
@@ -158,7 +158,7 @@ public:
 
    //------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// Default constructor.
    explicit
    ChangeExerciser( const std::string& instance_name,
@@ -169,13 +169,13 @@ public:
       , _type( type )
       , _representation( representation )
    {}
-   //@}
+   ///@}
 
 public:
 
    //------------------------------------
    /**@name Test methods */
-   //@{
+   ///@{
    void test_add_delete_row();
    void test_add_delete_rows();
    void test_add_delete_col();
@@ -201,13 +201,13 @@ public:
 
    /// Number of failed asserts.
    long asserts_failed() const { return _asserts_failed; }
-   //@}
+   ///@}
 
 private:
 
    //------------------------------------
    /**@name Testing support */
-   //@{
+   ///@{
    ///
    void _assert( const std::string& description, const bool condition )
    {
@@ -244,7 +244,7 @@ private:
    const SPxSolver::Type _type;
    ///
    const SPxSolver::Representation _representation;
-   //@}
+   ///@}
 };
 
 //

@@ -82,9 +82,9 @@ public:
 
       //------------------------------
       /**@name Public Data */
-      //@{
+      ///@{
       const char* name;      ///< pointer to the name string.
-      //@}
+      ///@}
 
       //------------------------------
       /**@name Friends */

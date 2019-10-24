@@ -67,7 +67,7 @@ private:
    DataArray < R >* weight;
    ///
    DataArray < R >* coWeight;
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Private helpers */

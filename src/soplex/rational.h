@@ -156,11 +156,11 @@ public:
    // Note: the function is only implemented in the #if part
    template <typename T, boost::multiprecision::expression_template_option eto>
    Rational& operator=(const boost::multiprecision::number<T, eto>& q);
-   //@}
+   ///@}
 
 
    ///@name Typecasts
-   //@{
+   ///@{
 
    operator double() const;
    operator long double() const;

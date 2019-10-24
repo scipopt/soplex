@@ -56,7 +56,7 @@ class SPxHybridPR : public SPxPricer<R>
    SPxPricer<R>*   thepricer;
    /// factor between dim and coDim of the problem to decide about the pricer
    R hybridFactor;
-   //@}
+   ///@}
 
 public:
 
@@ -85,7 +85,7 @@ public:
    virtual void addedVecs(int n);
    /// calls addedCoVecs(n) on all pricers
    virtual void addedCoVecs(int n);
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Consistency check */

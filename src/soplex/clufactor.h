@@ -183,7 +183,7 @@ protected:
 
    //----------------------------------------
    /**@name Protected data */
-   //@{
+   ///@{
    typename SLinSolver<R>::Status stat;   ///< Status indicator.
 
    int     thedim;            ///< dimension of factorized matrix
@@ -464,7 +464,7 @@ protected:
    void factor(const SVectorBase<R>** vec,   ///< Array of column VectorBase<R> pointers
                R threshold,    ///< pivoting threshold
                R eps);         ///< epsilon for zero detection
-   //@}
+   ///@}
 
    //----------------------------------------
    /**@name Debugging */

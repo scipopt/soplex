@@ -34,31 +34,31 @@ class SPxException
 private:
    //----------------------------------------
    /**@name Private data */
-   //@{
+   ///@{
    /// Exception message.
    std::string msg;
-   //@}
+   ///@}
 public:
    //----------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// constructor
    /** The constructor receives an optional string as an exception message.
     */
    SPxException(const std::string& m = "") : msg(m) {}
    /// destructor
    virtual ~SPxException() {}
-   //@}
+   ///@}
 
    //----------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    /// returns exception message
    virtual const std::string what() const
    {
       return msg;
    }
-   //@}
+   ///@}
 };
 
 /**@brief   Exception class for out of memory exceptions.
@@ -72,12 +72,12 @@ class SPxMemoryException : public SPxException
 public:
    //----------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// constructor
    /** The constructor receives an optional string as an exception message.
     */
    SPxMemoryException(const std::string& m = "") : SPxException(m) {}
-   //@}
+   ///@}
 };
 
 /**@brief   Exception class for status exceptions during the computations
@@ -91,12 +91,12 @@ class SPxStatusException : public SPxException
 public:
    //----------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// constructor
    /** The constructor receives an optional string as an exception message.
     */
    SPxStatusException(const std::string& m = "") : SPxException(m) {}
-   //@}
+   ///@}
 };
 
 /**@brief   Exception class for things that should NEVER happen.
@@ -111,12 +111,12 @@ class SPxInternalCodeException : public SPxException
 public:
    //----------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// constructor
    /** The constructor receives an optional string as an exception message.
     */
    SPxInternalCodeException(const std::string& m = "") : SPxException(m) {}
-   //@}
+   ///@}
 };
 
 
@@ -128,12 +128,12 @@ class SPxInterfaceException : public SPxException
 public:
    //----------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// constructor
    /** The constructor receives an optional string as an exception message.
     */
    SPxInterfaceException(const std::string& m = "") : SPxException(m) {}
-   //@}
+   ///@}
 };
 
 } //namespace soplex

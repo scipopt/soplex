@@ -108,7 +108,7 @@ private:
    updPrimRhs;         /**< right hand side vector of additional system to be solved after the ratio test */
    SSVectorBase<R>
    updPrimVec;         /**< allocation of memory for additional solution vector */
-   //@}
+   ///@}
 
    /** store all available pivots/breakpoints in an array (positive pivot search direction) */
    void collectBreakpointsMax(

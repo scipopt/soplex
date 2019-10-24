@@ -101,7 +101,7 @@ public:
    SPxOut(const SPxOut&);
    /// assignment operator
    SPxOut& operator=(const SPxOut&);
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Verbosity */

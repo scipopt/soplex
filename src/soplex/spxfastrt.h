@@ -162,7 +162,7 @@ protected:
    /// Tests and returns whether a shortcut after phase 1 is feasible for the
    /// selected enter pivot.
    bool shortEnter(const SPxId& enterId, int nr, R max, R maxabs) const;
-   //@}
+   ///@}
 
 public:
 

@@ -59,7 +59,7 @@ private:
 
    //--------------------------------
    /**@name Private data */
-   //@{
+   ///@{
    VectorRational    vec;           ///< Temporary vector
    SSVectorRational   ssvec;         ///< Temporary semi-sparse vector
    ///@}

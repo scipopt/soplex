@@ -44,7 +44,7 @@ protected:
    const int  m_maxIterations;    ///< maximum number of scaling iterations.
    const R m_minImprovement;   ///< improvement necessary to carry on. (Bixby said Fourer said in MP 23, 274 ff. that 0.9 is a good value)
    const R m_goodEnoughRatio;  ///< no scaling needed if ratio is less than this.
-   //@}
+   ///@}
 
 public:
 
@@ -70,10 +70,10 @@ public:
 
    //-------------------------------------
    /**@name Scaling */
-   //@{
+   ///@{
    /// Scale the loaded SPxLPBase<R>.
    virtual void scale(SPxLPBase<R>& lp, bool persistent = true) override;
-   //@}
+   ///@}
 
 };
 } // namespace soplex

@@ -115,7 +115,7 @@ public:
    virtual int selectLeave(R& val, R, bool);
    ///
    virtual SPxId selectEnter(R& val, int, bool);
-   //@}
+   ///@}
 
 };
 

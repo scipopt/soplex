@@ -2110,7 +2110,7 @@ private:
 
 
    //**@name Private solving methods implemented in solverational.hpp */
-   //@{
+   ///@{
 
    /// solves current problem with iterative refinement and recovery mechanism
    void _performOptIRStable(SolRational& sol,
@@ -2417,7 +2417,7 @@ private:
    /// function to retrieve the column status for the original problem basis from the reduced and complementary problems
    void getOriginalProblemBasisColStatus(int& nNonBasicCols);
 
-   //@}
+   ///@}
 
    // For argument parsing
    template <class S>

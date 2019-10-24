@@ -193,7 +193,7 @@ public:
    /// sparse version of solving three systems of equations with transposed basis matrix
    virtual void solveLeft(SSVectorBase<R>& x, SSVectorBase<R>& y, SSVectorBase<R>& z,
                           const SVectorBase<R>& b, SSVectorBase<R>& d, SSVectorBase<R>& e) = 0;
-   //@}
+   ///@}
 
 
    //---------------------------------------
@@ -208,7 +208,7 @@ public:
    {}
    /// clone function for polymorphism
    virtual SLinSolver<R>* clone() const = 0;
-   //@}
+   ///@}
 
    /// message handler
    SPxOut* spxout;

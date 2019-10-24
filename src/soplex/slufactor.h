@@ -44,7 +44,7 @@ public:
 
    //--------------------------------
    /**@name Types */
-   //@{
+   ///@{
    /// Specifies how to perform \ref soplex::SLUFactor<R>::change "change" method.
    enum UpdateType
    {
@@ -53,16 +53,16 @@ public:
    };
    /// for convenience
    using Status = typename SLinSolver<R>::Status;
-   //@}
+   ///@}
 
 private:
 
    //--------------------------------
    /**@name Private data */
-   //@{
+   ///@{
    VectorBase<R>    vec;           ///< Temporary VectorBase<R>
    SSVectorBase<R>    ssvec;         ///< Temporary semi-sparse VectorBase<R>
-   //@}
+   ///@}
 
 protected:
 
@@ -75,7 +75,7 @@ protected:
    SSVectorBase<R>
    forest;        ///< ? Update VectorBase<R> set up by solveRight4update() and solve2right4update()
    R       lastThreshold; ///< pivoting threshold of last factorization
-   //@}
+   ///@}
 
    //--------------------------------
    /**@name Control Parameters */
@@ -102,7 +102,7 @@ protected:
    void freeAll();
    ///
    void changeEta(int idx, SSVectorBase<R>& eta);
-   //@}
+   ///@}
 
 
 public:
@@ -185,7 +185,7 @@ public:
    std::string statistics() const;
    ///
    Status load(const SVectorBase<R>* vec[], int dim);
-   //@}
+   ///@}
 
 public:
 
@@ -237,7 +237,7 @@ public:
                   const SVectorBase<R>& b, SSVectorBase<R>& d, SSVectorBase<R>& e);
    ///
    Status change(int idx, const SVectorBase<R>& subst, const SSVectorBase<R>* eta = 0);
-   //@}
+   ///@}
 
    //--------------------------------
    /**@name Miscellaneous */
@@ -320,7 +320,7 @@ private:
    ///@{
    /// used to implement the assignment operator
    void assign(const SLUFactor<R>& old);
-   //@}
+   ///@}
 };
 
 } // namespace soplex

@@ -341,7 +341,7 @@ protected:
       be called whenever the VectorBase<R> pointers may have
       changed due to manipulations of the LP.
    */
-   //@{
+   ///@{
    /// the LP
    SPxSolverBase<R>* theLP;
    /// SPxId%s of basic vectors.
@@ -405,25 +405,25 @@ protected:
    SPxId  lastout;       ///< lastLeft(): variable left the base last
    int    lastidx;       ///< lastIndex(): basis index where last update was done
    R   minStab;       ///< minimum stability
-   //@}
+   ///@}
 
 private:
 
    //------------------------------------
    //**@name Private data */
-   //@{
+   ///@{
    SPxStatus thestatus;      ///< current status of the basis.
    Desc      thedesc;        ///< the basis' Descriptor
    bool      freeSlinSolver; ///< true iff factor should be freed inside of this object
    SPxOut*   spxout;         ///< message handler
 
-   //@}
+   ///@}
 
 public:
 
    //------------------------------------------------
    /**@name Status and Descriptor related Methods */
-   //@{
+   ///@{
    /// returns current SPxStatus.
    SPxStatus status() const
    {
@@ -497,12 +497,12 @@ public:
              ? dualStatus(SPxRowId(id))
              : dualStatus(SPxColId(id));
    }
-   //@}
+   ///@}
 
 
    //-----------------------------------
    /**@name Inquiry Methods */
-   //@{
+   ///@{
    ///
    inline SPxId& baseId(int i)
    {
@@ -568,11 +568,11 @@ public:
    {
       return theLP;
    }
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Linear Algebra */
-   //@{
+   ///@{
    /// Basis-vector product.
    /** Depending on the representation, for an SPxBasisBase B,
        B.multBaseWith(x) computes
@@ -795,14 +795,14 @@ public:
 
       factor->solveLeft(x, y, z, rhsx, rhsy, rhsz);
    }
-   //@}
+   ///@}
 
 
    //------------------------------------
    /**@name Modification notification.
       These methods must be called after the loaded LP has been modified.
    */
-   //@{
+   ///@{
    /// inform SPxBasisBase, that \p n new rows had been added.
    void addedRows(int n);
    /// inform SPxBasisBase that row \p i had been removed.
@@ -821,12 +821,12 @@ public:
    void changedCol(int);
    /// inform SPxBasisBase that a matrix entry had been changed.
    void changedElement(int, int);
-   //@}
+   ///@}
 
 
    //--------------------------------
    /**@name Miscellaneous */
-   //@{
+   ///@{
    /// performs basis update.
    /** Changes the \p i 'th vector of the basis with the vector associated to
        \p id. This includes:
@@ -952,11 +952,11 @@ public:
    {
       spxout = &newOutstream;
    }
-   //@}
+   ///@}
 
    //--------------------------------------
    /**@name Constructors / Destructors */
-   //@{
+   ///@{
    /// default constructor.
    SPxBasisBase<R>(Timer::TYPE ttype = Timer::USER_TIME);
    /// copy constructor
@@ -965,14 +965,14 @@ public:
    SPxBasisBase<R>& operator=(const SPxBasisBase<R>& rhs);
    /// destructor.
    virtual ~SPxBasisBase<R>();
-   //@}
+   ///@}
 
 
 protected:
 
    //--------------------------------------
    /**@name Protected helpers */
-   //@{
+   ///@{
    /// loads \ref soplex::SPxBasisBase<R>::matrix "matrix" according to the SPxId%s stored in \ref soplex::SPxBasisBase<R>::theBaseId "theBaseId".
    /** This method must  be called whenever there is a chance, that the vector
        pointers may have changed due to manipulations of the LP.
@@ -992,7 +992,7 @@ protected:
 
    /// sets descriptor representation according to loaded LP.
    void setRep();
-   //@}
+   ///@}
 
 };
 

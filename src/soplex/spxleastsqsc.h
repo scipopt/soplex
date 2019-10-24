@@ -60,7 +60,7 @@ public:
 
    //-------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    /// set Real param (conjugate gradient accuracy)
    virtual void setRealParam(R param, const char* name);
    /// set int param (maximal conjugate gradient rounds)

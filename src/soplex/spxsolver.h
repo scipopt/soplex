@@ -341,7 +341,7 @@ protected:
 
    //-----------------------------
    /**@name Protected data */
-   //@{
+   ///@{
    Array < UnitVectorBase<R> > unitVecs; ///< array of unit vectors
    const SVSetBase<R>*   thevectors;   ///< the LP vectors according to representation
    const SVSetBase<R>*   thecovectors; ///< the LP coVectors according to representation
@@ -415,17 +415,17 @@ protected:
    R           boundrange;       ///< absolute range of all bounds in the problem
    R           siderange;        ///< absolute range of all side in the problem
    R           objrange;         ///< absolute range of all objective coefficients in the problem
-   //@}
+   ///@}
 
    //-----------------------------
    /**@name Precision */
-   //@{
+   ///@{
    /// is the solution precise enough, or should we increase delta() ?
    virtual bool precisionReached(R& newpricertol) const;
 
    /// determine ranges of problem values for bounds, sides and objective to assess numerical difficulties
    void calculateProblemRanges();
-   //@}
+   ///@}
 
 public:
 
@@ -934,7 +934,7 @@ private:
 
    //-----------------------------
    /**@name Private helpers */
-   //@{
+   ///@{
    ///
    void localAddRows(int start);
    ///
@@ -947,7 +947,7 @@ private:
    void setDual(VectorBase<R>& p_vector);
    ///
    void setRedCost(VectorBase<R>& p_vector);
-   //@}
+   ///@}
 
 protected:
 
@@ -1680,7 +1680,7 @@ public:
    virtual void qualSlackViolation(R& maxviol, R& sumviol) const;
    /// get violation of optimality criterion.
    virtual void qualRedCostViolation(R& maxviol, R& sumviol) const;
-   //@}
+   ///@}
 
 private:
 
@@ -1703,7 +1703,7 @@ private:
    R perturbMax(const UpdateVector<R>& uvec,
                 VectorBase<R>& low, VectorBase<R>& up, R eps, R delta,
                 const typename SPxBasisBase<R>::Desc::Status* stat, int start, int incr);
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name The Simplex Loop
@@ -2020,7 +2020,7 @@ protected:
    void computeDualfarkas4Col(R direction);
    ///
    void computeDualfarkas4Row(R direction, SPxId enterId);
-   //@}
+   ///@}
 
 public:
 
@@ -2339,7 +2339,7 @@ public:
 
    //------------------------------------
    /** Miscellaneous */
-   //@{
+   ///@{
    /// check consistency.
    bool isConsistent() const;
    ///@}

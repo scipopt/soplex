@@ -56,10 +56,10 @@ private:
 
    //------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    R     theval;      ///< update multiplicator
    SSVectorBase<R> thedelta;    ///< update vector
-   //@}
+   ///@}
 
 public:
 
@@ -93,7 +93,7 @@ public:
 
    /// assignment
    UpdateVector<R>& operator=(const UpdateVector<R>& rhs);
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Access */

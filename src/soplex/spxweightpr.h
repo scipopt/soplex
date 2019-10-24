@@ -45,7 +45,7 @@ private:
 
    //-------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    /// column penalties
    VectorBase<R> cPenalty;
    /// row penalties
@@ -58,11 +58,11 @@ private:
    const R* coPenalty;
    /// length of objective vector.
    R objlength;
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Private helpers */
-   //@{
+   ///@{
    /// compute leave penalties.
    void computeLeavePenalty(int start, int end);
    /// compute weights for columns.

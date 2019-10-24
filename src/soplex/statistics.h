@@ -142,7 +142,7 @@ public:
    // Numerics
    R finalBasisCondition;  ///< condition number estimate of the optimal basis matrix
 
-   //@}
+   ///@}
 
 };
 } // namespace soplex
