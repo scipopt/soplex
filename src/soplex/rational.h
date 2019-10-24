@@ -159,7 +159,7 @@ public:
    //@}
 
 
-   //**@name Typecasts */
+   ///@name Typecasts
    //@{
 
    operator double() const;
@@ -685,7 +685,7 @@ public:
          mpq_set_si(privatevalue, i, 1);
    }
 
-   /// constructor from mpq_t
+   /// constructor from mpq_t (GMP only)
    Private(const mpq_t& q)
       : theprev(0)
       , thenext(0)
