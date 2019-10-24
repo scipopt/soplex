@@ -101,7 +101,7 @@ Nonzero<Real>& Nonzero<Real>::operator=(const Nonzero<S>& vec)
  *  <TR><TD>\c *     </TD><TD>skalar product</TD>
  *      <TD>\c x = \c a \c * \c b </TD></TR>
  *  <TR><TD>\c *=    </TD><TD>scaling       </TD><TD>\c a \c *= \c x </TD></TR>
- *  <TR><TD>maxAbs() </TD><TD>R(infinity) norm </TD>
+ *  <TR><TD>maxAbs() </TD><TD>infinity norm </TD>
  *      <TD>\c a.maxAbs() == \f$\|a\|_{\infty}\f$ </TD></TR>
  *  <TR><TD>length() </TD><TD>eucledian norm</TD>
  *      <TD>\c a.length() == \f$\sqrt{a^2}\f$ </TD></TR>
@@ -472,7 +472,7 @@ public:
    /**@name Arithmetic operations */
    ///@{
 
-   /// Maximum absolute value, i.e., R(infinity) norm.
+   /// Maximum absolute value, i.e., infinity norm.
    R maxAbs() const
    {
       R maxi = 0;

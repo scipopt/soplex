@@ -511,7 +511,7 @@ public:
    template < class S, class T >
    SSVectorBase<R>& assign2productAndSetup(const SVSetBase<S>& A, SSVectorBase<T>& x);
 
-   /// Maximum absolute value, i.e., R(infinity) norm.
+   /// Maximum absolute value, i.e., infinity norm.
    R maxAbs() const
    {
       if(isSetup())
