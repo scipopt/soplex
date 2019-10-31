@@ -63,7 +63,7 @@ interface & parameters:
   1. `VectorBase<T>` is now a wrapper of `std::vector<T>`
   2. The class can handle the additional functionality `DVectorBase<T>`, e.g.,
      `memSize()`, `reSize()`, `scaleAssign(,,).`
-  3. internal member `int dimen` removed. `val.size()` or `VectorBase<R>::dim()`
+  3. internal member `int dimen` *removed*. `val.size()` or `VectorBase<R>::dim()`
      is a replacement.
   4. Replaced calls to memcpy and memmove with `std::copy().` Former functions
      are not compatible with `boost::multiprecision::number`.
@@ -77,7 +77,10 @@ interface & parameters:
      issuing warnings about this with old SoPlex and the multiprecision vectors
      were not working. The same is also true for changes for DataArray and
      changes inside CLUFactor classes.
-- Removed DVectorBase. Replaced by VectorBase. The alias DVector is replaced by
+  8. *Removed* `isConsistent()`, which used to check a vector was empty and had no
+     memory allocated at the same time. This never happens with the std::vector
+     wrapper, hence the removal.
+- *Removed* DVectorBase. Replaced by VectorBase. The alias DVector is replaced by
   the alias Vector. (This has the same problem as VectorBase<T>)
 - DataArray is now a wrapper around `std::vector`, also has move constructor and
   move assignment.

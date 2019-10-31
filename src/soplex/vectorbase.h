@@ -494,9 +494,9 @@ public:
 
   // Provides access to the iterators of std::vector<R> val
   decltype(val.begin()) begin() const
-   {
+  {
     return val.begin();
-   }
+  }
 
 
   // Provides access to the iterators of std::vector<R> val
