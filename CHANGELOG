@@ -68,7 +68,9 @@ interface & parameters:
   4. Replaced calls to memcpy and memmove with `std::copy().` Former functions
      are not compatible with `boost::multiprecision::number`.
   5. Defined move constructor and move assignment.
-  6. *Reason for changes*: VectorBase previously used to manage a pointer and
+  6. Added begin() and end() iterators that return the corresponding iterator of
+     the internal std::vector.
+  7. *Reason for changes*: VectorBase previously used to manage a pointer and
      DVectorBase managed memory allocation by doing malloc, realloc and free
      calls. But this is only guaranteed to work with POD types (Plain Old Data,
      e.g., double, and not boost::number), the new g++ compilers were already

@@ -494,20 +494,18 @@ public:
       return val.data();
    }
 
-   /// Consistency check.
-   bool isConsistent() const
+  // Provides access to the iterators of std::vector<R> val
+  decltype(val.begin()) begin() const
    {
-      // TODO: Does this make sense anymore?
-#ifdef ENABLE_CONSISTENCY_CHECKS
-      if(dim() > 0)
-         return MSGinconsistent("VectorBase");
-
-#endif
-
-      return true;
+    return val.begin();
    }
 
 
+  // Provides access to the iterators of std::vector<R> val
+  decltype(val.end()) end() const
+  {
+    return val.end();
+  }
 
    // Functions from VectorBase
 
