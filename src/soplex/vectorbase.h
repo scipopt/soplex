@@ -194,7 +194,6 @@ public:
          for(decltype(dimen) i = 0 ; i < dimen; i++)
             val[i] = spxLdexp(vec[i], scaleExp);
 
-         assert(isConsistent());
       }
 
       return *this;
@@ -222,7 +221,6 @@ public:
                val[i] = spxLdexp(vec[i], scaleExp[i]);
          }
 
-         assert(isConsistent());
       }
 
       return *this;

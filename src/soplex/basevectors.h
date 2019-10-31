@@ -65,8 +65,6 @@ VectorBase<R>& VectorBase<R>::operator=(const SVectorBase<S>& vec)
       val[vec.index(i)] = vec.value(i);
    }
 
-   assert(isConsistent());
-
    return *this;
 }
 
@@ -84,8 +82,6 @@ VectorBase<R>& VectorBase<R>::assign(const SVectorBase<S>& vec)
       assert(vec.index(i) < dim());
       val[vec.index(i)] = vec.value(i);
    }
-
-   assert(isConsistent());
 
    return *this;
 }
