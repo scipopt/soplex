@@ -73,6 +73,7 @@ OPENSOURCE	=	true
 GMP		=	true
 ZLIB		=	true
 EGLIB		=	false
+Boost 	=  true
 
 COMP		=	gnu
 CXX		=	g++
@@ -382,7 +383,10 @@ GMP_CPPFLAGS	=
 endif
 
 # For boost program options
-LDFLAGS += $(BOOST_LDFLAGS)
+ifeq ($(Boost),true)
+	LDFLAGS += $(BOOST_LDFLAGS)
+	CPPFLAGS += -DSOPLEX_WITH_BOOST
+endif
 
 
 ZLIBDEP		:=	$(SRCDIR)/depend.zlib
