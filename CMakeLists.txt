@@ -22,7 +22,7 @@ include(CPack)
 option(ZLIB "Use ZLIB" ON)
 option(GMP "Use GMP" ON)
 option(STATIC_GMP "Prefer static GMP lib" OFF)
-option(Boost "Use Boost" ON)
+option(Boost "Use Boost (required to build the binary). Disable if you only want to build libsoplex." ON)
 option(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS "Export all symbols into the DLL" ON)
 option(MT "use static runtime libraries for Visual Studio compiler" OFF)
 option(SANITIZE_ADDRESS "should the address sanitizer be enabled in debug mode if available" OFF)
@@ -114,17 +114,19 @@ endif()
 
 # Made with: https://stackoverflow.com/a/3917033/4223038
 if(Boost)
-  # Technically the version 1.70.0 is not needed for program_option, but for the
-  # multiprecision, but it's header only, this is one way to guarantee that the
-  # user has the right version.
-
-  # TODO: The value of boost version should be decided in the future. It would
-  # be nice to check if the version is at least 1.70.0 and issue a warning if it
-  # isn't.
-  find_package(Boost 1.58.0 COMPONENTS program_options REQUIRED) # Refer to comments in cmake/Modules/FindBoost.cmake
-  if(BOOST_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
-  endif()
+    # Technically the version 1.70.0 is not needed for program_option, but for the
+    # multiprecision, but it's header only, this is one way to guarantee that the
+    # user has the right version.   
+    # TODO: The value of boost version should be decided in the future. It would
+    # be nice to check if the version is at least 1.70.0 and issue a warning if it
+    # isn't.
+    find_package(Boost 1.58.0 COMPONENTS program_options REQUIRED) # Refer to comments in cmake/Modules/FindBoost.cmake
+    add_definitions(-DSOPLEX_WITH_BOOST)
+    if(BOOST_FOUND)
+        include_directories(${Boost_INCLUDE_DIRS})
+    endif()
+else()
+    message(WARNING "When building without Boost, only the SoPlex library will be built. Boost with program_options is required to build the binary.")  
 endif()
 
 

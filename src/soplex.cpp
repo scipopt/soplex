@@ -7266,6 +7266,7 @@ bool SoPlexBase<Real>::loadSettingsFile(const char* filename)
    return !readError;
 }
 
+#ifdef SOPLEX_WITH_BOOST
 // TODO: need to change Real to R after soplex-mpf gets merged into master
 /// parses one setting string and returns true on success
 template <>
@@ -7423,6 +7424,7 @@ bool SoPlexBase<Real>::parseSettingsString(const std::string str, boost::any val
 
    return false;
 }
+#endif
 
 /// set statistic timers to a certain type, used to turn off statistic time measurement
 template <>

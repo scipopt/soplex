@@ -62,8 +62,10 @@
 
 #include "soplex/spxlpbase.h"
 
+#ifdef SOPLEX_WITH_BOOST
 #include <boost/any.hpp>
 #include <boost/program_options.hpp>
+#endif
 
 #define DEFAULT_RANDOM_SEED   0   // used to suppress output when the seed was not changed
 
@@ -1539,8 +1541,10 @@ public:
    /// reads settings file; returns true on success
    bool loadSettingsFile(const char* filename);
 
+#ifdef SOPLEX_WITH_BOOST
    /// parses one setting string and returns true on success; note that string is modified
    bool parseSettingsString(const std::string str, boost::any val);
+#endif
 
    ///@}
 
@@ -2409,18 +2413,21 @@ private:
 
    //@}
 
+#ifdef SOPLEX_WITH_BOOST
    // For argument parsing
    template <class S>
    friend int runSoPlex(const boost::program_options::variables_map& vm);
+#endif
 
 };
 
 /* Backwards compatibility */
 typedef SoPlexBase<Real> SoPlex;
 
+#ifdef SOPLEX_WITH_BOOST
 template <>
 bool SoPlexBase<Real>::parseSettingsString(const std::string str, boost::any val);
-
+#endif
 
 }
 #endif // _SOPLEX_H_

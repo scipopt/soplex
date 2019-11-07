@@ -18,11 +18,15 @@
  */
 
 #include "soplex/validation.h"
+
+#ifdef SOPLEX_WITH_BOOST
 #include "boost/lexical_cast.hpp"
+#endif
 
 namespace soplex
 {
 
+#ifdef SOPLEX_WITH_BOOST
 /// updates the external solution used for validation
 template <>
 bool Validation<Real>::updateExternalSolution(const std::string& solution)
@@ -162,5 +166,6 @@ void Validation<Real>::validateSolveReal(SoPlexBase<Real>& soplex)
    os << "   Dual             : " << std::scientific << std::setprecision(
          8) << maxDualViolation << std::fixed << "\n";
 }
+#endif
 
 } /* namespace soplex */
