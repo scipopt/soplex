@@ -551,6 +551,13 @@ SoPlexBase<R>::Settings::RealParam::RealParam()
    lower[SoPlexBase<R>::OBJ_OFFSET] = -DEFAULT_INFINITY;
    upper[SoPlexBase<R>::OBJ_OFFSET] = DEFAULT_INFINITY;
    defaultValue[SoPlexBase<R>::OBJ_OFFSET] = 0.0;
+
+   // minimal Markowitz threshold to control sparsity/stability in LU factorization
+   name[SoPlexBase<R>::MIN_MARKOWITZ] = "min_markowitz";
+   description[SoPlexBase<R>::MIN_MARKOWITZ] = "minimal Markowitz threshold in LU factorization";
+   lower[SoPlexBase<R>::MIN_MARKOWITZ] = 0.0001;
+   upper[SoPlexBase<R>::MIN_MARKOWITZ] = 0.9999;
+   defaultValue[SoPlexBase<R>::MIN_MARKOWITZ] = 0.01;
 }
 
 template <class R>
@@ -6126,6 +6133,10 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
          _rationalLP->changeObjOffset(value);
 
       break;
+
+   case SoPlexBase<R>::MIN_MARKOWITZ:
+     _slufactor.setMarkowitz(value);
+     break;
 
    default:
       return false;
