@@ -58,7 +58,7 @@ void SoPlexBase<R>::_optimizeRational()
                        _basisStatusCols.size());
    }
 
-   // store objective, bounds, and sides of R LP in case they will be modified during iterative refinement
+   // store objective, bounds, and sides of Real LP in case they will be modified during iterative refinement
    _storeLPReal();
 
    // deactivate objective limit in floating-point solver
@@ -336,16 +336,36 @@ void SoPlexBase<R>::_optimizeRational()
    if(boolParam(SoPlexBase<R>::LIFTING))
       _project(_solRational);
 
-   // restore objective, bounds, and sides of R LP in case they have been modified during iterative refinement
+   // restore objective, bounds, and sides of Real LP in case they have been modified during iterative refinement
    _restoreLPReal();
 
-   // since the R LP is loaded in the solver, we need to also pass the basis information to the solver if
+   // since the Real LP is loaded in the solver, we need to also pass the basis information to the solver if
    // available
    if(_hasBasis)
    {
       assert(_isRealLPLoaded);
       _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
       _hasBasis = (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
+
+      // since setBasis always sets the basis status to regular, we need to set it manually here
+      switch(_status)
+        {
+        case SPxSolverBase<R>::OPTIMAL:
+          _solver.setBasisStatus(SPxBasisBase<R>::OPTIMAL);
+          break;
+
+        case SPxSolverBase<R>::INFEASIBLE:
+          _solver.setBasisStatus(SPxBasisBase<R>::INFEASIBLE);
+          break;
+
+        case SPxSolverBase<R>::UNBOUNDED:
+          _solver.setBasisStatus(SPxBasisBase<R>::UNBOUNDED);
+          break;
+
+        default:
+          break;
+        }
+
    }
 
    // stop timing
@@ -486,7 +506,7 @@ void SoPlexBase<R>::_performOptIRStable(
          sol._primal[c] = upperRational(c);
       else if(basisStatusCol == SPxSolverBase<R>::FIXED)
       {
-         // it may happen that lower and upper are only equal in the R LP but different in the rational LP; we do
+         // it may happen that lower and upper are only equal in the Real LP but different in the rational LP; we do
          // not check this to avoid rational comparisons, but simply switch the basis status to the lower bound; this
          // is necessary, because for fixed variables any reduced cost is feasible
          sol._primal[c] = lowerRational(c);
@@ -506,7 +526,7 @@ void SoPlexBase<R>::_performOptIRStable(
    {
       typename SPxSolverBase<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
 
-      // it may happen that left-hand and right-hand side are different in the rational, but equal in the R LP,
+      // it may happen that left-hand and right-hand side are different in the rational, but equal in the Real LP,
       // leading to a fixed basis status; this is critical because rows with fixed basis status are ignored in the
       // computation of the dual violation; to avoid rational comparisons we do not check this but simply switch to
       // the left-hand side status
@@ -807,11 +827,15 @@ void SoPlexBase<R>::_performOptIRStable(
          bestViolation = maxViolation;
 
       // decide whether to perform rational reconstruction and/or factorization
+      bool forcebasic    = boolParam(SoPlexBase<R>::FORCEBASIC);
       bool performRatfac = boolParam(SoPlexBase<R>::RATFAC)
                            && lastStallRefinements >= intParam(SoPlexBase<R>::RATFAC_MINSTALLS) && _hasBasis
                            && factorSolNewBasis;
       bool performRatrec = boolParam(SoPlexBase<R>::RATREC)
                            && (_statistics->refinements >= nextRatrecRefinement || performRatfac);
+
+      // if we want to force the solution to be basic we need to turn rational factorization on
+      performRatfac = performRatfac || forcebasic;
 
       // attempt rational reconstruction
       errorCorrection *= errorCorrectionFactor;
@@ -828,16 +852,17 @@ void SoPlexBase<R>::_performOptIRStable(
             MSG_INFO1(spxout, spxout << "Tolerances reached.\n");
             primalFeasible = true;
             dualFeasible = true;
-            break;
+            if(_hasBasis || !forcebasic)
+              break;
          }
 
-         nextRatrecRefinement = int(_statistics->refinements * RealParam(SoPlexBase<R>::RATREC_FREQ)) + 1;
+         nextRatrecRefinement = int(_statistics->refinements * realParam(SoPlexBase<R>::RATREC_FREQ)) + 1;
          MSG_DEBUG(spxout << "Next rational reconstruction after refinement " << nextRatrecRefinement <<
                    ".\n");
       }
 
       // solve basis systems exactly
-      if(performRatfac && maxViolation > 0)
+      if((performRatfac && maxViolation > 0) || (!_hasBasis && forcebasic))
       {
          MSG_INFO1(spxout, spxout << "Performing rational factorization . . .\n");
 
@@ -1204,7 +1229,7 @@ void SoPlexBase<R>::_performOptIRStable(
          }
          else if(basisStatusCol == SPxSolverBase<R>::FIXED)
          {
-            // it may happen that lower and upper are only equal in the R LP but different in the rational LP; we
+            // it may happen that lower and upper are only equal in the Real LP but different in the rational LP; we
             // do not check this to avoid rational comparisons, but simply switch the basis status to the lower
             // bound; this is necessary, because for fixed variables any reduced cost is feasible
             basisStatusCol = SPxSolverBase<R>::ON_LOWER;
@@ -1406,7 +1431,7 @@ void SoPlexBase<R>::_performOptIRStable(
       {
          typename SPxSolverBase<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
 
-         // it may happen that left-hand and right-hand side are different in the rational, but equal in the R LP,
+         // it may happen that left-hand and right-hand side are different in the rational, but equal in the Real LP,
          // leading to a fixed basis status; this is critical because rows with fixed basis status are ignored in the
          // computation of the dual violation; to avoid rational comparisons we do not check this but simply switch
          // to the left-hand side status
