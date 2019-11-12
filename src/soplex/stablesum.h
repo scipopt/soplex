@@ -15,6 +15,7 @@
 
 #ifndef _SOPLEX_STABLE_SUM_H_
 #define _SOPLEX_STABLE_SUM_H_
+#include <type_traits>
 
 // #define CHECK_STABLESUM  // double check the stable sum computation
 
@@ -24,7 +25,7 @@ namespace soplex
 template <typename T>
 class StableSum
 {
-   T sum;
+  typename std::remove_const<T>::type sum;
 
 public:
    StableSum() : sum(0) {}
@@ -40,7 +41,7 @@ public:
       sum -= input;
    }
 
-   operator T() const
+  operator typename std::remove_const<T>::type() const
    {
       return sum;
    }
