@@ -372,7 +372,7 @@ public:
    /// Inner product.
    R operator*(const VectorBase<R>& vec) const
    {
-      R x = 0.0;
+     StableSum<R> x;
 
       auto dimen = dim();
 

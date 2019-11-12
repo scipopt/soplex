@@ -795,7 +795,7 @@ void SPxSolverBase<R>::setType(Type tp)
    R SPxSolverBase<R>::nonbasicValue()
    {
       int i;
-      R val = 0;
+      StableSum<R> val;
       const typename SPxBasisBase<R>::Desc& ds = this->desc();
 
 #ifndef ENABLE_ADDITIONAL_CHECKS
@@ -966,7 +966,7 @@ void SPxSolverBase<R>::setType(Type tp)
 
       if(!m_nonbasicValueUpToDate)
       {
-         m_nonbasicValue = val;
+         m_nonbasicValue = R(val);
          m_nonbasicValueUpToDate = true;
       }
 
@@ -1807,7 +1807,8 @@ void SPxSolverBase<R>::setType(Type tp)
 
    template <class R>
    typename SPxBasisBase<R>::Desc::Status
-   SPxSolverBase<R>::varStatusToBasisStatusRow(int row, typename SPxSolverBase<R>::VarStatus stat) const
+   SPxSolverBase<R>::varStatusToBasisStatusRow(int row,
+         typename SPxSolverBase<R>::VarStatus stat) const
    {
       typename SPxBasisBase<R>::Desc::Status rstat;
 
@@ -1875,7 +1876,8 @@ void SPxSolverBase<R>::setType(Type tp)
 
    template <class R>
    typename SPxBasisBase<R>::Desc::Status
-   SPxSolverBase<R>::varStatusToBasisStatusCol(int col, typename SPxSolverBase<R>::VarStatus stat) const
+   SPxSolverBase<R>::varStatusToBasisStatusCol(int col,
+         typename SPxSolverBase<R>::VarStatus stat) const
    {
       typename SPxBasisBase<R>::Desc::Status cstat;
 

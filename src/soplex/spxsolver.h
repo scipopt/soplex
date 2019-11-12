@@ -1943,21 +1943,22 @@ protected:
    ///
    virtual void getLeaveVals(int i,
                              typename SPxBasisBase<R>::Desc::Status& leaveStat, SPxId& leaveId,
-                             R& leaveMax, R& leavebound, int& leaveNum, R& objChange);
+                             R& leaveMax, R& leavebound, int& leaveNum, StableSum<R>& objChange);
    ///
    virtual void getLeaveVals2(R leaveMax, SPxId enterId,
                               R& enterBound, R& newUBbound,
-                              R& newLBbound, R& newCoPrhs, R& objChange);
+                              R& newLBbound, R& newCoPrhs, StableSum<R>& objChange);
    ///
    virtual void getEnterVals(SPxId id, R& enterTest,
                              R& enterUB, R& enterLB, R& enterVal, R& enterMax,
-                             R& enterPric, typename SPxBasisBase<R>::Desc::Status& enterStat, R& enterRO, R& objChange);
+                             R& enterPric, typename SPxBasisBase<R>::Desc::Status& enterStat, R& enterRO,
+                             StableSum<R>& objChange);
    ///
    virtual void getEnterVals2(int leaveIdx,
-                              R enterMax, R& leaveBound, R& objChange);
+                              R enterMax, R& leaveBound, StableSum<R>& objChange);
    ///
    virtual void ungetEnterVal(SPxId enterId, typename SPxBasisBase<R>::Desc::Status enterStat,
-                              R leaveVal, const SVectorBase<R>& vec, R& objChange);
+                              R leaveVal, const SVectorBase<R>& vec, StableSum<R>& objChange);
    ///
    virtual void rejectEnter(SPxId enterId,
                             R enterTest, typename SPxBasisBase<R>::Desc::Status enterStat);

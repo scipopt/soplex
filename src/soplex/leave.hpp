@@ -202,7 +202,7 @@ void SPxSolverBase<R>::getLeaveVals(
    R& leaveMax,
    R& leavebound,
    int& leaveNum,
-   R& objChange)
+   StableSum<R>& objChange)
 {
    typename SPxBasisBase<R>::Desc& ds = this->desc();
    leaveId = this->baseId(leaveIdx);
@@ -409,7 +409,7 @@ void SPxSolverBase<R>::getLeaveVals2(
    R& newUBbound,
    R& newLBbound,
    R& newCoPrhs,
-   R& objChange
+   StableSum<R>& objChange
 )
 {
    typename SPxBasisBase<R>::Desc& ds = this->desc();
@@ -770,7 +770,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
    R leaveMax;       // maximium lambda of leaving var
    R leavebound;     // current fVec value of leaving var
    int  leaveNum;       // number of leaveId in bounds
-   R objChange = 0.0; // amount of change in the objective function
+   StableSum<R> objChange; // amount of change in the objective function
 
    getLeaveVals(leaveIdx, leaveStat, leaveId, leaveMax, leavebound, leaveNum, objChange);
 
@@ -816,7 +816,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
          correct basis size */
       rejectLeave(leaveNum, leaveId, leaveStat);
       this->change(-1, none, 0);
-      objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
+      objChange = R(0.0); // the nonbasicValue is not supposed to be updated in this case
 
       if(polish)
          return false;
@@ -995,7 +995,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
 
                rejectLeave(leaveNum, leaveId, leaveStat);
                this->change(-1, none, 0);
-               objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
+               objChange = R(0.0); // the nonbasicValue is not supposed to be updated in this case
 
                /**@todo if shift() is not zero we must not conclude unboundedness */
                if(rep() == ROW)
@@ -1016,7 +1016,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
                theFvec->delta().clear();
                rejectLeave(leaveNum, leaveId, leaveStat, &newVector);
                this->change(-1, none, 0);
-               objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
+               objChange = R(0.0); // the nonbasicValue is not supposed to be updated in this case
 
                MSG_DEBUG(std::cout << "DLEAVE63 rejecting leave B (leaveIdx=" << leaveIdx
                          << ", theCoTest=" << theCoTest[leaveIdx]
@@ -1047,7 +1047,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
          {
             rejectLeave(leaveNum, leaveId, leaveStat);
             this->change(-1, none, 0);
-            objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
+            objChange = R(0.0); // the nonbasicValue is not supposed to be updated in this case
             throw F;
          }
 

@@ -456,7 +456,7 @@ void SPxSolverBase<R>::getEnterVals
    R& enterPric,
    typename SPxBasisBase<R>::Desc::Status& enterStat,
    R& enterRO,
-   R& objChange
+   StableSum<R>& objChange
 )
 {
    int enterIdx;
@@ -776,7 +776,7 @@ void SPxSolverBase<R>::getEnterVals2
    int leaveIdx,
    R enterMax,
    R& leavebound,
-   R& objChange
+   StableSum<R>& objChange
 )
 {
    int idx;
@@ -1094,7 +1094,7 @@ SPxSolverBase<R>::ungetEnterVal(
    typename SPxBasisBase<R>::Desc::Status enterStat,
    R leaveVal,
    const SVectorBase<R>& vec,
-   R& objChange
+   StableSum<R>& objChange
 )
 {
    assert(rep() == COLUMN);
@@ -1226,7 +1226,7 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
    R enterPric;      // priced value of entering variable
    typename SPxBasisBase<R>::Desc::Status enterStat;      // status of entering variable
    R enterRO;        // rhs/obj of entering variable
-   R objChange = 0.0;
+   StableSum<R> objChange;
    const SVectorBase<R>* enterVec = enterVector(enterId);
 
    bool instable = instableEnter;
