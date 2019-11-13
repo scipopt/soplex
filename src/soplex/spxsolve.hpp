@@ -192,7 +192,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve()
       /**@todo != REGULAR is not enough. Also OPTIMAL/DUAL/PRIMAL should
        * be tested and acted accordingly.
        */
-      if(thestarter != 0 && status() != REGULAR)   // no basis and no starter.
+     if(thestarter != 0 && status() != REGULAR && this->theLP->status() == NO_PROBLEM)   // no basis and no starter.
          thestarter->generate(*this);              // generate start basis.
 
       init();
@@ -1950,7 +1950,27 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::getDualSol(VectorBase<R>& p_
       }
    }
    else
-      p_vector = coPvec();
+   {
+     const typename SPxBasisBase<R>::Desc& ds = this->desc();
+
+     for(int i = 0; i < this->nRows(); ++i)
+       {
+         switch(ds.rowStatus(i))
+           {
+           case SPxBasisBase<R>::Desc::D_FREE:
+           case SPxBasisBase<R>::Desc::D_ON_UPPER:
+           case SPxBasisBase<R>::Desc::D_ON_LOWER:
+           case SPxBasisBase<R>::Desc::D_ON_BOTH:
+           case SPxBasisBase<R>::Desc::D_UNDEFINED:
+             // assert(isZero((*theCoPvec)[i], 1e-9));
+             p_vector[i] = 0;
+             break;
+
+           default:
+             p_vector[i] = (*theCoPvec)[i];
+           }
+       }
+   }
 
    p_vector *= Real(this->spxSense());
 
@@ -1994,7 +2014,25 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::getRedCostSol(VectorBase<R>&
    else
    {
       p_vector = this->maxObj();
-      p_vector -= pVec();
+      const typename SPxBasisBase<R>::Desc& ds = this->desc();
+
+      for(int i = 0; i < this->nCols(); ++i)
+        {
+          switch(ds.colStatus(i))
+            {
+            case SPxBasis::Desc::D_FREE:
+            case SPxBasis::Desc::D_ON_UPPER:
+            case SPxBasis::Desc::D_ON_LOWER:
+            case SPxBasis::Desc::D_ON_BOTH:
+            case SPxBasis::Desc::D_UNDEFINED:
+              // assert(EQ(maxObj()[i], (*thePvec)[i], 1e-9));
+              p_vector[i] = 0;
+              break;
+
+            default:
+              p_vector[i] = this->maxObj()[i] - (*thePvec)[i];
+            }
+        }
 
       if(this->spxSense() == SPxLPBase<R>::MINIMIZE)
          p_vector *= -1.0;
