@@ -114,8 +114,8 @@ void SPxSolverBase<R>::computeTest()
    R pricingTol = leavetol();
    m_pricingViolCoUpToDate = true;
    m_pricingViolCo = 0;
+
    infeasibilitiesCo.clear();
-   int ninfeasibilities = 0;
    int sparsitythreshold = (int)(sparsePricingFactor * coDim());
 
    for(int i = 0; i < coDim(); ++i)
@@ -142,28 +142,31 @@ void SPxSolverBase<R>::computeTest()
                m_pricingViolCo -= theTest[i];
                infeasibilitiesCo.addIdx(i);
                isInfeasibleCo[i] = SPxPricer<R>::VIOLATED;
-               ++ninfeasibilities;
+               ++m_numViol;
             }
             else
                isInfeasibleCo[i] = SPxPricer<R>::NOT_VIOLATED;
 
-            if(ninfeasibilities > sparsitythreshold)
+            if(infeasibilitiesCo.size() > sparsitythreshold)
             {
                MSG_INFO2((*this->spxout), (*this->spxout) << " --- using dense pricing"
                          << std::endl;)
                remainingRoundsEnterCo = DENSEROUNDS;
                sparsePricingEnterCo = false;
-               ninfeasibilities = 0;
+               infeasibilitiesCo.clear();
             }
          }
          else if(theTest[i] < -pricingTol)
+         {
             m_pricingViolCo -= theTest[i];
+            ++m_numViol;
+         }
       }
    }
 
-   if(ninfeasibilities == 0 && !sparsePricingEnterCo)
+   if(infeasibilitiesCo.size() == 0 && !sparsePricingEnterCo)
       --remainingRoundsEnterCo;
-   else if(ninfeasibilities <= sparsitythreshold && !sparsePricingEnterCo)
+   else if(infeasibilitiesCo.size() <= sparsitythreshold && !sparsePricingEnterCo)
    {
       MSG_INFO2((*this->spxout),
                 std::streamsize prec = spxout->precision();
@@ -174,7 +177,7 @@ void SPxSolverBase<R>::computeTest()
                    (*this->spxout) << " --- using sparse pricing, ";
                    (*this->spxout) << "sparsity: "
                    << std::setw(6) << std::fixed << std::setprecision(4)
-                   << (R) ninfeasibilities / coDim()
+                   << (R) infeasibilitiesCo.size() / coDim()
                    << std::scientific << std::setprecision(int(prec))
                    << std::endl;
                   )
@@ -252,8 +255,8 @@ void SPxSolverBase<R>::computeCoTest()
    R pricingTol = leavetol();
    m_pricingViolUpToDate = true;
    m_pricingViol = 0;
+   m_numViol = 0;
    infeasibilities.clear();
-   int ninfeasibilities = 0;
    int sparsitythreshold = (int)(sparsePricingFactor * dim());
    const typename SPxBasisBase<R>::Desc& ds = this->desc();
 
@@ -280,28 +283,31 @@ void SPxSolverBase<R>::computeCoTest()
                m_pricingViol -= theCoTest[i];
                infeasibilities.addIdx(i);
                isInfeasible[i] = SPxPricer<R>::VIOLATED;
-               ++ninfeasibilities;
+               ++m_numViol;
             }
             else
                isInfeasible[i] = SPxPricer<R>::NOT_VIOLATED;
 
-            if(ninfeasibilities > sparsitythreshold)
+            if(infeasibilities.size() > sparsitythreshold)
             {
                MSG_INFO2((*this->spxout), (*this->spxout) << " --- using dense pricing"
                          << std::endl;)
                remainingRoundsEnter = DENSEROUNDS;
                sparsePricingEnter = false;
-               ninfeasibilities = 0;
+               infeasibilities.clear();
             }
          }
          else if(theCoTest[i] < -pricingTol)
+         {
             m_pricingViol -= theCoTest[i];
+            ++m_numViol;
+         }
       }
    }
 
-   if(ninfeasibilities == 0 && !sparsePricingEnter)
+   if(infeasibilities.size() == 0 && !sparsePricingEnter)
       --remainingRoundsEnter;
-   else if(ninfeasibilities <= sparsitythreshold && !sparsePricingEnter)
+   else if(infeasibilities.size() <= sparsitythreshold && !sparsePricingEnter)
    {
       MSG_INFO2((*this->spxout),
                 std::streamsize prec = spxout->precision();
@@ -312,7 +318,7 @@ void SPxSolverBase<R>::computeCoTest()
                    (*this->spxout) << " --- using sparse pricing, ";
                    (*this->spxout) << "sparsity: "
                    << std::setw(6) << std::fixed << std::setprecision(4)
-                   << (R) ninfeasibilities / dim()
+                   << (R) infeasibilities.size() / dim()
                    << std::scientific << std::setprecision(int(prec))
                    << std::endl;
                   )

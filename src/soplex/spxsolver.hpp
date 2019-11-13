@@ -1091,6 +1091,7 @@ void SPxSolverBase<R>::setType(Type tp)
       , m_pricingViolUpToDate(false)
       , m_pricingViolCo(0.0)
       , m_pricingViolCoUpToDate(false)
+      , m_numViol(0)
       , theShift(0)
       , m_maxCycle(100)
       , m_numCycle(0)
@@ -1206,6 +1207,7 @@ void SPxSolverBase<R>::setType(Type tp)
          m_pricingViolUpToDate = base.m_pricingViolUpToDate;
          m_pricingViolCo = base.m_pricingViolCo;
          m_pricingViolCoUpToDate = base.m_pricingViolCoUpToDate;
+         m_numViol = base.m_numViol;
          m_entertol = base.m_entertol;
          m_leavetol = base.m_leavetol;
          theShift = base.theShift;
@@ -1404,6 +1406,7 @@ void SPxSolverBase<R>::setType(Type tp)
       , m_pricingViolUpToDate(base.m_pricingViolUpToDate)
       , m_pricingViolCo(base.m_pricingViolCo)
       , m_pricingViolCoUpToDate(base.m_pricingViolCoUpToDate)
+      , m_numViol(base.m_numViol)
       , m_entertol(base.m_entertol)
       , m_leavetol(base.m_leavetol)
       , theShift(base.theShift)

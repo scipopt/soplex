@@ -46,8 +46,8 @@ void SPxSolverBase<R>::computeFtest()
    m_pricingViolCoUpToDate = true;
    m_pricingViol = 0;
    m_pricingViolCo = 0;
+   m_numViol = 0;
    infeasibilities.clear();
-   int ninfeasibilities = 0;
    int sparsitythreshold = (int)(sparsePricingFactor * dim());
 
    for(int i = 0; i < dim(); ++i)
@@ -63,29 +63,32 @@ void SPxSolverBase<R>::computeFtest()
             m_pricingViol -= theCoTest[i];
             infeasibilities.addIdx(i);
             isInfeasible[i] = SPxPricer<R>::VIOLATED;
-            ++ninfeasibilities;
+            ++m_numViol;
          }
          else
             isInfeasible[i] = SPxPricer<R>::NOT_VIOLATED;
 
-         if(ninfeasibilities > sparsitythreshold)
+         if(infeasibilities.size() > sparsitythreshold)
          {
             MSG_INFO2((*this->spxout), (*this->spxout) << " --- using dense pricing"
                       << std::endl;)
             remainingRoundsLeave = DENSEROUNDS;
             sparsePricingLeave = false;
-            ninfeasibilities = 0;
+            infeasibilities.clear();
          }
       }
       else if(theCoTest[i] < -theeps)
+      {
          m_pricingViol -= theCoTest[i];
+         m_numViol++;
+      }
    }
 
-   if(ninfeasibilities == 0 && !sparsePricingLeave)
+   if(infeasibilities.size() == 0 && !sparsePricingLeave)
    {
       --remainingRoundsLeave;
    }
-   else if(ninfeasibilities <= sparsitythreshold && !sparsePricingLeave)
+   else if(infeasibilities.size() <= sparsitythreshold && !sparsePricingLeave)
    {
       MSG_INFO2((*this->spxout),
                 std::streamsize prec = spxout->precision();
@@ -96,7 +99,7 @@ void SPxSolverBase<R>::computeFtest()
                    (*this->spxout) << " --- using sparse pricing, ";
                    (*this->spxout) << "sparsity: "
                    << std::setw(6) << std::fixed << std::setprecision(4)
-                   << (R) ninfeasibilities / dim()
+                   << (R) m_numViol / dim()
                    << std::scientific << std::setprecision(int(prec))
                    << std::endl;
                   )
@@ -121,12 +124,12 @@ void SPxSolverBase<R>::updateFtest()
       int i = idx.index(j);
 
       if(m_pricingViolUpToDate && ftest[i] < -theeps)
+         // violation was present before this iteration
          m_pricingViol += ftest[i];
 
       ftest[i] = ((*theFvec)[i] > theUBbound[i])
                  ? theUBbound[i] - (*theFvec)[i]
                  : (*theFvec)[i] - theLBbound[i];
-
 
       if(sparsePricingLeave && ftest[i] < -theeps)
       {
@@ -149,7 +152,6 @@ void SPxSolverBase<R>::updateFtest()
       }
       else if(m_pricingViolUpToDate && ftest[i] < -theeps)
          m_pricingViol -= ftest[i];
-
    }
 
    // if boundflips were performed, we need to update these indices as well

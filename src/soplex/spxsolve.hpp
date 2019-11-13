@@ -417,8 +417,8 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve()
                      forceRecompNonbasicValue();
 
                      MSG_INFO2((*this->spxout), (*this->spxout) << " --- checking feasibility and optimality\n")
-                     computeTest();
                      computeCoTest();
+                     computeTest();
 
                      // is the solution good enough ?
                      // max three times reduced
@@ -1613,7 +1613,7 @@ void SPxSolverBase<R>::printDisplayLine(const bool force, const bool forceHead)
              if(forceHead || displayLine % (displayFreq * 30) == 0)
 {
    (*this->spxout)
-            << "type |   time |   iters | facts |    shift | violation |     obj value ";
+            << "type |   time |   iters | facts |    shift | viol sum | viol num | obj value ";
 
       if(printBasisMetric >= 0)
          (*this->spxout) << " | basis metric";
@@ -1628,8 +1628,9 @@ void SPxSolverBase<R>::printDisplayLine(const bool force, const bool forceHead)
       (*this->spxout) << std::scientific << std::setprecision(2);
       (*this->spxout) << std::setw(8) << this->iteration() << " | "
                       << std::setw(5) << slinSolver()->getFactorCount() << " | "
-                      << shift() << " |  "
+                      << shift() << " | "
                       << MAXIMUM(0.0, m_pricingViol + m_pricingViolCo) << " | "
+                      << std::setw(8) << MAXIMUM(0, m_numViol) << " | "
                       << std::setprecision(8) << value();
 
       if(getStartingDecompBasis && rep() == SPxSolverBase<R>::ROW)
@@ -1711,7 +1712,10 @@ bool SPxSolverBase<R>::terminate()
          computePvec();
 
          if(type() == ENTER)
+         {
+            computeCoTest();
             computeTest();
+         }
       }
 
       if(shift() > 0.0)

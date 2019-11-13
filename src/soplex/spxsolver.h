@@ -268,6 +268,8 @@ private:
 
    R           m_pricingViol;             ///< maximal feasibility violation of current solution
    bool           m_pricingViolUpToDate;     ///< true, if the stored violation is up to date
+   int            m_numViol;     ///< number of violations of current solution
+
    R
    m_pricingViolCo;           ///< maximal feasibility violation of current solution in coDim
    bool           m_pricingViolCoUpToDate;   ///< true, if the stored violation in coDim is up to date
