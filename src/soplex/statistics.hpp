@@ -264,25 +264,33 @@ void SoPlexBase<R>::Statistics::print(std::ostream& os)
 
    os << "Matrix-Vector ops   : \n"
       << "  Sparse    time    : " << multTimeSparse;
-   if( solTime > 0 )
+
+   if(solTime > 0)
       os << " (" << 100 * (multTimeSparse / solTime) << "% of solving time)";
+
    os << "\n            calls   : " << multSparseCalls;
-   os << " (" << 100 * (multSparseCalls / (0.01+iterations)) << "% of iterations)";
+   os << " (" << 100 * (multSparseCalls / (0.01 + iterations)) << "% of iterations)";
    os << "\n  Full      time    : " << multTimeFull;
-   if( solTime > 0 )
+
+   if(solTime > 0)
       os << " (" << 100 * (multTimeFull / solTime) << "% of solving time)";
+
    os << "\n            calls   : " << multFullCalls;
-   os << " (" << 100 * (multFullCalls / (0.01+iterations)) << "% of iterations)";
+   os << " (" << 100 * (multFullCalls / (0.01 + iterations)) << "% of iterations)";
    os << "\n  Colwise   time    : " << multTimeColwise;
-   if( solTime > 0 )
+
+   if(solTime > 0)
       os << " (" << 100 * (multTimeColwise / solTime) << "% of solving time)";
+
    os << "\n            calls   : " << multColwiseCalls;
-   os << " (" << 100 * (multColwiseCalls / (0.01+iterations)) << "% of iterations)";
+   os << " (" << 100 * (multColwiseCalls / (0.01 + iterations)) << "% of iterations)";
    os << "\n  Unsetup   time    : " << multTimeUnsetup;
-   if( solTime > 0 )
+
+   if(solTime > 0)
       os << " (" << 100 * (multTimeUnsetup / solTime) << "% of solving time)";
+
    os << "\n            calls   : " << multUnsetupCalls;
-   os << " (" << 100 * (multUnsetupCalls / (0.01+iterations)) << "% of iterations)";
+   os << " (" << 100 * (multUnsetupCalls / (0.01 + iterations)) << "% of iterations)";
    os << "\n";
 
    os << "Rat. factorizations : " << luFactorizationsRational << "\n"

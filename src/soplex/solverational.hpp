@@ -349,22 +349,22 @@ void SoPlexBase<R>::_optimizeRational()
 
       // since setBasis always sets the basis status to regular, we need to set it manually here
       switch(_status)
-        {
-        case SPxSolverBase<R>::OPTIMAL:
-          _solver.setBasisStatus(SPxBasisBase<R>::OPTIMAL);
-          break;
+      {
+      case SPxSolverBase<R>::OPTIMAL:
+         _solver.setBasisStatus(SPxBasisBase<R>::OPTIMAL);
+         break;
 
-        case SPxSolverBase<R>::INFEASIBLE:
-          _solver.setBasisStatus(SPxBasisBase<R>::INFEASIBLE);
-          break;
+      case SPxSolverBase<R>::INFEASIBLE:
+         _solver.setBasisStatus(SPxBasisBase<R>::INFEASIBLE);
+         break;
 
-        case SPxSolverBase<R>::UNBOUNDED:
-          _solver.setBasisStatus(SPxBasisBase<R>::UNBOUNDED);
-          break;
+      case SPxSolverBase<R>::UNBOUNDED:
+         _solver.setBasisStatus(SPxBasisBase<R>::UNBOUNDED);
+         break;
 
-        default:
-          break;
-        }
+      default:
+         break;
+      }
 
    }
 
@@ -852,8 +852,9 @@ void SoPlexBase<R>::_performOptIRStable(
             MSG_INFO1(spxout, spxout << "Tolerances reached.\n");
             primalFeasible = true;
             dualFeasible = true;
+
             if(_hasBasis || !forcebasic)
-              break;
+               break;
          }
 
          nextRatrecRefinement = int(_statistics->refinements * realParam(SoPlexBase<R>::RATREC_FREQ)) + 1;

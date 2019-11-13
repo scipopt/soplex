@@ -31,8 +31,8 @@
 
 namespace soplex
 {
-  // Some instantiations to avoid linking issues in (mostly) windows and linux.
-  // These functions are defined in spxlpbase_rational.cpp
+// Some instantiations to avoid linking issues in (mostly) windows and linux.
+// These functions are defined in spxlpbase_rational.cpp
 
 template <>
 void SPxLPBase<Rational>::writeMPS(
@@ -57,31 +57,32 @@ void SPxLPBase<Rational>::writeLPF(
    const DIdxSet* p_intvars          ///< integer variables
 ) const;
 
-  template <>
-  bool SPxLPBase<Rational>::readMPS(
-                                    std::istream& p_input,           ///< input stream.
-                                    NameSet*      p_rnames,          ///< row names.
-                                    NameSet*      p_cnames,          ///< column names.
-                                    DIdxSet*      p_intvars);         ///< integer variables.
+template <>
+bool SPxLPBase<Rational>::readMPS(
+   std::istream& p_input,           ///< input stream.
+   NameSet*      p_rnames,          ///< row names.
+   NameSet*      p_cnames,          ///< column names.
+   DIdxSet*      p_intvars);         ///< integer variables.
 
-  template < >
-  void SPxLPBase<Rational>::buildDualProblem(SPxLPBase<Rational>& dualLP, SPxRowId primalRowIds[],
-                                             SPxColId primalColIds[],
-                                             SPxRowId dualRowIds[], SPxColId dualColIds[], int* nprimalrows, int* nprimalcols, int* ndualrows,                                             int* ndualcols);
+template < >
+void SPxLPBase<Rational>::buildDualProblem(SPxLPBase<Rational>& dualLP, SPxRowId primalRowIds[],
+      SPxColId primalColIds[],
+      SPxRowId dualRowIds[], SPxColId dualColIds[], int* nprimalrows, int* nprimalcols, int* ndualrows,
+      int* ndualcols);
 
-  template<>
-  void SPxLPBase<Rational>::computeDualActivity(const VectorBase<Rational>& dual,
-                                                VectorBase<Rational>& activity, const bool unscaled) const;
+template<>
+void SPxLPBase<Rational>::computeDualActivity(const VectorBase<Rational>& dual,
+      VectorBase<Rational>& activity, const bool unscaled) const;
 
-  template<>
-  void SPxLPBase<Rational>::computePrimalActivity(const VectorBase<Rational>& primal,
-                                                  VectorBase<Rational>& activity, const bool unscaled) const;
+template<>
+void SPxLPBase<Rational>::computePrimalActivity(const VectorBase<Rational>& primal,
+      VectorBase<Rational>& activity, const bool unscaled) const;
 
-  template<>
-  Rational SPxLPBase<Rational>::maxAbsNzo(bool /* unscaled */) const;
+template<>
+Rational SPxLPBase<Rational>::maxAbsNzo(bool /* unscaled */) const;
 
-  template<>
-  Rational SPxLPBase<Rational>::minAbsNzo(bool /* unscaled */) const;
+template<>
+Rational SPxLPBase<Rational>::minAbsNzo(bool /* unscaled */) const;
 
 /// Is \p c a \c space, \c tab, \c nl or \c cr ?
 static inline bool LPFisSpace(int c)
@@ -1616,12 +1617,15 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSe
 
          int ncnames = cnames.size();
          cnames.add(colname);
+
          // check whether the new name is unique wrt previous column names
-         if( cnames.size() <= ncnames )
-           {
-               MSG_ERROR( std::cerr << "ERROR in COLUMNS: duplicate column name or not column-wise ordering" << std::endl; )
-               break;
-           }
+         if(cnames.size() <= ncnames)
+         {
+            MSG_ERROR(std::cerr << "ERROR in COLUMNS: duplicate column name or not column-wise ordering" <<
+                      std::endl;)
+            break;
+         }
+
          vec.clear();
          col.setObj(0.0);
          col.setLower(0.0);
@@ -2454,13 +2458,13 @@ static void MPSwriteRecord(
 
    if(name1 != nullptr)
    {
-     spxSnprintf(buf, sizeof(buf), "%-8.8s ", name1);
-     os << buf << value2;
+      spxSnprintf(buf, sizeof(buf), "%-8.8s ", name1);
+      os << buf << value2;
 
       if(name2 != nullptr)
       {
-        spxSnprintf(buf, sizeof(buf), "   %-8.8s ", name2);
-        os << buf << name2;
+         spxSnprintf(buf, sizeof(buf), "   %-8.8s ", name2);
+         os << buf << name2;
       }
    }
 

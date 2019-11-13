@@ -164,13 +164,13 @@ public:
       assert(n < size() && n >= 0);
 
       if(n + m < size())
-        {
-          data.erase(data.begin() + n, data.begin() + n + m);
-        }
+      {
+         data.erase(data.begin() + n, data.begin() + n + m);
+      }
       else
-        {
-          data.erase(data.begin() + n, data.end());
-        }
+      {
+         data.erase(data.begin() + n, data.end());
+      }
    }
    /// remove \p m last elements.
    void removeLast(int m = 1)
@@ -273,12 +273,12 @@ public:
       return *this;
    }
 
-  // Move assignment for Dataarray
-  DataArray& operator=(const DataArray&& rhs)
-  {
-    data = std::move(rhs.data);
-    return *this;
-  }
+   // Move assignment for Dataarray
+   DataArray& operator=(const DataArray&& rhs)
+   {
+      data = std::move(rhs.data);
+      return *this;
+   }
 
    /// copy constructor
    DataArray(const DataArray& old)
@@ -308,10 +308,10 @@ public:
       // though.
    }
 
-  // The move constructors
-  DataArray(DataArray&& other) noexcept: data(std::move(other.data))
-  {
-  }
+   // The move constructors
+   DataArray(DataArray&& other) noexcept: data(std::move(other.data))
+   {
+   }
 
    /// destructor
    ~DataArray()

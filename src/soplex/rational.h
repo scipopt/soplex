@@ -803,7 +803,7 @@ public:
          mpq_set_d(privatevalue, r);
 
       return *this;
-    }
+   }
 
    /// assignment operator from int
    Private& operator=(const int& i)
@@ -904,18 +904,18 @@ public:
    /// value
    long double privatevalue;
 
-  template <typename T, boost::multiprecision::expression_template_option eto>
-  Private(const boost::multiprecision::number<T, eto>& q)
-  {
-    privatevalue = (long double)q;
-  }
+   template <typename T, boost::multiprecision::expression_template_option eto>
+   Private(const boost::multiprecision::number<T, eto>& q)
+   {
+      privatevalue = (long double)q;
+   }
 
-  template <typename T, boost::multiprecision::expression_template_option eto>
-  Private& operator=(const boost::multiprecision::number<T, eto>& q)
-  {
-    privatevalue = (long double)q;
-    return *this;
-  }
+   template <typename T, boost::multiprecision::expression_template_option eto>
+   Private& operator=(const boost::multiprecision::number<T, eto>& q)
+   {
+      privatevalue = (long double)q;
+      return *this;
+   }
 
 
    /// default constructor
@@ -1048,11 +1048,11 @@ Rational::Rational(const boost::multiprecision::number<T, eto>& q)
 template <typename T, boost::multiprecision::expression_template_option eto>
 Rational::Rational(const boost::multiprecision::number<T, eto>& q)
 {
-  dpointer = 0;
-  spx_alloc(dpointer);
-  new(dpointer) Private(q);
+   dpointer = 0;
+   spx_alloc(dpointer);
+   new(dpointer) Private(q);
 
-  assert(dpointer != 0);
+   assert(dpointer != 0);
 }
 #endif // SOPLEX_WITH_CPPMPF
 

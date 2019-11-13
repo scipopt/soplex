@@ -133,14 +133,14 @@ public:
       this->operator=(vec);
    }
 
-  // The move constructor
-  VectorBase<R>(const VectorBase<R> && vec)noexcept: val(std::move(vec.val))
-  {
-  }
+   // The move constructor
+   VectorBase<R>(const VectorBase<R>&& vec)noexcept: val(std::move(vec.val))
+   {
+   }
 
-  VectorBase<R>(const VectorBase<R> &vec): val(vec.val)
-  {
-  }
+   VectorBase<R>(const VectorBase<R>& vec): val(vec.val)
+   {
+   }
 
 
    /// Assignment operator.
@@ -175,12 +175,12 @@ public:
       return *this;
    }
 
-  /// Move assignment operator
-  VectorBase<R>& operator=(const VectorBase<R>&& vec)
-  {
-    val = std::move(vec.val);
-    return *this;
-  }
+   /// Move assignment operator
+   VectorBase<R>& operator=(const VectorBase<R>&& vec)
+   {
+      val = std::move(vec.val);
+      return *this;
+   }
 
    /// scale and assign
    VectorBase<R>& scaleAssign(int scaleExp, const VectorBase<R>& vec)
@@ -372,7 +372,7 @@ public:
    /// Inner product.
    R operator*(const VectorBase<R>& vec) const
    {
-     StableSum<R> x;
+      StableSum<R> x;
 
       auto dimen = dim();
 
@@ -492,27 +492,27 @@ public:
       return val.data();
    }
 
-  // Provides access to the iterators of std::vector<R> val
-  decltype(val.begin()) begin() const
-  {
-    return val.begin();
-  }
+   // Provides access to the iterators of std::vector<R> val
+   decltype(val.begin()) begin() const
+   {
+      return val.begin();
+   }
 
-  decltype(val.begin()) begin()
-  {
-    return val.begin();
-  }
+   decltype(val.begin()) begin()
+   {
+      return val.begin();
+   }
 
-  // Provides access to the iterators of std::vector<R> val
-  decltype(val.end()) end() const
-  {
-    return val.end();
-  }
+   // Provides access to the iterators of std::vector<R> val
+   decltype(val.end()) end() const
+   {
+      return val.end();
+   }
 
-  decltype(val.end()) end()
-  {
-    return val.end();
-  }
+   decltype(val.end()) end()
+   {
+      return val.end();
+   }
 
    // Functions from VectorBase
 

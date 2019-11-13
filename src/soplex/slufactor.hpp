@@ -1247,9 +1247,6 @@ SLUFactor<R>::SLUFactor(const SLUFactor<R>& old)
    this->l.rperm     = 0;
 
    solveCount = 0;
-   solveTime = TimerFactory::createTimer(timerType);
-   this->factorTime = TimerFactory::createTimer(timerType);
-
    try
    {
       assign(old);
@@ -1339,6 +1336,18 @@ void SLUFactor<R>::freeAll()
 
    if(this->l.rperm)
       spx_free(this->l.rperm);
+
+   if(solveTime)
+     {
+       solveTime->~Timer();
+       spx_free(solveTime);
+     }
+
+   if(this->factorTime)
+     {
+       this->factorTime->~Timer();
+       spx_free(this->factorTime);
+     }
 }
 
 template <class R>
