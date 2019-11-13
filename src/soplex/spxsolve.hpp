@@ -2020,11 +2020,11 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::getRedCostSol(VectorBase<R>&
         {
           switch(ds.colStatus(i))
             {
-            case SPxBasis::Desc::D_FREE:
-            case SPxBasis::Desc::D_ON_UPPER:
-            case SPxBasis::Desc::D_ON_LOWER:
-            case SPxBasis::Desc::D_ON_BOTH:
-            case SPxBasis::Desc::D_UNDEFINED:
+            case SPxBasisBase<R>::Desc::D_FREE:
+            case SPxBasisBase<R>::Desc::D_ON_UPPER:
+            case SPxBasisBase<R>::Desc::D_ON_LOWER:
+            case SPxBasisBase<R>::Desc::D_ON_BOTH:
+            case SPxBasisBase<R>::Desc::D_UNDEFINED:
               // assert(EQ(maxObj()[i], (*thePvec)[i], 1e-9));
               p_vector[i] = 0;
               break;
