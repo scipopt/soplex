@@ -825,6 +825,7 @@ void SPxSolverBase<R>::setType(Type tp)
                   break;
 
                case SPxBasisBase<R>::Desc::P_FIXED :
+                 assert(EQ(SPxLPBase<R>::lower(i), SPxLPBase<R>::upper(i)));
                   val += this->maxObj(i) * SPxLPBase<R>::lower(i);
                   break;
 
@@ -846,6 +847,7 @@ void SPxSolverBase<R>::setType(Type tp)
                   break;
 
                case SPxBasisBase<R>::Desc::P_FIXED :
+                 assert(EQ(SPxLPBase<R>::lhs(i), SPxLPBase<R>::rhs(i)));
                   val += this->maxRowObj(i) * SPxLPBase<R>::lhs(i);
                   break;
 
@@ -871,7 +873,7 @@ void SPxSolverBase<R>::setType(Type tp)
                   break;
 
                case SPxBasisBase<R>::Desc::P_FIXED :
-                  assert(theLCbound[i] == theUCbound[i]);
+                  assert(EQ(theLCbound[i], theUCbound[i]));
                   val += this->maxObj(i) * theLCbound[i];
                   break;
 
@@ -893,6 +895,7 @@ void SPxSolverBase<R>::setType(Type tp)
                   break;
 
                case SPxBasisBase<R>::Desc::P_FIXED :
+                  assert(EQ(theLRbound[i], theURbound[i]));
                   val += this->maxRowObj(i) * theURbound[i];
                   break;
 
