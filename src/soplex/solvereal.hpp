@@ -144,7 +144,6 @@ void SoPlexBase<R>::_evaluateSolutionReal(typename SPxSimplifier<R>::Result simp
    {
    case SPxSolverBase<R>::OPTIMAL:
       _storeSolutionReal(!_isRealLPLoaded || _isRealLPScaled);
-
       // apply polishing on original problem
       if(_applyPolishing)
       {
@@ -191,17 +190,16 @@ void SoPlexBase<R>::_evaluateSolutionReal(typename SPxSimplifier<R>::Result simp
    case SPxSolverBase<R>::ABORT_CYCLING:
 
       // if preprocessing was applied, try to run again without to avoid cycling
-      if(!_isRealLPLoaded)
+      if(!_isRealLPLoaded || _isRealLPScaled)
       {
          MSG_INFO1(spxout, spxout << "encountered cycling - trying to solve again without simplifying" <<
                    std::endl;)
-         _preprocessAndSolveReal(false);
+           // store and unsimplify sub-optimal solution and basis, may trigger re-solve
+         _storeSolutionReal(true);
          return;
       }
-      else if(_solReal.isPrimalFeasible() && _solReal.isDualFeasible())
+      if(_solReal.isPrimalFeasible() || _solReal.isDualFeasible())
          _status = SPxSolverBase<R>::OPTIMAL_UNSCALED_VIOLATIONS;
-
-      break;
 
    // FALLTHROUGH
    case SPxSolverBase<R>::ABORT_TIME:
@@ -209,6 +207,10 @@ void SoPlexBase<R>::_evaluateSolutionReal(typename SPxSimplifier<R>::Result simp
    case SPxSolverBase<R>::ABORT_VALUE:
    case SPxSolverBase<R>::REGULAR:
    case SPxSolverBase<R>::RUNNING:
+      // If we aborted the solve for some reason and there is still a shift, ensure that the basis status is correct
+      if(_solver.shift() > _solver.epsilon() )
+         _solver.setBasisStatus(SPxBasisBase<R>::REGULAR);
+
       _storeSolutionReal(false);
       break;
 
@@ -413,12 +415,6 @@ void SoPlexBase<R>::_verifySolutionReal()
 {
    assert(_hasSolReal);
 
-   if(!_solReal._isPrimalFeasible && !_solReal._isDualFeasible)
-   {
-      _hasSolReal = false;
-      return;
-   }
-
    MSG_INFO1(spxout, spxout << " --- verifying computed solution" << std::endl;)
 
    R sumviol = 0;
@@ -427,17 +423,10 @@ void SoPlexBase<R>::_verifySolutionReal()
    R dualviol = 0;
    R redcostviol = 0;
 
-   if(_solReal._isPrimalFeasible)
-   {
-      (void) getBoundViolation(boundviol, sumviol);
-      (void) getRowViolation(rowviol, sumviol);
-   }
-
-   if(_solReal._isDualFeasible)
-   {
-      (void) getDualViolation(dualviol, sumviol);
-      (void) getRedCostViolation(redcostviol, sumviol);
-   }
+   (void) getBoundViolation(boundviol, sumviol);
+   (void) getRowViolation(rowviol, sumviol);
+   (void) getDualViolation(dualviol, sumviol);
+   (void) getRedCostViolation(redcostviol, sumviol);
 
    if(boundviol >= _solver.feastol() || rowviol >= _solver.feastol() || dualviol >= _solver.opttol()
          || redcostviol >= _solver.opttol())
@@ -580,6 +569,8 @@ void SoPlexBase<R>::_storeSolutionReal(bool verify)
       assert(_simplifier->result() == SPxSimplifier<R>::OKAY);
       assert(_realLP != &_solver);
 
+      typename SPxBasisBase<R>::SPxStatus simplifiedBasisStatus = _solver.getBasisStatus();
+
       try
       {
          // pass solution data of transformed problem to simplifier
@@ -610,13 +601,16 @@ void SoPlexBase<R>::_storeSolutionReal(bool verify)
 
       assert(_realLP == &_solver);
 
+      // reset basis status
+      _solver.setBasisStatus(simplifiedBasisStatus);
+
+      _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
       // load unsimplified basis into solver
       assert(_basisStatusRows.size() == numRows());
       assert(_basisStatusCols.size() == this->numCols());
-      _solver.setBasisStatus(SPxBasisBase<R>::REGULAR);
-      _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
       _hasBasis = true;
    }
+
    // load realLP into the solver again (internal scaling was applied)
    else if(_realLP != &_solver)
    {
@@ -689,10 +683,12 @@ void SoPlexBase<R>::_storeSolutionRealFromPresol()
       _unscaleSolutionReal(*_realLP, true);
 
    // compute the original objective function value
-   _solReal._objVal = realParam(SoPlexBase<R>::OBJ_OFFSET);
+   StableSum<R> objVal(realParam(SoPlexBase<R>::OBJ_OFFSET));
 
    for(int i = 0; i < numCols(); ++i)
-      _solReal._objVal += _solReal._primal[i] * objReal(i);
+     objVal += _solReal._primal[i] * objReal(i);
+
+   _solReal._objVal = R(objVal);
 
    // store the unsimplified basis
    _simplifier->getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(),
@@ -701,6 +697,7 @@ void SoPlexBase<R>::_storeSolutionRealFromPresol()
    _hasSolReal = true;
    _solReal._isPrimalFeasible = true;
    _solReal._isDualFeasible = true;
+   _solver.setBasisStatus(SPxBasisBase<R>::OPTIMAL);
 
    // check solution for violations and solve again if necessary
    _verifySolutionReal();
