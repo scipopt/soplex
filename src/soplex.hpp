@@ -131,6 +131,12 @@ SoPlexBase<R>::Settings::BoolParam::BoolParam()
    description[SoPlexBase<R>::ENSURERAY] =
       "re-optimize the original problem to get a proof (ray) of infeasibility/unboundedness?";
    defaultValue[SoPlexBase<R>::ENSURERAY] = false;
+
+   /// try to enforce that the optimal solution is a basic solution
+   name[SoPlexBase<Real>::FORCEBASIC] = "forcebasic";
+   description[SoPlexBase<Real>::FORCEBASIC] =
+      "try to enforce that the optimal solution is a basic solution";
+   defaultValue[SoPlexBase<Real>::FORCEBASIC] = false;
 }
 
 template <class R>
@@ -361,6 +367,13 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
    lower[SoPlexBase<R>::PRINTBASISMETRIC] = -1;
    upper[SoPlexBase<R>::PRINTBASISMETRIC] = 3;
    defaultValue[SoPlexBase<R>::PRINTBASISMETRIC] = -1;
+
+   /// measure time spent in solving steps, e.g. factorization time
+   name[SoPlexBase<R>::STATTIMER] = "STATTIMER";
+   description[SoPlexBase<R>::STATTIMER] = "measure for statistics, e.g. factorization time (0 - off, 1 - user time, 2 - wallclock time)";
+   lower[SoPlexBase<R>::STATTIMER] = 0;
+   upper[SoPlexBase<R>::STATTIMER] = 2;
+   defaultValue[SoPlexBase<R>::STATTIMER] = 1;
 }
 
 template <class R>
@@ -745,13 +758,13 @@ bool SoPlexBase<R>::getDualFarkasReal(VectorBase<R>& vector)
 
 
 #ifdef SOPLEX_WITH_GMP
-/// gets the primal solution vector if available; returns true on success
+/// gets the primal solution vector if available; returns true on success (GMP only method)
 template <class R>
 bool SoPlexBase<R>::getPrimalRational(mpq_t* vector, const int size)
 {
    assert(size >= numColsRational());
 
-   if(hasPrimal())
+   if(hasSol())
    {
       _syncRationalSolution();
 
@@ -765,13 +778,13 @@ bool SoPlexBase<R>::getPrimalRational(mpq_t* vector, const int size)
 }
 
 
-/// gets the vector of slack values if available; returns true on success
+/// gets the vector of slack values if available; returns true on success (GMP only method)
 template <class R>
 bool SoPlexBase<R>::getSlacksRational(mpq_t* vector, const int size)
 {
    assert(size >= numRowsRational());
 
-   if(hasPrimal())
+   if(hasSol())
    {
       _syncRationalSolution();
 
@@ -786,7 +799,7 @@ bool SoPlexBase<R>::getSlacksRational(mpq_t* vector, const int size)
 
 
 
-/// gets the primal ray if LP is unbounded; returns true on success
+/// gets the primal ray if LP is unbounded; returns true on success (GMP only method)
 template <class R>
 bool SoPlexBase<R>::getPrimalRayRational(mpq_t* vector, const int size)
 {
@@ -807,13 +820,13 @@ bool SoPlexBase<R>::getPrimalRayRational(mpq_t* vector, const int size)
 
 
 
-/// gets the dual solution vector if available; returns true on success
+/// gets the dual solution vector if available; returns true on success (GMP only method)
 template <class R>
 bool SoPlexBase<R>::getDualRational(mpq_t* vector, const int size)
 {
    assert(size >= numRowsRational());
 
-   if(hasDual())
+   if(hasSol())
    {
       _syncRationalSolution();
 
@@ -828,13 +841,13 @@ bool SoPlexBase<R>::getDualRational(mpq_t* vector, const int size)
 
 
 
-/// gets the vector of reduced cost values if available; returns true on success
+/// gets the vector of reduced cost values if available; returns true on success (GMP only method)
 template <class R>
 bool SoPlexBase<R>::getRedCostRational(mpq_t* vector, const int size)
 {
    assert(size >= numColsRational());
 
-   if(hasDual())
+   if(hasSol())
    {
       _syncRationalSolution();
 
@@ -849,7 +862,7 @@ bool SoPlexBase<R>::getRedCostRational(mpq_t* vector, const int size)
 
 
 
-/// gets the Farkas proof if LP is infeasible; returns true on success
+/// gets the Farkas proof if LP is infeasible; returns true on success (GMP only method)
 template <class R>
 bool SoPlexBase<R>::getDualFarkasRational(mpq_t* vector, const int size)
 {
@@ -975,7 +988,7 @@ int SoPlexBase<R>::numNonzeros() const
 template <class R>
 bool SoPlexBase<R>::getPrimal(VectorBase<R>& vector)
 {
-   if(hasPrimal() && vector.dim() >= numCols())
+   if(hasSol() && vector.dim() >= numCols())
    {
       _syncRealSolution();
       _solReal.getPrimalSol(vector);
@@ -1004,7 +1017,7 @@ bool SoPlexBase<R>::getPrimalRay(VectorBase<R>& vector)
 template <class R>
 bool SoPlexBase<R>::getDual(VectorBase<R>& vector)
 {
-   if(hasDual() && vector.dim() >= numRows())
+   if(hasSol() && vector.dim() >= numRows())
    {
       _syncRealSolution();
       _solReal.getDualSol(vector);
@@ -1077,7 +1090,7 @@ bool SoPlexBase<R>::getBoundViolation(R& maxviol, R& sumviol)
 template <class R>
 bool SoPlexBase<R>::getRedCost(VectorBase<R>& vector)
 {
-   if(hasDual() && vector.dim() >= numCols())
+   if(hasSol() && vector.dim() >= numCols())
    {
       _syncRealSolution();
       _solReal.getRedCostSol(vector);
@@ -1960,7 +1973,7 @@ void SoPlexBase<R>::changeRowReal(int i, const LPRowBase<R>& lprow)
    _invalidateSolution();
 }
 #ifdef SOPLEX_WITH_GMP
-/// adds a single column
+/// adds a single column (GMP only method)
 template <class R>
 void SoPlexBase<R>::addColRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues,
                                    const int* colIndices, const int colSize, const mpq_t* upper)
@@ -1984,7 +1997,7 @@ void SoPlexBase<R>::addColRational(const mpq_t* obj, const mpq_t* lower, const m
 
 
 
-/// adds a set of columns
+/// adds a set of columns (GMP only method)
 template <class R>
 void SoPlexBase<R>::addColsRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues,
                                     const int* colIndices, const int* colStarts, const int* colLengths, const int numCols,
@@ -2582,7 +2595,7 @@ void SoPlexBase<R>::addRowRational(const LPRowRational& lprow)
 
 
 #ifdef SOPLEX_WITH_GMP
-/// adds a single row
+/// adds a single row  (GMP only method)
 template <class R>
 void SoPlexBase<R>::addRowRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices,
                                    const int rowSize, const mpq_t* rhs)
@@ -2605,7 +2618,7 @@ void SoPlexBase<R>::addRowRational(const mpq_t* lhs, const mpq_t* rowValues, con
 
 
 
-/// adds a set of rows
+/// adds a set of rows  (GMP only method)
 template <class R>
 void SoPlexBase<R>::addRowsRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices,
                                     const int* rowStarts, const int* rowLengths, const int numRows, const int numValues,
@@ -2760,7 +2773,7 @@ void SoPlexBase<R>::changeLhsRational(int i, const Rational& lhs)
 
 
 #ifdef SOPLEX_WITH_GMP
-/// changes left-hand side of row \p i to \p lhs
+/// changes left-hand side of row \p i to \p lhs (GMP only method)
 template <class R>
 void SoPlexBase<R>::changeLhsRational(int i, const mpq_t* lhs)
 {
@@ -2804,7 +2817,7 @@ void SoPlexBase<R>::changeRhsRational(const VectorRational& rhs)
 
 
 #ifdef SOPLEX_WITH_GMP
-/// changes right-hand side vector to \p rhs
+/// changes right-hand side vector to \p rhs (GMP only method)
 template <class R>
 void SoPlexBase<R>::changeRhsRational(const mpq_t* rhs, int rhsSize)
 {
@@ -2891,7 +2904,7 @@ void SoPlexBase<R>::changeRangeRational(int i, const Rational& lhs, const Ration
 
 
 #ifdef SOPLEX_WITH_GMP
-/// changes left-hand side of row \p i to \p lhs
+/// changes left-hand side of row \p i to \p lhs (GMP only method)
 template <class R>
 void SoPlexBase<R>::changeRangeRational(int i, const mpq_t* lhs, const mpq_t* rhs)
 {
@@ -2976,7 +2989,7 @@ void SoPlexBase<R>::changeLowerRational(int i, const Rational& lower)
 
 
 #ifdef SOPLEX_WITH_GMP
-/// changes lower bound of column i to \p lower
+/// changes lower bound of column i to \p lower (GMP only method)
 template <class R>
 void SoPlexBase<R>::changeLowerRational(int i, const mpq_t* lower)
 {
@@ -3041,7 +3054,7 @@ void SoPlexBase<R>::changeUpperRational(int i, const Rational& upper)
 
 
 #ifdef SOPLEX_WITH_GMP
-/// changes upper bound of column i to \p upper
+/// changes upper bound of column i to \p upper (GMP only method)
 template <class R>
 void SoPlexBase<R>::changeUpperRational(int i, const mpq_t* upper)
 {
@@ -3105,7 +3118,7 @@ void SoPlexBase<R>::changeBoundsRational(int i, const Rational& lower, const Rat
 
 
 #ifdef SOPLEX_WITH_GMP
-/// changes bounds of column \p i to \p lower and \p upper
+/// changes bounds of column \p i to \p lower and \p upper (GMP only method)
 template <class R>
 void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t* upper)
 {
@@ -3165,7 +3178,7 @@ void SoPlexBase<R>::changeObjRational(int i, const Rational& obj)
 
 
 #ifdef SOPLEX_WITH_GMP
-/// changes objective coefficient of column i to \p obj
+/// changes objective coefficient of column i to \p obj (GMP only method)
 template <class R>
 void SoPlexBase<R>::changeObjRational(int i, const mpq_t* obj)
 {
@@ -3204,7 +3217,7 @@ void SoPlexBase<R>::changeElementRational(int i, int j, const Rational& val)
 
 
 #ifdef SOPLEX_WITH_GMP
-/// changes matrix entry in row \p i and column \p j to \p val
+/// changes matrix entry in row \p i and column \p j to \p val (GMP only method)
 template <class R>
 void SoPlexBase<R>::changeElementRational(int i, int j, const mpq_t* val)
 {
@@ -3478,19 +3491,8 @@ typename SPxBasisBase<R>::SPxStatus SoPlexBase<R>::basisStatus() const
 {
    if(!hasBasis())
       return SPxBasisBase<R>::NO_PROBLEM;
-   else if(status() == SPxSolverBase<R>::OPTIMAL
-           || status() == SPxSolverBase<R>::OPTIMAL_UNSCALED_VIOLATIONS)
-      return SPxBasisBase<R>::OPTIMAL;
-   else if(status() == SPxSolverBase<R>::UNBOUNDED)
-      return SPxBasisBase<R>::UNBOUNDED;
-   else if(status() == SPxSolverBase<R>::INFEASIBLE)
-      return SPxBasisBase<R>::INFEASIBLE;
-   else if(hasPrimal())
-      return SPxBasisBase<R>::PRIMAL;
-   else if(hasDual())
-      return SPxBasisBase<R>::DUAL;
    else
-      return SPxBasisBase<R>::REGULAR;
+     return _solver.getBasisStatus();
 }
 
 
@@ -3505,7 +3507,7 @@ R SoPlexBase<R>::objValueReal()
       return realParam(SoPlexBase<R>::INFTY) * intParam(SoPlexBase<R>::OBJSENSE);
    else if(status() == SPxSolverBase<R>::INFEASIBLE)
       return -realParam(SoPlexBase<R>::INFTY) * intParam(SoPlexBase<R>::OBJSENSE);
-   else if(hasPrimal() || hasDual())
+   else if(hasSol())
    {
       _syncRealSolution();
       return _solReal._objVal;
@@ -3536,7 +3538,7 @@ Rational SoPlexBase<R>::objValueRational()
       else
          return _rationalPosInfty;
    }
-   else if(hasPrimal() || hasDual())
+   else if(hasSol())
    {
       _syncRationalSolution();
       return _solRational._objVal;
@@ -3577,14 +3579,6 @@ bool SoPlexBase<R>::isDualFeasible() const
 
 }
 
-/// is a dual feasible solution available?
-// This is depreciated in an new commit. TODO Need to double check
-// template <class R>
-// bool SoPlexBase<R>::hasDual() const
-// {
-//    return _hasSolReal || _hasSolRational;
-// }
-
 /// is Farkas proof of infeasibility available?
 template <class R>
 bool SoPlexBase<R>::hasDualFarkas() const
@@ -3597,7 +3591,7 @@ bool SoPlexBase<R>::hasDualFarkas() const
 template <class R>
 bool SoPlexBase<R>::getSlacksReal(VectorBase<R>& vector)
 {
-   if(hasPrimal() && vector.dim() >= numRows())
+   if(hasSol() && vector.dim() >= numRows())
    {
       _syncRealSolution();
       _solReal.getSlacks(vector);
@@ -3611,7 +3605,7 @@ bool SoPlexBase<R>::getSlacksReal(VectorBase<R>& vector)
 template <class R>
 bool SoPlexBase<R>::getPrimalRational(VectorBase<Rational>& vector)
 {
-   if(_rationalLP != 0 && hasPrimal() && vector.dim() >= numColsRational())
+   if(_rationalLP != 0 && hasSol() && vector.dim() >= numColsRational())
    {
       _syncRationalSolution();
       _solRational.getPrimalSol(vector);
@@ -3626,7 +3620,7 @@ bool SoPlexBase<R>::getPrimalRational(VectorBase<Rational>& vector)
 template <class R>
 bool SoPlexBase<R>::getSlacksRational(VectorRational& vector)
 {
-   if(_rationalLP != 0 && hasPrimal() && vector.dim() >= numRowsRational())
+   if(_rationalLP != 0 && hasSol() && vector.dim() >= numRowsRational())
    {
       _syncRationalSolution();
       _solRational.getSlacks(vector);
@@ -3655,7 +3649,7 @@ bool SoPlexBase<R>::getPrimalRayRational(VectorBase<Rational>& vector)
 template <class R>
 bool SoPlexBase<R>::getDualRational(VectorBase<Rational>& vector)
 {
-   if(_rationalLP != 0 && hasDual() && vector.dim() >= numRowsRational())
+   if(_rationalLP != 0 && hasSol() && vector.dim() >= numRowsRational())
    {
       _syncRationalSolution();
       _solRational.getDualSol(vector);
@@ -3671,7 +3665,7 @@ bool SoPlexBase<R>::getDualRational(VectorBase<Rational>& vector)
 template <class R>
 bool SoPlexBase<R>::getRedCostRational(VectorRational& vector)
 {
-   if(_rationalLP != 0 && hasDual() && vector.dim() >= numColsRational())
+   if(_rationalLP != 0 && hasSol() && vector.dim() >= numColsRational())
    {
       _syncRationalSolution();
       _solRational.getRedCostSol(vector);
@@ -4026,7 +4020,7 @@ bool SoPlexBase<R>::getDualViolationRational(Rational& maxviol, Rational& sumvio
 template <class R>
 int SoPlexBase<R>::totalSizePrimalRational(const int base)
 {
-   if(hasPrimal() || hasPrimalRay())
+   if(hasSol() || hasPrimalRay())
    {
       _syncRationalSolution();
       return _solRational.totalSizePrimal(base);
@@ -4041,7 +4035,7 @@ int SoPlexBase<R>::totalSizePrimalRational(const int base)
 template <class R>
 int SoPlexBase<R>::totalSizeDualRational(const int base)
 {
-   if(hasDual() || hasDualFarkas())
+   if(hasSol() || hasDualFarkas())
    {
       _syncRationalSolution();
       return _solRational.totalSizeDual(base);
@@ -4056,7 +4050,7 @@ int SoPlexBase<R>::totalSizeDualRational(const int base)
 template <class R>
 int SoPlexBase<R>::dlcmSizePrimalRational(const int base)
 {
-   if(hasPrimal() || hasPrimalRay())
+   if(hasSol() || hasPrimalRay())
    {
       _syncRationalSolution();
       return _solRational.dlcmSizePrimal(base);
@@ -4071,7 +4065,7 @@ int SoPlexBase<R>::dlcmSizePrimalRational(const int base)
 template <class R>
 int SoPlexBase<R>::dlcmSizeDualRational(const int base)
 {
-   if(hasDual() || hasDualFarkas())
+   if(hasSol() || hasDualFarkas())
    {
       _syncRationalSolution();
       return _solRational.dlcmSizeDual(base);
@@ -4086,7 +4080,7 @@ int SoPlexBase<R>::dlcmSizeDualRational(const int base)
 template <class R>
 int SoPlexBase<R>::dmaxSizePrimalRational(const int base)
 {
-   if(hasPrimal() || hasPrimalRay())
+   if(hasSol() || hasPrimalRay())
    {
       _syncRationalSolution();
       return _solRational.dmaxSizePrimal(base);
@@ -4101,7 +4095,7 @@ int SoPlexBase<R>::dmaxSizePrimalRational(const int base)
 template <class R>
 int SoPlexBase<R>::dmaxSizeDualRational(const int base)
 {
-   if(hasDual() || hasDualFarkas())
+   if(hasSol() || hasDualFarkas())
    {
       _syncRationalSolution();
       return _solRational.dmaxSizeDual(base);
@@ -4225,6 +4219,7 @@ void SoPlexBase<R>::getBasis(typename SPxSolverBase<R>::VarStatus rows[],
 
 
 /// returns the indices of the basic columns and rows; basic column n gives value n, basic row m gives value -1-m
+/// note: the order of the indices might not coincide with the actual order when using ROW representation
 template <class R>
 void SoPlexBase<R>::getBasisInd(int* bind) const
 {
@@ -4393,6 +4388,7 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
             int scaleExp;
             DSVectorBase<R> rhs(_solver.unitVector(r));
 
+            // apply scaling \tilde{C} to rhs
             if(_solver.basis().baseId(r).isSPxColId())
                scaleExp = _scaler->getColScaleExp(_solver.number(_solver.basis().baseId(r)));
             else
@@ -4404,6 +4400,7 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
             x.setup();
             int size = x.size();
 
+            //apply scaling R to solution vector
             for(int i = 0; i < size; i++)
             {
                scaleExp = _scaler->getRowScaleExp(x.index(i));
@@ -4463,7 +4460,7 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
       // get vector corresponding to requested index r
       index = bind[r];
 
-      // r corresponds to a row vector
+      // r corresponds to a basic row
       if(index < 0)
       {
          // transform index to actual row index
@@ -4484,7 +4481,7 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
                rhs.value(i) = spxLdexp(rhs.value(i), -_scaler->getRowScaleExp(index));
          }
       }
-      // r corresponds to a column vector
+      // r corresponds to a basic column
       else
       {
          // should be a valid column index and in the column basis matrix, i.e., not basic w.r.t. row representation
@@ -4649,107 +4646,117 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
       assert(_solver.rep() == SPxSolverBase<R>::ROW);
 
       // @todo should rhs be a reference?
-      DSVectorBase<R> rhs(numCols());
-      SSVectorBase<R> y(numCols());
       int* bind = 0;
       int index;
 
-      // get ordering of column basis matrix
+      // get indices of column basis matrix (not in correct order!)
       spx_alloc(bind, numRows());
       getBasisInd(bind);
 
-      // get vector corresponding to requested index c
       index = bind[c];
-
-      // c corresponds to a row vector
-      if(index < 0)
-      {
-         // transform index to actual row index
-         index = -index - 1;
-
-         // should be a valid row index and in the column basis matrix, i.e., not basic w.r.t. row representation
-         assert(index >= 0);
-         assert(index < numRows());
-         assert(!_solver.isRowBasic(index));
-
-         // get row vector
-         rhs = _solver.rowVector(index);
-         rhs *= -1.0;
-      }
-      // c corresponds to a column vector
-      else
-      {
-         // should be a valid column index and in the column basis matrix, i.e., not basic w.r.t. row representation
-         assert(index < numCols());
-         assert(!_solver.isColBasic(index));
-
-         // get unit vector
-         rhs = UnitVectorReal(index);
-      }
-
-      // solve system "y B = rhs", where B is the row basis matrix
-      try
-      {
-         /* unscaling required? */
-         if(unscale && _solver.isScaled())
-         {
-            int size = rhs.size();
-            int scaleExp;
-
-            for(int i = 0; i < size; i++)
-            {
-               scaleExp = _scaler->getColScaleExp(i);
-               rhs.value(i) *= spxLdexp(1.0, scaleExp);
-            }
-
-            _solver.basis().coSolve(y, rhs);
-
-            int rowIdx;
-            size = y.size();
-
-            for(int i = 0; i < size; i++)
-            {
-               assert(_solver.basis().baseId(y.index(i)).isSPxRowId());
-               rowIdx = _solver.basis().baseId(y.index(i)).getIdx();
-               scaleExp = _scaler->getRowScaleExp(rowIdx);
-               y.setValue(i, y.value(i) * spxLdexp(1.0, scaleExp));
-            }
-         }
-         else
-         {
-            _solver.basis().coSolve(y, rhs);
-         }
-      }
-      catch(const SPxException& E)
-      {
-         MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                   "> while computing basis inverse row.\n");
-         return false;
-      }
+      // index = c >= numColsReal() ? 0 : c;
 
       // initialize result vector x as zero
-      memset(coef, 0, (unsigned int)numRows() * sizeof(R));
-
-      // add nonzero entries
-      for(int i = 0; i < numCols(); ++i)
+      memset(coef, 0, (unsigned int)numRows() * sizeof(Real));
+      if(!_solver.isRowBasic(c))
       {
-         SPxId id = _solver.basis().baseId(i);
-
-         if(id.isSPxRowId())
+         // this column of B^-1 is just a unit column
+         for(int i = 0; i < numRows(); i++)
          {
-            assert(_solver.number(id) >= 0);
-            assert(_solver.number(id) < numRows());
-            assert(bind[c] >= 0 || _solver.number(id) != index);
-
-            coef[_solver.number(id)] = y[i];
+            if(bind[i] < 0 && -bind[i]-1 == c)
+               coef[i] = 1.0;
          }
       }
-
-      // if c corresponds to a row vector, we have to add a 1 at position c
-      if(bind[c] < 0)
+      else
       {
-         assert(coef[index] == 0.0);
-         coef[index] = 1.0;
+         SSVectorReal x(numCols());
+
+         for(int k = 0; k < numCols(); k++)
+         {
+            if(c == _solver.number(_solver.basis().baseId(k)) && _solver.basis().baseId(k).isSPxRowId())
+            {
+               index = k;
+               break;
+            }
+         }
+
+         try
+         {
+            if(unscale && _solver.isScaled())
+            {
+               int scaleExp = -_scaler->getRowScaleExp(index);
+               DSVectorReal rhs(1);
+               rhs.add(index, spxLdexp(1.0, scaleExp));
+               _solver.basis().coSolve(x, rhs);
+               x.setup();
+               int size = x.size();
+
+               // apply scaling based on \tilde{C}
+               for(int i = 0; i < size; i++)
+               {
+                  int idx = bind[x.index(i)];
+                  if(idx < 0)
+                  {
+                     idx = -idx - 1;
+                     scaleExp = _scaler->getRowScaleExp(idx);
+                  }
+                  else
+                     scaleExp = - _scaler->getColScaleExp(idx);
+
+                  spxLdexp(x.value(i), scaleExp);
+               }
+            }
+            else
+            {
+               _solver.basis().coSolve(x, _solver.unitVector(index));
+            }
+         }
+         catch(const SPxException& E)
+         {
+            MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
+                      "> while computing basis inverse column.\n");
+            return false;
+         }
+
+         // add nonzero entries into result vector
+         for(int i = 0; i < numRows(); i++)
+         {
+            int idx = bind[i];
+
+            if(idx < 0)
+            {
+               // convert to proper row index
+               idx = - idx - 1;
+               // should be a valid row index, basic in the column basis
+               assert(idx >= 0);
+               assert(idx < numRows());
+               assert(!_solver.isRowBasic(idx));
+
+               if(unscale && _solver.isScaled())
+               {
+                  DSVector r_unscaled(numCols());
+                  _solver.getRowVectorUnscaled(idx, r_unscaled);
+                  coef[i] = - (r_unscaled * x);
+               }
+               else
+                  coef[i] = - (_solver.rowVector(idx) * x);
+
+               if(unscale && _solver.isScaled())
+                  coef[i] = spxLdexp(coef[i], _scaler->getRowScaleExp(idx));
+            }
+            else
+            {
+               // should be a valid column index, basic in the column basis
+               assert(idx >= 0);
+               assert(idx < numCols());
+               assert(!_solver.isColBasic(idx));
+
+               if(unscale && _solver.isScaled())
+                  coef[i] = spxLdexp(x[idx], _scaler->getColScaleExp(idx));
+               else
+                  coef[i] = x[idx];
+            }
+         }
       }
 
       // @todo implement returning of sparsity information like in column wise case
@@ -5538,6 +5545,9 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
    case ENSURERAY:
       break;
 
+   case FORCEBASIC:
+     break;
+
    default:
       return false;
    }
@@ -5738,7 +5748,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       default:
          return false;
       }
-
+      _solver.setStarter(_starter, false);
       break;
 
    // type of pricer
@@ -5960,6 +5970,10 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
    // printing of condition n
    case PRINTBASISMETRIC:
       _solver.setMetricInformation(value);
+      break;
+
+   case STATTIMER:
+      setTimings((Timer::TYPE) value);
       break;
 
    default:
@@ -7796,6 +7810,14 @@ void SoPlexBase<R>::_solveRealLPAndRecordStatistics()
    _statistics->iterationsFromBasis += _hadBasis ? _solver.iterations() : 0;
    _statistics->iterationsPolish += _solver.polishIterations();
    _statistics->boundflips += _solver.boundFlips();
+   _statistics->multTimeSparse += _solver.multTimeSparse->time();
+   _statistics->multTimeFull += _solver.multTimeFull->time();
+   _statistics->multTimeColwise += _solver.multTimeColwise->time();
+   _statistics->multTimeUnsetup += _solver.multTimeUnsetup->time();
+   _statistics->multSparseCalls += _solver.multSparseCalls;
+   _statistics->multFullCalls += _solver.multFullCalls;
+   _statistics->multColwiseCalls += _solver.multColwiseCalls;
+   _statistics->multUnsetupCalls += _solver.multUnsetupCalls;
    _statistics->luFactorizationTimeReal += _slufactor.getFactorTime();
    _statistics->luSolveTimeReal += _slufactor.getSolveTime();
    _statistics->luFactorizationsReal += _slufactor.getFactorCount();
@@ -9241,6 +9263,20 @@ bool SoPlexBase<R>::writeBasisFile(const char* filename, const NameSet* rowNames
    }
 }
 
+/// set statistic timers to a certain type, used to turn off statistic time measurement
+template <class R>
+void SoPlexBase<R>::setTimings(const Timer::TYPE ttype)
+{
+   _slufactor.changeTimer(ttype);
+   _statistics->readingTime = TimerFactory::switchTimer(_statistics->readingTime, ttype);
+   _statistics->simplexTime = TimerFactory::switchTimer(_statistics->simplexTime, ttype);
+   _statistics->syncTime = TimerFactory::switchTimer(_statistics->syncTime, ttype);
+   _statistics->solvingTime = TimerFactory::switchTimer(_statistics->solvingTime, ttype);
+   _statistics->preprocessingTime = TimerFactory::switchTimer(_statistics->preprocessingTime, ttype);
+   _statistics->rationalTime = TimerFactory::switchTimer(_statistics->rationalTime, ttype);
+   _statistics->transformTime = TimerFactory::switchTimer(_statistics->transformTime, ttype);
+   _statistics->reconstructionTime = TimerFactory::switchTimer(_statistics->reconstructionTime, ttype);
+}
 
 /// prints solution statistics
 template <class R>
