@@ -1773,7 +1773,7 @@ public:
       SVectorBase<R>& row = rowVector_w(i);
       SVectorBase<R>& col = colVector_w(j);
 
-      if(val != R(0))
+      if(isNotZero(val))
       {
          R newVal;
 
