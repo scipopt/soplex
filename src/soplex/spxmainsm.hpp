@@ -342,7 +342,8 @@ void SPxMainSM<R>::RowSingletonPS::execute(VectorBase<R>& x, VectorBase<R>& y, V
       }
       else // if reduced costs are negative or old lower bound not equal to xj, we need to change xj into the basis
       {
-         assert(EQrel(m_rhs, x[m_j]*aij, this->eps()) || EQrel(m_lhs, x[m_j]*aij, this->eps()));
+         assert(!isOptimal || EQrel(m_rhs, x[m_j]*aij, this->eps())
+                || EQrel(m_lhs, x[m_j]*aij, this->eps()));
 
          cStatus[m_j] = SPxSolverBase<R>::BASIC;
          rStatus[m_i] = (EQrel(m_lhs, x[m_j] * aij,
@@ -362,7 +363,8 @@ void SPxMainSM<R>::RowSingletonPS::execute(VectorBase<R>& x, VectorBase<R>& y, V
       }
       else // if reduced costs are positive or old upper bound not equal to xj, we need to change xj into the basis
       {
-         assert(EQrel(m_rhs, x[m_j]*aij, this->eps()) || EQrel(m_lhs, x[m_j]*aij, this->eps()));
+         assert(!isOptimal || EQrel(m_rhs, x[m_j]*aij, this->eps())
+                || EQrel(m_lhs, x[m_j]*aij, this->eps()));
 
          cStatus[m_j] = SPxSolverBase<R>::BASIC;
          rStatus[m_i] = (EQrel(m_lhs, x[m_j] * aij,
@@ -842,9 +844,9 @@ void SPxMainSM<R>::ZeroObjColSingletonPS::execute(VectorBase<R>& x, VectorBase<R
       }
       else
       {
-         assert(EQrel(m_lower, m_upper));
+         assert(EQrel(m_lower, m_upper, this->eps()));
 
-         x[m_j]        = m_lower;
+         x[m_j]        = (m_lower + m_upper) / 2.0;
          cStatus[m_j]  = SPxSolverBase<R>::FIXED;
       }
    }
@@ -2517,12 +2519,12 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::aggregateVars(SPxLPBase<R>& lp,
       z2 = 0.0;
 
    // determine which side has to be used for the bounds comparison below
-   if(GT(aik * aij, R(0.0), this->epsZero()))
+   if(aik * aij > 0.0)
    {
       new_lo_k = (upper_j >=  R(infinity)) ? R(-infinity) : z1 * scale1 / aik;
       new_up_k = (lower_j <= R(-infinity)) ?  R(infinity) : z2 * scale2 / aik;
    }
-   else if(LT(aik * aij, R(0.0), this->epsZero()))
+   else if(aik * aij < 0.0)
    {
       new_lo_k = (lower_j <= R(-infinity)) ? R(-infinity) : z2 * scale2 / aik;
       new_up_k = (upper_j >=  R(infinity)) ?  R(infinity) : z1 * scale1 / aik;
@@ -3532,12 +3534,12 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
             if(isZero(z2, this->epsZero()))
                z2 = 0.0;
 
-            if(GT(aij * aik, R(0.0), this->epsZero()))
+            if(aij * aik > 0.0)
             {
                lo = (lp.upper(j) >=  R(infinity)) ? R(-infinity) : z1 * scale1 / aik;
                up = (lp.lower(j) <= R(-infinity)) ?  R(infinity) : z2 * scale2 / aik;
             }
-            else if(LT(aij * aik, R(0.0), this->epsZero()))
+            else if(aij * aik < 0.0)
             {
                lo = (lp.lower(j) <= R(-infinity)) ? R(-infinity) : z2 * scale2 / aik;
                up = (lp.upper(j) >=  R(infinity)) ?  R(infinity) : z1 * scale1 / aik;
