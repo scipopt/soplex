@@ -25,7 +25,7 @@
 /* Notes: If we need to add new parameters to things for Settings class. say,
    BoolParam:
 
-          1. Add it to soplex.cpp under the name BoolParam default
+          1. Add it to soplex.hpp under the name BoolParam default
           constructor.
           2. Add it to variable boolParam in this file.
 
@@ -77,6 +77,11 @@ int runSoPlex(const po::variables_map& vm);
 
 namespace args
 {
+
+// A helper function to check if a command line argument lies in a range or in a
+// list of values. Throws an exception if it doesn't. The functions return
+// another function/lambda Will be used during the vm.notify()
+
 // Returns a function that checks if the val lies in [min, max] TODO: If we
 // have c++14/c++17, we can replace all the T with auto or use a template and
 // put this inside the parseArgs. This also means that we can get rid of the
@@ -92,7 +97,7 @@ auto checkRange(const T& min, const T& max, const std::string& str) -> std::func
    {
       if(val < min || val > max)
       {
-         throw po::validation_error(po::validation_error::invalid_option_value, str, std::to_string(val));
+         throw po::validation_error(po::validation_error::invalid_option_value, str + ", value=" + std::to_string(val));
       }
    };
 }
@@ -102,32 +107,6 @@ auto checkRange(const T& min, const T& max, const std::string& str) -> std::func
 // Parses the command line arguments
 inline auto parseArgsAndRun(int argc, char* argv[]) -> int
 {
-
-   // Two helper functions to check if a command line argument lies in a range
-   // or in a list of values. Throws an exception if it doesn't. The functions
-   // return another function/lambda Will be used during the vm.notify()
-
-
-   // Returns a function that checks whether a value is inside a list and if
-   // not, it throws an error TODO: If we have c++14, we can replace all the
-   // "int" with auto or use a template, also std::cend() and std::cbegin()
-   // Also refer to comments on checkRange. Using &list instead of list in the
-   // lambda may cause issues.
-   auto in = [](const std::initializer_list<int>& list, const std::string & str)
-   {
-      return [list, str](const int& val)
-      {
-         const auto lEnd = list.end();
-         const auto iter = std::find(list.begin(), list.end(), val);
-
-         if(iter == lEnd)            // meaning that val is not in the list
-         {
-            throw po::validation_error(po::validation_error::invalid_option_value, str, std::to_string(val));
-         }
-      };
-   };
-
-
    int solvemode = 1;
    unsigned int precision = 100;
 
@@ -202,7 +181,7 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
     "choose ratio tester (0 - textbook, 1 - harris, 2 - fast, 3 - boundflipping)");
 
    display.add_options()
-   ("verbosity,v", po::value<int>()->default_value(3)->notifier(in({0, 1, 2, 3, 4, 5}, "verbosity")),
+   ("verbosity,v", po::value<int>()->default_value(3)->notifier(args::checkRange(0, 5, "verbosity")),
     "set verbosity to <level> (0 - error, 3 - normal, 5 - high)")
    // Although the option says verbosity can be 0, 3, 5. In the program
    // verbosity 4 is also used.
@@ -254,7 +233,7 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
     "try to enforce that the optimal solution is a basic solution");
 
    intParam.add_options()
-   ("int:objsense", po::value<int>()->default_value(1)->notifier(in({-1, 1}, "int:objsense")),
+   ("int:objsense", po::value<int>()->default_value(1)->notifier(args::checkRange(-1, 1, "int:objsense")),
     "objective sense (-1 - minimize, +1 - maximize)")
    ("int:representation", po::value<int>()->default_value(0)->notifier(args::checkRange(0, 2,
          "int:representation")),
