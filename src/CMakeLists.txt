@@ -17,8 +17,7 @@ set(sources
     soplex/spxlpbase_real.cpp
     soplex/spxout.cpp
     soplex/usertimer.cpp
-    soplex/wallclocktimer.cpp
-    soplex.cpp)
+    soplex/wallclocktimer.cpp)
 
 set(headers
     soplex/array.h

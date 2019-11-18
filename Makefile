@@ -129,7 +129,6 @@ LIBHEADER	=	soplex/array.h \
 				soplex/didxset.h \
 				soplex/dsvectorbase.h \
 				soplex/dsvector.h \
-				soplex/dvectorbase.h \
 				soplex/dvector.h \
 				soplex/exceptions.h \
 				soplex/gzstream.h \
@@ -227,8 +226,7 @@ LIBOBJ = soplex/clufactor_rational.o \
 				soplex/spxout.o \
 				soplex/spxscaler.o \
 				soplex/usertimer.o \
-				soplex/wallclocktimer.o \
-				soplex.o
+				soplex/wallclocktimer.o
 
 BINOBJ		=	soplexmain.o
 EXAMPLEOBJ	=	example.o

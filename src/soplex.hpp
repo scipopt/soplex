@@ -23,6 +23,14 @@
 /// default setting for LU refactorization interval
 #define DEFAULT_REFACTOR_INTERVAL 200
 
+#ifdef _MSC_VER
+#define strncasecmp _strnicmp
+#endif
+
+#ifndef _MSC_VER
+#include <strings.h>
+#endif
+
 namespace soplex
 {
 template <class R>
