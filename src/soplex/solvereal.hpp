@@ -144,6 +144,7 @@ void SoPlexBase<R>::_evaluateSolutionReal(typename SPxSimplifier<R>::Result simp
    {
    case SPxSolverBase<R>::OPTIMAL:
       _storeSolutionReal(!_isRealLPLoaded || _isRealLPScaled);
+
       // apply polishing on original problem
       if(_applyPolishing)
       {
@@ -194,10 +195,11 @@ void SoPlexBase<R>::_evaluateSolutionReal(typename SPxSimplifier<R>::Result simp
       {
          MSG_INFO1(spxout, spxout << "encountered cycling - trying to solve again without simplifying" <<
                    std::endl;)
-           // store and unsimplify sub-optimal solution and basis, may trigger re-solve
+         // store and unsimplify sub-optimal solution and basis, may trigger re-solve
          _storeSolutionReal(true);
          return;
       }
+
       if(_solReal.isPrimalFeasible() || _solReal.isDualFeasible())
          _status = SPxSolverBase<R>::OPTIMAL_UNSCALED_VIOLATIONS;
 
@@ -207,8 +209,9 @@ void SoPlexBase<R>::_evaluateSolutionReal(typename SPxSimplifier<R>::Result simp
    case SPxSolverBase<R>::ABORT_VALUE:
    case SPxSolverBase<R>::REGULAR:
    case SPxSolverBase<R>::RUNNING:
+
       // If we aborted the solve for some reason and there is still a shift, ensure that the basis status is correct
-      if(_solver.shift() > _solver.epsilon() )
+      if(_solver.shift() > _solver.epsilon())
          _solver.setBasisStatus(SPxBasisBase<R>::REGULAR);
 
       _storeSolutionReal(false);
@@ -686,7 +689,7 @@ void SoPlexBase<R>::_storeSolutionRealFromPresol()
    StableSum<R> objVal(realParam(SoPlexBase<R>::OBJ_OFFSET));
 
    for(int i = 0; i < numCols(); ++i)
-     objVal += _solReal._primal[i] * objReal(i);
+      objVal += _solReal._primal[i] * objReal(i);
 
    _solReal._objVal = R(objVal);
 

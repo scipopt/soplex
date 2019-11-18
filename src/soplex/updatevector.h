@@ -29,7 +29,7 @@
 namespace soplex
 {
 
-/**@brief   Dense VectorBase<R> with semi-sparse VectorBase<R> for updates
+/**@brief   Dense Vector with semi-sparse Vector for updates
    @ingroup Algebra
 
     In many algorithms vectors are updated in every iteration, by
@@ -41,11 +41,11 @@ namespace soplex
     While the update itself can easily be expressed with methods of
     the class VectorBase<R>, it is often desirable to save the last update
     VectorBase<R> \f$\delta\f$ and value \f$\alpha\f$. This is provided by
-    class UpdateVector.
+    class UpdateVector<R>.
 
     UpdateVectors are derived from VectorBase<R> and provide additional
     methods for saving and setting the multiplicator \f$\alpha\f$ and
-    the update VectorBase<R> \f$\delta\f$. Further, it allows for efficient
+    the update Vector \f$\delta\f$. Further, it allows for efficient
     sparse updates, by providing an IdxSet idx() containing the
     nonzero indices of \f$\delta\f$.
 */
