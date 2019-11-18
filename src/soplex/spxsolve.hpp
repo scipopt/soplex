@@ -192,7 +192,8 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve()
       /**@todo != REGULAR is not enough. Also OPTIMAL/DUAL/PRIMAL should
        * be tested and acted accordingly.
        */
-     if(thestarter != 0 && status() != REGULAR && this->theLP->status() == NO_PROBLEM)   // no basis and no starter.
+      if(thestarter != 0 && status() != REGULAR
+            && this->theLP->status() == NO_PROBLEM)   // no basis and no starter.
          thestarter->generate(*this);              // generate start basis.
 
       init();
@@ -240,6 +241,11 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve()
    leaveCycles = 0;
    primalDegenSum = 0;
    dualDegenSum = 0;
+
+   multSparseCalls = 0;
+   multFullCalls = 0;
+   multColwiseCalls = 0;
+   multUnsetupCalls = 0;
 
    stallNumRecovers = 0;
 
@@ -1951,25 +1957,24 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::getDualSol(VectorBase<R>& p_
    }
    else
    {
-     const typename SPxBasisBase<R>::Desc& ds = this->desc();
+      const typename SPxBasisBase<R>::Desc& ds = this->desc();
 
-     for(int i = 0; i < this->nRows(); ++i)
-       {
+      for(int i = 0; i < this->nRows(); ++i)
+      {
          switch(ds.rowStatus(i))
-           {
-           case SPxBasisBase<R>::Desc::D_FREE:
-           case SPxBasisBase<R>::Desc::D_ON_UPPER:
-           case SPxBasisBase<R>::Desc::D_ON_LOWER:
-           case SPxBasisBase<R>::Desc::D_ON_BOTH:
-           case SPxBasisBase<R>::Desc::D_UNDEFINED:
-             // assert(isZero((*theCoPvec)[i], 1e-9));
-             p_vector[i] = 0;
-             break;
+         {
+         case SPxBasisBase<R>::Desc::D_FREE:
+         case SPxBasisBase<R>::Desc::D_ON_UPPER:
+         case SPxBasisBase<R>::Desc::D_ON_LOWER:
+         case SPxBasisBase<R>::Desc::D_ON_BOTH:
+         case SPxBasisBase<R>::Desc::D_UNDEFINED:
+            p_vector[i] = 0;
+            break;
 
-           default:
-             p_vector[i] = (*theCoPvec)[i];
-           }
-       }
+         default:
+            p_vector[i] = (*theCoPvec)[i];
+         }
+      }
    }
 
    p_vector *= Real(this->spxSense());
@@ -2017,22 +2022,21 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::getRedCostSol(VectorBase<R>&
       const typename SPxBasisBase<R>::Desc& ds = this->desc();
 
       for(int i = 0; i < this->nCols(); ++i)
-        {
-          switch(ds.colStatus(i))
-            {
-            case SPxBasisBase<R>::Desc::D_FREE:
-            case SPxBasisBase<R>::Desc::D_ON_UPPER:
-            case SPxBasisBase<R>::Desc::D_ON_LOWER:
-            case SPxBasisBase<R>::Desc::D_ON_BOTH:
-            case SPxBasisBase<R>::Desc::D_UNDEFINED:
-              // assert(EQ(maxObj()[i], (*thePvec)[i], 1e-9));
-              p_vector[i] = 0;
-              break;
+      {
+         switch(ds.colStatus(i))
+         {
+         case SPxBasisBase<R>::Desc::D_FREE:
+         case SPxBasisBase<R>::Desc::D_ON_UPPER:
+         case SPxBasisBase<R>::Desc::D_ON_LOWER:
+         case SPxBasisBase<R>::Desc::D_ON_BOTH:
+         case SPxBasisBase<R>::Desc::D_UNDEFINED:
+            p_vector[i] = 0;
+            break;
 
-            default:
-              p_vector[i] = this->maxObj()[i] - (*thePvec)[i];
-            }
-        }
+         default:
+            p_vector[i] = this->maxObj()[i] - (*thePvec)[i];
+         }
+      }
 
       if(this->spxSense() == SPxLPBase<R>::MINIMIZE)
          p_vector *= -1.0;
