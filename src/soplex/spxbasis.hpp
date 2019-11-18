@@ -1367,7 +1367,6 @@ SPxBasisBase<R>::SPxBasisBase(const SPxBasisBase<R>& old)
    , lastFill(old.lastFill)
    , lastNzCount(old.lastNzCount)
    , theTime(old.theTime)
-   , timerType(old.timerType)
    , lastin(old.lastin)
    , lastout(old.lastout)
    , lastidx(old.lastidx)
@@ -1376,6 +1375,7 @@ SPxBasisBase<R>::SPxBasisBase(const SPxBasisBase<R>& old)
    , thedesc(old.thedesc)
    , spxout(old.spxout)
 {
+   theTime = TimerFactory::createTimer(old.theTime->type());
 
    this->factor = old.factor->clone();
    freeSlinSolver = true;
@@ -1395,7 +1395,8 @@ SPxBasisBase<R>::~SPxBasisBase<R>()
       factor = 0;
    }
 
-   delete(theTime);
+   theTime->~Timer();
+   spx_free(theTime);
 }
 
 template <class R>
