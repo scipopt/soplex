@@ -61,6 +61,7 @@ set(settings
     default-row
     polish1
     polish2
+    mpf
     )
 
 #
