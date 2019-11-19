@@ -1544,7 +1544,7 @@ public:
    void printUserSettings();
 
    /// writes settings file; returns true on success
-   bool saveSettingsFile(const char* filename, const bool onlyChanged = false) const;
+   bool saveSettingsFile(const char* filename, const bool onlyChanged = false, int solvemode=1) const;
 
    /// reads settings file; returns true on success
    bool loadSettingsFile(const char* filename);

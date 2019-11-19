@@ -8657,10 +8657,9 @@ bool SoPlexBase<R>::parseSettingsString(const std::string str, boost::any val)
    return false;
 }
 
-
 /// writes settings file; returns true on success
 template <class R>
-bool SoPlexBase<R>::saveSettingsFile(const char* filename, const bool onlyChanged) const
+bool SoPlexBase<R>::saveSettingsFile(const char* filename, const bool onlyChanged, int solvemode) const
 {
    assert(filename != 0);
 
@@ -8680,6 +8679,10 @@ bool SoPlexBase<R>::saveSettingsFile(const char* filename, const bool onlyChange
    file << "." << SOPLEX_SUBVERSION;
 #endif
    file << "\n";
+
+   // Additional parameter solvemode is written
+   file<<"\n# solving mode (0 - floating-point solve, 1 - auto, 2 - force iterative refinement, 3 - multi precision solve)\n";
+   file<<"solvemode = "<<solvemode<<"\n";
 
    for(int i = 0; i < SoPlexBase<R>::BOOLPARAM_COUNT; i++)
    {

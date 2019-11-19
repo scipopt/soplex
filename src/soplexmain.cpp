@@ -502,7 +502,19 @@ int soplex::runSoPlex(const po::variables_map& vm)
       // --solvemode=<value> : choose solving mode (0* - floating-point solve, 1 - auto, 2 - force iterative refinement)
       if(vm.count("solvemode"))
       {
-         soplex.setIntParam(soplex.SOLVEMODE, vm["solvemode"].as<int>());
+         auto solvemode = vm["solvemode"].as<int>();
+
+         // The parameter int:solvemode determines if we are doing a Real or
+         // Rational solve. Whereas the parameter solvemode determines if we do
+         // a Real SoPlex or Templated Boost Soplex.
+         if(solvemode == 3)
+           {
+             soplex.setIntParam(soplex.SOLVEMODE, vm["int:solvemode"].as<int>());
+           }
+         else
+           {
+             soplex.setIntParam(soplex.SOLVEMODE, vm["solvemode"].as<int>());
+           }
 
          // if the LP is parsed rationally and might be solved rationally, we choose automatic syncmode such that
          // the rational LP is kept after reading
@@ -713,7 +725,7 @@ int soplex::runSoPlex(const po::variables_map& vm)
          MSG_INFO1(soplex.spxout, soplex.spxout << "Saving parameters to settings file <" << savesetname <<
                    "> . . .\n");
 
-         if(!soplex.saveSettingsFile(savesetname.c_str(), false))
+         if(!soplex.saveSettingsFile(savesetname.c_str(), false, vm["solvemode"].as<int>()))
          {
             MSG_ERROR(std::cerr << "Error writing parameters to file <" << savesetname << ">\n");
          }
