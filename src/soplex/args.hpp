@@ -59,11 +59,13 @@
 #ifdef SOPLEX_WITH_MPFR
 // For multiple precision
 #include <boost/multiprecision/mpfr.hpp>
+#ifndef NDEBUG
 #include "boost/multiprecision/debug_adaptor.hpp" // For debuging mpf numbers
-#endif
+#endif // NDEBUG
+#endif // SOPLEX_WITH_MPFR
 #ifdef SOPLEX_WITH_CPPMPF
 #include <boost/multiprecision/cpp_dec_float.hpp>
-#endif
+#endif  // SOPLEX_WITH_CPPMPF
 
 
 namespace po = boost::program_options;
@@ -380,8 +382,12 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
    po::options_description mpf("Multiprecision float solve");
    mpf.add_options()
    ("precision", po::value<unsigned int>(&precision)->default_value(100u),
-    "Minimum precision (number of decimal digits) of mpf float")
-   ("mpfdebug", "Run templated multi-precision SoPlex with boost debug adaptor");
+    "Minimum precision (number of decimal digits) of mpf float");
+
+   // mpfdebug option only available during Debugging
+   #ifndef NDEBUG
+   mpf.add_options()("mpfdebug", "Run templated multi-precision SoPlex with boost debug adaptor");
+   #endif  // NDEBUG
 
    po::options_description allOpt("Allowed options");
    allOpt.add(generic).add(general).add(lt).add(algo).add(display).add(mpf).add(intParam).add(
@@ -481,24 +487,30 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
          // allocation for the mpfr types. Is it relevant here? I probably also
          // need to have the mpfr_float_eto in the global soplex namespace
          using mpfr_float_eto = number<mpfr_float_backend<0>, et_off>;
+         #ifndef NDEBUG
          using mpfr_debug = number<debug_adaptor<mpfr_float_backend<0>>, et_off>;
+         #endif  // NDEBUG
 
          if(!vm.count("mpfdebug"))
          {
             mpfr_float_eto::default_precision(precision);
             runSoPlex<mpfr_float_eto>(vm);
          }
+         #ifndef NDEBUG
          else
          {
             mpfr_debug::default_precision(precision);
             runSoPlex<mpfr_debug>(vm);
          }
+         #endif  // NDEBUG
 
          break;
 #endif  // SOPLEX_WITH_MPFR
 
 #ifdef SOPLEX_WITH_CPPMPF
-         // TODO: Figure out how precision is set
+         // It seems that precision cannot be set on run time for cpp_float
+         // backend for boost::number. So a precision of 50 decimal points is
+         // set.
          using cpp_float = number<cpp_dec_float<50>, et_off>;
 
          runSoPlex<cpp_float>(vm);
