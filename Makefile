@@ -222,7 +222,6 @@ LIBOBJ = soplex/clufactor_rational.o \
 				soplex/spxgithash.o \
 				soplex/spxid.o \
 				soplex/spxlpbase_rational.o \
-				soplex/spxlpbase_real.o \
 				soplex/spxout.o \
 				soplex/spxscaler.o \
 				soplex/usertimer.o \

@@ -14,7 +14,6 @@ set(sources
     soplex/spxgithash.cpp
     soplex/spxid.cpp
     soplex/spxlpbase_rational.cpp
-    soplex/spxlpbase_real.cpp
     soplex/spxout.cpp
     soplex/usertimer.cpp
     soplex/wallclocktimer.cpp)
