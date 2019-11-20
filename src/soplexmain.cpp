@@ -508,13 +508,13 @@ int soplex::runSoPlex(const po::variables_map& vm)
          // Rational solve. Whereas the parameter solvemode determines if we do
          // a Real SoPlex or Templated Boost Soplex.
          if(solvemode == 3)
-           {
-             soplex.setIntParam(soplex.SOLVEMODE, vm["int:solvemode"].as<int>());
-           }
+         {
+            soplex.setIntParam(soplex.SOLVEMODE, vm["int:solvemode"].as<int>());
+         }
          else
-           {
-             soplex.setIntParam(soplex.SOLVEMODE, vm["solvemode"].as<int>());
-           }
+         {
+            soplex.setIntParam(soplex.SOLVEMODE, vm["solvemode"].as<int>());
+         }
 
          // if the LP is parsed rationally and might be solved rationally, we choose automatic syncmode such that
          // the rational LP is kept after reading

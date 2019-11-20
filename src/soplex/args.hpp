@@ -99,7 +99,8 @@ auto checkRange(const T& min, const T& max, const std::string& str) -> std::func
    {
       if(val < min || val > max)
       {
-         throw po::validation_error(po::validation_error::invalid_option_value, str + ", value=" + std::to_string(val));
+         throw po::validation_error(po::validation_error::invalid_option_value,
+                                    str + ", value=" + std::to_string(val));
       }
    };
 }
@@ -235,7 +236,8 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
     "try to enforce that the optimal solution is a basic solution");
 
    intParam.add_options()
-   ("int:objsense", po::value<int>()->default_value(1)->notifier(args::checkRange(-1, 1, "int:objsense")),
+   ("int:objsense", po::value<int>()->default_value(1)->notifier(args::checkRange(-1, 1,
+         "int:objsense")),
     "objective sense (-1 - minimize, +1 - maximize)")
    ("int:representation", po::value<int>()->default_value(0)->notifier(args::checkRange(0, 2,
          "int:representation")),
@@ -385,9 +387,9 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
     "Minimum precision (number of decimal digits) of mpf float");
 
    // mpfdebug option only available during Debugging
-   #ifndef NDEBUG
+#ifndef NDEBUG
    mpf.add_options()("mpfdebug", "Run templated multi-precision SoPlex with boost debug adaptor");
-   #endif  // NDEBUG
+#endif  // NDEBUG
 
    po::options_description allOpt("Allowed options");
    allOpt.add(generic).add(general).add(lt).add(algo).add(display).add(mpf).add(intParam).add(
@@ -487,22 +489,24 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
          // allocation for the mpfr types. Is it relevant here? I probably also
          // need to have the mpfr_float_eto in the global soplex namespace
          using mpfr_float_eto = number<mpfr_float_backend<0>, et_off>;
-         #ifndef NDEBUG
+#ifndef NDEBUG
          using mpfr_debug = number<debug_adaptor<mpfr_float_backend<0>>, et_off>;
-         #endif  // NDEBUG
+#endif  // NDEBUG
 
          if(!vm.count("mpfdebug"))
          {
             mpfr_float_eto::default_precision(precision);
             runSoPlex<mpfr_float_eto>(vm);
          }
-         #ifndef NDEBUG
+
+#ifndef NDEBUG
          else
          {
             mpfr_debug::default_precision(precision);
             runSoPlex<mpfr_debug>(vm);
          }
-         #endif  // NDEBUG
+
+#endif  // NDEBUG
 
          break;
 #endif  // SOPLEX_WITH_MPFR

@@ -378,7 +378,8 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
 
    /// measure time spent in solving steps, e.g. factorization time
    name[SoPlexBase<R>::STATTIMER] = "STATTIMER";
-   description[SoPlexBase<R>::STATTIMER] = "measure for statistics, e.g. factorization time (0 - off, 1 - user time, 2 - wallclock time)";
+   description[SoPlexBase<R>::STATTIMER] =
+      "measure for statistics, e.g. factorization time (0 - off, 1 - user time, 2 - wallclock time)";
    lower[SoPlexBase<R>::STATTIMER] = 0;
    upper[SoPlexBase<R>::STATTIMER] = 2;
    defaultValue[SoPlexBase<R>::STATTIMER] = 1;
@@ -3500,7 +3501,7 @@ typename SPxBasisBase<R>::SPxStatus SoPlexBase<R>::basisStatus() const
    if(!hasBasis())
       return SPxBasisBase<R>::NO_PROBLEM;
    else
-     return _solver.getBasisStatus();
+      return _solver.getBasisStatus();
 }
 
 
@@ -4666,12 +4667,13 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
 
       // initialize result vector x as zero
       memset(coef, 0, (unsigned int)numRows() * sizeof(Real));
+
       if(!_solver.isRowBasic(c))
       {
          // this column of B^-1 is just a unit column
          for(int i = 0; i < numRows(); i++)
          {
-            if(bind[i] < 0 && -bind[i]-1 == c)
+            if(bind[i] < 0 && -bind[i] - 1 == c)
                coef[i] = 1.0;
          }
       }
@@ -4703,6 +4705,7 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
                for(int i = 0; i < size; i++)
                {
                   int idx = bind[x.index(i)];
+
                   if(idx < 0)
                   {
                      idx = -idx - 1;
@@ -5554,7 +5557,7 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
       break;
 
    case FORCEBASIC:
-     break;
+      break;
 
    default:
       return false;
@@ -5756,6 +5759,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       default:
          return false;
       }
+
       _solver.setStarter(_starter, false);
       break;
 
@@ -6157,8 +6161,8 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
       break;
 
    case SoPlexBase<R>::MIN_MARKOWITZ:
-     _slufactor.setMarkowitz(value);
-     break;
+      _slufactor.setMarkowitz(value);
+      break;
 
    default:
       return false;
@@ -6901,7 +6905,8 @@ typename SoPlexBase<R>::RangeType SoPlexBase<R>::_rangeTypeRational(const Ration
 
 /// switches RANGETYPE_LOWER to RANGETYPE_UPPER and vice versa
 template <class R>
-typename SoPlexBase<R>::RangeType SoPlexBase<R>::_switchRangeType(const typename SoPlexBase<R>::RangeType&
+typename SoPlexBase<R>::RangeType SoPlexBase<R>::_switchRangeType(const typename
+      SoPlexBase<R>::RangeType&
       rangeType) const
 {
    if(rangeType == RANGETYPE_LOWER)
@@ -8660,7 +8665,8 @@ bool SoPlexBase<R>::parseSettingsString(const std::string str, boost::any val)
 
 /// writes settings file; returns true on success
 template <class R>
-bool SoPlexBase<R>::saveSettingsFile(const char* filename, const bool onlyChanged, int solvemode) const
+bool SoPlexBase<R>::saveSettingsFile(const char* filename, const bool onlyChanged,
+                                     int solvemode) const
 {
    assert(filename != 0);
 
@@ -8682,8 +8688,8 @@ bool SoPlexBase<R>::saveSettingsFile(const char* filename, const bool onlyChange
    file << "\n";
 
    // Additional parameter solvemode is written
-   file<<"\n# solving mode (0 - floating-point solve, 1 - auto, 2 - force iterative refinement, 3 - multi precision solve)\n";
-   file<<"solvemode = "<<solvemode<<"\n";
+   file << "\n# solving mode (0 - floating-point solve, 1 - auto, 2 - force iterative refinement, 3 - multi precision solve)\n";
+   file << "solvemode = " << solvemode << "\n";
 
    for(int i = 0; i < SoPlexBase<R>::BOOLPARAM_COUNT; i++)
    {
