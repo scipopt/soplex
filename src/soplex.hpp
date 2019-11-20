@@ -8557,10 +8557,11 @@ bool SoPlexBase<R>::parseSettingsString(const std::string str, boost::any val)
          }
          else if(str.substr(4) == _currentSettings->intParam.name[param])
          {
-            // TODO The setIntParam will check for the range of values, but I
-            // think this is un-necessary because the program options library
-            // will do this, in a better way. The if else condition is
-            // redundant, except if it gets values from SCIP.
+            // The setIntParam will check for the range of values, but I think
+            // this is un-necessary because the program options library will do
+            // this, in a better way. The if else condition is redundant, except
+            // if it gets values from SCIP. (for int:objsense this may be
+            // relevant?)
 
             auto value = boost::any_cast<int>(val);
 
@@ -8591,7 +8592,7 @@ bool SoPlexBase<R>::parseSettingsString(const std::string str, boost::any val)
          if(param >= REALPARAM_COUNT)
          {
             MSG_INFO1(spxout, spxout << "Error parsing setting string: unknown parameter name <" <<
-                      boost::any_cast<Real>(val) << ">.\n");
+                      str << ">.\n");
             return false;
          }
          else if(str.substr(5) == SoPlexBase<R>::_currentSettings->realParam.name[param])
@@ -8627,7 +8628,7 @@ bool SoPlexBase<R>::parseSettingsString(const std::string str, boost::any val)
       {
          if(param >= RATIONALPARAM_COUNT)
          {
-            MSG_INFO1(spxout, spxout << "Error parsing setting string: unknown parameter name <" << paramName <<
+            MSG_INFO1(spxout, spxout << "Error parsing setting string: unknown parameter name <" << str <<
                       ">.\n");
             return false;
          }
@@ -8642,8 +8643,8 @@ bool SoPlexBase<R>::parseSettingsString(const std::string str, boost::any val)
                break;
             else
             {
-               MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << paramValueString <<
-                         "> for rational parameter <" << paramName << ">.\n");
+               MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << val <<
+                         "> for rational parameter <" << str << ">.\n");
                return false;
             }
          }
