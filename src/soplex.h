@@ -645,30 +645,31 @@ public:
 
    /// gets the primal solution vector if available; returns true on success
    bool getPrimal(VectorBase<R>& vector);
-   bool getPrimalReal(VectorBase<R>& vector); /* For SCIP compatibility */
+   bool getPrimalReal(R* p_vector, int size);      // For SCIP compatibility
    bool getPrimalRational(VectorRational& vector);
 
    /// gets the vector of slack values if available; returns true on success
    bool getSlacksReal(VectorBase<R>& vector);
+   bool getSlacksReal(R* p_vector, int dim);
 
    /// gets the primal ray if available; returns true on success
    bool getPrimalRay(VectorBase<R>& vector);
-   bool getPrimalRayReal(VectorBase<R>& vector); /* For SCIP compatibility */
+   bool getPrimalRayReal(R* vector, int dim); /* For SCIP compatibility */
    bool getPrimalRayRational(VectorRational& vector);
 
    /// gets the dual solution vector if available; returns true on success
    bool getDual(VectorBase<R>& vector);
-   bool getDualReal(VectorBase<R>& vector); /* For SCIP compatibility */
+   bool getDualReal(R* p_vector, int dim); /* For SCIP compatibility */
    bool getDualRational(VectorRational& vector);
 
    /// gets the vector of reduced cost values if available; returns true on success
    bool getRedCost(VectorBase<R>& vector);
-   bool getRedCostReal(VectorBase<R>& vector); /* For SCIP compatibility */
+   bool getRedCostReal(R* vector, int dim); /* For SCIP compatibility */
    bool getRedCostRational(VectorRational& vector);
 
    /// gets the Farkas proof if available; returns true on success
    bool getDualFarkas(VectorBase<R>& vector);
-   bool getDualFarkasReal(VectorBase<R>& vector);
+   bool getDualFarkasReal(R* vector, int dim);
    bool getDualFarkasRational(VectorRational& vector);
 
    /// gets violation of bounds; returns true on success

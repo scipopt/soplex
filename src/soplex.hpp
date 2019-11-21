@@ -724,34 +724,56 @@ int SoPlexBase<R>::numColsReal() const
 
 // Wrapper function for reverse compatibility
 template <class R>
-bool SoPlexBase<R>::getPrimalReal(VectorBase<R>& vector)
+bool SoPlexBase<R>::getPrimalRayReal(R* vector, int dim)
 {
-   return getPrimal(vector);
+   if(hasPrimalRay() && dim >= numCols())
+   {
+      _syncRealSolution();
+      auto& primalRay = _solReal._primalRay;
+      std::copy(primalRay.begin(), primalRay.end(), vector);
+
+      return true;
+   }
+   else
+      return false;
+
 }
 
 
 // Wrapper function for reverse compatibility
 template <class R>
-bool SoPlexBase<R>::getPrimalRayReal(VectorBase<R>& vector)
+bool SoPlexBase<R>::getDualReal(R* p_vector, int dim) // For SCIP
 {
-   return getPrimalRay(vector);
-}
+   if(hasSol() && dim >= numRows())
+   {
+      _syncRealSolution();
+      auto& dual = _solReal._dual;
+      std::copy(dual.begin(), dual.end(), p_vector);
 
+      return true;
+   }
+   else
+      return false;
 
-// Wrapper function for reverse compatibility
-template <class R>
-bool SoPlexBase<R>::getDualReal(VectorBase<R>& vector) // For SCIP
-{
-   return getDual(vector);
 }
 
 
 
 /// wrapper for backwards compatibility
 template <class R>
-bool SoPlexBase<R>::getRedCostReal(VectorBase<R>& vector) // For SCIP compatibility
+bool SoPlexBase<R>::getRedCostReal(R* p_vector, int dim) // For SCIP compatibility
 {
-   return getRedCost(vector);
+   if(hasSol() && dim >= numCols())
+   {
+      _syncRealSolution();
+      auto& redcost = _solReal._redCost;
+      std::copy(redcost.begin(), redcost.end(), p_vector);
+
+      return true;
+   }
+   else
+      return false;
+
 }
 
 
@@ -759,9 +781,19 @@ bool SoPlexBase<R>::getRedCostReal(VectorBase<R>& vector) // For SCIP compatibil
 
 // Wrapping the function for reverse Compatibility
 template <class R>
-bool SoPlexBase<R>::getDualFarkasReal(VectorBase<R>& vector)
+bool SoPlexBase<R>::getDualFarkasReal(R* vector, int dim)
 {
-   return getDualFarkas(vector);
+   if(hasDualFarkas() && dim >= numRows())
+   {
+      _syncRealSolution();
+      auto& dualFarkas = _solReal._dualFarkas;
+      std::copy(dualFarkas.begin(), dualFarkas.end(), vector);
+
+      return true;
+   }
+   else
+      return false;
+
 }
 
 
@@ -1007,6 +1039,24 @@ bool SoPlexBase<R>::getPrimal(VectorBase<R>& vector)
       return false;
 }
 
+// A custom function for compatibility with scip and avoid making unnecessary
+// copies.
+template <class R>
+bool SoPlexBase<R>::getPrimalReal(R* p_vector, int size)
+{
+   if(hasSol() && size >= numCols())
+   {
+      _syncRealSolution();
+
+      auto& primal = _solReal._primal;
+      std::copy(primal.begin(), primal.end(), p_vector);
+
+      return true;
+   }
+   else
+      return false;
+}
+
 /// gets the primal ray if available; returns true on success
 template <class R>
 bool SoPlexBase<R>::getPrimalRay(VectorBase<R>& vector)
@@ -1019,6 +1069,7 @@ bool SoPlexBase<R>::getPrimalRay(VectorBase<R>& vector)
    }
    else
       return false;
+
 }
 
 
@@ -3609,6 +3660,23 @@ bool SoPlexBase<R>::getSlacksReal(VectorBase<R>& vector)
    else
       return false;
 }
+
+template <class R>
+bool SoPlexBase<R>::getSlacksReal(R* p_vector, int dim)
+{
+   if(hasSol() && dim >= numRows())
+   {
+      _syncRealSolution();
+
+      auto& slacks = _solReal._slacks;
+      std::copy(slacks.begin(), slacks.end(), p_vector);
+
+      return true;
+   }
+   else
+      return false;
+}
+
 
 /// gets the primal solution vector if available; returns true on success
 template <class R>
