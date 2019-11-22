@@ -2018,7 +2018,6 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::getRedCostSol(VectorBase<R>&
    }
    else
    {
-      p_vector = this->maxObj();
       const typename SPxBasisBase<R>::Desc& ds = this->desc();
 
       for(int i = 0; i < this->nCols(); ++i)
