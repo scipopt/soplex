@@ -955,8 +955,8 @@ void SLUFactorRational::freeAll()
    if(l.rperm)
       spx_free(l.rperm);
 
-   delete solveTime;
-   delete factorTime;
+   spx_free(solveTime);
+   spx_free(factorTime);
 }
 
 SLUFactorRational::~SLUFactorRational()

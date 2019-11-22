@@ -1182,9 +1182,22 @@ void SPxSolverBase<R>::setType(Type tp)
          thestarter = 0;
       }
 
-      // free timer
+      // free the timers
       assert(theTime);
-      delete theTime;
+      assert(multTimeSparse);
+      assert(multTimeFull);
+      assert(multTimeColwise);
+      assert(multTimeUnsetup);
+      theTime->~Timer();
+      multTimeSparse->~Timer();
+      multTimeFull->~Timer();
+      multTimeColwise->~Timer();
+      multTimeUnsetup->~Timer();
+      spx_free(theTime);
+      spx_free(multTimeSparse);
+      spx_free(multTimeFull);
+      spx_free(multTimeColwise);
+      spx_free(multTimeUnsetup);
    }
 
 

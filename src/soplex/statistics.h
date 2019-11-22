@@ -53,14 +53,22 @@ public:
    ~Statistics()
    {
       // we need to free all timers again (allocation happens in constructor)
-      delete readingTime;
-      delete solvingTime;
-      delete preprocessingTime;
-      delete simplexTime;
-      delete syncTime;
-      delete transformTime;
-      delete rationalTime;
-      delete reconstructionTime;
+      readingTime->~Timer();
+      solvingTime->~Timer();
+      preprocessingTime->~Timer();
+      simplexTime->~Timer();
+      syncTime->~Timer();
+      transformTime->~Timer();
+      rationalTime->~Timer();
+      reconstructionTime->~Timer();
+      spx_free(readingTime);
+      spx_free(solvingTime);
+      spx_free(preprocessingTime);
+      spx_free(simplexTime);
+      spx_free(syncTime);
+      spx_free(transformTime);
+      spx_free(rationalTime);
+      spx_free(reconstructionTime);
    }
 
    /// clears all statistics

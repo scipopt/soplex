@@ -1355,9 +1355,6 @@ template <class R>
 SLUFactor<R>::~SLUFactor<R>()
 {
    freeAll();
-
-   delete solveTime;
-   delete this->factorTime;
 }
 
 template <class R>
