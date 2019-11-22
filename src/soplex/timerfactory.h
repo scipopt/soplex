@@ -48,15 +48,18 @@ public:
       switch(ttype)
       {
       case Timer::OFF:
-         timer = new NoTimer;
+         spx_alloc(timer, sizeof(NoTimer));
+         timer = new(timer) NoTimer();
          break;
 
       case Timer::USER_TIME:
-         timer = new UserTimer;
+         spx_alloc(timer, sizeof(UserTimer));
+         timer = new(timer) UserTimer();
          break;
 
       case Timer::WALLCLOCK_TIME:
-         timer = new WallclockTimer;
+         spx_alloc(timer, sizeof(WallclockTimer));
+         timer = new(timer) WallclockTimer();
          break;
 
       default:
@@ -72,7 +75,7 @@ public:
       if(ttype != timer->type())
       {
          // @todo transfer the old times
-         delete timer;
+         spx_free(timer);
          timer = createTimer(ttype);
       }
 
