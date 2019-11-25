@@ -415,6 +415,13 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
          return 0;
       }
 
+      if(vm.count("version"))
+      {
+         SoPlexBase<Real> soplex;
+         soplex.printVersion();
+         return 0;
+      }
+
       if(vm.count("loadset"))
       {
          const auto fname = vm["loadset"].as<std::string>();
