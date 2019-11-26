@@ -190,7 +190,8 @@ void SoPlexBase<R>::_evaluateSolutionReal(typename SPxSimplifier<R>::Result simp
 
    case SPxSolverBase<R>::ABORT_CYCLING:
 
-      // if preprocessing was applied, try to run again without to avoid cycling
+      // if preprocessing or scaling was applied, try to run again without to
+      // avoid cycling
       if(!_isRealLPLoaded || _isRealLPScaled)
       {
          MSG_INFO1(spxout, spxout << "encountered cycling - trying to solve again without simplifying" <<

@@ -1139,6 +1139,10 @@ void SPxSolverBase<R>::setType(Type tp)
       , weights(0)
       , coWeights(0)
       , weightsAreSetup(false)
+      , multSparseCalls(0)
+      , multFullCalls(0)
+      , multColwiseCalls(0)
+      , multUnsetupCalls(0)
       , integerVariables(0)
    {
       theTime = TimerFactory::createTimer(timerType);
@@ -1293,6 +1297,10 @@ void SPxSolverBase<R>::setType(Type tp)
          weights = base.weights;
          coWeights = base.coWeights;
          weightsAreSetup = base.weightsAreSetup;
+         multSparseCalls = base.multSparseCalls;
+         multFullCalls = base.multFullCalls;
+         multColwiseCalls = base.multColwiseCalls;
+         multUnsetupCalls = base.multUnsetupCalls;
          spxout = base.spxout;
          integerVariables = base.integerVariables;
 
@@ -1499,10 +1507,18 @@ void SPxSolverBase<R>::setType(Type tp)
       , weights(base.weights)
       , coWeights(base.coWeights)
       , weightsAreSetup(base.weightsAreSetup)
+      , multSparseCalls(base.multSparseCalls)
+      , multFullCalls(base.multFullCalls)
+      , multColwiseCalls(base.multColwiseCalls)
+      , multUnsetupCalls(base.multUnsetupCalls)
       , spxout(base.spxout)
       , integerVariables(base.integerVariables)
    {
       theTime = TimerFactory::createTimer(timerType);
+      multTimeSparse = TimerFactory::createTimer(timerType);
+      multTimeFull = TimerFactory::createTimer(timerType);
+      multTimeColwise = TimerFactory::createTimer(timerType);
+      multTimeUnsetup = TimerFactory::createTimer(timerType);
 
       if(base.theRep == COLUMN)
       {
