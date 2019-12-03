@@ -4566,7 +4566,7 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
          assert(!_solver.isColBasic(index));
 
          // get unit vector
-         rhs = UnitVectorReal(index);
+         rhs = UnitVectorBase<R>(index);
 
          if(unscale && _solver.isScaled())
             rhs *= spxLdexp(1.0, _scaler->getColScaleExp(index));
@@ -4747,7 +4747,7 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
       }
       else
       {
-         SSVectorReal x(numCols());
+         SSVectorBase<R> x(numCols());
 
          for(int k = 0; k < numCols(); k++)
          {
@@ -4763,7 +4763,7 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
             if(unscale && _solver.isScaled())
             {
                int scaleExp = -_scaler->getRowScaleExp(index);
-               DSVectorReal rhs(1);
+               DSVectorBase<R> rhs(1);
                rhs.add(index, spxLdexp(1.0, scaleExp));
                _solver.basis().coSolve(x, rhs);
                x.setup();
@@ -4813,7 +4813,7 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
 
                if(unscale && _solver.isScaled())
                {
-                  DSVector r_unscaled(numCols());
+                  DSVectorBase<R> r_unscaled(numCols());
                   _solver.getRowVectorUnscaled(idx, r_unscaled);
                   coef[i] = - (r_unscaled * x);
                }
@@ -5108,7 +5108,7 @@ bool SoPlexBase<R>::multBasis(R* vec, bool unscale)
                assert(index < numRows());
                assert(!_solver.isRowBasic(index));
 
-               y.add(x[i] * UnitVectorReal(index));
+               y.add(x[i] * UnitVectorBase<R>(index));
             }
             // r corresponds to a column vector
             else
@@ -5223,7 +5223,7 @@ bool SoPlexBase<R>::multBasisTranspose(R* vec, bool unscale)
             assert(index < numRows());
             assert(!_solver.isRowBasic(index));
 
-            y.add(i, x * UnitVectorReal(index));
+            y.add(i, x * UnitVectorBase<R>(index));
          }
          // r corresponds to a column vector
          else
