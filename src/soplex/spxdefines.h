@@ -59,8 +59,8 @@ boost::multiprecision::number<T, eto> spxFrexp(boost::multiprecision::number<T, 
    return frexp(y, exp);
 }
 
-#define SOPLEX_VERSION         403
-#define SOPLEX_SUBVERSION        4
+#define SOPLEX_VERSION         410
+#define SOPLEX_SUBVERSION        0
 #define SOPLEX_APIVERSION        11
 #define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2019 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)"
 
