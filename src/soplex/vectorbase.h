@@ -114,7 +114,6 @@ public:
       ;
    }
 
-   // This constructor is never called in SoPlex, but in SCIP
    VectorBase<R>(int dimen, R* p_val)
    {
       val.assign(p_val, p_val + dimen);

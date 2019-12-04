@@ -4513,9 +4513,7 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
       }
       else
       {
-         VectorBase<R> y(numRows(), coef);
-         y = x;
-         std::copy(y.vec().begin(), y.vec().end(), coef);
+         std::copy(x.vec().begin(), x.vec().end(), coef);
 
          if(ninds != NULL)
             *ninds = -1;
@@ -4712,9 +4710,7 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
       }
       else
       {
-         VectorBase<R> y(numRows(), coef);
-         y = x;
-         std::copy(y.vec().begin(), y.vec().end(), coef);
+         std::copy(x.vec().begin(), x.vec().end(), coef);
 
          if(ninds != 0)
             *ninds = -1;
