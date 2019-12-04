@@ -4515,6 +4515,7 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
       {
          VectorBase<R> y(numRows(), coef);
          y = x;
+         std::copy(y.vec().begin(), y.vec().end(), coef);
 
          if(ninds != NULL)
             *ninds = -1;
@@ -4713,6 +4714,7 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
       {
          VectorBase<R> y(numRows(), coef);
          y = x;
+         std::copy(y.vec().begin(), y.vec().end(), coef);
 
          if(ninds != 0)
             *ninds = -1;
@@ -5013,6 +5015,9 @@ bool SoPlexBase<R>::getBasisInverseTimesVecReal(R* rhs, R* sol, bool unscale)
          }
       }
 
+      std::copy(v.vec().begin(), v.vec().end(), rhs);
+      std::copy(x.vec().begin(), x.vec().end(), sol);
+
       // free memory
       spx_free(bind);
    }
@@ -5038,9 +5043,6 @@ bool SoPlexBase<R>::multBasis(R* vec, bool unscale)
    {
       int basisdim = numRows();
 
-      // create VectorBase<R> from input values
-      VectorBase<R> x(basisdim, vec);
-
       if(unscale && _solver.isScaled())
       {
          /* for information on the unscaling procedure see spxscaler.h */
@@ -5059,8 +5061,11 @@ bool SoPlexBase<R>::multBasis(R* vec, bool unscale)
                vec[i] = spxLdexp(vec[i], scaleExp);
             }
          }
+         // create VectorBase<R> from input values
+         VectorBase<R> x(basisdim, vec);
 
          _solver.basis().multBaseWith(x);
+         std::copy(x.vec().begin(), x.vec().end(), vec);
 
          for(int i = 0; i < basisdim; ++i)
          {
@@ -5069,7 +5074,12 @@ bool SoPlexBase<R>::multBasis(R* vec, bool unscale)
          }
       }
       else
+      {
+         // create VectorBase<R> from input values
+         VectorBase<R> x(basisdim, vec);
          _solver.basis().multBaseWith(x);
+         std::copy(x.vec().begin(), x.vec().end(), vec);
+      }
    }
    else
    {
@@ -5131,6 +5141,7 @@ bool SoPlexBase<R>::multBasis(R* vec, bool unscale)
 
       spx_free(bind);
       x = y;
+      std::copy(x.vec().begin(), x.vec().end(), vec);
    }
 
    return true;
@@ -5154,9 +5165,6 @@ bool SoPlexBase<R>::multBasisTranspose(R* vec, bool unscale)
    {
       int basisdim = numRows();
 
-      // create VectorBase<R> from input values
-      VectorBase<R> x(basisdim, vec);
-
       if(unscale && _solver.isScaled())
       {
          /* for information on the unscaling procedure see spxscaler.h */
@@ -5172,7 +5180,10 @@ bool SoPlexBase<R>::multBasisTranspose(R* vec, bool unscale)
             }
          }
 
+         // create VectorBase<R> from input values
+         VectorBase<R> x(basisdim, vec);
          _solver.basis().multWithBase(x);
+         std::copy(x.vec().begin(), x.vec().end(), vec);
 
          for(int i = 0; i < basisdim; ++i)
          {
@@ -5188,7 +5199,12 @@ bool SoPlexBase<R>::multBasisTranspose(R* vec, bool unscale)
          }
       }
       else
+      {
+         // create VectorBase<R> from input values
+         VectorBase<R> x(basisdim, vec);
          _solver.basis().multWithBase(x);
+         std::copy(x.vec().begin(), x.vec().end(), vec);
+      }
    }
    else
    {
@@ -5245,6 +5261,7 @@ bool SoPlexBase<R>::multBasisTranspose(R* vec, bool unscale)
 
       spx_free(bind);
       x = y;
+      std::copy(x.vec().begin(), x.vec().end(), vec);
    }
 
    return true;

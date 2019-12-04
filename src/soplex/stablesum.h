@@ -45,6 +45,7 @@ public:
    {
       return sum;
    }
+
 };
 
 template <>
@@ -94,6 +95,16 @@ public:
       return sum + c;
    }
 };
+
+/// Output operator.
+template < class T >
+std::ostream& operator<<(std::ostream& s, const StableSum<T>& sum)
+{
+   s << static_cast<T>(sum);
+
+   return s;
+}
+
 }
 
 #endif

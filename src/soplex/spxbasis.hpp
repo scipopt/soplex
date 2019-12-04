@@ -816,7 +816,7 @@ void SPxBasisBase<R>::change(
       ++iterCount;
       ++updateCount;
 
-      MSG_DEBUG(std::cout << "factor_stats: iteration= " << iteration()
+      MSG_DEBUG(std::cout << "factor_stats: iteration= " << this->iteration()
                 << " update= " << updateCount
                 << " total_update= " << totalUpdateCount
                 << " nonzero_B= " << nzCount

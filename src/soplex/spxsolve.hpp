@@ -1776,7 +1776,7 @@ bool SPxSolverBase<R>::terminate()
                (*this->spxout) << " --- objective value limit reached" << std::endl
                << " (value: " << value()
                << ", limit: " << objLimit << ")" << std::endl
-               << " (spxSense: " << int(spxSense())
+               << " (spxSense: " << int(this->spxSense())
                << ", rep: " << int(rep())
                << ", type: " << int(type()) << ")" << std::endl;
             )

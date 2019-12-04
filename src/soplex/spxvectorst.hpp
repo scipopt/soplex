@@ -57,7 +57,7 @@ void SPxVectorST<R>::setupWeights(SPxSolverBase<R>& base)
             this->colUp[i] = 1;
          }
 
-         MSG_DEBUG(std::cout << colWeight[i] << " ";)
+         MSG_DEBUG(std::cout << this->colWeight[i] << " ";)
       }
 
       MSG_DEBUG(std::cout << std::endl << std::endl;)
@@ -82,7 +82,7 @@ void SPxVectorST<R>::setupWeights(SPxSolverBase<R>& base)
             this->rowRight[i] = 1;
          }
 
-         MSG_DEBUG(std::cout << rowWeight[i] << " ";)
+         MSG_DEBUG(std::cout << this->rowWeight[i] << " ";)
       }
 
       MSG_DEBUG(std::cout << std::endl;)

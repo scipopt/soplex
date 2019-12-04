@@ -1008,7 +1008,7 @@ void SPxSolverBase<R>::setType(Type tp)
          m_nonbasicValue += objChange;
 
       MSG_DEBUG(std::cout
-                << "Iteration: " << iteration()
+                << "Iteration: " << this->iteration()
                 << ": updated objValue: " << objChange
                 << ", new value: " << m_nonbasicValue
                 << ", correct value: " << nonbasicValue()

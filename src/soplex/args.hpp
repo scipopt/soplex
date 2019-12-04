@@ -488,26 +488,14 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
          // The documentation also mentions about static vs dynamic memory
          // allocation for the mpfr types. Is it relevant here? I probably also
          // need to have the mpfr_float_eto in the global soplex namespace
-         using mpfr_float_eto = number<mpfr_float_backend<0>, et_off>;
-#ifndef NDEBUG
-         using mpfr_debug = number<debug_adaptor<mpfr_float_backend<0>>, et_off>;
+#ifdef NDEBUG
+         using mulriprecision = number<mpfr_float_backend<0>, et_off>;
+#else
+         using mulriprecision = number<debug_adaptor<mpfr_float_backend<0>>, et_off>;
 #endif  // NDEBUG
 
-         if(!vm.count("mpfdebug"))
-         {
-            mpfr_float_eto::default_precision(precision);
-            runSoPlex<mpfr_float_eto>(vm);
-         }
-
-#ifndef NDEBUG
-         else
-         {
-            mpfr_debug::default_precision(precision);
-            runSoPlex<mpfr_debug>(vm);
-         }
-
-#endif  // NDEBUG
-
+         mulriprecision::default_precision(precision);
+         runSoPlex<mulriprecision>(vm);
          break;
 #endif  // SOPLEX_WITH_MPFR
 
@@ -515,9 +503,9 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
          // It seems that precision cannot be set on run time for cpp_float
          // backend for boost::number. So a precision of 50 decimal points is
          // set.
-         using cpp_float = number<cpp_dec_float<50>, et_off>;
+         using mulriprecision = number<cpp_dec_float<50>, et_off>;
 
-         runSoPlex<cpp_float>(vm);
+         runSoPlex<mulriprecision>(vm);
 #endif  // SOPLEX_WITH_CPPMPF
 
       default:
