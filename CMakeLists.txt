@@ -132,16 +132,18 @@ if(Boost)
     # Technically the version 1.70.0 is not needed for program_option, but for the
     # multiprecision, but it's header only, this is one way to guarantee that the
     # user has the right version.   
-    # TODO: The value of boost version should be decided in the future. It would
-    # be nice to check if the version is at least 1.70.0 and issue a warning if it
-    # isn't.
-    find_package(Boost 1.58.0 COMPONENTS program_options REQUIRED) # Refer to comments in cmake/Modules/FindBoost.cmake
+    find_package(Boost 1.70.0 COMPONENTS program_options REQUIRED) # Refer to comments in cmake/Modules/FindBoost.cmake
     add_definitions(-DSOPLEX_WITH_BOOST)
-    if(BOOST_FOUND)
+    if(Boost_FOUND)
         include_directories(${Boost_INCLUDE_DIRS})
+    else()
+        message(WARNING "Boost could not be found. If you do not inted to use \
+        the multiprecision feature and you only require the soplex library, \
+        consider building with -DBoost=off.")
     endif()
 else()
-    message(WARNING "When building without Boost, only the SoPlex library will be built. Boost with program_options is required to build the binary.")  
+    message(WARNING "When building without Boost, only the SoPlex library \
+    will be built. Boost with program_options is required to build the binary.")
 endif()
 
 
