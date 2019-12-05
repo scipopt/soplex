@@ -1,14 +1,14 @@
 /*
    DVector        primRhs;     ///< rhs vector for computing the primal vector
    UpdateVector   primVec;     ///< primal vector
-   DVector        dualRhs;     ///< rhs vector for computing the dual vector
+   Vector        dualRhs;     ///< rhs vector for computing the dual vector
    UpdateVector   dualVec;     ///< dual vector
    UpdateVector   addVec;      ///< storage for thePvec = &addVec
 
-   DVector        theURbound;  ///< Upper Row    Feasibility bound
-   DVector        theLRbound;  ///< Lower Row    Feasibility bound
-   DVector        theUCbound;  ///< Upper Column Feasibility bound
-   DVector        theLCbound;  ///< Lower Column Feasibility bound
+   Vector        theURbound;  ///< Upper Row    Feasibility bound
+   Vector        theLRbound;  ///< Lower Row    Feasibility bound
+   Vector        theUCbound;  ///< Upper Column Feasibility bound
+   Vector        theLCbound;  ///< Lower Column Feasibility bound
 
 
 Column Enter

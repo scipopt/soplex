@@ -36,6 +36,7 @@
 #include "soplex/statistics.h"
 #include "soplex/args.hpp"      // For argument parsing
 
+
 #ifdef SOPLEX_WITH_EGLIB
 extern "C" {
 #include "soplex/EGlib.h"
@@ -52,24 +53,25 @@ int main(int argc, char* argv[]);
 
 /// performs external feasibility check with real type
 ///@todo implement external check; currently we use the internal methods for convenience
+
+template <class R>
 static
-void checkSolutionReal(SoPlexBase<Real>& soplex)
+void checkSolutionReal(SoPlexBase<R>& soplex)
 {
-   if(soplex.hasSol())
+   if(soplex.hasPrimal())
    {
-      Real boundviol;
-      Real rowviol;
-      Real sumviol;
+      R boundviol;
+      R rowviol;
+      R sumviol;
 
       if(soplex.getBoundViolation(boundviol, sumviol) && soplex.getRowViolation(rowviol, sumviol))
       {
          MSG_INFO1(soplex.spxout,
-                   Real maxviol = boundviol > rowviol ? boundviol : rowviol;
-                   bool feasible = (maxviol <= soplex.realParam(SoPlexBase<Real>::FEASTOL));
+                   R maxviol = boundviol > rowviol ? boundviol : rowviol;
+                   bool feasible = (maxviol <= soplex.realParam(SoPlexBase<R>::FEASTOL));
                    soplex.spxout << "Primal solution " << (feasible ? "feasible" : "infeasible")
                    << " in original problem (max. violation = " << std::scientific << maxviol
-                   << std::setprecision(8) << std::fixed << ").\n"
-                  );
+                   << std::setprecision(8) << std::fixed << ").\n");
       }
       else
       {
@@ -81,17 +83,17 @@ void checkSolutionReal(SoPlexBase<Real>& soplex)
       MSG_INFO1(soplex.spxout, soplex.spxout << "No primal solution available.\n");
    }
 
-   if(soplex.hasSol())
+   if(soplex.hasDual())
    {
-      Real redcostviol;
-      Real dualviol;
-      Real sumviol;
+      R redcostviol;
+      R dualviol;
+      R sumviol;
 
       if(soplex.getRedCostViolation(redcostviol, sumviol) && soplex.getDualViolation(dualviol, sumviol))
       {
          MSG_INFO1(soplex.spxout,
-                   Real maxviol = redcostviol > dualviol ? redcostviol : dualviol;
-                   bool feasible = (maxviol <= soplex.realParam(SoPlexBase<Real>::OPTTOL));
+                   R maxviol = redcostviol > dualviol ? redcostviol : dualviol;
+                   bool feasible = (maxviol <= soplex.realParam(SoPlexBase<R>::OPTTOL));
                    soplex.spxout << "Dual solution " << (feasible ? "feasible" : "infeasible")
                    << " in original problem (max. violation = " << std::scientific << maxviol
                    << std::setprecision(8) << std::fixed << ").\n"
@@ -110,10 +112,10 @@ void checkSolutionReal(SoPlexBase<Real>& soplex)
 
 /// performs external feasibility check with rational type
 ///@todo implement external check; currently we use the internal methods for convenience
-static
-void checkSolutionRational(SoPlexBase<Real>& soplex)
+template <class R>
+static void checkSolutionRational(SoPlexBase<R>& soplex)
 {
-   if(soplex.hasSol())
+   if(soplex.hasPrimal())
    {
       Rational boundviol;
       Rational rowviol;
@@ -124,7 +126,7 @@ void checkSolutionRational(SoPlexBase<Real>& soplex)
       {
          MSG_INFO1(soplex.spxout,
                    Rational maxviol = boundviol > rowviol ? boundviol : rowviol;
-                   bool feasible = (maxviol <= soplex.realParam(SoPlexBase<Real>::FEASTOL));
+                   bool feasible = (maxviol <= soplex.realParam(SoPlexBase<R>::FEASTOL));
                    soplex.spxout << "Primal solution " << (feasible ? "feasible" : "infeasible") <<
                    " in original problem (max. violation = " << rationalToString(maxviol) << ").\n"
                   );
@@ -139,7 +141,7 @@ void checkSolutionRational(SoPlexBase<Real>& soplex)
       MSG_INFO1(soplex.spxout, soplex.spxout << "No primal solution available.\n");
    }
 
-   if(soplex.hasSol())
+   if(soplex.hasDual())
    {
       Rational redcostviol;
       Rational dualviol;
@@ -150,7 +152,7 @@ void checkSolutionRational(SoPlexBase<Real>& soplex)
       {
          MSG_INFO1(soplex.spxout,
                    Rational maxviol = redcostviol > dualviol ? redcostviol : dualviol;
-                   bool feasible = (maxviol <= soplex.realParam(SoPlexBase<Real>::OPTTOL));
+                   bool feasible = (maxviol <= soplex.realParam(SoPlexBase<R>::OPTTOL));
                    soplex.spxout << "Dual solution " << (feasible ? "feasible" : "infeasible") <<
                    " in original problem (max. violation = " << rationalToString(maxviol) << ").\n"
                   );
@@ -168,12 +170,11 @@ void checkSolutionRational(SoPlexBase<Real>& soplex)
 
 /// performs external feasibility check according to check mode
 template <class R>
-
 void checkSolution(SoPlexBase<R>& soplex)
 {
-   if(soplex.intParam(SoPlexBase<Real>::CHECKMODE) == SoPlexBase<Real>::CHECKMODE_RATIONAL
-         || (soplex.intParam(SoPlexBase<Real>::CHECKMODE) == SoPlexBase<Real>::CHECKMODE_AUTO
-             && soplex.intParam(SoPlexBase<Real>::READMODE) == SoPlexBase<Real>::READMODE_RATIONAL))
+   if(soplex.intParam(SoPlexBase<R>::CHECKMODE) == SoPlexBase<R>::CHECKMODE_RATIONAL
+         || (soplex.intParam(SoPlexBase<R>::CHECKMODE) == SoPlexBase<R>::CHECKMODE_AUTO
+             && soplex.intParam(SoPlexBase<R>::READMODE) == SoPlexBase<R>::READMODE_RATIONAL))
    {
       checkSolutionRational(soplex);
    }
@@ -185,8 +186,9 @@ void checkSolution(SoPlexBase<R>& soplex)
    MSG_INFO1(soplex.spxout, soplex.spxout << "\n");
 }
 
+template <class R>
 static
-void printPrimalSolution(SoPlexBase<Real>& soplex, NameSet& colnames, NameSet& rownames,
+void printPrimalSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownames,
                          bool real = true, bool rational = false)
 {
    int printprec;
@@ -196,7 +198,7 @@ void printPrimalSolution(SoPlexBase<Real>& soplex, NameSet& colnames, NameSet& r
 
    if(real)
    {
-      DVectorBase<Real> primal(soplex.numCols());
+      VectorBase<R> primal(soplex.numCols());
 
       if(soplex.getPrimalRay(primal))
       {
@@ -244,7 +246,7 @@ void printPrimalSolution(SoPlexBase<Real>& soplex, NameSet& colnames, NameSet& r
 
    if(rational)
    {
-      DVectorRational primal(soplex.numCols());
+      VectorRational primal(soplex.numCols());
 
       if(soplex.getPrimalRayRational(primal))
       {
@@ -298,7 +300,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 
    if(real)
    {
-      DVector dual(soplex.numRows());
+      VectorBase<R> dual(soplex.numRows());
 
       if(soplex.getDualFarkas(dual))
       {
@@ -336,7 +338,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
                    << std::setprecision(1) << std::scientific << Param::epsilon()
                    << std::setprecision(8) << std::fixed << ")." << std::endl;)
 
-         DVector redcost(soplex.numCols());
+         VectorBase<R> redcost(soplex.numCols());
 
          if(soplex.getRedCost(redcost))
          {
@@ -363,7 +365,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 
    if(rational)
    {
-      DVectorRational dual(soplex.numRows());
+      VectorRational dual(soplex.numRows());
 
       if(soplex.getDualFarkasRational(dual))
       {
@@ -395,7 +397,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 
          MSG_INFO1(soplex.spxout, soplex.spxout << "All other dual values are zero." << std::endl;)
 
-         DVectorRational redcost(soplex.numCols());
+         VectorRational redcost(soplex.numCols());
 
          if(soplex.getRedCostRational(redcost))
          {
@@ -433,17 +435,6 @@ int main(int argc, char* argv[])
 
    return retVal;
 }
-
-
-template <>
-typename SoPlexBase<Real>::Settings::BoolParam SoPlexBase<Real>::Settings::boolParam;
-
-template <>
-typename SoPlexBase<Real>::Settings::IntParam SoPlexBase<Real>::Settings::intParam;
-
-template <>
-typename SoPlexBase<Real>::Settings::RealParam SoPlexBase<Real>::Settings::realParam;
-
 
 // Runs SoPlex with the parsed boost variables map
 template <class R>
@@ -511,7 +502,19 @@ int soplex::runSoPlex(const po::variables_map& vm)
       // --solvemode=<value> : choose solving mode (0* - floating-point solve, 1 - auto, 2 - force iterative refinement)
       if(vm.count("solvemode"))
       {
-         soplex.setIntParam(soplex.SOLVEMODE, vm["solvemode"].as<int>());
+         auto solvemode = vm["solvemode"].as<int>();
+
+         // The parameter int:solvemode determines if we are doing a Real or
+         // Rational solve. Whereas the parameter solvemode determines if we do
+         // a Real SoPlex or Templated Boost Soplex.
+         if(solvemode == 3)
+         {
+            soplex.setIntParam(soplex.SOLVEMODE, vm["int:solvemode"].as<int>());
+         }
+         else
+         {
+            soplex.setIntParam(soplex.SOLVEMODE, vm["solvemode"].as<int>());
+         }
 
          // if the LP is parsed rationally and might be solved rationally, we choose automatic syncmode such that
          // the rational LP is kept after reading
@@ -722,7 +725,7 @@ int soplex::runSoPlex(const po::variables_map& vm)
          MSG_INFO1(soplex.spxout, soplex.spxout << "Saving parameters to settings file <" << savesetname <<
                    "> . . .\n");
 
-         if(!soplex.saveSettingsFile(savesetname.c_str(), false))
+         if(!soplex.saveSettingsFile(savesetname.c_str(), false, vm["solvemode"].as<int>()))
          {
             MSG_ERROR(std::cerr << "Error writing parameters to file <" << savesetname << ">\n");
          }

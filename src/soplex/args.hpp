@@ -25,7 +25,7 @@
 /* Notes: If we need to add new parameters to things for Settings class. say,
    BoolParam:
 
-          1. Add it to soplex.cpp under the name BoolParam default
+          1. Add it to soplex.hpp under the name BoolParam default
           constructor.
           2. Add it to variable boolParam in this file.
 
@@ -54,6 +54,20 @@
 
 #include <soplex/spxdefines.h>  // For access to some constants
 
+#include "boost/multiprecision/number.hpp"
+
+#ifdef SOPLEX_WITH_MPFR
+// For multiple precision
+#include <boost/multiprecision/mpfr.hpp>
+#ifndef NDEBUG
+#include "boost/multiprecision/debug_adaptor.hpp" // For debuging mpf numbers
+#endif // NDEBUG
+#endif // SOPLEX_WITH_MPFR
+#ifdef SOPLEX_WITH_CPPMPF
+#include <boost/multiprecision/cpp_dec_float.hpp>
+#endif  // SOPLEX_WITH_CPPMPF
+
+
 namespace po = boost::program_options;
 
 namespace soplex
@@ -65,6 +79,11 @@ int runSoPlex(const po::variables_map& vm);
 
 namespace args
 {
+
+// A helper function to check if a command line argument lies in a range or in a
+// list of values. Throws an exception if it doesn't. The functions return
+// another function/lambda Will be used during the vm.notify()
+
 // Returns a function that checks if the val lies in [min, max] TODO: If we
 // have c++14/c++17, we can replace all the T with auto or use a template and
 // put this inside the parseArgs. This also means that we can get rid of the
@@ -80,7 +99,8 @@ auto checkRange(const T& min, const T& max, const std::string& str) -> std::func
    {
       if(val < min || val > max)
       {
-         throw po::validation_error(po::validation_error::invalid_option_value, str, std::to_string(val));
+         throw po::validation_error(po::validation_error::invalid_option_value,
+                                    str + ", value=" + std::to_string(val));
       }
    };
 }
@@ -90,33 +110,8 @@ auto checkRange(const T& min, const T& max, const std::string& str) -> std::func
 // Parses the command line arguments
 inline auto parseArgsAndRun(int argc, char* argv[]) -> int
 {
-
-   // Two helper functions to check if a command line argument lies in a range
-   // or in a list of values. Throws an exception if it doesn't. The functions
-   // return another function/lambda Will be used during the vm.notify()
-
-
-   // Returns a function that checks whether a value is inside a list and if
-   // not, it throws an error TODO: If we have c++14, we can replace all the
-   // "int" with auto or use a template, also std::cend() and std::cbegin()
-   // Also refer to comments on checkRange. Using &list instead of list in the
-   // lambda may cause issues.
-   auto in = [](const std::initializer_list<int>& list, const std::string & str)
-   {
-      return [list, str](const int& val)
-      {
-         const auto lEnd = list.end();
-         const auto iter = std::find(list.begin(), list.end(), val);
-
-         if(iter == lEnd)            // meaning that val is not in the list
-         {
-            throw po::validation_error(po::validation_error::invalid_option_value, str, std::to_string(val));
-         }
-      };
-   };
-
-
    int solvemode = 1;
+   unsigned int precision = 100;
 
    // a special case for working with ./soplex file.mps, i.e., without
    // explicitly doing ./soplex --lpfile=file.mps
@@ -189,7 +184,7 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
     "choose ratio tester (0 - textbook, 1 - harris, 2 - fast, 3 - boundflipping)");
 
    display.add_options()
-   ("verbosity,v", po::value<int>()->default_value(3)->notifier(in({0, 1, 2, 3, 4, 5}, "verbosity")),
+   ("verbosity,v", po::value<int>()->default_value(3)->notifier(args::checkRange(0, 5, "verbosity")),
     "set verbosity to <level> (0 - error, 3 - normal, 5 - high)")
    // Although the option says verbosity can be 0, 3, 5. In the program
    // verbosity 4 is also used.
@@ -241,7 +236,8 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
     "try to enforce that the optimal solution is a basic solution");
 
    intParam.add_options()
-   ("int:objsense", po::value<int>()->default_value(1)->notifier(in({-1, 1}, "int:objsense")),
+   ("int:objsense", po::value<int>()->default_value(1)->notifier(args::checkRange(-1, 1,
+         "int:objsense")),
     "objective sense (-1 - minimize, +1 - maximize)")
    ("int:representation", po::value<int>()->default_value(0)->notifier(args::checkRange(0, 2,
          "int:representation")),
@@ -385,13 +381,25 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
    ("real:min_markowitz", po::value<double>()->default_value(0.01)->notifier(args::checkRange(0.0001,
          0.9999, "real:min_markowitz")), "minimal Markowitz threshold in LU factorization");
 
+   po::options_description mpf("Multiprecision float solve");
+   mpf.add_options()
+   ("precision", po::value<unsigned int>(&precision)->default_value(100u),
+    "Minimum precision (number of decimal digits) of mpf float");
+
+   // mpfdebug option only available during Debugging
+#ifndef NDEBUG
+   mpf.add_options()("mpfdebug", "Run templated multi-precision SoPlex with boost debug adaptor");
+#endif  // NDEBUG
+
    po::options_description allOpt("Allowed options");
-   allOpt.add(generic).add(general).add(lt).add(algo).add(display).add(intParam).add(
+   allOpt.add(generic).add(general).add(lt).add(algo).add(display).add(mpf).add(intParam).add(
       realParam).add(boolParam);
 
-   // This will contain a subsection of the options, i.e., without intParam, realParam, boolParam and rationalParam
+   // This will contain a subsection of the options, i.e., without intParam,
+   // realParam, boolParam and rationalParam. Useful for printing a shorter help
+   // message.
    po::options_description liteOpt("Allowed options");
-   liteOpt.add(generic).add(general).add(lt).add(algo).add(display);
+   liteOpt.add(generic).add(general).add(lt).add(algo).add(display).add(mpf);
 
    try
    {
@@ -479,7 +487,33 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
          runSoPlex<Real>(vm);
          break;
 
+      case 3:                 // soplex mpf
+         using namespace boost::multiprecision;
+#ifdef SOPLEX_WITH_MPFR
+
+         // et_off means the expression templates options is turned off. TODO:
+         // The documentation also mentions about static vs dynamic memory
+         // allocation for the mpfr types. Is it relevant here? I probably also
+         // need to have the mpfr_float_eto in the global soplex namespace
+#ifdef NDEBUG
+         using mulriprecision = number<mpfr_float_backend<0>, et_off>;
+#else
+         using mulriprecision = number<debug_adaptor<mpfr_float_backend<0>>, et_off>;
+#endif  // NDEBUG
+
+         mulriprecision::default_precision(precision);
+         runSoPlex<mulriprecision>(vm);
          break;
+#endif  // SOPLEX_WITH_MPFR
+
+#ifdef SOPLEX_WITH_CPPMPF
+         // It seems that precision cannot be set on run time for cpp_float
+         // backend for boost::number. So a precision of 50 decimal points is
+         // set.
+         using mulriprecision = number<cpp_dec_float<50>, et_off>;
+
+         runSoPlex<mulriprecision>(vm);
+#endif  // SOPLEX_WITH_CPPMPF
 
       default:
          std::cerr << "Wrong value for the solve mode\n\n" << allOpt << "\n";

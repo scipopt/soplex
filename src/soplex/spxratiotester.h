@@ -52,7 +52,7 @@ protected:
    /// internal storage of type
    typename SPxSolverBase<R>::Type m_type;
    /// allowed bound violation
-   Real delta;
+   R delta;
    ///@}
 
 public:
@@ -76,7 +76,7 @@ public:
    /// unloads LP.
    virtual void clear()
    {
-      thesolver = 0;
+      thesolver = nullptr;
    }
 
    /// returns loaded LP solver.
@@ -86,7 +86,7 @@ public:
    }
 
    /// set allowed bound violation
-   virtual void setDelta(Real newDelta)
+   virtual void setDelta(R newDelta)
    {
       if(newDelta <= DEFAULT_EPS_ZERO)
          delta = DEFAULT_EPS_ZERO;
@@ -95,7 +95,7 @@ public:
    }
 
    /// get allowed bound violation
-   virtual Real getDelta()
+   virtual R getDelta()
    {
       return delta;
    }
@@ -124,7 +124,7 @@ public:
        returned index, must be the index of an element of fVec(), that
        reaches one of its bounds with this update.
    */
-   virtual int selectLeave(Real& val, Real enterTest, bool polish = false) = 0;
+   virtual int selectLeave(R& val, R enterTest, bool polish = false) = 0;
 
    /// selects variable Id to enter the basis.
    /** Method #selectEnter() is called by the loaded SoPlex solver, when
@@ -153,7 +153,7 @@ public:
        element of pVec() or coPvec(), that reaches one of its bounds
        with this update.
    */
-   virtual SPxId selectEnter(Real& val, int leaveIdx, bool polish = false) = 0;
+   virtual SPxId selectEnter(R& val, int leaveIdx, bool polish = false) = 0;
 
    /// sets Simplex type.
    /** Informs pricer about (a change of) the loaded SoPlex's Type. In
@@ -196,8 +196,8 @@ public:
    /// destructor.
    virtual ~SPxRatioTester()
    {
-      thesolver = 0;
-      m_name    = 0;
+      thesolver = nullptr;
+      m_name    = nullptr;
    }
    /// clone function for polymorphism
    virtual SPxRatioTester* clone() const = 0;

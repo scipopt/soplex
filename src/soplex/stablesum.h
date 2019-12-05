@@ -15,10 +15,9 @@
 
 #ifndef _SOPLEX_STABLE_SUM_H_
 #define _SOPLEX_STABLE_SUM_H_
+#include <type_traits>
 
 // #define CHECK_STABLESUM  // double check the stable sum computation
-
-#include <type_traits>
 
 namespace soplex
 {
@@ -46,6 +45,7 @@ public:
    {
       return sum;
    }
+
 };
 
 template <>
@@ -95,6 +95,16 @@ public:
       return sum + c;
    }
 };
+
+/// Output operator.
+template < class T >
+std::ostream& operator<<(std::ostream& s, const StableSum<T>& sum)
+{
+   s << static_cast<T>(sum);
+
+   return s;
+}
+
 }
 
 #endif

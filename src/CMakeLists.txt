@@ -1,67 +1,22 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 set(sources
-    soplex/changesoplex.cpp
-    soplex/clufactor.cpp
     soplex/clufactor_rational.cpp
     soplex/didxset.cpp
-    soplex/enter.cpp
     soplex/gzstream.cpp
     soplex/idxset.cpp
-    soplex/leave.cpp
     soplex/mpsinput.cpp
     soplex/nameset.cpp
     soplex/rational.cpp
     soplex/ratrecon.cpp
-    soplex/slufactor.cpp
     soplex/slufactor_rational.cpp
-    soplex/solvedbds.cpp
-    soplex/solverational.cpp
-    soplex/solvereal.cpp
-    soplex/spxautopr.cpp
-    soplex/spxbasis.cpp
-    soplex/spxboundflippingrt.cpp
-    soplex/spxbounds.cpp
-    soplex/spxchangebasis.cpp
-    soplex/spxdantzigpr.cpp
-    soplex/spxdefaultrt.cpp
     soplex/spxdefines.cpp
-    soplex/spxdesc.cpp
-    soplex/spxdevexpr.cpp
-    soplex/spxequilisc.cpp
-    soplex/spxfastrt.cpp
-    soplex/spxfileio.cpp
-    soplex/spxgeometsc.cpp
     soplex/spxgithash.cpp
-    soplex/spxharrisrt.cpp
-    soplex/spxhybridpr.cpp
     soplex/spxid.cpp
-    soplex/spxleastsqsc.cpp
     soplex/spxlpbase_rational.cpp
-    soplex/spxlpbase_real.cpp
-    soplex/spxmainsm.cpp
     soplex/spxout.cpp
-    soplex/spxparmultpr.cpp
-    soplex/spxquality.cpp
-    soplex/spxscaler.cpp
-    soplex/spxshift.cpp
-    soplex/spxsolve.cpp
-    soplex/spxsolver.cpp
-    soplex/spxstarter.cpp
-    soplex/spxsteeppr.cpp
-    soplex/spxsumst.cpp
-    soplex/spxvecs.cpp
-    soplex/spxvectorst.cpp
-    soplex/spxweightpr.cpp
-    soplex/spxweightst.cpp
-    soplex/spxwritestate.cpp
-    soplex/statistics.cpp
-    soplex/testsoplex.cpp
-    soplex/updatevector.cpp
     soplex/usertimer.cpp
-    soplex/validation.cpp
-    soplex/wallclocktimer.cpp
-    soplex.cpp)
+    soplex/wallclocktimer.cpp)
 
 set(headers
     soplex/array.h
@@ -77,8 +32,6 @@ set(headers
     soplex/didxset.h
     soplex/dsvectorbase.h
     soplex/dsvector.h
-    soplex/dvectorbase.h
-    soplex/dvector.h
     soplex/exceptions.h
     soplex/gzstream.h
     soplex/idlist.h
@@ -156,6 +109,7 @@ set(headers
     soplex/validation.h
     soplex/vectorbase.h
     soplex/vector.h
+    soplex/dvector.h
     soplex/wallclocktimer.h)
 
     # create soplex library with pic

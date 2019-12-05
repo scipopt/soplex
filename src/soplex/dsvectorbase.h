@@ -27,6 +27,7 @@ namespace soplex
 {
 template < class R > class VectorBase;
 template < class S > class SSVectorBase;
+template < class R > class SLinSolver;
 
 /**@brief   Dynamic sparse vectors.
  * @ingroup Algebra
@@ -41,7 +42,7 @@ template < class S > class SSVectorBase;
 template < class R >
 class DSVectorBase : public SVectorBase<R>
 {
-   friend class SLinSolver;
+   friend class SLinSolver<R>;
 
 private:
 

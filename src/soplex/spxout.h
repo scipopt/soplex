@@ -212,7 +212,7 @@ private:
     extracts the verbosity level from the struct and passes it to the
     member function SPxOut::setVerbosity().
 */
-///@{
+//@{
 /// manipulator to be used in an output statement
 inline SPxOut::struct_Verbosity
 verb(const SPxOut::Verbosity&  v)
@@ -240,7 +240,7 @@ operator<< (SPxOut& stream,
  * other. When using only a template type, it is not clear what the
  * compiler makes out of it (according to lint).
  */
-///@{
+//@{
 ///
 /// Passes instances of type \p Type to the current stream.
 inline SPxOut& operator<< (SPxOut& _spxout, long t)
@@ -329,7 +329,7 @@ inline SPxOut& operator<< (SPxOut& _spxout, T  t)
    _spxout.getCurrentStream() << t;
    return _spxout;
 }
-///@}
+//@}
 
 }  // namespace soplex
 

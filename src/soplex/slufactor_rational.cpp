@@ -403,7 +403,7 @@ SLUFactorRational::Status SLUFactorRational::change(
       // forestUpdate() with the last parameter set to NULL should fail.
       forest = subst;
       CLUFactorRational::solveLright(forest.altValues());
-      forestUpdate(idx, forest.altValues(), 0, 0);
+      forestUpdate(idx, forest.altValues(), 0, nullptr);
       forest.setSize(0);
       forest.forceSetup();
    }
@@ -907,8 +907,6 @@ void SLUFactorRational::freeAll()
    if(u.row.elem)
       spx_free(u.row.elem);
 
-   u.row.val.reDim(0);
-
    if(u.row.idx)
       spx_free(u.row.idx);
 
@@ -944,12 +942,6 @@ void SLUFactorRational::freeAll()
 
    if(l.row)
       spx_free(l.row);
-
-   diag.reDim(0);
-   u.col.val.reDim(0);
-   l.val.reDim(0);
-
-   l.rval.reDim(0);
 
    if(l.ridx)
       spx_free(l.ridx);

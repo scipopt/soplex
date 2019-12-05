@@ -23,7 +23,6 @@
 
 namespace soplex
 {
-
 #define SHELLSORTMAX 25
 
 /** shell-sort an array of data elements; use it only for arrays smaller than 25 entries */
@@ -92,7 +91,9 @@ void SPxQuicksort(T* keys, int end, COMPARATOR& compare, int start = 0, bool typ
       int mid;
 
       /* select pivot element */
-      mid = (start + end) / 2;
+      mid = start + (end - start) / 2; // Instead of (start + end)/2 because the
+      // latter can overflow if start + end >
+      // INT_MAX
       pivotkey = keys[mid];
 
       /* partition the array into elements < pivot [start,hi] and elements >= pivot [lo,end] */

@@ -19,15 +19,27 @@
 #include "assert.h"
 #include "soplex/spxdefines.h"
 #include "soplex/spxout.h"
+#include "soplex/rational.h"
+
+#include "boost/multiprecision/number.hpp"
+#include "boost/multiprecision/debug_adaptor.hpp"
 
 namespace soplex
 {
+// Overloaded EQ function
+bool EQ(int a, int b)
+{
+   return (a == b);
+}
 
 THREADLOCAL const Real infinity                 = DEFAULT_INFINITY;
 
 THREADLOCAL Real Param::s_epsilon               = DEFAULT_EPS_ZERO;
+
 THREADLOCAL Real Param::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
+
 THREADLOCAL Real Param::s_epsilon_update        = DEFAULT_EPS_UPDATE;
+
 THREADLOCAL Real Param::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
 
 bool msginconsistent(const char* name, const char* file, int line)
@@ -42,15 +54,17 @@ bool msginconsistent(const char* name, const char* file, int line)
    return 0;
 }
 
+
 Real Param::epsilon()
 {
-   return s_epsilon;
+   return (s_epsilon);
 }
 
 void Param::setEpsilon(Real eps)
 {
    s_epsilon = eps;
 }
+
 
 Real Param::epsilonFactorization()
 {
@@ -61,6 +75,7 @@ void Param::setEpsilonFactorization(Real eps)
 {
    s_epsilon_factorization = eps;
 }
+
 
 Real Param::epsilonUpdate()
 {
@@ -81,5 +96,23 @@ void Param::setEpsilonPivot(Real eps)
 {
    s_epsilon_pivot = eps;
 }
+
+
+template <>
+Real spxFrexp(Real y, int* exp)
+{
+   return frexp(y, exp);
+}
+
+// @todo: write a boost version of the following function. Check whether this
+// function gets called from the Scalers, if not, we can have a general
+// version of the function in spxdefines.hpp
+Real spxLdexp(Real x, int exp)
+{
+   return ldexp(x, exp);
+}
+
+
+
 
 } // namespace soplex

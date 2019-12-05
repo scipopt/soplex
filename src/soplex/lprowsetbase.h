@@ -51,9 +51,9 @@ private:
    /**@name Data */
    ///@{
 
-   DVectorBase<R> left;    ///< vector of left hand sides (lower bounds) of LPRowBase%s.
-   DVectorBase<R> right;   ///< vector of right hand sides (upper bounds) of LPRowBase%s.
-   DVectorBase<R> object;  ///< vector of objective coefficients.
+   VectorBase<R> left;    ///< vector of left hand sides (lower bounds) of LPRowBase%s.
+   VectorBase<R> right;   ///< vector of right hand sides (upper bounds) of LPRowBase%s.
+   VectorBase<R> object;  ///< vector of objective coefficients.
 
    ///@}
 
@@ -226,10 +226,10 @@ public:
    /// Returns the inequalitiy type of the \p i 'th LPRowBase.
    typename LPRowBase<R>::Type type(int i) const
    {
-      if(rhs(i) >= double(infinity))
+      if(rhs(i) >= R(infinity))
          return LPRowBase<R>::GREATER_EQUAL;
 
-      if(lhs(i) <= double(-infinity))
+      if(lhs(i) <= R(-infinity))
          return LPRowBase<R>::LESS_EQUAL;
 
       if(lhs(i) == rhs(i))
@@ -250,11 +250,11 @@ public:
       switch(t)
       {
       case LPRowBase<R>::LESS_EQUAL:
-         lhs_w(i) = -infinity;
+         lhs_w(i) = R(-infinity);
          break;
 
       case LPRowBase<R>::EQUAL:
-         if(lhs_w(i) > -infinity)
+         if(lhs_w(i) > R(-infinity))
             rhs_w(i) = lhs(i);
          else
             lhs_w(i) = rhs(i);
@@ -262,7 +262,7 @@ public:
          break;
 
       case LPRowBase<R>::GREATER_EQUAL:
-         rhs_w(i) = infinity;
+         rhs_w(i) = R(infinity);
          break;
 
       case LPRowBase<R>::RANGE:
@@ -277,11 +277,11 @@ public:
    /// Returns the value of the \p i'th LPRowBase.
    const R& value(int i) const
    {
-      if(rhs(i) < infinity)
+      if(rhs(i) < R(infinity))
          return rhs(i);
       else
       {
-         assert(lhs(i) > -infinity);
+         assert(lhs(i) > R(-infinity));
          return lhs(i);
       }
    }

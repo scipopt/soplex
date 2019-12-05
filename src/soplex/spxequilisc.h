@@ -32,20 +32,21 @@ namespace soplex
    This SPxScaler implementation performs equilibrium scaling of the
    LPs rows and columns.
 */
-class SPxEquiliSC : public SPxScaler
+template <class R>
+class SPxEquiliSC : public SPxScaler<R>
 {
 public:
    /// compute equilibrium scaling vector rounded to power of two
-   static void computeEquiExpVec(const SVSet* vecset, const DataArray<int>& coScaleExp,
+   static void computeEquiExpVec(const SVSetBase<R>* vecset, const DataArray<int>& coScaleExp,
                                  DataArray<int>& scaleExp);
 
    /// compute equilibrium scaling vector rounded to power of two
-   static void computeEquiExpVec(const SVSet* vecset, const std::vector<Real>& coScaleVal,
+   static void computeEquiExpVec(const SVSetBase<R>* vecset, const std::vector<R>& coScaleVal,
                                  DataArray<int>& scaleExp);
 
-   /// compute equilibrium scaling rounded to power of 2 for existing Real scaling factors (preRowscale, preColscale)
-   static void computePostequiExpVecs(const SPxLPBase<Real>& lp, const std::vector<Real>& preRowscale,
-                                      const std::vector<Real>& preColscale,
+   /// compute equilibrium scaling rounded to power of 2 for existing R scaling factors (preRowscale, preColscale)
+   static void computePostequiExpVecs(const SPxLPBase<R>& lp, const std::vector<R>& preRowscale,
+                                      const std::vector<R>& preColscale,
                                       DataArray<int>& rowscaleExp, DataArray<int>& colscaleExp);
    //-------------------------------------
    /**@name Construction / destruction */
@@ -60,9 +61,9 @@ public:
    virtual ~SPxEquiliSC()
    {}
    /// clone function for polymorphism
-   inline virtual SPxScaler* clone() const override
+   inline virtual SPxScaler<R>* clone() const override
    {
-      return new SPxEquiliSC(*this);
+      return new SPxEquiliSC<R>(*this);
    }
    ///@}
 
@@ -70,8 +71,11 @@ public:
    /**@name Scaling */
    ///@{
    /// Scale the loaded SPxLP.
-   virtual void scale(SPxLPBase<Real>& lp, bool persistent = false) override;
+   virtual void scale(SPxLPBase<R>& lp, bool persistent = false) override;
    ///@}
 };
 } // namespace soplex
+
+#include "spxequilisc.hpp"
+
 #endif // _SPXEQUILISC_H_

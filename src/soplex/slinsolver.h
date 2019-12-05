@@ -27,7 +27,6 @@
 #include "soplex/svector.h"
 #include "soplex/ssvector.h"
 #include "soplex/dsvector.h"
-#include "soplex/dvector.h"
 #include "soplex/didxset.h"
 
 namespace soplex
@@ -38,8 +37,9 @@ namespace soplex
    Class SLinSolver provides a class for solving sparse linear systems with
    a matrix \f$A\f$ and arbitrary right-hand side vectors. For doing so, the
    matrix must be first #load%ed to an #SLinSolver object as an array of
-   pointers to the \em column \ref SVector "SVectors" of this matrix.
+   pointers to the \em column \ref SVectorBase<R> "SVectors" of this matrix.
 */
+template <class R>
 class SLinSolver
 {
 public:
@@ -87,16 +87,16 @@ public:
    /** Initializes SLinSolver for the solution of linear systems
        with the matrix consisting of \p dim column vectors given in \p vec.
    */
-   virtual Status load(const SVector* vec[], int dim) = 0;
+   virtual Status load(const SVectorBase<R>* vec[], int dim) = 0;
 
    /// returns a stability number (0: singularity, 1: perfect stability).
    /** Returns a stability parameter between 0 and 1, where 0 indicates
        singularity, while 1 indicates perfect stability.
    */
-   virtual Real stability() const = 0;
+   virtual R stability() const = 0;
 
    /// return estimate for the condition number based on the diagonal of U
-   virtual Real matrixMetric(int type = 0) const = 0;
+   virtual R matrixMetric(int type = 0) const = 0;
 
    /// returns statistical information in form of a string.
    virtual std::string statistics() const = 0;
@@ -107,7 +107,7 @@ public:
        optional parameter \p eta to the solution of #solveRight() if
        readily  availabble. This may improve on the performance of the update.
    */
-   virtual Status change(int idx, const SVector& subst, const SSVector* eta = 0) = 0;
+   virtual Status change(int idx, const SVectorBase<R>& subst, const SSVectorBase<R>* eta = 0) = 0;
 
    /// consistency check.
    virtual bool isConsistent() const = 0;
@@ -133,66 +133,66 @@ public:
       should generally be faster than solving two systems seperately.
 
       The result vector(s) are allways given as the first parameter(s). Two
-      types of result vectors are supported, Vector and SSVector.
+      types of result vectors are supported, VectorBase<R> and SSVectorBase<R> .
    */
    ///@{
    /// Solves \f$Ax=b\f$.
-   virtual void solveRight(Vector& x, const Vector& b) /* const */ = 0;
+   virtual void solveRight(VectorBase<R>& x, const VectorBase<R>& b) /* const */ = 0;
    /// Solves \f$Ax=b\f$.
-   virtual void solveRight(SSVector& x, const SSVector& b) /* const */ = 0;
-   virtual void solveRight(SSVector& x, const SVector& b) /* const */ = 0;
+   virtual void solveRight(SSVectorBase<R>& x, const SSVectorBase<R>& b) /* const */ = 0;
+   virtual void solveRight(SSVectorBase<R>& x, const SVectorBase<R>& b) /* const */ = 0;
 
    /** @brief Solves \f$Ax=b\f$.
        Possibly sets up internal data structures suitable for an optimized
        subsequent change() call with \f$b\f$ as entering column.
    */
-   virtual void solveRight4update(SSVector& x, const SVector& b) = 0;
+   virtual void solveRight4update(SSVectorBase<R>& x, const SVectorBase<R>& b) = 0;
 
    /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.
-   virtual void solve2right4update(SSVector& x,
-                                   Vector& y,
-                                   const SVector& b,
-                                   SSVector& d) = 0;
+   virtual void solve2right4update(SSVectorBase<R>& x,
+                                   VectorBase<R>& y,
+                                   const SVectorBase<R>& b,
+                                   SSVectorBase<R>& d) = 0;
    /// sparse version of solving two systems of equations
-   virtual void solve2right4update(SSVector& x,
-                                   SSVector& y,
-                                   const SVector& b,
-                                   SSVector& d) = 0;
+   virtual void solve2right4update(SSVectorBase<R>& x,
+                                   SSVectorBase<R>& y,
+                                   const SVectorBase<R>& b,
+                                   SSVectorBase<R>& d) = 0;
    /// Solves \f$Ax=b\f$, \f$Ay=d\f$ and \f$Az=e\f$.
-   virtual void solve3right4update(SSVector& x,
-                                   Vector& y,
-                                   Vector& z,
-                                   const SVector& b,
-                                   SSVector& d,
-                                   SSVector& e) = 0;
+   virtual void solve3right4update(SSVectorBase<R>& x,
+                                   VectorBase<R>& y,
+                                   VectorBase<R>& z,
+                                   const SVectorBase<R>& b,
+                                   SSVectorBase<R>& d,
+                                   SSVectorBase<R>& e) = 0;
    /// sparse version of solving three systems of equations
-   virtual void solve3right4update(SSVector& x,
-                                   SSVector& y,
-                                   SSVector& z,
-                                   const SVector& b,
-                                   SSVector& d,
-                                   SSVector& e) = 0;
+   virtual void solve3right4update(SSVectorBase<R>& x,
+                                   SSVectorBase<R>& y,
+                                   SSVectorBase<R>& z,
+                                   const SVectorBase<R>& b,
+                                   SSVectorBase<R>& d,
+                                   SSVectorBase<R>& e) = 0;
    /// solves \f$x^TA=b^T\f$.
-   virtual void solveLeft(Vector& x, const Vector& b) /* const */ = 0;
-   virtual void solveLeft(SSVector& x, const SSVector& b) /* const */ = 0;
+   virtual void solveLeft(VectorBase<R>& x, const VectorBase<R>& b) /* const */ = 0;
+   virtual void solveLeft(SSVectorBase<R>& x, const SSVectorBase<R>& b) /* const */ = 0;
    /// sparse version of solving one system of equations with transposed basis matrix
-   virtual void solveLeft(SSVector& x, const SVector& b) /* const */ = 0;
+   virtual void solveLeft(SSVectorBase<R>& x, const SVectorBase<R>& b) /* const */ = 0;
    /// solves \f$x^TA=b^T\f$ and \f$x^TA=rhs2^T\f$ internally using \f$rhs2\f$.
-   virtual void solveLeft(SSVector& x,
-                          Vector& two,
-                          const SVector& b,
-                          SSVector& rhs2) /* const */ = 0;
+   virtual void solveLeft(SSVectorBase<R>& x,
+                          VectorBase<R>& two,
+                          const SVectorBase<R>& b,
+                          SSVectorBase<R>& rhs2) /* const */ = 0;
    /// sparse version of solving two systems of equations with transposed basis matrix
-   virtual void solveLeft(SSVector& x,
-                          SSVector& two,
-                          const SVector& b,
-                          SSVector& rhs2) /* const */ = 0;
+   virtual void solveLeft(SSVectorBase<R>& x,
+                          SSVectorBase<R>& two,
+                          const SVectorBase<R>& b,
+                          SSVectorBase<R>& rhs2) /* const */ = 0;
    /// solves \f$x^TA=b^T\f$, \f$y^TA=d^T\f$ and \f$z^TA=e^T\f$
-   virtual void solveLeft(SSVector& x, Vector& y, Vector& z,
-                          const SVector& b, SSVector& d, SSVector& e) = 0;
+   virtual void solveLeft(SSVectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& z,
+                          const SVectorBase<R>& b, SSVectorBase<R>& d, SSVectorBase<R>& e) = 0;
    /// sparse version of solving three systems of equations with transposed basis matrix
-   virtual void solveLeft(SSVector& x, SSVector& y, SSVector& z,
-                          const SVector& b, SSVector& d, SSVector& e) = 0;
+   virtual void solveLeft(SSVectorBase<R>& x, SSVectorBase<R>& y, SSVectorBase<R>& z,
+                          const SVectorBase<R>& b, SSVectorBase<R>& d, SSVectorBase<R>& e) = 0;
    ///@}
 
 
@@ -207,7 +207,7 @@ public:
    virtual ~SLinSolver()
    {}
    /// clone function for polymorphism
-   virtual SLinSolver* clone() const = 0;
+   virtual SLinSolver<R>* clone() const = 0;
    ///@}
 
    /// message handler

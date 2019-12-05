@@ -32,7 +32,7 @@ namespace soplex
    accessed just like ordinary C++ array elements by means of the index
    operator[](). Safety is provided by
 
-    - automatic memory management in constructor and destructure
+    - automatic memory management in constructor and destructor
       preventing memory leaks
     - checking of array bound when accessing elements with the
       indexing operator[]() (only when compiled without \c -DNDEBUG).

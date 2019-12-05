@@ -44,4 +44,5 @@ typedef std::ifstream spxifstream;
 #endif // SOPLEX_WITH_ZLIB
 
 } // namespace soplex
+
 #endif // _SPXFILEIO_H_

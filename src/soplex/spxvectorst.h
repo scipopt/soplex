@@ -57,7 +57,7 @@ private:
    /**@name Data */
    ///@{
    /// the current (approximate) primal or dual vector
-   DVector vec;
+   VectorBase<R> vec;
    ///@}
 
 protected:
@@ -78,7 +78,7 @@ public:
    SPxVectorST()
       : state(NONE)
    {
-      this->m_name = "Vector";
+      this->m_name = "vector";
    }
    /// copy constructor
    SPxVectorST(const SPxVectorST& old)
@@ -116,13 +116,13 @@ public:
    /**@name Modification */
    ///@{
    /// sets up primal solution vector.
-   void primal(const Vector& v)
+   void primal(const VectorBase<R>& v)
    {
       vec = v;
       state = PVEC;
    }
    /// sets up primal solution vector.
-   void dual(const Vector& v)
+   void dual(const VectorBase<R>& v)
    {
       vec = v;
       state = DVEC;
@@ -132,4 +132,7 @@ public:
 };
 
 } // namespace soplex
+
+// For general templated files
+#include "spxvectorst.hpp"
 #endif // _SPXVECTORST_H_

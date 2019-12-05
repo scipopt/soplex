@@ -47,6 +47,7 @@
 
 namespace soplex
 {
+// Declarations to fix errors of the form "SPxMainSM is not a type"
 template <class R>
 class SPxSolverBase;
 template <class R>
@@ -55,6 +56,16 @@ template <class R>
 class SPxLPBase;
 template <class R>
 class SPxBasisBase;
+
+template <class R>
+class SPxEquiliSC;
+template <class R>
+class SPxLeastSqSC;
+template <class R>
+class SPxGeometSC;
+template <class R>
+class SPxMainSM;
+
 
 /**@brief   Saving LPs in a form suitable for SoPlex.
  * @ingroup Algo
@@ -88,10 +99,10 @@ class SPxLPBase : protected LPRowSetBase<R>, protected LPColSetBase<R>
 {
    template <class S> friend class SPxLPBase;
    friend SPxBasisBase<R>;
-   friend class SPxScaler;
-   friend class SPxEquiliSC;
-   friend class SPxLeastSqSC;
-   friend class SPxGeometSC;
+   friend SPxScaler<R>;
+   friend SPxEquiliSC<R>;
+   friend SPxLeastSqSC<R>;
+   friend SPxGeometSC<R>;
    friend SPxMainSM<R>;
 
 public:
@@ -118,8 +129,8 @@ private:
    SPxSense thesense;                ///< optimization sense.
    R offset;                         ///< offset computed, e.g., in simplification step
    bool _isScaled;                   ///< true, if scaling has been performed
-   SPxScaler*
-   lp_scaler;             ///< points to the scaler if the lp has been scaled, to 0 otherwise
+   SPxScaler<R>*
+   lp_scaler;             ///< points to the scaler if the lp has been scaled, to nullptr otherwise
 
    ///@}
 
@@ -222,7 +233,7 @@ public:
    }
 
    /// Gets unscaled row vector of row \p i.
-   void getRowVectorUnscaled(int i, DSVectorBase<Real>& vec) const;
+   void getRowVectorUnscaled(int i, DSVectorBase<R>& vec) const;
 
    /// Returns right hand side vector.
    const VectorBase<R>& rhs() const
@@ -250,7 +261,7 @@ public:
    }
 
    /// Gets unscaled right hand side vector.
-   void getRhsUnscaled(VectorBase<Real>& vec) const;
+   void getRhsUnscaled(VectorBase<R>& vec) const;
 
    /// Returns unscaled right hand side of row number \p i.
    R rhsUnscaled(int i) const;
@@ -322,7 +333,7 @@ public:
    }
 
    /// Returns unscaled left hand side vector.
-   void getLhsUnscaled(VectorBase<Real>& vec) const;
+   void getLhsUnscaled(VectorBase<R>& vec) const;
 
    /// Returns unscaled left hand side of row number \p i.
    R lhsUnscaled(int i) const;
@@ -393,13 +404,13 @@ public:
    }
 
    /// Gets column vector of column \p i.
-   void getColVectorUnscaled(int i, DSVectorBase<Real>& vec) const;
+   void getColVectorUnscaled(int i, DSVectorBase<R>& vec) const;
 
    /// Gets column vector of column with identifier \p id.
-   void getColVectorUnscaled(const SPxColId& id, DSVectorBase<Real>& vec) const;
+   void getColVectorUnscaled(const SPxColId& id, DSVectorBase<R>& vec) const;
 
    /// Gets unscaled objective vector.
-   void getObjUnscaled(VectorBase<Real>& pobj) const;
+   void getObjUnscaled(VectorBase<R>& pobj) const;
 
    /// Gets objective vector.
    void getObj(VectorBase<R>& pobj) const
@@ -456,7 +467,7 @@ public:
    }
 
    /// Returns unscaled objective vector for maximization problem.
-   void maxObjUnscaled(VectorBase<Real>& vec) const;
+   void maxObjUnscaled(VectorBase<R>& vec) const;
 
    /// Returns unscaled objective value of column \p i for maximization problem.
    R maxObjUnscaled(int i) const;
@@ -483,7 +494,7 @@ public:
    }
 
    /// Gets unscaled upper bound vector
-   void getUpperUnscaled(DVector& vec) const;
+   void getUpperUnscaled(VectorBase<R>& vec) const;
 
    /// Returns unscaled upper bound of column \p i.
    R upperUnscaled(int i) const;
@@ -510,7 +521,7 @@ public:
    }
 
    /// Gets unscaled lower bound vector.
-   void getLowerUnscaled(DVector& vec) const;
+   void getLowerUnscaled(VectorBase<R>& vec) const;
 
    /// Returns unscaled lower bound of column \p i.
    R lowerUnscaled(int i) const;
@@ -953,7 +964,7 @@ public:
 
    /// Removes multiple rows.
    /** This method removes all LPRowBase%s from the SPxLPBase with an index \p i such that \p perm[i] < 0. Upon
-    *  completion, \p perm[i] >= 0 indicates the new index where the \p i'th LPRow has been moved to due to this
+    *  completion, \p perm[i] >= 0 indicates the new index where the \p i'th LPRowBase<R> has been moved to due to this
     *  removal. Note that \p perm must point to an array of at least #nRows() ints.
     */
    virtual void removeRows(int perm[])
@@ -1145,7 +1156,7 @@ public:
       thesense = MAXIMIZE;
       offset = 0;
       _isScaled = false;
-      lp_scaler = 0;
+      lp_scaler = nullptr;
       LPColSetBase<R>::scaleExp.clear();
       LPRowSetBase<R>::scaleExp.clear();
    }
@@ -1257,13 +1268,13 @@ public:
          bool hasLower = false;
          bool hasUpper = false;
 
-         if(lower(i) > -infinity)
+         if(lower(i) > R(-infinity))
          {
             countLower++;
             hasLower = true;
          }
 
-         if(upper(i) < infinity)
+         if(upper(i) < R(infinity))
          {
             countUpper++;
             hasUpper = true;
@@ -1285,13 +1296,13 @@ public:
          bool hasRhs = false;
          bool hasLhs = false;
 
-         if(lhs(i) > -infinity)
+         if(lhs(i) > R(-infinity))
          {
             countLhs++;
             hasLhs = true;
          }
 
-         if(rhs(i) < infinity)
+         if(rhs(i) < R(infinity))
          {
             countRhs++;
             hasRhs = true;
@@ -1325,11 +1336,11 @@ public:
          << "                rhs : " << countRhs << "\n"
          << "               free : " << countFreeRow << "\n"
          << "  Nonzeros          : " << nNzos() << "\n"
-         << "         per column : " << Real(nNzos()) / Real(nCols()) << "\n"
-         << "            per row : " << Real(nNzos()) / Real(nRows()) << "\n"
-         << "           sparsity : " << Real(nNzos()) / Real(nCols()) / Real(nRows()) << "\n"
-         << "    min. abs. value : " << Real(minAbsNzo()) << "\n"
-         << "    max. abs. value : " << Real(maxAbsNzo()) << "\n";
+         << "         per column : " << R(nNzos()) / R(nCols()) << "\n"
+         << "            per row : " << R(nNzos()) / R(nRows()) << "\n"
+         << "           sparsity : " << R(nNzos()) / R(nCols()) / R(nRows()) << "\n"
+         << "    min. abs. value : " << R(minAbsNzo()) << "\n"
+         << "    max. abs. value : " << R(maxAbsNzo()) << "\n";
    }
 
    ///@}
@@ -1424,7 +1435,7 @@ public:
    /// changes \p i 'th lower bound to \p newLower. \p scale determines whether the new data should be scaled
    virtual void changeLower(int i, const R& newLower, bool scale = false)
    {
-      if(scale && newLower > -infinity)
+      if(scale && newLower > R(-infinity))
       {
          assert(_isScaled);
          assert(lp_scaler);
@@ -1462,7 +1473,7 @@ public:
    /// Changes \p i 'th upper bound to \p newUpper. \p scale determines whether the new data should be scaled
    virtual void changeUpper(int i, const R& newUpper, bool scale = false)
    {
-      if(scale && newUpper < infinity)
+      if(scale && newUpper < R(infinity))
       {
          assert(_isScaled);
          assert(lp_scaler);
@@ -1532,7 +1543,7 @@ public:
    /// Changes \p i 'th left hand side value to \p newLhs. \p scale determines whether the new data should be scaled
    virtual void changeLhs(int i, const R& newLhs, bool scale = false)
    {
-      if(scale && newLhs > -infinity)
+      if(scale && newLhs > R(-infinity))
       {
          assert(_isScaled);
          assert(lp_scaler);
@@ -1570,7 +1581,7 @@ public:
    /// Changes \p i 'th right hand side value to \p newRhs. \p scale determines whether the new data should be scaled
    virtual void changeRhs(int i, const R& newRhs, bool scale = false)
    {
-      if(scale && newRhs < infinity)
+      if(scale && newRhs < R(infinity))
       {
          assert(_isScaled);
          assert(lp_scaler);
@@ -1762,9 +1773,9 @@ public:
       SVectorBase<R>& row = rowVector_w(i);
       SVectorBase<R>& col = colVector_w(j);
 
-      if(val != R(0))
+      if(isNotZero(val))
       {
-         Real newVal;
+         R newVal;
 
          if(scale)
          {
@@ -1845,9 +1856,11 @@ public:
       thesense = sns;
    }
 
-   virtual void changeObjOffset(const R& o)
+   template <typename T>
+   void changeObjOffset(const T& o)
    {
-      offset = o;
+      offset = o;               // Converts o into type R. Example Rational into
+      // R
    }
 
    /// Computes activity of the rows for a given primal vector; activity does not need to be zero
@@ -2242,7 +2255,7 @@ private:
    /**@name Private helpers */
    ///@{
 
-   /// Returns the LP as an LPRowSet.
+   /// Returns the LP as an LPRowBase<R>Set.
    SVectorBase<R>& colVector_w(int i)
    {
       return LPColSetBase<R>::colVector_w(i);
@@ -2268,14 +2281,14 @@ private:
       DataArray <int>& colscaleExp = LPColSetBase<R>::scaleExp;
 
       // compute new row scaling factor and apply it to the sides
-      if(scale)
+      if(scale && lp_scaler)
       {
          newRowScaleExp = lp_scaler->computeScaleExp(vec, colscaleExp);
 
-         if(rhs(idx) < infinity)
+         if(rhs(idx) < R(infinity))
             rhs_w(idx) = spxLdexp(rhs_w(idx), newRowScaleExp);
 
-         if(lhs(idx) > -infinity)
+         if(lhs(idx) > R(-infinity))
             lhs_w(idx) = spxLdexp(lhs_w(idx), newRowScaleExp);
 
          maxRowObj_w(idx) = spxLdexp(maxRowObj_w(idx), newRowScaleExp);
@@ -2328,10 +2341,10 @@ private:
       {
          newRowScaleExp = lp_scaler->computeScaleExp(rowVec, colscaleExp);
 
-         if(rhs(idx) < infinity)
+         if(rhs(idx) < R(infinity))
             rhs_w(idx) = spxLdexp(rhs_w(idx), newRowScaleExp);
 
-         if(lhs(idx) > -infinity)
+         if(lhs(idx) > R(-infinity))
             lhs_w(idx) = spxLdexp(lhs_w(idx), newRowScaleExp);
 
          maxRowObj_w(idx) = spxLdexp(maxRowObj_w(idx), newRowScaleExp);
@@ -2441,10 +2454,10 @@ private:
          {
             newRowScaleExp = lp_scaler->computeScaleExp(vec, colscaleExp);
 
-            if(rhs(i) < infinity)
+            if(rhs(i) < R(infinity))
                rhs_w(i) = spxLdexp(rhs_w(i), newRowScaleExp);
 
-            if(lhs(i) > -infinity)
+            if(lhs(i) > R(-infinity))
                lhs_w(i) = spxLdexp(lhs_w(i), newRowScaleExp);
 
             maxRowObj_w(i) = spxLdexp(maxRowObj_w(i), newRowScaleExp);
@@ -2505,10 +2518,10 @@ private:
       {
          newColScaleExp = lp_scaler->computeScaleExp(vec, rowscaleExp);
 
-         if(upper(idx) < infinity)
+         if(upper(idx) < R(infinity))
             upper_w(idx) = spxLdexp(upper_w(idx), - newColScaleExp);
 
-         if(lower(idx) > -infinity)
+         if(lower(idx) > R(-infinity))
             lower_w(idx) = spxLdexp(lower_w(idx), - newColScaleExp);
 
          maxObj_w(idx) = spxLdexp(maxObj_w(idx), newColScaleExp);
@@ -2564,10 +2577,10 @@ private:
       {
          newColScaleExp = lp_scaler->computeScaleExp(colVec, rowscaleExp);
 
-         if(upper(idx) < infinity)
+         if(upper(idx) < R(infinity))
             upper_w(idx) = spxLdexp(upper_w(idx), - newColScaleExp);
 
-         if(lower(idx) > -infinity)
+         if(lower(idx) > R(-infinity))
             lower_w(idx) = spxLdexp(lower_w(idx), - newColScaleExp);
 
          maxObj_w(idx) = spxLdexp(maxObj_w(idx), newColScaleExp);
@@ -2663,7 +2676,16 @@ private:
       // insert new elements to row file
       for(i = oldColNumber; i < nCols(); ++i)
       {
-         LPColSetBase<R>::maxObj_w(i) *= thesense;
+         // @todo: Is there a better way to write the following if, else?
+         if(thesense == MAXIMIZE)
+         {
+            LPColSetBase<R>::maxObj_w(i) *= 1;
+         }
+         else                  // thesense is MINIMIZE = -1
+         {
+            LPColSetBase<R>::maxObj_w(i) *= -1;
+         }
+
          SVectorBase<R>& vec = colVector_w(i);
          int newColScaleExp = 0;
 
@@ -2674,10 +2696,10 @@ private:
          {
             newColScaleExp = lp_scaler->computeScaleExp(vec, rowscaleExp);
 
-            if(upper(i) < infinity)
+            if(upper(i) < R(infinity))
                upper_w(i) = spxLdexp(upper_w(i), - newColScaleExp);
 
-            if(lower(i) > -infinity)
+            if(lower(i) > R(-infinity))
                lower_w(i) = spxLdexp(lower_w(i), - newColScaleExp);
 
             maxObj_w(i) = spxLdexp(maxObj_w(i), newColScaleExp);
@@ -2757,9 +2779,9 @@ public:
       , thesense(old.thesense == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE)
       , offset(old.offset)
       , _isScaled(old._isScaled)
-      , lp_scaler(old.lp_scaler)
       , spxout(old.spxout)
    {
+      lp_scaler = nullptr;
       assert(isConsistent());
    }
 
@@ -2788,13 +2810,19 @@ public:
    {
       if(this != (const SPxLPBase<R>*)(&old))
       {
+         // The value of old.lp_scaler has to be nullptr
+         // Refer to issue #161 in soplex gitlab
+         assert(old.lp_scaler == nullptr);
+
          LPRowSetBase<R>::operator=(old);
          LPColSetBase<R>::operator=(old);
          thesense = (old.thesense) == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE :
                     SPxLPBase<R>::MAXIMIZE;
          offset = R(old.offset);
          _isScaled = old._isScaled;
-         lp_scaler = old.lp_scaler;
+
+         // this may have un-intended consequences in the future
+         lp_scaler = nullptr;
          spxout = old.spxout;
 
          assert(isConsistent());
@@ -2806,129 +2834,10 @@ public:
    ///@}
 };
 
-
-// Declaration of Real specializations found in spxlpbase_real.cpp
-
-template <>
-void SPxLPBase<Real>::unscaleLP();
-
-template <>
-void SPxLPBase<Real>::computePrimalActivity(const VectorBase<Real>& primal,
-      VectorBase<Real>& activity, const bool unscaled) const;
-
-template <>
-void SPxLPBase<Real>::computeDualActivity(const VectorBase<Real>& dual, VectorBase<Real>& activity,
-      const bool unscaled) const;
-
-template <>
-Real SPxLPBase<Real>::maxAbsNzo(bool unscaled) const;
-
-template <>
-Real SPxLPBase<Real>::minAbsNzo(bool unscaled) const;
-
-template <>
-void SPxLPBase<Real>::getObjUnscaled(VectorBase<Real>& pobj) const;
-
-template <>
-void SPxLPBase<Real>::getRowVectorUnscaled(int i, DSVectorBase<Real>& vec) const;
-
-template <>
-void SPxLPBase<Real>::getRhsUnscaled(VectorBase<Real>& vec) const;
-
-template <>
-Real SPxLPBase<Real>::rhsUnscaled(int i) const;
-
-template <>
-Real SPxLPBase<Real>::rhsUnscaled(const SPxRowId& id) const;
-
-template <>
-void SPxLPBase<Real>::getLhsUnscaled(VectorBase<Real>& vec) const;
-
-template <>
-Real SPxLPBase<Real>::lhsUnscaled(int i) const;
-
-template <>
-Real SPxLPBase<Real>::lhsUnscaled(const SPxRowId& id) const;
-
-template <>
-void SPxLPBase<Real>::getColVectorUnscaled(int i, DSVectorBase<Real>& vec) const;
-
-template <>
-void SPxLPBase<Real>::getColVectorUnscaled(const SPxColId& id, DSVectorBase<Real>& vec) const;
-
-template <>
-Real SPxLPBase<Real>::objUnscaled(int i) const;
-
-template <>
-Real SPxLPBase<Real>::objUnscaled(const SPxColId& id) const;
-
-template <>
-void SPxLPBase<Real>::maxObjUnscaled(VectorBase<Real>& vec) const;
-
-template <>
-Real SPxLPBase<Real>::maxObjUnscaled(int i) const;
-
-template <>
-Real SPxLPBase<Real>::maxObjUnscaled(const SPxColId& id) const;
-
-template <>
-void SPxLPBase<Real>::getUpperUnscaled(DVector& vec) const;
-
-template <>
-Real SPxLPBase<Real>::upperUnscaled(int i) const;
-
-template <>
-Real SPxLPBase<Real>::upperUnscaled(const SPxColId& id) const;
-
-template <>
-void SPxLPBase<Real>::getLowerUnscaled(DVector& vec) const;
-
-template <>
-Real SPxLPBase<Real>::lowerUnscaled(int i) const;
-
-template <>
-Real SPxLPBase<Real>::lowerUnscaled(const SPxColId& id) const;
-
-template <>
-void SPxLPBase<Real>::changeMaxObj(const VectorBase<Real>& newObj, bool scale);
-
-template <>
-void SPxLPBase<Real>::changeLower(const VectorBase<Real>& newLower, bool scale);
-
-template <>
-void SPxLPBase<Real>::changeUpper(const VectorBase<Real>& newUpper, bool scale);
-
-template <>
-void SPxLPBase<Real>::changeLhs(const VectorBase<Real>& newLhs, bool scale);
-
-template <>
-void SPxLPBase<Real>::changeRhs(const VectorBase<Real>& newRhs, bool scale);
-
-template <>
-void SPxLPBase<Real>::changeElement(int i, int j, const Real& val, bool scale);
-
-template <>
-bool SPxLPBase<Real>::readLPF(std::istream& p_input, NameSet* p_rnames, NameSet* p_cnames,
-                              DIdxSet* p_intvars);
-
-template <>
-bool SPxLPBase<Real>::readMPS(std::istream& p_input, NameSet* p_rnames, NameSet* p_cnames,
-                              DIdxSet* p_intvars);
-
-template <>
-void SPxLPBase<Real>::writeLPF(std::ostream& p_output, const NameSet* p_rnames,
-                               const NameSet* p_cnames, const DIdxSet* p_intvars) const;
-
-template <>
-void SPxLPBase<Real>::writeMPS(std::ostream& p_output, const NameSet* p_rnames,
-                               const NameSet* p_cnames, const DIdxSet* p_intvars) const;
-
-template <>
-void SPxLPBase<Real>::buildDualProblem(SPxLPBase<Real>& dualLP, SPxRowId primalRowIds[],
-                                       SPxColId primalColIds[], SPxRowId dualRowIds[], SPxColId dualColIds[], int* nprimalrows,
-                                       int* nprimalcols, int* ndualrows, int* ndualcols);
-
 } // namespace soplex
+
+// For the general templated functions
+#include "spxlpbase_real.hpp"
 
 /* reset the SOPLEX_DEBUG flag to its original value */
 #undef SOPLEX_DEBUG

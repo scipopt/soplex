@@ -29,7 +29,7 @@ public:
   
   //---------------------------------------------------------------------------
   /**@name Solve methods */
-  //@{
+  ///@{
   /// Solve initial LP relaxation 
   virtual void initialSolve();
   
@@ -38,7 +38,7 @@ public:
   
   /// Invoke solver's built-in enumeration algorithm
   virtual void branchAndBound();
-  //@}
+  ///@}
   
   //---------------------------------------------------------------------------
   /**@name Parameter set/get methods
@@ -55,7 +55,7 @@ public:
      solver and is implemented. In this case the value of the parameter is
      returned in the second argument. Otherwise they return false.
   */
-  //@{
+  ///@{
     // Set an integer parameter
     bool setIntParam(OsiIntParam key, int value);
     // Set an double parameter
@@ -64,11 +64,11 @@ public:
     bool getIntParam(OsiIntParam key, int& value) const;
     // Get an double parameter
     bool getDblParam(OsiDblParam key, double& value) const;
-  //@}
+  ///@}
 
   //---------------------------------------------------------------------------
   ///@name Methods returning info on how the solution process terminated
-  //@{
+  ///@{
     /// Are there a numerical difficulties?
     virtual bool isAbandoned() const;
     /// Is optimality proven?
@@ -83,17 +83,17 @@ public:
     virtual bool isDualObjectiveLimitReached() const;
     /// Iteration limit reached?
     virtual bool isIterationLimitReached() const;
-  //@}
+  ///@}
 
   //---------------------------------------------------------------------------
   /**@name WarmStart related methods */
-  //@{
+  ///@{
     /// Get warmstarting information
     virtual OsiWarmStart* getWarmStart() const;
     /** Set warmstarting information. Return true/false depending on whether
 	the warmstart information was accepted or not. */
     virtual bool setWarmStart(const OsiWarmStart* warmstart);
-  //@}
+  ///@}
 
   //---------------------------------------------------------------------------
   /**@name Hotstart related methods (primarily used in strong branching). <br>
@@ -101,14 +101,14 @@ public:
      then reoptimize over and over again always starting from there.<br>
      <strong>NOTE</strong>: between hotstarted optimizations only
      bound changes are allowed. */
-  //@{
+  ///@{
     /// Create a hotstart point of the optimization process
     virtual void markHotStart();
     /// Optimize starting from the hotstart
     virtual void solveFromHotStart();
     /// Delete the snapshot
     virtual void unmarkHotStart();
-  //@}
+  ///@}
 
   //---------------------------------------------------------------------------
   /**@name Problem information methods 
@@ -122,9 +122,9 @@ public:
      Const pointers returned from any data-query method are valid as
      long as the data is unchanged and the solver is not called.
   */
-  //@{
+  ///@{
     /**@name Methods related to querying the input data */
-    //@{
+    ///@{
       /// Get number of columns
       virtual int getNumCols() const;
   
@@ -211,10 +211,10 @@ public:
   
       /// Get solver's value for infinity
       virtual double getInfinity() const;
-    //@}
+    ///@}
     
     /**@name Methods related to querying the solution */
-    //@{
+    ///@{
       /// Get pointer to array[getNumCols()] of primal solution vector
       virtual const double * getColSolution() const;
   
@@ -266,16 +266,16 @@ public:
       virtual OsiVectorInt getFractionalIndices(const double etol=1.e-05)
 	const;
 #endif
-    //@}
-  //@}
+    ///@}
+  ///@}
   
   //---------------------------------------------------------------------------
 
   /**@name Problem modifying methods */
-  //@{
+  ///@{
     //-------------------------------------------------------------------------
     /**@name Changing bounds on variables and constraints */
-    //@{
+    ///@{
       /** Set an objective function coefficient */
       virtual void setObjCoeff( int elementIndex, double elementValue );
 
@@ -352,11 +352,11 @@ public:
 				  const double* rhsList,
 				  const double* rangeList);
 #endif
-    //@}
+    ///@}
     
     //-------------------------------------------------------------------------
     /**@name Integrality related changing methods */
-    //@{
+    ///@{
       /** Set the index-th variable to be a continuous variable */
       virtual void setContinuous(int index);
       /** Set the index-th variable to be an integer variable */
@@ -369,7 +369,7 @@ public:
 	  integer variables */
       virtual void setInteger(const int* indices, int len);
 #endif
-    //@}
+    ///@}
     
     //-------------------------------------------------------------------------
     /// Set objective function sense (1 for min (default), -1 for max,)
@@ -403,7 +403,7 @@ public:
     /**@name Methods to expand a problem.<br>
        Note that if a column is added then by default it will correspond to a
        continuous variable. */
-    //@{
+    ///@{
       /** */
       virtual void addCol(const OsiPackedVectorBase& vec,
 			  const double collb, const double colub,   
@@ -469,13 +469,13 @@ public:
       virtual ApplyCutsReturnCode applyCuts(const OsiCuts & cs,
     					    double effectivenessLb = 0.0);
 #endif
-    //@}
-  //@}
+    ///@}
+  ///@}
 
   //---------------------------------------------------------------------------
 
   /**@name Methods to input a problem */
-  //@{
+  ///@{
     /** Load in an problem by copying the arguments (the constraints on the
         rows are given by lower and upper bounds). If a pointer is 0 then the
         following values are the default:
@@ -559,12 +559,12 @@ public:
     /** Write the problem into an mps file of the given filename */
     virtual void writeMps(const char *filename,
 			  const char *extension = "mps") const;
-  //@}
+  ///@}
 
   //---------------------------------------------------------------------------
 
   /**@name Constructors and destructor */
-  //@{
+  ///@{
   /// Default Constructor
   OsiSpxSolverInterface(); 
   
@@ -579,12 +579,12 @@ public:
   
   /// Destructor 
   virtual ~OsiSpxSolverInterface();
-  //@}
+  ///@}
   
 protected:
   
   /**@name Protected methods */
-  //@{
+  ///@{
   /// Apply a row cut. Return true if cut was applied.
   virtual void applyRowCut( const OsiRowCut & rc );
   
@@ -592,11 +592,11 @@ protected:
       Return true if cut was applied.
   */
   virtual void applyColCut( const OsiColCut & cc );
-  //@}
+  ///@}
   
 private:
   /**@name Private methods */
-  //@{
+  ///@{
   
   /// free cached column rim vectors
   void freeCachedColRim();
@@ -644,11 +644,11 @@ private:
 
   /// Just for testing purposes
   void printBounds(); 
-  //@}
+  ///@}
   
   
   /**@name Private member data */
-  //@{
+  ///@{
   /// SOPLEX solver object
   soplex::SPxSolver spxsolver_;
 
@@ -663,9 +663,9 @@ private:
   int                       hotStartMaxIteration_;
 
   /**@name Cached information derived from the SOPLEX model */
-  //@{
+  ///@{
   /// Pointer to objective Vector
-  mutable soplex::DVector *obj_;
+  mutable soplex::Vector *obj_;
 
   /// Pointer to dense vector of row sense indicators
   mutable char    *rowsense_;
@@ -677,24 +677,24 @@ private:
   mutable double  *rowrange_;
   
   /// Pointer to primal solution vector
-  mutable soplex::DVector *colsol_;
+  mutable soplex::Vector *colsol_;
   
   /// Pointer to dual solution vector
-  mutable soplex::DVector *rowsol_;
+  mutable soplex::Vector *rowsol_;
 
   /// Pointer to reduced cost vector
-  mutable soplex::DVector *redcost_;
+  mutable soplex::Vector *redcost_;
 
   /// Pointer to row activity (slack) vector
-  mutable soplex::DVector *rowact_;
+  mutable soplex::Vector *rowact_;
 
   /// Pointer to row-wise copy of problem matrix coefficients.
   mutable OsiPackedMatrix *matrixByRow_;  
   
   /// Pointer to row-wise copy of problem matrix coefficients.
   mutable OsiPackedMatrix *matrixByCol_;  
-  //@}
-  //@}
+  ///@}
+  ///@}
 };
 
 //#############################################################################

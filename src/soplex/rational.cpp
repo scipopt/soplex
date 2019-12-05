@@ -88,275 +88,6 @@ THREADLOCAL bool Rational::useListMem = true;
 THREADLOCAL IdList< Rational::Private > Rational::unusedPrivateList(0, 0, true);
 #endif
 
-/// Defines the "Pimpl"-class Private
-class Rational::Private
-{
-public:
-
-   mpq_t privatevalue;  ///< actual value of the Rational object
-   Private* theprev;    ///< pointer to the previous element in the list
-   Private* thenext;    ///< pointer to the next element in the list
-
-   /// default constructor
-   Private()
-      : theprev(0)
-      , thenext(0)
-   {
-      mpq_init(privatevalue);
-   }
-
-   /// copy constructor
-   Private(const Private& p)
-      : theprev(0)
-      , thenext(0)
-   {
-      // a newly constructed element is not in any list, even if the original element (p) is; hence we initialize
-      // theprev and thenext to zero
-      mpq_init(privatevalue);
-      mpq_set(this->privatevalue, p.privatevalue);
-   }
-
-   /// constructor from long double
-   Private(const long double& r)
-      : theprev(0)
-      , thenext(0)
-   {
-      mpq_init(privatevalue);
-
-      if(r == (long double)(1.0))
-         mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
-      else if(r == (long double)(-1.0))
-         mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
-      else if(r == (long double)(0.0))
-      {
-         assert(mpq_equal(privatevalue, Rational::ZERO.dpointer->privatevalue) != 0);
-      }
-      else
-         mpq_set_d(privatevalue, double(r));
-   }
-
-   /// constructor from double
-   Private(const double& r)
-      : theprev(0)
-      , thenext(0)
-   {
-      mpq_init(privatevalue);
-
-      if(r == 1.0)
-         mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
-      else if(r == -1.0)
-         mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
-      else if(r == 0.0)
-      {
-         assert(mpq_equal(privatevalue, Rational::ZERO.dpointer->privatevalue) != 0);
-      }
-      else
-         mpq_set_d(privatevalue, r);
-   }
-
-   /// constructor from int
-   Private(const int& i)
-      : theprev(0)
-      , thenext(0)
-   {
-      mpq_init(privatevalue);
-
-      if(i == 1)
-         mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
-      else if(i == -1)
-         mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
-      else if(i == 0)
-      {
-         assert(mpq_equal(privatevalue, Rational::ZERO.dpointer->privatevalue) != 0);
-      }
-      else
-         mpq_set_si(privatevalue, i, 1);
-   }
-
-   /// constructor from mpq_t
-   Private(const mpq_t& q)
-      : theprev(0)
-      , thenext(0)
-   {
-      mpq_init(privatevalue);
-      mpq_set(privatevalue, q);
-   }
-
-   /// destructor
-   ~Private()
-   {
-      mpq_clear(privatevalue);
-   }
-
-   /// assignment operator
-   Private& operator=(const Private& p)
-   {
-#ifdef SOPLEX_PERFALT_4
-
-      if(mpq_equal(this->privatevalue, p.privatevalue) != 0)
-         return *this;
-
-#endif
-
-      // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
-      mpq_set(this->privatevalue, p.privatevalue);
-      return *this;
-   }
-
-   /// assignment operator from long double
-   Private& operator=(const long double& r)
-   {
-      // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
-      if(r == (long double)(0.0))
-      {
-#ifdef SOPLEX_PERFALT_5a
-#ifdef SOPLEX_PERFALT_1
-
-         if(mpq_sgn(privatevalue) != 0)
-#else
-         if(mpq_equal(privatevalue, Rational::ZERO.dpointer->privatevalue) == 0)
-#endif
-#endif
-            mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
-      }
-      else if(r == (long double)(1.0))
-      {
-#ifdef SOPLEX_PERFALT_5b
-
-         if(mpq_equal(privatevalue, Rational::POSONE.dpointer->privatevalue) == 0)
-#endif
-            mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
-      }
-      else if(r == (long double)(-1.0))
-      {
-#ifdef SOPLEX_PERFALT_5b
-
-         if(mpq_equal(privatevalue, Rational::NEGONE.dpointer->privatevalue) == 0)
-#endif
-            mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
-      }
-      else
-         mpq_set_d(this->privatevalue, double(r));
-
-      return *this;
-   }
-
-   /// assignment operator from double
-   Private& operator=(const double& r)
-   {
-      // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
-      if(r == 0.0)
-      {
-#ifdef SOPLEX_PERFALT_5a
-#ifdef SOPLEX_PERFALT_1
-
-         if(mpq_sgn(privatevalue) != 0)
-#else
-         if(mpq_equal(privatevalue, Rational::ZERO.dpointer->privatevalue) == 0)
-#endif
-#endif
-            mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
-      }
-      else if(r == 1.0)
-      {
-#ifdef SOPLEX_PERFALT_5b
-
-         if(mpq_equal(privatevalue, Rational::POSONE.dpointer->privatevalue) == 0)
-#endif
-            mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
-      }
-      else if(r == -1.0)
-      {
-#ifdef SOPLEX_PERFALT_5b
-
-         if(mpq_equal(privatevalue, Rational::NEGONE.dpointer->privatevalue) == 0)
-#endif
-            mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
-      }
-      else
-         mpq_set_d(privatevalue, r);
-
-      return *this;
-   }
-
-   /// assignment operator from int
-   Private& operator=(const int& i)
-   {
-      // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
-      if(i == 0)
-      {
-#ifdef SOPLEX_PERFALT_5a
-#ifdef SOPLEX_PERFALT_1
-
-         if(mpq_sgn(privatevalue) != 0)
-#else
-         if(mpq_equal(privatevalue, Rational::ZERO.dpointer->privatevalue) == 0)
-#endif
-#endif
-            mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
-      }
-      else if(i == 1)
-      {
-#ifdef SOPLEX_PERFALT_5b
-
-         if(mpq_equal(privatevalue, Rational::POSONE.dpointer->privatevalue) == 0)
-#endif
-            mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
-      }
-      else if(i == -1)
-      {
-#ifdef SOPLEX_PERFALT_5b
-
-         if(mpq_equal(privatevalue, Rational::NEGONE.dpointer->privatevalue) == 0)
-#endif
-            mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
-      }
-      else
-         mpq_set_si(privatevalue, i, 1);
-
-      return *this;
-   }
-
-   /// assignment operator from mpq_t
-   Private& operator=(const mpq_t& q)
-   {
-#ifdef SOPLEX_PERFALT_4
-
-      if(mpq_equal(this->privatevalue, q) != 0)
-         return *this;
-
-#endif
-
-      // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
-      mpq_set(this->privatevalue, q);
-      return *this;
-   }
-
-   /// previous Private element
-   Private*& prev()
-   {
-      return theprev;
-   }
-
-   /// previous Private element
-   Private* const& prev() const
-   {
-      return theprev;
-   }
-
-   /// next Private element
-   Private*& next()
-   {
-      return thenext;
-   }
-
-   /// next Private element
-   Private* const& next() const
-   {
-      return thenext;
-   }
-};
-
 
 
 /// special constructor only for initializing static rational variables; this is necessary since we need a constructor
@@ -649,6 +380,8 @@ Rational& Rational::operator=(const double& r)
    *(this->dpointer) = r;
    return *this;
 }
+
+
 
 
 
@@ -1864,12 +1597,12 @@ bool Rational::isNextTo(const double& d)
    if(Rational(x) < *this)
    {
       a = x;
-      b = (double)spxNextafter(a, infinity);
+      b = (double)spxNextafter(a, double(infinity));
    }
    else
    {
       b = x;
-      a = (double)spxNextafter(b, -infinity);
+      a = (double)spxNextafter(b, double(-infinity));
    }
 
    // check if d equals the closer end of the intervall
@@ -1879,8 +1612,6 @@ bool Rational::isNextTo(const double& d)
 
    return result;
 }
-
-
 
 /// checks if d is exactly equal to the Rational and if not, if it is one of the two adjacent doubles
 bool Rational::isAdjacentTo(const double& d) const
@@ -1900,13 +1631,13 @@ bool Rational::isAdjacentTo(const double& d) const
    if(cmp < 0)
    {
       a = x;
-      b = (double)spxNextafter(a, infinity);
+      b = (double)spxNextafter(a, double(infinity));
    }
    // the rounded value is larger than the rational value
    else if(cmp > 0)
    {
       b = x;
-      a = (double)spxNextafter(b, -infinity);
+      a = (double)spxNextafter(b, double(-infinity));
    }
    // the rational value is representable in double precision
    else
@@ -3108,73 +2839,6 @@ int dmaxSizeRational(const Rational* vector, const int length, const int base)
 
 
 
-/// Defines the "Pimpl"-class Private
-class Rational::Private
-{
-
-public:
-
-   /// value
-   long double privatevalue;
-
-   /// default constructor
-   Private()
-   {
-      privatevalue = 0;
-   }
-
-   /// copy constructor
-   Private(const Private& p)
-   {
-      *this = p;
-   }
-
-   /// constructor from long double
-   Private(const long double& r)
-   {
-      privatevalue = r;
-   }
-
-   /// constructor from double
-   Private(const double& r)
-   {
-      privatevalue = r;
-   }
-
-   /// constructor from int
-   Private(const int& i)
-   {
-      privatevalue = i;
-   }
-
-   /// assignment operator
-   Private& operator=(const Private& p)
-   {
-      this->privatevalue = p.privatevalue;
-      return *this;
-   }
-
-   /// assignment operator from long double
-   Private& operator=(const long double& r)
-   {
-      this->privatevalue = r;
-      return *this;
-   }
-
-   /// assignment operator from double
-   Private& operator=(const double& r)
-   {
-      this->privatevalue = (long double)(r);
-      return *this;
-   }
-
-   /// assignment operator from int
-   Private& operator=(const int& i)
-   {
-      this->privatevalue = (long double)(i);
-      return *this;
-   }
-};
 
 
 

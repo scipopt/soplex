@@ -33,7 +33,7 @@ using namespace soplex;
 
 class SPxCPlex : public SoPlex
 {
-   SLUFactor    m_slu;
+   SLUFactor<Real>    m_slu;
    SPxSteepPR   m_price;
    SPxFastRT    m_ratio;
    bool         m_verbose;
@@ -465,7 +465,7 @@ extern "C" int CPXsolution(
    if ((slack != 0) || (dual != 0))
    {
       int     rows  = spx->nRows() ;
-      DVector tmp(rows);
+      Vector tmp(rows);
 
       if (slack != 0)
       {
@@ -938,7 +938,7 @@ extern "C" int CPXgetslack(
    if ((start < 0) || (start > end) || (end > spx->nRows()))
       return CPXERR_BAD_ARGUMENT;
 
-   DVector tmp(spx->nRows());
+   Vector tmp(spx->nRows());
    spx->getSlacks(tmp);
 
    for(int i = start; i <= end; i++)
@@ -963,7 +963,7 @@ extern "C" int CPXgetdj(
    if ((start < 0) || (start > end) || (end > spx->nCols()))
       return CPXERR_BAD_ARGUMENT;
 
-   DVector tmp(spx->nCols());
+   Vector tmp(spx->nCols());
    spx->getRdCost(tmp);
 
    for(int i = start; i <= end; i++)

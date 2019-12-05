@@ -23,10 +23,13 @@
 #include "soplex/basevectors.h"
 #include "soplex/vector.h" // for compatibility
 
+// This file exists for reverse compatibility with SCIP. This isn't currently
+// needed in SoPlex. DVector used to be typedefs from DVectorBase<T>, but
+// DVectorBase has been replaced by VectorBase.
 namespace soplex
 {
-typedef DVectorBase< Real > DVector;
-typedef DVectorBase< Real > DVectorReal;
-typedef DVectorBase< Rational > DVectorRational;
+typedef VectorBase< Real > DVector;
+typedef VectorBase< Real > DVectorReal;
+typedef VectorBase< Rational > DVectorRational;
 } // namespace soplex
 #endif // _DVECTOR_H_

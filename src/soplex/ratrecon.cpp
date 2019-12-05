@@ -296,7 +296,7 @@ bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
 bool reconstructSol(SolRational& solution)
 {
 #if 0
-   DVectorRational buffer;
+   VectorRational buffer;
 
    if(solution.hasPrimal())
    {
@@ -335,7 +335,7 @@ bool reconstructSol(SolRational& solution)
    if(solution.hasDualfarkas())
    {
       buffer.reDim((solution._dualfarkas).dim());
-      solution.getDualFarkas(buffer);
+      solution.getDualfarkas(buffer);
       reconstructVector(buffer);
       solution._dualfarkas = buffer;
    }
