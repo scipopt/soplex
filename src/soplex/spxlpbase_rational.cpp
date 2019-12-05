@@ -153,64 +153,6 @@ Rational SPxLPBase<Rational>::minAbsNzo(bool /* unscaled */) const
 
 #define LPF_MAX_LINE_LEN  8192     ///< maximum length of a line (8190 + \\n + \\0)
 
-/// Is \p c a \c space, \c tab, \c nl or \c cr ?
-static inline bool LPFisSpace(int c)
-{
-   return (c == ' ') || (c == '\t') || (c == '\n') || (c == '\r');
-}
-
-
-
-/// Is there a number at the beginning of \p s ?
-static bool LPFisValue(const char* s)
-{
-   return ((*s >= '0') && (*s <= '9')) || (*s == '+') || (*s == '-') || (*s == '.');
-}
-
-
-
-/// Is there a possible column name at the beginning of \p s ?
-static bool LPFisColName(const char* s)
-{
-   // strchr() gives a true for the null char.
-   if(*s == '\0')
-      return false;
-
-   return ((*s >= 'A') && (*s <= 'Z'))
-          || ((*s >= 'a') && (*s <= 'z'))
-          || (strchr("!\"#$%&()/,;?@_'`{}|~", *s) != 0);
-}
-
-
-
-/// Is there a comparison operator at the beginning of \p s ?
-static bool LPFisSense(const char* s)
-{
-   return (*s == '<') || (*s == '>') || (*s == '=');
-}
-
-
-
-static bool LPFisInfinity(const char* s)
-{
-   return ((s[0] == '-') || (s[0] == '+'))
-          && (tolower(s[1]) == 'i')
-          && (tolower(s[2]) == 'n')
-          && (tolower(s[3]) == 'f');
-}
-
-
-
-static bool LPFisFree(const char* s)
-{
-   return (tolower(s[0]) == 'f')
-          && (tolower(s[1]) == 'r')
-          && (tolower(s[2]) == 'e')
-          && (tolower(s[3]) == 'e');
-}
-
-
-
 /// Read the next number and advance \p pos.
 /** If only a sign is encountered, the number is assumed to be \c sign * 1.  This routine will not catch malformatted
  *  numbers like .e10 !
@@ -377,135 +319,6 @@ static int LPFreadColName(char*& pos, NameSet* colnames, LPColSetBase<Rational>&
 
    return colidx;
 }
-
-
-
-/// Read the next <,>,=,==,<=,=<,>=,=> and advance \p pos.
-static int LPFreadSense(char*& pos)
-{
-   assert(LPFisSense(pos));
-
-   int sense = *pos++;
-
-   if((*pos == '<') || (*pos == '>'))
-      sense = *pos++;
-   else if(*pos == '=')
-      pos++;
-
-   MSG_DEBUG(std::cout << "DLPFRD04 LPFreadSense = " << static_cast<char>(sense) << std::endl;)
-
-   if(LPFisSpace(*pos))
-      pos++;
-
-   return sense;
-}
-
-
-
-/// Is the \p keyword present in \p buf ? If yes, advance \p pos.
-/** \p keyword should be lower case. It can contain optional sections which are enclosed in '[' ']' like "min[imize]".
- */
-static bool LPFhasKeyword(char*& pos, const char* keyword)
-{
-   int i;
-   int k;
-
-   assert(keyword != 0);
-
-   for(i = 0, k = 0; keyword[i] != '\0'; i++, k++)
-   {
-      if(keyword[i] == '[')
-      {
-         i++;
-
-         // Here we assumed that we have a ']' for the '['.
-         while((tolower(pos[k]) == keyword[i]) && (pos[k] != '\0'))
-         {
-            k++;
-            i++;
-         }
-
-         while(keyword[i] != ']')
-            i++;
-
-         --k;
-      }
-      else
-      {
-         if(keyword[i] != tolower(pos[k]))
-            break;
-      }
-   }
-
-   // we have to be at the end of the keyword and the word found on the line also has to end here.  Attention: The
-   // LPFisSense is a kludge to allow LPFhasKeyword also to process Inf[inity] keywords in the bounds section.
-   if(keyword[i] == '\0' && (pos[k] == '\0' || LPFisSpace(pos[k]) || LPFisSense(&pos[k])))
-   {
-      pos += k;
-
-      MSG_DEBUG(std::cout << "DLPFRD05 LPFhasKeyword: " << keyword << std::endl;)
-
-      return true;
-   }
-
-   return false;
-}
-
-
-
-/// If \p buf start with "name:" store the name in \p rownames and advance \p pos.
-static bool LPFhasRowName(char*& pos, NameSet* rownames)
-{
-   const char* s = strchr(pos, ':');
-
-   if(s == 0)
-      return false;
-
-   int dcolpos = int(s - pos);
-
-   int end;
-   int srt;
-
-   // skip spaces between name and ":"
-   for(end = dcolpos - 1; end >= 0; end--)
-      if(pos[end] != ' ')
-         break;
-
-   // are there only spaces in front of the ":" ?
-   if(end < 0)
-   {
-      pos = &(pos[dcolpos + 1]);
-      return false;
-   }
-
-   // skip spaces in front of name
-   for(srt = end - 1; srt >= 0; srt--)
-      if(pos[srt] == ' ')
-         break;
-
-   // go back to the non-space character
-   srt++;
-
-   assert(srt <= end && pos[srt] != ' ');
-
-   char name[LPF_MAX_LINE_LEN];
-   int i;
-   int k = 0;
-
-   for(i = srt; i <= end; i++)
-      name[k++] = pos[i];
-
-   name[k] = '\0';
-
-   if(rownames != 0)
-      rownames->add(name);
-
-   pos = &(pos[dcolpos + 1]);
-
-   return true;
-}
-
-
 
 static Rational LPFreadInfinity(char*& pos)
 {
@@ -902,7 +715,7 @@ bool SPxLPBase<Rational>::readLPF(
 
                         assert(cnames->has(colidx));
 
-                        MSG_WARNING((*spxout), (*spxout) << "WLPFRD10 Duplicate index "
+                        MSG_WARNING((*this->spxout), (*this->spxout) << "WLPFRD10 Duplicate index "
                                     << (*cnames)[colidx]
                                     << " in line " << lineno
                                     << std::endl;)
@@ -952,7 +765,7 @@ bool SPxLPBase<Rational>::readLPF(
 
             if((colidx = LPFreadColName(pos, cnames, cset, 0, spxout)) < 0)
             {
-               MSG_WARNING((*spxout), (*spxout) << "WLPFRD11 in Bounds section line "
+               MSG_WARNING((*this->spxout), (*this->spxout) << "WLPFRD11 in Bounds section line "
                            << lineno << " ignored" << std::endl;)
                *pos = '\0';
                continue;
@@ -1013,8 +826,8 @@ bool SPxLPBase<Rational>::readLPF(
          case INTEGERS:
             if((colidx = LPFreadColName(pos, cnames, cset, 0, spxout)) < 0)
             {
-               MSG_WARNING((*spxout), (*spxout) << "WLPFRD12 in Binary/General section line " << lineno <<
-                           " ignored" << std::endl;)
+               MSG_WARNING((*this->spxout), (*this->spxout) << "WLPFRD12 in Binary/General section line " << lineno
+                           << " ignored" << std::endl;)
             }
             else
             {
@@ -1062,7 +875,8 @@ syntax_error:
 
    if(finished)
    {
-      MSG_INFO2((*spxout), (*spxout) << "Finished reading " << lineno << " lines" << std::endl;)
+      MSG_INFO2((*this->spxout), (*this->spxout) << "Finished reading " << lineno << " lines" <<
+                std::endl;)
    }
    else
       MSG_ERROR(std::cerr << "ELPFRD15 Syntax error in line " << lineno << std::endl;)
@@ -1075,113 +889,6 @@ syntax_error:
 
    return finished;
 }
-
-
-
-// ---------------------------------------------------------------------------------------------------------------------
-// Specialization for reading MPS format
-// ---------------------------------------------------------------------------------------------------------------------
-
-/// Process NAME section.
-static void MPSreadName(MPSInput& mps, SPxOut* spxout)
-{
-   do
-   {
-      // This has to be the Line with the NAME section.
-      if(!mps.readLine() || (mps.field0() == 0) || strcmp(mps.field0(), "NAME"))
-         break;
-
-      // Sometimes the name is omitted.
-      mps.setProbName((mps.field1() == 0) ? "_MPS_" : mps.field1());
-
-      MSG_INFO2((*spxout), (*spxout) << "IMPSRD01 Problem name   : " << mps.probName() << std::endl;)
-
-      // This has to be a new section
-      if(!mps.readLine() || (mps.field0() == 0))
-         break;
-
-      if(!strcmp(mps.field0(), "ROWS"))
-         mps.setSection(MPSInput::ROWS);
-      else if(!strncmp(mps.field0(), "OBJSEN", 6))
-         mps.setSection(MPSInput::OBJSEN);
-      else if(!strcmp(mps.field0(), "OBJNAME"))
-         mps.setSection(MPSInput::OBJNAME);
-      else
-         break;
-
-      return;
-   }
-   while(false);
-
-   mps.syntaxError();
-}
-
-
-
-/// Process OBJSEN section. This Section is an ILOG extension.
-static void MPSreadObjsen(MPSInput& mps)
-{
-   do
-   {
-      // This has to be the Line with MIN or MAX.
-      if(!mps.readLine() || (mps.field1() == 0))
-         break;
-
-      if(!strcmp(mps.field1(), "MIN"))
-         mps.setObjSense(MPSInput::MINIMIZE);
-      else if(!strcmp(mps.field1(), "MAX"))
-         mps.setObjSense(MPSInput::MAXIMIZE);
-      else
-         break;
-
-      // Look for ROWS or OBJNAME Section
-      if(!mps.readLine() || (mps.field0() == 0))
-         break;
-
-      if(!strcmp(mps.field0(), "ROWS"))
-         mps.setSection(MPSInput::ROWS);
-      else if(!strcmp(mps.field0(), "OBJNAME"))
-         mps.setSection(MPSInput::OBJNAME);
-      else
-         break;
-
-      return;
-   }
-   while(false);
-
-   mps.syntaxError();
-}
-
-
-
-/// Process OBJNAME section. This Section is an ILOG extension.
-static void MPSreadObjname(MPSInput& mps)
-{
-   do
-   {
-      // This has to be the Line with the name.
-      if(!mps.readLine() || (mps.field1() == 0))
-         break;
-
-      mps.setObjName(mps.field1());
-
-      // Look for ROWS Section
-      if(!mps.readLine() || (mps.field0() == 0))
-         break;
-
-      if(strcmp(mps.field0(), "ROWS"))
-         break;
-
-      mps.setSection(MPSInput::ROWS);
-
-      return;
-   }
-   while(false);
-
-   mps.syntaxError();
-}
-
-
 
 /// Process ROWS section.
 static void MPSreadRows(MPSInput& mps, LPRowSetBase<Rational>& rset, NameSet& rnames,
@@ -2209,15 +1916,15 @@ void SPxLPBase<Rational>::writeLPF(
 // Specialization for writing MPS format
 // ---------------------------------------------------------------------------------------------------------------------
 
-
+// A problem here.
 static void MPSwriteRecord(
    std::ostream&  os,
    const char*    indicator,
    const char*    name,
    SPxOut* spxout,
-   const char*    name1  = 0,
+   const char*    name1  = nullptr,
    const Rational value1 = 0,
-   const char*    name2  = 0,
+   const char*    name2  = nullptr,
    const Rational value2 = 0
 )
 {
@@ -2229,7 +1936,7 @@ static void MPSwriteRecord(
                (name == 0)      ? "" : name);
    os << buf;
 
-   if(name1 != 0)
+   if(name1 != nullptr)
    {
       spxSnprintf(buf, sizeof(buf), " %-8.8s ", name1);
       os << buf << value1;

@@ -44,6 +44,9 @@ template <class R>
 class SolBase
 {
    template <class T> friend class SoPlexBase;
+   // Why do we need the following? This is at least used in the operator=
+   // When Rational solution needs to be copied into Real, the private member
+   // _objVal is accessed.
    template <class S> friend class SolBase;
 
 public:
@@ -215,12 +218,12 @@ public:
    }
 
 private:
-   DVectorBase<R> _primal;
-   DVectorBase<R> _slacks;
-   DVectorBase<R> _primalRay;
-   DVectorBase<R> _dual;
-   DVectorBase<R> _redCost;
-   DVectorBase<R> _dualFarkas;
+   VectorBase<R> _primal;
+   VectorBase<R> _slacks;
+   VectorBase<R> _primalRay;
+   VectorBase<R> _dual;
+   VectorBase<R> _redCost;
+   VectorBase<R> _dualFarkas;
 
    R _objVal;
 
@@ -275,6 +278,7 @@ private:
          _isPrimalFeasible = sol._isPrimalFeasible;
          _primal = sol._primal;
          _slacks = sol._slacks;
+
          _objVal = R(sol._objVal);
 
          _hasPrimalRay = sol._hasPrimalRay;
@@ -294,6 +298,7 @@ private:
 
       return *this;
    }
+
 };
 } // namespace soplex
 

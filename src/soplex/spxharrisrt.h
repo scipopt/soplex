@@ -46,32 +46,32 @@ private:
    /**@name Private helpers */
    ///@{
    ///
-   Real degenerateEps() const;
+   R degenerateEps() const;
 
    ///
    int maxDelta(
-      Real* /*max*/,        ///< max abs value in \p upd
-      Real* val,            ///< initial and chosen value
+      R* /*max*/,        ///< max abs value in \p upd
+      R* val,            ///< initial and chosen value
       int num,              ///< number of indices in \p idx
       const int* idx,       ///< nonzero indices in \p upd
-      const Real* upd,      ///< update vector for \p vec
-      const Real* vec,      ///< current vector
-      const Real* low,      ///< lower bounds for \p vec
-      const Real* up,       ///< upper bounds for \p vec
-      Real epsilon          ///< what is 0?
+      const R* upd,      ///< update VectorBase<R> for \p vec
+      const R* vec,      ///< current vector
+      const R* low,      ///< lower bounds for \p vec
+      const R* up,       ///< upper bounds for \p vec
+      R epsilon          ///< what is 0?
    ) const;
 
    ///
    int minDelta(
-      Real* /*max*/,        ///< max abs value in \p upd
-      Real* val,            ///< initial and chosen value
+      R* /*max*/,        ///< max abs value in \p upd
+      R* val,            ///< initial and chosen value
       int num,              ///< of indices in \p idx
       const int* idx,       ///< nonzero indices in \p upd
-      const Real* upd,      ///< update vector for \p vec
-      const Real* vec,      ///< current vector
-      const Real* low,      ///< lower bounds for \p vec
-      const Real* up,       ///< upper bounds for \p vec
-      Real epsilon          ///< what is 0?
+      const R* upd,      ///< update VectorBase<R> for \p vec
+      const R* vec,      ///< current vector
+      const R* low,      ///< lower bounds for \p vec
+      const R* up,       ///< upper bounds for \p vec
+      R epsilon          ///< what is 0?
    ) const;
    ///@}
 
@@ -112,12 +112,16 @@ public:
    /**@name Leave / enter */
    ///@{
    ///
-   virtual int selectLeave(Real& val, Real, bool);
+   virtual int selectLeave(R& val, R, bool);
    ///
-   virtual SPxId selectEnter(Real& val, int, bool);
+   virtual SPxId selectEnter(R& val, int, bool);
    ///@}
 
 };
 
 } // namespace soplex
+// For the general template
+#include "spxharrisrt.hpp"
+
+
 #endif // _SPXHARRISRT_H_

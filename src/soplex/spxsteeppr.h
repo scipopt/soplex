@@ -66,9 +66,9 @@ private:
    /**@name Data */
    ///@{
    /// working vector
-   SSVector workVec;
+   SSVectorBase<R>  workVec;
    /// working vector
-   SSVector workRhs;
+   SSVectorBase<R>  workRhs;
    /// temporary array of precomputed pricing values
    DataArray<typename SPxPricer<R>::IdxElement> prices;
    /// temporary array of precomputed pricing values
@@ -78,7 +78,7 @@ private:
    /// array of best pricing candidates
    DIdxSet bestPricesCo;
    ///
-   Real pi_p;
+   R pi_p;
    /// setup type.
    Setup setup;
    /// has a refinement step already been tried?
@@ -87,30 +87,30 @@ private:
 
    //-------------------------------------
    /// prepare data structures for hyper sparse pricing
-   int buildBestPriceVectorLeave(Real feastol);
+   int buildBestPriceVectorLeave(R feastol);
    /// implementation of full pricing
-   int selectLeaveX(Real tol);
+   int selectLeaveX(R tol);
    /// implementation of sparse pricing in the leaving Simplex
-   int selectLeaveSparse(Real tol);
+   int selectLeaveSparse(R tol);
    /// implementation of hyper sparse pricing in the leaving Simplex
-   int selectLeaveHyper(Real tol);
+   int selectLeaveHyper(R tol);
    /// build up vector of pricing values for later use
-   SPxId buildBestPriceVectorEnterDim(Real& best, Real feastol);
-   SPxId buildBestPriceVectorEnterCoDim(Real& best, Real feastol);
+   SPxId buildBestPriceVectorEnterDim(R& best, R feastol);
+   SPxId buildBestPriceVectorEnterCoDim(R& best, R feastol);
    /// choose the best entering index among columns and rows but prefer sparsity
-   SPxId selectEnterX(Real tol);
+   SPxId selectEnterX(R tol);
    /// implementation of sparse pricing for the entering Simplex (slack variables)
-   SPxId selectEnterSparseDim(Real& best, Real tol);
+   SPxId selectEnterSparseDim(R& best, R tol);
    /// implementation of sparse pricing for the entering Simplex
-   SPxId selectEnterSparseCoDim(Real& best, Real tol);
+   SPxId selectEnterSparseCoDim(R& best, R tol);
    /// implementation of selectEnter() in dense case (slack variables)
-   SPxId selectEnterDenseDim(Real& best, Real tol);
+   SPxId selectEnterDenseDim(R& best, R tol);
    /// implementation of selectEnter() in dense case
-   SPxId selectEnterDenseCoDim(Real& best, Real tol);
+   SPxId selectEnterDenseCoDim(R& best, R tol);
    /// implementation of hyper sparse pricing in the entering Simplex
-   SPxId selectEnterHyperDim(Real& best, Real feastol);
+   SPxId selectEnterHyperDim(R& best, R feastol);
    /// implementation of hyper sparse pricing in the entering Simplex
-   SPxId selectEnterHyperCoDim(Real& best, Real feastol);
+   SPxId selectEnterHyperCoDim(R& best, R feastol);
 
 public:
 

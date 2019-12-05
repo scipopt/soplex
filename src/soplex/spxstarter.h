@@ -117,4 +117,8 @@ private:
 
 };
 } // namespace soplex
+
+// For general templated functions
+#include "spxstarter.hpp"
+
 #endif // _SPXDSTARTER_H_

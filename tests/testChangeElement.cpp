@@ -29,7 +29,7 @@ int main(int argc, const char* const argv[])
    SPxSolver work(SPxSolver::LEAVE, SPxSolver::COLUMN);
 
    /* no starter, no simplifier, no scaler */
-   SLUFactor solver;
+   SLUFactor<Real> solver;
    SPxFastRT tester;
    SPxSteepPR pricer;
    work.setBasisSolver(&solver);

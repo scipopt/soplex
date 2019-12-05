@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-VERSION="4.0.2.4"
+VERSION="4.1.0"
 NAME="soplex-$VERSION"
 rm -f $NAME.tgz
 rm -f $NAME.tar

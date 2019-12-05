@@ -7,9 +7,9 @@ project(SOPLEX
     LANGUAGES CXX)
 
 set(SOPLEX_VERSION_MAJOR 4)
-set(SOPLEX_VERSION_MINOR 0)
-set(SOPLEX_VERSION_PATCH 2)
-set(SOPLEX_VERSION_SUB 4)
+set(SOPLEX_VERSION_MINOR 1)
+set(SOPLEX_VERSION_PATCH 0)
+set(SOPLEX_VERSION_SUB 0)
 set(SOPLEX_VERSION_API 10)
 
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING")
@@ -23,6 +23,7 @@ option(ZLIB "Use ZLIB" ON)
 option(GMP "Use GMP" ON)
 option(STATIC_GMP "Prefer static GMP lib" OFF)
 option(Boost "Use Boost (required to build the binary). Disable if you only want to build libsoplex." ON)
+option(MPFR "Use MPFR" ON)
 option(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS "Export all symbols into the DLL" ON)
 option(MT "use static runtime libraries for Visual Studio compiler" OFF)
 option(SANITIZE_ADDRESS "should the address sanitizer be enabled in debug mode if available" OFF)
@@ -110,6 +111,20 @@ if(GMP_FOUND)
     include_directories(${GMP_INCLUDE_DIRS})
     set(libs ${libs} ${GMP_LIBRARIES})
 endif()
+
+if(MPFR)
+  find_package(MPFR)
+endif()
+if(MPFR_FOUND)
+    message("SoPlex with Boost MPFR libraries.")
+    add_definitions(-DSOPLEX_WITH_MPFR)
+    include_directories(${MPFR_INCLUDE_DIRS})
+    set(libs ${libs} ${MPFR_LIBRARIES})
+else()
+    message("SoPlex with Boost CPP multiprecision libraries.")
+    add_definitions(-DSOPLEX_WITH_CPPMPF)
+endif()
+
 
 
 # Made with: https://stackoverflow.com/a/3917033/4223038

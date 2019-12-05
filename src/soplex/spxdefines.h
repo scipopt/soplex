@@ -40,11 +40,28 @@
 #include <stdio.h>
 #include <iostream>
 
+#include <cstdlib>
+
+#include "boost/multiprecision/number.hpp"
+
 namespace soplex
 {
-#define SOPLEX_VERSION         402
-#define SOPLEX_SUBVERSION        4
-#define SOPLEX_APIVERSION        10
+// Overloaded EQ function
+bool EQ(int a, int b);
+
+// wrapped frexp function
+template <typename T, boost::multiprecision::expression_template_option eto>
+boost::multiprecision::number<T, eto> spxFrexp(boost::multiprecision::number<T, eto> y, int* exp)
+{
+   using namespace std;
+   using namespace boost::math::tools;
+
+   return frexp(y, exp);
+}
+
+#define SOPLEX_VERSION         410
+#define SOPLEX_SUBVERSION        0
+#define SOPLEX_APIVERSION        11
 #define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2019 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)"
 
 /*-----------------------------------------------------------------------------
@@ -151,6 +168,38 @@ extern bool msginconsistent(const char* name, const char* file, int line);
  *-----------------------------------------------------------------------------
  */
 
+// Overloaded spxLdexp
+template <typename T, boost::multiprecision::expression_template_option eto>
+boost::multiprecision::number<T> spxLdexp(boost::multiprecision::number<T, eto> x, int exp)
+{
+   return boost::multiprecision::ldexp(x, exp);
+}
+
+// Overloaded function to return the square-root
+template <typename T, boost::multiprecision::expression_template_option ep>
+boost::multiprecision::number<T, ep> spxSqrt(boost::multiprecision::number<T, ep> a)
+{
+   return boost::multiprecision::sqrt(a);
+}
+
+// the nextafter function
+template <typename T, boost::multiprecision::expression_template_option eto>
+boost::multiprecision::number<T, eto> spxNextafter(boost::multiprecision::number<T, eto> x,
+      boost::multiprecision::number<T, eto> y)
+{
+   using namespace std;
+   using namespace boost::math;
+
+   // Turns out that nextafter is not supported in the mpfr library? The mpfr
+   // library does a different function named nextabove. Probably a
+   // replacement? I've made an issue about this.
+   // return nextafter(x,y);
+
+   // @todo Temporarily, I'm returning 0
+   assert(false);
+   return 0;
+}
+
 #ifdef WITH_LONG_DOUBLE
 
 
@@ -212,6 +261,11 @@ typedef float Real;
 #endif
 #define DEFAULT_INFINITY   1e100
 
+/// returns square root
+inline Real spxSqrt(Real a)
+{
+   return std::sqrt(a);
+}
 
 #else
 
@@ -291,8 +345,20 @@ public:
    ///@}
 };
 
+// A generic version of spxAbs. It would be nice if we could replace spxAbs
+// with std::abs. Currently there are different versions of spxAbs under
+// compile time #if. It's better to make this an overloaded function. Even
+// better, replace it by std::abs since types from boost/multiprecision would
+// need no extra modification.
+template <class R>
+R spxAbs(R a)
+{
+   return abs(a);
+}
+
 #ifdef WITH_LONG_DOUBLE
 /// returns |a|
+template <>
 inline Real spxAbs(Real a)
 {
    return fabsl(a);
@@ -301,14 +367,24 @@ inline Real spxAbs(Real a)
 /// returns square root
 inline Real spxSqrt(Real a)
 {
-   return sqrtl(a);
+   return std::sqrt(a);
 }
 
+// Returns the square root
+template <typename T>
+boost::multiprecision::number<T> spxSqrt(boost::multiprecision::number<T> a)
+{
+   return boost::multiprecision::sqrt(a);
+}
+
+
 // returns the next representable value after x in the direction of y
+
 inline Real spxNextafter(Real x, Real y)
 {
    return nextafterl(x, y);
 }
+
 
 /// returns x * 2^exp
 inline Real spxLdexp(Real x, int exp)
@@ -316,13 +392,9 @@ inline Real spxLdexp(Real x, int exp)
    return ldexpl(x, exp);
 }
 
-// returns x and exp such that y = x * 2^exp
-inline Real spxFrexp(Real y, int* exp)
-{
-   return frexpl(y, exp);
-}
 #else
 /// returns |a|
+template <>
 inline Real spxAbs(Real a)
 {
    return fabs(a);
@@ -331,7 +403,7 @@ inline Real spxAbs(Real a)
 /// returns square root
 inline Real spxSqrt(Real a)
 {
-   return sqrt(a);
+   return std::sqrt(a);
 }
 
 // returns the next representable value after x in the direction of y
@@ -344,17 +416,6 @@ inline Real spxNextafter(Real x, Real y)
 #endif
 }
 
-/// returns x * 2^exp
-inline Real spxLdexp(Real x, int exp)
-{
-   return ldexp(x, exp);
-}
-
-// returns x and exp such that y = x * 2^exp
-inline Real spxFrexp(Real y, int* exp)
-{
-   return frexp(y, exp);
-}
 #endif
 
 /// returns max(|a|,|b|)
@@ -366,94 +427,29 @@ inline Real maxAbs(Real a, Real b)
    return absa > absb ? absa : absb;
 }
 
+/// returns max(|a|,|b|)
+template <typename T, boost::multiprecision::expression_template_option et>
+inline boost::multiprecision::number<T, et> maxAbs(
+   boost::multiprecision::number<T, et> a, boost::multiprecision::number<T, et> b)
+{
+   const auto absa = spxAbs(a);
+   const auto absb = spxAbs(b);
+
+   return absa > absb ? absa : absb;
+}
+
+
 /// returns (a-b) / max(|a|,|b|,1.0)
 inline Real relDiff(Real a, Real b)
 {
    return (a - b) / (maxAbs(a, b) > 1.0 ? maxAbs(a, b) : 1.0);
 }
 
-/// returns \c true iff |a-b| <= eps
-inline bool EQ(Real a, Real b, Real eps = Param::epsilon())
+template <typename T, boost::multiprecision::expression_template_option et>
+inline boost::multiprecision::number<T, et> relDiff(boost::multiprecision::number<T, et> a,
+      boost::multiprecision::number<T, et> b)
 {
-   return spxAbs(a - b) <= eps;
-}
-
-/// returns \c true iff |a-b| > eps
-inline bool NE(Real a, Real b, Real eps = Param::epsilon())
-{
-   return spxAbs(a - b) > eps;
-}
-
-/// returns \c true iff a < b + eps
-inline bool LT(Real a, Real b, Real eps = Param::epsilon())
-{
-   return (a - b) < -eps;
-}
-
-/// returns \c true iff a <= b + eps
-inline bool LE(Real a, Real b, Real eps = Param::epsilon())
-{
-   return (a - b) < eps;
-}
-
-/// returns \c true iff a > b + eps
-inline bool GT(Real a, Real b, Real eps = Param::epsilon())
-{
-   return (a - b) > eps;
-}
-
-/// returns \c true iff a >= b + eps
-inline bool GE(Real a, Real b, Real eps = Param::epsilon())
-{
-   return (a - b) > -eps;
-}
-
-/// returns \c true iff |a| <= eps
-inline bool isZero(Real a, Real eps = Param::epsilon())
-{
-   return spxAbs(a) <= eps;
-}
-
-/// returns \c true iff |a| > eps
-inline bool isNotZero(Real a, Real eps = Param::epsilon())
-{
-   return spxAbs(a) > eps;
-}
-
-/// returns \c true iff |relDiff(a,b)| <= eps
-inline bool EQrel(Real a, Real b, Real eps = Param::epsilon())
-{
-   return spxAbs(relDiff(a, b)) <= eps;
-}
-
-/// returns \c true iff |relDiff(a,b)| > eps
-inline bool NErel(Real a, Real b, Real eps = Param::epsilon())
-{
-   return spxAbs(relDiff(a, b)) > eps;
-}
-
-/// returns \c true iff relDiff(a,b) <= -eps
-inline bool LTrel(Real a, Real b, Real eps = Param::epsilon())
-{
-   return relDiff(a, b) <= -eps;
-}
-
-/// returns \c true iff relDiff(a,b) <= eps
-inline bool LErel(Real a, Real b, Real eps = Param::epsilon())
-{
-   return relDiff(a, b) <= eps;
-}
-
-/// returns \c true iff relDiff(a,b) > eps
-inline bool GTrel(Real a, Real b, Real eps = Param::epsilon())
-{
-   return relDiff(a, b) > eps;
-}
-
-/// returns \c true iff relDiff(a,b) > -eps
-inline bool GErel(Real a, Real b, Real eps = Param::epsilon())
-{
-   return relDiff(a, b) > -eps;
+   return (a - b) / (maxAbs(a, b) > 1.0 ? maxAbs(a, b) : 1.0);
 }
 
 /// safe version of snprintf
@@ -496,5 +492,10 @@ inline int spxSnprintf(
    return n;
 }
 
+
 } // namespace soplex
+
+// For the templated functions
+#include "spxdefines.hpp"
+
 #endif // _SPXDEFINES_H_

@@ -140,7 +140,7 @@ public:
    {
       int i = index(h);
 
-      return (i >= 0) ? &m_elem[i].info : 0;
+      return (i >= 0) ? &m_elem[i].info : nullptr;
    }
    /// references \a Info of \a HashItem \p h.
    /** Index operator for accessing the \a Info associated to
@@ -171,7 +171,7 @@ public:
 
       assert(m_used < m_elem.size());
 
-      int i;
+      decltype(m_elem.size()) i;
 
       for(i = (*m_hashfun)(&h) % m_elem.size();
             m_elem[i].stat == Elem::USED;
@@ -378,7 +378,7 @@ private:
     */
    int autoHashSize() const
    {
-      int oldsize = m_elem.size();
+      auto oldsize = m_elem.size();
 
       int left = 0;
       int right = nprimes - 1;
@@ -463,8 +463,8 @@ private:
 
       assert(m_elem.size() > 0);
 
-      int i = (*m_hashfun)(&h) % m_elem.size();
-      int j = i;
+      auto i = (*m_hashfun)(&h) % m_elem.size();
+      auto j = i;
 
       while(m_elem[i].stat != Elem::FREE)
       {

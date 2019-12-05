@@ -332,13 +332,13 @@ public:
 protected:
 
    //------------------------------------
-   ///@name Protected data
+   //**@name Protected data
    /**
       For storing the basis matrix we keep two arrays: Array #theBaseId
       contains the SPxId%s of the basis vectors, and #matrix the pointers to
       the vectors themselfes. Method #loadMatrixVecs() serves for loading
       #matrix according to the SPxId%s stored in #theBaseId. This method must
-      be called whenever the vector pointers may have
+      be called whenever the VectorBase<R> pointers may have
       changed due to manipulations of the LP.
    */
    ///@{
@@ -347,7 +347,7 @@ protected:
    /// SPxId%s of basic vectors.
    DataArray < SPxId > theBaseId;
    /// pointers to the vectors of the basis matrix.
-   DataArray < const SVector* > matrix;
+   DataArray < const SVectorBase<R>* > matrix;
    /// \c true iff the pointers in \ref soplex::SPxBasisBase<R>::matrix "matrix" are set up correctly.
    bool matrixIsSetup;
 
@@ -355,7 +355,7 @@ protected:
       The factorization of the matrix is stored in #factor if #factorized != 0.
       Otherwise #factor is undefined.
    */
-   SLinSolver* factor;
+   SLinSolver<R>* factor;
    /// \c true iff \ref soplex::SPxBasisBase<R>::factor "factor" = \ref soplex::SPxBasisBase<R>::matrix "matrix" \f$^{-1}\f$.
    bool factorized;
 
@@ -373,16 +373,16 @@ protected:
        #nonzeroFactor times the number of nonzeros in B, the
        basis matrix is refactorized.
    */
-   Real   nonzeroFactor;
+   R   nonzeroFactor;
 
    /// allowed increase in relative fill before refactorization
    /** When the real relative fill is bigger than fillFactor times lastFill
     *  the Basis will be refactorized.
     */
-   Real   fillFactor;
+   R   fillFactor;
 
    /// allowed total increase in memory consumption before refactorization
-   Real   memFactor;
+   R   memFactor;
 
    /* Rank-1-updates to the basis may be performed via method #change(). In
       this case, the factorization is updated, and the following members are
@@ -395,7 +395,7 @@ protected:
    int    totalUpdateCount; ///< number of updates
    int    nzCount;       ///< number of nonzeros in basis matrix
    int    lastMem;       ///< memory needed after last fresh factorization
-   Real   lastFill;      ///< fill ratio that occured during last factorization
+   R   lastFill;      ///< fill ratio that occured during last factorization
    int    lastNzCount;   ///< number of nonzeros in basis matrix after last fresh factorization
 
    Timer* theTime;  ///< time spent in updates
@@ -404,13 +404,13 @@ protected:
    SPxId  lastin;        ///< lastEntered(): variable entered the base last
    SPxId  lastout;       ///< lastLeft(): variable left the base last
    int    lastidx;       ///< lastIndex(): basis index where last update was done
-   Real   minStab;       ///< minimum stability
+   R   minStab;       ///< minimum stability
    ///@}
 
 private:
 
    //------------------------------------
-   ///@name Private data
+   //**@name Private data */
    ///@{
    SPxStatus thestatus;      ///< current status of the basis.
    Desc      thedesc;        ///< the basis' Descriptor
@@ -422,7 +422,7 @@ private:
 public:
 
    //------------------------------------------------
-   ///@name Status and Descriptor related Methods
+   /**@name Status and Descriptor related Methods */
    ///@{
    /// returns current SPxStatus.
    SPxStatus status() const
@@ -501,7 +501,7 @@ public:
 
 
    //-----------------------------------
-   ///@name Inquiry Methods
+   /**@name Inquiry Methods */
    ///@{
    ///
    inline SPxId& baseId(int i)
@@ -515,13 +515,13 @@ public:
    }
 
    /// returns the \p i'th basic vector.
-   const SVector& baseVec(int i) const
+   const SVectorBase<R>& baseVec(int i) const
    {
       assert(matrixIsSetup);
       return *matrix[i];
    }
 
-   /// returns SPxId of last vector included to the basis.
+   /// returns SPxId of last VectorBase<R> included to the basis.
    inline SPxId lastEntered() const
    {
       return lastin;
@@ -571,7 +571,7 @@ public:
    ///@}
 
    //-----------------------------------
-   ///@name Linear Algebra
+   /**@name Linear Algebra */
    ///@{
    /// Basis-vector product.
    /** Depending on the representation, for an SPxBasisBase B,
@@ -582,10 +582,10 @@ public:
        Both can be seen uniformly as multiplying the basis matrix \p B with
        a vector \p x aligned the same way as the \em vectors of \p B.
    */
-   Vector& multBaseWith(Vector& x) const;
+   VectorBase<R>& multBaseWith(VectorBase<R>& x) const;
 
    /// Basis-vector product
-   void multBaseWith(SSVector& x, SSVector& result) const;
+   void multBaseWith(SSVectorBase<R>& x, SSVectorBase<R>& result) const;
 
    /// Vector-basis product.
    /** Depending on the representation, for a #SPxBasisBase B,
@@ -596,25 +596,25 @@ public:
        Both can be seen uniformly as multiplying the basis matrix \p B with
        a vector \p x aligned the same way as the \em covectors of \p B.
    */
-   Vector& multWithBase(Vector& x) const;
+   VectorBase<R>& multWithBase(VectorBase<R>& x) const;
 
-   /// Vector-basis product
-   void multWithBase(SSVector& x, SSVector& result) const;
+   /// VectorBase<R>-basis product
+   void multWithBase(SSVectorBase<R>& x, SSVectorBase<R>& result) const;
 
    /* compute an estimated condition number for the current basis matrix
     * by computing estimates of the norms of B and B^-1 using the power method.
     * maxiters and tolerance control the accuracy of the estimate.
     */
-   Real condition(int maxiters = 10, Real tolerance = 1e-6);
+   R condition(int maxiters = 10, R tolerance = 1e-6);
 
    /* wrapper to compute an estimate of the condition number of the current basis matrix */
-   Real getEstimatedCondition()
+   R getEstimatedCondition()
    {
       return condition(20, 1e-6);
    }
 
    /* wrapper to compute the exact condition number of the current basis matrix */
-   Real getExactCondition()
+   R getExactCondition()
    {
       return condition(1000, 1e-9);
    }
@@ -624,15 +624,15 @@ public:
      * type = 1: trace of U (sum of diagonal elements)
     *  type = 2: determinant (product of diagonal elements)
      */
-   Real getMatrixMetric(int type = 0);
+   R getMatrixMetric(int type = 0);
 
    /// returns the stability of the basis matrix.
-   Real stability() const
+   R stability() const
    {
       return factor->stability();
    }
    ///
-   void solve(Vector& x, const Vector& rhs)
+   void solve(VectorBase<R>& x, const VectorBase<R>& rhs)
    {
       if(rhs.dim() == 0)
       {
@@ -646,7 +646,7 @@ public:
       factor->solveRight(x, rhs);
    }
    ///
-   void solve(SSVector& x, const SVector& rhs)
+   void solve(SSVectorBase<R>& x, const SVectorBase<R>& rhs)
    {
       if(rhs.size() == 0)
       {
@@ -669,7 +669,7 @@ public:
        matrix \p B and a right handside vector \p x aligned the same way as
        the \em vectors of \p B.
    */
-   void solve4update(SSVector& x, const SVector& rhs)
+   void solve4update(SSVectorBase<R>& x, const SVectorBase<R>& rhs)
    {
       if(rhs.size() == 0)
       {
@@ -683,7 +683,8 @@ public:
       factor->solveRight4update(x, rhs);
    }
    /// solves two systems in one call.
-   void solve4update(SSVector& x, Vector& y, const SVector& rhsx, SSVector& rhsy)
+   void solve4update(SSVectorBase<R>& x, VectorBase<R>& y, const SVectorBase<R>& rhsx,
+                     SSVectorBase<R>& rhsy)
    {
       if(!factorized)
          SPxBasisBase<R>::factorize();
@@ -691,7 +692,8 @@ public:
       factor->solve2right4update(x, y, rhsx, rhsy);
    }
    /// solves two systems in one call using only sparse data structures
-   void solve4update(SSVector& x, SSVector& y, const SVector& rhsx, SSVector& rhsy)
+   void solve4update(SSVectorBase<R>& x, SSVectorBase<R>& y, const SVectorBase<R>& rhsx,
+                     SSVectorBase<R>& rhsy)
    {
       if(!factorized)
          SPxBasisBase<R>::factorize();
@@ -699,8 +701,8 @@ public:
       factor->solve2right4update(x, y, rhsx, rhsy);
    }
    /// solves three systems in one call.
-   void solve4update(SSVector& x, Vector& y, Vector& y2,
-                     const SVector& rhsx, SSVector& rhsy, SSVector& rhsy2)
+   void solve4update(SSVectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& y2,
+                     const SVectorBase<R>& rhsx, SSVectorBase<R>& rhsy, SSVectorBase<R>& rhsy2)
    {
       if(!factorized)
          SPxBasisBase<R>::factorize();
@@ -710,8 +712,8 @@ public:
       factor->solve3right4update(x, y, y2, rhsx, rhsy, rhsy2);
    }
    /// solves three systems in one call using only sparse data structures
-   void solve4update(SSVector& x, SSVector& y, SSVector& y2,
-                     const SVector& rhsx, SSVector& rhsy, SSVector& rhsy2)
+   void solve4update(SSVectorBase<R>& x, SSVectorBase<R>& y, SSVectorBase<R>& y2,
+                     const SVectorBase<R>& rhsx, SSVectorBase<R>& rhsy, SSVectorBase<R>& rhsy2)
    {
       if(!factorized)
          SPxBasisBase<R>::factorize();
@@ -730,7 +732,7 @@ public:
        matrix \p B and a right handside vector \p x aligned the same way as
        the \em covectors of \p B.
    */
-   void coSolve(Vector& x, const Vector& rhs)
+   void coSolve(VectorBase<R>& x, const VectorBase<R>& rhs)
    {
       if(rhs.dim() == 0)
       {
@@ -744,7 +746,7 @@ public:
       factor->solveLeft(x, rhs);
    }
    /// Sparse version of coSolve
-   void coSolve(SSVector& x, const SVector& rhs)
+   void coSolve(SSVectorBase<R>& x, const SVectorBase<R>& rhs)
    {
       if(rhs.size() == 0)
       {
@@ -758,7 +760,8 @@ public:
       factor->solveLeft(x, rhs);
    }
    /// solves two systems in one call.
-   void coSolve(SSVector& x, Vector& y, const SVector& rhsx, SSVector& rhsy)
+   void coSolve(SSVectorBase<R>& x, VectorBase<R>& y, const SVectorBase<R>& rhsx,
+                SSVectorBase<R>& rhsy)
    {
       if(!factorized)
          SPxBasisBase<R>::factorize();
@@ -766,7 +769,8 @@ public:
       factor->solveLeft(x, y, rhsx, rhsy);
    }
    /// Sparse version of solving two systems in one call.
-   void coSolve(SSVector& x, SSVector& y, const SVector& rhsx, SSVector& rhsy)
+   void coSolve(SSVectorBase<R>& x, SSVectorBase<R>& y, const SVectorBase<R>& rhsx,
+                SSVectorBase<R>& rhsy)
    {
       if(!factorized)
          SPxBasisBase<R>::factorize();
@@ -774,7 +778,8 @@ public:
       factor->solveLeft(x, y, rhsx, rhsy);
    }
    /// solves three systems in one call. May be improved by using just one pass through the basis.
-   void coSolve(SSVector& x, Vector& y, Vector& z, const SVector& rhsx, SSVector& rhsy, SSVector& rhsz)
+   void coSolve(SSVectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& z, const SVectorBase<R>& rhsx,
+                SSVectorBase<R>& rhsy, SSVectorBase<R>& rhsz)
    {
       if(!factorized)
          SPxBasisBase<R>::factorize();
@@ -782,8 +787,8 @@ public:
       factor->solveLeft(x, y, z, rhsx, rhsy, rhsz);
    }
    /// Sparse version of solving three systems in one call.
-   void coSolve(SSVector& x, SSVector& y, SSVector& z, const SVector& rhsx, SSVector& rhsy,
-                SSVector& rhsz)
+   void coSolve(SSVectorBase<R>& x, SSVectorBase<R>& y, SSVectorBase<R>& z, const SVectorBase<R>& rhsx,
+                SSVectorBase<R>& rhsy, SSVectorBase<R>& rhsz)
    {
       if(!factorized)
          SPxBasisBase<R>::factorize();
@@ -794,8 +799,9 @@ public:
 
 
    //------------------------------------
-   ///@name Modification notification.
-   /// These methods must be called after the loaded LP has been modified.
+   /**@name Modification notification.
+      These methods must be called after the loaded LP has been modified.
+   */
    ///@{
    /// inform SPxBasisBase, that \p n new rows had been added.
    void addedRows(int n);
@@ -819,7 +825,7 @@ public:
 
 
    //--------------------------------
-   ///@name Miscellaneous
+   /**@name Miscellaneous */
    ///@{
    /// performs basis update.
    /** Changes the \p i 'th vector of the basis with the vector associated to
@@ -848,7 +854,7 @@ public:
        SLinSolver implementation class.
    */
    virtual void change(int i, SPxId& id,
-                       const SVector* enterVec, const SSVector* eta = 0);
+                       const SVectorBase<R>* enterVec, const SSVectorBase<R>* eta = 0);
 
    /** Load basis from \p in in MPS format. If \p rowNames and \p colNames
     *  are \c NULL, default names are used for the constraints and variables.
@@ -883,7 +889,7 @@ public:
    /// sets up linear solver to use.
    /** If destroy is true, solver will be freed inside this object, e.g. in the destructor.
     */
-   virtual void loadBasisSolver(SLinSolver* solver, const bool destroy = false);
+   virtual void loadBasisSolver(SLinSolver<R>* solver, const bool destroy = false);
 
    /// loads the LP \p lp to the basis.
    /** This involves resetting all counters to 0 and setting up a regular
@@ -949,7 +955,7 @@ public:
    ///@}
 
    //--------------------------------------
-   ///@name Constructors / Destructors
+   /**@name Constructors / Destructors */
    ///@{
    /// default constructor.
    SPxBasisBase<R>(Timer::TYPE ttype = Timer::USER_TIME);
@@ -965,7 +971,7 @@ public:
 protected:
 
    //--------------------------------------
-   ///@name Protected helpers
+   /**@name Protected helpers */
    ///@{
    /// loads \ref soplex::SPxBasisBase<R>::matrix "matrix" according to the SPxId%s stored in \ref soplex::SPxBasisBase<R>::theBaseId "theBaseId".
    /** This method must  be called whenever there is a chance, that the vector
@@ -1005,6 +1011,10 @@ std::ostream& operator<<(std::ostream& os,
 typedef SPxBasisBase<Real> SPxBasis;
 
 } // namespace soplex
+
+// General templated definitions
+#include "spxbasis.hpp"
+#include "spxdesc.hpp"
 
 /* reset the SOPLEX_DEBUG flag to its original value */
 #undef SOPLEX_DEBUG

@@ -246,7 +246,7 @@ bool StatusExceptionCheck::noPricerCheck()
    SPxSolver* solver = new SPxSolver();
    NameSet rownames, colnames;
    const char* filename  = "../check/LP/netlib/adlittle.mps.gz";
-   SLUFactor slu;
+   SLUFactor<Real> slu;
    solver->readFile(filename, &rownames, &colnames);
    solver->setBasisSolver(&slu);
    try{
@@ -275,7 +275,7 @@ bool StatusExceptionCheck::noRatioTesterCheck()
    SPxSolver* solver = new SPxSolver();
    NameSet rownames, colnames;
    const char* filename  = "../check/LP/netlib/adlittle.mps.gz";
-   SLUFactor slu;
+   SLUFactor<Real> slu;
    SPxSteepPR pricer;
    solver->readFile(filename, &rownames, &colnames);
    solver->setBasisSolver(&slu);
@@ -306,7 +306,7 @@ bool StatusExceptionCheck::notInitialized()
    SPxSolver* solver = new SPxSolver();
    NameSet rownames, colnames;
    const char* filename  = "../check/LP/netlib/adlittle.mps.gz";
-   SLUFactor slu;
+   SLUFactor<Real> slu;
    SPxSteepPR pricer;
    SPxDefaultRT tester;
    Vector* v;

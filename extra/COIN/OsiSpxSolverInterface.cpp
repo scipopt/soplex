@@ -553,7 +553,7 @@ const double * OsiSpxSolverInterface::getObjCoefficients() const
 {
   if( obj_ == NULL )
     {
-      obj_ = new soplex::DVector( getNumCols() );
+      obj_ = new soplex::Vector( getNumCols() );
       spxsolver_.getObj( *obj_ );
     }
   return obj_->get_const_ptr();
@@ -683,7 +683,7 @@ const double * OsiSpxSolverInterface::getColSolution() const
       int ncols = getNumCols();
       if( ncols > 0 )
 	{
-	  colsol_ = new soplex::DVector( ncols );
+	  colsol_ = new soplex::Vector( ncols );
 	  if( isProvenOptimal() )
 	    spxsolver_.getPrimalSol( *colsol_ );
 	  else
@@ -702,7 +702,7 @@ const double * OsiSpxSolverInterface::getRowPrice() const
       int nrows = getNumRows();
       if( nrows > 0 )
 	{
-	  rowsol_ = new soplex::DVector( nrows );
+	  rowsol_ = new soplex::Vector( nrows );
 	  if( isProvenOptimal() )
 	    spxsolver_.getDualSol( *rowsol_ );
 	  else
@@ -721,7 +721,7 @@ const double * OsiSpxSolverInterface::getReducedCost() const
       int ncols = getNumCols();
       if( ncols > 0 )
 	{
-	  redcost_ = new soplex::DVector( ncols );
+	  redcost_ = new soplex::Vector( ncols );
 	  if( isProvenOptimal() )
 	    spxsolver_.getRdCost( *redcost_ );
 	  else
@@ -740,7 +740,7 @@ const double * OsiSpxSolverInterface::getRowActivity() const
       int nrows = getNumRows();
       if( nrows > 0 )
 	{
-	  rowact_ = new soplex::DVector( nrows );
+	  rowact_ = new soplex::Vector( nrows );
 	  if( isProvenOptimal() )
 	    spxsolver_.getSlacks( *rowact_ );
 	  else
@@ -903,7 +903,7 @@ void OsiSpxSolverInterface::setColSolution(const double * cs)
 
   if( ncols > 0 && cs != NULL )
     {
-      colsol_ = new soplex::DVector( ncols );
+      colsol_ = new soplex::Vector( ncols );
       for( col = 0; col < ncols; ++col )
 	(*colsol_)[col] = cs[col];
     }
@@ -923,7 +923,7 @@ void OsiSpxSolverInterface::setRowPrice(const double * rs)
 
   if( nrows > 0 && rs != NULL )
     {
-      rowsol_ = new soplex::DVector( nrows );
+      rowsol_ = new soplex::Vector( nrows );
       for( row = 0; row < nrows; ++row )
 	(*rowsol_)[row] = rs[row];
     }

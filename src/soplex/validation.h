@@ -37,7 +37,7 @@ public:
    std::string          validatesolution;
 
    /// tolerance used for validation
-   double         validatetolerance;
+   R         validatetolerance;
 
    /// default constructor
    Validation()
@@ -63,5 +63,8 @@ public:
 };
 
 } /* namespace soplex */
+
+// For general templated functions
+#include "validation.hpp"
 
 #endif /* SRC_VALIDATION_H_ */

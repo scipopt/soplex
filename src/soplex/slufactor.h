@@ -23,7 +23,6 @@
 
 #include "soplex/spxdefines.h"
 #include "soplex/timerfactory.h"
-#include "soplex/dvector.h"
 #include "soplex/slinsolver.h"
 #include "soplex/clufactor.h"
 
@@ -38,21 +37,22 @@ namespace soplex
  * This class implements a SLinSolver interface by using the sparse LU
  * factorization implemented in CLUFactor.
  */
-class SLUFactor : public SLinSolver, protected CLUFactor
+template <class R>
+class SLUFactor : public SLinSolver<R>, protected CLUFactor<R>
 {
 public:
 
    //--------------------------------
    /**@name Types */
    ///@{
-   /// Specifies how to perform \ref soplex::SLUFactor::change "change" method.
+   /// Specifies how to perform \ref soplex::SLUFactor<R>::change "change" method.
    enum UpdateType
    {
       ETA = 0,       ///<
       FOREST_TOMLIN  ///<
    };
    /// for convenience
-   typedef SLinSolver::Status Status;
+   using Status = typename SLinSolver<R>::Status;
    ///@}
 
 private:
@@ -60,8 +60,8 @@ private:
    //--------------------------------
    /**@name Private data */
    ///@{
-   DVector    vec;           ///< Temporary vector
-   SSVector   ssvec;         ///< Temporary semi-sparse vector
+   VectorBase<R>    vec;           ///< Temporary VectorBase<R>
+   SSVectorBase<R>    ssvec;         ///< Temporary semi-sparse VectorBase<R>
    ///@}
 
 protected:
@@ -70,22 +70,22 @@ protected:
    /**@name Protected data */
    ///@{
    bool       usetup;        ///< TRUE iff update vector has been setup
-   UpdateType uptype;        ///< the current \ref soplex::SLUFactor::UpdateType "UpdateType".
-   SSVector   eta;           ///<
-   SSVector
-   forest;        ///< ? Update vector set up by solveRight4update() and solve2right4update()
-   Real       lastThreshold; ///< pivoting threshold of last factorization
+   UpdateType uptype;        ///< the current \ref soplex::SLUFactor<R>::UpdateType "UpdateType".
+   SSVectorBase<R>    eta;           ///<
+   SSVectorBase<R>
+   forest;        ///< ? Update VectorBase<R> set up by solveRight4update() and solve2right4update()
+   R       lastThreshold; ///< pivoting threshold of last factorization
    ///@}
 
    //--------------------------------
    /**@name Control Parameters */
    ///@{
    /// minimum threshold to use.
-   Real minThreshold;
+   R minThreshold;
    /// minimum stability to achieve by setting threshold.
-   Real minStability;
+   R minStability;
    /// |x| < epsililon is considered to be 0.
-   Real epsilon;
+   R epsilon;
    /// Time spent in solves
    Timer* solveTime;
    Timer::TYPE timerType;
@@ -101,7 +101,7 @@ protected:
    ///
    void freeAll();
    ///
-   void changeEta(int idx, SSVector& eta);
+   void changeEta(int idx, SSVectorBase<R>& eta);
    ///@}
 
 
@@ -126,7 +126,7 @@ public:
    }
 
    /// sets minimum Markowitz threshold.
-   void setMarkowitz(Real m)
+   void setMarkowitz(R m)
    {
       if(m < 0.0001)
          m = 0.0001;
@@ -139,7 +139,7 @@ public:
    }
 
    /// returns Markowitz threshold.
-   Real markowitz()
+   R markowitz()
    {
       return lastThreshold;
    }
@@ -156,35 +156,35 @@ public:
    ///
    int dim() const
    {
-      return thedim;
+      return this->thedim;
    }
    ///
    int memory() const
    {
-      return nzCnt + l.start[l.firstUnused];
+      return this->nzCnt + this->l.start[this->l.firstUnused];
    }
    ///
    const char* getName() const
    {
-      return (uptype == SLUFactor::ETA) ? "SLU-Eta" : "SLU-Forest-Tomlin";
+      return (uptype == SLUFactor<R>::ETA) ? "SLU-Eta" : "SLU-Forest-Tomlin";
    }
    ///
    Status status() const
    {
-      return Status(stat);
+      return Status(this->stat);
    }
    ///
-   Real stability() const;
+   R stability() const;
    /** return one of several matrix metrics based on the diagonal of U
     * 0: condition number estimate by ratio of min/max
     * 1: trace (sum of diagonal elements)
     * 2: determinant (product of diagonal elements)
     */
-   Real matrixMetric(int type = 0) const;
+   R matrixMetric(int type = 0) const;
    ///
    std::string statistics() const;
    ///
-   Status load(const SVector* vec[], int dim);
+   Status load(const SVectorBase<R>* vec[], int dim);
    ///@}
 
 public:
@@ -193,68 +193,73 @@ public:
    /**@name Solve */
    ///@{
    /// Solves \f$Ax=b\f$.
-   void solveRight(Vector& x, const Vector& b);
-   void solveRight(SSVector& x, const SSVector& b)
+   void solveRight(VectorBase<R>& x, const VectorBase<R>& b);
+   void solveRight(SSVectorBase<R>& x, const SSVectorBase<R>& b)
    {
       x.unSetup();
-      solveRight((Vector&) x, (const Vector&) b);
+      solveRight((VectorBase<R>&) x, (const VectorBase<R>&) b);
    }
    /// Solves \f$Ax=b\f$.
-   void solveRight(SSVector& x, const SVector& b);
+   void solveRight(SSVectorBase<R>& x, const SVectorBase<R>& b);
    /// Solves \f$Ax=b\f$.
-   void solveRight4update(SSVector& x, const SVector& b);
+   void solveRight4update(SSVectorBase<R>& x, const SVectorBase<R>& b);
    /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.
-   void solve2right4update(SSVector& x, Vector& y, const SVector& b, SSVector& d);
+   void solve2right4update(SSVectorBase<R>& x, VectorBase<R>& y, const SVectorBase<R>& b,
+                           SSVectorBase<R>& d);
    /// Sparse version of solving two systems of equations
-   void solve2right4update(SSVector& x, SSVector& y, const SVector& b, SSVector& d);
+   void solve2right4update(SSVectorBase<R>& x, SSVectorBase<R>& y, const SVectorBase<R>& b,
+                           SSVectorBase<R>& d);
    /// Solves \f$Ax=b\f$, \f$Ay=d\f$ and \f$Az=e\f$.
-   void solve3right4update(SSVector& x, Vector& y, Vector& z,
-                           const SVector& b, SSVector& d, SSVector& e);
+   void solve3right4update(SSVectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& z,
+                           const SVectorBase<R>& b, SSVectorBase<R>& d, SSVectorBase<R>& e);
    /// sparse version of solving three systems of equations
-   void solve3right4update(SSVector& x, SSVector& y, SSVector& z,
-                           const SVector& b, SSVector& d, SSVector& e);
+   void solve3right4update(SSVectorBase<R>& x, SSVectorBase<R>& y, SSVectorBase<R>& z,
+                           const SVectorBase<R>& b, SSVectorBase<R>& d, SSVectorBase<R>& e);
    /// sparse version of solving one system of equations with transposed basis matrix
-   void solveLeft(Vector& x, const Vector& b);
-   void solveLeft(SSVector& x, const SSVector& b)
+   void solveLeft(VectorBase<R>& x, const VectorBase<R>& b);
+   void solveLeft(SSVectorBase<R>& x, const SSVectorBase<R>& b)
    {
       x.unSetup();
-      solveLeft((Vector&) x, (const Vector&) b);
+      solveLeft((VectorBase<R>&) x, (const VectorBase<R>&) b);
    }
    /// Solves \f$Ax=b\f$.
-   void solveLeft(SSVector& x, const SVector& b);
+   void solveLeft(SSVectorBase<R>& x, const SVectorBase<R>& b);
    /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.
-   void solveLeft(SSVector& x, Vector& y, const SVector& b, SSVector& d);
+   void solveLeft(SSVectorBase<R>& x, VectorBase<R>& y, const SVectorBase<R>& b, SSVectorBase<R>& d);
    /// sparse version of solving two systems of equations with transposed basis matrix
-   void solveLeft(SSVector& x, SSVector& two, const SVector& b, SSVector& rhs2);
+   void solveLeft(SSVectorBase<R>& x, SSVectorBase<R>& two, const SVectorBase<R>& b,
+                  SSVectorBase<R>& rhs2);
    /// Solves \f$Ax=b\f$, \f$Ay=d\f$ and \f$Az=e\f$.
-   void solveLeft(SSVector& x, Vector& y, Vector& z,
-                  const SVector& b, SSVector& d, SSVector& e);
+   void solveLeft(SSVectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& z,
+                  const SVectorBase<R>& b, SSVectorBase<R>& d, SSVectorBase<R>& e);
    /// sparse version of solving three systems of equations with transposed basis matrix
-   void solveLeft(SSVector& x, SSVector& y, SSVector& z,
-                  const SVector& b, SSVector& d, SSVector& e);
+   void solveLeft(SSVectorBase<R>& x, SSVectorBase<R>& y, SSVectorBase<R>& z,
+                  const SVectorBase<R>& b, SSVectorBase<R>& d, SSVectorBase<R>& e);
    ///
-   Status change(int idx, const SVector& subst, const SSVector* eta = 0);
+   Status change(int idx, const SVectorBase<R>& subst, const SSVectorBase<R>* eta = 0);
    ///@}
 
    //--------------------------------
    /**@name Miscellaneous */
    ///@{
    /// time spent in factorizations
+   // @todo fix the return type from of the type form Real to a cpp time (Refactoring) TODO
    Real getFactorTime() const
    {
-      return factorTime->time();
+      return this->factorTime->time();
    }
    /// reset FactorTime
    void resetFactorTime()
    {
-      factorTime->reset();
+      this->factorTime->reset();
    }
    /// number of factorizations performed
    int getFactorCount() const
    {
-      return factorCount;
+      return this->factorCount;
    }
    /// time spent in solves
+   // @todo fix the return type of time to a cpp time type TODO
    Real getSolveTime() const
    {
       return solveTime->time();
@@ -272,15 +277,15 @@ public:
    /// reset timers and counters
    void resetCounters()
    {
-      factorTime->reset();
+      this->factorTime->reset();
       solveTime->reset();
-      factorCount = 0;
+      this->factorCount = 0;
       solveCount = 0;
    }
    void changeTimer(const Timer::TYPE ttype)
    {
       solveTime = TimerFactory::switchTimer(solveTime, ttype);
-      factorTime = TimerFactory::switchTimer(factorTime, ttype);
+      this->factorTime = TimerFactory::switchTimer(this->factorTime, ttype);
       timerType = ttype;
    }
    /// prints the LU factorization to stdout.
@@ -294,17 +299,17 @@ public:
    /**@name Constructors / Destructors */
    ///@{
    /// default constructor.
-   SLUFactor();
+   SLUFactor<R>();
    /// assignment operator.
-   SLUFactor& operator=(const SLUFactor& old);
+   SLUFactor<R>& operator=(const SLUFactor<R>& old);
    /// copy constructor.
-   SLUFactor(const SLUFactor& old);
+   SLUFactor<R>(const SLUFactor<R>& old);
    /// destructor.
-   virtual ~SLUFactor();
+   virtual ~SLUFactor<R>();
    /// clone function for polymorphism
-   inline virtual SLinSolver* clone() const
+   inline virtual SLinSolver<R>* clone() const
    {
-      return new SLUFactor(*this);
+      return new SLUFactor<R>(*this);
    }
    ///@}
 
@@ -314,9 +319,11 @@ private:
    /**@name Private helpers */
    ///@{
    /// used to implement the assignment operator
-   void assign(const SLUFactor& old);
+   void assign(const SLUFactor<R>& old);
    ///@}
 };
 
 } // namespace soplex
+
+#include "slufactor.hpp"
 #endif // _SLUFACTOR_H_

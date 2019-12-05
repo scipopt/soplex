@@ -24,6 +24,7 @@
 #include "soplex/spxscaler.h"
 #include "soplex/spxlp.h"
 
+
 namespace soplex
 {
 
@@ -33,7 +34,8 @@ namespace soplex
    This SPxScaler implementation performs least squares scaling as suggested by Curtis and Reid in:
    On the Automatic Scaling of Matrices for Gaussian Elimination (1972).
 */
-class SPxLeastSqSC : public SPxScaler
+template <class R>
+class SPxLeastSqSC : public SPxScaler<R>
 {
 public:
 
@@ -50,7 +52,7 @@ public:
    virtual ~SPxLeastSqSC()
    {}
    /// clone function for polymorphism
-   inline virtual SPxScaler* clone() const
+   inline virtual SPxScaler<R>* clone() const
    {
       return new SPxLeastSqSC(*this);
    }
@@ -59,8 +61,8 @@ public:
    //-------------------------------------
    /**@name Access / modification */
    ///@{
-   /// set real param (conjugate gradient accuracy)
-   virtual void setRealParam(Real param, const char* name);
+   /// set Real param (conjugate gradient accuracy)
+   virtual void setRealParam(R param, const char* name);
    /// set int param (maximal conjugate gradient rounds)
    virtual void setIntParam(int param, const char* name);
    ///@}
@@ -69,13 +71,18 @@ public:
    /**@name Scaling */
    ///@{
    /// Scale the loaded SPxLP.
-   virtual void scale(SPxLP& lp, bool persistent = true);
+   virtual void scale(SPxLPBase<R>& lp, bool persistent = true);
 
 
 protected:
-   Real acrcydivisor = 1000.0;
+   R acrcydivisor = 1000.0;
    int maxrounds = 20;
 
 };
 } // namespace soplex
+
+// For the general templated files
+#include "spxleastsqsc.hpp"
+
 #endif // _SPXLEASTSQSC_H_
+

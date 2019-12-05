@@ -24,6 +24,10 @@
 #include <string.h>
 #include <math.h>
 #include <iostream>
+#include "vector"
+#include "algorithm"
+
+#include "soplex/spxdefines.h"
 #include "soplex/stablesum.h"
 
 namespace soplex
@@ -74,18 +78,21 @@ template < class R > class SSVectorBase;
 template < class R >
 class VectorBase
 {
+
+   // VectorBase is a friend of VectorBase of different template type. This is so
+   // that we can conversions.
+   template <typename S>
+   friend class VectorBase;
+
+
 protected:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Data */
    ///@{
 
-   /// Dimension of vector.
-   int dimen;
-
    /// Values of vector.
-   /** The memory block pointed to by val must at least have size dimen * sizeof(R). */
-   R* val;
+   std::vector<R> val;
 
    ///@}
 
@@ -99,26 +106,56 @@ public:
    /** There is no default constructor since the storage for a VectorBase must be provided externally.  Storage must be
     *  passed as a memory block val at construction. It must be large enough to fit at least dimen values.
     */
-   VectorBase<R>(int p_dimen, R* p_val)
-      : dimen(p_dimen)
-      , val(p_val)
+
+   // Default constructor
+   VectorBase<R>()
    {
-      assert(dimen >= 0);
-      assert(isConsistent());
+      // Default constructor
+      ;
    }
 
+   VectorBase<R>(int dimen, R* p_val)
+   {
+      val.assign(p_val, p_val + dimen);
+   }
+
+   explicit VectorBase<R>(int p_dimen)
+   {
+      val.resize(p_dimen);
+   }
+
+   // Constructing an element (usually involving casting Real to Rational and
+   // vice versa.)
+   template <typename S>
+   VectorBase<R>(const VectorBase<S>& vec)
+   {
+      this->operator=(vec);
+   }
+
+   // The move constructor
+   VectorBase<R>(const VectorBase<R>&& vec)noexcept: val(std::move(vec.val))
+   {
+   }
+
+   VectorBase<R>(const VectorBase<R>& vec): val(vec.val)
+   {
+   }
+
+
    /// Assignment operator.
+   // Supports assignment from a Rational vector to Real and vice versa
    template < class S >
    VectorBase<R>& operator=(const VectorBase<S>& vec)
    {
       if((VectorBase<S>*)this != &vec)
       {
-         assert(dim() == vec.dim());
+         val.clear();
+         val.reserve(vec.dim());
 
-         for(int i = 0; i < dimen; i++)
-            val[i] = vec[i];
-
-         assert(isConsistent());
+         for(auto& v : vec.val)
+         {
+            val.push_back(R(v));
+         }
       }
 
       return *this;
@@ -129,36 +166,40 @@ public:
    {
       if(this != &vec)
       {
-         assert(dim() == vec.dim());
+         val.reserve(vec.dim());
 
-         for(int i = 0; i < dimen; i++)
-            val[i] = vec[i];
-
-         assert(isConsistent());
+         val = vec.val;
       }
 
       return *this;
    }
 
+   /// Move assignment operator
+   VectorBase<R>& operator=(const VectorBase<R>&& vec)
+   {
+      val = std::move(vec.val);
+      return *this;
+   }
+
    /// scale and assign
-   VectorBase<Real>& scaleAssign(int scaleExp, const VectorBase<Real>& vec)
+   VectorBase<R>& scaleAssign(int scaleExp, const VectorBase<R>& vec)
    {
       if(this != &vec)
       {
          assert(dim() == vec.dim());
 
-         for(int i = 0; i < dimen; i++)
+         auto dimen = dim();
+
+         for(decltype(dimen) i = 0 ; i < dimen; i++)
             val[i] = spxLdexp(vec[i], scaleExp);
 
-         assert(isConsistent());
       }
 
       return *this;
    }
 
    /// scale and assign
-   VectorBase<Real>& scaleAssign(const int* scaleExp, const VectorBase<Real>& vec,
-                                 bool negateExp = false)
+   VectorBase<R>& scaleAssign(const int* scaleExp, const VectorBase<R>& vec, bool negateExp = false)
    {
       if(this != &vec)
       {
@@ -166,16 +207,19 @@ public:
 
          if(negateExp)
          {
-            for(int i = 0; i < dimen; i++)
+            auto dimen = dim();
+
+            for(decltype(dimen) i = 0; i < dimen; i++)
                val[i] = spxLdexp(vec[i], -scaleExp[i]);
          }
          else
          {
-            for(int i = 0; i < dimen; i++)
+            auto dimen = dim();
+
+            for(decltype(dimen) i = 0; i < dimen; i++)
                val[i] = spxLdexp(vec[i], scaleExp[i]);
          }
 
-         assert(isConsistent());
       }
 
       return *this;
@@ -216,40 +260,33 @@ public:
    /// Dimension of vector.
    int dim() const
    {
-      return dimen;
+      return int(val.size());
    }
 
    /// Return \p n 'th value by reference.
    R& operator[](int n)
    {
-      assert(n >= 0 && n < dimen);
+      assert(n >= 0 && n < dim());
       return val[n];
    }
 
    /// Return \p n 'th value.
    const R& operator[](int n) const
    {
-      assert(n >= 0 && n < dimen);
+      assert(n >= 0 && n < dim());
       return val[n];
    }
 
    /// Equality operator.
    friend bool operator==(const VectorBase<R>& vec1, const VectorBase<R>& vec2)
    {
-      if(&vec1 == &vec2)
-         return true;
-      else if(vec1.dim() != vec2.dim())
-         return false;
-      else
-      {
-         for(int i = 0; i < vec1.dim(); i++)
-         {
-            if(vec1[i] != vec2[i])
-               return false;
-         }
-      }
+      return (vec1.val == vec2.val);
+   }
 
-      return true;
+   /// Return underlying std::vector.
+   std::vector<R>& vec()
+   {
+      return val;
    }
 
    ///@}
@@ -259,13 +296,11 @@ public:
    ///@{
 
    /// Set vector to 0.
+   // TODO: is this set to zero actually useful? Can't I just do a val.clear()?
    void clear()
    {
-      if(dimen > 0)
-      {
-         for(int i = 0; i < dimen; i++)
-            val[i] = 0;
-      }
+      for(auto& v : val)
+         v = 0;
    }
 
    /// Addition.
@@ -273,9 +308,10 @@ public:
    VectorBase<R>& operator+=(const VectorBase<S>& vec)
    {
       assert(dim() == vec.dim());
-      assert(dim() == dimen);
 
-      for(int i = 0; i < dimen; i++)
+      auto dimen = dim();
+
+      for(decltype(dimen) i = 0; i < dimen; i++)
          val[i] += vec[i];
 
       return *this;
@@ -294,9 +330,10 @@ public:
    VectorBase<R>& operator-=(const VectorBase<S>& vec)
    {
       assert(dim() == vec.dim());
-      assert(dim() == dimen);
 
-      for(int i = 0; i < dimen; i++)
+      auto dimen = dim();
+
+      for(decltype(dimen) i = 0; i < dimen; i++)
          val[i] -= vec[i];
 
       return *this;
@@ -314,9 +351,10 @@ public:
    template < class S >
    VectorBase<R>& operator*=(const S& x)
    {
-      assert(dim() == dimen);
 
-      for(int i = 0; i < dimen; i++)
+      auto dimen = dim();
+
+      for(decltype(dimen) i = 0; i < dimen; i++)
          val[i] *= x;
 
       return *this;
@@ -328,7 +366,9 @@ public:
    {
       assert(x != 0);
 
-      for(int i = 0; i < dim(); i++)
+      auto dimen = dim();
+
+      for(decltype(dimen) i = 0; i < dimen; i++)
          val[i] /= x;
 
       return *this;
@@ -337,11 +377,11 @@ public:
    /// Inner product.
    R operator*(const VectorBase<R>& vec) const
    {
-      assert(vec.dim() == dimen);
-
       StableSum<R> x;
 
-      for(int i = 0; i < dimen; i++)
+      auto dimen = dim();
+
+      for(decltype(dimen) i = 0; i < dimen; i++)
          x += val[i] * vec.val[i];
 
       return x;
@@ -357,17 +397,16 @@ public:
    R maxAbs() const
    {
       assert(dim() > 0);
-      assert(dim() == dimen);
 
-      R maxi = 0.0;
-
-      for(int i = 0; i < dimen; i++)
+      // A helper function for the std::max_element. Because we compare the absolute value.
+      auto absCmpr = [](R a, R b)
       {
-         R x = spxAbs(val[i]);
+         return (spxAbs(a) < spxAbs(b));
+      };
 
-         if(x > maxi)
-            maxi = x;
-      }
+      auto maxReference = std::max_element(val.begin(), val.end(), absCmpr);
+
+      R maxi = spxAbs(*maxReference);
 
       assert(maxi >= 0.0);
 
@@ -378,17 +417,16 @@ public:
    R minAbs() const
    {
       assert(dim() > 0);
-      assert(dim() == dimen);
 
-      R mini = spxAbs(val[0]);
-
-      for(int i = 1; i < dimen; i++)
+      // A helper function for the std::min_element. Because we compare the absolute value.
+      auto absCmpr = [](R a, R b)
       {
-         R x = spxAbs(val[i]);
+         return (spxAbs(a) < spxAbs(b));
+      };
 
-         if(x < mini)
-            mini = x;
-      }
+      auto minReference = std::min_element(val.begin(), val.end(), absCmpr);
+
+      R mini = spxAbs(*minReference);
 
       assert(mini >= 0.0);
 
@@ -396,9 +434,9 @@ public:
    }
 
    /// Floating point approximation of euclidian norm (without any approximation guarantee).
-   Real length() const
+   R length() const
    {
-      return spxSqrt((Real)length2());
+      return spxSqrt(length2());
    }
 
    /// Squared norm.
@@ -411,9 +449,11 @@ public:
    template < class S, class T >
    VectorBase<R>& multAdd(const S& x, const VectorBase<T>& vec)
    {
-      assert(vec.dim() == dimen);
+      assert(vec.dim() == dim());
 
-      for(int i = 0; i < dimen; i++)
+      auto dimen = dim();
+
+      for(decltype(dimen) i = 0; i < dimen; i++)
          val[i] += x * vec.val[i];
 
       return *this;
@@ -445,7 +485,7 @@ public:
     */
    R* get_ptr()
    {
-      return val;
+      return val.data();
    }
 
    /// Conversion to C-style pointer.
@@ -454,93 +494,141 @@ public:
     */
    const R* get_const_ptr() const
    {
-      return val;
+      return val.data();
    }
 
-   /// Consistency check.
-   bool isConsistent() const
+   // Provides access to the iterators of std::vector<R> val
+   decltype(val.begin()) begin() const
    {
-#ifdef ENABLE_CONSISTENCY_CHECKS
-
-      if(dim() > 0 && val == 0)
-         return MSGinconsistent("VectorBase");
-
-#endif
-
-      return true;
+      return val.begin();
    }
+
+   decltype(val.begin()) begin()
+   {
+      return val.begin();
+   }
+
+   // Provides access to the iterators of std::vector<R> val
+   decltype(val.end()) end() const
+   {
+      return val.end();
+   }
+
+   decltype(val.end()) end()
+   {
+      return val.end();
+   }
+
+   // Functions from VectorBase
+
+   // This used to be VectorBase's way of having std::vector's capacity. This
+   // represents the maximum number of elements the std::vector can have without,
+   // needing any more resizing. Bigger than size, mostly.
+   int memSize() const
+   {
+      return int(val.capacity());
+   }
+
+   /// Resets \ref soplex::VectorBase "VectorBase"'s dimension to \p newdim.
+   void reDim(int newdim, const bool setZero = true)
+   {
+      if(setZero && newdim > dim())
+      {
+         // Inserts 0 to the rest of the vectors.
+         //
+         // TODO: Is this important after the change of raw pointers to
+         // std::vector. This is just a waste of operations, I think.
+         val.insert(val.end(), newdim - VectorBase<R>::dim(), 0);
+      }
+      else
+      {
+         val.resize(newdim);
+      }
+
+   }
+
+
+   /// Resets \ref soplex::VectorBase "VectorBase"'s memory size to \p newsize.
+   void reSize(int newsize)
+   {
+      assert(newsize > VectorBase<R>::dim());
+
+      // Problem: This is not a conventional resize for std::vector. This only
+      // updates the capacity, i.e., by pushing elements to the vector after this,
+      // there will not be any (internal) resizes.
+      val.reserve(newsize);
+   }
+
+   // For operations such as vec1 - vec2
+   const VectorBase<R> operator-(const VectorBase<R>& vec) const
+   {
+      assert(vec.dim() == dim());
+      VectorBase<R> res;
+      res.val.reserve(dim());
+
+      auto dimen = dim();
+
+      for(decltype(dimen) i = 0; i < dimen; i++)
+      {
+         res.val.push_back(val[i] - vec[i]);
+      }
+
+      return res;
+   }
+
+   // Addition
+   const VectorBase<R> operator+(const VectorBase<R>& v) const
+   {
+      assert(v.dim() == dim());
+      VectorBase<R> res;
+      res.val.reserve(dim());
+
+      auto dimen = dim();
+
+      for(decltype(dimen) i = 0; i < dimen; i++)
+      {
+         res.val.push_back(val[i] + v[i]);
+      }
+
+      return res;
+   }
+
+   // The negation operator. e.g. -vec1;
+   friend VectorBase<R> operator-(const VectorBase<R>& vec)
+   {
+      VectorBase<R> res;
+
+      res.val.reserve(vec.dim());
+
+      for(auto& v : vec.val)
+      {
+         res.val.push_back(-(v));
+      }
+
+      return res;
+   }
+
 
    ///@}
 
 };
-
-
-
-/// Assignment operator (specialization for Real).
-template <>
-inline
-VectorBase<Real>& VectorBase<Real>::operator=(const VectorBase<Real>& vec)
-{
-   if(this != &vec)
-   {
-      assert(dim() == vec.dim());
-
-      memcpy(val, vec.val, (unsigned int)dimen * sizeof(Real));
-
-      assert(isConsistent());
-   }
-
-   return *this;
-}
-
-
-
-/// Assignment operator (specialization for Real).
-template <>
-template <>
-inline
-VectorBase<Real>& VectorBase<Real>::operator=(const VectorBase<Rational>& vec)
-{
-   if((VectorBase<Rational>*)this != &vec)
-   {
-      assert(dim() == vec.dim());
-
-      for(int i = 0; i < dimen; i++)
-         val[i] = Real(vec[i]);
-
-      assert(isConsistent());
-   }
-
-   return *this;
-}
-
-
-
-/// Set vector to 0 (specialization for Real).
-template<>
-inline
-void VectorBase<Real>::clear()
-{
-   if(dimen > 0)
-      memset(val, 0, (unsigned int)dimen * sizeof(Real));
-}
-
-
 
 /// Inner product.
 template<>
 inline
 Rational VectorBase<Rational>::operator*(const VectorBase<Rational>& vec) const
 {
-   assert(vec.dim() == dimen);
+   assert(vec.dim() == dim());
 
-   if(dimen <= 0 || vec.dim() <= 0)
+   if(dim() <= 0 || vec.dim() <= 0)
       return 0;
 
    Rational x = val[0];
    x *= vec.val[0];
 
-   for(int i = 1; i < dimen && i < vec.dim(); i++)
+   auto dimen = dim();
+
+   for(decltype(dimen) i = 1; i < dimen; i++)
       x.addProduct(val[i], vec.val[i]);
 
    return x;
