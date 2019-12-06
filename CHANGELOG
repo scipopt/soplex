@@ -75,8 +75,7 @@ interface & parameters:
      calls. But this is only guaranteed to work with POD types (Plain Old Data,
      e.g., double, and not boost::number), the new g++ compilers were already
      issuing warnings about this with old SoPlex and the multiprecision vectors
-     were not working. The same is also true for changes for DataArray and
-     changes inside CLUFactor classes.
+     were not working. The same is also true for changes inside CLUFactor classes.
   8. *Removed* `isConsistent()`, which used to check a vector was empty and had no
      memory allocated at the same time. This never happens with the std::vector
      wrapper, hence the removal.

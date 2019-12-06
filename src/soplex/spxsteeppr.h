@@ -70,9 +70,9 @@ private:
    /// working vector
    SSVectorBase<R>  workRhs;
    /// temporary array of precomputed pricing values
-   DataArray<typename SPxPricer<R>::IdxElement> prices;
+   Array<typename SPxPricer<R>::IdxElement> prices;
    /// temporary array of precomputed pricing values
-   DataArray<typename SPxPricer<R>::IdxElement> pricesCo;
+   Array<typename SPxPricer<R>::IdxElement> pricesCo;
    /// array of best pricing candidates
    DIdxSet bestPrices;
    /// array of best pricing candidates

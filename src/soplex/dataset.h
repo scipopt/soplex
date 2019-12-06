@@ -23,6 +23,7 @@
 #include <string.h>
 #include <assert.h>
 
+#include "soplex/array.h"
 #include "soplex/dataarray.h"
 #include "soplex/datakey.h"
 #include "soplex/spxalloc.h"

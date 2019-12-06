@@ -66,7 +66,7 @@ private:
    /**@name Helper data */
    ///@{
    ///
-   DataArray < SPxParMultPr_Tmp > pricSet;
+   Array < SPxParMultPr_Tmp > pricSet;
    ///
    int multiParts;
    ///

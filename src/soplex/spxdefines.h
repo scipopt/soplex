@@ -42,22 +42,14 @@
 
 #include <cstdlib>
 
+#ifdef SOPLEX_WITH_BOOST
 #include "boost/multiprecision/number.hpp"
+#endif
 
 namespace soplex
 {
 // Overloaded EQ function
 bool EQ(int a, int b);
-
-// wrapped frexp function
-template <typename T, boost::multiprecision::expression_template_option eto>
-boost::multiprecision::number<T, eto> spxFrexp(boost::multiprecision::number<T, eto> y, int* exp)
-{
-   using namespace std;
-   using namespace boost::math::tools;
-
-   return frexp(y, exp);
-}
 
 #define SOPLEX_VERSION         410
 #define SOPLEX_SUBVERSION        0
@@ -168,37 +160,6 @@ extern bool msginconsistent(const char* name, const char* file, int line);
  *-----------------------------------------------------------------------------
  */
 
-// Overloaded spxLdexp
-template <typename T, boost::multiprecision::expression_template_option eto>
-boost::multiprecision::number<T> spxLdexp(boost::multiprecision::number<T, eto> x, int exp)
-{
-   return boost::multiprecision::ldexp(x, exp);
-}
-
-// Overloaded function to return the square-root
-template <typename T, boost::multiprecision::expression_template_option ep>
-boost::multiprecision::number<T, ep> spxSqrt(boost::multiprecision::number<T, ep> a)
-{
-   return boost::multiprecision::sqrt(a);
-}
-
-// the nextafter function
-template <typename T, boost::multiprecision::expression_template_option eto>
-boost::multiprecision::number<T, eto> spxNextafter(boost::multiprecision::number<T, eto> x,
-      boost::multiprecision::number<T, eto> y)
-{
-   using namespace std;
-   using namespace boost::math;
-
-   // Turns out that nextafter is not supported in the mpfr library? The mpfr
-   // library does a different function named nextabove. Probably a
-   // replacement? I've made an issue about this.
-   // return nextafter(x,y);
-
-   // @todo Temporarily, I'm returning 0
-   assert(false);
-   return 0;
-}
 
 #ifdef WITH_LONG_DOUBLE
 
@@ -370,13 +331,6 @@ inline Real spxSqrt(Real a)
    return std::sqrt(a);
 }
 
-// Returns the square root
-template <typename T>
-boost::multiprecision::number<T> spxSqrt(boost::multiprecision::number<T> a)
-{
-   return boost::multiprecision::sqrt(a);
-}
-
 
 // returns the next representable value after x in the direction of y
 
@@ -427,27 +381,8 @@ inline Real maxAbs(Real a, Real b)
    return absa > absb ? absa : absb;
 }
 
-/// returns max(|a|,|b|)
-template <typename T, boost::multiprecision::expression_template_option et>
-inline boost::multiprecision::number<T, et> maxAbs(
-   boost::multiprecision::number<T, et> a, boost::multiprecision::number<T, et> b)
-{
-   const auto absa = spxAbs(a);
-   const auto absb = spxAbs(b);
-
-   return absa > absb ? absa : absb;
-}
-
-
 /// returns (a-b) / max(|a|,|b|,1.0)
 inline Real relDiff(Real a, Real b)
-{
-   return (a - b) / (maxAbs(a, b) > 1.0 ? maxAbs(a, b) : 1.0);
-}
-
-template <typename T, boost::multiprecision::expression_template_option et>
-inline boost::multiprecision::number<T, et> relDiff(boost::multiprecision::number<T, et> a,
-      boost::multiprecision::number<T, et> b)
 {
    return (a - b) / (maxAbs(a, b) > 1.0 ? maxAbs(a, b) : 1.0);
 }
@@ -492,6 +427,74 @@ inline int spxSnprintf(
    return n;
 }
 
+#ifdef SOPLEX_WITH_BOOST
+// wrapped frexp function
+template <typename T, boost::multiprecision::expression_template_option eto>
+boost::multiprecision::number<T, eto> spxFrexp(boost::multiprecision::number<T, eto> y, int* exp)
+{
+   using namespace std;
+   using namespace boost::math::tools;
+
+   return frexp(y, exp);
+}
+
+// Overloaded spxLdexp
+template <typename T, boost::multiprecision::expression_template_option eto>
+boost::multiprecision::number<T> spxLdexp(boost::multiprecision::number<T, eto> x, int exp)
+{
+   return boost::multiprecision::ldexp(x, exp);
+}
+
+// Overloaded function to return the square-root
+template <typename T, boost::multiprecision::expression_template_option ep>
+boost::multiprecision::number<T, ep> spxSqrt(boost::multiprecision::number<T, ep> a)
+{
+   return boost::multiprecision::sqrt(a);
+}
+
+// the nextafter function
+template <typename T, boost::multiprecision::expression_template_option eto>
+boost::multiprecision::number<T, eto> spxNextafter(boost::multiprecision::number<T, eto> x,
+      boost::multiprecision::number<T, eto> y)
+{
+   using namespace std;
+   using namespace boost::math;
+
+   // Turns out that nextafter is not supported in the mpfr library? The mpfr
+   // library does a different function named nextabove. Probably a
+   // replacement? I've made an issue about this.
+   // return nextafter(x,y);
+
+   // @todo Temporarily, I'm returning 0
+   assert(false);
+   return 0;
+}
+
+// Returns the square root
+template <typename T>
+boost::multiprecision::number<T> spxSqrt(boost::multiprecision::number<T> a)
+{
+   return boost::multiprecision::sqrt(a);
+}
+
+/// returns max(|a|,|b|)
+template <typename T, boost::multiprecision::expression_template_option et>
+inline boost::multiprecision::number<T, et> maxAbs(
+   boost::multiprecision::number<T, et> a, boost::multiprecision::number<T, et> b)
+{
+   const auto absa = spxAbs(a);
+   const auto absb = spxAbs(b);
+
+   return absa > absb ? absa : absb;
+}
+
+template <typename T, boost::multiprecision::expression_template_option et>
+inline boost::multiprecision::number<T, et> relDiff(boost::multiprecision::number<T, et> a,
+      boost::multiprecision::number<T, et> b)
+{
+   return (a - b) / (maxAbs(a, b) > 1.0 ? maxAbs(a, b) : 1.0);
+}
+#endif
 
 } // namespace soplex
 

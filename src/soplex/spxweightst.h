@@ -64,9 +64,9 @@ private:
    ///
    DataArray < int > forbidden;
    ///
-   DataArray < R >* weight;
+   Array < R >* weight;
    ///
-   DataArray < R >* coWeight;
+   Array < R >* coWeight;
    ///@}
 
    //-----------------------------------
@@ -82,9 +82,9 @@ protected:
    /**@name Protected data */
    ///@{
    /// weight value for LP rows.
-   DataArray < R > rowWeight;
+   Array < R > rowWeight;
    /// weight value for LP columns.
-   DataArray < R > colWeight;
+   Array < R > colWeight;
    /// set variable to rhs?.
    DataArray < bool > rowRight;
    /// set primal variable to upper bound.

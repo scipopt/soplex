@@ -369,13 +369,13 @@ private:
       const int       m_old_i;
       const R      m_lRhs;
       DSVectorBase<R>        m_row;
-      DataArray<R> m_objs;
+      Array<R> m_objs;
       DataArray<bool> m_fixed;
       Array<DSVectorBase<R>> m_cols;
       const bool      m_lhsFixed;
       const bool      m_maxSense;
-      DataArray<R> m_oldLowers;
-      DataArray<R> m_oldUppers;
+      Array<R> m_oldLowers;
+      Array<R> m_oldUppers;
       const R      m_lhs;
       const R      m_rhs;
       const R      m_rowobj;
@@ -383,7 +383,7 @@ private:
    public:
       ///
       ForceConstraintPS(const SPxLPBase<R>& lp, int _i, bool lhsFixed, DataArray<bool>& fixCols,
-                        DataArray<R>& lo, DataArray<R>& up)
+                        Array<R>& lo, Array<R>& up)
          : PostStep("ForceConstraint", lp.nRows(), lp.nCols())
          , m_i(_i)
          , m_old_i(lp.nRows() - 1)
@@ -917,7 +917,7 @@ private:
    public:
       DuplicateRowsPS(const SPxLPBase<R>& lp, int _i,
                       int maxLhsIdx, int minRhsIdx, const DSVectorBase<R>& dupRows,
-                      const DataArray<R> scale, const DataArray<int> perm, const DataArray<bool> isLhsEqualRhs,
+                      const Array<R> scale, const DataArray<int> perm, const DataArray<bool> isLhsEqualRhs,
                       bool isTheLast, bool isFixedRow, bool isFirst = false)
          : PostStep("DuplicateRows", lp.nRows(), lp.nCols())
          , m_i(_i)
@@ -1313,7 +1313,7 @@ private:
    DataArray<typename SPxSolverBase<R>::VarStatus> m_rBasisStat; ///< basis status of rows.
    DataArray<int>                  m_cIdx;       ///< column index VectorBase<R> in original LP.
    DataArray<int>                  m_rIdx;       ///< row index VectorBase<R> in original LP.
-   DataArray<PostStep*>            m_hist;       ///< VectorBase<R> of presolve history.
+   Array<PostStep*>            m_hist;       ///< VectorBase<R> of presolve history.
    Array<DSVectorBase<R>>
                        m_classSetRows; ///< stores parallel classes with non-zero colum entry
    Array<DSVectorBase<R>>

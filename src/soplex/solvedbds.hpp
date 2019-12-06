@@ -761,7 +761,7 @@ void SoPlexBase<R>::_formDecompComplementaryProblem()
    }
 
    int naddedrows = 0;
-   DataArray< SPxRowId > rangedRowIds(numRows());
+   DataArray < SPxRowId > rangedRowIds(numRows());
    _deleteAndUpdateRowsComplementaryProblem(rangedRowIds.get_ptr(), naddedrows);
 
    if(boolParam(
@@ -1247,7 +1247,7 @@ void SoPlexBase<R>::_updateDecompReducedProblem(R objValue, VectorBase<R> dualVe
 
 
    // Identifying the violated rows
-   DataArray<RowViolation> violatedrows;
+   Array<RowViolation> violatedrows;
    int nviolatedrows = 0;
    int* newrowidx = 0;
    int nnewrowidx = 0;
@@ -1519,7 +1519,7 @@ void SoPlexBase<R>::_updateDecompReducedProblemViol(bool allrows)
 // A row is violated in the constraint matrix Ax <= b, if b - A_{i}x < 0
 // To aid the computation, all violations are translated to <= constraints
 template <class R>
-void SoPlexBase<R>::_findViolatedRows(R compObjValue, DataArray<RowViolation>& violatedrows,
+void SoPlexBase<R>::_findViolatedRows(R compObjValue, Array<RowViolation>& violatedrows,
                                       int& nviolatedrows)
 {
    R feastol = realParam(SoPlexBase<R>::FEASTOL);

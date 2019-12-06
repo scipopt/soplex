@@ -103,7 +103,7 @@ private:
    R
    flipPotential;      /**< tracks bound flip history and decides which ratio test to use */
    int                   relax_count;        /**< count rounds of ratio test */
-   DataArray<Breakpoint> breakpoints;        /**< array of breakpoints */
+   Array<Breakpoint> breakpoints;        /**< array of breakpoints */
    SSVectorBase<R>
    updPrimRhs;         /**< right hand side vector of additional system to be solved after the ratio test */
    SSVectorBase<R>

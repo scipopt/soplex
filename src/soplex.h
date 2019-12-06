@@ -1708,7 +1708,7 @@ private:
    DSVectorRational _primalDualDiff;
    DataArray< typename SPxSolverBase<R>::VarStatus > _storedBasisStatusRows;
    DataArray< typename SPxSolverBase<R>::VarStatus > _storedBasisStatusCols;
-   DataArray< UnitVectorRational* > _unitMatrixRational;
+   Array< UnitVectorRational* > _unitMatrixRational;
    bool _storedBasis;
    int _beforeLiftRows;
    int _beforeLiftCols;
@@ -2339,7 +2339,7 @@ private:
    void _updateDecompReducedProblemViol(bool allrows);
 
    /// builds the update rows with those violated in the complmentary problem
-   void _findViolatedRows(R compObjValue, DataArray<RowViolation>& violatedrows, int& nviolatedrows);
+   void _findViolatedRows(R compObjValue, Array<RowViolation>& violatedrows, int& nviolatedrows);
 
    /// update the dual complementary problem with additional columns and rows
    void _updateDecompComplementaryDualProblem(bool origObj);
