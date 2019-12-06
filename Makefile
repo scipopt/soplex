@@ -207,8 +207,9 @@ LIBHEADER	=	soplex/array.h \
 				soplex/validation.h \
 				soplex/vectorbase.h \
 				soplex/vector.h \
-				soplex/wallclocktimer.h \
-				soplex.h
+				soplex/wallclocktimer.h 
+LIBHPPHEADER := $(shell find src/soplex/ -maxdepth 1 -type f -regex ".*\.hpp")
+
 LIBOBJ = soplex/clufactor_rational.o \
 				soplex/didxset.o \
 				soplex/gzstream.o \
@@ -315,7 +316,7 @@ LIBOBJFILES	=	$(addprefix $(LIBOBJDIR)/,$(LIBOBJ))
 BINSRC		=	$(addprefix $(SRCDIR)/,$(BINOBJ:.o=.cpp))
 EXAMPLESRC	=	$(addprefix $(SRCDIR)/,$(EXAMPLEOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
-LIBSRCHEADER	=	$(addprefix $(SRCDIR)/,$(LIBHEADER))
+LIBSRCHEADER	=	$(addprefix $(SRCDIR)/,$(LIBHEADER)) $(LIBHPPHEADER) 
 ALLSRC		=	$(BINSRC) $(EXAMPLESRC) $(LIBSRC) $(LIBSRCHEADER)
 
 #-----------------------------------------------------------------------------

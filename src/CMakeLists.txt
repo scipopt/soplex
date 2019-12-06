@@ -110,7 +110,13 @@ set(headers
     soplex/vectorbase.h
     soplex/vector.h
     soplex/dvector.h
-    soplex/wallclocktimer.h)
+    soplex/wallclocktimer.h
+    )
+
+file(GLOB headers
+    ${headers}
+    soplex/*.hpp
+)
 
     # create soplex library with pic
     add_library(libsoplex-pic STATIC ${sources})
@@ -153,7 +159,7 @@ set_target_properties(libsoplex-pic PROPERTIES
 
 # install the header files of soplex
 install(FILES ${headers} DESTINATION include/soplex)
-install(FILES soplex.h DESTINATION include)
+install(FILES soplex.h soplex.hpp DESTINATION include)
 
 # install the binary and the library to appropriate lcoations and add them to an export group
 install(TARGETS soplex libsoplex libsoplex-pic EXPORT soplex-targets
