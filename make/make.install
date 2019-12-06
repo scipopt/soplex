@@ -28,8 +28,11 @@ install:	installheader installlibs installbinary
 installheader: 
 ifneq ($(INSTALLDIR),)
 		@echo "-> install SoPlex headers into INSTALLDIR <$(INSTALLDIR)>"
-		@-install -m 755 -d $(INSTALLDIR)/$(INCLUDEDIR)/
-		@-install -m 644 -p $(LIBSRCHEADER) $(INSTALLDIR)/$(INCLUDEDIR)/
+		@-install -m 755 -d $(INSTALLDIR)/$(INCLUDEDIR)/soplex/
+		@-install -m 644 -p $(SRCDIR)/soplex/*.h $(INSTALLDIR)/$(INCLUDEDIR)/soplex/
+		@-install -m 644 -p $(SRCDIR)/soplex/*.hpp $(INSTALLDIR)/$(INCLUDEDIR)/soplex/
+		@-install -m 644 -p $(SRCDIR)/*.h $(INSTALLDIR)/$(INCLUDEDIR)
+		@-install -m 644 -p $(SRCDIR)/*.hpp $(INSTALLDIR)/$(INCLUDEDIR)
 else
 		@echo "no installation directory specified - use make install INSTALLDIR=<dir>, e.g., make install INSTALLDIR=/usr/local"
 endif
