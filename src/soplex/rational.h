@@ -29,11 +29,11 @@
 
 
 #include "soplex/spxalloc.h"
+#ifdef SOPLEX_WITH_BOOST
 #include "boost/multiprecision/number.hpp"
 
 #ifdef SOPLEX_WITH_MPFR
 #include "boost/multiprecision/mpfr.hpp"
-#include "boost/multiprecision/gmp.hpp"
 #endif
 
 #ifdef SOPLEX_WITH_CPPMPF
@@ -41,9 +41,13 @@
 // make much sense in the Rational class. So this code doesn't make much sense
 #include "boost/multiprecision/cpp_dec_float.hpp"
 #endif
+#endif
 
 #ifdef SOPLEX_WITH_GMP
 #include "gmp.h"
+#ifdef SOPLEX_WITH_BOOST
+#include "boost/multiprecision/gmp.hpp"
+#endif
 #endif
 
 
@@ -106,9 +110,11 @@ public:
    Rational(const mpq_t& q);
 #endif
 
+#ifdef SOPLEX_WITH_BOOST
    // constructor from boost number
    template <typename T, boost::multiprecision::expression_template_option eto>
    Rational(const boost::multiprecision::number<T, eto>& q);
+#endif
 
    /// destructor
    ~Rational();
@@ -150,6 +156,7 @@ public:
    Rational& operator=(const mpq_t& q);
 #endif
 
+#ifdef SOPLEX_WITH_BOOST
    // assignment operator from boost multiprecision number The operator should
    // convert the boost number to mpq_t
 
@@ -157,16 +164,18 @@ public:
    template <typename T, boost::multiprecision::expression_template_option eto>
    Rational& operator=(const boost::multiprecision::number<T, eto>& q);
    ///@}
-
+#endif
 
    ///@name Typecasts
    ///@{
 
    operator double() const;
    operator long double() const;
+#ifdef SOPLEX_WITH_BOOST
    // Operator to typecast Rational to one of the Boost Number types
    template <typename T, boost::multiprecision::expression_template_option eto>
    operator boost::multiprecision::number<T, eto>() const;
+#endif
 
 #ifdef SOPLEX_WITH_GMP
    /// provides read-only access to underlying mpq_t
@@ -696,7 +705,8 @@ public:
 
    /// constructor from boost number
    // Also should satisfy SOPLEX_WITH_GMP
-#ifdef SOPLEX_WITH_MPFR
+#ifdef SOPLEX_WITH_BOOST
+#ifdef SOPLEX_WITH_GMP
    template <typename T, boost::multiprecision::expression_template_option eto>
    Private(const boost::multiprecision::number<T, eto>& q)
       : theprev(0)
@@ -706,6 +716,7 @@ public:
       mpq_init(privatevalue);
       mpq_set(privatevalue, tmp.backend().data());
    }
+#endif
 #endif
 
    /// destructor
@@ -858,6 +869,7 @@ public:
       return *this;
    }
 
+#ifdef SOPLEX_WITH_BOOST
    // The back end for Rational operator=.
    template <typename T, boost::multiprecision::expression_template_option eto>
    Private& operator=(const boost::multiprecision::number<T, eto>& q)
@@ -868,6 +880,7 @@ public:
       mpq_set(this->privatevalue, tmp.backend().data());
       return *this;
    }
+#endif
 
    /// previous Private element
    Private*& prev()
@@ -904,6 +917,7 @@ public:
    /// value
    long double privatevalue;
 
+#ifdef SOPLEX_WITH_BOOST
    template <typename T, boost::multiprecision::expression_template_option eto>
    Private(const boost::multiprecision::number<T, eto>& q)
    {
@@ -916,6 +930,7 @@ public:
       privatevalue = (long double)q;
       return *this;
    }
+#endif
 
 
    /// default constructor
@@ -980,6 +995,7 @@ public:
 
 
 
+#ifdef SOPLEX_WITH_BOOST
 // Definitions related to boost number and SoPlex Rational. This is still
 // inside the #ifdef SOPLEX_WITH_GMP
 
@@ -1055,6 +1071,7 @@ Rational::Rational(const boost::multiprecision::number<T, eto>& q)
    assert(dpointer != 0);
 }
 #endif // SOPLEX_WITH_CPPMPF
+#endif
 
 // A dummy function to deal with the rational scalar issue. This will never be
 // called
