@@ -116,99 +116,6 @@ BINDIR		=	bin
 LIBDIR		=	lib
 INCLUDEDIR	=	include
 NAME		=	soplex
-LIBHEADER	=	soplex/array.h \
-				soplex/basevectors.h \
-				soplex/classarray.h \
-				soplex/clufactor.h \
-				soplex/clufactor_rational.h \
-				soplex/cring.h \
-				soplex/dataarray.h \
-				soplex/datahashtable.h \
-				soplex/datakey.h \
-				soplex/dataset.h \
-				soplex/didxset.h \
-				soplex/dsvectorbase.h \
-				soplex/dsvector.h \
-				soplex/dvector.h \
-				soplex/exceptions.h \
-				soplex/gzstream.h \
-				soplex/idlist.h \
-				soplex/idxset.h \
-				soplex/islist.h \
-				soplex/lpcolbase.h \
-				soplex/lpcol.h \
-				soplex/lpcolsetbase.h \
-				soplex/lpcolset.h \
-				soplex/lprowbase.h \
-				soplex/lprow.h \
-				soplex/lprowsetbase.h \
-				soplex/lprowset.h \
-				soplex/mpsinput.h \
-				soplex/nameset.h \
-				soplex/notimer.h \
-				soplex/random.h \
-				soplex/rational.h \
-				soplex/ratrecon.h \
-				soplex/slinsolver.h \
-				soplex/slinsolver_rational.h \
-				soplex/slufactor.h \
-				soplex/slufactor_rational.h \
-				soplex/solbase.h \
-				soplex/sol.h \
-				soplex/sorter.h \
-				soplex/spxalloc.h \
-				soplex/spxautopr.h \
-				soplex/spxbasis.h \
-				soplex/spxboundflippingrt.h \
-				soplex/spxdantzigpr.h \
-				soplex/spxdefaultrt.h \
-				soplex/spxdefines.h \
-				soplex/spxdevexpr.h \
-				soplex/spxequilisc.h \
-				soplex/spxleastsqsc.h \
-				soplex/spxfastrt.h \
-				soplex/spxfileio.h \
-				soplex/spxgeometsc.h \
-				soplex/spxgithash.h \
-				soplex/spxharrisrt.h \
-				soplex/spxhybridpr.h \
-				soplex/spxid.h \
-				soplex/spxlpbase.h \
-				soplex/spxlp.h \
-				soplex/spxmainsm.h \
-				soplex/spxout.h \
-				soplex/spxparmultpr.h \
-				soplex/spxpricer.h \
-				soplex/spxratiotester.h \
-				soplex/spxscaler.h \
-				soplex/spxsimplifier.h \
-				soplex/spxsolver.h \
-				soplex/spxstarter.h \
-				soplex/spxsteepexpr.h \
-				soplex/spxsteeppr.h \
-				soplex/spxsumst.h \
-				soplex/spxvectorst.h \
-				soplex/spxweightpr.h \
-				soplex/spxweightst.h \
-				soplex/ssvectorbase.h \
-				soplex/ssvector.h \
-				soplex/stablesum.h \
-				soplex/statistics.h \
-				soplex/svectorbase.h \
-				soplex/svector.h \
-				soplex/svsetbase.h \
-				soplex/svset.h \
-				soplex/timer.h \
-				soplex/timerfactory.h \
-				soplex/unitvectorbase.h \
-				soplex/unitvector.h \
-				soplex/usertimer.h \
-				soplex/updatevector.h \
-				soplex/validation.h \
-				soplex/vectorbase.h \
-				soplex/vector.h \
-				soplex/wallclocktimer.h 
-LIBHPPHEADER := $(shell find src/soplex/ -maxdepth 1 -type f -regex ".*\.hpp")
 
 LIBOBJ = soplex/clufactor_rational.o \
 				soplex/didxset.o \
@@ -316,8 +223,7 @@ LIBOBJFILES	=	$(addprefix $(LIBOBJDIR)/,$(LIBOBJ))
 BINSRC		=	$(addprefix $(SRCDIR)/,$(BINOBJ:.o=.cpp))
 EXAMPLESRC	=	$(addprefix $(SRCDIR)/,$(EXAMPLEOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
-LIBSRCHEADER	=	$(addprefix $(SRCDIR)/,$(LIBHEADER)) $(LIBHPPHEADER) 
-ALLSRC		=	$(BINSRC) $(EXAMPLESRC) $(LIBSRC) $(LIBSRCHEADER)
+ALLSRC		=	$(BINSRC) $(EXAMPLESRC) $(LIBSRC)
 
 #-----------------------------------------------------------------------------
 # External Libraries
