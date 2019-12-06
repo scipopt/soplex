@@ -64,6 +64,7 @@ set(settings
     mpf
     )
 
+if(Boost)
 #
 # define a macro to add tests
 #
@@ -109,3 +110,4 @@ endmacro(add_instancetests)
 #
 add_instancetests( successInstances "Success" )
 add_instancetests( failInstances "Fail" )
+endif()

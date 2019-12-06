@@ -3780,7 +3780,7 @@ void SoPlexBase<R>::_computeBasisInverseRational()
    const int matrixdim = numRowsRational();
    assert(_rationalLUSolverBind.size() == matrixdim);
 
-   DataArray< const SVectorRational* > matrix(matrixdim);
+   Array< const SVectorRational* > matrix(matrixdim);
    _rationalLUSolverBind.reSize(matrixdim);
 
    for(int i = 0; i < matrixdim; i++)

@@ -21,9 +21,6 @@
 #include "soplex/spxout.h"
 #include "soplex/rational.h"
 
-#include "boost/multiprecision/number.hpp"
-#include "boost/multiprecision/debug_adaptor.hpp"
-
 namespace soplex
 {
 // Overloaded EQ function

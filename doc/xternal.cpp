@@ -149,7 +149,7 @@
  
     The distinction between data and general C++ objects becomes
     relevant when using such objects in container classes such as
-    DataArray or Array.  
+    DataArray or Array.
 */
 
 

@@ -135,20 +135,24 @@ set_target_properties(libsoplex PROPERTIES
 add_dependencies(libsoplex soplex_update_githash)
 target_link_libraries(libsoplex ${libs})
 
-# create soplex binary using library without pic
-add_executable(soplex soplexmain.cpp)
-target_link_libraries(soplex LINK_PUBLIC libsoplex ${Boost_LIBRARIES})
 
-if(CMAKE_BUILD_TYPE EQUAL "Debug")
-    find_package(Sanitizers)
-    add_sanitizers(soplex)
+if(Boost)
+    # create soplex binary using library without pic
+    add_executable(soplex soplexmain.cpp)
+    target_link_libraries(soplex LINK_PUBLIC libsoplex ${Boost_LIBRARIES})
+
+    if(CMAKE_BUILD_TYPE EQUAL "Debug")
+        find_package(Sanitizers)
+        add_sanitizers(soplex)
+    endif()
+
+    add_executable(example EXCLUDE_FROM_ALL example.cpp)
+    target_link_libraries(example libsoplex)
+
+    # set the install rpath to the installed destination
+    set_target_properties(soplex PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 endif()
 
-add_executable(example EXCLUDE_FROM_ALL example.cpp)
-target_link_libraries(example libsoplex)
-
-# set the install rpath to the installed destination
-set_target_properties(soplex PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 # on UNIX system the 'lib' prefix is automatically added
 set_target_properties(libsoplex PROPERTIES
     OUTPUT_NAME "soplex"
@@ -161,12 +165,20 @@ set_target_properties(libsoplex-pic PROPERTIES
 install(FILES ${headers} DESTINATION include/soplex)
 install(FILES soplex.h soplex.hpp DESTINATION include)
 
+if(Boost)
 # install the binary and the library to appropriate lcoations and add them to an export group
 install(TARGETS soplex libsoplex libsoplex-pic EXPORT soplex-targets
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin
         INCLUDES DESTINATION include)
+else()
+# install the the library to appropriate lcoations and add them to an export group
+install(TARGETS libsoplex libsoplex-pic EXPORT soplex-targets
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        INCLUDES DESTINATION include)
+endif()
 
 # Add library targets to the build-tree export set
 export(TARGETS libsoplex libsoplex-pic

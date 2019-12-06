@@ -7120,7 +7120,6 @@ void SoPlexBase<R>::_addColReal(R obj, R lower, const SVectorBase<R>& lpcol, R u
 }
 
 
-
 /// adds multiple columns to the R LP and adjusts basis
 template <class R>
 void SoPlexBase<R>::_addColsReal(const LPColSetReal& lpcolset)
@@ -7200,8 +7199,6 @@ void SoPlexBase<R>::_changeLhsReal(const VectorBase<R>& lhs)
       }
    }
 }
-
-
 
 /// changes left-hand side of row \p i to \p lhs and adjusts basis
 template <class R>
@@ -8586,6 +8583,8 @@ bool SoPlexBase<R>::loadSettingsFile(const char* filename)
    return !readError;
 }
 
+
+#ifdef SOPLEX_WITH_BOOST
 /// parses one setting string and returns true on success
 template <class R>
 bool SoPlexBase<R>::parseSettingsString(const std::string str, boost::any val)
@@ -8743,6 +8742,7 @@ bool SoPlexBase<R>::parseSettingsString(const std::string str, boost::any val)
 
    return false;
 }
+#endif
 
 /// writes settings file; returns true on success
 template <class R>

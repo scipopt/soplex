@@ -86,13 +86,13 @@ void SPxDevexPR<R>::setType(typename SPxSolverBase<R>::Type tp)
 
    bestPrices.clear();
    bestPrices.setMax(this->thesolver->dim());
-   prices.reMax(this->thesolver->dim());
+   prices.reSize(this->thesolver->dim());
 
    if(tp == SPxSolverBase<R>::ENTER)
    {
       bestPricesCo.clear();
       bestPricesCo.setMax(this->thesolver->coDim());
-      pricesCo.reMax(this->thesolver->coDim());
+      pricesCo.reSize(this->thesolver->coDim());
    }
 
    assert(isConsistent());

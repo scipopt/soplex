@@ -3034,8 +3034,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                    << std::endl;)
 
          DataArray<bool> fixedCol(row.size());
-         DataArray<R> lowers(row.size());
-         DataArray<R> uppers(row.size());
+         Array<R> lowers(row.size());
+         Array<R> uppers(row.size());
 
          for(int k = 0; k < row.size(); ++k)
          {
@@ -3078,8 +3078,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                    << std::endl;)
 
          DataArray<bool> fixedCol(row.size());
-         DataArray<R> lowers(row.size());
-         DataArray<R> uppers(row.size());
+         Array<R> lowers(row.size());
+         Array<R> uppers(row.size());
 
          for(int k = 0; k < row.size(); ++k)
          {
@@ -4257,7 +4257,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLPBase<R>& lp, 
 
    DataArray<int>    pClass(lp.nRows());           // class of parallel rows
    DataArray<int>    classSize(lp.nRows());        // size of each class
-   DataArray<R>   scale(lp.nRows());            // scaling factor for each row
+   Array<R>   scale(lp.nRows());            // scaling factor for each row
    int*              idxMem = 0;
 
    try
@@ -4599,7 +4599,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
 
    DataArray<int>    pClass(lp.nCols());          // class of parallel columns
    DataArray<int>    classSize(lp.nCols());       // size of each class
-   DataArray<R>   scale(lp.nCols());           // scaling factor for each column
+   Array<R>   scale(lp.nCols());           // scaling factor for each column
    int*              idxMem = 0;
 
    try

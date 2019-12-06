@@ -49,9 +49,9 @@ private:
    /**@name Data */
    ///@{
    R  last;           ///< penalty, selected at last iteration.
-   DataArray<typename SPxPricer<R>::IdxElement>
+   Array<typename SPxPricer<R>::IdxElement>
    prices;   ///< temporary array of precomputed pricing values
-   DataArray<typename SPxPricer<R>::IdxElement>
+   Array<typename SPxPricer<R>::IdxElement>
    pricesCo; ///< temporary array of precomputed pricing values
    DIdxSet bestPrices;   ///< set of best pricing candidates
    DIdxSet bestPricesCo; ///< set of best pricing candidates

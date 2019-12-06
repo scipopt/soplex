@@ -23,11 +23,11 @@
 #include <stddef.h>
 #include <string.h>
 #include <iostream>
+#include <type_traits>
 
 #include "soplex/spxdefines.h"
 #include "soplex/spxalloc.h"
-
-#include <boost/container/vector.hpp>
+#include "soplex/spxid.h"
 
 namespace soplex
 {
@@ -61,14 +61,25 @@ namespace soplex
 
    @see Array, \ref DataObjects "Data Objects"
 */
-template <typename T>
+template < class T >
 class DataArray
 {
+   static_assert(std::is_trivially_copyable<T>::value || std::is_same<T, SPxId>::value 
+      || std::is_same<T, SPxColId>::value || std::is_same<T, SPxRowId>::value,
+      "Only trivially copyable types are allowed with DataArray, since it does memcopy" );
 private:
-   // A boost container vector is used instead of std::vector. This is because
-   // std::vector<bool> is not consistent with the rest of the std::vectors<T>.
-   // Namely, the current code needs the operator[] for DataArray<bool>.
-   boost::container::vector<T>  data;              ///< the array of elements
+   int thesize;           ///< number of used elements in array data
+   int themax;            ///< the length of array data and
+   T*  data;              ///< the array of elements
+
+protected:
+   /** When a DataArray is reSize()%d to more than max() elements, the
+       new value for max() is not just set to the new size but rather to
+       \p memFactor * \p size. This makes #reSize%ing perform better in codes
+       where a DataArray is extended often by a small number of elements
+       only.
+    */
+   Real memFactor;     ///< memory extension factor.
 
 public:
 
@@ -76,57 +87,75 @@ public:
    T& operator[](int n)
    {
       assert(n >= 0);
+      assert(n < thesize);
       return data[n];
    }
-
    /// reference \p n 'th const element.
    const T& operator[](int n) const
    {
       assert(n >= 0);
+      assert(n < thesize);
       return data[n];
    }
 
    /// reference last element.
    T& last()
    {
-      return data.back();
+      assert(thesize > 0);
+      return data[thesize - 1];
    }
    /// reference last const element.
    const T& last() const
    {
-      return data.back();
+      assert(thesize > 0);
+      return data[thesize - 1];
    }
 
    /// get a C pointer to the data.
    T* get_ptr()
    {
-      return data.data();
+      return data;
    }
    /// get a const C pointer to the data.
    const T* get_const_ptr() const
    {
-      return data.data();
+      return data;
    }
 
    /// append element \p t.
    void append(const T& t)
    {
-      data.push_back(t);
+      insert(thesize, 1, &t);
    }
    /// append \p n elements with value \p t.
    void append(int n, const T& t)
    {
-      data.insert(data.end(), n, t);
+      insert(thesize, n, t);
    }
    /// append \p n elements from \p t.
    void append(int n, const T t[])
    {
-      data.insert(data.end(), t, t + n);
+      insert(thesize, n, t);
    }
    /// append all elements from \p t.
    void append(const DataArray<T>& t)
    {
-      data.insert(data.end(), t.data.begin(), t.data.end());
+      insert(thesize, t);
+   }
+
+   /// insert \p n uninitialized elements before \p i 'th element.
+   void insert(int i, int n)
+   {
+      int j = thesize;
+
+      assert(i >= 0);
+      assert(n >= 0);
+
+      reSize(thesize + n);
+
+      /// move \p n elements in memory from insert position \p i to the back
+      if(j > i)
+         memmove(&(data[i + n]), &(data[i]), (unsigned int)(j - i) * sizeof(T));
    }
 
    /// insert \p n elements with value \p t before \p i 'the element.
@@ -134,7 +163,10 @@ public:
    {
       if(n > 0)
       {
-         data.insert(data.begin() + i - 1, n, t);
+         insert(i, n);
+
+         for(int j = 0; j < n; j++)
+            data[i + j] = t;
       }
    }
 
@@ -143,9 +175,8 @@ public:
    {
       if(n > 0)
       {
-         // Inserts the elements of t (using legacy iterators, i.e., pointers)
-         // before data's i th position.
-         data.insert(data.begin() + i - 1, t, t + n);
+         insert(i, n);
+         memcpy(&(data[i]), t, (unsigned int) n * sizeof(T));
       }
    }
 
@@ -154,7 +185,8 @@ public:
    {
       if(t.size())
       {
-         data.insert(data.begin() + i - 1, t.data.begin(), t.data.end());
+         insert(i, t.size());
+         memcpy(&(data[i]), t.data, (unsigned int)t.size() * sizeof(T));
       }
    }
 
@@ -163,32 +195,30 @@ public:
    {
       assert(n < size() && n >= 0);
 
+      /* use memmove instead of memcopy because the destination and the source might overlap */
       if(n + m < size())
-      {
-         data.erase(data.begin() + n, data.begin() + n + m);
-      }
+         memmove(&(data[n]), &(data[n + m]), (unsigned int)(size() - (n + m)) * sizeof(T));
       else
-      {
-         data.erase(data.begin() + n, data.end());
-      }
+         m = size() - n;
+
+      thesize -= m;
    }
    /// remove \p m last elements.
    void removeLast(int m = 1)
    {
       assert(m <= size() && m >= 0);
-      // Erase the last m elements
-      data.erase(data.end() - m, data.end());
+      thesize -= m;
    }
    /// remove all elements.
    void clear()
    {
-      data.clear();
+      thesize = 0;
    }
 
    /// return nr. of elements.
    int size() const
    {
-      return int(data.size());
+      return thesize;
    }
 
    /// reset size to \p newsize.
@@ -200,16 +230,14 @@ public:
     */
    void reSize(int newsize)
    {
-      if(newsize > int(data.capacity()))
-         reMax(newsize, newsize);
+      assert(memFactor >= 1);
+
+      if(newsize > themax)
+         reMax(int(memFactor * newsize), newsize);
       else if(newsize < 0)
-      {
-         data.clear();
-      }
+         thesize = 0;
       else
-      {
-         data.resize(newsize);
-      }
+         thesize = newsize;
    }
 
    /// return maximum number of elements.
@@ -219,7 +247,7 @@ public:
     */
    int max() const
    {
-      return int(data.capacity());
+      return themax;
    }
 
    /// reset maximum number of elements.
@@ -235,9 +263,7 @@ public:
    void reMax(int newMax = 1, int newSize = -1)
    {
       if(newSize >= 0)
-      {
-         data.resize(newSize);
-      }
+         thesize = newSize;
 
       if(newMax < newSize)
          newMax = newSize;
@@ -245,21 +271,19 @@ public:
       if(newMax < 1)
          newMax = 1;
 
-      if(newMax == int(data.capacity()))
+      if(newMax == themax)
          return;
 
-      int themax = newMax;
+      themax = newMax;
 
-      if(newSize <= 0)
+      if(thesize <= 0)
       {
          /* no data needs to be copied so do a clean free and alloc */
-         data.clear();
-         data.resize(themax);
+         spx_free(data);
+         spx_alloc(data, themax);
       }
       else
-      {
-         data.resize(themax);
-      }
+         spx_realloc(data, themax);
    }
    /// assignment operator
    DataArray& operator=(const DataArray& rhs)
@@ -267,24 +291,46 @@ public:
       if(this != &rhs)
       {
          reSize(rhs.size());
-         data = rhs.data;
+         memcpy(data, rhs.data, (unsigned int) size() * sizeof(T));
+
+         assert(isConsistent());
       }
 
       return *this;
    }
 
-   // Move assignment for Dataarray
-   DataArray& operator=(const DataArray&& rhs)
+   /// consistency check
+   bool isConsistent() const
    {
-      data = std::move(rhs.data);
-      return *this;
+#ifdef ENABLE_CONSISTENCY_CHECKS
+
+      if((data == 0)
+            || (themax < 1)
+            || (themax < thesize)
+            || (thesize < 0)
+            || (memFactor < 1.0))
+         return MSGinconsistent("DataArray");
+
+#endif
+
+      return true;
    }
 
    /// copy constructor
    DataArray(const DataArray& old)
+      : thesize(old.thesize)
+      , themax(old.themax)
+      , data(0)
+      , memFactor(old.memFactor)
    {
-      data.reserve(max());
-      data = old.data;
+      spx_alloc(data, max());
+
+      assert(thesize >= 0);
+
+      if(thesize)
+         memcpy(data, old.data, (unsigned int)thesize * sizeof(T));
+
+      assert(isConsistent());
    }
 
    /// default constructor.
@@ -292,41 +338,31 @@ public:
        elements. The internal array is allocated to have \p max nonzeros,
        and the memory extension factor is set to \p fac.
 
-       @param p_size number of uninitialised elements.
+       @param p_size number of unitialised elements.
        @param p_max  maximum number of elements the array can hold.
+       @param p_fac  value for memFactor.
     */
-   explicit DataArray(int p_size = 0, int p_max = 0)
+   explicit DataArray(int p_size = 0, int p_max = 0, Real p_fac = 1.2)
+      : data(0)
+      , memFactor(p_fac)
    {
-      // p_size number of uninitialized elements.
-      //
-      // That is, the operator[] is valid on for 0...(p_size -1) whereas, even
-      // though the internal array can handle 0...(p_max -1) elements, the
-      // operator[] on beyond (p_size -1) would give an exception.
-      data.reserve(p_max);
-      data.resize(p_size);
-      // The underlying array will have at least p_max number of elements,
-      // though.
-   }
+      thesize = (p_size < 0) ? 0 : p_size;
 
-   // The move constructors
-   DataArray(DataArray&& other) noexcept: data(std::move(other.data))
-   {
+      if(p_max > thesize)
+         themax = p_max;
+      else
+         themax = (thesize == 0) ? 1 : thesize;
+
+      spx_alloc(data, themax);
+
+      assert(isConsistent());
    }
 
    /// destructor
    ~DataArray()
    {
-      ;
-   }
-
-   void push_back(const T& val)
-   {
-      data.push_back(val);
-   }
-
-   void push_back(T&& val)
-   {
-      data.push_back(val);
+      if(data)
+         spx_free(data);
    }
 };
 

@@ -63,6 +63,7 @@
 
 #include "soplex/spxlpbase.h"
 
+#ifdef SOPLEX_WITH_BOOST
 #ifdef SOPLEX_WITH_MPFR
 // For multiple precision
 #include <boost/multiprecision/mpfr.hpp>
@@ -75,6 +76,7 @@
 namespace mpf = boost::multiprecision;
 #include <boost/any.hpp>
 #include <boost/program_options.hpp>
+#endif
 
 #define DEFAULT_RANDOM_SEED   0   // used to suppress output when the seed was not changed
 
@@ -1551,8 +1553,10 @@ public:
    /// reads settings file; returns true on success
    bool loadSettingsFile(const char* filename);
 
+#ifdef SOPLEX_WITH_BOOST
    /// parses one setting string and returns true on success; note that string is modified
    bool parseSettingsString(const std::string str, boost::any val);
+#endif
 
    ///@}
 
@@ -1704,7 +1708,7 @@ private:
    DSVectorRational _primalDualDiff;
    DataArray< typename SPxSolverBase<R>::VarStatus > _storedBasisStatusRows;
    DataArray< typename SPxSolverBase<R>::VarStatus > _storedBasisStatusCols;
-   DataArray< UnitVectorRational* > _unitMatrixRational;
+   Array< UnitVectorRational* > _unitMatrixRational;
    bool _storedBasis;
    int _beforeLiftRows;
    int _beforeLiftCols;
@@ -2335,7 +2339,7 @@ private:
    void _updateDecompReducedProblemViol(bool allrows);
 
    /// builds the update rows with those violated in the complmentary problem
-   void _findViolatedRows(R compObjValue, DataArray<RowViolation>& violatedrows, int& nviolatedrows);
+   void _findViolatedRows(R compObjValue, Array<RowViolation>& violatedrows, int& nviolatedrows);
 
    /// update the dual complementary problem with additional columns and rows
    void _updateDecompComplementaryDualProblem(bool origObj);
@@ -2421,9 +2425,11 @@ private:
 
    ///@}
 
+#ifdef SOPLEX_WITH_BOOST
    // For argument parsing
    template <class S>
    friend int runSoPlex(const boost::program_options::variables_map& vm);
+#endif
 
 };
 
@@ -2432,7 +2438,6 @@ typedef SoPlexBase<Real> SoPlex;
 // A header file containing all the general templated functions
 
 } // namespace soplex
-
 
 // General templated function
 #include "soplex.hpp"

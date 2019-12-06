@@ -61,13 +61,13 @@ void SPxSteepPR<R>::setType(typename SPxSolverBase<R>::Type type)
 
    bestPrices.clear();
    bestPrices.setMax(this->thesolver->dim());
-   prices.reMax(this->thesolver->dim());
+   prices.reSize(this->thesolver->dim());
 
    if(type == SPxSolverBase<R>::ENTER)
    {
       bestPricesCo.clear();
       bestPricesCo.setMax(this->thesolver->coDim());
-      pricesCo.reMax(this->thesolver->coDim());
+      pricesCo.reSize(this->thesolver->coDim());
    }
 }
 

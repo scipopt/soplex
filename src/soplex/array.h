@@ -95,11 +95,26 @@ public:
    {
       return data;
    }
+   /// get a const C pointer to the data.
+   const T* get_const_ptr() const
+   {
+      return data;
+   }
 
+   /// append 1 elements with value \p t.
+   void append(const T& t)
+   {
+      insert(num, 1, t);
+   }
    /// append \p n uninitialized elements.
    void append(int n)
    {
       insert(num, n);
+   }
+   /// append \p n elements with value \p t.
+   void append(int n, const T& t)
+   {
+      insert(num, n, t);
    }
    /// append \p n elements from \p p_array.
    void append(int n, const T* p_array)
@@ -155,6 +170,18 @@ public:
 
          data = newdata;
          num += n;
+      }
+   }
+
+   /// insert \p n elements with value \p t before \p i 'the element.
+   void insert(int i, int n, const T& t)
+   {
+      if(n > 0)
+      {
+         insert(i, n);
+
+         for(int j = 0; j < n; j++)
+            data[i + j] = t;
       }
    }
 

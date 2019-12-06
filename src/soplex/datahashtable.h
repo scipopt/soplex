@@ -24,6 +24,7 @@
 #include <limits.h>
 
 #include "soplex/spxdefines.h"
+#include "soplex/array.h"
 
 #define   HASHTABLE_FILLFACTOR   0.7
 
@@ -104,7 +105,7 @@ private:
    /**@name Data */
    ///@{
    /// stores all elements of the hash table
-   DataArray < Elem > m_elem;
+   Array < Elem > m_elem;
    /// increment added to hash index, if allready used
    int m_hashsize;
    /// current number of entries in the hash table
@@ -214,7 +215,7 @@ public:
     */
    void reMax(int newSize = -1, int newHashSize = 0)
    {
-      DataArray< Elem > save(m_elem);
+      Array< Elem > save(m_elem);
 
       m_elem.reSize(newSize < m_used ? m_used : newSize);
 

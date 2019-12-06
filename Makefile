@@ -71,9 +71,10 @@ CONTINUE	=	false
 OPENSOURCE	=	true
 
 GMP		=	true
-MPFR = true
+MPFR 		= 	false
 ZLIB		=	true
 EGLIB		=	false
+Boost 	=  false
 
 COMP		=	gnu
 CXX		=	g++
@@ -254,7 +255,10 @@ else
 endif
 
 # For boost program options
-LDFLAGS += $(BOOST_LDFLAGS)
+ifeq ($(Boost),true)
+	LDFLAGS += $(BOOST_LDFLAGS)
+	CPPFLAGS += -DSOPLEX_WITH_BOOST
+endif
 
 
 ZLIBDEP		:=	$(SRCDIR)/depend.zlib
@@ -304,7 +308,12 @@ endif
 
 .PHONY: all
 all:		makelibfile
+ifeq ($(Boost),true)
 		@$(MAKE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
+else
+		@echo "using make without Boost means only the SoPlex library will be built."
+		@echo "To build the binary, set Boost=true and make sure Boost with program_options is available"
+endif
 
 .PHONY: preprocess
 preprocess:	checkdefines

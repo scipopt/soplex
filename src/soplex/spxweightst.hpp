@@ -161,10 +161,10 @@ public:
 */
 template <class R>
 static void initPrefs(
-   DataArray<SPxId>&      pref,
+   DataArray < SPxId >&      pref,
    const SPxSolverBase<R>&       base,
-   const DataArray<R>& rowWeight,
-   const DataArray<R>& colWeight)
+   const Array<R>& rowWeight,
+   const Array<R>& colWeight)
 {
    DataArray<int> row(base.nRows());
    DataArray<int> col(base.nCols());

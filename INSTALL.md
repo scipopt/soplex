@@ -58,6 +58,7 @@ list run `cmake <path/to/SoPlex> -LH`:
 | COVERAGE             | on, off                      | --                     | |
 | MT                   | on, off                      | --                     | use static runtime libraries for Visual Studio compiler on Windows |
 | SANITIZE_...         | on, off                      | --                     | enable sanitizer in debug mode if available |
+| Boost                | on, off                      | Boost=[true,false]     | necessary for the binary, optional for building libsoplex |
 
 Parameters can be set all at once or in subsequent calls to `cmake` - extending
 or modifying the existing configuration.
@@ -92,6 +93,12 @@ If ZLIB is not available, building may fail. In this case try
 
 which will deactivate the possibility to read gzipped LP and MPS files.
 
+### Boost support
+
+Boost (program_options) is required to build the SoPlex binary. If Boost is not available,
+you can still build the SoPlex library. 
+- If you are using cmake, use `cmake -DBoost=off`. This will disable compilation and installation of the binary.
+- If you are using make, use `make Boost=false makelibfile`. This will build only the SoPlex library without Boost.
 
 ### GMP support
 
