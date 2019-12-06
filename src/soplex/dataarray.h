@@ -64,7 +64,9 @@ namespace soplex
 template < class T >
 class DataArray
 {
-   static_assert(std::is_trivially_copyable<T>::value || std::is_same<T, SPxId>::value || std::is_same<T, SPxColId>::value || std::is_same<T, SPxRowId>::value );
+   static_assert(std::is_trivially_copyable<T>::value || std::is_same<T, SPxId>::value 
+      || std::is_same<T, SPxColId>::value || std::is_same<T, SPxRowId>::value,
+      "Only trivially copyable types are allowed with DataArray, since it does memcopy" );
 private:
    int thesize;           ///< number of used elements in array data
    int themax;            ///< the length of array data and
