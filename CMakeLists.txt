@@ -132,7 +132,7 @@ if(Boost)
     # Technically the version 1.70.0 is not needed for program_option, but for the
     # multiprecision, but it's header only, this is one way to guarantee that the
     # user has the right version.   
-    find_package(Boost 1.70.0 COMPONENTS program_options REQUIRED) # Refer to comments in cmake/Modules/FindBoost.cmake
+    find_package(Boost 1.58.0 COMPONENTS program_options REQUIRED) # Refer to comments in cmake/Modules/FindBoost.cmake
     add_definitions(-DSOPLEX_WITH_BOOST)
     if(Boost_FOUND)
         include_directories(${Boost_INCLUDE_DIRS})
