@@ -5011,12 +5011,12 @@ bool SoPlexBase<R>::getBasisInverseTimesVecReal(R* rhs, R* sol, bool unscale)
          }
       }
 
-      std::copy(v.vec().begin(), v.vec().end(), rhs);
-      std::copy(x.vec().begin(), x.vec().end(), sol);
-
       // free memory
       spx_free(bind);
    }
+
+   std::copy(v.vec().begin(), v.vec().end(), rhs);
+   std::copy(x.vec().begin(), x.vec().end(), sol);
 
    return true;
 }
