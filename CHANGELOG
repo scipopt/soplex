@@ -11,6 +11,10 @@ interface & parameters:
 - new parameter 'bool:forcebasic', determines whether optimal solution has to be basic when performing
   rational solve with iterative refinement, triggers rational factorization if reconstruction optimal
   but not basic
+- SoPlex can now do multiprecision solve, i.e., `SoPlex<R>` with `R =
+  boost::multiprecision::number<T>` will work. In particular, for Linux and Mac,
+  SoPlex can do multiprecision solve with `mpfr_float` and on windows with
+  `cpp_float`.
 - Templated SoPlex, SPxSolver, and SPxBasis.
 - Renamed SoPlex<R>, SPxSolver<R>, and SPxBasis<R> to SoPlexBase<R>,
   SPxSolverBase<R>, SPxBasisBase<R> respectively for backwards compatibility
@@ -47,9 +51,9 @@ interface & parameters:
   5. `getPrimalReal`
 
 - Renamed `SPxSolverBase<R>::getDualfarkas` to `SPxSolverBase<R>::getDualFarkas`
-  (for consistency.) Note that there is a method with the same name in
-  `SoPlexBase<R>`.
+  (for consistency.) Note that there is a method with the same name in `SoPlexBase<R>`.
 - Rewrote the code for command line argument parsing. Current code uses Boost Program Options.
+   Note that you do not need Program Options if you just want to build the SoPlex library.
 - Some of the memory allocation from heap (using spx_alloc) changed to static memory.
 - Improvements in exception handling in `src/soplexmain.cpp`
 - Renamed `int numNonzeros` to `nNonzeros`
@@ -59,30 +63,32 @@ interface & parameters:
   1. Constructor from `boost::multiprecision::number<T>`.
   2. Conversion from Rational to `boost::multiprecision::number<T>`, provided
      that boost can handle `mpq_t` to `T` conversion.
-- Changes to `VectorBase<T>`
-  1. `VectorBase<T>` is now a wrapper of `std::vector<T>`
+- Changes to `VectorBase<T>` and `DVectorBase<T>`:
+  1. `VectorBase<T>` is now a wrapper of `std::vector<T>`, it no longer uses 
+      pre-allocated memory.
   2. The class can handle the additional functionality `DVectorBase<T>`, e.g.,
      `memSize()`, `reSize()`, `scaleAssign(,,).`
   3. internal member `int dimen` *removed*. `val.size()` or `VectorBase<R>::dim()`
      is a replacement.
   4. Replaced calls to memcpy and memmove with `std::copy().` Former functions
-     are not compatible with `boost::multiprecision::number`.
+     are not compatible with Types that are not trivially copyable.
   5. Defined move constructor and move assignment.
   6. Added begin() and end() iterators that return the corresponding iterator of
      the internal std::vector.
-  7. *Reason for changes*: VectorBase previously used to manage a pointer and
+  7. Added vec() function that returns a const reference to the underlying vector.
+  8. *Reason for changes*: VectorBase previously used to manage a pointer and
      DVectorBase managed memory allocation by doing malloc, realloc and free
-     calls. But this is only guaranteed to work with POD types (Plain Old Data,
-     e.g., double, and not boost::number), the new g++ compilers were already
-     issuing warnings about this with old SoPlex and the multiprecision vectors
-     were not working. The same is also true for changes inside CLUFactor classes.
+     calls. But this is only guaranteed to work with trivially copyable data types,
+     the new g++ compilers were already issuing warnings about this for some time.
+     The multiprecision vectors were not working. The same is also true for changes
+     inside CLUFactor classes.
   8. *Removed* `isConsistent()`, which used to check a vector was empty and had no
      memory allocated at the same time. This never happens with the std::vector
      wrapper, hence the removal.
-- *Removed* DVectorBase. Replaced by VectorBase. The alias DVector is replaced by
-  the alias Vector. (This has the same problem as VectorBase<T>)
-- DataArray is now a wrapper around `std::vector`, also has move constructor and
-  move assignment.
+  9. *Removed* DVectorBase. Replaced by VectorBase. The alias DVector is replaced by
+     the alias Vector. (This has the same problem as VectorBase<T>)
+- DataArray now checks if template type is trivially copyable via `static_assert`.
+  Changed all instances of DataArray where this is not the case to Array.
 - The following internal objects of the CLUFactor class was changed from a raw
   pointer to a std::vector
   1. `u.col.val`, `u.row.val`
@@ -93,10 +99,6 @@ interface & parameters:
   object" with using `std::vector`. Because `realloc` is not guaranteed to work
   on objects with non-trivial copy constructors, in particular, with
   `boost::multiprecision::number.`
-- SoPlex can now do multiprecision solve, i.e., `SoPlex<R>` with `R =
-  boost::multiprecision::number<T>` will work. In particular, for Linux and Mac,
-  SoPlex can do multiprecision solve with `mpfr_float` and on windows with
-  `cpp_float`.
 
 fixed bugs:
 - use center value for very close bounds in singleton postsolver
