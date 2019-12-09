@@ -38,17 +38,14 @@ template < class R > class SSVectorBase;
 /**@brief   Dense vector.
  * @ingroup Algebra
  *
- *  Class VectorBase provides dense linear algebra vectors.  It does not provide memory management for the %array of
- *  values. Instead, the constructor requires a pointer to a memory block large enough to fit the desired dimension of
- *  Real or Rational values.
+ *  Class VectorBase provides dense linear algebra vectors. Internally, VectorBase wraps std::vector.
  *
  *  After construction, the values of a VectorBase can be accessed with the subscript operator[]().  Safety is provided by
  *  qchecking of array bound when accessing elements with the subscript operator[]() (only when compiled without \c
  *  -DNDEBUG).
  *
  *  A VectorBase is distinguished from a simple array of %Reals or %Rationals by providing a set of mathematical
- *  operations.  Since VectorBase does not provide any memory management features, no operations are available that would
- *  require allocation of temporary memory space.
+ *  operations.
  *
  *  The following mathematical operations are provided by class VectorBase (VectorBase \p a, \p b; R \p x):
  *
@@ -80,7 +77,7 @@ class VectorBase
 {
 
    // VectorBase is a friend of VectorBase of different template type. This is so
-   // that we can conversions.
+   // that we can do conversions.
    template <typename S>
    friend class VectorBase;
 
@@ -114,11 +111,13 @@ public:
       ;
    }
 
+   // Construct from pointer, copies the values into the VectorBase
    VectorBase<R>(int dimen, R* p_val)
    {
       val.assign(p_val, p_val + dimen);
    }
 
+   // do not convert int to empty vectorbase
    explicit VectorBase<R>(int p_dimen)
    {
       val.resize(p_dimen);
@@ -137,6 +136,7 @@ public:
    {
    }
 
+   // Copy constructor
    VectorBase<R>(const VectorBase<R>& vec): val(vec.val)
    {
    }
@@ -284,7 +284,7 @@ public:
    }
 
    /// Return underlying std::vector.
-   std::vector<R>& vec()
+   const std::vector<R>& vec()
    {
       return val;
    }
@@ -296,11 +296,9 @@ public:
    ///@{
 
    /// Set vector to 0.
-   // TODO: is this set to zero actually useful? Can't I just do a val.clear()?
    void clear()
    {
-      for(auto& v : val)
-         v = 0;
+      val.clear();
    }
 
    /// Addition.
