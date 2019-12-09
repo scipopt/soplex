@@ -22,6 +22,7 @@
 #include <iostream>
 #include <assert.h>
 #include <math.h>
+#include <cmath>
 #include "soplex/stablesum.h"
 
 namespace soplex

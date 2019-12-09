@@ -31,6 +31,8 @@
 #define _SPXDEFINES_H_
 
 #include <math.h>
+#include <cmath>
+
 #ifdef _MSC_VER
 #include <float.h>
 #endif
