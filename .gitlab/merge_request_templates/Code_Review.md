@@ -28,3 +28,4 @@
 * [ ] Document interface changes in the CHANGELOG.
 * [ ] Increase SOPLEX_APIVERSION after the merge.
 * [ ] Tag this MR with the label 'default parameter' and inform one of the developers responsible for SAP (default: Jakob) if a parameter was added/deleted/changed.
+* [ ] if any LPI-changes ocurred, ensure to run the SCIP LPI unittests and the SCIP ctest before merging.
