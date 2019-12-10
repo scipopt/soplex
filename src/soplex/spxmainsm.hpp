@@ -783,7 +783,7 @@ void SPxMainSM<R>::ZeroObjColSingletonPS::execute(VectorBase<R>& x, VectorBase<R
       up = 0.0;
 
    assert(LErel(lo, up));
-   ASSERT_WARN("WMAISM01", isNotZero(aij, 1.0 / R(infinity)));
+   ASSERT_WARN("WMAISM01", isNotZero(aij, R(1.0 / R(infinity))));
 
    if(rStatus[m_i] == SPxSolverBase<R>::ON_LOWER)
    {
@@ -1947,7 +1947,7 @@ void SPxMainSM<R>::trivialHeuristic(SPxLPBase<R>& lp)
 
    R largeValue = R(infinity);
 
-   if(LT(1.0 / feastol(), R(infinity)))
+   if(LT(R(1.0 / feastol()), R(infinity)))
       largeValue = 1.0 / feastol();
 
 
@@ -2610,7 +2610,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
          R aij = row.value(k);
          int  j   = row.index(k);
 
-         if(!isNotZero(aij, 1.0 / R(infinity)))
+         if(!isNotZero(aij, R(1.0 / R(infinity))))
          {
             MSG_WARNING((*this->spxout), (*this->spxout) << "Warning: tiny nonzero coefficient " << aij <<
                         " in row " << i << "\n");

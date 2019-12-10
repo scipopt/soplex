@@ -170,6 +170,7 @@ public:
 
    operator double() const;
    operator long double() const;
+   operator float() const;
 #ifdef SOPLEX_WITH_BOOST
 #ifndef SOPLEX_WITH_CPPMPF
    // Operator to typecast Rational to one of the Boost Number types

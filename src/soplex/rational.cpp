@@ -447,7 +447,26 @@ Rational::operator long double() const
    return (long double)mpq_get_d(this->dpointer->privatevalue);
 }
 
+/// typecasts Rational to float (allows only explicit typecast)
+Rational::operator float() const
+{
+#ifdef SOPLEX_PERFALT_3
+#ifdef SOPLEX_PERFALT_1
 
+   if(mpq_sgn(this->dpointer->privatevalue) == 0)
+#else
+   if(mpq_equal(this->dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0)
+#endif
+      return 0.0f;
+   else if(mpq_equal(this->dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) != 0)
+      return 1.0f;
+   else if(mpq_equal(this->dpointer->privatevalue, Rational::NEGONE.dpointer->privatevalue) != 0)
+      return -1.0f;
+
+#endif
+
+   return float(mpq_get_d(this->dpointer->privatevalue));
+}
 
 /// provides read-only access to underlying mpq_t
 const mpq_t* Rational::getMpqPtr() const
