@@ -37,9 +37,8 @@
 #endif
 
 #ifdef SOPLEX_WITH_CPPMPF
-// Note: If SOPLEX_WITH_GMP is not available, then SOPLEX_WITH_MPFR does not
-// make much sense in the Rational class. So this code doesn't make much sense
 #include "boost/multiprecision/cpp_dec_float.hpp"
+#include "boost/multiprecision/cpp_int.hpp"
 #endif
 #endif
 
@@ -172,9 +171,15 @@ public:
    operator double() const;
    operator long double() const;
 #ifdef SOPLEX_WITH_BOOST
+#ifndef SOPLEX_WITH_CPPMPF
    // Operator to typecast Rational to one of the Boost Number types
    template <typename T, boost::multiprecision::expression_template_option eto>
    operator boost::multiprecision::number<T, eto>() const;
+#else
+   // Operator to typecast Rational to one of the Boost Number types
+   template <unsigned bits, boost::multiprecision::expression_template_option eto>
+   operator boost::multiprecision::number<boost::multiprecision::backends::cpp_dec_float<bits>, eto>() const;
+#endif
 #endif
 
 #ifdef SOPLEX_WITH_GMP
@@ -996,33 +1001,43 @@ public:
 
 
 #ifdef SOPLEX_WITH_BOOST
+using namespace boost::multiprecision;
 // Definitions related to boost number and SoPlex Rational. This is still
 // inside the #ifdef SOPLEX_WITH_GMP
 
 // Assignment operator from boost number. Uses the API for the Private class
 // to do this.
-template <typename T, boost::multiprecision::expression_template_option eto>
-Rational& Rational::operator=(const boost::multiprecision::number<T, eto>& r)
+template <typename T, expression_template_option eto>
+Rational& Rational::operator=(const number<T, eto>& r)
 {
    *(this->dpointer) = r;
    return *this;
 }
 
+#ifndef SOPLEX_WITH_CPPMPF
 // Operator to typecast Rational to one of the Boost Number types
-template <typename T, boost::multiprecision::expression_template_option eto>
-Rational::operator boost::multiprecision::number<T,  eto>() const
+template <typename T, expression_template_option eto>
+Rational::operator number<T,  eto>() const
 {
    // Constructs a boost::multiprecision::number<T> with value
    // this->pointer->privatevalue
-   return boost::multiprecision::number<T, eto>(this->dpointer->privatevalue);
-   // @todo may need to work with edge cases like the other codes?
-   // TODO look into this
+   return number<T, eto>(this->dpointer->privatevalue);
 }
+
+#else
+// Specialization for the conversion mpq_t -> cpp_rational 
+template<unsigned bits, expression_template_option eto>
+Rational::operator number<backends::cpp_dec_float<bits>, eto>() const
+{
+   number<gmp_rational, et_on> mpq_numb(this->dpointer->privatevalue);
+   number<cpp_rational_backend, et_on> cpp_numb = cpp_rational(mpq_numb);
+   return number<backends::cpp_dec_float<bits>, eto>(cpp_numb);
+}
+#endif
 
 // Constructor from boost number. Code is exactly same as that of construction
 // of Rational from mpq_t, basically a wrapper around the assignment operator
 // (=) of the Private class; calls the boost number assignment operator.
-
 #ifdef SOPLEX_WITH_MPFR
 template <typename T, boost::multiprecision::expression_template_option eto>
 Rational::Rational(const boost::multiprecision::number<T, eto>& q)
