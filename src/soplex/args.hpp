@@ -111,7 +111,7 @@ auto checkRange(const T& min, const T& max, const std::string& str) -> std::func
 inline auto parseArgsAndRun(int argc, char* argv[]) -> int
 {
    int solvemode = 1;
-   unsigned int precision = 100;
+   unsigned int precision = 50;
 
    // a special case for working with ./soplex file.mps, i.e., without
    // explicitly doing ./soplex --lpfile=file.mps
@@ -172,7 +172,7 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
     "choose reading mode for <lpfile> (0 - floating-point, 1 - rational)")
    ("solvemode", po::value<int>(&solvemode)->default_value(1)->notifier(args::checkRange(0, 3,
          "solvemode")),
-    "choose solving mode (0 - floating-point solve, 1 - auto, 2 - force iterative refinement, 3 - multi precision solve)")
+    "choose solving mode (0 - floating-point solve, 1 - auto, 2 - force iterative refinement, 3 - multi precision solve (default precision 50))")
    ("simplifier,s", po::value<int>()->default_value(1)->notifier(args::checkRange(0, 3, "simplifier")),
     "choose simplifier/presolver (0 - off, 1 - auto)")
    ("scaler,g", po::value<int>()->default_value(2)->notifier(args::checkRange(0, 6, "scaler")),
@@ -275,7 +275,7 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
     "mode for synchronizing real and rational LP (0 - store only real LP, 1 - auto, 2 - manual)")
    ("int:readmode", po::value<int>()->default_value(0)->notifier(args::checkRange(0, 1,
          "int:readmode")), "mode for reading LP files (0 - floating-point, 1 - rational)")
-   ("int:solvemode", po::value<int>()->default_value(1)->notifier(args::checkRange(0, 2,
+   ("int:solvemode", po::value<int>()->default_value(1)->notifier(args::checkRange(0, 3,
          "int:solvemode")),
     "mode for iterative refinement strategy (0 - floating-point solve, 1 - auto, 2 - exact rational solve)")
    ("int:checkmode", po::value<int>()->default_value(1)->notifier(args::checkRange(0, 2,
@@ -381,15 +381,18 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
    ("real:min_markowitz", po::value<double>()->default_value(0.01)->notifier(args::checkRange(0.0001,
          0.9999, "real:min_markowitz")), "minimal Markowitz threshold in LU factorization");
 
+#ifdef SOPLEX_WITH_MPFR
    po::options_description mpf("Multiprecision float solve");
    mpf.add_options()
-   ("precision", po::value<unsigned int>(&precision)->default_value(100u),
+   ("precision", po::value<unsigned int>(&precision)->default_value(50u),
     "Minimum precision (number of decimal digits) of mpf float");
-
-   // mpfdebug option only available during Debugging
-#ifndef NDEBUG
-   mpf.add_options()("mpfdebug", "Run templated multi-precision SoPlex with boost debug adaptor");
-#endif  // NDEBUG
+#endif
+#ifdef SOPLEX_WITH_CPPMPF
+   po::options_description mpf("Multiprecision float solve");
+   mpf.add_options()
+   ("precision", po::value<unsigned int>(&precision)->default_value(50u),
+    "Minimum precision (number of decimal digits) of cpp float. Only values 50, 100, 200 available. Compile with MPFR for other precisions.");
+#endif
 
    po::options_description allOpt("Allowed options");
    allOpt.add(generic).add(general).add(lt).add(algo).add(display).add(mpf).add(intParam).add(
@@ -495,25 +498,32 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
          // The documentation also mentions about static vs dynamic memory
          // allocation for the mpfr types. Is it relevant here? I probably also
          // need to have the mpfr_float_eto in the global soplex namespace
-#ifdef NDEBUG
-         using mulriprecision = number<mpfr_float_backend<0>, et_off>;
+#ifndef USE_DEBUG_ADAPTOR
+         using multiprecision = number<mpfr_float_backend<0>, et_off>;
 #else
-         using mulriprecision = number<debug_adaptor<mpfr_float_backend<0>>, et_off>;
+         using multiprecision = number<debug_adaptor<mpfr_float_backend<0>>, et_off>;
 #endif  // NDEBUG
 
-         mulriprecision::default_precision(precision);
-         runSoPlex<mulriprecision>(vm);
-         break;
+         multiprecision::default_precision(precision);
+         runSoPlex<multiprecision>(vm);
 #endif  // SOPLEX_WITH_MPFR
 
 #ifdef SOPLEX_WITH_CPPMPF
          // It seems that precision cannot be set on run time for cpp_float
          // backend for boost::number. So a precision of 50 decimal points is
          // set.
-         using mulriprecision = number<cpp_dec_float<50>, et_off>;
+         using multiprecision1 = number<cpp_dec_float<50>, et_off>;
+         using multiprecision2 = number<cpp_dec_float<100>, et_off>;
+         using multiprecision3 = number<cpp_dec_float<200>, et_off>;
+         if(precision <= 50)
+            runSoPlex<multiprecision1>(vm);
+         else if(precision <= 100)
+            runSoPlex<multiprecision2>(vm);
+         else
+            runSoPlex<multiprecision3>(vm);
 
-         runSoPlex<mulriprecision>(vm);
 #endif  // SOPLEX_WITH_CPPMPF
+      break;
 
       default:
          std::cerr << "Wrong value for the solve mode\n\n" << allOpt << "\n";

@@ -499,7 +499,7 @@ int soplex::runSoPlex(const po::variables_map& vm)
          soplex.setIntParam(soplex.READMODE, vm["readmode"].as<int>());
       }
 
-      // --solvemode=<value> : choose solving mode (0* - floating-point solve, 1 - auto, 2 - force iterative refinement)
+      // --solvemode=<value> : choose solving mode (0* - floating-point solve, 1 - auto, 2 - force iterative refinement, 3 - multiprecision)
       if(vm.count("solvemode"))
       {
          auto solvemode = vm["solvemode"].as<int>();
@@ -509,6 +509,7 @@ int soplex::runSoPlex(const po::variables_map& vm)
          // a Real SoPlex or Templated Boost Soplex.
          if(solvemode == 3)
          {
+            MSG_INFO1(soplex.spxout, soplex.spxout << "Solving with increased precision." << std::endl);
             soplex.setIntParam(soplex.SOLVEMODE, vm["int:solvemode"].as<int>());
          }
          else
