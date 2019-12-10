@@ -381,12 +381,6 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
    ("real:min_markowitz", po::value<double>()->default_value(0.01)->notifier(args::checkRange(0.0001,
          0.9999, "real:min_markowitz")), "minimal Markowitz threshold in LU factorization");
 
-
-   po::options_description allOpt("Allowed options");
-   allOpt.add(generic).add(general).add(lt).add(algo).add(display).add(intParam).add(
-      realParam).add(boolParam);
-
-#ifdef SOPLEX_WITH_BOOST
 #ifdef SOPLEX_WITH_MPFR
    po::options_description mpf("Multiprecision float solve");
    mpf.add_options()
@@ -399,8 +393,10 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
    ("precision", po::value<unsigned int>(&precision)->default_value(50u),
     "Minimum precision (number of decimal digits) of cpp float. Only values 50, 100, 200 available. Compile with MPFR for other precisions.");
 #endif
-   allOpt.add(mpf);
-#endif
+
+   po::options_description allOpt("Allowed options");
+   allOpt.add(generic).add(general).add(lt).add(algo).add(display).add(mpf).add(intParam).add(
+      realParam).add(boolParam);
 
    // This will contain a subsection of the options, i.e., without intParam,
    // realParam, boolParam and rationalParam. Useful for printing a shorter help
