@@ -258,6 +258,9 @@ endif
 ifeq ($(Boost),true)
 	LDFLAGS += $(BOOST_LDFLAGS)
 	CPPFLAGS += -DSOPLEX_WITH_BOOST
+	ifeq ($(MPFR),false)
+		CPPFLAGS += -DSOPLEX_WITH_CPPMPF
+	endif
 endif
 
 
