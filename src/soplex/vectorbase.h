@@ -295,10 +295,11 @@ public:
    /**@name Arithmetic operations */
    ///@{
 
-   /// Set vector to 0.
+   /// Set vector to contain all-zeros (keeping the same length)
    void clear()
    {
-      val.clear();
+      for(auto& v : val)
+         v = 0;
    }
 
    /// Addition.
