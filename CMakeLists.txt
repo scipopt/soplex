@@ -159,6 +159,7 @@ if(MSVC)
     add_definitions(/wd4100)
     add_definitions(/wd4661)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+    add_compile_options(/bigobj)
 
     # set MT or MTd flag when using the static VS runtime libraries
     if(MT)
