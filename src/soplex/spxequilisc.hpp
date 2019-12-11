@@ -97,7 +97,7 @@ void SPxEquiliSC<R>::computeEquiExpVec(const SVSetBase<R>* vecset, const DataArr
 
       assert(maxi > 0.0);
 
-      spxFrexp(1.0 / maxi, &(scaleExp[i]));
+      spxFrexp(Real(1.0 / maxi), &(scaleExp[i]));
 
       scaleExp[i] -= 1;
    }
@@ -130,7 +130,7 @@ void SPxEquiliSC<R>::computeEquiExpVec(const SVSetBase<R>* vecset, const std::ve
 
       assert(maxi > 0.0);
 
-      spxFrexp(1.0 / maxi, &(scaleExp[i]));
+      spxFrexp(Real(1.0 / maxi), &(scaleExp[i]));
 
       scaleExp[i] -= 1;
    }

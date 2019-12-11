@@ -111,7 +111,7 @@ auto checkRange(const T& min, const T& max, const std::string& str) -> std::func
 inline auto parseArgsAndRun(int argc, char* argv[]) -> int
 {
    int solvemode = 1;
-   unsigned int precision = 100;
+   unsigned int precision = 50;
 
    // a special case for working with ./soplex file.mps, i.e., without
    // explicitly doing ./soplex --lpfile=file.mps
@@ -161,9 +161,9 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
    lt.add_options()
    ("time,t", po::value<int>(), "set time limit to n seconds")
    ("iterlimit,i", po::value<int>(), "set iteration limit to n")
-   ("primfeastol,f", po::value<double>(), "set primal feasibility tolerance to double")
-   ("dualfeastol,o", po::value<double>(), "set dual feasibility (optimality) tolerance to")
-   ("valtol,l", po::value<double>(), "set validation tolerance to whatever");
+   ("primfeastol,f", po::value<Real>(), "set primal feasibility tolerance to double")
+   ("dualfeastol,o", po::value<Real>(), "set dual feasibility (optimality) tolerance to")
+   ("valtol,l", po::value<Real>(), "set validation tolerance to whatever");
 
    // Variables will contain value specified by user or the default
 
@@ -172,7 +172,7 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
     "choose reading mode for <lpfile> (0 - floating-point, 1 - rational)")
    ("solvemode", po::value<int>(&solvemode)->default_value(1)->notifier(args::checkRange(0, 3,
          "solvemode")),
-    "choose solving mode (0 - floating-point solve, 1 - auto, 2 - force iterative refinement, 3 - multi precision solve)")
+    "choose solving mode (0 - floating-point solve, 1 - auto, 2 - force iterative refinement, 3 - multi precision solve (default precision 50))")
    ("simplifier,s", po::value<int>()->default_value(1)->notifier(args::checkRange(0, 3, "simplifier")),
     "choose simplifier/presolver (0 - off, 1 - auto)")
    ("scaler,g", po::value<int>()->default_value(2)->notifier(args::checkRange(0, 6, "scaler")),
@@ -275,7 +275,7 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
     "mode for synchronizing real and rational LP (0 - store only real LP, 1 - auto, 2 - manual)")
    ("int:readmode", po::value<int>()->default_value(0)->notifier(args::checkRange(0, 1,
          "int:readmode")), "mode for reading LP files (0 - floating-point, 1 - rational)")
-   ("int:solvemode", po::value<int>()->default_value(1)->notifier(args::checkRange(0, 2,
+   ("int:solvemode", po::value<int>()->default_value(1)->notifier(args::checkRange(0, 3,
          "int:solvemode")),
     "mode for iterative refinement strategy (0 - floating-point solve, 1 - auto, 2 - exact rational solve)")
    ("int:checkmode", po::value<int>()->default_value(1)->notifier(args::checkRange(0, 2,
@@ -314,82 +314,85 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
     "measure for statistics, e.g. factorization time (0 - off, 1 - user time, 2 - wallclock time)");
 
    realParam.add_options()
-   ("real:feastol", po::value<double>()->default_value(1e-6)->notifier(args::checkRange(0.0, 0.1,
+   ("real:feastol", po::value<Real>()->default_value(1e-6)->notifier(args::checkRange(0.0, 0.1,
          "real:feastol")), "primal feasibility tolerance")
-   ("real:opttol", po::value<double>()->default_value(1e-6)->notifier(args::checkRange(0.0, 1.0,
+   ("real:opttol", po::value<Real>()->default_value(1e-6)->notifier(args::checkRange(0.0, 1.0,
          "real:opttol")), "dual feasibility tolerance")
-   ("real:epsilon_zero", po::value<double>()->default_value(DEFAULT_EPS_ZERO)->notifier(
+   ("real:epsilon_zero", po::value<Real>()->default_value(DEFAULT_EPS_ZERO)->notifier(
        args::checkRange(0.0, 1.0, "real:epsilon_zero")), "general zero tolerance")
    ("real:epsilon_factorization",
-    po::value<double>()->default_value(DEFAULT_EPS_FACTOR)->notifier(args::checkRange(0.0, 1.0,
+    po::value<Real>()->default_value(DEFAULT_EPS_FACTOR)->notifier(args::checkRange(0.0, 1.0,
           "real:epsilon_factorization")), "zero tolerance used in factorization")
-   ("real:epsilon_update", po::value<double>()->default_value(DEFAULT_EPS_UPDATE)->notifier(
+   ("real:epsilon_update", po::value<Real>()->default_value(DEFAULT_EPS_UPDATE)->notifier(
        args::checkRange(0.0, 1.0, "real:epsilon_update")),
     "zero tolerance used in update of the factorization")
-   ("real:epsilon_pivot", po::value<double>()->default_value(DEFAULT_EPS_PIVOT)->notifier(
+   ("real:epsilon_pivot", po::value<Real>()->default_value(DEFAULT_EPS_PIVOT)->notifier(
        args::checkRange(0.0, 1.0, "real:epsilon_pivot")), "pivot zero tolerance used in factorization")
-   ("real:infty", po::value<double>()->default_value(DEFAULT_INFINITY)->notifier(args::checkRange(1e10,
+   ("real:infty", po::value<Real>()->default_value(DEFAULT_INFINITY)->notifier(args::checkRange(1e10,
          1e100, "real:infty")), "infinity threshold")
-   ("real:timelimit", po::value<double>()->default_value(DEFAULT_INFINITY)->notifier(args::checkRange(
-            0.0, DEFAULT_INFINITY, "real:timelimit")), "time limit in seconds")
-   ("real:objlimit_lower", po::value<double>()->default_value(-DEFAULT_INFINITY)->notifier(
+   ("real:timelimit", po::value<Real>()->default_value(DEFAULT_INFINITY)->notifier(args::checkRange(
+            Real(0.0), DEFAULT_INFINITY, "real:timelimit")), "time limit in seconds")
+   ("real:objlimit_lower", po::value<Real>()->default_value(-DEFAULT_INFINITY)->notifier(
        args::checkRange(-DEFAULT_INFINITY, DEFAULT_INFINITY, "real:objlimit_lower")),
     "lower limit on objective value")
-   ("real:objlimit_upper", po::value<double>()->default_value(DEFAULT_INFINITY)->notifier(
+   ("real:objlimit_upper", po::value<Real>()->default_value(DEFAULT_INFINITY)->notifier(
        args::checkRange(-DEFAULT_INFINITY, DEFAULT_INFINITY, "real:objlimit_upper")),
     "upper limit on objective value")
-   ("real:fpfeastol", po::value<double>()->default_value(1e-9)->notifier(args::checkRange(1e-12, 1.0,
+   ("real:fpfeastol", po::value<Real>()->default_value(1e-9)->notifier(args::checkRange(1e-12, 1.0,
          "real:fpfeastol")),
     "working tolerance for feasibility in floating-point solver during iterative refinement")
-   ("real:fpopttol", po::value<double>()->default_value(1e-9)->notifier(args::checkRange(1e-12, 1.0,
+   ("real:fpopttol", po::value<Real>()->default_value(1e-9)->notifier(args::checkRange(1e-12, 1.0,
          "real:fpopttol")),
     "working tolerance for optimality in floating-point solver during iterative refinement")
-   ("real:maxscaleincr", po::value<double>()->default_value(1e25)->notifier(args::checkRange(1.0,
+   ("real:maxscaleincr", po::value<Real>()->default_value(1e25)->notifier(args::checkRange(Real(1.0),
          DEFAULT_INFINITY, "real:maxscaleincr")), "maximum increase of scaling factors between refinements")
-   ("real:liftminval", po::value<double>()->default_value(0.000976562)->notifier(args::checkRange(0.0,
+   ("real:liftminval", po::value<Real>()->default_value(0.000976562)->notifier(args::checkRange(0.0,
          0.1, "real:liftminval")),
     "lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)")
-   ("real:liftmaxval", po::value<double>()->default_value(1024.0)->notifier(args::checkRange(10.0,
+   ("real:liftmaxval", po::value<Real>()->default_value(1024.0)->notifier(args::checkRange(Real(10.0),
          DEFAULT_INFINITY, "real:liftmaxval")),
     "lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)")
-   ("real:sparsity_threshold", po::value<double>()->default_value(0.6)->notifier(args::checkRange(0.0,
+   ("real:sparsity_threshold", po::value<Real>()->default_value(0.6)->notifier(args::checkRange(0.0,
          1.0, "real:sparsity_threshold")),
     "sparse pricing threshold (#violations < dimension * SPARSITY_THRESHOLD activates sparse pricing)")
    ("real:representation_switch",
-    po::value<double>()->default_value(1.2)->notifier(args::checkRange(0.0, DEFAULT_INFINITY,
+    po::value<Real>()->default_value(1.2)->notifier(args::checkRange(Real(0.0), DEFAULT_INFINITY,
           "real:representation_switch")),
     "threshold on number of rows vs. number of columns for switching from column to row representations in auto mode")
-   ("real:ratrec_freq", po::value<double>()->default_value(1.2)->notifier(args::checkRange(1.0,
+   ("real:ratrec_freq", po::value<Real>()->default_value(1.2)->notifier(args::checkRange(Real(1.0),
          DEFAULT_INFINITY, "real:ratrec_freq")),
     "geometric frequency at which to apply rational reconstruction")
-   ("real:minred", po::value<double>()->default_value(1e-4)->notifier(args::checkRange(0.0, 1.0,
+   ("real:minred", po::value<Real>()->default_value(1e-4)->notifier(args::checkRange(0.0, 1.0,
          "real:minred")), "minimal reduction (sum of removed rows/cols) to continue simplification")
-   ("real:refac_basis_nnz", po::value<double>()->default_value(10.0)->notifier(args::checkRange(1.0,
+   ("real:refac_basis_nnz", po::value<Real>()->default_value(10.0)->notifier(args::checkRange(1.0,
          100.0, "real:refac_basis_nnz")),
     "refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix")
-   ("real:refac_update_fill", po::value<double>()->default_value(5.0)->notifier(args::checkRange(1.0,
+   ("real:refac_update_fill", po::value<Real>()->default_value(5.0)->notifier(args::checkRange(1.0,
          100.0, "real:refac_update_fill")),
     "refactor threshold for fill-in in current factor update compared to fill-in in last factorization")
-   ("real:refac_mem_factor", po::value<double>()->default_value(1.5)->notifier(args::checkRange(1.0,
+   ("real:refac_mem_factor", po::value<Real>()->default_value(1.5)->notifier(args::checkRange(1.0,
          10.0, "real:refac_mem_factor")),
     "refactor threshold for memory growth in factorization since last refactorization")
-   ("real:leastsq_acrcy", po::value<double>()->default_value(1000.0)->notifier(args::checkRange(1.0,
+   ("real:leastsq_acrcy", po::value<Real>()->default_value(1000.0)->notifier(args::checkRange(Real(1.0),
          DEFAULT_INFINITY, "real:leastsq_acrcy")),
     "accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)")
-   ("real:obj_offset", po::value<double>()->default_value(0.0)->notifier(args::checkRange(
+   ("real:obj_offset", po::value<Real>()->default_value(0.0)->notifier(args::checkRange(
             -DEFAULT_INFINITY, DEFAULT_INFINITY, "real:obj_offset")), "objective offset to be used")
-   ("real:min_markowitz", po::value<double>()->default_value(0.01)->notifier(args::checkRange(0.0001,
+   ("real:min_markowitz", po::value<Real>()->default_value(0.01)->notifier(args::checkRange(0.0001,
          0.9999, "real:min_markowitz")), "minimal Markowitz threshold in LU factorization");
 
+#ifdef SOPLEX_WITH_MPFR
    po::options_description mpf("Multiprecision float solve");
    mpf.add_options()
-   ("precision", po::value<unsigned int>(&precision)->default_value(100u),
+   ("precision", po::value<unsigned int>(&precision)->default_value(50u),
     "Minimum precision (number of decimal digits) of mpf float");
-
-   // mpfdebug option only available during Debugging
-#ifndef NDEBUG
-   mpf.add_options()("mpfdebug", "Run templated multi-precision SoPlex with boost debug adaptor");
-#endif  // NDEBUG
+#endif
+#ifdef SOPLEX_WITH_CPPMPF
+   po::options_description mpf("Multiprecision float solve");
+   mpf.add_options()
+   ("precision", po::value<unsigned int>(&precision)->default_value(50u),
+    "Minimum precision (number of decimal digits) of cpp float. Only values 50, 100, 200 available. Compile with MPFR for other precisions.");
+#endif
 
    po::options_description allOpt("Allowed options");
    allOpt.add(generic).add(general).add(lt).add(algo).add(display).add(mpf).add(intParam).add(
@@ -495,26 +498,32 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
          // The documentation also mentions about static vs dynamic memory
          // allocation for the mpfr types. Is it relevant here? I probably also
          // need to have the mpfr_float_eto in the global soplex namespace
-#ifdef NDEBUG
-         using mulriprecision = number<mpfr_float_backend<0>, et_off>;
+#ifndef USE_DEBUG_ADAPTOR
+         using multiprecision = number<mpfr_float_backend<0>, et_off>;
 #else
-         using mulriprecision = number<debug_adaptor<mpfr_float_backend<0>>, et_off>;
+         using multiprecision = number<debug_adaptor<mpfr_float_backend<0>>, et_off>;
 #endif  // NDEBUG
 
-         mulriprecision::default_precision(precision);
-         runSoPlex<mulriprecision>(vm);
-         break;
+         multiprecision::default_precision(precision);
+         runSoPlex<multiprecision>(vm);
 #endif  // SOPLEX_WITH_MPFR
 
 #ifdef SOPLEX_WITH_CPPMPF
          // It seems that precision cannot be set on run time for cpp_float
          // backend for boost::number. So a precision of 50 decimal points is
          // set.
-         using mulriprecision = number<cpp_dec_float<50>, et_off>;
+         using multiprecision1 = number<cpp_dec_float<50>, et_off>;
+         using multiprecision2 = number<cpp_dec_float<100>, et_off>;
+         using multiprecision3 = number<cpp_dec_float<200>, et_off>;
+         if(precision <= 50)
+            runSoPlex<multiprecision1>(vm);
+         else if(precision <= 100)
+            runSoPlex<multiprecision2>(vm);
+         else
+            runSoPlex<multiprecision3>(vm);
 
-         runSoPlex<mulriprecision>(vm);
 #endif  // SOPLEX_WITH_CPPMPF
-
+      break;
       default:
          std::cerr << "Wrong value for the solve mode\n\n" << allOpt << "\n";
          return 0;

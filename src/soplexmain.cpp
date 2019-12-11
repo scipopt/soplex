@@ -193,7 +193,7 @@ void printPrimalSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rown
 {
    int printprec;
    int printwidth;
-   printprec = (int) - log10(double(Param::epsilon()));
+   printprec = (int) - log10(Real(Param::epsilon()));
    printwidth = printprec + 10;
 
    if(real)
@@ -295,7 +295,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 {
    int printprec;
    int printwidth;
-   printprec = (int) - log10(double(Param::epsilon()));
+   printprec = (int) - log10(Real(Param::epsilon()));
    printwidth = printprec + 10;
 
    if(real)
@@ -499,7 +499,7 @@ int soplex::runSoPlex(const po::variables_map& vm)
          soplex.setIntParam(soplex.READMODE, vm["readmode"].as<int>());
       }
 
-      // --solvemode=<value> : choose solving mode (0* - floating-point solve, 1 - auto, 2 - force iterative refinement)
+      // --solvemode=<value> : choose solving mode (0* - floating-point solve, 1 - auto, 2 - force iterative refinement, 3 - multiprecision)
       if(vm.count("solvemode"))
       {
          auto solvemode = vm["solvemode"].as<int>();
@@ -509,6 +509,7 @@ int soplex::runSoPlex(const po::variables_map& vm)
          // a Real SoPlex or Templated Boost Soplex.
          if(solvemode == 3)
          {
+            MSG_INFO1(soplex.spxout, soplex.spxout << "Solving with increased precision." << std::endl);
             soplex.setIntParam(soplex.SOLVEMODE, vm["int:solvemode"].as<int>());
          }
          else
@@ -552,13 +553,13 @@ int soplex::runSoPlex(const po::variables_map& vm)
       // -f<eps> : set primal feasibility tolerance to <eps>
       if(vm.count("primfeastol"))
       {
-         soplex.setRealParam(soplex.FEASTOL, vm["primfeastol"].as<double>());
+         soplex.setRealParam(soplex.FEASTOL, vm["primfeastol"].as<Real>());
       }
 
       // -o<eps> : set dual feasibility (optimality) tolerance to <eps>
       if(vm.count("dualfeastol"))
       {
-         soplex.setRealParam(soplex.OPTTOL, vm["dualfeastol"].as<double>());
+         soplex.setRealParam(soplex.OPTTOL, vm["dualfeastol"].as<Real>());
       }
 
       // l<eps> : set validation tolerance to <eps>

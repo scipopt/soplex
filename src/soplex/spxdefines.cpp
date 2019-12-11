@@ -101,15 +101,4 @@ Real spxFrexp(Real y, int* exp)
    return frexp(y, exp);
 }
 
-// @todo: write a boost version of the following function. Check whether this
-// function gets called from the Scalers, if not, we can have a general
-// version of the function in spxdefines.hpp
-Real spxLdexp(Real x, int exp)
-{
-   return ldexp(x, exp);
-}
-
-
-
-
 } // namespace soplex

@@ -176,7 +176,7 @@ int SPxScaler<R>::computeScaleExp(const SVectorBase<R>& vec,
    else
    {
       int scaleExp;
-      spxFrexp(1.0 / maxi, &(scaleExp));
+      spxFrexp(R(1.0 / maxi), &(scaleExp));
       return scaleExp - 1;
    }
 }
