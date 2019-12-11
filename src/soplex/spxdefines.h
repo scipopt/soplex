@@ -29,7 +29,6 @@
  */
 #ifndef _SPXDEFINES_H_
 #define _SPXDEFINES_H_
-#include <tgmath.h>
 #include <cmath>
 
 #ifdef _MSC_VER
@@ -312,7 +311,7 @@ R spxAbs(R a)
    return abs(a);
 }
 
-// tgmath means proper long double function gets called, e.g. for fabs -> fabsl.
+// cmath means proper long double function gets called, e.g. for fabs -> fabsl.
 // Documentation unclear for nextafterl, so the ifdef remains for that case.
 #ifdef WITH_LONG_DOUBLE
 // returns the next representable value after x in the direction of y
