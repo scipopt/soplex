@@ -381,6 +381,21 @@ public:
    friend bool operator>(const long double& r, const Rational& s);
    friend bool operator>=(const long double& r, const Rational& s);
 
+   friend bool operator!=(const Rational& r, const float& s);
+   friend bool operator==(const Rational& r, const float& s);
+   friend bool operator<(const Rational& r, const float& s);
+   friend bool operator<=(const Rational& r, const float& s);
+   friend bool operator>(const Rational& r, const float& s);
+   friend bool operator>=(const Rational& r, const float& s);
+
+   friend bool operator!=(const float& r, const Rational& s);
+   friend bool operator==(const float& r, const Rational& s);
+   friend bool operator<(const float& r, const Rational& s);
+   friend bool operator<=(const float& r, const Rational& s);
+   friend bool operator>(const float& r, const Rational& s);
+   friend bool operator>=(const float& r, const Rational& s);
+
+
    friend Rational operator+(const double& d, const Rational& r);
    friend Rational operator-(const double& d, const Rational& r);
    friend Rational operator*(const double& d, const Rational& r);

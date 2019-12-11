@@ -29,8 +29,7 @@
  */
 #ifndef _SPXDEFINES_H_
 #define _SPXDEFINES_H_
-
-#include <math.h>
+#include <tgmath.h>
 #include <cmath>
 
 #ifdef _MSC_VER
@@ -207,28 +206,22 @@ typedef float Real;
 #endif
 /// default allowed bound violation
 #ifndef DEFAULT_BND_VIOL
-#define DEFAULT_BND_VIOL   1e-1
+#define DEFAULT_BND_VIOL   1e-1f
 #endif
 /// default allowed additive zero: 1.0 + EPS_ZERO == 1.0
 #ifndef DEFAULT_EPS_ZERO
-#define DEFAULT_EPS_ZERO   1e-7
+#define DEFAULT_EPS_ZERO   1e-7f
 #endif
 #ifndef DEFAULT_EPS_FACTOR
-#define DEFAULT_EPS_FACTOR 1e-7
+#define DEFAULT_EPS_FACTOR 1e-7f
 #endif
 #ifndef DEFAULT_EPS_UPDATE
-#define DEFAULT_EPS_UPDATE 1e-6
+#define DEFAULT_EPS_UPDATE 1e-6f
 #endif
 #ifndef DEFAULT_EPS_PIVOT
-#define DEFAULT_EPS_PIVOT 1e-6
+#define DEFAULT_EPS_PIVOT 1e-6f
 #endif
-#define DEFAULT_INFINITY   1e100
-
-/// returns square root
-inline Real spxSqrt(Real a)
-{
-   return std::sqrt(a);
-}
+#define DEFAULT_INFINITY   1e35f
 
 #else
 
@@ -319,36 +312,26 @@ R spxAbs(R a)
    return abs(a);
 }
 
+// tgmath means proper long double function gets called, e.g. for fabs -> fabsl.
+// Documentation unclear for nextafterl, so the ifdef remains for that case.
 #ifdef WITH_LONG_DOUBLE
-/// returns |a|
-template <>
-inline Real spxAbs(Real a)
-{
-   return fabsl(a);
-}
-
-/// returns square root
-inline Real spxSqrt(Real a)
-{
-   return std::sqrt(a);
-}
-
-
 // returns the next representable value after x in the direction of y
-
 inline Real spxNextafter(Real x, Real y)
 {
    return nextafterl(x, y);
 }
-
-
-/// returns x * 2^exp
-inline Real spxLdexp(Real x, int exp)
-{
-   return ldexpl(x, exp);
-}
-
 #else
+// returns the next representable value after x in the direction of y
+inline Real spxNextafter(Real x, Real y)
+{
+#ifndef _MSC_VER
+   return nextafter(x, y);
+#else
+   return _nextafter(x, y);
+#endif
+}
+#endif
+
 /// returns |a|
 template <>
 inline Real spxAbs(Real a)
@@ -361,18 +344,6 @@ inline Real spxSqrt(Real a)
 {
    return std::sqrt(a);
 }
-
-// returns the next representable value after x in the direction of y
-inline Real spxNextafter(Real x, Real y)
-{
-#ifndef _MSC_VER
-   return nextafter(x, y);
-#else
-   return _nextafter(x, y);
-#endif
-}
-
-#endif
 
 /// returns max(|a|,|b|)
 inline Real maxAbs(Real a, Real b)

@@ -193,7 +193,7 @@ void printPrimalSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rown
 {
    int printprec;
    int printwidth;
-   printprec = (int) - log10(double(Param::epsilon()));
+   printprec = (int) - log10(Real(Param::epsilon()));
    printwidth = printprec + 10;
 
    if(real)
@@ -295,7 +295,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 {
    int printprec;
    int printwidth;
-   printprec = (int) - log10(double(Param::epsilon()));
+   printprec = (int) - log10(Real(Param::epsilon()));
    printwidth = printprec + 10;
 
    if(real)
@@ -553,13 +553,13 @@ int soplex::runSoPlex(const po::variables_map& vm)
       // -f<eps> : set primal feasibility tolerance to <eps>
       if(vm.count("primfeastol"))
       {
-         soplex.setRealParam(soplex.FEASTOL, vm["primfeastol"].as<double>());
+         soplex.setRealParam(soplex.FEASTOL, vm["primfeastol"].as<Real>());
       }
 
       // -o<eps> : set dual feasibility (optimality) tolerance to <eps>
       if(vm.count("dualfeastol"))
       {
-         soplex.setRealParam(soplex.OPTTOL, vm["dualfeastol"].as<double>());
+         soplex.setRealParam(soplex.OPTTOL, vm["dualfeastol"].as<Real>());
       }
 
       // l<eps> : set validation tolerance to <eps>

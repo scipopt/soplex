@@ -2463,13 +2463,179 @@ bool operator>=(const long double& r, const Rational& s)
 }
 
 
+/// equality operator for Rational and float
+bool operator==(const Rational& r, const float& s)
+{
+   if(s == 0.0)
+#ifdef SOPLEX_PERFALT_1
+      return (mpq_sgn(r.dpointer->privatevalue) == 0);
+
+#else
+      return (mpq_equal(r.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0);
+#endif
+   else if(s == 1.0)
+      return (mpq_equal(r.dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) != 0);
+   else if(s == -1.0)
+      return (mpq_equal(r.dpointer->privatevalue, Rational::NEGONE.dpointer->privatevalue) != 0);
+   else
+      return (r == Rational(s));
+}
+
+
+
+/// inequality operator for Rational and float
+bool operator!=(const Rational& r, const float& s)
+{
+   if(s == 0.0)
+#ifdef SOPLEX_PERFALT_1
+      return (mpq_sgn(r.dpointer->privatevalue) != 0);
+
+#else
+      return (mpq_equal(r.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) == 0);
+#endif
+   else if(s == 1.0)
+      return (mpq_equal(r.dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) == 0);
+   else if(s == -1.0)
+      return (mpq_equal(r.dpointer->privatevalue, Rational::NEGONE.dpointer->privatevalue) == 0);
+   else
+      return (r != Rational(s));
+}
+
+
+
+/// less than operator for Rational and float
+bool operator<(const Rational& r, const float& s)
+{
+   if(s == 0.0)
+#ifdef SOPLEX_PERFALT_1
+      return (mpq_sgn(r.dpointer->privatevalue) == -1);
+
+#else
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) < 0);
+#endif
+   else if(s == 1.0)
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) < 0);
+   else if(s == -1.0)
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::NEGONE.dpointer->privatevalue) < 0);
+   else
+      return (r < Rational(s));
+}
+
+
+
+/// less than or equal to operator for Rational and float
+bool operator<=(const Rational& r, const float& s)
+{
+   if(s == 0.0)
+#ifdef SOPLEX_PERFALT_1
+      return (mpq_sgn(r.dpointer->privatevalue) <= 0);
+
+#else
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) <= 0);
+#endif
+   else if(s == 1.0)
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) <= 0);
+   else if(s == -1.0)
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::NEGONE.dpointer->privatevalue) <= 0);
+   else
+      return (r <= Rational(s));
+}
+
+
+
+/// greater than operator for Rational and float
+bool operator>(const Rational& r, const float& s)
+{
+   if(s == 0.0)
+#ifdef SOPLEX_PERFALT_1
+      return (mpq_sgn(r.dpointer->privatevalue) == 1);
+
+#else
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) > 0);
+#endif
+   else if(s == 1.0)
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) > 0);
+   else if(s == -1.0)
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::NEGONE.dpointer->privatevalue) > 0);
+   else
+      return (r > Rational(s));
+}
+
+
+
+/// greater than or equal to operator for Rational and float
+bool operator>=(const Rational& r, const float& s)
+{
+   if(s == 0.0)
+#ifdef SOPLEX_PERFALT_1
+      return (mpq_sgn(r.dpointer->privatevalue) >= 0);
+
+#else
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) >= 0);
+#endif
+   else if(s == 1.0)
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) >= 0);
+   else if(s == -1.0)
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::NEGONE.dpointer->privatevalue) >= 0);
+   else
+      return (r >= Rational(s));
+}
+
+
+
+/// equality operator for float and Rational
+bool operator==(const float& r, const Rational& s)
+{
+   return (s == r);
+}
+
+
+
+/// inequality operator for float and Rational
+bool operator!=(const float& r, const Rational& s)
+{
+   return (s != r);
+}
+
+
+
+/// less than operator for float and Rational
+bool operator<(const float& r, const Rational& s)
+{
+   return (s > r);
+}
+
+
+
+/// less than or equal to operator for float and Rational
+bool operator<=(const float& r, const Rational& s)
+{
+   return (s >= r);
+}
+
+
+
+/// greater than operator for float and Rational
+bool operator>(const float& r, const Rational& s)
+{
+   return (s < r);
+}
+
+
+
+/// greater than or equal to operator for float and Rational
+bool operator>=(const float& r, const Rational& s)
+{
+   return (s <= r);
+}
+
+
 
 /// addition operator for double and Rational
 Rational operator+(const double& d, const Rational& r)
 {
    return (r + d);
 }
-
 
 
 /// subtraction operator for double and Rational

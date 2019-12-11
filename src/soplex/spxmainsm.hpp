@@ -1964,7 +1964,7 @@ void SPxMainSM<R>::trivialHeuristic(SPxLPBase<R>& lp)
       {
          R aij = col.value(k);
 
-         ASSERT_WARN("WMAISM45", isNotZero(aij, 1.0 / R(infinity)));
+         ASSERT_WARN("WMAISM45", isNotZero(aij, R(1.0 / R(infinity))));
 
          if(GT(lp.lhs(col.index(k)), R(-infinity)) && LT(lp.rhs(col.index(k)), R(infinity)))
          {
@@ -2655,7 +2655,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
             redundantLower = false;
             redundantUpper = false;
 
-            ASSERT_WARN("WMAISM12", isNotZero(aij, 1.0 / R(infinity)));
+            ASSERT_WARN("WMAISM12", isNotZero(aij, R(1.0 / R(infinity))));
 
             if(aij > 0.0)
             {
@@ -3047,7 +3047,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
             lowers[k] = lp.lower(j);
             uppers[k] = lp.upper(j);
 
-            ASSERT_WARN("WMAISM25", isNotZero(aij, 1.0 / R(infinity)));
+            ASSERT_WARN("WMAISM25", isNotZero(aij, R(1.0 / R(infinity))));
 
             if(aij > 0.0)
                lp.changeLower(j, lp.upper(j));
@@ -3091,7 +3091,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
             lowers[k] = lp.lower(j);
             uppers[k] = lp.upper(j);
 
-            ASSERT_WARN("WMAISM27", isNotZero(aij, 1.0 / R(infinity)));
+            ASSERT_WARN("WMAISM27", isNotZero(aij, R(1.0 / R(infinity))));
 
             if(aij > 0.0)
                lp.changeUpper(j, lp.lower(j));
@@ -3258,7 +3258,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
             int i = col.index(k);
 
             // warn since this unhandled case may slip through unnoticed otherwise
-            ASSERT_WARN("WMAISM31", isNotZero(col.value(k), 1.0 / R(infinity)));
+            ASSERT_WARN("WMAISM31", isNotZero(col.value(k), R(1.0 / R(infinity))));
 
             if(col.value(k) > 0.0)
             {
@@ -3510,7 +3510,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
             else
                throw SPxInternalCodeException("XMAISM11 This should never happen.");
 
-            ASSERT_WARN("WMAISM39", isNotZero(aik, 1.0 / R(infinity)));
+            ASSERT_WARN("WMAISM39", isNotZero(aik, R(1.0 / R(infinity))));
 
             R lo, up;
             R oldLower = lp.lower(k);
@@ -3752,7 +3752,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLPBase<R>& lp, b
          int  i   = lp.colVector(j).index(0);
          R aij = lp.colVector(j).value(0);
 
-         ASSERT_WARN("WMAISM44", isNotZero(aij, 1.0 / R(infinity)));
+         ASSERT_WARN("WMAISM44", isNotZero(aij, R(1.0 / R(infinity))));
 
          R bound = lp.maxObj(j) / aij;
 
@@ -3791,7 +3791,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLPBase<R>& lp, b
          R aij = col.value(k);
          int  i   = col.index(k);
 
-         ASSERT_WARN("WMAISM45", isNotZero(aij, 1.0 / R(infinity)));
+         ASSERT_WARN("WMAISM45", isNotZero(aij, R(1.0 / R(infinity))));
 
          if(aij > 0)
          {
@@ -3986,7 +3986,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::multiaggregation(SPxLPBase<R>& l
       {
          R aij = col.value(k);
 
-         ASSERT_WARN("WMAISM45", isNotZero(aij, 1.0 / R(infinity)));
+         ASSERT_WARN("WMAISM45", isNotZero(aij, R(1.0 / R(infinity))));
 
          if(GT(lp.lhs(col.index(k)), R(-infinity)) && LT(lp.rhs(col.index(k)), R(infinity)))
          {
@@ -4428,7 +4428,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLPBase<R>& lp, 
             int i = m_dupRows[k].index(l);
             isLhsEqualRhs[l] = (lp.lhs(i) == lp.rhs(i));
 
-            ASSERT_WARN("WMAISM54", isNotZero(scale[i], 1.0 / R(infinity)));
+            ASSERT_WARN("WMAISM54", isNotZero(scale[i], R(1.0 / R(infinity))));
 
             if(rowIdx == -1)
             {
