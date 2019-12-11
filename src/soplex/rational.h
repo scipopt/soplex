@@ -1041,6 +1041,7 @@ Rational::operator number<T,  eto>() const
 }
 
 #else
+#ifdef SOPLEX_WITH_GMP
 // Specialization for the conversion mpq_t -> cpp_rational 
 template<unsigned bits, expression_template_option eto>
 Rational::operator number<backends::cpp_dec_float<bits>, eto>() const
@@ -1049,6 +1050,14 @@ Rational::operator number<backends::cpp_dec_float<bits>, eto>() const
    number<cpp_rational_backend, et_on> cpp_numb = cpp_rational(mpq_numb);
    return number<backends::cpp_dec_float<bits>, eto>(cpp_numb);
 }
+#else
+// Specialization for the conversion double -> cpp_rational 
+template<unsigned bits, expression_template_option eto>
+Rational::operator number<backends::cpp_dec_float<bits>, eto>() const
+{
+   return number<backends::cpp_dec_float<bits>, eto>(this->dpointer->privatevalue);
+}
+#endif
 #endif
 
 // Constructor from boost number. Code is exactly same as that of construction
