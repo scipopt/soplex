@@ -90,6 +90,7 @@ public:
       : SVectorBase<R>(1, &themem)
    {
       themem = rhs.themem;
+      this->set_size(1);
 
       assert(isConsistent());
    }
@@ -99,6 +100,7 @@ public:
       if(this != &rhs)
       {
          themem = rhs.themem;
+         this->set_size(1);
 
          assert(isConsistent());
       }

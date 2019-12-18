@@ -89,6 +89,8 @@ interface & parameters:
      the alias Vector. (This has the same problem as VectorBase<T>)
 - DataArray now checks if template type is trivially copyable via `static_assert`.
   Changed all instances of DataArray where this is not the case to Array.
+- Changed Array to wrap std::vector to be more efficient and easier to use.
+- Changed spxmainsm to use smart pointers inside of Array
 - The following internal objects of the CLUFactor class was changed from a raw
   pointer to a std::vector
   1. `u.col.val`, `u.row.val`
@@ -104,6 +106,7 @@ fixed bugs:
 - use center value for very close bounds in singleton postsolver
 - enable initial/crash basis methods again
 - adjust bounds if they are equal within epsilon
+- fix untriggered bug in copy constructor of UnitVector
 
 10 July 2019 - Release 4.0.2
 ============================
