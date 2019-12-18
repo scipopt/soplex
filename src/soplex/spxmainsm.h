@@ -20,6 +20,7 @@
 #define _SPXMAINSM_H_
 
 #include <assert.h>
+#include <memory>
 
 #include "soplex/spxdefines.h"
 #include "soplex/spxsimplifier.h"
@@ -1313,7 +1314,7 @@ private:
    DataArray<typename SPxSolverBase<R>::VarStatus> m_rBasisStat; ///< basis status of rows.
    DataArray<int>                  m_cIdx;       ///< column index VectorBase<R> in original LP.
    DataArray<int>                  m_rIdx;       ///< row index VectorBase<R> in original LP.
-   Array<PostStep*>            m_hist;       ///< VectorBase<R> of presolve history.
+   Array<std::shared_ptr<PostStep>>m_hist;       ///< VectorBase<R> of presolve history.
    Array<DSVectorBase<R>>
                        m_classSetRows; ///< stores parallel classes with non-zero colum entry
    Array<DSVectorBase<R>>
@@ -1467,6 +1468,7 @@ public:
       , m_rBasisStat(old.m_rBasisStat)
       , m_cIdx(old.m_cIdx)
       , m_rIdx(old.m_rIdx)
+      , m_hist(old.m_hist)
       , m_postsolved(old.m_postsolved)
       , m_epsilon(old.m_epsilon)
       , m_feastol(old.m_feastol)
@@ -1479,16 +1481,7 @@ public:
       , m_cutoffbound(old.m_cutoffbound)
       , m_pseudoobj(old.m_pseudoobj)
    {
-      // copy pointers in m_hist
-      m_hist.reSize(0);
-
-      for(int k = 0; k < old.m_hist.size(); ++k)
-      {
-         if(old.m_hist[k] != 0)
-            m_hist.append(old.m_hist[k]->clone());
-         else
-            m_hist.append(0);
-      }
+      ;
    }
    /// assignment operator
    SPxMainSM& operator=(const SPxMainSM& rhs)
@@ -1515,40 +1508,16 @@ public:
          m_result = rhs.m_result;
          m_cutoffbound = rhs.m_cutoffbound;
          m_pseudoobj = rhs.m_pseudoobj;
-
-         // delete pointers in m_hist
-         for(int k = 0; k < m_hist.size(); ++k)
-         {
-            m_hist[k]->~PostStep();
-            spx_free(m_hist[k]);
-         }
-
-         m_hist.clear();
-
-         // copy pointers in m_hist
-         for(int k = 0; k < rhs.m_hist.size(); ++k)
-         {
-            if(rhs.m_hist[k] != 0)
-               m_hist.append(rhs.m_hist[k]->clone());
-            else
-               m_hist.append(0);
-         }
+         m_hist = rhs.m_hist;
       }
+
 
       return *this;
    }
    /// destructor.
    virtual ~SPxMainSM()
    {
-      // delete pointers in m_hist
-      for(int k = 0; k < m_hist.size(); ++k)
-      {
-         if(m_hist[k] != 0)
-         {
-            m_hist[k]->~PostStep();
-            spx_free(m_hist[k]);
-         }
-      }
+      ;
    }
    /// clone function for polymorphism
    inline virtual SPxSimplifier<R>* clone() const

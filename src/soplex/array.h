@@ -21,6 +21,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <vector>
 #include "soplex/spxalloc.h"
 
 namespace soplex
@@ -61,13 +62,14 @@ namespace soplex
 template < class T >
 class Array
 {
+   static_assert(!std::is_same<T, bool>::value,
+      "Since Array wraps std::vector, bool is not allowed to avoid unallowed behavior");
 protected:
 
    //----------------------------------------
    /**@name Data */
    ///@{
-   int num;     ///< the length of array data
-   T*  data;    ///< the array of elements
+   std::vector<T> data;
    ///@}
 
 public:
@@ -78,13 +80,13 @@ public:
    /// reference \p n 'th element.
    T& operator[](int n)
    {
-      assert(n >= 0 && n < num);
+      assert(n >= 0 && n < int(data.capacity()));
       return data[n];
    }
    /// reference \p n 'th element.
    const T& operator[](int n) const
    {
-      assert(n >= 0 && n < num);
+      assert(n >= 0 && n < int(data.capacity()));
       return data[n];
    }
 
@@ -93,84 +95,47 @@ public:
     */
    T* get_ptr()
    {
-      return data;
+      return data.data();
    }
    /// get a const C pointer to the data.
    const T* get_const_ptr() const
    {
-      return data;
+      return data.data();
    }
 
    /// append 1 elements with value \p t.
    void append(const T& t)
    {
-      insert(num, 1, t);
+      data.push_back(t);
    }
    /// append \p n uninitialized elements.
    void append(int n)
    {
-      insert(num, n);
+      T newt = T();
+      this->append(n, newt);
    }
    /// append \p n elements with value \p t.
    void append(int n, const T& t)
    {
-      insert(num, n, t);
+      data.insert(data.end(), n, t);
    }
-   /// append \p n elements from \p p_array.
-   void append(int n, const T* p_array)
+   /// append \p n elements from \p t.
+   void append(int n, const T t[])
    {
-      insert(num, n, p_array);
+      data.insert(data.end(), t, t + n);
    }
    /// append all elements from \p p_array.
-   void append(const Array<T>& p_array)
+   void append(const Array<T>& t)
    {
-      insert(num, p_array);
+      data.insert(data.end(), t.data.begin(), t.data.end());
    }
 
-   /** insert \p n uninitialized elements before \p i 'th element.
-    *
-    * You must not! use realloc, memcpy or memmove, because some data element points inside itself, and therefore you
-    * always need to copy all elements by hand.
-    */
+   /// insert \p n uninitialized elements before \p i 'th element. 
    void insert(int i, int n)
    {
-      assert(i <= num);
-      assert(num >= 0);
-
-      if(n > 0)
-      {
-         T* newdata = 0;
-         int k;
-
-         spx_alloc(newdata, num + n);
-         assert(newdata != 0);
-
-         // copy front segment to new array
-         for(k = 0; k < i; ++k)
-         {
-            new(&(newdata[k])) T();
-            newdata[k] = data[k];
-            data[k].~T();
-         }
-
-         // call constructor for new elements
-         for(; k < i + n; ++k)
-            new(&(newdata[k])) T();
-
-         // copy rear segment to new array
-         for(k = i; k < num; ++k)
-         {
-            new(&(newdata[n + k])) T();
-            newdata[n + k] = data[k];
-            data[k].~T();
-         }
-
-         if(data)
-            spx_free(data);
-
-         data = newdata;
-         num += n;
-      }
+      T newt = T();
+      if( n > 0 )
+         data.insert(data.begin() + i - 1, n, newt);
    }
 
    /// insert \p n elements with value \p t before \p i 'the element.
@@ -178,145 +143,82 @@ public:
    {
       if(n > 0)
       {
-         insert(i, n);
-
-         for(int j = 0; j < n; j++)
-            data[i + j] = t;
+         data.insert(data.begin() + i -1, n, t);
       }
    }
 
    /// insert \p n elements from \p p_array before \p i 'th element.
-   void insert(int i, int n, const T* p_array)
+   void insert(int i, int n, const T t[])
    {
-      insert(i, n);
-
-      for(n--; n >= 0; --n)
-         data[n + i] = p_array[n];
+      if(n > 0)
+      {
+         data.insert(data.begin() + i - 1, t, t + n);
+      }
    }
 
    /// insert all elements from \p p_array before \p i 'th element.
-   void insert(int i, const Array<T>& p_array)
+   void insert(int i, const Array<T>& t)
    {
-      int n = p_array.size();
-      insert(i, n);
-
-      for(n--; n >= 0; --n)
-         data[n + i] = p_array.data[n];
+      if(t.size())
+      {
+         data.insert(data.begin() + i - 1, t.data.begin(), t.data.end());
+      }
    }
 
-   /** remove \p m elements starting at \p n.
-    *
-    * You must not! use realloc, memcpy or memmove, because some data element points inside itself, and therefore you
-    * always need to copy all elements by hand.
-    */
+   /// remove \p m elements starting at \p n.
    void remove(int n = 0, int m = 1)
    {
-      assert(n >= 0 && m >= 0);
+      assert(n < size() && n >= 0);
 
-      if(m > 0 && n < num)
+      if(n + m < size())
       {
-         T* newdata = 0;
-         int k;
-
-         assert(num == size());
-         m -= (n + m <= num) ? 0 : n + m - num;
-
-         if(num > m)
-         {
-            spx_alloc(newdata, num - m);
-            assert(newdata != 0);
-
-            // copy rear segment to new array
-            for(k = num - 1; k >= n + m; --k)
-            {
-               new(&(newdata[k - m])) T();
-               newdata[k - m] = data[k];
-               data[k].~T();
-            }
-
-            // call destructor for old elements
-            for(; k >= n; --k)
-               data[k].~T();
-
-            // copy front segment to new array
-            for(; k >= 0; --k)
-            {
-               new(&(newdata[k])) T();
-               newdata[k] = data[k];
-               data[k].~T();
-            }
-         }
-         else
-         {
-            assert(num == m);
-            assert(n == 0);
-
-            // call destructor for old elements
-            for(k = m - 1; k >= 0; --k)
-               data[k].~T();
-         }
-
-         assert(data != 0);
-         spx_free(data);
-         data = newdata;
-
-         num -= m;
-         assert((data == 0) == (num == 0));
+         data.erase(data.begin() + n, data.begin() + n + m);
+      }
+      else
+      {
+         data.erase(data.begin() + n, data.end());
       }
    }
 
    /// remove all elements.
    void clear()
    {
-      // call destructors of all elements
-      while(num > 0)
-      {
-         --num;
-         data[num].~T();
-      }
-
-      if(data)
-         spx_free(data);
-
-      assert(num == 0);
+      data.clear();
    }
 
    /// return the number of elements.
    int size() const
    {
-      return num;
+      return int(data.size());
    }
 
    /// reset the number of elements.
    void reSize(int newsize)
    {
-      if(newsize < num)
-         remove(newsize, num - newsize);
-      else if(newsize > num)
-         append(newsize - num);
+      data.resize(newsize);
    }
+
    ///@}
 
    //----------------------------------------
    /**@name Construction / destruction */
    ///@{
    /// assignment operator.
-   /** Assigning an rvalue Array to an lvalue Array involves resizing
-    *  the lvalue to the rvalues size() and copying all elements via
-    *  the Array element's assignment operator=().
-    */
    Array<T>& operator=(const Array<T>& rhs)
    {
       if(this != &rhs)
       {
          reSize(rhs.size());
-
-         for(int i = 0; i < num; ++i)
-            data[i] = rhs.data[i];
-
-         assert(Array::isConsistent());
+         data = rhs.data;
       }
 
+      return *this;
+   }
+
+   // Move assignment for Array
+   Array& operator=(const Array&& rhs)
+   {
+      data = std::move(rhs.data);
       return *this;
    }
 
@@ -325,74 +227,32 @@ public:
     */
    explicit
    Array(int n = 0)
-      : data(0)
    {
-      assert(n >= 0);
-      num = n;
-
-      if(num > 0)
-      {
-         int k;
-
-         spx_alloc(data, num);
-         assert(data != 0);
-
-         for(k = 0; k < num; ++k)
-            new(&(data[k])) T();
-      }
-
-      assert(Array::isConsistent());
+      data.resize(n);
    }
 
    /// copy constructor
-   Array(const Array<T>& old)
-      : num(old.num)
+   Array(const Array& old)
    {
-      if(num > 0)
-      {
-         int k;
-
-         data = 0;
-         spx_alloc(data, num);
-         assert(data != 0);
-
-         for(k = 0; k < num; ++k)
-         {
-            new(&(data[k])) T();
-            data[k] = old.data[k];
-         }
-      }
-      else
-         data = 0;
-
-      assert(Array::isConsistent());
+      data = old.data;
    }
 
    /// destructor
    ~Array()
    {
-      while(num > 0)
-      {
-         --num;
-         data[num].~T();
-      }
-
-      if(data)
-         spx_free(data);
+      ;
    }
 
-   /// consistency check
-   bool isConsistent() const
+   void push_back(const T& val)
    {
-#ifdef ENABLE_CONSISTENCY_CHECKS
-
-      if(num < 0 || (num > 0 && data == 0))
-         return MSGinconsistent("Array");
-
-#endif
-
-      return true;
+      data.push_back(val);
    }
+
+   void push_back(T&& val)
+   {
+      data.push_back(val);
+   }
+
    ///@}
 };
 } // namespace soplex
