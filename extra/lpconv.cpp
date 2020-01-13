@@ -255,7 +255,7 @@ int main(int argc, char **argv)
    "*                                                                      *\n"
    "*       LPConv --- Convert LPF to MPS format.                          *\n"
    "*                  Release 1.0.2                                       *\n"
-   "*    Copyright (C) 2007-2011 Konrad-Zuse-Zentrum                       *\n"
+   "*    Copyright (C) 2007-2020 Konrad-Zuse-Zentrum                       *\n"
    "*                            fuer Informationstechnik Berlin           *\n"
    "*                                                                      *\n"
    "*  LPConv is distributed under the terms of the ZIB Academic Licence.  *\n"
