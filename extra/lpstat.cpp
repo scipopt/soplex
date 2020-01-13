@@ -29,7 +29,7 @@ int main(int argc, char **argv)
    "*                                                                      *\n"
    "*       LPStat --- Print Statistics about LPs.                         *\n"
    "*                  Release 1.0.2                                       *\n"
-   "*    Copyright (C) 2002-2012 Konrad-Zuse-Zentrum                       *\n"
+   "*    Copyright (C) 2002-2020 Konrad-Zuse-Zentrum                       *\n"
    "*                            fuer Informationstechnik Berlin           *\n"
    "*                                                                      *\n"
    "*  LPStat is distributed under the terms of the ZIB Academic Licence.  *\n"
