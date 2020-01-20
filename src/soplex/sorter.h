@@ -226,20 +226,15 @@ void SPxQuicksort(T* keys, int end, COMPARATOR& compare, int start = 0, bool typ
  */
 template < class T, class COMPARATOR >
 int SPxQuicksortPart(
-   T*
-   keys,               /**< array of elements to be sorted between index start and end */
+   T*                    keys,               /**< array of elements to be sorted between index start and end */
    COMPARATOR&           compare,            /**< comparator */
    int                   start,              /**< index of first element in range to be sorted */
-   int
-   end,                /**< index of last element in range to be sorted, plus 1 */
+   int                   end,                /**< index of last element in range to be sorted, plus 1 */
    int                   size,               /**< guaranteed number of sorted elements */
-   int                   start2 =
-      0,         /**< auxiliary start index of sub range used for recursive call */
-   int                   end2 =
-      0,           /**< auxiliary end index of sub range used for recursive call */
-   bool                  type =
-      true         /**< type of sorting, to be more flexable on degenerated cases */
-)
+   int                   start2 = 0,         /**< auxiliary start index of sub range used for recursive call */
+   int                   end2 = 0,           /**< auxiliary end index of sub range used for recursive call */
+   bool                  type = true         /**< type of sorting, to be more flexable on degenerated cases */
+   )
 {
    assert(start >= 0);
 
@@ -379,7 +374,7 @@ int SPxQuicksortPart(
    else
    {
       SPxQuicksort(keys, hi + 1, compare, start2, !type);
-      return SPxQuicksortPart(keys, compare, start, end, size + start2 - lo, lo, end2, !type);
+      return SPxQuicksortPart(keys, compare, start, end + 1, size + start2 - lo, lo, end2, !type);
    }
 }
 
