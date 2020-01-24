@@ -232,6 +232,7 @@ void SPxLeastSqSC<R>::setIntParam(int param, const char* name)
    maxrounds = param;
 }
 
+// todo refactor this method. Has no abstraction and is too long
 template <class R>
 void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
 {
@@ -243,6 +244,16 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    const int nrows = lp.nRows();
    const int ncols = lp.nCols();
    const int lpnnz = lp.nNzos();
+
+   // is contraints matrix empty?
+   //todo don't create the scaler in this case!
+   if( nrows == 0 || ncols == 0 )
+   {
+      // to keep the invariants, we still need to call this method
+	  this->applyScaling(lp);
+
+	  return;
+   }
 
    /* constant factor matrices;
     * in Curtis-Reid article
@@ -333,6 +344,8 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    for(k = 0; k < maxrounds; ++k)
    {
       const R sprev = scurr;
+
+      assert(isNotZero(sprev));
 
       // is k even?
       if((k % 2) == 0)

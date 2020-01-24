@@ -38,6 +38,8 @@ template <class R>
 class SPxLeastSqSC : public SPxScaler<R>
 {
 public:
+   static constexpr R acrcydivisorDefault = R(1000.0);
+   static constexpr int maxroundsDefault = 20;
 
    //-------------------------------------
    /**@name Construction / destruction */
@@ -71,12 +73,12 @@ public:
    /**@name Scaling */
    ///@{
    /// Scale the loaded SPxLP.
-   virtual void scale(SPxLPBase<R>& lp, bool persistent = true);
+   virtual void scale(SPxLPBase<R>& lp, bool persistent = true) override;
 
 
-protected:
-   R acrcydivisor = 1000.0;
-   int maxrounds = 20;
+private:
+   R acrcydivisor = acrcydivisorDefault;
+   int maxrounds = maxroundsDefault;
 
 };
 } // namespace soplex
