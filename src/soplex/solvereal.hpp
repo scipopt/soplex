@@ -603,6 +603,9 @@ void SoPlexBase<R>::_storeSolutionReal(bool verify)
       // load original problem but don't setup a slack basis
       _loadRealLP(false);
 
+      // since we presolved the problem, we should not allow access to the dual norms
+      _solver.weightsAreSetup = false;
+
       assert(_realLP == &_solver);
 
       // reset basis status
