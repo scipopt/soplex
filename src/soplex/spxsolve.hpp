@@ -1106,38 +1106,38 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve()
       {
          int     c;
          R    val;
-         VectorBase<R> sol(nCols());
+         VectorBase<R> sol(this->nCols());
 
          getPrimalSol(sol);
 
-         for(int row = 0; row < nRows(); ++row)
+         for(int row = 0; row < this->nRows(); ++row)
          {
-            const SVectorBase<R>& rowvec = rowVector(row);
+            const SVectorBase<R>& rowvec = this->rowVector(row);
             val = 0.0;
 
             for(c = 0; c < rowvec.size(); ++c)
                val += rowvec.value(c) * sol[rowvec.index(c)];
 
-            if(LT(val, lhs(row), feastol()) ||
-                  GT(val, rhs(row), feastol()))
+            if(LT(val, this->lhs(row), feastol()) ||
+                  GT(val, this->rhs(row), feastol()))
             {
                // Minor rhs violations happen frequently, so print these
                // warnings only with verbose level INFO2 and higher.
                MSG_INFO2((*this->spxout), (*this->spxout) << "WSOLVE88 Warning! Constraint " << row
                          << " is violated by solution" << std::endl
-                         << "   lhs:" << lhs(row)
+                         << "   lhs:" << this->lhs(row)
                          << " <= val:" << val
-                         << " <= rhs:" << rhs(row) << std::endl;)
+                         << " <= rhs:" << this->rhs(row) << std::endl;)
 
                if(type() == LEAVE && isRowBasic(row))
                {
                   // find basis variable
-                  for(c = 0; c < nRows(); ++c)
+                  for(c = 0; c < this->nRows(); ++c)
                      if(basis().baseId(c).isSPxRowId()
                            && (this->number(basis().baseId(c)) == row))
                         break;
 
-                  assert(c < nRows());
+                  assert(c < this->nRows());
 
                   MSG_WARNING((*this->spxout), (*this->spxout) << "WSOLVE90 basis idx:" << c
                               << " fVec:" << fVec()[c]
@@ -1147,27 +1147,27 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve()
             }
          }
 
-         for(int col = 0; col < nCols(); ++col)
+         for(int col = 0; col < this->nCols(); ++col)
          {
-            if(LT(sol[col], lower(col), feastol()) ||
-                  GT(sol[col], upper(col), feastol()))
+            if(LT(sol[col], this->lower(col), feastol()) ||
+                  GT(sol[col], this->upper(col), feastol()))
             {
                // Minor bound violations happen frequently, so print these
                // warnings only with verbose level INFO2 and higher.
                MSG_INFO2((*this->spxout), (*this->spxout) << "WSOLVE91 Warning! Bound for column " << col
                          << " is violated by solution" << std::endl
-                         << "   lower:" << lower(col)
+                         << "   lower:" << this->lower(col)
                          << " <= val:" << sol[col]
-                         << " <= upper:" << upper(col) << std::endl;)
+                         << " <= upper:" << this->upper(col) << std::endl;)
 
                if(type() == LEAVE && isColBasic(col))
                {
-                  for(c = 0; c < nRows() ; ++c)
+                  for(c = 0; c < this->nRows() ; ++c)
                      if(basis().baseId(c).isSPxColId()
                            && (this->number(basis().baseId(c)) == col))
                         break;
 
-                  assert(c < nRows());
+                  assert(c < this->nRows());
                   MSG_WARNING((*this->spxout), (*this->spxout) << "WSOLVE92 basis idx:" << c
                               << " fVec:" << fVec()[c]
                               << " fRhs:" << fRhs()[c]
