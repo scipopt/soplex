@@ -95,11 +95,13 @@ which will deactivate the possibility to read gzipped LP and MPS files.
 
 ### Boost support
 
-Boost (program_options) is required to build the SoPlex binary. If Boost is not available,
+Boost (program_options) is required to build the SoPlex binary. However, if Boost is not available,
 you can still build the SoPlex library. You can set the path to your boost installation with `-DBOOSTROOT=...` 
 or by setting the environment variable `BOOSTROOT`.
-- If you are using cmake, use `cmake -DBOOST=off`. This will disable compilation and installation of the binary.
-- If you are using make, use `make BOOST=false makelibfile`. This will build only the SoPlex library without Boost.
+By default, only the SoPlex library is built. If you wish to compile the SoPlex binary
+- using cmake, set `cmake -DBOOST=on`.
+- using make, use `make BOOST=true`.
+If you want to build only the library with make, use `make Boost=false makelibfile`
 
 ### GMP support
 
