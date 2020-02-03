@@ -253,6 +253,12 @@ public:
       data.push_back(val);
    }
 
+      /// Consistency check.
+   bool isConsistent() const
+   {
+      return true;
+   }
+
    ///@}
 };
 } // namespace soplex

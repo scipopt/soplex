@@ -232,6 +232,7 @@ void SPxLeastSqSC<R>::setIntParam(int param, const char* name)
    maxrounds = param;
 }
 
+// todo refactor this method. Has no abstraction and is too long
 template <class R>
 void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
 {
@@ -243,6 +244,18 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    const int nrows = lp.nRows();
    const int ncols = lp.nCols();
    const int lpnnz = lp.nNzos();
+
+   // is contraints matrix empty?
+   //todo don't create the scaler in this case!
+   if( lpnnz == 0 )
+   {
+      // to keep the invariants, we still need to call this method
+	  this->applyScaling(lp);
+
+	  return;
+   }
+
+   assert(nrows > 0 && ncols > 0 && lpnnz > 0);
 
    /* constant factor matrices;
     * in Curtis-Reid article
@@ -307,12 +320,9 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    initConstVecs(lp.rowSet(), facnrows, rowlogs, rownnzinv);
    initConstVecs(lp.colSet(), facncols, collogs, colnnzinv);
 
-   assert(tmprows.isSetup());
-   assert(tmpcols.isSetup());
-   assert(rowscale1.isSetup());
-   assert(rowscale2.isSetup());
-   assert(colscale1.isSetup());
-   assert(colscale2.isSetup());
+   assert(tmprows.isSetup() && tmpcols.isSetup());
+   assert(rowscale1.isSetup() && rowscale2.isSetup());
+   assert(colscale1.isSetup() && colscale2.isSetup());
 
    // compute first residual vector r0
    int dummy1 = 0;
@@ -333,6 +343,10 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    for(k = 0; k < maxrounds; ++k)
    {
       const R sprev = scurr;
+
+      // termination criterion met?
+      if(scurr < smax)
+         break;
 
       // is k even?
       if((k % 2) == 0)
@@ -357,24 +371,21 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
       for(unsigned l = 2; l > 0; --l)
          eprev[l] = eprev[l - 1];
 
+      assert(isNotZero(sprev));
+
       eprev[0] = (qcurr * scurr) / sprev;
 
       const R tmp = qcurr;
       qcurr = 1.0 - eprev[0];
       qprev = tmp;
-
-      // termination criterion met?
-      if(scurr < smax)
-         break;
    }
 
-   // is k even?
-   if((k % 2) == 0)
+   if( k > 0 && (k % 2) == 0)
    {
       // update column scaling factor vector
       updateScaleFinal(colnnzinv, resncols, tmpcols, csccurr, cscprev, qprev, eprev[1], eprev[2]);
    }
-   else // k is odd
+   else if( k > 0 )
    {
       // update row scaling factor vector
       updateScaleFinal(rownnzinv, resnrows, tmprows, rsccurr, rscprev, qprev, eprev[1], eprev[2]);

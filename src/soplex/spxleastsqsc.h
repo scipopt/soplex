@@ -38,7 +38,6 @@ template <class R>
 class SPxLeastSqSC : public SPxScaler<R>
 {
 public:
-
    //-------------------------------------
    /**@name Construction / destruction */
    ///@{
@@ -52,7 +51,7 @@ public:
    virtual ~SPxLeastSqSC()
    {}
    /// clone function for polymorphism
-   inline virtual SPxScaler<R>* clone() const
+   inline virtual SPxScaler<R>* clone() const override
    {
       return new SPxLeastSqSC(*this);
    }
@@ -62,20 +61,20 @@ public:
    /**@name Access / modification */
    ///@{
    /// set Real param (conjugate gradient accuracy)
-   virtual void setRealParam(R param, const char* name);
+   virtual void setRealParam(R param, const char* name) override;
    /// set int param (maximal conjugate gradient rounds)
-   virtual void setIntParam(int param, const char* name);
+   virtual void setIntParam(int param, const char* name) override;
    ///@}
 
    //-------------------------------------
    /**@name Scaling */
    ///@{
    /// Scale the loaded SPxLP.
-   virtual void scale(SPxLPBase<R>& lp, bool persistent = true);
+   virtual void scale(SPxLPBase<R>& lp, bool persistent = true) override;
 
 
-protected:
-   R acrcydivisor = 1000.0;
+private:
+   R acrcydivisor = R(1000.0);
    int maxrounds = 20;
 
 };

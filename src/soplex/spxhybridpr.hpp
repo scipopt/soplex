@@ -26,10 +26,10 @@ bool SPxHybridPR<R>::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
-   if(thesolver != 0 &&
-         (thesolver != steep.this->solver() ||
-          thesolver != devex.this->solver() ||
-          thesolver != parmult.this->solver()))
+   if(this->thesolver != 0 &&
+         (this->thesolver != steep.solver() ||
+          this->thesolver != devex.solver() ||
+          this->thesolver != parmult.solver()))
       return MSGinconsistent("SPxHybridPR");
 
    return steep.isConsistent()

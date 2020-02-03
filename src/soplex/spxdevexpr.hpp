@@ -36,8 +36,8 @@ bool SPxDevexPR<R>::isConsistent() const
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
    if(this->thesolver != 0)
-      if(weights.dim() != this->thesolver->coDim()
-            || coWeights.dim() != this->thesolver->dim())
+      if(this->thesolver->weights.dim() != this->thesolver->coDim()
+            || this->thesolver->coWeights.dim() != this->thesolver->dim())
          return MSGinconsistent("SPxDevexPR");
 
 #endif

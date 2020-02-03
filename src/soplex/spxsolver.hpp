@@ -1611,7 +1611,7 @@ void SPxSolverBase<R>::setType(Type tp)
       if(dualVec.delta().getEpsilon() != addVec.delta().getEpsilon())
          return MSGinconsistent("SPxSolverBase");
 
-      if(unitVecs.size() < SPxLPBase<R>::this->nCols() || unitVecs.size() < SPxLPBase<R>::this->nRows())
+      if(unitVecs.size() < SPxLPBase<R>::nCols() || unitVecs.size() < SPxLPBase<R>::nRows())
          return MSGinconsistent("SPxSolverBase");
 
       if(initialized)
@@ -1637,16 +1637,16 @@ void SPxSolverBase<R>::setType(Type tp)
          if(theCoTest.dim() != dim())
             return MSGinconsistent("SPxSolverBase");
 
-         if(theURbound.dim() != SPxLPBase<R>::this->nRows())
+         if(theURbound.dim() != SPxLPBase<R>::nRows())
             return MSGinconsistent("SPxSolverBase");
 
-         if(theLRbound.dim() != SPxLPBase<R>::this->nRows())
+         if(theLRbound.dim() != SPxLPBase<R>::nRows())
             return MSGinconsistent("SPxSolverBase");
 
-         if(theUCbound.dim() != SPxLPBase<R>::this->nCols())
+         if(theUCbound.dim() != SPxLPBase<R>::nCols())
             return MSGinconsistent("SPxSolverBase");
 
-         if(theLCbound.dim() != SPxLPBase<R>::this->nCols())
+         if(theLCbound.dim() != SPxLPBase<R>::nCols())
             return MSGinconsistent("SPxSolverBase");
 
          if(theUBbound.dim() != dim())
