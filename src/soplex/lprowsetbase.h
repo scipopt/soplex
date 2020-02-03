@@ -663,8 +663,7 @@ public:
       if(ldim != num())
          return MSGinconsistent("LPRowSetBase");
 
-      return left.isConsistent() && right.isConsistent() && object.isConsistent()
-             && SVSetBase<R>::isConsistent();
+      return SVSetBase<R>::isConsistent();
 #else
       return true;
 #endif

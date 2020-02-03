@@ -47,7 +47,7 @@ bool UpdateVector<R>::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
-   if(dim() != thedelta.dim())
+   if(this->dim() != thedelta.dim())
       return MSGinconsistent("UpdateVector");
 
    return VectorBase<R>::isConsistent() && thedelta.isConsistent();

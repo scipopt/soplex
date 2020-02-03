@@ -609,6 +609,11 @@ public:
 
 
    ///@}
+   /// Consistency check.
+   bool isConsistent() const
+   {
+      return true;
+   }
 
 };
 

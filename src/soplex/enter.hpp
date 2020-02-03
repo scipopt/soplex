@@ -1270,7 +1270,7 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
       VectorBase<R> tmp(dim());
       // BH 2005-11-15: This cast is necessary since SSVectorBase<R>  inherits protected from VectorBase<R>.
       tmp = reinterpret_cast<VectorBase<R>&>(theFvec->delta());
-      multBaseWith(tmp);
+      this->multBaseWith(tmp);
       tmp -= *enterVec;
 
       if(tmp.length() > entertol())

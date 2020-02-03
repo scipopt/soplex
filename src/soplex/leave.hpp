@@ -746,7 +746,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
    {
       SSVectorBase<R>  tmp(dim(), epsilon());
       tmp.clear();
-      coSolve(tmp, unitVecs[leaveIdx]);
+      this->coSolve(tmp, unitVecs[leaveIdx]);
       tmp -= theCoPvec->delta();
 
       if(tmp.length() > leavetol())
@@ -1163,7 +1163,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
 #ifdef ENABLE_ADDITIONAL_CHECKS
       {
          VectorBase<R> tmp = fVec();
-         multBaseWith(tmp);
+         this->multBaseWith(tmp);
          tmp -= fRhs();
 
          if(tmp.length() > entertol())
