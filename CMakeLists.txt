@@ -22,7 +22,7 @@ include(CPack)
 option(ZLIB "Use ZLIB" ON)
 option(GMP "Use GMP" ON)
 option(STATIC_GMP "Prefer static GMP lib" OFF)
-option(BOOST "Use Boost (required to build the binary). Disable if you only want to build libsoplex." ON)
+option(BOOST "Use Boost (required to build the binary). Disable if you only want to build libsoplex." OFF)
 option(MPFR "Use MPFR" OFF)
 option(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS "Export all symbols into the DLL" ON)
 option(MT "use static runtime libraries for Visual Studio compiler" OFF)
@@ -137,7 +137,7 @@ if(BOOST)
     else()
         message(WARNING "Boost could not be found. If you do not inted to use \
         the multiprecision feature and you only require the soplex library, \
-        consider building with -DBoost=off.")
+        consider building with -DBOOST=off.")
     endif()
 else()
     message(WARNING "When building without Boost, only the SoPlex library \
