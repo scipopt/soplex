@@ -136,7 +136,7 @@ add_dependencies(libsoplex soplex_update_githash)
 target_link_libraries(libsoplex ${libs})
 
 
-if(Boost)
+if(BOOST)
     # create soplex binary using library without pic
     add_executable(soplex soplexmain.cpp)
     target_link_libraries(soplex LINK_PUBLIC libsoplex ${Boost_LIBRARIES})
@@ -165,7 +165,7 @@ set_target_properties(libsoplex-pic PROPERTIES
 install(FILES ${headers} DESTINATION include/soplex)
 install(FILES soplex.h soplex.hpp DESTINATION include)
 
-if(Boost)
+if(BOOST)
 # install the binary and the library to appropriate lcoations and add them to an export group
 install(TARGETS soplex libsoplex libsoplex-pic EXPORT soplex-targets
         LIBRARY DESTINATION lib
