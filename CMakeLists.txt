@@ -140,14 +140,14 @@ if(BOOST)
         consider building with -DBOOST=off.")
     endif()
 else()
-    message(WARNING "When building without Boost, only the SoPlex library \
-    will be built. Boost with program_options is required to build the binary.")
+    message(WARNING "When building without Boost, ONLY the SoPlex library \
+    will be built and NOT the binary. Boost with program_options is required to build the binary.")
 endif()
 
 
 # enable all warnings and explicitly switch on colored output for ninja
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -lboost_program_options -Wall -Wno-strict-overflow")
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wno-strict-overflow")
     if(CMAKE_GENERATOR STREQUAL "Ninja")
         set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always")
     endif()
