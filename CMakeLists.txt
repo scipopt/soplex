@@ -138,6 +138,7 @@ if(BOOST)
         message(WARNING "Boost could not be found. If you do not inted to use \
         the multiprecision feature and you only require the soplex library, \
         consider building with -DBOOST=off.")
+        set(BOOST off)
     endif()
 else()
     message(WARNING "When building without Boost, ONLY the SoPlex library \

@@ -74,7 +74,7 @@ GMP		=	true
 MPFR 		= 	false
 ZLIB		=	true
 EGLIB		=	false
-BOOST 	=  false
+BOOST 	=  true
 
 COMP		=	gnu
 CXX		=	g++
