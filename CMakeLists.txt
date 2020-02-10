@@ -4,7 +4,7 @@ set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_DEBUG} ${CMAKE_C_FLAGS_RELEASE
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_DEBUG} ${CMAKE_CXX_FLAGS_RELEASE}")
 
 project(SOPLEX
-    LANGUAGES CXX)
+  LANGUAGES CXX)
 
 set(SOPLEX_VERSION_MAJOR 5)
 set(SOPLEX_VERSION_MINOR 0)
@@ -36,6 +36,13 @@ SET(COVERAGE_CTEST_ARGS "" CACHE STRING "additional ctest arguments for coverage
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+# for colorized output
+if(NOT WIN32)
+  string(ASCII 27 Esc)
+  set(ColourReset "${Esc}[m")
+  set(Red         "${Esc}[31m")
+endif()
 
 # path to e.g. findGMP module
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
@@ -125,19 +132,18 @@ else()
     add_definitions(-DSOPLEX_WITH_CPPMPF)
 endif()
 
-
 if(BOOST)
     # Technically the version 1.70.0 is not needed for program_option, but for the
     # multiprecision, but it's header only, this is one way to guarantee that the
     # user has the right version.
-    find_package(Boost 1.70.0 COMPONENTS program_options REQUIRED) # Refer to comments in cmake/Modules/FindBoost.cmake
-    add_definitions(-DSOPLEX_WITH_BOOST)
+    find_package(Boost 1.70.0 COMPONENTS program_options) # Refer to comments in cmake/Modules/FindBoost.cmake
     if(Boost_FOUND)
+        add_definitions(-DSOPLEX_WITH_BOOST)
         include_directories(${Boost_INCLUDE_DIRS})
     else()
-        message(WARNING "Boost could not be found. If you do not inted to use \
-        the multiprecision feature and you only require the soplex library, \
-        consider building with -DBOOST=off.")
+        message(WARNING "${Red}Boost could not be found! ONLY the SoPlex library can be built without Boost. \
+                         The SoPlex binary will NOT be built${ColourReset}. If you require the binary, please \
+                         make sure Boost is installed and your BOOST_ROOT environment variable is set.")
         set(BOOST off)
     endif()
 else()
