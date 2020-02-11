@@ -64,7 +64,7 @@ set(settings
     mpf
     )
 
-if(Boost)
+if(BOOST)
 #
 # define a macro to add tests
 #
