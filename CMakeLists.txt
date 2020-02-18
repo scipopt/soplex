@@ -133,13 +133,14 @@ else()
 endif()
 
 if(BOOST)
-    # Technically the version 1.70.0 is not needed for program_option, but for the
-    # multiprecision, but it's header only, this is one way to guarantee that the
-    # user has the right version.
-    find_package(Boost 1.70.0 COMPONENTS program_options) # Refer to comments in cmake/Modules/FindBoost.cmake
+    find_package(Boost 1.58.0 COMPONENTS program_options) # Refer to comments in cmake/Modules/FindBoost.cmake
     if(Boost_FOUND)
         add_definitions(-DSOPLEX_WITH_BOOST)
         include_directories(${Boost_INCLUDE_DIRS})
+        if(${Boost_VERSION_MACRO} LESS "107000")
+            message(WARNING "Warning: ${Red} The multiprecision feature is disabled with Boost versions older than 1.70.${ColourReset} \
+                            Found version is ${Boost_VERSION_STRING}.")
+        endif()
     else()
         message(WARNING "${Red}Boost could not be found! ONLY the SoPlex library can be built without Boost. \
                          The SoPlex binary will NOT be built${ColourReset}. If you require the binary, please \
