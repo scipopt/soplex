@@ -444,13 +444,13 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve()
                      }
                   }
 
-                  MSG_INFO3((*this->spxout), (*this->spxout) << " --- solve(enter) triggers refactorization" <<
-                            std::endl;)
-
                   // if the factorization is not fresh, we better refactorize and call the pricer again; however, this can
                   // create cycling, so it is performed only a limited number of times per ENTER round
                   if(this->lastUpdate() > 0 && enterFacPivotCount < MAXREFACPIVOTS)
                   {
+                     MSG_INFO3((*this->spxout), (*this->spxout) << " --- solve(enter) triggers refactorization" <<
+                           std::endl;)
+
                      factorize();
 
                      // if the factorization was found out to be singular, we have to quit
@@ -763,13 +763,13 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve()
                      }
                   }
 
-                  MSG_INFO3((*this->spxout), (*this->spxout) << " --- solve(leave) triggers refactorization" <<
-                            std::endl;)
-
                   // if the factorization is not fresh, we better refactorize and call the pricer again; however, this can
                   // create cycling, so it is performed only a limited number of times per LEAVE round
                   if(this->lastUpdate() > 0 && leaveFacPivotCount < MAXREFACPIVOTS)
                   {
+                     MSG_INFO3((*this->spxout), (*this->spxout) << " --- solve(leave) triggers refactorization" <<
+                           std::endl;)
+
                      factorize();
 
                      // Inna/Tobi: if the factorization was found out to be singular, we have to quit

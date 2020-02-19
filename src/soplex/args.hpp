@@ -492,6 +492,19 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
 
       case 3:                 // soplex mpf
          using namespace boost::multiprecision;
+
+      if( BOOST_VERSION < 107000 )
+      {
+         std::cerr << "Error: Boost version too old." << std:: endl <<
+         "In order to use the multiprecision feature of SoPlex," <<
+         " Boost Version 1.70.0 or higher is required." << std::endl << \
+         "Included Boost version is " << BOOST_VERSION / 100000 << "."  // maj. version
+          << BOOST_VERSION / 100 % 1000 << "."  // min. version
+          << BOOST_VERSION % 100                // patch version;
+          << std::endl;
+
+         return 0;
+      }
 #ifdef SOPLEX_WITH_MPFR
 
          // et_off means the expression templates options is turned off. TODO:

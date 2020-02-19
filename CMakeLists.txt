@@ -4,7 +4,7 @@ set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_DEBUG} ${CMAKE_C_FLAGS_RELEASE
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_DEBUG} ${CMAKE_CXX_FLAGS_RELEASE}")
 
 project(SOPLEX
-    LANGUAGES CXX)
+  LANGUAGES CXX)
 
 set(SOPLEX_VERSION_MAJOR 5)
 set(SOPLEX_VERSION_MINOR 0)
@@ -22,7 +22,7 @@ include(CPack)
 option(ZLIB "Use ZLIB" ON)
 option(GMP "Use GMP" ON)
 option(STATIC_GMP "Prefer static GMP lib" OFF)
-option(Boost "Use Boost (required to build the binary). Disable if you only want to build libsoplex." OFF)
+option(BOOST "Use Boost (required to build the binary). Disable if you only want to build libsoplex." ON)
 option(MPFR "Use MPFR" OFF)
 option(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS "Export all symbols into the DLL" ON)
 option(MT "use static runtime libraries for Visual Studio compiler" OFF)
@@ -36,6 +36,13 @@ SET(COVERAGE_CTEST_ARGS "" CACHE STRING "additional ctest arguments for coverage
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+# for colorized output
+if(NOT WIN32)
+  string(ASCII 27 Esc)
+  set(ColourReset "${Esc}[m")
+  set(Red         "${Esc}[31m")
+endif()
 
 # path to e.g. findGMP module
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
@@ -125,31 +132,30 @@ else()
     add_definitions(-DSOPLEX_WITH_CPPMPF)
 endif()
 
-
-
-# Made with: https://stackoverflow.com/a/3917033/4223038
-if(Boost)
-    # Technically the version 1.70.0 is not needed for program_option, but for the
-    # multiprecision, but it's header only, this is one way to guarantee that the
-    # user has the right version.   
-    find_package(Boost 1.58.0 COMPONENTS program_options REQUIRED) # Refer to comments in cmake/Modules/FindBoost.cmake
-    add_definitions(-DSOPLEX_WITH_BOOST)
+if(BOOST)
+    find_package(Boost 1.58.0 COMPONENTS program_options) # Refer to comments in cmake/Modules/FindBoost.cmake
     if(Boost_FOUND)
+        add_definitions(-DSOPLEX_WITH_BOOST)
         include_directories(${Boost_INCLUDE_DIRS})
+        if(${Boost_VERSION_MACRO} LESS "107000")
+            message(WARNING "Warning: ${Red} The multiprecision feature is disabled with Boost versions older than 1.70.${ColourReset} \
+                            Found version is ${Boost_VERSION_STRING}.")
+        endif()
     else()
-        message(WARNING "Boost could not be found. If you do not inted to use \
-        the multiprecision feature and you only require the soplex library, \
-        consider building with -DBoost=off.")
+        message(WARNING "${Red}Boost could not be found! ONLY the SoPlex library can be built without Boost. \
+                         The SoPlex binary will NOT be built${ColourReset}. If you require the binary, please \
+                         make sure Boost is installed and your BOOST_ROOT environment variable is set.")
+        set(BOOST off)
     endif()
 else()
-    message(WARNING "When building without Boost, only the SoPlex library \
-    will be built. Boost with program_options is required to build the binary.")
+    message(WARNING "When building without Boost, ONLY the SoPlex library \
+    will be built and NOT the binary. Boost with program_options is required to build the binary.")
 endif()
 
 
 # enable all warnings and explicitly switch on colored output for ninja
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -lboost_program_options -Wall -Wno-strict-overflow")
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wno-strict-overflow")
     if(CMAKE_GENERATOR STREQUAL "Ninja")
         set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always")
     endif()

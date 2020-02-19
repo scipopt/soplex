@@ -61,10 +61,15 @@ set(settings
     default-row
     polish1
     polish2
-    mpf
     )
 
-if(Boost)
+if(${Boost_VERSION_MACRO} GREATER_EQUAL "107000")
+    set(settings
+        ${settings}
+        mpf)
+endif()
+
+if(BOOST)
 #
 # define a macro to add tests
 #
