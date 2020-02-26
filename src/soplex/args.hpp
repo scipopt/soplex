@@ -54,7 +54,11 @@
 
 #include <soplex/spxdefines.h>  // For access to some constants
 
-#include "boost/multiprecision/number.hpp"
+#include <boost/multiprecision/number.hpp>
+
+#ifdef SOPLEX_WITH_FLOAT128
+#include <boost/multiprecision/float128.hpp>
+#endif
 
 #ifdef SOPLEX_WITH_MPFR
 // For multiple precision
@@ -170,9 +174,9 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
    algo.add_options()
    ("readmode", po::value<int>()->default_value(0)->notifier(args::checkRange(0, 1, "readmode")),
     "choose reading mode for <lpfile> (0 - floating-point, 1 - rational)")
-   ("solvemode", po::value<int>(&solvemode)->default_value(1)->notifier(args::checkRange(0, 3,
+   ("solvemode", po::value<int>(&solvemode)->default_value(1)->notifier(args::checkRange(0, 4,
          "solvemode")),
-    "choose solving mode (0 - floating-point solve, 1 - auto, 2 - force iterative refinement, 3 - multi precision solve (default precision 50))")
+    "choose solving mode (0 - floating-point, 1 - auto, 2 - force iterative refinement, 3 - multi-precision, 4 - Quadruple-precision (128-bit))")
    ("simplifier,s", po::value<int>()->default_value(1)->notifier(args::checkRange(0, 3, "simplifier")),
     "choose simplifier/presolver (0 - off, 1 - auto)")
    ("scaler,g", po::value<int>()->default_value(2)->notifier(args::checkRange(0, 6, "scaler")),
@@ -275,7 +279,7 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
     "mode for synchronizing real and rational LP (0 - store only real LP, 1 - auto, 2 - manual)")
    ("int:readmode", po::value<int>()->default_value(0)->notifier(args::checkRange(0, 1,
          "int:readmode")), "mode for reading LP files (0 - floating-point, 1 - rational)")
-   ("int:solvemode", po::value<int>()->default_value(1)->notifier(args::checkRange(0, 3,
+   ("int:solvemode", po::value<int>()->default_value(1)->notifier(args::checkRange(0, 4,
          "int:solvemode")),
     "mode for iterative refinement strategy (0 - floating-point solve, 1 - auto, 2 - exact rational solve)")
    ("int:checkmode", po::value<int>()->default_value(1)->notifier(args::checkRange(0, 2,
@@ -385,13 +389,13 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
    po::options_description mpf("Multiprecision float solve");
    mpf.add_options()
    ("precision", po::value<unsigned int>(&precision)->default_value(50u),
-    "Minimum precision (number of decimal digits) of mpf float");
+    "Minimum precision (number of decimal digits) of mpf float. Only has effect if solvemode is set to 3");
 #endif
 #ifdef SOPLEX_WITH_CPPMPF
    po::options_description mpf("Multiprecision float solve");
    mpf.add_options()
    ("precision", po::value<unsigned int>(&precision)->default_value(50u),
-    "Minimum precision (number of decimal digits) of cpp float. Only values 50, 100, 200 available. Compile with MPFR for other precisions.");
+    "Minimum precision (number of decimal digits) of cpp float. Only values 50, 100, 200 available. Compile with MPFR for other precisions. \n Only has effect if solvemode is set to 3");
 #endif
 
    po::options_description allOpt("Allowed options");
@@ -511,12 +515,7 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
          // The documentation also mentions about static vs dynamic memory
          // allocation for the mpfr types. Is it relevant here? I probably also
          // need to have the mpfr_float_eto in the global soplex namespace
-#ifndef USE_DEBUG_ADAPTOR
          using multiprecision = number<mpfr_float_backend<0>, et_off>;
-#else
-         using multiprecision = number<debug_adaptor<mpfr_float_backend<0>>, et_off>;
-#endif  // NDEBUG
-
          multiprecision::default_precision(precision);
          runSoPlex<multiprecision>(vm);
 #endif  // SOPLEX_WITH_MPFR
@@ -537,6 +536,13 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
 
 #endif  // SOPLEX_WITH_CPPMPF
       break;
+#ifdef SOPLEX_WITH_FLOAT128
+      case 4:                // quadprecision
+         using namespace boost::multiprecision;
+         using Quad = boost::multiprecision::float128;
+         runSoPlex<Quad>(vm);
+         break;
+#endif
       default:
          std::cerr << "Wrong value for the solve mode\n\n" << allOpt << "\n";
          return 0;

@@ -68,6 +68,11 @@ if(${Boost_VERSION_MACRO} GREATER_EQUAL "107000")
         ${settings}
         mpf)
 endif()
+if(SOPLEX_HAVE_FLOAT128)
+    set(settings
+        ${settings}
+        quad)
+endif()
 
 if(BOOST)
 #

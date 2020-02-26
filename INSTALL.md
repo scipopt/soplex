@@ -58,7 +58,8 @@ list run `cmake <path/to/SoPlex> -LH`:
 | COVERAGE             | on, off                      | --                     | |
 | MT                   | on, off                      | --                     | use static runtime libraries for Visual Studio compiler on Windows |
 | SANITIZE_...         | on, off                      | --                     | enable sanitizer in debug mode if available |
-| Boost                | on, off                      | Boost=[true,false]     | necessary for the binary, optional for building libsoplex |
+| BOOST                | on, off                      | BOOST=[true,false]     | necessary for the binary, optional for building libsoplex |
+| QUADMATH             | on, off                      | QUADMATH=[true,false]  | to run SoPlex with Quadruple precision |
 
 Parameters can be set all at once or in subsequent calls to `cmake` - extending
 or modifying the existing configuration.
