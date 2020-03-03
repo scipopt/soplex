@@ -142,9 +142,12 @@ void SPxMainSM<R>::FreeConstraintPS::execute(VectorBase<R>& x, VectorBase<R>& y,
       DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the row:
-   s[m_old_i] = s[m_i];
-   y[m_old_i] = y[m_i];
-   rStatus[m_old_i] = rStatus[m_i];
+   if( m_i != m_old_i )
+   {
+      s[m_old_i] = s[m_i];
+      y[m_old_i] = y[m_i];
+      rStatus[m_old_i] = rStatus[m_i];
+   }
 
    // primal:
    R slack = 0.0;
@@ -177,9 +180,12 @@ void SPxMainSM<R>::EmptyConstraintPS::execute(VectorBase<R>&, VectorBase<R>& y, 
       DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the row:
-   s[m_old_i] = s[m_i];
-   y[m_old_i] = y[m_i];
-   rStatus[m_old_i] = rStatus[m_i];
+   if( m_i != m_old_i )
+   {
+      s[m_old_i] = s[m_i];
+      y[m_old_i] = y[m_i];
+      rStatus[m_old_i] = rStatus[m_i];
+   }
 
    // primal:
    s[m_i] = 0.0;
@@ -207,9 +213,12 @@ void SPxMainSM<R>::RowSingletonPS::execute(VectorBase<R>& x, VectorBase<R>& y, V
       DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the row:
-   s[m_old_i] = s[m_i];
-   y[m_old_i] = y[m_i];
-   rStatus[m_old_i] = rStatus[m_i];
+   if( m_i != m_old_i )
+   {
+      y[m_old_i] = y[m_i];
+      s[m_old_i] = s[m_i];
+      rStatus[m_old_i] = rStatus[m_i];
+   }
 
    R aij = m_col[m_i];
 
@@ -403,10 +412,12 @@ void SPxMainSM<R>::ForceConstraintPS::execute(VectorBase<R>& x, VectorBase<R>& y
       DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the row:
-   s[m_old_i] = s[m_i];
-   y[m_old_i] = y[m_i];
-   rStatus[m_old_i] = rStatus[m_i];
-
+   if( m_i != m_old_i )
+   {
+      s[m_old_i] = s[m_i];
+      y[m_old_i] = y[m_i];
+      rStatus[m_old_i] = rStatus[m_i];
+   }
    // primal:
    s[m_i] = m_lRhs;
 
@@ -581,9 +592,12 @@ void SPxMainSM<R>::FreeZeroObjVariablePS::execute(VectorBase<R>& x, VectorBase<R
       DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the column and corresponding rows:
-   x[m_old_j] = x[m_j];
-   r[m_old_j] = r[m_j];
-   cStatus[m_old_j] = cStatus[m_j];
+   if( m_j != m_old_j )
+   {
+      x[m_old_j] = x[m_j];
+      r[m_old_j] = r[m_j];
+      cStatus[m_old_j] = cStatus[m_j];
+   }
 
    int rIdx = m_old_i - m_col.size() + 1;
 
@@ -743,9 +757,12 @@ void SPxMainSM<R>::ZeroObjColSingletonPS::execute(VectorBase<R>& x, VectorBase<R
       DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the column and corresponding rows:
-   x[m_old_j] = x[m_j];
-   r[m_old_j] = r[m_j];
-   cStatus[m_old_j] = cStatus[m_j];
+   if( m_j != m_old_j )
+   {
+      x[m_old_j] = x[m_j];
+      r[m_old_j] = r[m_j];
+      cStatus[m_old_j] = cStatus[m_j];
+   }
 
    // primal & basis:
    R aij = m_row[m_j];
@@ -908,14 +925,20 @@ void SPxMainSM<R>::FreeColSingletonPS::execute(VectorBase<R>& x, VectorBase<R>& 
 {
 
    // correcting the change of idx by deletion of the row:
-   s[m_old_i] = s[m_i];
-   y[m_old_i] = y[m_i];
-   rStatus[m_old_i] = rStatus[m_i];
+   if( m_i != m_old_i )
+   {
+      s[m_old_i] = s[m_i];
+      y[m_old_i] = y[m_i];
+      rStatus[m_old_i] = rStatus[m_i];
+   }
 
    // correcting the change of idx by deletion of the column:
-   x[m_old_j] = x[m_j];
-   r[m_old_j] = r[m_j];
-   cStatus[m_old_j] = cStatus[m_j];
+   if( m_j != m_old_j )
+   {
+      x[m_old_j] = x[m_j];
+      r[m_old_j] = r[m_j];
+      cStatus[m_old_j] = cStatus[m_j];
+   }
 
    // primal:
    R val = 0.0;
@@ -1388,14 +1411,20 @@ void SPxMainSM<R>::AggregationPS::execute(VectorBase<R>& x, VectorBase<R>& y, Ve
       DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the row:
-   s[m_old_i] = s[m_i];
-   y[m_old_i] = y[m_i];
-   rStatus[m_old_i] = rStatus[m_i];
+   if( m_i != m_old_i )
+   {
+      s[m_old_i] = s[m_i];
+      y[m_old_i] = y[m_i];
+      rStatus[m_old_i] = rStatus[m_i];
+   }
 
    // correcting the change of idx by deletion of the column:
-   x[m_old_j] = x[m_j];
-   r[m_old_j] = r[m_j];
-   cStatus[m_old_j] = cStatus[m_j];
+   if( m_j != m_old_j )
+   {
+      x[m_old_j] = x[m_j];
+      r[m_old_j] = r[m_j];
+      cStatus[m_old_j] = cStatus[m_j];
+   }
 
    // primal:
    R val = 0.0;
@@ -1495,14 +1524,20 @@ void SPxMainSM<R>::MultiAggregationPS::execute(VectorBase<R>& x, VectorBase<R>& 
 {
 
    // correcting the change of idx by deletion of the row:
-   s[m_old_i] = s[m_i];
-   y[m_old_i] = y[m_i];
-   rStatus[m_old_i] = rStatus[m_i];
+   if( m_i != m_old_i )
+   {
+      s[m_old_i] = s[m_i];
+      y[m_old_i] = y[m_i];
+      rStatus[m_old_i] = rStatus[m_i];
+   }
 
    // correcting the change of idx by deletion of the column:
-   x[m_old_j] = x[m_j];
-   r[m_old_j] = r[m_j];
-   cStatus[m_old_j] = cStatus[m_j];
+   if( m_j != m_old_j )
+   {
+      x[m_old_j] = x[m_j];
+      r[m_old_j] = r[m_j];
+      cStatus[m_old_j] = cStatus[m_j];
+   }
 
    // primal:
    R val = 0.0;
