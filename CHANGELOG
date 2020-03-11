@@ -19,10 +19,12 @@ interface & parameters:
 - new parameter 'bool:forcebasic', determines whether optimal solution has to be basic when performing
   rational solve with iterative refinement, triggers rational factorization if reconstruction optimal
   but not basic
-- SoPlex can now do multiprecision solve, i.e., `SoPlex<R>` with `R =
+- SoPlex can now do a multiprecision solve, i.e., `SoPlex<R>` with `R =
   boost::multiprecision::number<T>` will work. In particular, for Linux and Mac,
-  SoPlex can do multiprecision solve with `mpfr_float` and on windows with
+  SoPlex can do a multiprecision solve with `mpfr_float` and on windows with
   `cpp_float`.
+- extended parameter 'solvemode' with value (3 - multiprecision solve, 4 - solve with Quadruple precision (128bit))
+- new parameter 'precision' (only active in solvemode 3) to set the precision  
 - Templated SoPlex, SPxSolver, and SPxBasis.
 - Renamed SoPlex<R>, SPxSolver<R>, and SPxBasis<R> to SoPlexBase<R>,
   SPxSolverBase<R>, SPxBasisBase<R> respectively for backwards compatibility

@@ -512,6 +512,11 @@ int soplex::runSoPlex(const po::variables_map& vm)
             MSG_INFO1(soplex.spxout, soplex.spxout << "Solving with increased precision." << std::endl);
             soplex.setIntParam(soplex.SOLVEMODE, vm["int:solvemode"].as<int>());
          }
+         else if(solvemode == 4)
+         {
+            MSG_INFO1(soplex.spxout, soplex.spxout << "Solving with Quad precision." << std::endl);
+            soplex.setIntParam(soplex.SOLVEMODE, vm["int:solvemode"].as<int>());
+         }
          else
          {
             soplex.setIntParam(soplex.SOLVEMODE, vm["solvemode"].as<int>());

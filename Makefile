@@ -70,11 +70,12 @@ CONTINUE	=	false
 # is it allowed to link to external open source libraries?
 OPENSOURCE	=	true
 
-GMP		=	true
-MPFR 		= 	false
-ZLIB		=	true
-EGLIB		=	false
-BOOST 	=  true
+GMP      =  true
+MPFR     =  false
+ZLIB     =  true
+EGLIB    =  false
+BOOST    =  true
+QUADMATH =  false
 
 COMP		=	gnu
 CXX		=	g++
@@ -110,13 +111,14 @@ DFLAGS		=	-MM
 GMP_LDFLAGS	= -lgmp
 GMP_CPPFLAGS	=
 BOOST_LDFLAGS = -lboost_program_options
+QUADMATH_LDFLAGS = -lquadmath
 
 SOPLEXDIR	=	$(realpath .)
 SRCDIR		=	src
 BINDIR		=	bin
 LIBDIR		=	lib
 INCLUDEDIR	=	include
-NAME		=	soplex
+NAME		   =	soplex
 
 LIBOBJ = soplex/clufactor_rational.o \
 				soplex/didxset.o \
@@ -263,6 +265,12 @@ ifeq ($(BOOST),true)
 	endif
 endif
 
+# For quadmath support
+ifeq ($(QUADMATH),true)
+	LDFLAGS += $(QUADMATH_LDFLAGS)
+	CPPFLAGS += -DSOPLEX_WITH_FLOAT128
+endif
+
 
 ZLIBDEP		:=	$(SRCDIR)/depend.zlib
 ZLIBSRC		:=	$(shell cat $(ZLIBDEP))
@@ -296,7 +304,7 @@ endif
 endif
 
 ifeq ($(SHARED),true)
-EXT_LIBS	= $(ZLIB_LDFLAGS) $(GMP_LDFLAGS)
+EXT_LIBS	= $(ZLIB_LDFLAGS) $(GMP_LDFLAGS) $(BOOST_LDFLAGS) $(QUADMATH_LDFLAGS)
 endif
 
 
