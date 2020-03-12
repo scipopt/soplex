@@ -497,23 +497,23 @@ public:
    }
 
    // Provides access to the iterators of std::vector<R> val
-   decltype(val.begin()) begin() const
+   typename std::vector<R>::const_iterator begin() const
    {
       return val.begin();
    }
 
-   decltype(val.begin()) begin()
+   typename std::vector<R>::iterator begin()
    {
       return val.begin();
    }
 
    // Provides access to the iterators of std::vector<R> val
-   decltype(val.end()) end() const
+   typename std::vector<R>::const_iterator end() const
    {
       return val.end();
    }
 
-   decltype(val.end()) end()
+   typename std::vector<R>::iterator end()
    {
       return val.end();
    }
