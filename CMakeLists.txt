@@ -183,7 +183,7 @@ if(MSVC)
     add_definitions(/wd4661)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
     add_compile_options(/bigobj)
-    target_compile_definitions(soplex INTERFACE BOOST_ALL_NO_LIB)
+    add_definitions(-DBOOST_ALL_NO_LIB)
 
     # set MT or MTd flag when using the static VS runtime libraries
     if(MT)
