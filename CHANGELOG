@@ -1,4 +1,4 @@
-XY January 2020 - Release 5.0.0
+24 Febuary 2020 - Release 5.0.0
 ===============================
 
 interface & parameters:
@@ -17,7 +17,7 @@ interface & parameters:
   SoPlex can do a multiprecision solve with `mpfr_float` and on windows with
   `cpp_float`.
 - extended parameter 'solvemode' with value (3 - multiprecision solve, 4 - solve with Quadruple precision (128bit))
-- new parameter 'precision' (only active in solvemode 3) to set the precision  
+- new parameter 'precision' (only active in solvemode 3) to set the precision
 - Templated SoPlex, SPxSolver, and SPxBasis.
 - Renamed SoPlex<R>, SPxSolver<R>, and SPxBasis<R> to SoPlexBase<R>,
   SPxSolverBase<R>, SPxBasisBase<R> respectively for backwards compatibility
@@ -67,7 +67,7 @@ interface & parameters:
   2. Conversion from Rational to `boost::multiprecision::number<T>`, provided
      that boost can handle `mpq_t` to `T` conversion.
 - Changes to `VectorBase<T>` and `DVectorBase<T>`:
-  1. `VectorBase<T>` is now a wrapper of `std::vector<T>`, it no longer uses 
+  1. `VectorBase<T>` is now a wrapper of `std::vector<T>`, it no longer uses
       pre-allocated memory.
   2. The class can handle the additional functionality `DVectorBase<T>`, e.g.,
      `memSize()`, `reSize()`, `scaleAssign(,,).`
