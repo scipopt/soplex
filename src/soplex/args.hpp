@@ -313,8 +313,8 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
    ("int:printbasismetric", po::value<int>()->default_value(-1)->notifier(args::checkRange(-1, 3,
          "int:printbasismetric")),
     "print basis metric during the solve (-1 - off, 0 - condition estimate , 1 - trace, 2 - determinant, 3 - condition)")
-   ("int:STATTIMER", po::value<int>()->default_value(1)->notifier(args::checkRange(0, 2,
-         "int:STATTIMER")),
+   ("int:stattimer", po::value<int>()->default_value(1)->notifier(args::checkRange(0, 2,
+         "int:stattimer")),
     "measure for statistics, e.g. factorization time (0 - off, 1 - user time, 2 - wallclock time)");
 
    realParam.add_options()
