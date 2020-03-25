@@ -3,10 +3,10 @@
 
 interface & parameters:
 - show number of violations in log to improve understanding of solving progress
-- new parameter 'int:printbasismetric' to replace 'printcondition'
-	(-1: off, 0: condition estimate, 1: trace, 2: determinant, 3: condition)
+- new parameter 'int:printbasismetric' to replace 'int:printcondition'
+  (-1: off, 0: condition estimate, 1: trace, 2: determinant, 3: condition)
 - new parameter 'real:min_markowitz' to limit the Markowitz stability threshold
-   (range 0.0001 to 0.9999, high values sacrifice performance for stability)
+  (range 0.0001 to 0.9999, high values sacrifice performance for stability)
 - new parameter 'int:stattimer' to control time measurement for statistics during solving
   (0: off, 1: user time, 2: wallclock time)
 - new parameter 'bool:forcebasic', determines whether optimal solution has to be basic when performing
@@ -23,28 +23,28 @@ interface & parameters:
   SPxSolverBase<R>, SPxBasisBase<R> respectively for backwards compatibility
   (and for SCIP.)
 - Following renames:
-	| From                   | To                    |
-	|------------------------|-----------------------|
-	| `getDualFarkas`        | `getDualFarkasSol`    |
-	| `getDualFarkasT`       | `getDualFarkas`       |
-	| `getBoundViolationT`   | `getBoundViolation`   |
-	| `numColsT`             | `numCols`             |
-	| `numRowsT`             | `numRows`             |
-	| `getRedCost`           | `getRedCostSol`       |
-	| `getRedCostT`          | `getRedCost`          |
-	| `writeFile`            | `writeFileLPBase`     |
-	| `writeFileT`           | `writeFile`           |
-	| `getRowViolationT`     | `getRowViolation`     |
-	| `getDualViolationT`    | `getDualViolation`    |
-	| `getRedCostViolationT` | `getRedCostViolation` |
-	| `getDual`              | `getDualSol`          |
-	| `getDualT`             | `getDual`             |
-	| `getPrimal`            | `getPrimalSol`        |
-	| `getPrimalT`           | `getPrimal`           |
-	| `numNonZerosT`         | `numNonZeros`         |
-	| `_optimizeT`           | `_optimize`           |
-	| `getPrimalRay`         | `getPrimalRaySol`     |
-	| `getPrimalRayT`        | `getPrimalRay`        |
+  | From                   | To                    |
+  |------------------------|-----------------------|
+  | `getDualFarkas`        | `getDualFarkasSol`    |
+  | `getDualFarkasT`       | `getDualFarkas`       |
+  | `getBoundViolationT`   | `getBoundViolation`   |
+  | `numColsT`             | `numCols`             |
+  | `numRowsT`             | `numRows`             |
+  | `getRedCost`           | `getRedCostSol`       |
+  | `getRedCostT`          | `getRedCost`          |
+  | `writeFile`            | `writeFileLPBase`     |
+  | `writeFileT`           | `writeFile`           |
+  | `getRowViolationT`     | `getRowViolation`     |
+  | `getDualViolationT`    | `getDualViolation`    |
+  | `getRedCostViolationT` | `getRedCostViolation` |
+  | `getDual`              | `getDualSol`          |
+  | `getDualT`             | `getDual`             |
+  | `getPrimal`            | `getPrimalSol`        |
+  | `getPrimalT`           | `getPrimal`           |
+  | `numNonZerosT`         | `numNonZeros`         |
+  | `_optimizeT`           | `_optimize`           |
+  | `getPrimalRay`         | `getPrimalRaySol`     |
+  | `getPrimalRayT`        | `getPrimalRay`        |
 
 - Wrapped the following functions:
   1. `getDualFarkasReal`
