@@ -1228,7 +1228,7 @@ SLUFactor<R>::SLUFactor(const SLUFactor<R>& old)
    this->col.perm    = 0;
    this->col.orig    = 0;
    this->u.row.elem  = 0;
-   this->u.row.val.empty();
+   this->u.row.val.clear();
    this->u.row.idx   = 0;
    this->u.row.start = 0;
    this->u.row.len   = 0;
