@@ -377,7 +377,7 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
    defaultValue[SoPlexBase<R>::PRINTBASISMETRIC] = -1;
 
    /// measure time spent in solving steps, e.g. factorization time
-   name[SoPlexBase<R>::STATTIMER] = "STATTIMER";
+   name[SoPlexBase<R>::STATTIMER] = "stattimer";
    description[SoPlexBase<R>::STATTIMER] =
       "measure for statistics, e.g. factorization time (0 - off, 1 - user time, 2 - wallclock time)";
    lower[SoPlexBase<R>::STATTIMER] = 0;
