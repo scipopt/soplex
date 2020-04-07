@@ -63,11 +63,6 @@ set(settings
     polish2
     )
 
-if(${Boost_VERSION_MACRO} GREATER_EQUAL "107000")
-    set(settings
-        ${settings}
-        mpf)
-endif()
 if(SOPLEX_HAVE_FLOAT128)
     set(settings
         ${settings}
@@ -75,6 +70,14 @@ if(SOPLEX_HAVE_FLOAT128)
 endif()
 
 if(BOOST)
+
+# use GREATER to work with old cmake versions
+if(${Boost_VERSION_MACRO} GREATER "106999")
+    set(settings
+        ${settings}
+        mpf)
+endif()
+
 #
 # define a macro to add tests
 #
