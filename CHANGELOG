@@ -1,3 +1,6 @@
+fixed bugs:
+- add missing case of `scale = true` in spxlpbase.h change functions
+
 30 March 2020 - Release 5.0.0
 ===============================
 
