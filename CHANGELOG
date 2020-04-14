@@ -1,3 +1,14 @@
+next Release - Release 5.0.1
+===============================
+
+features:
+
+interface & parameters:
+
+performance:
+
+code quality:
+
 fixed bugs:
 - add missing case of `scale = true` in spxlpbase.h change functions
 
