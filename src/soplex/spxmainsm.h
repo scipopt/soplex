@@ -609,8 +609,6 @@ private:
       {
          for(int k = 0; k < m_col.size(); ++k)
          {
-            assert(isNotZero(m_col.value(k)));
-
             int r = m_col.index(k);
 
             if((m_loFree  && m_col.value(k) > 0) ||
