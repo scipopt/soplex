@@ -46,7 +46,7 @@ COMP		=	msvc
 CXX			=	cl
 AR			=	LIB
 
-CPPFLAGS	=	/I$(SRCDIR) /D_CRT_SECURE_NO_WARNINGS 
+CPPFLAGS	=	/I$(SRCDIR) /D_CRT_SECURE_NO_WARNINGS
 CXXFLAGS	=	/nologo /EHsc
 LDFLAGS		=	/link /STACK:67108864 /OPT:REF /OPT:ICF /NOLOGO
 ARFLAGS		=
@@ -180,19 +180,19 @@ LDFLAGS		=	$(LDFLAGS) /NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCMTD
 !CMDSWITCHES +S
 !endif
 
-all:		$(LIBFILE) $(BINFILE) 
+all:		$(LIBFILE) $(BINFILE)
 
-example:	$(LIBFILE) $(EXAMPLEFILE) 
+example:	$(LIBFILE) $(EXAMPLEFILE)
 
 $(BINFILE):	$(BINDIR) $(BINOBJDIR) $(LIBFILE) $(BINOBJ)
 		@echo "-> linking $@"
 		$(CXX) $(CXXFLAGS) $(BINOBJ) $(LIBS) /Fe$@ $(LDFLAGS) $(LIBFILE)
-		
+
 $(EXAMPLEFILE):	$(BINDIR) $(EXAMPLEOBJDIR) $(LIBFILE) $(EXAMPLEOBJ)
 		@echo "-> linking $@"
 		$(CXX) $(CXXFLAGS) $(EXAMPLEOBJ) $(LIBFILE) $(LIBS) /Fe$@ $(LDFLAGS)
 
-$(LIBFILE):	$(LIBDIR) $(LIBOBJDIR) $(LIBOBJ) 
+$(LIBFILE):	$(LIBDIR) $(LIBOBJDIR) $(LIBOBJ)
 		@echo "-> generating library $@"
 		@-del $(LIBFILE)
 		$(AR) $(ARFLAGS) $(LIBOBJ) /OUT:$@
@@ -202,13 +202,13 @@ cleanbin:	$(BINDIR)
 		@-del $(BINFILE)
 
 cleanlib:	$(LIBDIR)
-		@echo "remove library $(LIBFILE)" 
+		@echo "remove library $(LIBFILE)"
 		@-del $(LIBFILE)
 
 clean:		cleanlib cleanbin $(LIBOBJDIR) $(BINOBJDIR) $(OBJDIR)
-		@echo "remove objective files" 
-		@-del /Q $(LIBOBJDIR)\*.obj 
-		@-del /Q $(BINOBJDIR)\*.obj 
+		@echo "remove objective files"
+		@-del /Q $(LIBOBJDIR)\*.obj
+		@-del /Q $(BINOBJDIR)\*.obj
 		@-del $(EXAMPLEFILE)
 
 $(OBJDIR):

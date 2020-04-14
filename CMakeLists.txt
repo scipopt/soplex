@@ -183,12 +183,17 @@ if(MSVC)
     add_definitions(/wd4661)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
     add_compile_options(/bigobj)
+    add_definitions(-DBOOST_ALL_NO_LIB)
 
     # set MT or MTd flag when using the static VS runtime libraries
     if(MT)
         set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
     endif()
+endif()
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi")
 endif()
 
 add_subdirectory(src)

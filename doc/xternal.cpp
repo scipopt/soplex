@@ -101,14 +101,14 @@
    @brief     Everything should be within this namespace.
 
    We have put the whole class library in the namespace soplex.
-   If anything here is defined outside, this is a mistake and 
-   should be reported. 
+   If anything here is defined outside, this is a mistake and
+   should be reported.
 */
 
 
 /**@defgroup Elementary Elementary Classes
    @brief    General purpose classes.
-   
+
    Elementary classes are provided for general purpose use in
    projects way beyond the scope of numerical software or linear
    programming.
@@ -116,7 +116,7 @@
 
 /**@defgroup Algebra Linear Algebra Classes
    @brief Basic data types for linear algebra computations.
-   
+
    Linear algebra classes provide basic data types for (sparse)
    linear algebra computations. However, their functionality is
    restricted to simple operations such as addition and scaling.
@@ -125,13 +125,13 @@
 */
 
 /**@defgroup Algo Algorithmic Classes
-   @brief Implementation of numerical algorithms.   
-   
+   @brief Implementation of numerical algorithms.
+
    Algorithmic classes serve for implementing a variety of
    algorithms for solving numerical (sub-)problems.
 */
 
-/**@page DataObjects Data Objects 
+/**@page DataObjects Data Objects
 
     \em Data \em objects refer to C++ objects that do not allocate any
     resources, particularly that do not allocate any memory.  This
@@ -140,13 +140,13 @@
     memcopy of the memory taken by the object. Examples for data
     objects are all builtin types such as \c int or \c double or
     \e simple classes such as \c complex.
- 
+
     We distinguish \em data \em objects from general C++ objects that
     may include some allocation of resources. (Note that for general
     C++ objects that do allocate resources, this must be respected by
     providing appropriate copy constructor and assignment operators.)
     An example for a general C++ class is class DataArray.
- 
+
     The distinction between data and general C++ objects becomes
     relevant when using such objects in container classes such as
     DataArray or Array.
