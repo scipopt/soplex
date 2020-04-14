@@ -1388,9 +1388,18 @@ public:
    /// Changes objective vector to \p newObj. \p scale determines whether the new data should be scaled
    virtual void changeMaxObj(const VectorBase<R>& newObj, bool scale = false)
    {
-      assert(scale == false);
       assert(maxObj().dim() == newObj.dim());
-      LPColSetBase<R>::maxObj_w() = newObj;
+
+      if(scale)
+      {
+         assert(_isScaled);
+         assert(lp_scaler);
+         for(int i = 0; i < maxObj().dim(); i++ )
+            LPColSetBase<R>::maxObj_w(i) = lp_scaler->scaleObj(*this, i, newObj[i]);
+      }
+      else
+         LPColSetBase<R>::maxObj_w() = newObj;
+
       assert(isConsistent());
    }
 
@@ -1426,9 +1435,18 @@ public:
    /// Changes vector of lower bounds to \p newLower. \p scale determines whether the new data should be scaled
    virtual void changeLower(const VectorBase<R>& newLower, bool scale = false)
    {
-      assert(scale == false);
       assert(lower().dim() == newLower.dim());
-      LPColSetBase<R>::lower_w() = newLower;
+
+      if(scale)
+      {
+         assert(_isScaled);
+         assert(lp_scaler);
+         for(int i = 0; i < lower().dim(); i++ )
+            LPColSetBase<R>::lower_w(i) = lp_scaler->scaleLower(*this, i, newLower[i]);
+      }
+      else
+         LPColSetBase<R>::lower_w() = newLower;
+
       assert(isConsistent());
    }
 
@@ -1464,9 +1482,18 @@ public:
    /// Changes vector of upper bounds to \p newUpper. \p scale determines whether the new data should be scaled
    virtual void changeUpper(const VectorBase<R>& newUpper, bool scale = false)
    {
-      assert(scale == false);
       assert(upper().dim() == newUpper.dim());
-      LPColSetBase<R>::upper_w() = newUpper;
+
+      if(scale)
+      {
+         assert(_isScaled);
+         assert(lp_scaler);
+         for(int i = 0; i < upper().dim(); i++ )
+            LPColSetBase<R>::upper_w(i) = lp_scaler->scaleUpper(*this, i, newUpper[i]);
+      }
+      else
+         LPColSetBase<R>::upper_w() = newUpper;
+
       assert(isConsistent());
    }
 
@@ -1534,9 +1561,18 @@ public:
    /// Changes left hand side vector for constraints to \p newLhs. \p scale determines whether the new data should be scaled
    virtual void changeLhs(const VectorBase<R>& newLhs, bool scale = false)
    {
-      assert(scale == false);
       assert(lhs().dim() == newLhs.dim());
-      LPRowSetBase<R>::lhs_w() = newLhs;
+
+      if(scale)
+      {
+         assert(_isScaled);
+         assert(lp_scaler);
+         for(int i = 0; i < lhs().dim(); i++ )
+            LPRowSetBase<R>::lhs_w(i) = lp_scaler->scaleLhs(*this, i, newLhs[i]);
+      }
+      else
+         LPRowSetBase<R>::lhs_w() = newLhs;
+
       assert(isConsistent());
    }
 
@@ -1572,9 +1608,18 @@ public:
    /// Changes right hand side vector for constraints to \p newRhs. \p scale determines whether the new data should be scaled
    virtual void changeRhs(const VectorBase<R>& newRhs, bool scale = false)
    {
-      assert(scale == false);
       assert(rhs().dim() == newRhs.dim());
-      LPRowSetBase<R>::rhs_w() = newRhs;
+
+      if(scale)
+      {
+         assert(_isScaled);
+         assert(lp_scaler);
+         for(int i = 0; i < rhs().dim(); i++ )
+            LPRowSetBase<R>::rhs_w(i) = lp_scaler->scaleRhs(*this, i, newRhs[i]);
+      }
+      else
+         LPRowSetBase<R>::rhs_w() = newRhs;
+
       assert(isConsistent());
    }
 
