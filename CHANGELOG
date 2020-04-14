@@ -11,9 +11,10 @@ code quality:
 
 fixed bugs:
 - add missing case of `scale = true` in spxlpbase.h change functions
+- corrected feasibility checks for rational solution in debug mode
 
 30 March 2020 - Release 5.0.0
-===============================
+=============================
 
 interface & parameters:
 - show number of violations in log to improve understanding of solving progress
