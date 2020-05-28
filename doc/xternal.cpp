@@ -48,13 +48,13 @@
  *
  * SoPlex has been used in numerous reasearch and industry projects and is the
  * standard LP solver linked to the constraint integer programming solver <a
- * href="http://scip.zib.de/">SCIP</a>.
+ * href="http://scipopt.org/">SCIP</a>.
  *
  *@section INST Download, License, and Installation
  *
  * SoPlex can be downloaded in source code and as precompiled binaries from the
  * <a href="http://soplex.zib.de">SoPlex</a> web page.  It is also distributed
- * as part of the <a href="http://scip.zib.de/">SCIP Optimization Suite</a>.
+ * as part of the <a href="http://scipopt.org/">SCIP Optimization Suite</a>.
  *
  * SoPlex is distributed under the terms of the \ref LICENSE "ZIB Academic Licence"
  * and can be freely used for academic research.  See the <a
@@ -81,7 +81,7 @@
  *
  * A tutorial article for getting started with the SCIP Optimization Suite,
  * which includes SoPlex, is available as <a
- * href="http://scip.zib.de/doc/ZR-12-27.pdf">ZIB-Report 12-27</a>.
+ * href="http://scipopt.org/doc/ZR-12-27.pdf">ZIB-Report 12-27</a>.
  *
  * @section AUTHORS Authors
  *
