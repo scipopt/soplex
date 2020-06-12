@@ -801,7 +801,7 @@ void SoPlexBase<R>::_performOptIRStable(
       }
 
       // terminate if some limit is reached
-      if(_isSolveStopped(stoppedTime, stoppedIter))
+      if(_isSolveStopped(stoppedTime, stoppedIter) || lastStallRefinements > 100)
          break;
 
       // check progress
@@ -4282,6 +4282,11 @@ void SoPlexBase<R>::_factorizeColumnRational(SolRational& sol,
 
       sol._isDualFeasible  = true;
    }
+   else
+   {
+      _rationalLUSolver.clear();
+   }
+
 
 TERMINATE:
    // stop rational solving time
