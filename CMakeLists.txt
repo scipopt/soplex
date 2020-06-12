@@ -163,8 +163,8 @@ if(BOOST)
            set(Boost_VERSION_MACRO ${Boost_VERSION})
         endif()
         if(${Boost_VERSION_MACRO} LESS "107000")
-            message(WARNING "Warning: ${Red} The multiprecision feature is disabled with Boost versions older than 1.70.${ColourReset} \
-                            Found version is ${Boost_VERSION_STRING}. However, Quad-precision is still available.")
+            message(WARNING "Warning: ${Red} The multiprecision and quadprecision features are disabled with Boost versions older than 1.70.${ColourReset} \
+                            Found version is ${Boost_VERSION_STRING}")
         endif()
     else()
         message(WARNING "${Red}Boost could not be found! ONLY the SoPlex library can be built without Boost. \
