@@ -530,15 +530,24 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
             runSoPlex<multiprecision2>(vm);
          else
             runSoPlex<multiprecision3>(vm);
-
 #endif  // SOPLEX_WITH_CPPMPF
-      break;
 #endif
+      break;
 #ifdef SOPLEX_WITH_FLOAT128
       case 4:                // quadprecision
+#if BOOST_VERSION < 107000
+      std::cerr << "Error: Boost version too old." << std:: endl <<
+      "In order to use the quadprecision feature of SoPlex," <<
+      " Boost Version 1.70.0 or higher is required." << std::endl << \
+      "Included Boost version is " << BOOST_VERSION / 100000 << "."  // maj. version
+      << BOOST_VERSION / 100 % 1000 << "."  // min. version
+      << BOOST_VERSION % 100                // patch version;
+      << std::endl;
+#else
          using namespace boost::multiprecision;
          using Quad = boost::multiprecision::float128;
          runSoPlex<Quad>(vm);
+#endif
          break;
 #endif
       default:
