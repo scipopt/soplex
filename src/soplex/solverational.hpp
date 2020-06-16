@@ -801,7 +801,7 @@ void SoPlexBase<R>::_performOptIRStable(
       }
 
       // terminate if some limit is reached
-      if(_isSolveStopped(stoppedTime, stoppedIter) || lastStallRefinements > 100)
+      if(_isSolveStopped(stoppedTime, stoppedIter) || numFailedRefinements > 10)
          break;
 
       // check progress
@@ -821,10 +821,14 @@ void SoPlexBase<R>::_performOptIRStable(
       if(maxViolation > bestViolation)
       {
          MSG_INFO2(spxout, spxout << "Failed to reduce violation significantly.\n");
+         bestViolation /= violationImprovementFactor;
          numFailedRefinements++;
       }
       else
+      {
          bestViolation = maxViolation;
+         numFailedRefinements = 0;
+      }
 
       // decide whether to perform rational reconstruction and/or factorization
       bool forcebasic    = boolParam(SoPlexBase<R>::FORCEBASIC);
