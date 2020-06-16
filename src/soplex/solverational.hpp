@@ -825,10 +825,7 @@ void SoPlexBase<R>::_performOptIRStable(
          numFailedRefinements++;
       }
       else
-      {
          bestViolation = maxViolation;
-         numFailedRefinements = 0;
-      }
 
       // decide whether to perform rational reconstruction and/or factorization
       bool forcebasic    = boolParam(SoPlexBase<R>::FORCEBASIC);
