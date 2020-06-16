@@ -554,7 +554,7 @@ void SoPlexBase<R>::_performOptIRStable(
    // control progress
    Rational maxViolation;
    Rational bestViolation = _rationalPosInfty;
-   const Rational violationImprovementFactor = 0.9;
+   const Rational violationImprovementFactor = 2;
    const Rational errorCorrectionFactor = 1.1;
    Rational errorCorrection = 2;
    int numFailedRefinements = 0;
@@ -816,12 +816,12 @@ void SoPlexBase<R>::_performOptIRStable(
       if(dualViolation > maxViolation)
          maxViolation = dualViolation;
 
-      bestViolation *= violationImprovementFactor;
+      bestViolation /= violationImprovementFactor;
 
       if(maxViolation > bestViolation)
       {
          MSG_INFO2(spxout, spxout << "Failed to reduce violation significantly.\n");
-         bestViolation /= violationImprovementFactor;
+         bestViolation *= violationImprovementFactor;
          numFailedRefinements++;
       }
       else
