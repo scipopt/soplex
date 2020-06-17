@@ -16,7 +16,7 @@ fixed bugs:
 - Makefiles: fix BOOST=false SHARED=true case
 - CMake: add minimum gcc requirement
 - CMake: fix for older cmake versions and for building without boost
-
+- iterative refinement: fixed possible infinite loop and consistency issue
 
 30 March 2020 - Release 5.0.0
 =============================
