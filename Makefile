@@ -263,6 +263,8 @@ ifeq ($(BOOST),true)
 	ifeq ($(MPFR),false)
 		CPPFLAGS += -DSOPLEX_WITH_CPPMPF
 	endif
+	else
+		BOOST_LDFLAGS =
 endif
 
 # For quadmath support

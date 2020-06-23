@@ -6,6 +6,14 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_DEBUG} ${CMAKE_CXX_FLAGS_R
 project(SOPLEX
   LANGUAGES CXX)
 
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi")
+   # require at least gcc 5
+   if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5)
+     message(WARNING "GCC version not supported, should be at least 5!")
+   endif()
+endif()
+
 set(SOPLEX_VERSION_MAJOR 5)
 set(SOPLEX_VERSION_MINOR 0)
 set(SOPLEX_VERSION_PATCH 0)
@@ -155,8 +163,8 @@ if(BOOST)
            set(Boost_VERSION_MACRO ${Boost_VERSION})
         endif()
         if(${Boost_VERSION_MACRO} LESS "107000")
-            message(WARNING "Warning: ${Red} The multiprecision feature is disabled with Boost versions older than 1.70.${ColourReset} \
-                            Found version is ${Boost_VERSION_STRING}. However, Quad-precision is still available.")
+            message(WARNING "Warning: ${Red} The multiprecision and quadprecision features are disabled with Boost versions older than 1.70.${ColourReset} \
+                            Found version is ${Boost_VERSION_STRING}")
         endif()
     else()
         message(WARNING "${Red}Boost could not be found! ONLY the SoPlex library can be built without Boost. \

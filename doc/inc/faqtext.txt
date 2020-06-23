@@ -31,7 +31,7 @@ SECTION:Frequently asked questions about SoPlex
         extract the solution. For further details, you have to consult the doxygen
         documentation of the code (or even the code itself).
         Another good starting point might also be
-        the SoPlex interface of <a href="http://scip.zib.de">SCIP</a>.
+        the SoPlex interface of <a href="http://scipopt.org">SCIP</a>.
    </p>
 
     QUESTION:Can I use SoPlex with Branch-and-cut or MIP solvers?
@@ -45,7 +45,7 @@ SECTION:Frequently asked questions about SoPlex
     </p>
     <ul>
         <li>
-            <a  href="http://scip.zib.de">SCIP</a> - Solving
+            <a  href="http://scipopt.org">SCIP</a> - Solving
             Constraint Integer Programs.
         </li>
         <li>
@@ -97,7 +97,7 @@ SECTION:Frequently asked questions about SoPlex
         as a subroutine and do some kind of Branch-and-Bound. For
         instance, you can use  SCIP (Solving Constraint Integer Programs)
         together with SoPlex to solve IPs.  SCIP can be obtained at
-        <a href="http://scip.zib.de/">here</a> and is
+        <a href="http://scipopt.org/">here</a> and is
         distributed under the ZIB academic license, like SoPlex.
     </p>
 

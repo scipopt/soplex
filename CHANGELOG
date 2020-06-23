@@ -11,22 +11,23 @@ code quality:
 
 fixed bugs:
 
-next Release - Release 5.0.1
-============================
+Release 5.0.2
+===============================
 
-features:
-
-interface & parameters:
-
-performance:
-
-code quality:
+23 June 2020 - Release 5.0.1
+===============================
 
 fixed bugs:
 - add missing case of `scale = true` in spxlpbase.h change functions
+- corrected feasibility checks for rational solution in debug mode
+- Makefiles: fix a typo in SANITIZERFLAGS, if SHARED=true, add SANITZERFLAGS also to LIBBUILDFLAGS and always add SANITZERFLAGS to LDFLAGS
+- Makefiles: fix BOOST=false SHARED=true case
+- CMake: add minimum gcc requirement
+- CMake: fix for older cmake versions and for building without boost
+- iterative refinement: fixed possible infinite loop and consistency issue
 
 30 March 2020 - Release 5.0.0
-===============================
+=============================
 
 interface & parameters:
 - show number of violations in log to improve understanding of solving progress
