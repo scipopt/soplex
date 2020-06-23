@@ -51,8 +51,8 @@ namespace soplex
 // Overloaded EQ function
 bool EQ(int a, int b);
 
-#define SOPLEX_VERSION         500
-#define SOPLEX_SUBVERSION        2
+#define SOPLEX_VERSION         501
+#define SOPLEX_SUBVERSION        3
 #define SOPLEX_APIVERSION       11
 #define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2020 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)"
 
