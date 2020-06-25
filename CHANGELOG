@@ -1,6 +1,9 @@
 23 June 2020 - Release 5.0.2
 ===============================
 
+fixed bugs:
+- fix bug regarding objective sense when starting SYNCMODE_MANUAL
+
 23 June 2020 - Release 5.0.1
 ===============================
 

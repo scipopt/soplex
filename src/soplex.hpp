@@ -5905,6 +5905,9 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
 
       case SYNCMODE_MANUAL:
          _ensureRationalLP();
+         assert(_realLP != 0);
+         _rationalLP->changeSense(_realLP->spxSense() == SPxLPBase<R>::MINIMIZE ? SPxLPRational::MINIMIZE :
+                                  SPxLPRational::MAXIMIZE);
          break;
 
       default:
