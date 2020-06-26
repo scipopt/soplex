@@ -94,8 +94,7 @@ void SPxMainSM<R>::RowObjPS::execute(VectorBase<R>& x, VectorBase<R>& y, VectorB
                                      DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
                                      DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
 {
-   assert(isZero(s[m_i], R(1e-9)));
-   s[m_i] = -x[m_j];
+   s[m_i] = s[m_i]-x[m_j];
 
    assert(rStatus[m_i] != SPxSolverBase<R>::UNDEFINED);
    assert(cStatus[m_j] != SPxSolverBase<R>::UNDEFINED);

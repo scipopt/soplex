@@ -1,6 +1,9 @@
 23 June 2020 - Release 5.0.2
 ===============================
 
+fixed bugs:
+- fixed overly conservative assert in postsolving of row objective simplifier
+
 23 June 2020 - Release 5.0.1
 ===============================
 
