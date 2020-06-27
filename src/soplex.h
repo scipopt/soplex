@@ -2127,17 +2127,17 @@ private:
                             bool& dualFeasible,
                             bool& infeasible,
                             bool& unbounded,
-                            bool& stopped,
+                            bool& stoppedTime,
                             bool& stoppedIter,
                             bool& error);
 
    /// performs iterative refinement on the auxiliary problem for testing unboundedness
-   void _performUnboundedIRStable(SolRational& sol, bool& hasUnboundedRay, bool& stopped,
+   void _performUnboundedIRStable(SolRational& sol, bool& hasUnboundedRay, bool& stoppedTime,
                                   bool& stoppedIter, bool& error);
 
    /// performs iterative refinement on the auxiliary problem for testing feasibility
-   void _performFeasIRStable(SolRational& sol, bool& withDualFarkas, bool& stopped, bool& stoppedIter,
-                             bool& error);
+   void _performFeasIRStable(SolRational& sol, bool& withDualFarkas, bool& stoppedTime,
+                             bool& stoppedIter, bool& error);
 
    /// reduces matrix coefficient in absolute value by the lifting procedure of Thiele et al. 2013
    void _lift();

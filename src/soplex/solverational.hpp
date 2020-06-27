@@ -1531,7 +1531,7 @@ template <class R>
 void SoPlexBase<R>::_performUnboundedIRStable(
    SolRational& sol,
    bool& hasUnboundedRay,
-   bool& stopped,
+   bool& stoppedTime,
    bool& stoppedIter,
    bool& error)
 {
@@ -1551,13 +1551,13 @@ void SoPlexBase<R>::_performUnboundedIRStable(
 
    // perform iterative refinement
    _performOptIRStable(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded,
-                       stopped, stoppedIter, error);
+                       stoppedTime, stoppedIter, error);
 
    // update unbounded refinement counter
    _statistics->unbdRefinements += _statistics->refinements - oldRefinements;
 
    // stopped due to some limit
-   if(stopped)
+   if(stoppedTime || stoppedIter)
    {
       sol.invalidate();
       hasUnboundedRay = false;
@@ -1568,7 +1568,6 @@ void SoPlexBase<R>::_performUnboundedIRStable(
    {
       sol.invalidate();
       hasUnboundedRay = false;
-      stopped = false;
       error = true;
    }
    else
@@ -1599,7 +1598,7 @@ template <class R>
 void SoPlexBase<R>::_performFeasIRStable(
    SolRational& sol,
    bool& withDualFarkas,
-   bool& stopped,
+   bool& stoppedTime,
    bool& stoppedIter,
    bool& error)
 {
@@ -1632,13 +1631,13 @@ void SoPlexBase<R>::_performFeasIRStable(
 
       // perform iterative refinement
       _performOptIRStable(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded,
-                          stopped, stoppedIter, error);
+                          stoppedTime, stoppedIter, error);
 
       // update feasible refinement counter
       _statistics->feasRefinements += _statistics->refinements - oldRefinements;
 
       // stopped due to some limit
-      if(stopped)
+      if(stoppedTime || stoppedIter)
       {
          sol.invalidate();
          withDualFarkas = false;
@@ -1649,7 +1648,6 @@ void SoPlexBase<R>::_performFeasIRStable(
       {
          sol.invalidate();
          withDualFarkas = false;
-         stopped = false;
          error = true;
       }
       // else we should have either a refined Farkas proof or an approximate feasible solution to the original
@@ -1689,7 +1687,7 @@ void SoPlexBase<R>::_performFeasIRStable(
          }
       }
    }
-   while(!error && !success && !stopped);
+   while(!error && !success && !(stoppedTime || stoppedIter));
 
    // restore problem
    _untransformFeasibility(sol, withDualFarkas);
