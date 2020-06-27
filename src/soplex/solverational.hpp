@@ -3346,8 +3346,6 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
    // stop timing
    _statistics->syncTime->stop();
 
-   _hasBasis = false;
-
    try
    {
       // apply problem simplification
@@ -3484,17 +3482,9 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                   _scaler->unscalePrimal(_solver, primal);
                   _scaler->unscaleDual(_solver, dual);
                }
-
-               // get basis of transformed problem
-               basisStatusRows.reSize(_solver.nRows());
-               basisStatusCols.reSize(_solver.nCols());
-               _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(),
-                                basisStatusCols.size());
-               _hasBasis = true;
-               result = SPxSolverBase<R>::OPTIMAL;
             }
 
-            break;
+         // intentional fallthrough
 
          case SPxSolverBase<R>::ABORT_TIME:
          case SPxSolverBase<R>::ABORT_ITER:
@@ -3502,13 +3492,29 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
          case SPxSolverBase<R>::REGULAR:
          case SPxSolverBase<R>::RUNNING:
          case SPxSolverBase<R>::UNBOUNDED:
+            _hasBasis = (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
+
+            if(_hasBasis)
+            {
+               basisStatusRows.reSize(_solver.nRows());
+               basisStatusCols.reSize(_solver.nCols());
+               _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(),
+                                basisStatusCols.size());
+            }
+            else
+               _rationalLUSolver.clear();
+
             break;
 
          case SPxSolverBase<R>::INFEASIBLE:
 
-            // if simplifier is active we cannot return a Farkas ray currently
+            // if simplifier is active we can currently not return a Farkas ray or basis
             if(_simplifier != 0)
+            {
+               _hasBasis = false;
+               _rationalLUSolver.clear();
                break;
+            }
 
             // return Farkas ray as dual solution
             _solver.getDualfarkas(dual);
@@ -3528,6 +3534,8 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
          case SPxSolverBase<R>::INForUNBD:
          case SPxSolverBase<R>::SINGULAR:
          default:
+            _hasBasis = false;
+            _rationalLUSolver.clear();
             break;
          }
       }
@@ -3536,6 +3544,9 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
    {
       MSG_INFO1(spxout, spxout << "Exception thrown during floating-point solve.\n");
       result = SPxSolverBase<R>::ERROR;
+      _hasBasis = false;
+      _rationalLUSolver.clear();
+
    }
 
    // restore original LP if necessary
