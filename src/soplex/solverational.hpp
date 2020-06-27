@@ -3340,8 +3340,9 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
       rationalLP = new(rationalLP) SPxLPRational(_solver);
    }
 
-   // if preprocessing is applied, the basis may change, hence invalidate the rational basis factorization; if no
-   if(_simplifier != 0 || _scaler != nullptr)
+   // with preprocessing or solving from scratch, the basis may change, hence invalidate the
+   // rational basis factorization
+   if(_simplifier != nullptr || _scaler != nullptr || fromscratch)
       _rationalLUSolver.clear();
 
    // stop timing
