@@ -142,7 +142,7 @@ void SPxMainSM<R>::FreeConstraintPS::execute(VectorBase<R>& x, VectorBase<R>& y,
       DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the row:
-   if( m_i != m_old_i )
+   if(m_i != m_old_i)
    {
       s[m_old_i] = s[m_i];
       y[m_old_i] = y[m_i];
@@ -180,7 +180,7 @@ void SPxMainSM<R>::EmptyConstraintPS::execute(VectorBase<R>&, VectorBase<R>& y, 
       DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the row:
-   if( m_i != m_old_i )
+   if(m_i != m_old_i)
    {
       s[m_old_i] = s[m_i];
       y[m_old_i] = y[m_i];
@@ -213,7 +213,7 @@ void SPxMainSM<R>::RowSingletonPS::execute(VectorBase<R>& x, VectorBase<R>& y, V
       DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the row:
-   if( m_i != m_old_i )
+   if(m_i != m_old_i)
    {
       y[m_old_i] = y[m_i];
       s[m_old_i] = s[m_i];
@@ -412,12 +412,13 @@ void SPxMainSM<R>::ForceConstraintPS::execute(VectorBase<R>& x, VectorBase<R>& y
       DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the row:
-   if( m_i != m_old_i )
+   if(m_i != m_old_i)
    {
       s[m_old_i] = s[m_i];
       y[m_old_i] = y[m_i];
       rStatus[m_old_i] = rStatus[m_i];
    }
+
    // primal:
    s[m_i] = m_lRhs;
 
@@ -592,7 +593,7 @@ void SPxMainSM<R>::FreeZeroObjVariablePS::execute(VectorBase<R>& x, VectorBase<R
       DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the column and corresponding rows:
-   if( m_j != m_old_j )
+   if(m_j != m_old_j)
    {
       x[m_old_j] = x[m_j];
       r[m_old_j] = r[m_j];
@@ -757,7 +758,7 @@ void SPxMainSM<R>::ZeroObjColSingletonPS::execute(VectorBase<R>& x, VectorBase<R
       DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the column and corresponding rows:
-   if( m_j != m_old_j )
+   if(m_j != m_old_j)
    {
       x[m_old_j] = x[m_j];
       r[m_old_j] = r[m_j];
@@ -925,7 +926,7 @@ void SPxMainSM<R>::FreeColSingletonPS::execute(VectorBase<R>& x, VectorBase<R>& 
 {
 
    // correcting the change of idx by deletion of the row:
-   if( m_i != m_old_i )
+   if(m_i != m_old_i)
    {
       s[m_old_i] = s[m_i];
       y[m_old_i] = y[m_i];
@@ -933,7 +934,7 @@ void SPxMainSM<R>::FreeColSingletonPS::execute(VectorBase<R>& x, VectorBase<R>& 
    }
 
    // correcting the change of idx by deletion of the column:
-   if( m_j != m_old_j )
+   if(m_j != m_old_j)
    {
       x[m_old_j] = x[m_j];
       r[m_old_j] = r[m_j];
@@ -1411,7 +1412,7 @@ void SPxMainSM<R>::AggregationPS::execute(VectorBase<R>& x, VectorBase<R>& y, Ve
       DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the row:
-   if( m_i != m_old_i )
+   if(m_i != m_old_i)
    {
       s[m_old_i] = s[m_i];
       y[m_old_i] = y[m_i];
@@ -1419,7 +1420,7 @@ void SPxMainSM<R>::AggregationPS::execute(VectorBase<R>& x, VectorBase<R>& y, Ve
    }
 
    // correcting the change of idx by deletion of the column:
-   if( m_j != m_old_j )
+   if(m_j != m_old_j)
    {
       x[m_old_j] = x[m_j];
       r[m_old_j] = r[m_j];
@@ -1524,7 +1525,7 @@ void SPxMainSM<R>::MultiAggregationPS::execute(VectorBase<R>& x, VectorBase<R>& 
 {
 
    // correcting the change of idx by deletion of the row:
-   if( m_i != m_old_i )
+   if(m_i != m_old_i)
    {
       s[m_old_i] = s[m_i];
       y[m_old_i] = y[m_i];
@@ -1532,7 +1533,7 @@ void SPxMainSM<R>::MultiAggregationPS::execute(VectorBase<R>& x, VectorBase<R>& 
    }
 
    // correcting the change of idx by deletion of the column:
-   if( m_j != m_old_j )
+   if(m_j != m_old_j)
    {
       x[m_old_j] = x[m_j];
       r[m_old_j] = r[m_j];
@@ -2346,7 +2347,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::removeRowSingleton(SPxLPBase<R>&
    }
 
    std::shared_ptr<PostStep> ptr(new RowSingletonPS(lp, i, j, stricterLo, stricterUp, lp.lower(j),
-                 lp.upper(j), oldLo, oldUp));
+                                 lp.upper(j), oldLo, oldUp));
    m_hist.append(ptr);
 
    removeRow(lp, i);
@@ -3366,7 +3367,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
                SPxQuicksort(col_idx_sorted.mem(), col_idx_sorted.size(), compare);
 
                std::shared_ptr<PostStep> ptr(new FreeZeroObjVariablePS(lp, j, unconstrained_below,
-                             col_idx_sorted));
+                                             col_idx_sorted));
                m_hist.append(ptr);
 
                // we have to remove the rows with larger idx first, because otherwise the rows are reorder and indices
@@ -3919,7 +3920,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLPBase<R>& lp, b
                    << " dual lhs bound=" << dualConsLo[j] << std::endl;)
 
          std::shared_ptr<PostStep> ptr(new FixBoundsPS(lp, j, lp.lower(j)));
-         m_hist.append(ptr );
+         m_hist.append(ptr);
          lp.changeUpper(j, lp.lower(j));
 
          ++m_stat[WEAKLY_DOMINATED_COL];
@@ -4491,16 +4492,16 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLPBase<R>& lp, 
                }
 
                std::shared_ptr<PostStep> ptr(new DuplicateRowsPS(lp, rowIdx, maxLhsIdx, minRhsIdx,
-                             m_dupRows[k], scale, da_perm, isLhsEqualRhs, true, 
-                             EQrel(newLhs, newRhs), k == idxFirstDupRows));
+                                             m_dupRows[k], scale, da_perm, isLhsEqualRhs, true,
+                                             EQrel(newLhs, newRhs), k == idxFirstDupRows));
                m_hist.append(ptr);
             }
             else
             {
                DataArray<int> da_perm_empty(0);
                std::shared_ptr<PostStep> ptr(new DuplicateRowsPS(lp, rowIdx, maxLhsIdx, minRhsIdx,
-                             m_dupRows[k], scale, da_perm_empty, isLhsEqualRhs, false, EQrel(newLhs, newRhs),
-                             k == idxFirstDupRows));
+                                             m_dupRows[k], scale, da_perm_empty, isLhsEqualRhs, false, EQrel(newLhs, newRhs),
+                                             k == idxFirstDupRows));
                m_hist.append(ptr);
             }
 

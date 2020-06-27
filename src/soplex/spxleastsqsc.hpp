@@ -247,12 +247,12 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
 
    // is contraints matrix empty?
    //todo don't create the scaler in this case!
-   if( lpnnz == 0 )
+   if(lpnnz == 0)
    {
       // to keep the invariants, we still need to call this method
-	  this->applyScaling(lp);
+      this->applyScaling(lp);
 
-	  return;
+      return;
    }
 
    assert(nrows > 0 && ncols > 0 && lpnnz > 0);
@@ -380,12 +380,12 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
       qprev = tmp;
    }
 
-   if( k > 0 && (k % 2) == 0)
+   if(k > 0 && (k % 2) == 0)
    {
       // update column scaling factor vector
       updateScaleFinal(colnnzinv, resncols, tmpcols, csccurr, cscprev, qprev, eprev[1], eprev[2]);
    }
-   else if( k > 0 )
+   else if(k > 0)
    {
       // update row scaling factor vector
       updateScaleFinal(rownnzinv, resnrows, tmprows, rsccurr, rscprev, qprev, eprev[1], eprev[2]);

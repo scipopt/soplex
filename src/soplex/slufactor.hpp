@@ -1494,12 +1494,12 @@ typename SLUFactor<R>::Status SLUFactor<R>::load(const SVectorBase<R>* matrix[],
       for(i = 0; i < dim(); ++i)
       j += matrix[i]->size();
       for(i = 0; i < dim(); ++i)
-      {
-         for(j = 0; j < matrix[i]->size(); ++j)
+   {
+      for(j = 0; j < matrix[i]->size(); ++j)
          {
-               fprintf(fl, "%8d  %8d  ",
-                     i + 1, matrix[i]->index(j) + 1);
-               std::cout << matrix[i]->value(j) << std::endl;
+            fprintf(fl, "%8d  %8d  ",
+                    i + 1, matrix[i]->index(j) + 1);
+            std::cout << matrix[i]->value(j) << std::endl;
          }
       }
    fclose(fl);
