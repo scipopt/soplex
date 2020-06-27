@@ -3,6 +3,7 @@
 
 fixed bugs:
 - fixed overly conservative assert in postsolving of row objective simplifier
+- always clear rational LU factorization when changing the problem to avoid inconsistent basis data
 
 23 June 2020 - Release 5.0.1
 ===============================
