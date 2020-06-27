@@ -442,7 +442,7 @@ void SoPlexBase<R>::_performOptIRStable(
 
    _statistics->rationalTime->stop();
    result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows,
-                             _basisStatusCols, _hasBasis);
+                             _basisStatusCols);
 
    // evaluate result
    switch(result)
@@ -1137,7 +1137,7 @@ void SoPlexBase<R>::_performOptIRStable(
       int prevIterations = _statistics->iterations;
       _statistics->rationalTime->stop();
       result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows,
-                                _basisStatusCols, _hasBasis, primalScale > 1e20 || dualScale > 1e20);
+                                _basisStatusCols, primalScale > 1e20 || dualScale > 1e20);
 
       // count refinements and remember whether we moved to a new basis
       _statistics->refinements++;
@@ -3302,7 +3302,7 @@ template <class R>
 typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool fromscratch,
       VectorBase<R>& primal, VectorBase<R>& dual,
       DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
-      DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& returnedBasis)
+      DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols)
 {
    assert(_isConsistent());
 
@@ -3348,7 +3348,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
    // stop timing
    _statistics->syncTime->stop();
 
-   returnedBasis = false;
+   _hasBasis = false;
 
    try
    {
@@ -3447,12 +3447,11 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                basisStatusCols.reSize(numColsRational());
                _simplifier->getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(),
                                      basisStatusCols.size());
-               returnedBasis = true;
+               _hasBasis = true;
 
                primal = _simplifier->unsimplifiedPrimal();
                dual = _simplifier->unsimplifiedDual();
             }
-            // if the original problem is not in the solver because of scaling, we also need to store the basis
             else
             {
                _solver.getPrimalSol(primal);
@@ -3470,7 +3469,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                basisStatusCols.reSize(_solver.nCols());
                _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(),
                                 basisStatusCols.size());
-               returnedBasis = true;
+               _hasBasis = true;
             }
 
             break;
@@ -3493,7 +3492,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                basisStatusCols.reSize(_solver.nCols());
                _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(),
                                 basisStatusCols.size());
-               returnedBasis = true;
+               _hasBasis = true;
                result = SPxSolverBase<R>::OPTIMAL;
             }
 
@@ -3520,12 +3519,12 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             if(_scaler != nullptr)
                _scaler->unscaleDual(_solver, dual);
 
-            // if the original problem is not in the solver because of scaling, we also need to store the basis
+            // get basis of transformed problem
             basisStatusRows.reSize(_solver.nRows());
             basisStatusCols.reSize(_solver.nCols());
             _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(),
                              basisStatusCols.size());
-            returnedBasis = true;
+            _hasBasis = true;
             break;
 
          case SPxSolverBase<R>::INForUNBD:
@@ -3561,7 +3560,7 @@ template <class R>
 typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnbounded,
       bool acceptInfeasible, VectorBase<R>& primal, VectorBase<R>& dual,
       DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
-      DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& returnedBasis,
+      DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
       const bool forceNoSimplifier)
 {
    typename SPxSolverBase<R>::Status result = SPxSolverBase<R>::UNKNOWN;
@@ -3593,8 +3592,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
    {
       assert(!increasedMarkowitz || GE(_slufactor.markowitz(), R(0.9)));
 
-      result = _solveRealForRational(fromScratch, primal, dual, basisStatusRows, basisStatusCols,
-                                     returnedBasis);
+      result = _solveRealForRational(fromScratch, primal, dual, basisStatusRows, basisStatusCols);
 
       solved = (result == SPxSolverBase<R>::OPTIMAL)
                || (result == SPxSolverBase<R>::INFEASIBLE && acceptInfeasible)

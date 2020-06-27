@@ -2211,13 +2211,13 @@ private:
    typename SPxSolverBase<R>::Status _solveRealForRational(bool fromscratch, VectorBase<R>& primal,
          VectorBase<R>& dual,
          DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
-         DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& returnedBasis);
+         DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols);
 
    /// solves real LP with recovery mechanism
    typename SPxSolverBase<R>::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible,
          VectorBase<R>& primal, VectorBase<R>& dual,
          DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
-         DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& returnedBasis,
+         DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
          const bool forceNoSimplifier = false);
 
    /// computes rational inverse of basis matrix as defined by _rationalLUSolverBind
