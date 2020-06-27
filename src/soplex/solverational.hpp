@@ -3596,11 +3596,8 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
                || (result == SPxSolverBase<R>::INFEASIBLE && acceptInfeasible)
                || (result == SPxSolverBase<R>::UNBOUNDED && acceptUnbounded);
 
-      if(solved)
+      if(solved || result == SPxSolverBase<R>::ABORT_TIME || result == SPxSolverBase<R>::ABORT_ITER)
          break;
-
-      //         if( _isSolveStopped() )
-      //            break;
 
       if(initialSolve)
       {
