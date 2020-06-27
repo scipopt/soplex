@@ -3324,6 +3324,10 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
    _disableSimplifierAndScaler();
 #endif
 
+   // reset basis to slack basis when solving from scratch
+   if(fromscratch)
+      _solver.reLoad();
+
    // start timing
    _statistics->syncTime->start();
 
@@ -3619,7 +3623,6 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
          setIntParam(SoPlexBase<R>::SIMPLIFIER, SoPlexBase<R>::SIMPLIFIER_OFF);
 
          fromScratch = true;
-         _solver.reLoad();
          solvedFromScratch = true;
          continue;
       }
@@ -3650,8 +3653,6 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
          MSG_INFO1(spxout, spxout << "Solving from scratch." << std::endl);
 
          fromScratch = true;
-         _solver.reLoad();
-
          solvedFromScratch = true;
          continue;
       }
@@ -3669,8 +3670,6 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
             setIntParam(SoPlexBase<R>::SCALER, SoPlexBase<R>::SCALER_OFF);
 
          fromScratch = true;
-         _solver.reLoad();
-
          solvedFromScratch = true;
          switchedScaler = true;
          continue;
@@ -3686,8 +3685,6 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
             setIntParam(SoPlexBase<R>::SIMPLIFIER, SoPlexBase<R>::SIMPLIFIER_OFF);
 
          fromScratch = true;
-         _solver.reLoad();
-
          solvedFromScratch = true;
          switchedSimplifier = true;
          continue;
