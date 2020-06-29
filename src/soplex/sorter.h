@@ -223,18 +223,19 @@ void SPxQuicksort(T* keys, int end, COMPARATOR& compare, int start = 0, bool typ
  * - < 0, if \p t1 is to appear before \p t2,
  * - = 0, if \p t1 and \p t2 can appear in any order, or
  * - > 0, if \p t1 is to appear after \p t2.
+ *
+ * @param keys               array of elements to be sorted between index start and end
+ * @param compare            comparator
+ * @param start              index of first element in range to be sorted
+ * @param end                index of last element in range to be sorted, plus 1
+ * @param size               guaranteed number of sorted elements
+ * @param start2             auxiliary start index of sub range used for recursive call
+ * @param end2               auxiliary end index of sub range used for recursive call
+ * @param type               type of sorting, to be more flexable on degenerated cases
  */
 template < class T, class COMPARATOR >
-int SPxQuicksortPart(
-   T*                    keys,               /**< array of elements to be sorted between index start and end */
-   COMPARATOR&           compare,            /**< comparator */
-   int                   start,              /**< index of first element in range to be sorted */
-   int                   end,                /**< index of last element in range to be sorted, plus 1 */
-   int                   size,               /**< guaranteed number of sorted elements */
-   int                   start2 = 0,         /**< auxiliary start index of sub range used for recursive call */
-   int                   end2 = 0,           /**< auxiliary end index of sub range used for recursive call */
-   bool                  type = true         /**< type of sorting, to be more flexable on degenerated cases */
-   )
+int SPxQuicksortPart(T* keys, COMPARATOR& compare, int start, int end, int size, int start2 = 0,
+                     int end2 = 0, bool type = true)
 {
    assert(start >= 0);
 
