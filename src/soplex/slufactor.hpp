@@ -1486,28 +1486,30 @@ typename SLUFactor<R>::Status SLUFactor<R>::load(const SVectorBase<R>* matrix[],
              << "\tstability = " << stability()
              << "\tminStability = " << minStability << std::endl;)
    MSG_DEBUG(
+   {
       int i;
       FILE* fl = fopen("dump.lp", "w");
       std::cout << "DSLUFA03 Basis:\n";
       int j = 0;
 
       for(i = 0; i < dim(); ++i)
-      j += matrix[i]->size();
+         j += matrix[i]->size();
       for(i = 0; i < dim(); ++i)
       {
          for(j = 0; j < matrix[i]->size(); ++j)
          {
-               fprintf(fl, "%8d  %8d  ",
-                     i + 1, matrix[i]->index(j) + 1);
-               std::cout << matrix[i]->value(j) << std::endl;
+            fprintf(fl, "%8d  %8d  ",
+                    i + 1, matrix[i]->index(j) + 1);
+            std::cout << matrix[i]->value(j) << std::endl;
          }
       }
-   fclose(fl);
-   std::cout << "DSLUFA04 LU-Factors:" << std::endl;
-             dump();
+      fclose(fl);
+      std::cout << "DSLUFA04 LU-Factors:" << std::endl;
+      dump();
 
-             std::cout << "DSLUFA05 threshold = " << lastThreshold
-             << "\tstability = " << stability() << std::endl;
+      std::cout << "DSLUFA05 threshold = " << lastThreshold
+                << "\tstability = " << stability() << std::endl;
+   }
    )
 
    assert(isConsistent());

@@ -449,7 +449,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve()
                   if(this->lastUpdate() > 0 && enterFacPivotCount < MAXREFACPIVOTS)
                   {
                      MSG_INFO3((*this->spxout), (*this->spxout) << " --- solve(enter) triggers refactorization" <<
-                           std::endl;)
+                               std::endl;)
 
                      factorize();
 
@@ -768,7 +768,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve()
                   if(this->lastUpdate() > 0 && leaveFacPivotCount < MAXREFACPIVOTS)
                   {
                      MSG_INFO3((*this->spxout), (*this->spxout) << " --- solve(leave) triggers refactorization" <<
-                           std::endl;)
+                               std::endl;)
 
                      factorize();
 

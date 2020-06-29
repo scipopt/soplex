@@ -63,7 +63,7 @@ template < class T >
 class Array
 {
    static_assert(!std::is_same<T, bool>::value,
-      "Since Array wraps std::vector, bool is not allowed to avoid unallowed behavior");
+                 "Since Array wraps std::vector, bool is not allowed to avoid unallowed behavior");
 protected:
 
    //----------------------------------------
@@ -130,11 +130,12 @@ public:
       data.insert(data.end(), t.data.begin(), t.data.end());
    }
 
-   /// insert \p n uninitialized elements before \p i 'th element. 
+   /// insert \p n uninitialized elements before \p i 'th element.
    void insert(int i, int n)
    {
       T newt = T();
-      if( n > 0 )
+
+      if(n > 0)
          data.insert(data.begin() + i - 1, n, newt);
    }
 
@@ -143,7 +144,7 @@ public:
    {
       if(n > 0)
       {
-         data.insert(data.begin() + i -1, n, t);
+         data.insert(data.begin() + i - 1, n, t);
       }
    }
 
@@ -253,7 +254,7 @@ public:
       data.push_back(val);
    }
 
-      /// Consistency check.
+   /// Consistency check.
    bool isConsistent() const
    {
       return true;
