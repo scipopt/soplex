@@ -179,7 +179,8 @@ public:
 #else
    // Operator to typecast Rational to one of the Boost Number types
    template <unsigned bits, boost::multiprecision::expression_template_option eto>
-   operator boost::multiprecision::number<boost::multiprecision::backends::cpp_dec_float<bits>, eto>() const;
+   operator boost::multiprecision::number<boost::multiprecision::backends::cpp_dec_float<bits>, eto>()
+   const;
 #endif
 #endif
 
@@ -1042,7 +1043,7 @@ Rational::operator number<T,  eto>() const
 
 #else
 #ifdef SOPLEX_WITH_GMP
-// Specialization for the conversion mpq_t -> cpp_rational 
+// Specialization for the conversion mpq_t -> cpp_rational
 template<unsigned bits, expression_template_option eto>
 Rational::operator number<backends::cpp_dec_float<bits>, eto>() const
 {
@@ -1051,7 +1052,7 @@ Rational::operator number<backends::cpp_dec_float<bits>, eto>() const
    return number<backends::cpp_dec_float<bits>, eto>(cpp_numb);
 }
 #else
-// Specialization for the conversion double -> cpp_rational 
+// Specialization for the conversion double -> cpp_rational
 template<unsigned bits, expression_template_option eto>
 Rational::operator number<backends::cpp_dec_float<bits>, eto>() const
 {

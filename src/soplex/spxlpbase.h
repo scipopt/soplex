@@ -1394,7 +1394,8 @@ public:
       {
          assert(_isScaled);
          assert(lp_scaler);
-         for(int i = 0; i < maxObj().dim(); i++ )
+
+         for(int i = 0; i < maxObj().dim(); i++)
             LPColSetBase<R>::maxObj_w(i) = lp_scaler->scaleObj(*this, i, newObj[i]);
       }
       else
@@ -1441,7 +1442,8 @@ public:
       {
          assert(_isScaled);
          assert(lp_scaler);
-         for(int i = 0; i < lower().dim(); i++ )
+
+         for(int i = 0; i < lower().dim(); i++)
             LPColSetBase<R>::lower_w(i) = lp_scaler->scaleLower(*this, i, newLower[i]);
       }
       else
@@ -1488,7 +1490,8 @@ public:
       {
          assert(_isScaled);
          assert(lp_scaler);
-         for(int i = 0; i < upper().dim(); i++ )
+
+         for(int i = 0; i < upper().dim(); i++)
             LPColSetBase<R>::upper_w(i) = lp_scaler->scaleUpper(*this, i, newUpper[i]);
       }
       else
@@ -1567,7 +1570,8 @@ public:
       {
          assert(_isScaled);
          assert(lp_scaler);
-         for(int i = 0; i < lhs().dim(); i++ )
+
+         for(int i = 0; i < lhs().dim(); i++)
             LPRowSetBase<R>::lhs_w(i) = lp_scaler->scaleLhs(*this, i, newLhs[i]);
       }
       else
@@ -1614,7 +1618,8 @@ public:
       {
          assert(_isScaled);
          assert(lp_scaler);
-         for(int i = 0; i < rhs().dim(); i++ )
+
+         for(int i = 0; i < rhs().dim(); i++)
             LPRowSetBase<R>::rhs_w(i) = lp_scaler->scaleRhs(*this, i, newRhs[i]);
       }
       else
