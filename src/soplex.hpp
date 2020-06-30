@@ -3918,13 +3918,13 @@ bool SoPlexBase<R>::getRedCostViolationRational(Rational& maxviol, Rational& sum
       // basis must not necessarily hold exactly, even within tolerances; hence the following assertions are relaxed by
       // a factor of two
       assert(!_hasBasis || basisColStatus(c) != SPxSolverBase<R>::ON_LOWER
-             || spxAbs(_solRational._primal[c] - lowerRational(c)) <= 2*_rationalFeastol);
+             || spxAbs(_solRational._primal[c] - lowerRational(c)) <= 2 * _rationalFeastol);
       assert(!_hasBasis || basisColStatus(c) != SPxSolverBase<R>::ON_UPPER
-             || spxAbs(_solRational._primal[c] - upperRational(c)) <= 2*_rationalFeastol);
+             || spxAbs(_solRational._primal[c] - upperRational(c)) <= 2 * _rationalFeastol);
       assert(!_hasBasis || basisColStatus(c) != SPxSolverBase<R>::FIXED
-             || spxAbs(_solRational._primal[c] - lowerRational(c)) <= 2*_rationalFeastol);
+             || spxAbs(_solRational._primal[c] - lowerRational(c)) <= 2 * _rationalFeastol);
       assert(!_hasBasis || basisColStatus(c) != SPxSolverBase<R>::FIXED
-             || spxAbs(_solRational._primal[c] - upperRational(c)) <= 2*_rationalFeastol);
+             || spxAbs(_solRational._primal[c] - upperRational(c)) <= 2 * _rationalFeastol);
 
       if(intParam(SoPlexBase<R>::OBJSENSE) == OBJSENSE_MINIMIZE)
       {
@@ -4017,13 +4017,13 @@ bool SoPlexBase<R>::getDualViolationRational(Rational& maxviol, Rational& sumvio
       // basis must not necessarily hold exactly, even within tolerances; hence the following assertions are relaxed by
       // a factor of two
       assert(!_hasBasis || basisRowStatus(r) != SPxSolverBase<R>::ON_LOWER
-             || spxAbs(_solRational._slacks[r] - lhsRational(r)) <= 2*_rationalFeastol);
+             || spxAbs(_solRational._slacks[r] - lhsRational(r)) <= 2 * _rationalFeastol);
       assert(!_hasBasis || basisRowStatus(r) != SPxSolverBase<R>::ON_UPPER
-             || spxAbs(_solRational._slacks[r] - rhsRational(r)) <= 2*_rationalFeastol);
+             || spxAbs(_solRational._slacks[r] - rhsRational(r)) <= 2 * _rationalFeastol);
       assert(!_hasBasis || basisRowStatus(r) != SPxSolverBase<R>::FIXED
-             || spxAbs(_solRational._slacks[r] - lhsRational(r)) <= 2*_rationalFeastol);
+             || spxAbs(_solRational._slacks[r] - lhsRational(r)) <= 2 * _rationalFeastol);
       assert(!_hasBasis || basisRowStatus(r) != SPxSolverBase<R>::FIXED
-             || spxAbs(_solRational._slacks[r] - rhsRational(r)) <= 2*_rationalFeastol);
+             || spxAbs(_solRational._slacks[r] - rhsRational(r)) <= 2 * _rationalFeastol);
 
       if(intParam(SoPlexBase<R>::OBJSENSE) == OBJSENSE_MINIMIZE)
       {
@@ -5063,6 +5063,7 @@ bool SoPlexBase<R>::multBasis(R* vec, bool unscale)
                vec[i] = spxLdexp(vec[i], scaleExp);
             }
          }
+
          // create VectorBase<R> from input values
          VectorBase<R> x(basisdim, vec);
 
