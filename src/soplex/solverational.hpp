@@ -3485,7 +3485,6 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             }
 
          // intentional fallthrough
-
          case SPxSolverBase<R>::ABORT_TIME:
          case SPxSolverBase<R>::ABORT_ITER:
          case SPxSolverBase<R>::ABORT_VALUE:
@@ -3494,7 +3493,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
          case SPxSolverBase<R>::UNBOUNDED:
             _hasBasis = (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
 
-            if(_hasBasis)
+            if(_hasBasis && _simplifier == 0)
             {
                basisStatusRows.reSize(_solver.nRows());
                basisStatusCols.reSize(_solver.nCols());
@@ -3502,7 +3501,10 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                                 basisStatusCols.size());
             }
             else
+            {
+               _hasBasis = false;
                _rationalLUSolver.clear();
+            }
 
             break;
 
