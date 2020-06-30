@@ -305,7 +305,7 @@ int SPxDevexPR<R>::selectLeaveHyper(R feastol)
          }
 
          // get the smallest price of candidate list
-         if(x < leastBest)
+         if(x < leastBest || (x > infinity && leastBest == infinity))
             leastBest = x;
       }
       else
@@ -594,7 +594,7 @@ SPxId SPxDevexPR<R>::selectEnterHyperDim(R& best, R feastol)
             last = cpen[idx];
          }
 
-         if(x < leastBest)
+         if(x < leastBest || (x > infinity && leastBest == infinity))
             leastBest = x;
       }
       else
@@ -679,7 +679,7 @@ SPxId SPxDevexPR<R>::selectEnterHyperCoDim(R& best, R feastol)
             last = pen[idx];
          }
 
-         if(x < leastBest)
+         if(x < leastBest || (x > infinity && leastBest == infinity))
             leastBest = x;
       }
       else
