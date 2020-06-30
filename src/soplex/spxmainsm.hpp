@@ -94,7 +94,7 @@ void SPxMainSM<R>::RowObjPS::execute(VectorBase<R>& x, VectorBase<R>& y, VectorB
                                      DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
                                      DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
 {
-   s[m_i] = s[m_i]-x[m_j];
+   s[m_i] = s[m_i] - x[m_j];
 
    assert(rStatus[m_i] != SPxSolverBase<R>::UNDEFINED);
    assert(cStatus[m_j] != SPxSolverBase<R>::UNDEFINED);
@@ -220,6 +220,7 @@ void SPxMainSM<R>::RowSingletonPS::execute(VectorBase<R>& x, VectorBase<R>& y, V
    }
 
    R aij = m_col[m_i];
+   assert(aij != 0.0);
 
    // primal:
    s[m_i] = aij * x[m_j];
@@ -285,9 +286,9 @@ void SPxMainSM<R>::RowSingletonPS::execute(VectorBase<R>& x, VectorBase<R>& y, V
          if(r[m_j] >= this->eps())
          {
             // the reduced cost is positive, xj should in the basic
-            assert(EQrel(m_rhs, x[m_j]*aij, this->eps()) || EQrel(m_lhs, x[m_j]*aij, this->eps()));
+            assert(EQrel(m_rhs / aij, x[m_j], this->eps()) || EQrel(m_lhs / aij, x[m_j], this->eps()));
 
-            rStatus[m_i] = (EQrel(m_lhs, x[m_j] * aij,
+            rStatus[m_i] = (EQrel(m_lhs / aij, x[m_j],
                                   this->eps())) ? SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ON_UPPER;
             cStatus[m_j] = SPxSolverBase<R>::BASIC;
             y[m_i] = val / aij;
@@ -309,9 +310,9 @@ void SPxMainSM<R>::RowSingletonPS::execute(VectorBase<R>& x, VectorBase<R>& y, V
          if(r[m_j] <= -this->eps())
          {
             // the reduced cost is negative, xj should in the basic
-            assert(EQrel(m_rhs, x[m_j]*aij, this->eps()) || EQrel(m_lhs, x[m_j]*aij, this->eps()));
+            assert(EQrel(m_rhs / aij, x[m_j], this->eps()) || EQrel(m_lhs / aij, x[m_j], this->eps()));
 
-            rStatus[m_i] = (EQrel(m_lhs, x[m_j] * aij,
+            rStatus[m_i] = (EQrel(m_lhs / aij, x[m_j],
                                   this->eps())) ? SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ON_UPPER;
             cStatus[m_j] = SPxSolverBase<R>::BASIC;
             y[m_i] = val / aij;
@@ -351,11 +352,11 @@ void SPxMainSM<R>::RowSingletonPS::execute(VectorBase<R>& x, VectorBase<R>& y, V
       }
       else // if reduced costs are negative or old lower bound not equal to xj, we need to change xj into the basis
       {
-         assert(!isOptimal || EQrel(m_rhs, x[m_j]*aij, this->eps())
-                || EQrel(m_lhs, x[m_j]*aij, this->eps()));
+         assert(!isOptimal || EQrel(m_rhs / aij, x[m_j], this->eps())
+                || EQrel(m_lhs / aij, x[m_j], this->eps()));
 
          cStatus[m_j] = SPxSolverBase<R>::BASIC;
-         rStatus[m_i] = (EQrel(m_lhs, x[m_j] * aij,
+         rStatus[m_i] = (EQrel(m_lhs / aij, x[m_j],
                                this->eps())) ? SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ON_UPPER;
          y[m_i] = val / aij;
          r[m_j] = 0.0;
@@ -372,11 +373,11 @@ void SPxMainSM<R>::RowSingletonPS::execute(VectorBase<R>& x, VectorBase<R>& y, V
       }
       else // if reduced costs are positive or old upper bound not equal to xj, we need to change xj into the basis
       {
-         assert(!isOptimal || EQrel(m_rhs, x[m_j]*aij, this->eps())
-                || EQrel(m_lhs, x[m_j]*aij, this->eps()));
+         assert(!isOptimal || EQrel(m_rhs / aij, x[m_j], this->eps())
+                || EQrel(m_lhs / aij, x[m_j], this->eps()));
 
          cStatus[m_j] = SPxSolverBase<R>::BASIC;
-         rStatus[m_i] = (EQrel(m_lhs, x[m_j] * aij,
+         rStatus[m_i] = (EQrel(m_lhs / aij, x[m_j],
                                this->eps())) ? SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ON_UPPER;
          y[m_i] = val / aij;
          r[m_j] = 0.0;
