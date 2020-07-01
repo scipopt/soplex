@@ -5,6 +5,7 @@ fixed bugs:
 - fix comparison in postsolving of row singleton simplifier
 - fixed overly conservative assert in postsolving of row objective simplifier
 - fixed bug regarding objective sense when starting SYNCMODE_MANUAL
+- fixed incorrect assert in devex and steepest edge pricer
 
 23 June 2020 - Release 5.0.1
 ===============================
