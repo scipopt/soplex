@@ -395,7 +395,7 @@ int SPxSteepPR<R>::selectLeaveHyper(R tol)
 {
    const R* coPen = this->thesolver->coWeights.get_const_ptr();
    const R* fTest = this->thesolver->fTest().get_const_ptr();
-   R leastBest = R(infinity);
+   R leastBest = -1;
    R best = R(-infinity);
    R x;
    int bestIdx = -1;
@@ -413,13 +413,15 @@ int SPxSteepPR<R>::selectLeaveHyper(R tol)
                 || this->thesolver->isInfeasible[idx] == this->VIOLATED_AND_CHECKED);
          x = steeppr::computePrice(x, coPen[idx], tol);
 
+         assert(x >= 0);
+
          if(x > best)
          {
             best = x;
             bestIdx = idx;
          }
 
-         if(x < leastBest)
+         if(x < leastBest || leastBest < 0)
             leastBest = x;
       }
       else
@@ -427,13 +429,6 @@ int SPxSteepPR<R>::selectLeaveHyper(R tol)
          bestPrices.remove(i);
          this->thesolver->isInfeasible[idx] = this->NOT_VIOLATED;
       }
-   }
-
-   // make sure we do not skip potential candidates due to a high leastBest value
-   if(leastBest == R(infinity))
-   {
-      assert(bestPrices.size() == 0);
-      leastBest = 0;
    }
 
    // scan the updated indices for a better price
@@ -730,7 +725,7 @@ SPxId SPxSteepPR<R>::selectEnterHyperDim(R& best, R tol)
    const R* coTest        = this->thesolver->coTest().get_const_ptr();
    const R* coWeights_ptr = this->thesolver->coWeights.get_const_ptr();
 
-   R leastBest = R(infinity);
+   R leastBest = -1;
    R x;
    int enterIdx = -1;
    int idx;
@@ -745,13 +740,15 @@ SPxId SPxSteepPR<R>::selectEnterHyperDim(R& best, R tol)
       {
          x = steeppr::computePrice(x, coWeights_ptr[idx], tol);
 
+         assert(x >= 0);
+
          if(x > best)
          {
             best = x;
             enterIdx = idx;
          }
 
-         if(x < leastBest)
+         if(x < leastBest || leastBest < 0)
             leastBest = x;
       }
       else
@@ -759,13 +756,6 @@ SPxId SPxSteepPR<R>::selectEnterHyperDim(R& best, R tol)
          bestPrices.remove(i);
          this->thesolver->isInfeasible[idx] = this->NOT_VIOLATED;
       }
-   }
-
-   // make sure we do not skip potential candidates due to a high leastBest value
-   if(leastBest == R(infinity))
-   {
-      assert(bestPrices.size() == 0);
-      leastBest = 0;
    }
 
    // scan the updated indices for a better price
@@ -815,7 +805,7 @@ SPxId SPxSteepPR<R>::selectEnterHyperCoDim(R& best, R tol)
    const R* test        = this->thesolver->test().get_const_ptr();
    const R* weights_ptr = this->thesolver->weights.get_const_ptr();
 
-   R leastBest = R(infinity);
+   R leastBest = -1;
    R x;
    int enterIdx = -1;
    int idx;
@@ -830,13 +820,15 @@ SPxId SPxSteepPR<R>::selectEnterHyperCoDim(R& best, R tol)
       {
          x = steeppr::computePrice(x, weights_ptr[idx], tol);
 
+         assert(x >= 0);
+
          if(x > best)
          {
             best = x;
             enterIdx = idx;
          }
 
-         if(x < leastBest)
+         if(x < leastBest || leastBest < 0)
             leastBest = x;
       }
       else
@@ -844,13 +836,6 @@ SPxId SPxSteepPR<R>::selectEnterHyperCoDim(R& best, R tol)
          bestPricesCo.remove(i);
          this->thesolver->isInfeasibleCo[idx] = this->NOT_VIOLATED;
       }
-   }
-
-   // make sure we do not skip potential candidates due to a high leastBest value
-   if(leastBest == R(infinity))
-   {
-      assert(bestPricesCo.size() == 0);
-      leastBest = 0;
    }
 
    // scan the updated indices for a better price
