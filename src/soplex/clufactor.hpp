@@ -25,6 +25,19 @@
 namespace soplex
 {
 
+/* Macro to print a warning message for huge values */
+#ifndef NDEBUG
+#define DEBUG_CHECK_HUGE_VALUE( prefix, value )                         \
+   if(spxAbs(value) >= 1e40)                                            \
+   {                                                                    \
+      std::cout << prefix                                               \
+                << " Huge value during triangular solve: "              \
+                << value << std::endl;                                  \
+   }
+#else
+#define DEBUG_CHECK_HUGE_VALUE( prefix, value ) /**/
+#endif
+
 /* This number is used to decide wether a value is zero
  * or was explicitly set to zero.
  */
@@ -3672,13 +3685,13 @@ void CLUFactor<R>::solveUleft(R* p_work, R* vec)
 
       R x  = vec[c];
 
-      ASSERT_WARN("WSOLVE01", spxAbs(vec[c]) < 1e40);
 
       vec[c]  = 0.0;
 
       if(x != 0.0)
       {
-         ASSERT_WARN("WSOLVE02", spxAbs(diag[r]) < 1e40);
+         DEBUG_CHECK_HUGE_VALUE("WSOLVE01", x);
+         DEBUG_CHECK_HUGE_VALUE("WSOLVE02", diag[r]);
 
          x        *= diag[r];
          p_work[r] = x;
@@ -3688,7 +3701,7 @@ void CLUFactor<R>::solveUleft(R* p_work, R* vec)
          for(int m = u.row.start[r]; m < end; m++)
          {
             vec[u.row.idx[m]] -= x * u.row.val[m];
-            ASSERT_WARN("WSOLVE03", spxAbs(vec[u.row.idx[m]]) < 1e40);
+            DEBUG_CHECK_HUGE_VALUE("WSOLVE03", vec[u.row.idx[m]]);
          }
       }
    }
@@ -3722,6 +3735,9 @@ void CLUFactor<R>::solveUleft2(
 
       if((x1 != 0.0) && (x2 != 0.0))
       {
+         DEBUG_CHECK_HUGE_VALUE("WSOLVE04", x1);
+         DEBUG_CHECK_HUGE_VALUE("WSOLVE05", x2);
+         DEBUG_CHECK_HUGE_VALUE("WSOLVE06", diag[r]);
          x1 *= diag[r];
          x2 *= diag[r];
          p_work1[r] = x1;
@@ -3734,11 +3750,15 @@ void CLUFactor<R>::solveUleft2(
          {
             vec1[*idx] -= x1 * (*val);
             vec2[*idx] -= x2 * (*val++);
+            DEBUG_CHECK_HUGE_VALUE("WSOLVE07", vec1[*idx]);
+            DEBUG_CHECK_HUGE_VALUE("WSOLVE08", vec2[*idx]);
             idx++;
          }
       }
       else if(x1 != 0.0)
       {
+         DEBUG_CHECK_HUGE_VALUE("WSOLVE09", x1);
+         DEBUG_CHECK_HUGE_VALUE("WSOLVE10", diag[r]);
          x1 *= diag[r];
          p_work1[r] = x1;
          k = rbeg[r];
@@ -3746,10 +3766,16 @@ void CLUFactor<R>::solveUleft2(
          val = &rval[k];
 
          for(int m = rlen[r]; m != 0; --m)
-            vec1[*idx++] -= x1 * (*val++);
+         {
+            vec1[*idx] -= x1 * (*val++);
+            DEBUG_CHECK_HUGE_VALUE("WSOLVE11", vec1[*idx]);
+            idx++;
+         }
       }
       else if(x2 != 0.0)
       {
+         DEBUG_CHECK_HUGE_VALUE("WSOLVE12", x2);
+         DEBUG_CHECK_HUGE_VALUE("WSOLVE13", diag[r]);
          x2 *= diag[r];
          p_work2[r] = x2;
          k = rbeg[r];
@@ -3757,7 +3783,11 @@ void CLUFactor<R>::solveUleft2(
          val = &rval[k];
 
          for(int m = rlen[r]; m != 0; --m)
-            vec2[*idx++] -= x2 * (*val++);
+         {
+            vec2[*idx] -= x2 * (*val++);
+            DEBUG_CHECK_HUGE_VALUE("WSOLVE14", vec2[*idx]);
+            idx++;
+         }
       }
    }
 }
