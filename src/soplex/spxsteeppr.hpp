@@ -415,12 +415,14 @@ int SPxSteepPR<R>::selectLeaveHyper(R tol)
 
          assert(x >= 0);
 
+         // update the best price of candidate list
          if(x > best)
          {
             best = x;
             bestIdx = idx;
          }
 
+         // update the smallest price of candidate list
          if(x < leastBest || leastBest < 0)
             leastBest = x;
       }
@@ -742,12 +744,14 @@ SPxId SPxSteepPR<R>::selectEnterHyperDim(R& best, R tol)
 
          assert(x >= 0);
 
+         // update the best price of candidate list
          if(x > best)
          {
             best = x;
             enterIdx = idx;
          }
 
+         // update the smallest price of candidate list
          if(x < leastBest || leastBest < 0)
             leastBest = x;
       }
@@ -822,12 +826,14 @@ SPxId SPxSteepPR<R>::selectEnterHyperCoDim(R& best, R tol)
 
          assert(x >= 0);
 
+         // update the best price of candidate list
          if(x > best)
          {
             best = x;
             enterIdx = idx;
          }
 
+         // update the smallest price of candidate list
          if(x < leastBest || leastBest < 0)
             leastBest = x;
       }

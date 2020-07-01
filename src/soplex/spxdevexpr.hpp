@@ -299,6 +299,7 @@ int SPxDevexPR<R>::selectLeaveHyper(R feastol)
 
          assert(x >= 0);
 
+         // update the best price of candidate list
          if(x > best)
          {
             best = x;
@@ -306,7 +307,7 @@ int SPxDevexPR<R>::selectLeaveHyper(R feastol)
             last = cpen[idx];
          }
 
-         // get the smallest price of candidate list
+         // update the smallest price of candidate list
          if(x < leastBest || leastBest < 0)
             leastBest = x;
       }
@@ -584,6 +585,7 @@ SPxId SPxDevexPR<R>::selectEnterHyperDim(R& best, R feastol)
 
          assert(x >= 0);
 
+         // update the best price of candidate list
          if(x > best)
          {
             best = x;
@@ -591,6 +593,7 @@ SPxId SPxDevexPR<R>::selectEnterHyperDim(R& best, R feastol)
             last = cpen[idx];
          }
 
+         // update the smallest price of candidate list
          if(x < leastBest || leastBest < 0)
             leastBest = x;
       }
@@ -664,6 +667,7 @@ SPxId SPxDevexPR<R>::selectEnterHyperCoDim(R& best, R feastol)
 
          assert(x >= 0);
 
+         // update the best price of candidate list
          if(x > best)
          {
             best = x;
@@ -671,6 +675,7 @@ SPxId SPxDevexPR<R>::selectEnterHyperCoDim(R& best, R feastol)
             last = pen[idx];
          }
 
+         // update the smallest price of candidate list
          if(x < leastBest || leastBest < 0)
             leastBest = x;
       }
