@@ -84,7 +84,8 @@ protected:
          IdxElement      b
       ) const
       {
-         return b.val - a.val;
+         //the first case is needed to handle inf-values
+         return (a.val == b.val) ? 0 : b.val - a.val;
       }
    };
 
