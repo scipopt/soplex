@@ -7208,6 +7208,8 @@ void SoPlexBase<R>::_changeLhsReal(const VectorBase<R>& lhs)
                                   SPxSolverBase<R>::ZERO;
       }
    }
+
+   _rationalLUSolver.clear();
 }
 
 /// changes left-hand side of row \p i to \p lhs and adjusts basis
@@ -7228,6 +7230,7 @@ void SoPlexBase<R>::_changeLhsReal(int i, const R& lhs)
       _basisStatusRows[i] = (rhsReal(i) < realParam(SoPlexBase<R>::INFTY)) ? SPxSolverBase<R>::ON_UPPER :
                             SPxSolverBase<R>::ZERO;
 
+   _rationalLUSolver.clear();
 }
 
 
@@ -7254,6 +7257,8 @@ void SoPlexBase<R>::_changeRhsReal(const VectorBase<R>& rhs)
                                   SPxSolverBase<R>::ZERO;
       }
    }
+
+   _rationalLUSolver.clear();
 }
 
 
@@ -7275,6 +7280,8 @@ void SoPlexBase<R>::_changeRhsReal(int i, const R& rhs)
            && rhs >= realParam(SoPlexBase<R>::INFTY))
       _basisStatusRows[i] = (lhsReal(i) > -realParam(SoPlexBase<R>::INFTY)) ? SPxSolverBase<R>::ON_LOWER :
                             SPxSolverBase<R>::ZERO;
+
+   _rationalLUSolver.clear();
 }
 
 
@@ -7305,6 +7312,8 @@ void SoPlexBase<R>::_changeRangeReal(const VectorBase<R>& lhs, const VectorBase<
                                   SPxSolverBase<R>::ZERO;
       }
    }
+
+   _rationalLUSolver.clear();
 }
 
 
@@ -7331,6 +7340,8 @@ void SoPlexBase<R>::_changeRangeReal(int i, const R& lhs, const R& rhs)
          _basisStatusRows[i] = (lhs > -realParam(SoPlexBase<R>::INFTY)) ? SPxSolverBase<R>::ON_LOWER :
                                SPxSolverBase<R>::ZERO;
    }
+
+   _rationalLUSolver.clear();
 }
 
 
@@ -7390,6 +7401,8 @@ void SoPlexBase<R>::_changeLowerReal(const VectorBase<R>& lower)
                                   SPxSolverBase<R>::ON_UPPER : SPxSolverBase<R>::ZERO;
       }
    }
+
+   _rationalLUSolver.clear();
 }
 
 
@@ -7411,6 +7424,8 @@ void SoPlexBase<R>::_changeLowerReal(int i, const R& lower)
            && lower <= -realParam(SoPlexBase<R>::INFTY))
       _basisStatusCols[i] = (upperReal(i) < realParam(SoPlexBase<R>::INFTY)) ?
                             SPxSolverBase<R>::ON_UPPER : SPxSolverBase<R>::ZERO;
+
+   _rationalLUSolver.clear();
 }
 
 
@@ -7437,6 +7452,8 @@ void SoPlexBase<R>::_changeUpperReal(const VectorBase<R>& upper)
                                   SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ZERO;
       }
    }
+
+   _rationalLUSolver.clear();
 }
 
 
@@ -7458,6 +7475,8 @@ void SoPlexBase<R>::_changeUpperReal(int i, const R& upper)
            && upper >= realParam(SoPlexBase<R>::INFTY))
       _basisStatusCols[i] = (lowerReal(i) > -realParam(SoPlexBase<R>::INFTY)) ?
                             SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ZERO;
+
+   _rationalLUSolver.clear();
 }
 
 
@@ -7489,6 +7508,8 @@ void SoPlexBase<R>::_changeBoundsReal(const VectorBase<R>& lower, const VectorBa
                                   SPxSolverBase<R>::ZERO;
       }
    }
+
+   _rationalLUSolver.clear();
 }
 
 
@@ -7516,6 +7537,8 @@ void SoPlexBase<R>::_changeBoundsReal(int i, const R& lower, const R& upper)
          _basisStatusCols[i] = (lower > -realParam(SoPlexBase<R>::INFTY)) ? SPxSolverBase<R>::ON_LOWER :
                                SPxSolverBase<R>::ZERO;
    }
+
+   _rationalLUSolver.clear();
 }
 
 
