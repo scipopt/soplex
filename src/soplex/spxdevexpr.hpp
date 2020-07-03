@@ -283,7 +283,7 @@ int SPxDevexPR<R>::selectLeaveHyper(R feastol)
    const R* fTest = this->thesolver->fTest().get_const_ptr();
    const R* cpen = this->thesolver->coWeights.get_const_ptr();
    R best = 0;
-   R leastBest = infinity;
+   R leastBest = -1;
    int bstI = -1;
    int idx = -1;
 
@@ -297,6 +297,9 @@ int SPxDevexPR<R>::selectLeaveHyper(R feastol)
       {
          x = devexpr::computePrice(x, cpen[idx], feastol);
 
+         assert(x >= 0);
+
+         // update the best price of candidate list
          if(x > best)
          {
             best = x;
@@ -304,8 +307,8 @@ int SPxDevexPR<R>::selectLeaveHyper(R feastol)
             last = cpen[idx];
          }
 
-         // get the smallest price of candidate list
-         if(x < leastBest)
+         // update the smallest price of candidate list
+         if(x < leastBest || leastBest < 0)
             leastBest = x;
       }
       else
@@ -313,13 +316,6 @@ int SPxDevexPR<R>::selectLeaveHyper(R feastol)
          bestPrices.remove(i);
          this->thesolver->isInfeasible[idx] = this->NOT_VIOLATED;
       }
-   }
-
-   // make sure we do not skip potential candidates due to a high leastBest value
-   if(leastBest == R(infinity))
-   {
-      assert(bestPrices.size() == 0);
-      leastBest = 0;
    }
 
    // scan the updated indices for a better price
@@ -572,7 +568,7 @@ SPxId SPxDevexPR<R>::selectEnterHyperDim(R& best, R feastol)
 {
    const R* cTest = this->thesolver->coTest().get_const_ptr();
    const R* cpen = this->thesolver->coWeights.get_const_ptr();
-   R leastBest = R(infinity);
+   R leastBest = -1;
    R x;
    int enterIdx = -1;
    int idx;
@@ -587,6 +583,9 @@ SPxId SPxDevexPR<R>::selectEnterHyperDim(R& best, R feastol)
       {
          x = devexpr::computePrice(x, cpen[idx], feastol);
 
+         assert(x >= 0);
+
+         // update the best price of candidate list
          if(x > best)
          {
             best = x;
@@ -594,7 +593,8 @@ SPxId SPxDevexPR<R>::selectEnterHyperDim(R& best, R feastol)
             last = cpen[idx];
          }
 
-         if(x < leastBest)
+         // update the smallest price of candidate list
+         if(x < leastBest || leastBest < 0)
             leastBest = x;
       }
       else
@@ -602,13 +602,6 @@ SPxId SPxDevexPR<R>::selectEnterHyperDim(R& best, R feastol)
          bestPrices.remove(i);
          this->thesolver->isInfeasible[idx] = this->NOT_VIOLATED;
       }
-   }
-
-   // make sure we do not skip potential candidates due to a high leastBest value
-   if(leastBest == R(infinity))
-   {
-      assert(bestPrices.size() == 0);
-      leastBest = 0;
    }
 
    // scan the updated indeces for a better price
@@ -657,7 +650,7 @@ SPxId SPxDevexPR<R>::selectEnterHyperCoDim(R& best, R feastol)
 {
    const R* test = this->thesolver->test().get_const_ptr();
    const R* pen = this->thesolver->weights.get_const_ptr();
-   R leastBest = R(infinity);
+   R leastBest = -1;
    R x;
    int enterIdx = -1;
    int idx;
@@ -672,6 +665,9 @@ SPxId SPxDevexPR<R>::selectEnterHyperCoDim(R& best, R feastol)
       {
          x = devexpr::computePrice(x, pen[idx], feastol);
 
+         assert(x >= 0);
+
+         // update the best price of candidate list
          if(x > best)
          {
             best = x;
@@ -679,7 +675,8 @@ SPxId SPxDevexPR<R>::selectEnterHyperCoDim(R& best, R feastol)
             last = pen[idx];
          }
 
-         if(x < leastBest)
+         // update the smallest price of candidate list
+         if(x < leastBest || leastBest < 0)
             leastBest = x;
       }
       else
@@ -687,13 +684,6 @@ SPxId SPxDevexPR<R>::selectEnterHyperCoDim(R& best, R feastol)
          bestPricesCo.remove(i);
          this->thesolver->isInfeasibleCo[idx] = this->NOT_VIOLATED;
       }
-   }
-
-   // make sure we do not skip potential candidates due to a high leastBest value
-   if(leastBest == R(infinity))
-   {
-      assert(bestPricesCo.size() == 0);
-      leastBest = 0;
    }
 
    //scan the updated indeces for a better price
