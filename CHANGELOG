@@ -7,6 +7,7 @@ fixed bugs:
 - always clear rational LU factorization when changing the problem to avoid inconsistent basis data
 - ensure consistent basis data when floating-point solves fail during iterative refinement
 - fixed bug regarding objective sense when starting SYNCMODE_MANUAL
+- handle infinity values in IdxCompare of pricers
 
 23 June 2020 - Release 5.0.1
 ===============================
