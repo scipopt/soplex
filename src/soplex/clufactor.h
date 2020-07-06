@@ -206,7 +206,7 @@ protected:
 
    Timer*  factorTime;        ///< Time spent in factorizations
    int     factorCount;       ///< Number of factorizations
-   int     hugeValues;        ///< number of times huge values occurred during solve
+   int     hugeValues;        ///< number of times huge values occurred during solve (only used in debug mode)
    ///@}
 
 private:
