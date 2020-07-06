@@ -27,14 +27,14 @@ namespace soplex
 
 /* Macro to print a warning message for huge values */
 #ifndef NDEBUG
-#define DEBUG_CHECK_HUGE_VALUE( prefix, value )                         \
-   if(spxAbs(value) >= 1e40 && this->hugeValues < 3)                    \
-   {                                                                    \
-      this->hugeValues++;                                               \
-      std::cout << prefix                                               \
-                << " Huge value during triangular solve: "              \
-                << value << std::endl;                                  \
-      if(this->hugeValues >= 3)                                         \
+#define DEBUG_CHECK_HUGE_VALUE( prefix, value )                                                    \
+   if(spxAbs(value) >= 1e40 && this->hugeValues < 3)                                               \
+   {                                                                                               \
+      this->hugeValues++;                                                                          \
+      std::cout << prefix                                                                          \
+                << " Huge value during triangular solve: "                                         \
+                << value << std::endl;                                                             \
+      if(this->hugeValues >= 3)                                                                    \
          std::cout << "Skipping further warnings of this type during current solve." << std::endl; \
    }
 #else
