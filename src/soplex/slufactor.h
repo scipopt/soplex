@@ -280,6 +280,7 @@ public:
       this->factorTime->reset();
       solveTime->reset();
       this->factorCount = 0;
+      this->hugeValues = 0;
       solveCount = 0;
    }
    void changeTimer(const Timer::TYPE ttype)

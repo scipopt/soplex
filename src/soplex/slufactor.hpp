@@ -1187,6 +1187,7 @@ SLUFactor<R>::SLUFactor()
    SLUFactor<R>::clear(); // clear() is virtual
 
    this->factorCount = 0;
+   this->hugeValues = 0;
    solveCount  = 0;
    assert(this->row.perm != 0);
 
