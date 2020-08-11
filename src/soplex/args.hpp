@@ -377,8 +377,8 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
    ("real:refac_mem_factor", po::value<Real>()->default_value(1.5)->notifier(args::checkRange(1.0,
          10.0, "real:refac_mem_factor")),
     "refactor threshold for memory growth in factorization since last refactorization")
-   ("real:leastsq_acrcy", po::value<Real>()->default_value(1000.0)->notifier(args::checkRange(Real(1.0),
-         DEFAULT_INFINITY, "real:leastsq_acrcy")),
+   ("real:leastsq_acrcy", po::value<Real>()->default_value(1000.0)->notifier(args::checkRange(Real(
+            1.0), DEFAULT_INFINITY, "real:leastsq_acrcy")),
     "accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)")
    ("real:obj_offset", po::value<Real>()->default_value(0.0)->notifier(args::checkRange(
             -DEFAULT_INFINITY, DEFAULT_INFINITY, "real:obj_offset")), "objective offset to be used")
@@ -498,13 +498,13 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
          using namespace boost::multiprecision;
 
 #if BOOST_VERSION < 107000
-      std::cerr << "Error: Boost version too old." << std:: endl <<
-      "In order to use the multiprecision feature of SoPlex," <<
-      " Boost Version 1.70.0 or higher is required." << std::endl << \
-      "Included Boost version is " << BOOST_VERSION / 100000 << "."  // maj. version
-      << BOOST_VERSION / 100 % 1000 << "."  // min. version
-      << BOOST_VERSION % 100                // patch version;
-      << std::endl;
+         std::cerr << "Error: Boost version too old." << std:: endl <<
+                   "In order to use the multiprecision feature of SoPlex," <<
+                   " Boost Version 1.70.0 or higher is required." << std::endl << \
+                   "Included Boost version is " << BOOST_VERSION / 100000 << "."  // maj. version
+                   << BOOST_VERSION / 100 % 1000 << "."  // min. version
+                   << BOOST_VERSION % 100                // patch version;
+                   << std::endl;
 #else
 #ifdef SOPLEX_WITH_MPFR
 
@@ -524,25 +524,28 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
          using multiprecision1 = number<cpp_dec_float<50>, et_off>;
          using multiprecision2 = number<cpp_dec_float<100>, et_off>;
          using multiprecision3 = number<cpp_dec_float<200>, et_off>;
+
          if(precision <= 50)
             runSoPlex<multiprecision1>(vm);
          else if(precision <= 100)
             runSoPlex<multiprecision2>(vm);
          else
             runSoPlex<multiprecision3>(vm);
+
 #endif  // SOPLEX_WITH_CPPMPF
 #endif
-      break;
+         break;
 #ifdef SOPLEX_WITH_FLOAT128
+
       case 4:                // quadprecision
 #if BOOST_VERSION < 107000
-      std::cerr << "Error: Boost version too old." << std:: endl <<
-      "In order to use the quadprecision feature of SoPlex," <<
-      " Boost Version 1.70.0 or higher is required." << std::endl << \
-      "Included Boost version is " << BOOST_VERSION / 100000 << "."  // maj. version
-      << BOOST_VERSION / 100 % 1000 << "."  // min. version
-      << BOOST_VERSION % 100                // patch version;
-      << std::endl;
+         std::cerr << "Error: Boost version too old." << std:: endl <<
+                   "In order to use the quadprecision feature of SoPlex," <<
+                   " Boost Version 1.70.0 or higher is required." << std::endl << \
+                   "Included Boost version is " << BOOST_VERSION / 100000 << "."  // maj. version
+                   << BOOST_VERSION / 100 % 1000 << "."  // min. version
+                   << BOOST_VERSION % 100                // patch version;
+                   << std::endl;
 #else
          using namespace boost::multiprecision;
          using Quad = boost::multiprecision::float128;
@@ -550,6 +553,7 @@ inline auto parseArgsAndRun(int argc, char* argv[]) -> int
 #endif
          break;
 #endif
+
       default:
          std::cerr << "Wrong value for the solve mode\n\n" << allOpt << "\n";
          return 0;
