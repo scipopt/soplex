@@ -2464,6 +2464,7 @@ void CLUFactorRational::eliminatePivot(int prow, int pos)
    {
       assert(row.perm[m] < 0);
       assert(lv >= 0);
+      /* coverity[negative_returns] */
       updateRow(m, lv++, prow, pcol, pval);
    }
 
@@ -2474,6 +2475,7 @@ void CLUFactorRational::eliminatePivot(int prow, int pos)
    for(++i; i < m; ++i)
    {
       assert(lv >= 0);
+      /* coverity[negative_returns] */
       updateRow(u.col.idx[u.col.start[pcol] + i], lv++, prow, pcol, pval);
    }
 
