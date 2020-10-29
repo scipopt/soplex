@@ -1,3 +1,6 @@
+performance:
+- stricter limitation of refinement rounds with failed or slow progress in accuracy
+
 fixed bugs:
 - add missing invalidations of nonBasicValue (these led to incorrect cutoffs due to objective limit)
 
