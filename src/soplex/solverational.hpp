@@ -554,7 +554,7 @@ void SoPlexBase<R>::_performOptIRStable(
    // control progress
    Rational maxViolation;
    Rational bestViolation = _rationalPosInfty;
-   const Rational violationImprovementFactor = 2;
+   const Rational violationImprovementFactor = 16;
    const Rational errorCorrectionFactor = 1.1;
    Rational errorCorrection = 2;
    int numFailedRefinements = 0;
@@ -801,7 +801,7 @@ void SoPlexBase<R>::_performOptIRStable(
       }
 
       // terminate if some limit is reached
-      if(_isSolveStopped(stoppedTime, stoppedIter) || numFailedRefinements > 10)
+      if(_isSolveStopped(stoppedTime, stoppedIter) || numFailedRefinements > 2)
          break;
 
       // check progress
