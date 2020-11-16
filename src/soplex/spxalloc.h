@@ -66,7 +66,7 @@ inline void spx_alloc(T& p, int n = 1)
    if(nullptr == p)
    {
       std::cerr << "EMALLC01 malloc: Out of memory - cannot allocate "
-                << sizeof(*p) * (unsigned int) n << " bytes" << std::endl;
+                << sizeof(*p) * (unsigned int) n << " bytes" << std::endl; // coverity[suspicious_sizeof]
       throw(SPxMemoryException("XMALLC01 malloc: Could not allocate enough memory"));
    }
 }
