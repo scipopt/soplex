@@ -24,7 +24,6 @@
 #include <sstream>
 
 #include "soplex/spxdefines.h"
-#include "soplex/slufactor.h"
 #include "soplex/cring.h"
 #include "soplex/spxalloc.h"
 #include "soplex/spxout.h"

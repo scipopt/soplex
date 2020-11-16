@@ -21,8 +21,6 @@
 
 #include <iostream>
 #include <assert.h>
-#include "soplex/spxscaler.h"
-#include "soplex/spxlp.h"
 #include "soplex/dsvector.h"
 #include <limits>
 

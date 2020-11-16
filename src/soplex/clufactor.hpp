@@ -16,7 +16,6 @@
 #include <assert.h>
 
 #include "soplex/spxdefines.h"
-#include "soplex/clufactor.h"
 #include "soplex/cring.h"
 #include "soplex/spxalloc.h"
 #include "soplex/exceptions.h"

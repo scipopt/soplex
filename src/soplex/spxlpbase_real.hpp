@@ -23,7 +23,6 @@
 #include <iostream>
 
 #include "soplex/spxdefines.h"
-#include "soplex/spxlpbase.h"
 #include "soplex/spxout.h"
 #include "soplex/mpsinput.h"
 #include "soplex/exceptions.h"
