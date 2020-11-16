@@ -505,6 +505,8 @@ void SLUFactorRational::clear()
  */
 void SLUFactorRational::assign(const SLUFactorRational& old)
 {
+   unsigned int thediminc;
+
    // slufactor_rational
    uptype        = old.uptype;
    minThreshold  = old.minThreshold;
@@ -539,20 +541,21 @@ void SLUFactorRational::assign(const SLUFactorRational& old)
 
    /* setup U
     */
+   thediminc = (unsigned int) (thedim + 1);
    u.row.used = old.u.row.used;
 
    spx_alloc(u.row.elem,  thedim);
    spx_alloc(u.row.idx,   u.row.val.dim());
-   spx_alloc(u.row.start, thedim + 1);
-   spx_alloc(u.row.len,   thedim + 1);
-   spx_alloc(u.row.max,   thedim + 1);
+   spx_alloc(u.row.start, thediminc);
+   spx_alloc(u.row.len, thediminc);
+   spx_alloc(u.row.max, thediminc);
 
    memcpy(u.row.elem,  old.u.row.elem, (unsigned int)thedim       * sizeof(*u.row.elem));
    u.row.val = old.u.row.val;
    memcpy(u.row.idx,   old.u.row.idx, (unsigned int)u.row.val.dim()   * sizeof(*u.row.idx));
-   memcpy(u.row.start, old.u.row.start, (unsigned int)(thedim + 1) * sizeof(*u.row.start));
-   memcpy(u.row.len,   old.u.row.len, (unsigned int)(thedim + 1) * sizeof(*u.row.len));
-   memcpy(u.row.max,   old.u.row.max, (unsigned int)(thedim + 1) * sizeof(*u.row.max));
+   memcpy(u.row.start, old.u.row.start, thediminc * sizeof(*u.row.start));
+   memcpy(u.row.len,   old.u.row.len, thediminc * sizeof(*u.row.len));
+   memcpy(u.row.max,   old.u.row.max, thediminc * sizeof(*u.row.max));
 
    // need to make row list ok ?
    if(thedim > 0 && stat == OK)
@@ -579,16 +582,16 @@ void SLUFactorRational::assign(const SLUFactorRational& old)
 
    spx_alloc(u.col.elem,  thedim);
    spx_alloc(u.col.idx,   u.col.size);
-   spx_alloc(u.col.start, thedim + 1);
-   spx_alloc(u.col.len,   thedim + 1);
-   spx_alloc(u.col.max,   thedim + 1);
+   spx_alloc(u.col.start, thediminc);
+   spx_alloc(u.col.len, thediminc);
+   spx_alloc(u.col.max, thediminc);
    u.col.val = old.u.col.val;
 
    memcpy(u.col.elem,  old.u.col.elem, (unsigned int)thedim       * sizeof(*u.col.elem));
    memcpy(u.col.idx,   old.u.col.idx, (unsigned int)u.col.size   * sizeof(*u.col.idx));
-   memcpy(u.col.start, old.u.col.start, (unsigned int)(thedim + 1) * sizeof(*u.col.start));
-   memcpy(u.col.len,   old.u.col.len, (unsigned int)(thedim + 1) * sizeof(*u.col.len));
-   memcpy(u.col.max,   old.u.col.max, (unsigned int)(thedim + 1) * sizeof(*u.col.max));
+   memcpy(u.col.start, old.u.col.start, thediminc * sizeof(*u.col.start));
+   memcpy(u.col.len,   old.u.col.len, thediminc * sizeof(*u.col.len));
+   memcpy(u.col.max,   old.u.col.max, thediminc * sizeof(*u.col.max));
 
    // need to make col list ok
    if(thedim > 0 && stat == OK)
@@ -637,12 +640,12 @@ void SLUFactorRational::assign(const SLUFactorRational& old)
 
       l.rval = old.l.rval;
       spx_alloc(l.ridx,  memsize);
-      spx_alloc(l.rbeg,  thedim + 1);
+      spx_alloc(l.rbeg,  thediminc);
       spx_alloc(l.rorig, thedim);
       spx_alloc(l.rperm, thedim);
 
       memcpy(l.ridx,  old.l.ridx, (unsigned int)memsize     * sizeof(*l.ridx));
-      memcpy(l.rbeg,  old.l.rbeg, (unsigned int)(thedim + 1) * sizeof(*l.rbeg));
+      memcpy(l.rbeg,  old.l.rbeg, thediminc * sizeof(*l.rbeg));
       memcpy(l.rorig, old.l.rorig, (unsigned int)thedim      * sizeof(*l.rorig));
       memcpy(l.rperm, old.l.rperm, (unsigned int)thedim      * sizeof(*l.rperm));
    }
