@@ -59,7 +59,7 @@ namespace soplex
  */
 
 /// If compiled with GMP support, Rational is defined as mpq_class.
-class Rational
+class Rational // coverity[missing_move_assignment]
 {
 private:
    class Private;
