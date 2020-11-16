@@ -233,8 +233,6 @@ void CLUFactorRational::Temp::clear()
    if(s_cact != 0)
       spx_free(s_cact);
 
-   s_max.reDim(0);
-
    if(pivot_col != 0)
       spx_free(pivot_col);
 
@@ -246,6 +244,15 @@ void CLUFactorRational::Temp::clear()
 
    if(pivot_rowNZ != 0)
       spx_free(pivot_rowNZ);
+
+   try
+   {
+      s_max.reDim(0);
+   }
+   catch(const SPxMemoryException& x)
+   {
+      throw x;
+   }
 }
 
 CLUFactorRational::Temp::~Temp()
