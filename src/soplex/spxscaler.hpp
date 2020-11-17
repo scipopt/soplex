@@ -22,6 +22,8 @@
 #include <iostream>
 #include <assert.h>
 #include "soplex/dsvector.h"
+#include "soplex/lprowsetbase.h"
+#include "soplex/lpcolsetbase.h"
 #include <limits>
 
 namespace soplex
