@@ -1600,7 +1600,7 @@ template <class R>
 void SoPlexBase<R>::getUpperReal(VectorBase<R>& upper) const
 {
    assert(_realLP != 0);
-   return _realLP->getUpperUnscaled(upper);
+   _realLP->getUpperUnscaled(upper);
 }
 
 
@@ -1628,7 +1628,7 @@ template <class R>
 void SoPlexBase<R>::getLowerReal(VectorBase<R>& lower) const
 {
    assert(_realLP != 0);
-   return _realLP->getLowerUnscaled(lower);
+   _realLP->getLowerUnscaled(lower);
 }
 
 
