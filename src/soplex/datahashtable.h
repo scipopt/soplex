@@ -193,8 +193,12 @@ public:
    /// remove \a HashItem \p h from the DataHashTable.
    void remove(const HashItem& h)
    {
-      assert(has(h));
-      m_elem[index(h)].stat = Elem::RELEASED;
+      int i = index(h);
+
+      if(i < 0)
+         return;
+
+      m_elem[i].stat = Elem::RELEASED;
       m_used--;
       assert(!has(h));
    }

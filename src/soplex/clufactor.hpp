@@ -2527,6 +2527,7 @@ void CLUFactor<R>::eliminatePivot(int prow, int pos, R eps)
    {
       assert(row.perm[m] < 0);
       assert(lv >= 0);
+      /* coverity[negative_returns] */
       updateRow(m, lv++, prow, pcol, pval, eps);
    }
 
@@ -2537,6 +2538,7 @@ void CLUFactor<R>::eliminatePivot(int prow, int pos, R eps)
    for(++i; i < m; ++i)
    {
       assert(lv >= 0);
+      /* coverity[negative_returns] */
       updateRow(u.col.idx[u.col.start[pcol] + i], lv++, prow, pcol, pval, eps);
    }
 
