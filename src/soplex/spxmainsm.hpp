@@ -1456,7 +1456,7 @@ void SPxMainSM<R>::AggregationPS::execute(VectorBase<R>& x, VectorBase<R>& y, Ve
       z = 0.0;
 
    x[m_j] = z * scale / aij;
-   s[m_i] = 0.0;
+   s[m_i] = m_rhs;
 
    if(isOptimal && (LT(x[m_j], m_lower, this->eps()) || GT(x[m_j], m_upper, this->eps())))
    {
