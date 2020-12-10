@@ -541,7 +541,7 @@ void SLUFactorRational::assign(const SLUFactorRational& old)
 
    /* setup U
     */
-   thediminc = (unsigned int) (thedim + 1);
+   thediminc = (unsigned int)(thedim + 1);
    u.row.used = old.u.row.used;
 
    spx_alloc(u.row.elem,  thedim);
