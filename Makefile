@@ -307,10 +307,6 @@ LINKSINFO	+=	" -> \"libmpir.*\" is the path to the MPIR library\n"
 endif
 endif
 
-ifeq ($(SHARED),true)
-EXT_LIBS	= $(ZLIB_LDFLAGS) $(GMP_LDFLAGS) $(BOOST_LDFLAGS) $(QUADMATH_LDFLAGS)
-endif
-
 
 #-----------------------------------------------------------------------------
 # Rules
