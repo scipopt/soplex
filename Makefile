@@ -373,11 +373,7 @@ makelibfile:	preprocess
 $(LIBFILE):	$(LIBOBJFILES) | $(LIBDIR) $(LIBOBJDIR)
 		@echo "-> generating library $@"
 		-rm -f $(LIBFILE)
-ifeq ($(SHARED),true)
 		$(LIBBUILD) $(LIBBUILDFLAGS) $(LIBBUILD_o)$@ $(LIBOBJFILES) $(REPOSIT) $(LDFLAGS)
-else
-		$(LIBBUILD) $(LIBBUILDFLAGS) $(LIBBUILD_o)$@ $(LIBOBJFILES) $(REPOSIT) $(EXT_LIBS)
-endif
 ifneq ($(RANLIB),)
 		$(RANLIB) $@
 endif
