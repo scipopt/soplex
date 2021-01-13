@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2020 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2021 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -372,6 +372,8 @@ void SPxSolverBase<R>::changeLower(int i, const R& newLower, bool scale)
 {
    if(newLower != (scale ? this->lowerUnscaled(i) : this->lower(i)))
    {
+      forceRecompNonbasicValue();
+
       R oldLower = this->lower(i);
       // This has to be done before calling changeLowerStatus() because that is calling
       // basis.dualColStatus() which calls lower() and needs the changed value.
@@ -499,6 +501,8 @@ void SPxSolverBase<R>::changeUpper(int i, const R& newUpper, bool scale)
 {
    if(newUpper != (scale ? this->upperUnscaled(i) : this->upper(i)))
    {
+      forceRecompNonbasicValue();
+
       R oldUpper = this->upper(i);
       SPxLPBase<R>::changeUpper(i, newUpper, scale);
 
@@ -644,6 +648,8 @@ void SPxSolverBase<R>::changeLhs(int i, const R& newLhs, bool scale)
 {
    if(newLhs != (scale ? this->lhsUnscaled(i) : this->lhs(i)))
    {
+      forceRecompNonbasicValue();
+
       R oldLhs = this->lhs(i);
       SPxLPBase<R>::changeLhs(i, newLhs, scale);
 
@@ -770,6 +776,8 @@ void SPxSolverBase<R>::changeRhs(int i, const R& newRhs, bool scale)
 {
    if(newRhs != (scale ? this->rhsUnscaled(i) : this->rhs(i)))
    {
+      forceRecompNonbasicValue();
+
       R oldRhs = this->rhs(i);
       SPxLPBase<R>::changeRhs(i, newRhs, scale);
 

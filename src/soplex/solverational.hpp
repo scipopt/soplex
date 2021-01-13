@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2020 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2021 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -554,7 +554,7 @@ void SoPlexBase<R>::_performOptIRStable(
    // control progress
    Rational maxViolation;
    Rational bestViolation = _rationalPosInfty;
-   const Rational violationImprovementFactor = 2;
+   const Rational violationImprovementFactor = 16;
    const Rational errorCorrectionFactor = 1.1;
    Rational errorCorrection = 2;
    int numFailedRefinements = 0;
@@ -801,7 +801,7 @@ void SoPlexBase<R>::_performOptIRStable(
       }
 
       // terminate if some limit is reached
-      if(_isSolveStopped(stoppedTime, stoppedIter) || numFailedRefinements > 10)
+      if(_isSolveStopped(stoppedTime, stoppedIter) || numFailedRefinements > 2)
          break;
 
       // check progress

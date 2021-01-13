@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2020 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2021 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -66,7 +66,7 @@ inline void spx_alloc(T& p, int n = 1)
    if(nullptr == p)
    {
       std::cerr << "EMALLC01 malloc: Out of memory - cannot allocate "
-                << sizeof(*p) * (unsigned int) n << " bytes" << std::endl;
+                << sizeof(*p) * (unsigned int) n << " bytes" << std::endl; // coverity[suspicious_sizeof]
       throw(SPxMemoryException("XMALLC01 malloc: Could not allocate enough memory"));
    }
 }

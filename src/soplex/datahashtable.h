@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2020 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2021 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -193,8 +193,12 @@ public:
    /// remove \a HashItem \p h from the DataHashTable.
    void remove(const HashItem& h)
    {
-      assert(has(h));
-      m_elem[index(h)].stat = Elem::RELEASED;
+      int i = index(h);
+
+      if(i < 0)
+         return;
+
+      m_elem[i].stat = Elem::RELEASED;
       m_used--;
       assert(!has(h));
    }

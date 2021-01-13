@@ -11,10 +11,27 @@ code quality:
 
 fixed bugs:
 
-Release 5.0.2
-===============================
+next minor Release 5.0.3
+========================
+
+features:
+
+interface & parameters:
+
+performance:
+
+code quality:
 
 fixed bugs:
+
+December 2020 - Release 5.0.2
+===============================
+
+performance:
+- stricter limitation of refinement rounds with failed or slow progress in accuracy
+
+fixed bugs:
+- add missing invalidations of nonBasicValue (these led to incorrect cutoffs due to objective limit)
 - fix comparison in postsolving of row singleton simplifier
 - fixed overly conservative assert in postsolving of row objective simplifier
 - always clear rational LU factorization when changing the problem to avoid inconsistent basis data

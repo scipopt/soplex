@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2020 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2021 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -16,7 +16,6 @@
 #include <assert.h>
 
 #include "soplex/spxdefines.h"
-#include "soplex/clufactor.h"
 #include "soplex/cring.h"
 #include "soplex/spxalloc.h"
 #include "soplex/exceptions.h"
@@ -2528,6 +2527,7 @@ void CLUFactor<R>::eliminatePivot(int prow, int pos, R eps)
    {
       assert(row.perm[m] < 0);
       assert(lv >= 0);
+      /* coverity[negative_returns] */
       updateRow(m, lv++, prow, pcol, pval, eps);
    }
 
@@ -2538,6 +2538,7 @@ void CLUFactor<R>::eliminatePivot(int prow, int pos, R eps)
    for(++i; i < m; ++i)
    {
       assert(lv >= 0);
+      /* coverity[negative_returns] */
       updateRow(u.col.idx[u.col.start[pcol] + i], lv++, prow, pcol, pval, eps);
    }
 

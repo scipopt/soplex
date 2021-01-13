@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2020 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2021 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -233,8 +233,6 @@ void CLUFactorRational::Temp::clear()
    if(s_cact != 0)
       spx_free(s_cact);
 
-   s_max.reDim(0);
-
    if(pivot_col != 0)
       spx_free(pivot_col);
 
@@ -246,6 +244,15 @@ void CLUFactorRational::Temp::clear()
 
    if(pivot_rowNZ != 0)
       spx_free(pivot_rowNZ);
+
+   try
+   {
+      s_max.reDim(0);
+   }
+   catch(const SPxMemoryException& x)
+   {
+      throw x;
+   }
 }
 
 CLUFactorRational::Temp::~Temp()
@@ -2464,6 +2471,7 @@ void CLUFactorRational::eliminatePivot(int prow, int pos)
    {
       assert(row.perm[m] < 0);
       assert(lv >= 0);
+      /* coverity[negative_returns] */
       updateRow(m, lv++, prow, pcol, pval);
    }
 
@@ -2474,6 +2482,7 @@ void CLUFactorRational::eliminatePivot(int prow, int pos)
    for(++i; i < m; ++i)
    {
       assert(lv >= 0);
+      /* coverity[negative_returns] */
       updateRow(u.col.idx[u.col.start[pcol] + i], lv++, prow, pcol, pval);
    }
 
