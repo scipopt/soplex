@@ -26,7 +26,7 @@ namespace soplex
 {
 /// solves real LP
 template <class R>
-void SoPlexBase<R>::_optimize()
+void SoPlexBase<R>::_optimize(bool* interrupt)
 {
    assert(_realLP != 0);
    assert(_realLP == &_solver);
@@ -69,9 +69,9 @@ void SoPlexBase<R>::_optimize()
    // scratch, apply preprocessing according to parameter settings
    if(!_hasBasis && realParam(SoPlexBase<R>::OBJLIMIT_LOWER) == -realParam(SoPlexBase<R>::INFTY)
          && realParam(SoPlexBase<R>::OBJLIMIT_UPPER) == realParam(SoPlexBase<R>::INFTY))
-      _preprocessAndSolveReal(true);
+      _preprocessAndSolveReal(true, interrupt);
    else
-      _preprocessAndSolveReal(false);
+      _preprocessAndSolveReal(false, interrupt);
 
    _statistics->finalBasisCondition = _solver.getBasisMetric(0);
 
@@ -228,7 +228,7 @@ void SoPlexBase<R>::_evaluateSolutionReal(typename SPxSimplifier<R>::Result simp
 
 /// solves real LP with/without preprocessing
 template <class R>
-void SoPlexBase<R>::_preprocessAndSolveReal(bool applySimplifier)
+void SoPlexBase<R>::_preprocessAndSolveReal(bool applySimplifier, bool* interrupt)
 {
    _solver.changeObjOffset(realParam(SoPlexBase<R>::OBJ_OFFSET));
    _statistics->preprocessingTime->start();
@@ -324,7 +324,7 @@ void SoPlexBase<R>::_preprocessAndSolveReal(bool applySimplifier)
          _scaler->scale(_solver, false);
       }
 
-      _solveRealLPAndRecordStatistics();
+      _solveRealLPAndRecordStatistics(interrupt);
    }
 
    _evaluateSolutionReal(simplificationStatus);

@@ -7833,7 +7833,7 @@ void SoPlexBase<R>::_ensureRealLPLoaded()
 
 /// call floating-point solver and update statistics on iterations etc.
 template <class R>
-void SoPlexBase<R>::_solveRealLPAndRecordStatistics()
+void SoPlexBase<R>::_solveRealLPAndRecordStatistics(bool* interrupt)
 {
    bool _hadBasis = _hasBasis;
 
@@ -9155,7 +9155,7 @@ bool SoPlexBase<R>::readBasisFile(const char* filename, const NameSet* rowNames,
 /// solves the LP
 /// R specialization of the optimize function
 template <class R>
-typename SPxSolverBase<R>::Status SoPlexBase<R>::optimize()
+typename SPxSolverBase<R>::Status SoPlexBase<R>::optimize(bool* interrupt)
 {
    assert(_isConsistent());
 
@@ -9203,7 +9203,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::optimize()
 
       _solver.setComputeDegenFlag(boolParam(COMPUTEDEGEN));
 
-      _optimize();
+      _optimize(interrupt);
 #ifdef SOPLEX_DEBUG // this check will remove scaling of the realLP
       _checkBasisScaling();
 #endif
@@ -9211,7 +9211,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::optimize()
    else if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
    {
       _syncLPRational();
-      _optimizeRational();
+      _optimizeRational(interrupt);
    }
    else if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_MANUAL)
    {
@@ -9221,7 +9221,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::optimize()
       assert(areLPsInSync(true, false, false));
 #endif
 
-      _optimizeRational();
+      _optimizeRational(interrupt);
 
 #ifdef ENABLE_ADDITIONAL_CHECKS
       assert(areLPsInSync(true, true, false));
@@ -9237,7 +9237,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::optimize()
       assert(areLPsInSync(true, false, false));
 #endif
 
-      _optimizeRational();
+      _optimizeRational(interrupt);
    }
 
    MSG_INFO1(spxout, spxout << "\n";
