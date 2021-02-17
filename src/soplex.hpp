@@ -7909,7 +7909,7 @@ void SoPlexBase<R>::_solveRealLPAndRecordStatistics(bool* interrupt)
 
    try
    {
-      _solver.solve();
+      _solver.solve(interrupt);
    }
    catch(const SPxException& E)
    {
