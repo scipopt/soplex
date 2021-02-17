@@ -651,7 +651,7 @@ public:
     *  @throw SPxStatusException if either no problem, solver, pricer
     *  or ratiotester loaded or if solve is still running when it shouldn't be
     */
-   virtual Status solve(bool* interrupt = 0);
+   virtual Status solve(volatile bool* interrupt = NULL);
 
    /** Identify primal basic variables that have zero reduced costs and
     * try to pivot them out of the basis to make them tight.

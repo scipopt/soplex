@@ -7833,7 +7833,7 @@ void SoPlexBase<R>::_ensureRealLPLoaded()
 
 /// call floating-point solver and update statistics on iterations etc.
 template <class R>
-void SoPlexBase<R>::_solveRealLPAndRecordStatistics(bool* interrupt)
+void SoPlexBase<R>::_solveRealLPAndRecordStatistics(volatile bool* interrupt)
 {
    bool _hadBasis = _hasBasis;
 
@@ -9155,7 +9155,7 @@ bool SoPlexBase<R>::readBasisFile(const char* filename, const NameSet* rowNames,
 /// solves the LP
 /// R specialization of the optimize function
 template <class R>
-typename SPxSolverBase<R>::Status SoPlexBase<R>::optimize(bool* interrupt)
+typename SPxSolverBase<R>::Status SoPlexBase<R>::optimize(volatile bool* interrupt)
 {
    assert(_isConsistent());
 

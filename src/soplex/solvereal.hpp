@@ -26,7 +26,7 @@ namespace soplex
 {
 /// solves real LP
 template <class R>
-void SoPlexBase<R>::_optimize(bool* interrupt)
+void SoPlexBase<R>::_optimize(volatile bool* interrupt)
 {
    assert(_realLP != 0);
    assert(_realLP == &_solver);
@@ -228,7 +228,7 @@ void SoPlexBase<R>::_evaluateSolutionReal(typename SPxSimplifier<R>::Result simp
 
 /// solves real LP with/without preprocessing
 template <class R>
-void SoPlexBase<R>::_preprocessAndSolveReal(bool applySimplifier, bool* interrupt)
+void SoPlexBase<R>::_preprocessAndSolveReal(bool applySimplifier, volatile bool* interrupt)
 {
    _solver.changeObjOffset(realParam(SoPlexBase<R>::OBJ_OFFSET));
    _statistics->preprocessingTime->start();

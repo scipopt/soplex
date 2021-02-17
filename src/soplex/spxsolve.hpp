@@ -131,7 +131,7 @@ void SPxSolverBase<R>::calculateProblemRanges()
 }
 
 template <class R>
-typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(bool* interrupt)
+typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interrupt)
 {
 
    SPxId enterId;

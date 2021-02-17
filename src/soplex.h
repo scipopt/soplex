@@ -587,10 +587,10 @@ public:
    ///@{
 
    /// optimize the given LP
-   typename SPxSolverBase<R>::Status optimize(bool* interrupt = 0);
+   typename SPxSolverBase<R>::Status optimize(volatile bool* interrupt = NULL);
 
    // old name for backwards compatibility
-   typename SPxSolverBase<R>::Status solve(bool* interrupt = 0)
+   typename SPxSolverBase<R>::Status solve(volatile bool* interrupt = NULL)
    {
       return optimize(interrupt);
    }
@@ -2073,7 +2073,7 @@ private:
    void _ensureRealLPLoaded();
 
    /// call floating-point solver and update statistics on iterations etc.
-   void _solveRealLPAndRecordStatistics(bool* interrupt = 0);
+   void _solveRealLPAndRecordStatistics(volatile bool* interrupt = NULL);
 
    /// reads real LP in LP or MPS format from file and returns true on success; gets row names, column names, and
    /// integer variables if desired
@@ -2240,16 +2240,16 @@ private:
    ///@{
 
    /// solves the templated LP
-   void _optimize(bool* interrupt = 0);
+   void _optimize(volatile bool* interrupt = NULL);
 
    /// temporary fix for Rational
-   void _optimizeRational(bool* interrupt = 0);
+   void _optimizeRational(volatile bool* interrupt = NULL);
 
    /// checks result of the solving process and solves again without preprocessing if necessary
    void _evaluateSolutionReal(typename SPxSimplifier<R>::Result simplificationStatus);
 
    /// solves real LP with/without preprocessing
-   void _preprocessAndSolveReal(bool applyPreprocessing, bool* interrupt = 0);
+   void _preprocessAndSolveReal(bool applyPreprocessing, volatile bool* interrupt = NULL);
 
    /// loads original problem into solver and solves again after it has been solved to optimality with preprocessing
    void _resolveWithoutPreprocessing(typename SPxSimplifier<R>::Result simplificationStatus);
