@@ -487,7 +487,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(bool* interrupt)
                   break;
                }
 
-               if(interrupt != 0 && *interrupt)
+               if(interrupt != NULL && *interrupt)
                {
                   MSG_INFO2((*this->spxout), (*this->spxout) << " --- aborted due to interrupt signal" << std::endl;)
                   m_status = ABORT_TIME;
