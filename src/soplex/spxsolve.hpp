@@ -814,6 +814,14 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                   break;
                }
 
+               if(interrupt != NULL && *interrupt)
+               {
+                  MSG_INFO2((*this->spxout), (*this->spxout) << " --- aborted due to interrupt signal" << std::endl;)
+                  m_status = ABORT_TIME;
+                  stop = true;
+                  break;
+               }
+
                leave(leaveNum);
                assert((testBounds(), 1));
                thepricer->left4(this->lastIndex(), this->lastLeft());
