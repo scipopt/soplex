@@ -1,4 +1,12 @@
 
 void* SoPlex_create();
 
-int SoPlex_numrows(void *soplex);
+void SoPlex_free(void *soplex);
+
+int SoPlex_numRows(void *soplex);
+
+int SoPlex_numCols(void *soplex);
+
+void SoPlex_setRational(void *soplex);
+
+void SoPlex_setIntParam(void *soplex, int paramcode, int paramvalue);
