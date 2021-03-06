@@ -133,7 +133,7 @@ set_target_properties(libsoplex PROPERTIES
     VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}.${SOPLEX_VERSION_SUB}
     SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
 add_dependencies(libsoplex soplex_update_githash)
-target_link_libraries(libsoplex-pic ${libs})
+target_link_libraries(libsoplex ${libs})
 
 # create C shared library
 add_library(libsoplexshared SHARED soplex_interface.cpp ${sources})
