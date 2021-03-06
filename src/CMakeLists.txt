@@ -136,7 +136,7 @@ add_dependencies(libsoplex soplex_update_githash)
 target_link_libraries(libsoplex-pic ${libs})
 
 # create C shared library
-add_library(libsoplexshared SHARED soplex_interface.cpp ${sources})
+add_library(libsoplexshared STATIC soplex_interface.cpp ${sources})
 set_target_properties(libsoplexshared PROPERTIES
     VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}.${SOPLEX_VERSION_SUB}
     SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
@@ -168,7 +168,7 @@ set_target_properties(libsoplex-pic PROPERTIES
     OUTPUT_NAME "soplex-pic"
     MACOSX_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 set_target_properties(libsoplexshared PROPERTIES
-    OUTPUT_NAME "soplex"
+    OUTPUT_NAME "soplexc"
     MACOSX_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 # install the header files of soplex
