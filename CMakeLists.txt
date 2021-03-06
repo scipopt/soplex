@@ -205,6 +205,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 endif()
 
 add_subdirectory(src)
+add_subdirectory(tests/c_interface)
 add_subdirectory(check)
 
 enable_testing()
