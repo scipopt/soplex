@@ -3,33 +3,33 @@
 
 using namespace soplex;
 
-void* SoPlex_create()
+extern "C" void *SoPlex_create()
 {
-   SoPlex* so = new SoPlex();
+   SoPlex *so = new SoPlex();
    return so;
 }
 
-void SoPlex_free(void *soplex)
+extern "C" void SoPlex_free(void *soplex)
 {
-   SoPlex* so = (SoPlex*)(soplex);
+   SoPlex *so = (SoPlex *)(soplex);
    delete so;
 }
 
-int SoPlex_numRows(void *soplex)
+extern "C" int SoPlex_numRows(void *soplex)
 {
-   SoPlex* so = (SoPlex*)(soplex);
+   SoPlex *so = (SoPlex *)(soplex);
    return so->numRows();
 }
 
-int SoPlex_numCols(void *soplex)
+extern "C" int SoPlex_numCols(void *soplex)
 {
-   SoPlex* so = (SoPlex*)(soplex);
+   SoPlex *so = (SoPlex *)(soplex);
    return so->numCols();
 }
 
-void SoPlex_setRational(void *soplex)
+extern "C" void SoPlex_setRational(void *soplex)
 {
-   SoPlex* so = (SoPlex*)(soplex);
+   SoPlex *so = (SoPlex *)(soplex);
    so->setIntParam(SoPlex::READMODE, SoPlex::READMODE_RATIONAL);
    so->setIntParam(SoPlex::SOLVEMODE, SoPlex::SOLVEMODE_RATIONAL);
    so->setIntParam(SoPlex::CHECKMODE, SoPlex::CHECKMODE_RATIONAL);
@@ -38,8 +38,8 @@ void SoPlex_setRational(void *soplex)
    so->setRealParam(SoPlex::OPTTOL, 0.0);
 }
 
-void SoPlex_setIntParam(void *soplex, int paramcode, int paramvalue)
+extern "C" void SoPlex_setIntParam(void *soplex, int paramcode, int paramvalue)
 {
-   SoPlex* so = (SoPlex*)(soplex);
+   SoPlex *so = (SoPlex *)(soplex);
    so->setIntParam((SoPlex::IntParam)paramcode, paramvalue);
 }
