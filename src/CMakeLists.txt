@@ -136,12 +136,13 @@ add_dependencies(libsoplex soplex_update_githash)
 target_link_libraries(libsoplex ${libs})
 
 # create C shared library
-add_library(libsoplexshared STATIC soplex_interface.cpp ${sources})
+add_library(libsoplexshared SHARED soplex_interface.cpp ${sources})
 set_target_properties(libsoplexshared PROPERTIES
     VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}.${SOPLEX_VERSION_SUB}
     SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
 add_dependencies(libsoplexshared soplex_update_githash libsoplex)
 target_link_libraries(libsoplexshared libsoplex ${libs})
+set_target_properties(libsoplexshared PROPERTIES CXX_VISIBILITY_PRESET default)
 
 if(BOOST)
     # create soplex binary using library without pic

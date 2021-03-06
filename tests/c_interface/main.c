@@ -3,6 +3,7 @@
 int main(void)
 {
 	void *soplex = SoPlex_create();
+	int n = SoPlex_numRows(soplex);
 	SoPlex_free(soplex);
-	printf("Testing\n");
+	printf("Testing %d\n", n);
 }
