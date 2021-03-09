@@ -15,6 +15,20 @@ void SoPlex_setRational(void *soplex);
 
 void SoPlex_setIntParam(void *soplex, int paramcode, int paramvalue);
 
+void SoPlex_addColReal(void *soplex, double* colentries, int colsize, int nnonzeros, double objval, double lb, double ub);
+
+void SoPlex_addColRational(void *soplex, int* colnums, int* coldenoms, int colsize, int nnonzeros, int objvalnum, int objvaldenom, int lbnum, int lbdenom, int ubnum, int ubdenom);
+
+void SoPlex_addRowReal(void *soplex, double* rowentries, int rowsize, int nnonzeros, double lb, double ub);
+
+void SoPlex_addRowRational(void *soplex, int* rownums, int* rowdenoms, int rowsize, int nnonzeros, int lbnum, int lbdenom, int ubnum, int ubdenom);
+
+void SoPlex_getPrimalReal(void *soplex, double* primal, int dim);
+
+void SoPlex_getDualReal(void *soplex, double* dual, int dim);
+
+int SoPlex_optimize(void *soplex);
+
 #ifdef __cplusplus
 }
 #endif
