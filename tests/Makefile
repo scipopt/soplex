@@ -8,7 +8,7 @@ include ../make/make.detecthost
 #
 
 NAME		=	soplex
-VERSION		:=	1.8.0.1
+VERSION		:=	5.0.2.4
 
 OPT		=	opt
 LINK		=	static
@@ -35,6 +35,7 @@ LIBOFLAGS	=
 LDFLAGS		=	-lm -lz #-static
 GMP_FLAGS	=
 GMP_LDFLAGS	=	-lgmpxx -lgmp -lz
+BOOST_LDFLAGS = -lpthread -lboost_thread
 
 LIBNAME		=	$(NAME)-$(VERSION).$(BASE)
 LIBFILE		=	$(LIBDIR)/lib$(LIBNAME).$(LIBEXT)
@@ -42,6 +43,11 @@ LIBFILE		=	$(LIBDIR)/lib$(LIBNAME).$(LIBEXT)
 ifeq ($(GMP),true)
 CPPFLAGS	+=	-DSOPLEX_WITH_GMP $(GMP_FLAGS)
 LDFLAGS		+=	$(GMP_LDFLAGS)
+endif
+
+ifeq ($(BOOST),true)
+CPPFLAGS += -DSOPLEX_WITH_BOOST $(BOOST_FLAGS)
+LDFLAGS += $(BOOST_LDFLAGS)
 endif
 
 #
@@ -65,10 +71,13 @@ TESTMEMORYBIN	=	testMemory.$(BASE)
 TESTRATIONALOBJ	=	testRational.o
 TESTRATIONALBIN	=	testRational.$(BASE)
 
+TESTASYNCTERMOBJ = test-async-term.o
+TESTASYNCTERMBIN = test-async-term.$(BASE)
+
 TESTCOPYCONSASSIGNMENTFUNCOBJ    =  testCopyconsAssignmentfunc.o
 TESTCOPYCONSASSIGNMENTFUNCBIN    =  testCopyconsAssignmentfunc.$(BASE)
 
-ALLOBJ		= $(CHANGEBINOBJ) $(EXCEPTIONBINOBJ) $(TESTCHANGEOBJECTIVEOBJ) $(TESTCHANGEOBJECTIVEOBJ) $(TESTMEMORYOBJ) $(TESTRATIONALOBJ) $(TESTCOPYCONSASSIGNMENTFUNCOBJ)
+ALLOBJ		= $(CHANGEBINOBJ) $(EXCEPTIONBINOBJ) $(TESTCHANGEOBJECTIVEOBJ) $(TESTCHANGEOBJECTIVEOBJ) $(TESTMEMORYOBJ) $(TESTRATIONALOBJ) $(TESTCOPYCONSASSIGNMENTFUNCOBJ) $(TESTASYNCTERMOBJ)
 
 #------------------------------------------------------------------------------
 #--- NOTHING TO CHANGE FROM HERE ON -------------------------------------------
@@ -84,7 +93,7 @@ GCCWARN		=	-Wall -W -Wpointer-arith -Wno-unknown-pragmas \
 #include make/make.$(OSTYPE).$(ARCH).$(COMP).$(OPT).$(LINK)
 #-----------------------------------------------------------------------------
 
-.PHONY: change_exerciser status_exception_test testChangeElement testChangeObjective testCopyconsAssignmentfunc testMemory testRational  clean all
+.PHONY: change_exerciser status_exception_test testChangeElement testChangeObjective testCopyconsAssignmentfunc testMemory testRational testAsyncTerminate  clean all
 
 all: change_exerciser status_exception_test testChangeElement testCopyconsAssignmentfunc testMemory testRational
 
@@ -101,6 +110,8 @@ testCopyconsAssignmentfunc: $(TESTCOPYCONSASSIGNMENTFUNCBIN)
 testMemory: $(TESTMEMORYBIN)
 
 testRational: $(TESTRATIONALBIN)
+
+testAsyncTerminate: $(TESTASYNCTERMBIN)
 
 
 $(CHANGEBINFILE): $(LIBFILE) $(CHANGEBINOBJ)
@@ -171,6 +182,16 @@ ifeq ($(VERBOSE), true)
 else
 		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TESTRATIONALOBJ) \
 		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+endif
+
+$(TESTASYNCTERMBIN): $(LIBFILE) $(TESTASYNCTERMOBJ)
+		@echo "-> linking $@"
+ifeq ($(VERBOSE), true)
+		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TESTASYNCTERMOBJ) \
+		 -L$(BOOST_LIBDIR) -L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+else
+		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TESTASYNCTERMOBJ) \
+		 -L$(BOOST_LIBDIR) -L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
 endif
 
 .PHONY: $(DEPEND)

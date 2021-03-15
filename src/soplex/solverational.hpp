@@ -26,7 +26,7 @@ namespace soplex
 
 /// solves rational LP
 template <class R>
-void SoPlexBase<R>::_optimizeRational()
+void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
 {
    bool hasUnboundedRay = false;
    bool infeasibilityNotCertified = false;
