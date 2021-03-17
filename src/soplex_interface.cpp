@@ -159,3 +159,42 @@ extern "C" int SoPlex_optimize(void *soplex)
    SoPlex* so = (SoPlex*)(soplex);
    return so->optimize();
 }
+
+extern "C" void SoPlex_changeObjReal(void *soplex, double* obj, int dim)
+{
+   SoPlex* so = (SoPlex*)(soplex);
+   Vector objective(dim, obj);
+   return so->changeObjReal(objective);
+}
+
+extern "C" void SoPlex_changeObjRational(void *soplex, int* objnums, int* objdenoms, int dim)
+{
+   SoPlex* so = (SoPlex*)(soplex);
+   Rational* objrational = new Rational [dim];
+
+   /* create rational objective vector */
+   for( int i = 0; i < dim; ++i )
+   {
+        Rational r;
+        r = objnums[i];
+        r /= objdenoms[i];
+        objrational[i] = r;
+    }
+
+   VectorRational objective(dim, objrational);
+   return so->changeObjRational(objective);
+}
+
+extern "C" void SoPlex_changeLhsReal(void *soplex, double* lhs, int dim)
+{
+    SoPlex* so = (SoPlex*)(soplex);
+    Vector lhsvec(dim, lhs);
+    return so->changeLhsReal(lhsvec);
+}
+
+extern "C" void SoPlex_changeRhsReal(void *soplex, double* rhs, int dim)
+{
+    SoPlex* so = (SoPlex*)(soplex);
+    Vector rhsvec(dim, rhs);
+    return so->changeRhsReal(rhsvec);
+}

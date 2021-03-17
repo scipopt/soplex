@@ -29,6 +29,14 @@ void SoPlex_getDualReal(void *soplex, double* dual, int dim);
 
 int SoPlex_optimize(void *soplex);
 
+void SoPlex_changeObjReal(void *soplex, double* obj, int dim);
+
+void SoPlex_changeObjRational(void *soplex, int* objnums, int* objdenoms, int dim);
+
+void SoPlex_changeLhsReal(void *soplex, double* lhs, int dim);
+
+void SoPlex_changeRhsReal(void *soplex, double* rhs, int dim);
+
 #ifdef __cplusplus
 }
 #endif
