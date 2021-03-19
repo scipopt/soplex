@@ -37,6 +37,12 @@ void SoPlex_changeLhsReal(void *soplex, double* lhs, int dim);
 
 void SoPlex_changeRhsReal(void *soplex, double* rhs, int dim);
 
+void SoPlex_writeFileReal(void *soplex, char* filename);
+
+double SoPlex_objValueReal(void *soplex);
+
+void SoPlex_changeBoundsReal(void *soplex, double* lb, double* ub, int dim);
+
 #ifdef __cplusplus
 }
 #endif

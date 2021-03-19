@@ -198,3 +198,23 @@ extern "C" void SoPlex_changeRhsReal(void *soplex, double* rhs, int dim)
     Vector rhsvec(dim, rhs);
     return so->changeRhsReal(rhsvec);
 }
+
+extern "C" void SoPlex_writeFileReal(void *soplex, char* filename)
+{
+    SoPlex* so = (SoPlex*)(soplex);
+    so->writeFileReal(filename, NULL, NULL, NULL);
+}
+
+extern "C" double SoPlex_objValueReal(void *soplex)
+{
+    SoPlex* so = (SoPlex*)(soplex);
+    return so->objValueReal();
+}
+
+extern "C" void SoPlex_changeBoundsReal(void *soplex, double* lb, double* ub, int dim)
+{
+    SoPlex* so = (SoPlex*)(soplex);
+    Vector lbvec(dim, lb);
+    Vector ubvec(dim, ub);
+    return so->changeBoundsReal(lbvec, ubvec);
+}
