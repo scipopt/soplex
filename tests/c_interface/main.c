@@ -2,10 +2,11 @@
 #include <soplex_interface.h>
 #include <assert.h>
 
-int main(void)
+void test_real(void)
 {
    /* create LP via columns */
-	void *soplex = SoPlex_create();
+
+   void *soplex = SoPlex_create();
    double infty = 10e+20;
    double colentries1[] = {-1.0};
    double colentries2[] = {1.0};
@@ -29,24 +30,27 @@ int main(void)
    assert(result == 1);
    SoPlex_getPrimalReal(soplex, primal, 2);
    assert(primal[0] == 0.0 && primal[1] == -10.0);
+   assert(SoPlex_objValueReal(soplex) == -10.0);
 
 	SoPlex_free(soplex);
 
    /* create LP via rows */
+
    void *soplex2 = SoPlex_create();
    double rowentries1[] = {-1.0, 1.0};
-   double rowentries2[] = {1.0, 0.0};
-   double rowentries3[] = {0.0, 1.0};
+   double lb[] = {0.0, -infty};
+   double ub[] = {infty, infty};
    double obj[] = {1.0, 1.0};
 
    /* minimize */
    SoPlex_setIntParam(soplex2, 0, -1);
 
    /* add row */
-   SoPlex_addRowReal(soplex2, rowentries1, 2, 2, -10, infty);
-   SoPlex_addRowReal(soplex2, rowentries2, 2, 1, 0.0, infty);
-   SoPlex_addRowReal(soplex2, rowentries3, 2, 1, -infty, infty);
-   assert(SoPlex_numRows(soplex2) == 3);
+   SoPlex_addRowReal(soplex2, rowentries1, 2, 2, -10.0, infty);
+
+   /* add variable bounds */
+   SoPlex_changeBoundsReal(soplex2, lb, ub, 2);
+   assert(SoPlex_numRows(soplex2) == 1);
    assert(SoPlex_numCols(soplex2) == 2);
 
    /* add objective */
@@ -57,6 +61,16 @@ int main(void)
    assert(result == 1);
    SoPlex_getPrimalReal(soplex2, primal, 2);
    assert(primal[0] == 0.0 && primal[1] == -10.0);
+   assert(SoPlex_objValueReal(soplex2) == -10.0);
 
 	SoPlex_free(soplex2);
+}
+
+int main(void)
+{
+   printf("testing real... \n");
+   test_real();
+
+   printf("\n");
+   printf("testing rational... \n");
 }
