@@ -148,6 +148,21 @@ extern "C" void SoPlex_getPrimalReal(void *soplex, double* primal, int dim)
 	so->getPrimalReal(primal, dim);
 }
 
+extern "C" char* SoPlex_getPrimalRationalString(void *soplex, int dim)
+{
+    SoPlex* so = (SoPlex*)(soplex);
+    VectorRational primal(dim);
+    std::string primalstring;
+    so->getPrimalRational(primal);
+
+    for( int i = 0; i < dim; ++i )
+    {
+        primalstring.append(rationalToString(primal[i], 0));
+        primalstring.append(" ");
+    }
+    return const_cast<char*>( primalstring.c_str());
+}
+
 extern "C" void SoPlex_getDualReal(void *soplex, double* dual, int dim)
 {
 	SoPlex* so = (SoPlex*)(soplex);
@@ -192,11 +207,47 @@ extern "C" void SoPlex_changeLhsReal(void *soplex, double* lhs, int dim)
     return so->changeLhsReal(lhsvec);
 }
 
+extern "C" void SoPlex_changeLhsRational(void *soplex, int* lhsnums, int* lhsdenoms, int dim)
+{
+    SoPlex* so = (SoPlex*)(soplex);
+    Rational* lhsrational = new Rational [dim];
+
+    /* create rational lhs vector */
+    for( int i; i < dim; ++i)
+    {
+        Rational r;
+        r = lhsnums[i];
+        r /= lhsdenoms[i];
+        lhsrational[i] = r;
+    }
+
+    VectorRational lhs(dim, lhsrational);
+    return so->changeLhsRational(lhs);
+}
+
 extern "C" void SoPlex_changeRhsReal(void *soplex, double* rhs, int dim)
 {
     SoPlex* so = (SoPlex*)(soplex);
     Vector rhsvec(dim, rhs);
     return so->changeRhsReal(rhsvec);
+}
+
+extern "C" void SoPlex_changeRhsRational(void *soplex, int* rhsnums, int* rhsdenoms, int dim)
+{
+    SoPlex* so = (SoPlex*)(soplex);
+    Rational* rhsrational = new Rational [dim];
+
+    /* create rational rhs vector */
+    for( int i; i < dim; ++i)
+    {
+        Rational r;
+        r = rhsnums[i];
+        r /= rhsdenoms[i];
+        rhsrational[i] = r;
+    }
+
+    VectorRational rhs(dim, rhsrational);
+    return so->changeRhsRational(rhs);
 }
 
 extern "C" void SoPlex_writeFileReal(void *soplex, char* filename)
@@ -209,6 +260,12 @@ extern "C" double SoPlex_objValueReal(void *soplex)
 {
     SoPlex* so = (SoPlex*)(soplex);
     return so->objValueReal();
+}
+
+extern "C" char* SoPlex_objValueRationalString(void *soplex)
+{
+    SoPlex* so = (SoPlex*)(soplex);
+    return const_cast<char*>(rationalToString(so->objValueRational(), 0).c_str());
 }
 
 extern "C" void SoPlex_changeBoundsReal(void *soplex, double* lb, double* ub, int dim)

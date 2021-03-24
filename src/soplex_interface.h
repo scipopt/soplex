@@ -25,6 +25,8 @@ void SoPlex_addRowRational(void *soplex, int* rownums, int* rowdenoms, int rowsi
 
 void SoPlex_getPrimalReal(void *soplex, double* primal, int dim);
 
+char* SoPlex_getPrimalRationalString(void *soplex, int dim);
+
 void SoPlex_getDualReal(void *soplex, double* dual, int dim);
 
 int SoPlex_optimize(void *soplex);
@@ -35,11 +37,17 @@ void SoPlex_changeObjRational(void *soplex, int* objnums, int* objdenoms, int di
 
 void SoPlex_changeLhsReal(void *soplex, double* lhs, int dim);
 
+void SoPlex_changeLhsRational(void *soplex, int* lhsnums, int* lhsdenoms, int dim);
+
 void SoPlex_changeRhsReal(void *soplex, double* rhs, int dim);
+
+void SoPlex_changeRhsRational(void *soplex, int* rhsnums, int* rhsdenoms, int dim);
 
 void SoPlex_writeFileReal(void *soplex, char* filename);
 
 double SoPlex_objValueReal(void *soplex);
+
+char* SoPlex_objValueRationalString(void *soplex);
 
 void SoPlex_changeBoundsReal(void *soplex, double* lb, double* ub, int dim);
 
