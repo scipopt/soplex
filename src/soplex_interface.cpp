@@ -213,7 +213,7 @@ extern "C" void SoPlex_changeLhsRational(void *soplex, int* lhsnums, int* lhsden
     Rational* lhsrational = new Rational [dim];
 
     /* create rational lhs vector */
-    for( int i; i < dim; ++i)
+    for( int i = 0; i < dim; ++i)
     {
         Rational r;
         r = lhsnums[i];
@@ -238,7 +238,7 @@ extern "C" void SoPlex_changeRhsRational(void *soplex, int* rhsnums, int* rhsden
     Rational* rhsrational = new Rational [dim];
 
     /* create rational rhs vector */
-    for( int i; i < dim; ++i)
+    for( int i = 0; i < dim; ++i)
     {
         Rational r;
         r = rhsnums[i];
