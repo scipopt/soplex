@@ -99,12 +99,12 @@ void test_rational(void)
 
    /* create LP via columns */
    void *soplex2 = SoPlex_create();
-   int colnums1[] = {2};
+   int colnums1[] = {-1};
    int coldenoms1[] = {1};
    int colnums2[] = {1};
    int coldenoms2[] = {1};
-   int lhsnums[] = {1000};
-   int lhsdenoms[] = {1};
+   int lhsnums[] = {-1};
+   int lhsdenoms[] = {5};
 
    /* use rational solver */
    SoPlex_setRational(soplex2);
@@ -114,19 +114,16 @@ void test_rational(void)
 
    /* add cols */
    SoPlex_addColRational(soplex2, colnums1, coldenoms1, 1, 1, 1, 5, 0, 1, infty, 1);
-   //SoPlex_addColRational(soplex2, colnums2, coldenoms2, 1, 1, 1, 1, -infty, 1, infty, 1);
+   SoPlex_addColRational(soplex2, colnums2, coldenoms2, 1, 1, 1, 5, -infty, 1, infty, 1);
 
-   //SoPlex_addColReal(soplex, colentries1, 1, 1, 1.0, 0.0, infty);
-   //SoPlex_addColReal(soplex, colentries2, 1, 1, 1.0, -infty, infty);
    /* add bounds to constraint */
    SoPlex_changeLhsRational(soplex2, lhsnums, lhsdenoms, 1);
 
    /* optimize and check rational solution and objective value */
    result = SoPlex_optimize(soplex2);
    assert(result == 1);
-   printf("%s \n", SoPlex_getPrimalRationalString(soplex2, 1));
-   //assert(strcmp(SoPlex_getPrimalRationalString(soplex2, 2), "0 1/5 ") == 0);
-   //assert(strcmp(SoPlex_objValueRationalString(soplex2), "1/25") == 0);
+   assert(strcmp(SoPlex_getPrimalRationalString(soplex2, 2), "0 -1/5 ") == 0);
+   assert(strcmp(SoPlex_objValueRationalString(soplex2), "-1/25") == 0);
 
    SoPlex_free(soplex2);
 
@@ -134,8 +131,8 @@ void test_rational(void)
 
 int main(void)
 {
-   //printf("testing real... \n");
-   //test_real();
+   printf("testing real... \n");
+   test_real();
 
    printf("\n");
    printf("testing rational... \n");
