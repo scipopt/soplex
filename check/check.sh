@@ -1,13 +1,28 @@
-#!/usr/bin/env bash
+#!/bin/bash -ex
+#* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
+#*                                                                           *#
+#*                  This file is part of the class library                   *#
+#*       SoPlex --- the Sequential object-oriented simPlex.                  *#
+#*                                                                           *#
+#*    Copyright (C) 1996-2021 Konrad-Zuse-Zentrum                            *#
+#*                            fuer Informationstechnik Berlin                *#
+#*                                                                           *#
+#*  SoPlex is distributed under the terms of the ZIB Academic Licence.       *#
+#*                                                                           *#
+#*  You should have received a copy of the ZIB Academic License              *#
+#*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  *#
+#*                                                                           *#
+#* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
 
 # Solves a number of standard settings with a short testset
+# Called by 'make check' from soplex root
 
-BINFILE=$1
-BINNAME=`basename $BINFILE`
-HOST=`uname -n | sed 's/\(.zib.de\)//g'`
-BINNAME=$BINNAME.$HOST
+EXECUTABLE="${1}"
+BINNAME=$(basename "${EXECUTABLE}")
+HOST=$(uname -n | sed 's/\(.zib.de\)//g')
+BINNAME="${BINNAME}.${HOST}"
 
-RESDIR=results/quick
+OUTPUTDIR=results/quick
 
 SETTINGSLIST=(default devex steep exact)
 
@@ -19,7 +34,7 @@ fi
 # Solve with the different settings
 for SETTINGS in ${SETTINGSLIST[@]}
 do
-    ./test.sh quick $BINFILE $SETTINGS 60 $RESDIR
+    ./test.sh quick "${EXECUTABLE}" "${SETTINGS}" 60 "${OUTPUTDIR}"
 done
 
 echo
@@ -27,9 +42,8 @@ echo 'Summary:'
 for SETTINGS in ${SETTINGSLIST[@]}
 do
     echo
-    grep 'Results' -A1 $RESDIR'/check.quick.'$BINNAME'.'$SETTINGS'.res'
-    echo 'check/'$RESDIR'/check.quick.'$BINNAME'.'$SETTINGS'.res'
+    grep 'Results' -A1 ${OUTPUTDIR}'/check.quick.'${BINNAME}'.'${SETTINGS}'.res'
+    echo 'check/'${OUTPUTDIR}'/check.quick.'${BINNAME}'.'${SETTINGS}'.res'
 done
-
 
 # Evalulate the results
