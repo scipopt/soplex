@@ -58,7 +58,7 @@ ALGO		=  1 2 3 4
 LIMIT		=  #
 SETTINGS	=	default
 TIME		=	3600
-RESDIR		=	results
+OUTPUTDIR	=	results
 MAKESOFTLINKS	=	true
 SOFTLINKS	=
 LINKSINFO	=
@@ -208,6 +208,7 @@ BINNAME		=	$(NAME)-$(VERSION).$(BASE)
 EXAMPLENAME	=	example.$(BASE)
 LIBNAME		=	$(NAME)-$(VERSION).$(BASE)
 BINFILE		=	$(BINDIR)/$(BINNAME)$(EXEEXTENSION)
+EXECUTABLE	=	$(BINFILE)
 EXAMPLEFILE	=	$(BINDIR)/$(EXAMPLENAME)$(EXEEXTENSION)
 LIBFILE		=	$(LIBDIR)/lib$(LIBNAME).$(LIBEXT)
 LIBSHORTLINK	=	$(LIBDIR)/lib$(NAME).$(LIBEXT)
@@ -413,11 +414,11 @@ doc:
 
 .PHONY: test
 test:		#$(BINFILE)
-		cd check; ./test.sh $(TEST) ../$(BINFILE) $(SETTINGS) $(TIME) $(RESDIR)
+		cd check; ./test.sh $(TEST) $(EXECUTABLE) $(SETTINGS) $(TIME) $(OUTPUTDIR)
 
 .PHONY: check
 check:	#$(BINFILE)
-		cd check; ./check.sh ../$(BINFILE) $(RESDIR)
+		cd check; ./check.sh $(EXECUTABLE) $(OUTPUTDIR)
 
 .PHONY: cleanbin
 cleanbin:	| $(BINDIR)

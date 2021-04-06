@@ -14,33 +14,35 @@
 #*                                                                           *#
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
 
+# Execute binary and write logfiles, gets called by check_cluster_perplex.sh.
+
 # check if tmp-path exists
-if test ! -d $CLIENTTMPDIR
+if test ! -d "${CLIENTTMPDIR}"
 then
     echo Skipping test since the path for the tmp-dir does not exist.
     exit
 fi
 
-OUTFILE=$CLIENTTMPDIR/$BASENAME.perplex.out
-BASFILE=$SOLVERPATH/results/$BASENAME.bas
+OUTFILE="${CLIENTTMPDIR}/${BASENAME}.perplex.out"
+BASFILE="${SOLVERPATH}/results/${BASENAME}.bas"
 
 # check if basis file exists
-if test ! -e $BASFILE
+if test ! -e "${BASFILE}"
 then
     echo Skipping test since the basis file does not exist.
     exit
 fi
 
-uname -a                            > $OUTFILE
-echo @11 $FILENAME                  >> $OUTFILE
-echo -----------------------------  >> $OUTFILE
-date                                >> $OUTFILE
-echo -----------------------------  >> $OUTFILE
-date +"@13 %s"                      >> $OUTFILE
-$EXECNAME $INSTANCE $BASFILE >> $OUTFILE 2>>$OUTFILE
-date +"@14 %s"                      >> $OUTFILE
-echo -----------------------------  >> $OUTFILE
-date                                >> $OUTFILE
-echo -----------------------------  >> $OUTFILE
+uname -a                              > "${OUTFILE}"
+echo "@11 ${FILENAME}"                >> "${OUTFILE}"
+echo "-----------------------------"  >> "${OUTFILE}"
+date                                  >> "${OUTFILE}"
+echo "-----------------------------"  >> "${OUTFILE}"
+date +"@13 %s"                        >> "${OUTFILE}"
+"${EXECNAME}" "${INSTANCE}" "${BASFILE}" >> "${OUTFILE}" 2>> "${OUTFILE}"
+date +"@14 %s"                        >> "${OUTFILE}"
+echo "-----------------------------"  >> "${OUTFILE}"
+date                                  >> "${OUTFILE}"
+echo "-----------------------------"  >> "${OUTFILE}"
 
-mv $OUTFILE $SOLVERPATH/results/$BASENAME.perplex.out
+mv "${OUTFILE}" "${SOLVERPATH}/results/${BASENAME}.perplex.out"

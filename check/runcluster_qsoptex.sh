@@ -14,35 +14,37 @@
 #*                                                                           *#
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
 
+# Execute binary and write logfiles, gets called by check_cluster_sqoptex.sh.
+
 # check if tmp-path exists
-if test ! -d $CLIENTTMPDIR
+if test ! -d "${CLIENTTMPDIR}"
 then
-    echo Skipping test since the path for the tmp-dir does not exist.
+    echo "Skipping test since the path for the tmp-dir does not exist."
     exit
 fi
 
-OUTFILE=$CLIENTTMPDIR/$BASENAME.qsoptex.out
-BASFILE=$SOLVERPATH/results/$BASENAME.bas
-QSOBASFILE=$SOLVERPATH/results/$BASENAME.qsoptex.bas
+OUTFILE="${CLIENTTMPDIR}/${BASENAME}.qsoptex.out"
+BASFILE="${SOLVERPATH}/results/${BASENAME}.bas"
+QSOBASFILE="${SOLVERPATH}/results/${BASENAME}.qsoptex.bas"
 
 # check if basis file exists
-if test ! -e $BASFILE
+if test ! -e "${BASFILE}"
 then
-    echo Skipping test since the basis file does not exist.
+    echo "Skipping test since the basis file does not exist."
     exit
 fi
 
-uname -a                            > $OUTFILE
-echo @21 $FILENAME                  >> $OUTFILE
-echo -----------------------------  >> $OUTFILE
-date                                >> $OUTFILE
-echo -----------------------------  >> $OUTFILE
-date +"@23 %s"                      >> $OUTFILE
-sed '/s/^ XU/ XL/g' $BASFILE > $QSOBASFILE
-$EXECNAME -B $QSOBASFILE $INSTANCE >> $OUTFILE 2>>$OUTFILE
-date +"@24 %s"                      >> $OUTFILE
-echo -----------------------------  >> $OUTFILE
-date                                >> $OUTFILE
-echo -----------------------------  >> $OUTFILE
+uname -a                               > "${OUTFILE}"
+echo "@21 ${FILENAME}"                >> "${OUTFILE}"
+echo "-----------------------------"  >> "${OUTFILE}"
+date                                  >> "${OUTFILE}"
+echo "-----------------------------"  >> "${OUTFILE}"
+date +"@23 %s"                        >> "${OUTFILE}"
+sed '/s/^ XU/ XL/g' "${BASFILE}" > "${QSOBASFILE}"
+"${EXECNAME}" -B "${QSOBASFILE}" "${INSTANCE}" >> "${OUTFILE}" 2>> "${OUTFILE}"
+date +"@24 %s"                        >> "${OUTFILE}"
+echo "-----------------------------"  >> "${OUTFILE}"
+date                                  >> "${OUTFILE}"
+echo "-----------------------------"  >> "${OUTFILE}"
 
-mv $OUTFILE $SOLVERPATH/results/$BASENAME.qsoptex.out
+mv "${OUTFILE}" "${SOLVERPATH}/results/${BASENAME}.qsoptex.out"
