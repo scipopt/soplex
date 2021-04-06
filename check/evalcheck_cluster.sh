@@ -14,6 +14,11 @@
 #*                                                                           *#
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
 
+# evaluate logfiles from testrun started by 'make testcluster'
+#
+# USAGE, from directory check, call
+#              ./evalcheck_cluster.sh results/check.*.eval
+
 export LANG=C
 
 REMOVE=0
@@ -23,166 +28,141 @@ FILES=""
 
 for i in $@
 do
-    if test ! -e $i
+    if test ! -e "${i}"
     then
-        if test "$i" = "-r"
+        if test "${i}" = "-r"
         then
             REMOVE=1
         else
-            AWKARGS="$AWKARGS $i"
+            AWKARGS="${AWKARGS} ${i}"
         fi
 
-        if test "$i" = "-d"
+        if test "${i}" = "-d"
         then
             DECOMP=1
         fi
     else
-        FILES="$FILES $i"
+        FILES="${FILES} ${i}"
     fi
 done
 
-for FILE in $FILES
+for FILE in ${FILES}
 do
-    DIR=`dirname $FILE`
-    EVALFILE=`basename $FILE .eval`
-    EVALFILE=`basename $EVALFILE .out`
+    DIR=$(dirname "${FILE}")
+    EVALFILE=$(basename "${FILE}" .eval)
+    EVALFILE=$(basename "${EVALFILE}" .out)
 
-    OUTFILE=$DIR/$EVALFILE.out
-    ERRFILE=$DIR/$EVALFILE.err
-    RESFILE=$DIR/$EVALFILE.res
-    SETFILE=$DIR/$EVALFILE.set
+    OUTFILE="${DIR}/${EVALFILE}.out"
+    ERRFILE="${DIR}/${EVALFILE}.err"
+    RESFILE="${DIR}/${EVALFILE}.res"
+    SETFILE="${DIR}/${EVALFILE}.set"
 
     # check if the eval file exists; if this is the case construct the overall solution files
-    if test -e $DIR/$EVALFILE.eval
+    if test -e "${DIR}/${EVALFILE}.eval"
     then
         # in case an output file exists, copy it away to save the results
-        DATEINT=`date +"%s"`
-        if test -e $OUTFILE
+        DATEINT=$(date +"%s")
+        if test -e "${OUTFILE}"
         then
-            cp $OUTFILE $OUTFILE.old-$DATEINT
+            cp "${OUTFILE}" "${OUTFILE}.old-${DATEINT}"
         fi
-        if test -e $ERRFILE
+        if test -e "${ERRFILE}"
         then
-            cp $ERRFILE $ERRFILE.old-$DATEINT
+            cp "${ERRFILE}" "${ERRFILE}.old-${DATEINT}"
         fi
 
-        echo > $OUTFILE
-        echo > $ERRFILE
-        echo create overall output and error file for $EVALFILE
+        echo > "${OUTFILE}"
+        echo > "${ERRFILE}"
+        echo "create overall output and error file for ${EVALFILE}"
 
-        for i in `cat $DIR/$EVALFILE.eval` DONE
-            do
-            if test "$i" = "DONE"
+        for i in $(cat "${DIR}/${EVALFILE}.eval") DONE
+        do
+            if test "${i}" = "DONE"
             then
                 break
             fi
 
-            FILE=$i.out
-            if test -e $FILE
+            FILE="${i}.out"
+            if test -e "${FILE}"
             then
-                cat $FILE >> $OUTFILE
-                if test "$REMOVE" = "1"
+                cat "${FILE}" >> "${OUTFILE}"
+                if test "${REMOVE}" = "1"
                 then
-                    rm -f $FILE
+                    rm -f "${FILE}"
                 fi
             else
-                echo Missing $i
+                echo "Missing ${i}"
             fi
 
-            FILE=$i.perplex.out
-            if test -e $FILE
+            FILE="${i}.perplex.out"
+            if test -e "${FILE}"
             then
-                echo           >> $OUTFILE
-                echo =perplex= >> $OUTFILE
-                cat $FILE >> $OUTFILE
-                if test "$REMOVE" = "1"
+                echo             >> "${OUTFILE}"
+                echo "=perplex=" >> "${OUTFILE}"
+                cat "${FILE}" >> "${OUTFILE}"
+                if test "${REMOVE}" = "1"
                 then
-                    rm -f $FILE
+                    rm -f "${FILE}"
                 fi
             fi
 
-            FILE=$i.qsoptex.out
-            if test -e $FILE
+            FILE="${i}.qsoptex.out"
+            if test -e "${FILE}"
             then
-                echo           >> $OUTFILE
-                echo =qsoptex= >> $OUTFILE
-                cat $FILE >> $OUTFILE
-                if test "$REMOVE" = "1"
+                echo             >> "${OUTFILE}"
+                echo "=qsoptex=" >> "${OUTFILE}"
+                cat "${FILE}" >> "${OUTFILE}"
+                if test "${REMOVE}" = "1"
                 then
-                    rm -f $FILE
+                    rm -f "${FILE}"
                 fi
             fi
 
-            echo         >> $OUTFILE
-            echo =ready= >> $OUTFILE
+            echo           >> "${OUTFILE}"
+            echo "=ready=" >> "${OUTFILE}"
 
-            FILE=$i.err
-            if test -e $FILE
+            FILE="${i}.err"
+            if test -e "${FILE}"
             then
-                cat $FILE >> $ERRFILE
-                if test "$REMOVE" = "1"
+                cat "${FILE}" >> "${ERRFILE}"
+                if test "${REMOVE}" = "1"
                 then
-                    rm -f $FILE
+                    rm -f "${FILE}"
                 fi
             fi
 
-	         FILE=$i.set
-	         if test -e $FILE
-	         then
-	             cp $FILE $SETFILE
-	             if test "$REMOVE" = "1"
-	             then
-		              rm -f $FILE
-	             fi
-	         fi
-
-            if test "$REMOVE" = "1"
+            FILE="${i}.set"
+            if test -e "${FILE}"
             then
-                rm -f $i.bas
+                cp "${FILE}" "${SETFILE}"
+                if test "${REMOVE}" = "1"
+                then
+                    rm -f "${FILE}"
+                fi
+            fi
+
+            if test "${REMOVE}" = "1"
+            then
+                rm -f "${i}.bas"
             fi
         done
 
-        if test "$REMOVE" = "1"
+        if test "${REMOVE}" = "1"
         then
-            rm -f $DIR/$EVALFILE.eval
+            rm -f "${DIR}/${EVALFILE}.eval"
         fi
     fi
 
     # check if the out file exists
-    if test -e $DIR/$EVALFILE.out
+    if test -e "${DIR}/${EVALFILE}.out"
     then
-        echo create results for $EVALFILE
+        echo "create results for ${EVALFILE}"
 
-        # detect test set
-        TSTNAME=`echo $EVALFILE | sed 's/check.\([a-zA-Z0-9_-]*\).*/\1/g'`
-
-        echo "Testset " $TSTNAME
-
-        if test -f $TSTNAME.test
+        if test "${DECOMP}" = "1"
         then
-            TESTFILE=$TSTNAME.test
+            ./evaluation.py -d "${OUTFILE}" | tee "${RESFILE}"
         else
-            TESTFILE=""
+            ./evaluation.py "${OUTFILE}" | tee "${RESFILE}"
         fi
-
-        if test -f $TSTNAME.solu
-        then
-            SOLUFILE=$TSTNAME.solu
-        else
-            if test -f all.solu
-            then
-                SOLUFILE=all.solu
-            else
-                SOLUFILE=""
-            fi
-        fi
-
-        if test "$DECOMP" = "1"
-        then
-            ./evaluation.py -d $OUTFILE | tee $RESFILE
-        else
-            ./evaluation.py $OUTFILE | tee $RESFILE
-        fi
-
     fi
 done
