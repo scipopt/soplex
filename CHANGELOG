@@ -5,6 +5,8 @@ features:
 
 interface & parameters:
 
+- added intterupt flag to optimize() (default NULL)
+
 performance:
 
 code quality:

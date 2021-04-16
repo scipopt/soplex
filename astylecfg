@@ -1,5 +1,5 @@
 ## This config file can be used with [astyle](http://astyle.sourceforge.net/) to auto-format the soplex code
-## The invocation is: `astyle --options=astylecfg PATH-TO-FILE`
+## USAGE: `astyle --options=astylecfg PATH-TO-FILE`
 
 
 # braces style
