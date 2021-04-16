@@ -14,6 +14,12 @@ extern "C" void SoPlex_free(void *soplex)
    delete so;
 }
 
+extern "C" void SoPlex_clearLPReal(void *soplex)
+{
+   SoPlex *so = (SoPlex *)(soplex);
+   so->clearLPReal();
+}
+
 extern "C" int SoPlex_numRows(void *soplex)
 {
    SoPlex *so = (SoPlex *)(soplex);
@@ -253,7 +259,7 @@ extern "C" void SoPlex_changeRhsRational(void *soplex, int* rhsnums, int* rhsden
 extern "C" void SoPlex_writeFileReal(void *soplex, char* filename)
 {
     SoPlex* so = (SoPlex*)(soplex);
-    so->writeFileReal(filename, NULL, NULL, NULL);
+    so->writeFile(filename);
 }
 
 extern "C" double SoPlex_objValueReal(void *soplex)
@@ -274,4 +280,48 @@ extern "C" void SoPlex_changeBoundsReal(void *soplex, double* lb, double* ub, in
     Vector lbvec(dim, lb);
     Vector ubvec(dim, ub);
     return so->changeBoundsReal(lbvec, ubvec);
+}
+
+extern "C" void SoPlex_changeVarBoundsReal(void *soplex, int colidx, double lb, double ub)
+{
+    SoPlex* so = (SoPlex*)(soplex);
+    std::cout << lb;
+    std::cout << '\n';
+    std::cout << colidx;
+    std::cout << '\n';
+    std::cout << ub;
+    std::cout << '\n';
+    return so->changeBoundsReal(colidx, lb, ub);
+}
+
+extern "C" void SoPlex_changeVarBoundsRational(void *soplex, int colidx, int lbnum, int lbdenom, int ubnum, int ubdenom)
+{
+    SoPlex* so = (SoPlex*)(soplex);
+
+    Rational lb;
+    lb = lbnum;
+    lb /= lbdenom;
+
+    Rational ub;
+    ub = ubnum;
+    lb /= ubdenom;
+
+    return so->changeBoundsRational(colidx, lb, ub);
+}
+
+extern "C" void SoPlex_changeVarUpperReal(void *soplex, int colidx, double ub)
+{
+    SoPlex* so = (SoPlex*)(soplex);
+    return so->changeLowerReal(colidx, ub);
+}
+
+extern "C" void SoPlex_getUpperReal(void *soplex, double* ub, int dim)
+{
+    SoPlex* so = (SoPlex*)(soplex);
+    Vector ubvec(dim, ub);
+
+    so->getLowerReal(ubvec);
+
+    for( int i = 0; i < dim; ++i )
+        ub[i] = ubvec[i];
 }

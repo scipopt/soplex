@@ -7,6 +7,8 @@ void* SoPlex_create();
 
 void SoPlex_free(void *soplex);
 
+void SoPlex_clearLPReal(void *soplex);
+
 int SoPlex_numRows(void *soplex);
 
 int SoPlex_numCols(void *soplex);
@@ -50,6 +52,14 @@ double SoPlex_objValueReal(void *soplex);
 char* SoPlex_objValueRationalString(void *soplex);
 
 void SoPlex_changeBoundsReal(void *soplex, double* lb, double* ub, int dim);
+
+void SoPlex_changeVarBoundsReal(void *soplex, int colidx, double lb, double ub);
+
+void SoPlex_changeVarBoundsRational(void *soplex, int colidx, int lbnum, int lbdenom, int ubnum, int ubdenom);
+
+void SoPlex_changeVarUpperReal(void *soplex, int colidx, double ub);
+
+void SoPlex_getUpperReal(void *soplex, double* ub, int dim);
 
 #ifdef __cplusplus
 }
