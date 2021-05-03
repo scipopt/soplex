@@ -1,4 +1,5 @@
 #include "soplex.h"
+#include <iostream>
 
 using namespace soplex;
 
@@ -64,25 +65,31 @@ extern "C" void SoPlex_addColReal(void *soplex, double* colentries, int colsize,
 	so->addColReal(LPCol(objval, col, ub, lb));
 }
 
-extern "C" void SoPlex_addColRational(void *soplex, int* colnums, int* coldenoms, int colsize, int nnonzeros, int objvalnum, int objvaldenom, int lbnum, int lbdenom, int ubnum, int ubdenom)
+extern "C" void SoPlex_addColRational(void *soplex, long* colnums, long* coldenoms, int colsize, int nnonzeros, long objvalnum, long objvaldenom, long lbnum, long lbdenom, long ubnum, long ubdenom)
 {
 	SoPlex* so = (SoPlex*)(soplex);
 	DSVectorRational col(nnonzeros);
 	
 	/* get rational lower bound */
-	Rational lb;
-	lb = lbnum;
-	lb /= lbdenom;
+	mpq_t lb;
+    mpq_init(lb);
+    mpq_set_si(lb, lbnum, lbdenom);
+    Rational lower = lb;
+    mpq_clear(lb);
 	
 	/* get rational upper bound */
-	Rational ub;
-	ub = ubnum;
-	ub /= ubdenom;
-
-	/* get rational objective value */
-	Rational objval;
-	objval = objvalnum;
-	objval /= objvaldenom;
+	mpq_t ub;
+    mpq_init(ub);
+    mpq_set_si(ub, ubnum, ubdenom);
+    Rational upper = ub;
+    mpq_clear(ub);
+	
+    /* get rational objective value */	
+	mpq_t obj;
+    mpq_init(obj);
+    mpq_set_si(obj, objvalnum, objvaldenom);
+    Rational objval = obj;
+    mpq_clear(obj);
 
 	/* add nonzero entries to column vector */
 	for( int i = 0; i < colsize; ++i )
@@ -90,15 +97,17 @@ extern "C" void SoPlex_addColRational(void *soplex, int* colnums, int* coldenoms
 		if( colnums[i] != 0 )
 		{
 			/* get rational nonzero entry */
-			Rational r;
-			r = colnums[i];
-			r /= coldenoms[i];
+	        mpq_t r;
+            mpq_init(r);
+            mpq_set_si(r, colnums[i], coldenoms[i]);
+            Rational colentry = r;
+            mpq_clear(r);
 
-			col.add(i, r);
+			col.add(i, colentry);
 		}
 	}
 	
-	so->addColRational(LPColRational(objval, col, ub, lb));
+	so->addColRational(LPColRational(objval, col, upper, lower));
 }
 
 extern "C" void SoPlex_addRowReal(void *soplex, double* rowentries, int rowsize, int nnonzeros, double lb, double ub)
@@ -116,20 +125,24 @@ extern "C" void SoPlex_addRowReal(void *soplex, double* rowentries, int rowsize,
 	so->addRowReal(LPRow(lb, row, ub));
 }
 
-extern "C" void SoPlex_addRowRational(void *soplex, int* rownums, int* rowdenoms, int rowsize, int nnonzeros, int lbnum, int lbdenom, int ubnum, int ubdenom)
+extern "C" void SoPlex_addRowRational(void *soplex, long* rownums, long* rowdenoms, int rowsize, int nnonzeros, long lbnum, long lbdenom, long ubnum, long ubdenom)
 {
 	SoPlex* so = (SoPlex*)(soplex);
 	DSVectorRational row(nnonzeros);
 
 	/* get rational lower bound */
-	Rational lb;
-	lb = lbnum;
-	lb /= lbdenom;
-	
-	/* get rational upper bound */
-	Rational ub;
-	ub = ubnum;
-	ub /= ubdenom;
+	mpq_t lb;
+    mpq_init(lb);
+    mpq_set_si(lb, lbnum, lbdenom);
+    Rational lower = lb;
+    mpq_clear(lb);
+
+	/* get rational upper bound */	
+	mpq_t ub;
+    mpq_init(ub);
+    mpq_set_si(ub, ubnum, ubdenom);
+    Rational upper = ub;
+    mpq_clear(ub);
 
 	/* add nonzero entries to row vector */
 	for( int i = 0; i < rowsize; ++i )
@@ -137,21 +150,26 @@ extern "C" void SoPlex_addRowRational(void *soplex, int* rownums, int* rowdenoms
 		if( rownums[i] != 0 )
 		{
 			/* get rational nonzero entry */
-			Rational r;
-			r = rownums[i];
-			r /= rowdenoms[i];
+	        mpq_t r;
+            mpq_init(r);
+            mpq_set_si(r, rownums[i], rowdenoms[i]);
+			Rational rowentry = r;
+            mpq_clear(r);
 
-			row.add(i, r);
+			row.add(i, rowentry);
 		}
 	}
 	
-	so->addRowRational(LPRowRational(lb, row, ub));
+	so->addRowRational(LPRowRational(lower, row, upper));
 }
 
 extern "C" void SoPlex_getPrimalReal(void *soplex, double* primal, int dim)
 {
 	SoPlex* so = (SoPlex*)(soplex);
 	so->getPrimalReal(primal, dim);
+
+    //for( int i = 0; i < dim; ++i)
+    //    std::cout << primal[i];
 }
 
 extern "C" char* SoPlex_getPrimalRationalString(void *soplex, int dim)
@@ -188,7 +206,7 @@ extern "C" void SoPlex_changeObjReal(void *soplex, double* obj, int dim)
    return so->changeObjReal(objective);
 }
 
-extern "C" void SoPlex_changeObjRational(void *soplex, int* objnums, int* objdenoms, int dim)
+extern "C" void SoPlex_changeObjRational(void *soplex, long* objnums, long* objdenoms, int dim)
 {
    SoPlex* so = (SoPlex*)(soplex);
    Rational* objrational = new Rational [dim];
@@ -196,10 +214,12 @@ extern "C" void SoPlex_changeObjRational(void *soplex, int* objnums, int* objden
    /* create rational objective vector */
    for( int i = 0; i < dim; ++i )
    {
-        Rational r;
-        r = objnums[i];
-        r /= objdenoms[i];
-        objrational[i] = r;
+	    mpq_t r;
+        mpq_init(r);
+        mpq_set_si(r, objnums[i], objdenoms[i]);
+	    Rational objentry = r;
+        mpq_clear(r);
+        objrational[i] = objentry;
     }
 
    VectorRational objective(dim, objrational);
@@ -213,7 +233,7 @@ extern "C" void SoPlex_changeLhsReal(void *soplex, double* lhs, int dim)
     return so->changeLhsReal(lhsvec);
 }
 
-extern "C" void SoPlex_changeLhsRational(void *soplex, int* lhsnums, int* lhsdenoms, int dim)
+extern "C" void SoPlex_changeLhsRational(void *soplex, long* lhsnums, long* lhsdenoms, int dim)
 {
     SoPlex* so = (SoPlex*)(soplex);
     Rational* lhsrational = new Rational [dim];
@@ -221,9 +241,11 @@ extern "C" void SoPlex_changeLhsRational(void *soplex, int* lhsnums, int* lhsden
     /* create rational lhs vector */
     for( int i = 0; i < dim; ++i)
     {
-        Rational r;
-        r = lhsnums[i];
-        r /= lhsdenoms[i];
+	    mpq_t r;
+        mpq_init(r);
+        mpq_set_si(r, lhsnums[i], lhsdenoms[i]);
+	    Rational lhsentry = r;
+        mpq_clear(r);
         lhsrational[i] = r;
     }
 
@@ -238,7 +260,7 @@ extern "C" void SoPlex_changeRhsReal(void *soplex, double* rhs, int dim)
     return so->changeRhsReal(rhsvec);
 }
 
-extern "C" void SoPlex_changeRhsRational(void *soplex, int* rhsnums, int* rhsdenoms, int dim)
+extern "C" void SoPlex_changeRhsRational(void *soplex, long* rhsnums, long* rhsdenoms, int dim)
 {
     SoPlex* so = (SoPlex*)(soplex);
     Rational* rhsrational = new Rational [dim];
@@ -246,9 +268,12 @@ extern "C" void SoPlex_changeRhsRational(void *soplex, int* rhsnums, int* rhsden
     /* create rational rhs vector */
     for( int i = 0; i < dim; ++i)
     {
-        Rational r;
-        r = rhsnums[i];
-        r /= rhsdenoms[i];
+
+	    mpq_t r;
+        mpq_init(r);
+        mpq_set_si(r, rhsnums[i], rhsdenoms[i]);
+	    Rational rhsentry = r;
+        mpq_clear(r);
         rhsrational[i] = r;
     }
 
@@ -285,28 +310,32 @@ extern "C" void SoPlex_changeBoundsReal(void *soplex, double* lb, double* ub, in
 extern "C" void SoPlex_changeVarBoundsReal(void *soplex, int colidx, double lb, double ub)
 {
     SoPlex* so = (SoPlex*)(soplex);
-    std::cout << lb;
-    std::cout << '\n';
-    std::cout << colidx;
-    std::cout << '\n';
-    std::cout << ub;
-    std::cout << '\n';
+    //std::cout << lb;
+    //std::cout << '\n';
+    //std::cout << colidx;
+    //std::cout << '\n';
+    //std::cout << ub;
+    //std::cout << '\n';
     return so->changeBoundsReal(colidx, lb, ub);
 }
 
-extern "C" void SoPlex_changeVarBoundsRational(void *soplex, int colidx, int lbnum, int lbdenom, int ubnum, int ubdenom)
+extern "C" void SoPlex_changeVarBoundsRational(void *soplex, int colidx, long lbnum, long lbdenom, long ubnum, long ubdenom)
 {
     SoPlex* so = (SoPlex*)(soplex);
 
-    Rational lb;
-    lb = lbnum;
-    lb /= lbdenom;
+    mpq_t lb;
+    mpq_init(lb);
+    mpq_set_si(lb, lbnum, lbdenom);
+	Rational lower = lb;
+    mpq_clear(lb);
+    
+    mpq_t ub;
+    mpq_init(ub);
+    mpq_set_si(ub, ubnum, ubdenom);
+	Rational upper = ub;
+    mpq_clear(ub);
 
-    Rational ub;
-    ub = ubnum;
-    lb /= ubdenom;
-
-    return so->changeBoundsRational(colidx, lb, ub);
+    return so->changeBoundsRational(colidx, lower, upper);
 }
 
 extern "C" void SoPlex_changeVarUpperReal(void *soplex, int colidx, double ub)

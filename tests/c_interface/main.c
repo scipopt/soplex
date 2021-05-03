@@ -72,11 +72,11 @@ void test_rational(void)
    /* create LP via rows */
 
    void *soplex = SoPlex_create();
-   int infty = 1000000;
-   int rownums[] = {-1, 1};
-   int rowdenoms[] = {1, 1};
-   int objnums[] = {1, 1};
-   int objdenoms[] = {1, 1};
+   long infty = 1000000;
+   long rownums[] = {-1, 1};
+   long rowdenoms[] = {1, 1};
+   long objnums[] = {1, 1};
+   long objdenoms[] = {1, 1};
    double primal[] = {0.0,0.0};
 
    /* use rational solver */
@@ -99,12 +99,12 @@ void test_rational(void)
 
    /* create LP via columns */
    void *soplex2 = SoPlex_create();
-   int colnums1[] = {-1};
-   int coldenoms1[] = {1};
-   int colnums2[] = {1};
-   int coldenoms2[] = {1};
-   int lhsnums[] = {-1};
-   int lhsdenoms[] = {5};
+   long colnums1[] = {-1};
+   long coldenoms1[] = {1};
+   long colnums2[] = {1};
+   long coldenoms2[] = {1};
+   long lhsnums[] = {-1};
+   long lhsdenoms[] = {5};
 
    /* use rational solver */
    SoPlex_setRational(soplex2);
