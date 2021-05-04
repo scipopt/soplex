@@ -50,7 +50,15 @@ extern "C" void SoPlex_setIntParam(void *soplex, int paramcode, int paramvalue)
    so->setIntParam((SoPlex::IntParam)paramcode, paramvalue);
 }
 
-extern "C" void SoPlex_addColReal(void *soplex, double* colentries, int colsize, int nnonzeros, double objval, double lb, double ub)
+extern "C" void SoPlex_addColReal(
+    void *soplex,
+    double* colentries,
+    int colsize,
+    int nnonzeros,
+    double objval,
+    double lb,
+    double ub
+    )
 {
 	SoPlex* so = (SoPlex*)(soplex);
 	DSVector col(nnonzeros);
@@ -65,7 +73,19 @@ extern "C" void SoPlex_addColReal(void *soplex, double* colentries, int colsize,
 	so->addColReal(LPCol(objval, col, ub, lb));
 }
 
-extern "C" void SoPlex_addColRational(void *soplex, long* colnums, long* coldenoms, int colsize, int nnonzeros, long objvalnum, long objvaldenom, long lbnum, long lbdenom, long ubnum, long ubdenom)
+extern "C" void SoPlex_addColRational(
+    void *soplex,
+    long* colnums,
+    long* coldenoms,
+    int colsize,
+    int nnonzeros,
+    long objvalnum,
+    long objvaldenom,
+    long lbnum,
+    long lbdenom,
+    long ubnum,
+    long ubdenom
+    )
 {
 	SoPlex* so = (SoPlex*)(soplex);
 	DSVectorRational col(nnonzeros);
@@ -110,7 +130,14 @@ extern "C" void SoPlex_addColRational(void *soplex, long* colnums, long* coldeno
 	so->addColRational(LPColRational(objval, col, upper, lower));
 }
 
-extern "C" void SoPlex_addRowReal(void *soplex, double* rowentries, int rowsize, int nnonzeros, double lb, double ub)
+extern "C" void SoPlex_addRowReal(
+    void *soplex,
+    double* rowentries,
+    int rowsize,
+    int nnonzeros,
+    double lb,
+    double ub
+    )
 {
 	SoPlex* so = (SoPlex*)(soplex);
 	DSVector row(nnonzeros);
@@ -125,7 +152,17 @@ extern "C" void SoPlex_addRowReal(void *soplex, double* rowentries, int rowsize,
 	so->addRowReal(LPRow(lb, row, ub));
 }
 
-extern "C" void SoPlex_addRowRational(void *soplex, long* rownums, long* rowdenoms, int rowsize, int nnonzeros, long lbnum, long lbdenom, long ubnum, long ubdenom)
+extern "C" void SoPlex_addRowRational(
+    void *soplex,
+    long* rownums,
+    long* rowdenoms,
+    int rowsize,
+    int nnonzeros,
+    long lbnum,
+    long lbdenom,
+    long ubnum,
+    long ubdenom
+    )
 {
 	SoPlex* so = (SoPlex*)(soplex);
 	DSVectorRational row(nnonzeros);
@@ -319,7 +356,14 @@ extern "C" void SoPlex_changeVarBoundsReal(void *soplex, int colidx, double lb, 
     return so->changeBoundsReal(colidx, lb, ub);
 }
 
-extern "C" void SoPlex_changeVarBoundsRational(void *soplex, int colidx, long lbnum, long lbdenom, long ubnum, long ubdenom)
+extern "C" void SoPlex_changeVarBoundsRational(
+    void *soplex,
+    int colidx,
+    long lbnum,
+    long lbdenom,
+    long ubnum,
+    long ubdenom
+    )
 {
     SoPlex* so = (SoPlex*)(soplex);
 

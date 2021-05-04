@@ -17,34 +17,49 @@ void SoPlex_setRational(void *soplex);
 
 void SoPlex_setIntParam(void *soplex, int paramcode, int paramvalue);
 
-void SoPlex_addColReal(void *soplex, double* colentries, int colsize, int nnonzeros, double objval, double lb, double ub);
-
-void SoPlex_addColRational(
-        void *soplex,
-        long* colnums,
-        long* coldenoms,
-        int colsize,
-        int nnonzeros,
-        long objvalnum,
-        long objvaldenom,
-        long lbnum,
-        long lbdenom,
-        long ubnum,
-        long ubdenom
+void SoPlex_addColReal(
+    void *soplex,
+    double* colentries,
+    int colsize,
+    int nnonzeros,
+    double objval,
+    double lb,
+    double ub
 );
 
-void SoPlex_addRowReal(void *soplex, double* rowentries, int rowsize, int nnonzeros, double lb, double ub);
+void SoPlex_addColRational(
+    void *soplex,
+    long* colnums,
+    long* coldenoms,
+    int colsize,
+    int nnonzeros,
+    long objvalnum,
+    long objvaldenom,
+    long lbnum,
+    long lbdenom,
+    long ubnum,
+    long ubdenom
+);
+
+void SoPlex_addRowReal(
+    void *soplex,
+    double* rowentries,
+    int rowsize,
+    int nnonzeros,
+    double lb, 
+    double ub
+);
 
 void SoPlex_addRowRational(
-        void *soplex,
-        long* rownums,
-        long* rowdenoms,
-        int rowsize,
-        int nnonzeros,
-        long lbnum,
-        long lbdenom,
-        long ubnum,
-        long ubdenom
+    void *soplex,
+    long* rownums,
+    long* rowdenoms,
+    int rowsize,
+    int nnonzeros,
+    long lbnum,
+    long lbdenom,
+    long ubnum,
+    long ubdenom
 );
 
 void SoPlex_getPrimalReal(void *soplex, double* primal, int dim);
@@ -77,7 +92,14 @@ void SoPlex_changeBoundsReal(void *soplex, double* lb, double* ub, int dim);
 
 void SoPlex_changeVarBoundsReal(void *soplex, int colidx, double lb, double ub);
 
-void SoPlex_changeVarBoundsRational(void *soplex, int colidx, long lbnum, long lbdenom, long ubnum, long ubdenom);
+void SoPlex_changeVarBoundsRational(
+    void *soplex,
+    int colidx,
+    long lbnum,
+    long lbdenom,
+    long ubnum,
+    long ubdenom
+);
 
 void SoPlex_changeVarUpperReal(void *soplex, int colidx, double ub);
 
