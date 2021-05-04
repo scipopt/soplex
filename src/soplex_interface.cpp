@@ -89,21 +89,21 @@ extern "C" void SoPlex_addColRational(
 {
    SoPlex* so = (SoPlex*)(soplex);
    DSVectorRational col(nnonzeros);
-	
+
    /* get rational lower bound */
    mpq_t lb;
    mpq_init(lb);
    mpq_set_si(lb, lbnum, lbdenom);
    Rational lower = lb;
    mpq_clear(lb);
-	
+
    /* get rational upper bound */
    mpq_t ub;
    mpq_init(ub);
    mpq_set_si(ub, ubnum, ubdenom);
    Rational upper = ub;
    mpq_clear(ub);
-	
+
    /* get rational objective value */	
    mpq_t obj;
    mpq_init(obj);
@@ -126,7 +126,7 @@ extern "C" void SoPlex_addColRational(
          col.add(i, colentry);
       }
    }
-	
+
    so->addColRational(LPColRational(objval, col, upper, lower));
 }
 
@@ -148,7 +148,7 @@ extern "C" void SoPlex_addRowReal(
       if( rowentries[i] != 0.0 )
          row.add(i, rowentries[i]);
    }
-	
+
    so->addRowReal(LPRow(lb, row, ub));
 }
 
@@ -196,7 +196,7 @@ extern "C" void SoPlex_addRowRational(
          row.add(i, rowentry);
       }
    }
-	
+
    so->addRowRational(LPRowRational(lower, row, upper));
 }
 
