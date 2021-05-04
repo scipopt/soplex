@@ -210,6 +210,7 @@ extern "C" char* SoPlex_getPrimalRationalString(void *soplex, int dim)
 {
    SoPlex* so = (SoPlex*)(soplex);
    VectorRational primal(dim);
+   std::string primalstring;
    so->getPrimalRational(primal);
 
    for( int i = 0; i < dim; ++i )
