@@ -67,6 +67,7 @@ void test_real(void)
 	SoPlex_free(soplex2);
 }
 
+#ifdef SOPLEX_WITH_GMP
 void test_rational(void)
 {
    /* create LP via rows */
@@ -126,8 +127,8 @@ void test_rational(void)
    assert(strcmp(SoPlex_objValueRationalString(soplex2), "-1/25") == 0);
 
    SoPlex_free(soplex2);
-
 }
+#endif
 
 int main(void)
 {
