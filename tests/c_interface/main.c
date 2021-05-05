@@ -134,7 +134,9 @@ int main(void)
    printf("testing real... \n");
    test_real();
 
+   #ifdef SOPLEX_WITH_GMP
    printf("\n");
    printf("testing rational... \n");
    test_rational();
+   #endif
 }
