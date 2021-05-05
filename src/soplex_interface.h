@@ -27,6 +27,7 @@ void SoPlex_addColReal(
     double ub
 );
 
+#ifdef SOPLEX_WITH_GMP
 void SoPlex_addColRational(
     void *soplex,
     long* colnums,
@@ -40,6 +41,7 @@ void SoPlex_addColRational(
     long ubnum,
     long ubdenom
 );
+#endif
 
 void SoPlex_addRowReal(
     void *soplex,
@@ -50,6 +52,7 @@ void SoPlex_addRowReal(
     double ub
 );
 
+#ifdef SOPLEX_WITH_GMP
 void SoPlex_addRowRational(
     void *soplex,
     long* rownums,
@@ -61,6 +64,7 @@ void SoPlex_addRowRational(
     long ubnum,
     long ubdenom
 );
+#endif
 
 void SoPlex_getPrimalReal(void *soplex, double* primal, int dim);
 
@@ -72,15 +76,21 @@ int SoPlex_optimize(void *soplex);
 
 void SoPlex_changeObjReal(void *soplex, double* obj, int dim);
 
+#ifdef SOPLEX_WITH_GMP
 void SoPlex_changeObjRational(void *soplex, long* objnums, long* objdenoms, int dim);
+#endif
 
 void SoPlex_changeLhsReal(void *soplex, double* lhs, int dim);
 
+#ifdef SOPLEX_WITH_GMP
 void SoPlex_changeLhsRational(void *soplex, long* lhsnums, long* lhsdenoms, int dim);
+#endif
 
 void SoPlex_changeRhsReal(void *soplex, double* rhs, int dim);
 
+#ifdef SOPLEX_WITH_GMP
 void SoPlex_changeRhsRational(void *soplex, long* rhsnums, long* rhsdenoms, int dim);
+#endif
 
 void SoPlex_writeFileReal(void *soplex, char* filename);
 
@@ -92,6 +102,7 @@ void SoPlex_changeBoundsReal(void *soplex, double* lb, double* ub, int dim);
 
 void SoPlex_changeVarBoundsReal(void *soplex, int colidx, double lb, double ub);
 
+#ifdef SOPLEX_WITH_GMP
 void SoPlex_changeVarBoundsRational(
     void *soplex,
     int colidx,
@@ -100,6 +111,7 @@ void SoPlex_changeVarBoundsRational(
     long ubnum,
     long ubdenom
 );
+#endif
 
 void SoPlex_changeVarUpperReal(void *soplex, int colidx, double ub);
 

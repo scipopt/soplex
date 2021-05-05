@@ -33,6 +33,7 @@ extern "C" int SoPlex_numCols(void *soplex)
     return so->numCols();
 }
 
+#ifdef SOPLEX_WITH_GMP
 extern "C" void SoPlex_setRational(void *soplex)
 {
     SoPlex *so = (SoPlex *)(soplex);
@@ -43,6 +44,7 @@ extern "C" void SoPlex_setRational(void *soplex)
     so->setRealParam(SoPlex::FEASTOL, 0.0);
     so->setRealParam(SoPlex::OPTTOL, 0.0);
 }
+#endif
 
 extern "C" void SoPlex_setIntParam(void *soplex, int paramcode, int paramvalue)
 {
@@ -73,6 +75,7 @@ extern "C" void SoPlex_addColReal(
     so->addColReal(LPCol(objval, col, ub, lb));
 }
 
+#ifdef SOPLEX_WITH_GMP
 extern "C" void SoPlex_addColRational(
     void *soplex,
     long* colnums,
@@ -129,6 +132,7 @@ extern "C" void SoPlex_addColRational(
 
     so->addColRational(LPColRational(objval, col, upper, lower));
 }
+#endif
 
 extern "C" void SoPlex_addRowReal(
     void *soplex,
@@ -152,6 +156,7 @@ extern "C" void SoPlex_addRowReal(
     so->addRowReal(LPRow(lb, row, ub));
 }
 
+#ifdef SOPLEX_WITH_GMP
 extern "C" void SoPlex_addRowRational(
     void *soplex,
     long* rownums,
@@ -199,6 +204,7 @@ extern "C" void SoPlex_addRowRational(
 
     so->addRowRational(LPRowRational(lower, row, upper));
 }
+#endif
 
 extern "C" void SoPlex_getPrimalReal(void *soplex, double* primal, int dim)
 {
@@ -240,6 +246,7 @@ extern "C" void SoPlex_changeObjReal(void *soplex, double* obj, int dim)
     return so->changeObjReal(objective);
 }
 
+#ifdef SOPLEX_WITH_GMP
 extern "C" void SoPlex_changeObjRational(void *soplex, long* objnums, long* objdenoms, int dim)
 {
     SoPlex* so = (SoPlex*)(soplex);
@@ -259,6 +266,7 @@ extern "C" void SoPlex_changeObjRational(void *soplex, long* objnums, long* objd
     VectorRational objective(dim, objrational);
     return so->changeObjRational(objective);
 }
+#endif
 
 extern "C" void SoPlex_changeLhsReal(void *soplex, double* lhs, int dim)
 {
@@ -267,6 +275,7 @@ extern "C" void SoPlex_changeLhsReal(void *soplex, double* lhs, int dim)
     return so->changeLhsReal(lhsvec);
 }
 
+#ifdef SOPLEX_WITH_GMP
 extern "C" void SoPlex_changeLhsRational(void *soplex, long* lhsnums, long* lhsdenoms, int dim)
 {
     SoPlex* so = (SoPlex*)(soplex);
@@ -286,6 +295,7 @@ extern "C" void SoPlex_changeLhsRational(void *soplex, long* lhsnums, long* lhsd
     VectorRational lhs(dim, lhsrational);
     return so->changeLhsRational(lhs);
 }
+#endif
 
 extern "C" void SoPlex_changeRhsReal(void *soplex, double* rhs, int dim)
 {
@@ -294,6 +304,7 @@ extern "C" void SoPlex_changeRhsReal(void *soplex, double* rhs, int dim)
     return so->changeRhsReal(rhsvec);
 }
 
+#ifdef SOPLEX_WITH_GMP
 extern "C" void SoPlex_changeRhsRational(void *soplex, long* rhsnums, long* rhsdenoms, int dim)
 {
     SoPlex* so = (SoPlex*)(soplex);
@@ -313,6 +324,7 @@ extern "C" void SoPlex_changeRhsRational(void *soplex, long* rhsnums, long* rhsd
     VectorRational rhs(dim, rhsrational);
     return so->changeRhsRational(rhs);
 }
+#endif
 
 extern "C" void SoPlex_writeFileReal(void *soplex, char* filename)
 {
@@ -346,6 +358,7 @@ extern "C" void SoPlex_changeVarBoundsReal(void *soplex, int colidx, double lb, 
     return so->changeBoundsReal(colidx, lb, ub);
 }
 
+#ifdef SOPLEX_WITH_GMP
 extern "C" void SoPlex_changeVarBoundsRational(
     void *soplex,
     int colidx,
@@ -373,6 +386,7 @@ extern "C" void SoPlex_changeVarBoundsRational(
 
     return so->changeBoundsRational(colidx, lower, upper);
 }
+#endif
 
 extern "C" void SoPlex_changeVarUpperReal(void *soplex, int colidx, double ub)
 {
