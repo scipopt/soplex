@@ -595,7 +595,7 @@ private:
 
    public:
       ///
-      FreeZeroObjVariablePS(const SPxLPBase<R>& lp, int _j, bool loFree, SVectorBase<R> col_idx_sorted)
+      FreeZeroObjVariablePS(const SPxLPBase<R>& lp, int _j, bool loFree, DSVectorBase<R> col_idx_sorted)
          : PostStep("FreeZeroObjVariable", lp.nRows(), lp.nCols())
          , m_j(_j)
          , m_old_j(lp.nCols() - 1)

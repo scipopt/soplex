@@ -3360,7 +3360,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
                          << " with zero objective (" << lp.maxObj(j)
                          << ")" << std::endl;)
 
-               SVectorBase<R> col_idx_sorted(col);
+               DSVectorBase<R> col_idx_sorted(col);
 
                // sort col elements by increasing idx
                IdxCompare compare;
