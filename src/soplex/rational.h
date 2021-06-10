@@ -428,9 +428,6 @@ public:
    ///@}
 };
 
-/// less than operator
-bool operator<(const Rational& r, const Rational& s);
-
 ///@name Parsing and printing
 ///@{
 
@@ -444,9 +441,6 @@ bool readStringRational(const char* s, Rational& value);
 std::ostream& operator<<(std::ostream& os, const Rational& r);
 
 ///@}
-
-/// less than operator for Rational and double
-bool operator<(const Rational& r, const double& s);
 
 ///@name Relational operators
 ///@{
@@ -591,32 +585,11 @@ int sign(const Rational& r);
 /// addition operator for double and Rational
 Rational operator+(const double& d, const Rational& r);
 
-/// addition operator for double and Rational
-Rational operator+(const double& d, const Rational& r);
-
-/// addition operator for double and Rational
-Rational operator+(const double& d, const Rational& r);
-
-/// addition operator for double and Rational
-Rational operator+(const double& d, const Rational& r);
-
-/// addition operator for int and Rational
-Rational operator+(const int& d, const Rational& r);
-
-/// addition operator for int and Rational
-Rational operator+(const int& d, const Rational& r);
-
-/// addition operator for int and Rational
-Rational operator+(const int& d, const Rational& r);
-
 /// addition operator for int and Rational
 Rational operator+(const int& d, const Rational& r);
 
 /// absolute function
 Rational spxAbs(const Rational& r);
-
-/// Sign function; returns 1 if r > 0, 0 if r = 0, and -1 if r < 0.
-int sign(const Rational& r);
 
 /// Negation.
 Rational operator-(const Rational& r);
