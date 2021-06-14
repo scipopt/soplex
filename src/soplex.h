@@ -28,6 +28,7 @@
 #include "soplex/spxsolver.h"
 #include "soplex/slufactor.h"
 #include "soplex/slufactor_rational.h"
+#include "soplex/presol.h"
 
 ///@todo try to move to cpp file by forward declaration
 #include "soplex/spxsimplifier.h"
@@ -1154,10 +1155,13 @@ public:
    enum
    {
       /// no simplifier
-      SIMPLIFIER_OFF = 0,
+      PRESOLVING_OFF = 0,
 
       /// automatic choice
-      SIMPLIFIER_AUTO = 1
+      PRESOLVING_INTERNAL = 1,
+
+      /// automatic choice
+      PRESOLVING_PAPILO = 2
    };
 
    /// values for parameter SCALER
@@ -1642,6 +1646,7 @@ private:
    SPxSolverBase<R> _solver;
    SLUFactor<R> _slufactor;
    SPxMainSM<R> _simplifierMainSM;
+   Presol<R> _presol_papilo;
    SPxEquiliSC<R> _scalerUniequi;
    SPxEquiliSC<R> _scalerBiequi;
    SPxGeometSC<R> _scalerGeo1;

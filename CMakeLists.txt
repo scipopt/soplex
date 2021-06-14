@@ -40,6 +40,8 @@ option(SANITIZE_MEMORY "should the memory sanitizer be enabled in debug mode if 
 option(SANITIZE_UNDEFINED "should the undefined behavior sanitizer be enabled in debug mode if available" ON)
 option(SANITIZE_THREAD "should the thread sanitizer be enabled in debug mode if available" OFF)
 option(COVERAGE "enable coverage support" OFF)
+option(PAPILO "should papilo library be linked" ON)
+
 SET(COVERAGE_CTEST_ARGS "" CACHE STRING "additional ctest arguments for coverage")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -156,6 +158,21 @@ if(Quadmath_FOUND)
 else()
    set(QUADMATH_IMPORTED_TARGET "")
 endif()
+
+# look for presolvelib PaPILO
+if(PAPILO)
+    message(STATUS "Finding PAPILO")
+    find_package(PAPILO CONFIG REQUIRED)
+    message(STATUS "Finding PAPILO - found")
+    add_definitions(-DSOPLEX_WITH_PAPILO=ON)
+else()
+    message(STATUS "Support PAPILO: OFF")
+    set(PAPILO_IMPORTED_TARGETS "")
+    add_definitions(-DSOPLEX_WITH_PAPILO=OFF)
+endif()
+
+# use C++14 standard
+set(CMAKE_CXX_STANDARD 14)
 
 if(BOOST)
     find_package(Boost 1.58.0) # Refer to comments in cmake/Modules/FindBoost.cmake

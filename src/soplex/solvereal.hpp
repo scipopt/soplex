@@ -306,11 +306,14 @@ void SoPlexBase<R>::_preprocessAndSolveReal(bool applySimplifier, volatile bool*
                 && (_solver.nCols() + 1) * realParam(SoPlexBase<R>::REPRESENTATION_SWITCH) < (_solver.nRows() + 1)))
          keepbounds &= boolParam(SoPlexBase<R>::ROWBOUNDFLIPS);
 
+      _solver.writeLPF(std::cout, 0,0);
       simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlexBase<R>::EPSILON_ZERO),
                              realParam(SoPlexBase<R>::FEASTOL), realParam(SoPlexBase<R>::OPTTOL), keepbounds);
       _solver.changeObjOffset(_simplifier->getObjoffset() + realParam(SoPlexBase<R>::OBJ_OFFSET));
       _solver.setScalingInfo(false);
       _applyPolishing = true;
+      _solver.writeLPF(std::cout, 0,0);
+
       _solver.setSolutionPolishing(SPxSolverBase<R>::POLISH_OFF);
    }
 

@@ -795,7 +795,7 @@ int runSoPlex(int argc, char* argv[])
 
          case 's' :
 
-            // -s<value> : choose simplifier/presolver (0 - off, 1* - auto)
+            // -s<value> : choose simplifier/presolver (0 - off, 1 - auto, 2* - PaPILO)
             if(!soplex->setIntParam(soplex->SIMPLIFIER, option[2] - '0'))
             {
                printUsage(argv, optidx);

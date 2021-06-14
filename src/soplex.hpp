@@ -227,10 +227,10 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
 
    // type of simplifier
    name[SoPlexBase<R>::SIMPLIFIER] = "simplifier";
-   description[SoPlexBase<R>::SIMPLIFIER] = "simplifier (0 - off, 1 - auto)";
+   description[SoPlexBase<R>::SIMPLIFIER] = "simplifier (0 - off, 1 - internal, 2 - PaPILO)";
    lower[SoPlexBase<R>::SIMPLIFIER] = 0;
-   upper[SoPlexBase<R>::SIMPLIFIER] = 1;
-   defaultValue[SoPlexBase<R>::SIMPLIFIER] = SoPlexBase<R>::SIMPLIFIER_AUTO;
+   upper[SoPlexBase<R>::SIMPLIFIER] = 2;
+   defaultValue[SoPlexBase<R>::SIMPLIFIER] = SoPlexBase<R>::PRESOLVING_PAPILO;
 
    // type of scaler
    name[SoPlexBase<R>::SCALER] = "scaler";
@@ -1383,6 +1383,7 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
       _solver = rhs._solver;
       _slufactor = rhs._slufactor;
       _simplifierMainSM = rhs._simplifierMainSM;
+      _presol_papilo = rhs._presol_papilo;
       _scalerUniequi = rhs._scalerUniequi;
       _scalerBiequi = rhs._scalerBiequi;
       _scalerGeo1 = rhs._scalerGeo1;
@@ -5837,14 +5838,23 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
    case SoPlexBase<R>::SIMPLIFIER:
       switch(value)
       {
-      case SIMPLIFIER_OFF:
+      case PRESOLVING_OFF:
          _simplifier = 0;
          break;
-
-      case SIMPLIFIER_AUTO:
+      case PRESOLVING_INTERNAL:
          _simplifier = &_simplifierMainSM;
          assert(_simplifier != 0);
          break;
+      case PRESOLVING_PAPILO:
+#ifdef SOPLEX_WITH_PAPILO
+         _simplifier = &_presol_papilo;
+         assert  (_simplifier != 0);
+#else
+         MSG_INFO1((*this->spxout), (*this->spxout) << " --- PaPILO not specified- using fallback presolving" << std::endl;)
+         _simplifier = &_simplifierMainSM;
+         assert(_simplifier != 0);
+#endif
+            break;
 
       default:
          return false;
@@ -7791,17 +7801,29 @@ template <class R>
 void SoPlexBase<R>::_enableSimplifierAndScaler()
 {
    // type of simplifier
-   switch(intParam(SoPlexBase<R>::SIMPLIFIER))
+   int i = intParam(SoPlexBase<R>::SIMPLIFIER);
+   switch(i)
    {
-   case SIMPLIFIER_OFF:
+   case PRESOLVING_OFF:
       _simplifier = 0;
       break;
 
-   case SIMPLIFIER_AUTO:
+   case PRESOLVING_INTERNAL:
       _simplifier = &_simplifierMainSM;
       assert(_simplifier != 0);
       _simplifier->setMinReduction(realParam(MINRED));
       break;
+
+   case PRESOLVING_PAPILO:
+      #ifdef SOPLEX_WITH_PAPILO
+         _simplifier = &_presol_papilo;
+         assert(_simplifier != 0);
+      #else
+         _simplifier = &_simplifierMainSM;
+         assert(_simplifier != 0);
+         _simplifier->setMinReduction(realParam(MINRED));
+      #endif
+         break;
 
    default:
       break;
