@@ -108,10 +108,10 @@ LDFLAGS		=
 ARFLAGS		=	cr
 DFLAGS		=	-MM
 
-GMP_LDFLAGS	= -lgmp
+GMP_LDFLAGS	= 	-lgmp
 GMP_CPPFLAGS	=
-BOOST_LDFLAGS = -lboost_program_options
-QUADMATH_LDFLAGS = -lquadmath
+BOOST_LDFLAGS 	= 	-lboost_program_options
+QUADMATH_LDFLAGS = 	-lquadmath
 
 SOPLEXDIR	=	$(realpath .)
 SRCDIR		=	src
@@ -162,7 +162,7 @@ GCCWARN		=	-pedantic -Wall -W -Wpointer-arith -Wcast-align -Wwrite-strings \
 			-Wcast-qual \
 			-Wmissing-declarations \
 			-Wno-unused-parameter -Wno-strict-overflow -Wno-long-long \
-	    -Wno-sign-conversion
+		        -Wno-sign-conversion
 #			-Wold-style-cast
 #			-Weffc++
 
