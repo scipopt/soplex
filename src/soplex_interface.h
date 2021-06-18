@@ -17,6 +17,8 @@ void SoPlex_setRational(void* soplex);
 
 void SoPlex_setIntParam(void* soplex, int paramcode, int paramvalue);
 
+int SoPlex_getIntParam(void* soplex, int paramcode);
+
 void SoPlex_addColReal(
    void* soplex,
    double* colentries,

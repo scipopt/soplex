@@ -52,6 +52,12 @@ extern "C" void SoPlex_setIntParam(void* soplex, int paramcode, int paramvalue)
    so->setIntParam((SoPlex::IntParam)paramcode, paramvalue);
 }
 
+extern "C" int SoPlex_getIntParam(void* soplex, int paramcode)
+{
+    SoPlex* so = (SoPlex*)(soplex);
+    return so->intParam((SoPlex::IntParam)paramcode);
+}
+
 extern "C" void SoPlex_addColReal(
    void* soplex,
    double* colentries,
