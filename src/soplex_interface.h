@@ -20,51 +20,51 @@ void SoPlex_setIntParam(void* soplex, int paramcode, int paramvalue);
 int SoPlex_getIntParam(void* soplex, int paramcode);
 
 void SoPlex_addColReal(
-    void* soplex,
-    double* colentries,
-    int colsize,
-    int nnonzeros,
-    double objval,
-    double lb,
-    double ub
+   void* soplex,
+   double* colentries,
+   int colsize,
+   int nnonzeros,
+   double objval,
+   double lb,
+   double ub
 );
 
 #ifdef SOPLEX_WITH_GMP
 void SoPlex_addColRational(
-    void* soplex,
-    long* colnums,
-    long* coldenoms,
-    int colsize,
-    int nnonzeros,
-    long objvalnum,
-    long objvaldenom,
-    long lbnum,
-    long lbdenom,
-    long ubnum,
-    long ubdenom
+   void* soplex,
+   long* colnums,
+   long* coldenoms,
+   int colsize,
+   int nnonzeros,
+   long objvalnum,
+   long objvaldenom,
+   long lbnum,
+   long lbdenom,
+   long ubnum,
+   long ubdenom
 );
 #endif
 
 void SoPlex_addRowReal(
-    void* soplex,
-    double* rowentries,
-    int rowsize,
-    int nnonzeros,
-    double lb,
-    double ub
+   void* soplex,
+   double* rowentries,
+   int rowsize,
+   int nnonzeros,
+   double lb,
+   double ub
 );
 
 #ifdef SOPLEX_WITH_GMP
 void SoPlex_addRowRational(
-    void* soplex,
-    long* rownums,
-    long* rowdenoms,
-    int rowsize,
-    int nnonzeros,
-    long lbnum,
-    long lbdenom,
-    long ubnum,
-    long ubdenom
+   void* soplex,
+   long* rownums,
+   long* rowdenoms,
+   int rowsize,
+   int nnonzeros,
+   long lbnum,
+   long lbdenom,
+   long ubnum,
+   long ubdenom
 );
 #endif
 
@@ -106,12 +106,12 @@ void SoPlex_changeVarBoundsReal(void* soplex, int colidx, double lb, double ub);
 
 #ifdef SOPLEX_WITH_GMP
 void SoPlex_changeVarBoundsRational(
-    void* soplex,
-    int colidx,
-    long lbnum,
-    long lbdenom,
-    long ubnum,
-    long ubdenom
+   void* soplex,
+   int colidx,
+   long lbnum,
+   long lbdenom,
+   long ubnum,
+   long ubdenom
 );
 #endif
 
