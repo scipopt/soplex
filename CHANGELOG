@@ -4,6 +4,7 @@ next minor Release 5.0.3
 features:
 
 interface & parameters:
+- the cmake build system now exports the SOPLEX_WITH_GMP flag which makes the build of the importing project (i.e. SCIP) set the correct compilation flag
 
 performance:
 

@@ -118,14 +118,17 @@ file(GLOB headers
     soplex/*.hpp
 )
 
-    # create soplex library with pic
-    add_library(libsoplex-pic STATIC ${sources})
-    set_target_properties(libsoplex-pic PROPERTIES
+# create soplex library with pic
+add_library(libsoplex-pic STATIC ${sources})
+set_target_properties(libsoplex-pic PROPERTIES
     POSITION_INDEPENDENT_CODE on
     VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}.${SOPLEX_VERSION_SUB}
     SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
 add_dependencies(libsoplex-pic soplex_update_githash)
 target_link_libraries(libsoplex-pic ${libs})
+if(GMP_FOUND)
+    target_compile_definitions(libsoplex-pic PUBLIC SOPLEX_WITH_GMP)
+endif()
 
 # create soplex library without pic
 add_library(libsoplex STATIC ${sources})
@@ -134,6 +137,9 @@ set_target_properties(libsoplex PROPERTIES
     SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
 add_dependencies(libsoplex soplex_update_githash)
 target_link_libraries(libsoplex ${libs})
+if(GMP_FOUND)
+    target_compile_definitions(libsoplex PUBLIC SOPLEX_WITH_GMP)
+endif()
 
 
 if(BOOST)
