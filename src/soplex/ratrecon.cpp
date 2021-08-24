@@ -103,12 +103,12 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
 
             temp = 1;
 
-            boost::multiprecision::divide_qr(tn, td, a0, temp);
+            divide_qr(tn, td, a0, temp);
 
             tn = td;
             td = temp;
 
-            boost::multiprecision::divide_qr(tn, td, ai, temp);
+            divide_qr(tn, td, ai, temp);
             tn = td;
             td = temp;
 
@@ -135,13 +135,12 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
                /* update everything: compute next ai, then update convergents */
 
                /* update ai */
-               boost::multiprecision::divide_qr(tn, td, ai, temp);
+               divide_qr(tn, td, ai, temp);
                tn = td;
                td = temp;
 
                /* shift p,q */
                q[0] = q[1];
-               q[0] =  q[1];
                q[1] =  q[2];
                p[0] =  p[1];
                p[1] =  p[2];
@@ -163,7 +162,7 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
             /* Assign the values */
             resvec[j] = Rational(p[1],q[1]);
             mpq_canonicalize(resvec[j].backend().data());
-            SpxGcd(temp, gcd, boost::multiprecision::denominator(resvec[j]));
+            SpxGcd(temp, gcd, denominator(resvec[j]));
             gcd *= temp;
 
             if( gcd > Dbound )
@@ -198,12 +197,12 @@ bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
    if(indexSet == 0)
    {
       for(int i = 0; i < dim; i++)
-         SpxLcm(denom, denom, boost::multiprecision::denominator(input[i]));
+         SpxLcm(denom, denom, denominator(input[i]));
 
       for(int i = 0; i < dim; i++)
       {
-         xnum[i] = denom * Integer(boost::multiprecision::numerator(input[i]));
-         xnum[i] = xnum[i] / Integer(boost::multiprecision::denominator(input[i]));
+         xnum[i] = denom * numerator(input[i]);
+         xnum[i] = xnum[i] / Integer(denominator(input[i]));
       }
    }
    else
@@ -212,7 +211,7 @@ bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
       {
          assert(indexSet->index(i) >= 0);
          assert(indexSet->index(i) < input.dim());
-         SpxLcm(denom, denom, boost::multiprecision::denominator(input[indexSet->index(i)]));
+         SpxLcm(denom, denom, denominator(input[indexSet->index(i)]));
       }
 
       for(int i = 0; i < indexSet->size(); i++)
@@ -220,8 +219,8 @@ bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
          int k = indexSet->index(i);
          assert(k >= 0);
          assert(k < input.dim());
-         xnum[k] = denom * Integer(boost::multiprecision::numerator(input[k]));
-         xnum[k] = xnum[k] / Integer(boost::multiprecision::denominator(input[k]));
+         xnum[k] = denom * numerator(input[k]);
+         xnum[k] = xnum[k] / Integer(denominator(input[k]));
       }
    }
 
