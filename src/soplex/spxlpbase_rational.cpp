@@ -27,6 +27,7 @@
 #include "soplex/spxout.h"
 #include "soplex/mpsinput.h"
 #include "soplex/exceptions.h"
+#include "soplex/rational.h"
 
 #define MAX_LINE_WRITE_LEN 65536   ///< maximum length allowed for writing lines
 
@@ -253,10 +254,15 @@ static Rational LPFreadValue(char*& pos, SPxOut* spxout, const int lineno = -1)
 
       *t = '\0';
 
-      if(!value.readString(tmp))
+      try
+      {
+         value = ratFromString(tmp);
+      }
+      catch(const std::exception& e)
       {
          MSG_WARNING((*spxout), (*spxout) << "WLPFRD04 Warning: In line " << lineno <<
                      ": malformed rational value in LP file\n");
+         std::cerr << e.what() << '\n';
       }
    }
 
@@ -1031,11 +1037,15 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
          }
       }
 
-      if(!val.readString(mps.field3()))
+      try
+      {
+         val = ratFromString(mps.field3());
+      }
+      catch(const std::exception& e)
       {
          MSG_WARNING((*spxout), (*spxout) << "WMPSRD01 Warning: malformed rational value in MPS file\n");
+         std::cerr << e.what() << '\n';
       }
-
 
       if(!strcmp(mps.field2(), mps.objName()))
          col.setObj(val);
@@ -1051,9 +1061,14 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
       {
          assert(mps.field4() != 0);
 
-         if(!val.readString(mps.field5()))
+         try
+         {
+            val = ratFromString(mps.field5());
+         }
+         catch(const std::exception& e)
          {
             MSG_WARNING((*spxout), (*spxout) << "WMPSRD02 Warning: malformed rational value in MPS file\n");
+            std::cerr << e.what() << '\n';
          }
 
          if(!strcmp(mps.field4(), mps.objName()))
@@ -1124,9 +1139,14 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
             mps.entryIgnored("RHS", mps.field1(), "row", mps.field2());
          else
          {
-            if(!val.readString(mps.field3()))
+            try
+            {
+               val = ratFromString(mps.field3());
+            }
+            catch(const std::exception& e)
             {
                MSG_WARNING((*spxout), (*spxout) << "WMPSRD03 Warning: malformed rational value in MPS file\n");
+               std::cerr << e.what() << '\n';
             }
 
             // LE or EQ
@@ -1144,9 +1164,14 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
                mps.entryIgnored("RHS", mps.field1(), "row", mps.field4());
             else
             {
-               if(!val.readString(mps.field5()))
+               try
+         {
+            val = ratFromString(mps.field5());
+         }
+               catch(const std::exception& e)
                {
                   MSG_WARNING((*spxout), (*spxout) << "WMPSRD04 Warning: malformed rational value in MPS file\n");
+                  std::cerr << e.what() << '\n';
                }
 
                // LE or EQ
@@ -1217,9 +1242,14 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
             mps.entryIgnored("Range", mps.field1(), "row", mps.field2());
          else
          {
-            if(!val.readString(mps.field3()))
+            try
+            {
+               val = ratFromString(mps.field3());
+            }
+            catch(const std::exception& e)
             {
                MSG_WARNING((*spxout), (*spxout) << "WMPSRD05 Warning: malformed rational value in MPS file\n");
+               std::cerr << e.what() << '\n';
             }
 
             // EQ
@@ -1255,9 +1285,14 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
                mps.entryIgnored("Range", mps.field1(), "row", mps.field4());
             else
             {
-               if(!val.readString(mps.field5()))
+               try
+               {
+                  val = ratFromString(mps.field5());
+               }
+               catch(const std::exception& e)
                {
                   MSG_WARNING((*spxout), (*spxout) << "WMPSRD06 Warning: malformed rational value in MPS file\n");
+                  std::cerr << e.what() << '\n';
                }
 
                // EQ
@@ -1357,12 +1392,14 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
             else if(!strcmp(mps.field4(), "Inf") || !strcmp(mps.field4(), "inf")
                     || !strcmp(mps.field4(), "+Inf") || !strcmp(mps.field4(), "+inf"))
                val = infinity;
-            else if(!val.readString(mps.field4()))
+            else try
             {
-               MSG_WARNING((*spxout), (*spxout) << "WMPSRD07 Warning: malformed rational value in MPS file line "
-                           << mps.lineno() << ": " << mps.field4() << "\n");
-               mps.syntaxError();
-               return;
+               val = ratFromString(mps.field4());
+            }
+            catch(const std::exception& e)
+            {
+               MSG_WARNING((*spxout), (*spxout) << "WMPSRD07 Warning: malformed rational value in MPS file\n");
+               std::cerr << e.what() << '\n';
             }
 
             // ILOG extension (Integer Bound)
@@ -1655,8 +1692,7 @@ static void LPFwriteSVector(
       {
          // insert a line break every NUM_ENTRIES_PER_LINE columns or whenever max line length is nearly exceeded
          if(num_coeffs == NUM_ENTRIES_PER_LINE ||
-               (long long)(p_output.tellp()) - pos + (long long)(rationalToString(coeff,
-                     false).length() + 100) > MAX_LINE_WRITE_LEN)
+               (long long)(p_output.tellp()) - pos + (long long)(coeff.str().length() + 100) > MAX_LINE_WRITE_LEN)
          {
             num_coeffs = 0;
             p_output << "\n\t";
@@ -1727,8 +1763,8 @@ static void LPFwriteRow(
 
    long long sidelen;
    sidelen = (p_lhs == p_rhs
-              || double(p_lhs) <= double(-infinity)) ? (long long)rationalToString(p_rhs,
-                    false).length() : (long long)rationalToString(p_lhs, false).length();
+              || double(p_lhs) <= double(-infinity)) ? (long long)p_rhs.str().length()
+                    : (long long)p_lhs.str().length();
 
    // insert a line break if max line length is in danger of being exceeded
    if((long long)(p_output.tellp()) - pos + sidelen + (long long)100 > MAX_LINE_WRITE_LEN)

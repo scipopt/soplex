@@ -7,7 +7,6 @@ set(sources
     soplex/idxset.cpp
     soplex/mpsinput.cpp
     soplex/nameset.cpp
-    soplex/rational.cpp
     soplex/ratrecon.cpp
     soplex/slufactor_rational.cpp
     soplex/spxdefines.cpp

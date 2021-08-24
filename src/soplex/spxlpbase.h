@@ -43,7 +43,7 @@
 #include "soplex/didxset.h"
 #include "soplex/spxfileio.h"
 #include "soplex/spxscaler.h"
-
+#include "soplex/rational.h"
 
 namespace soplex
 {

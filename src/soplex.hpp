@@ -810,7 +810,7 @@ bool SoPlexBase<R>::getPrimalRational(mpq_t* vector, const int size)
       _syncRationalSolution();
 
       for(int i = 0; i < numColsRational(); i++)
-         mpq_set(vector[i], _solRational._primal[i].getMpqRef());
+         mpq_set(vector[i], _solRational._primal[i].backend().data());
 
       return true;
    }
@@ -830,7 +830,7 @@ bool SoPlexBase<R>::getSlacksRational(mpq_t* vector, const int size)
       _syncRationalSolution();
 
       for(int i = 0; i < numRowsRational(); i++)
-         mpq_set(vector[i], _solRational._slacks[i].getMpqRef());
+         mpq_set(vector[i], _solRational._slacks[i].backend().data());
 
       return true;
    }
@@ -851,7 +851,7 @@ bool SoPlexBase<R>::getPrimalRayRational(mpq_t* vector, const int size)
       _syncRationalSolution();
 
       for(int i = 0; i < numColsRational(); i++)
-         mpq_set(vector[i], _solRational._primalRay[i].getMpqRef());
+         mpq_set(vector[i], _solRational._primalRay[i].backend().data());
 
       return true;
    }
@@ -872,7 +872,7 @@ bool SoPlexBase<R>::getDualRational(mpq_t* vector, const int size)
       _syncRationalSolution();
 
       for(int i = 0; i < numRowsRational(); i++)
-         mpq_set(vector[i], _solRational._dual[i].getMpqRef());
+         mpq_set(vector[i], _solRational._dual[i].backend().data());
 
       return true;
    }
@@ -893,7 +893,7 @@ bool SoPlexBase<R>::getRedCostRational(mpq_t* vector, const int size)
       _syncRationalSolution();
 
       for(int i = 0; i < numColsRational(); i++)
-         mpq_set(vector[i], _solRational._redCost[i].getMpqRef());
+         mpq_set(vector[i], _solRational._redCost[i].backend().data());
 
       return true;
    }
@@ -914,7 +914,7 @@ bool SoPlexBase<R>::getDualFarkasRational(mpq_t* vector, const int size)
       _syncRationalSolution();
 
       for(int i = 0; i < numRowsRational(); i++)
-         mpq_set(vector[i], _solRational._dualFarkas[i].getMpqRef());
+         mpq_set(vector[i], _solRational._dualFarkas[i].backend().data());
 
       return true;
    }
@@ -3797,10 +3797,9 @@ bool SoPlexBase<R>::getBoundViolationRational(Rational& maxviol, Rational& sumvi
          if(viol > maxviol)
          {
             maxviol = viol;
-            MSG_DEBUG(std::cout << "increased bound violation for column " << i << ": " << rationalToString(
-                         viol)
-                      << " lower: " << rationalToString(lowerRational(i))
-                      << ", primal: " << rationalToString(primal[i]) << "\n");
+            MSG_DEBUG(std::cout << "increased bound violation for column " << i << ": " << viol.str()
+                      << " lower: " << lowerRational(i).str()
+                      << ", primal: " << primal[i].str() << "\n");
          }
       }
 
@@ -3813,10 +3812,9 @@ bool SoPlexBase<R>::getBoundViolationRational(Rational& maxviol, Rational& sumvi
          if(viol > maxviol)
          {
             maxviol = viol;
-            MSG_DEBUG(std::cout << "increased bound violation for column " << i << ": " << rationalToString(
-                         viol)
-                      << " upper: " << rationalToString(upperRational(i))
-                      << ", primal: " << rationalToString(primal[i]) << "\n");
+            MSG_DEBUG(std::cout << "increased bound violation for column " << i << ": " << viol.str()
+                      << " upper: " << upperRational(i).str()
+                      << ", primal: " << primal[i].str() << "\n");
          }
       }
    }
@@ -3857,10 +3855,9 @@ bool SoPlexBase<R>::getRowViolationRational(Rational& maxviol, Rational& sumviol
          if(viol > maxviol)
          {
             maxviol = viol;
-            MSG_DEBUG(std::cout << "increased constraint violation for row " << i << ": " << rationalToString(
-                         viol)
-                      << " lhs: " << rationalToString(lhsRational(i))
-                      << ", activity: " << rationalToString(activity[i]) << "\n");
+            MSG_DEBUG(std::cout << "increased constraint violation for row " << i << ": " << viol.str()
+                      << " lhs: " << lhsRational(i).str()
+                      << ", activity: " << activity[i].str() << "\n");
          }
       }
 
@@ -3873,10 +3870,9 @@ bool SoPlexBase<R>::getRowViolationRational(Rational& maxviol, Rational& sumviol
          if(viol > maxviol)
          {
             maxviol = viol;
-            MSG_DEBUG(std::cout << "increased constraint violation for row " << i << ": " << rationalToString(
-                         viol)
-                      << " rhs: " << rationalToString(rhsRational(i))
-                      << ", activity: " << rationalToString(activity[i]) << "\n");
+            MSG_DEBUG(std::cout << "increased constraint violation for row " << i << ": " << viol.str()
+                      << " rhs: " << rhsRational(i).str()
+                      << ", activity: " << activity[i].str() << "\n");
          }
       }
    }
@@ -3935,7 +3931,7 @@ bool SoPlexBase<R>::getRedCostViolationRational(Rational& maxviol, Rational& sum
             if(redcost[c] < -maxviol)
             {
                MSG_DEBUG(std::cout << "increased reduced cost violation for column " << c <<
-                         " not on upper bound: " << rationalToString(-redcost[c]) << "\n");
+                         " not on upper bound: " << -redcost[c].str() << "\n");
                maxviol = -redcost[c];
             }
          }
@@ -3947,7 +3943,7 @@ bool SoPlexBase<R>::getRedCostViolationRational(Rational& maxviol, Rational& sum
             if(redcost[c] > maxviol)
             {
                MSG_DEBUG(std::cout << "increased reduced cost violation for column " << c <<
-                         " not on lower bound: " << rationalToString(redcost[c]) << "\n");
+                         " not on lower bound: " << redcost[c].str() << "\n");
                maxviol = redcost[c];
             }
          }
@@ -3961,7 +3957,7 @@ bool SoPlexBase<R>::getRedCostViolationRational(Rational& maxviol, Rational& sum
             if(redcost[c] > maxviol)
             {
                MSG_DEBUG(std::cout << "increased reduced cost violation for column " << c <<
-                         " not on upper bound: " << rationalToString(redcost[c]) << "\n");
+                         " not on upper bound: " << redcost[c].str() << "\n");
                maxviol = redcost[c];
             }
          }
@@ -3973,7 +3969,7 @@ bool SoPlexBase<R>::getRedCostViolationRational(Rational& maxviol, Rational& sum
             if(redcost[c] < -maxviol)
             {
                MSG_DEBUG(std::cout << "increased reduced cost violation for column " << c <<
-                         " not on lower bound: " << rationalToString(-redcost[c]) << "\n");
+                         " not on lower bound: " << -redcost[c].str() << "\n");
                maxviol = -redcost[c];
             }
          }
@@ -4034,11 +4030,11 @@ bool SoPlexBase<R>::getDualViolationRational(Rational& maxviol, Rational& sumvio
             if(dual[r] < -maxviol)
             {
                MSG_DEBUG(std::cout << "increased dual violation for row " << r << " not on upper bound: " <<
-                         rationalToString(-dual[r])
-                         << " (slack = " << rationalToString(_solRational._slacks[r])
+                         -dual[r].str()
+                         << " (slack = " << _solRational._slacks[r].str()
                          << ", status = " << basisRowStatus(r)
-                         << ", lhs = " << rationalToString(lhsRational(r))
-                         << ", rhs = " << rationalToString(rhsRational(r)) << ")\n");
+                         << ", lhs = " << lhsRational(r).str()
+                         << ", rhs = " << rhsRational(r).str() << ")\n");
                maxviol = -dual[r];
             }
          }
@@ -4050,11 +4046,11 @@ bool SoPlexBase<R>::getDualViolationRational(Rational& maxviol, Rational& sumvio
             if(dual[r] > maxviol)
             {
                MSG_DEBUG(std::cout << "increased dual violation for row " << r << " not on lower bound: " <<
-                         rationalToString(dual[r])
-                         << " (slack = " << rationalToString(_solRational._slacks[r])
+                         dual[r].str()
+                         << " (slack = " << _solRational._slacks[r].str()
                          << ", status = " << basisRowStatus(r)
-                         << ", lhs = " << rationalToString(lhsRational(r))
-                         << ", rhs = " << rationalToString(rhsRational(r)) << ")\n");
+                         << ", lhs = " << lhsRational(r).str()
+                         << ", rhs = " << rhsRational(r) << ")\n".str());
                maxviol = dual[r];
             }
          }
@@ -4068,11 +4064,11 @@ bool SoPlexBase<R>::getDualViolationRational(Rational& maxviol, Rational& sumvio
             if(dual[r] > maxviol)
             {
                MSG_DEBUG(std::cout << "increased dual violation for row " << r << " not on upper bound: " <<
-                         rationalToString(dual[r])
-                         << " (slack = " << rationalToString(_solRational._slacks[r])
+                         dual[r].str()
+                         << " (slack = " << _solRational._slacks[r].str()
                          << ", status = " << basisRowStatus(r)
-                         << ", lhs = " << rationalToString(lhsRational(r))
-                         << ", rhs = " << rationalToString(rhsRational(r)) << ")\n");
+                         << ", lhs = " << lhsRational(r).str()
+                         << ", rhs = " << rhsRational(r).str() << ")\n");
                maxviol = dual[r];
             }
          }
@@ -4084,11 +4080,11 @@ bool SoPlexBase<R>::getDualViolationRational(Rational& maxviol, Rational& sumvio
             if(dual[r] < -maxviol)
             {
                MSG_DEBUG(std::cout << "increased dual violation for row " << r << " not on lower bound: " <<
-                         rationalToString(-dual[r])
-                         << " (slack = " << rationalToString(_solRational._slacks[r])
+                         -dual[r].str()
+                         << " (slack = " << _solRational._slacks[r].str()
                          << ", status = " << basisRowStatus(r)
-                         << ", lhs = " << rationalToString(lhsRational(r))
-                         << ", rhs = " << rationalToString(rhsRational(r)) << ")\n");
+                         << ", lhs = " << lhsRational(r).str()
+                         << ", rhs = " << rhsRational(r).str() << ")\n");
                maxviol = -dual[r];
             }
          }
@@ -6664,7 +6660,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
                   _rationalPosInfty))
                   || (LT(_realLP->rhs()[i], R(realParam(SoPlexBase<R>::INFTY)))
                       && _rationalLP->rhs()[i] < _rationalPosInfty
-                      && !_rationalLP->rhs()[i].isAdjacentTo((double)_realLP->rhs()[i])))
+                      && !isAdjacentTo(_rationalLP->rhs()[i], (double)_realLP->rhs()[i])))
             {
                if(!quiet)
                {
@@ -6692,7 +6688,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
                   _rationalNegInfty))
                   || (GT(_realLP->lhs()[i], R(-realParam(SoPlexBase<R>::INFTY)))
                       && _rationalLP->lhs()[i] > _rationalNegInfty
-                      && !_rationalLP->lhs()[i].isAdjacentTo((double)_realLP->lhs()[i])))
+                      && !isAdjacentTo(_rationalLP->lhs()[i], (double)_realLP->lhs()[i])))
             {
                if(!quiet)
                {
@@ -6716,7 +6712,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
       {
          for(int i = 0; i < _realLP->maxObj().dim(); i++)
          {
-            if(!_rationalLP->maxObj()[i].isAdjacentTo((double)_realLP->maxObj()[i]))
+            if(!isAdjacentTo(_rationalLP->maxObj()[i], (double)_realLP->maxObj()[i]))
             {
                if(!quiet)
                {
@@ -6746,7 +6742,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
                   _rationalPosInfty))
                   || (LT(_realLP->upper()[i], R(realParam(SoPlexBase<R>::INFTY)))
                       && _rationalLP->upper()[i] < _rationalPosInfty
-                      && !_rationalLP->upper()[i].isAdjacentTo((double)_realLP->upper()[i])))
+                      && !isAdjacentTo(_rationalLP->upper()[i], (double)_realLP->upper()[i])))
             {
                if(!quiet)
                {
@@ -6774,7 +6770,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
                   _rationalNegInfty))
                   || (GT(_realLP->lower()[i], R(-realParam(SoPlexBase<R>::INFTY)))
                       && _rationalLP->lower()[i] > _rationalNegInfty
-                      && !_rationalLP->lower()[i].isAdjacentTo((double)_realLP->lower()[i])))
+                      && !isAdjacentTo(_rationalLP->lower()[i], (double)_realLP->lower()[i])))
             {
                if(!quiet)
                {
@@ -6803,7 +6799,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
       {
          for(int j = 0; j < _realLP->nRows() ; j++)
          {
-            if(!_rationalLP->colVector(i)[j].isAdjacentTo((double)_realLP->colVector(i)[j]))
+            if(!isAdjacentTo(_rationalLP->colVector(i)[j], (double)_realLP->colVector(i)[j]))
             {
                if(!quiet)
                {
@@ -9424,7 +9420,7 @@ void SoPlexBase<R>::printSolutionStatistics(std::ostream& os)
    else if(_lastSolveMode == SOLVEMODE_RATIONAL)
    {
       os << "Solution (rational) : \n"
-         << "  Objective value   : " << rationalToString(objValueRational()) << "\n";
+         << "  Objective value   : " << objValueRational().str() << "\n";
       os << "Size (base 2/10)    : \n"
          << "  Total primal      : " << totalSizePrimalRational() << " / " << totalSizePrimalRational(
             10) << "\n"
@@ -9451,26 +9447,22 @@ void SoPlexBase<R>::printSolutionStatistics(std::ostream& os)
       os << "Violation (rational): \n";
 
       if(getBoundViolationRational(maxviol, sumviol))
-         os << "  Max/sum bound     : " << rationalToString(maxviol) << " / " << rationalToString(
-               sumviol) << "\n";
+         os << "  Max/sum bound     : " << maxviol.str() << " / " << sumviol.str() << "\n";
       else
          os << "  Max/sum bound     : - / -\n";
 
       if(getRowViolationRational(maxviol, sumviol))
-         os << "  Max/sum row       : " << rationalToString(maxviol) << " / " << rationalToString(
-               sumviol) << "\n";
+         os << "  Max/sum row       : " << maxviol.str() << " / " << sumviol.str() << "\n";
       else
          os << "  Max/sum row       : - / -\n";
 
       if(getRedCostViolationRational(maxviol, sumviol))
-         os << "  Max/sum redcost   : " << rationalToString(maxviol) << " / " << rationalToString(
-               sumviol) << "\n";
+         os << "  Max/sum redcost   : " << maxviol.str() << " / " << sumviol.str() << "\n";
       else
          os << "  Max/sum redcost   : - / -\n";
 
       if(getDualViolationRational(maxviol, sumviol))
-         os << "  Max/sum dual      : " << rationalToString(maxviol) << " / " << rationalToString(
-               sumviol) << "\n";
+         os << "  Max/sum dual      : " << maxviol.str() << " / " << sumviol.str() << "\n";
       else
          os << "  Max/sum dual      : - / -\n";
    }

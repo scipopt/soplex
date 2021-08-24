@@ -137,11 +137,12 @@ inline bool GErel(R a, S b, R eps = Param::epsilon())
 // Instantiation for Real
 inline Real spxLdexp(Real x, int exp)
 {
-   return ldexp(x, exp);
+   return std::ldexp(x, exp);
 }
 
-// returns x and exp such that y = x * 2^exp
-template <typename T>
-T spxFrexp(T y, int* exp);
+inline Real spxFrexp(Real x, int* exp)
+{
+   return std::frexp(x, exp);
+}
 
 } // namespace soplex

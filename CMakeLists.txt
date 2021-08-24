@@ -129,6 +129,7 @@ if(GMP)
 endif()
 if(GMP_FOUND)
     add_definitions(-DSOPLEX_WITH_GMP)
+    set(SOPLEX_HAVE_GMP 1)
     include_directories(${GMP_INCLUDE_DIRS})
     set(libs ${libs} ${GMP_LIBRARIES})
 endif()
@@ -163,6 +164,7 @@ if(BOOST)
     find_package(Boost 1.58.0 COMPONENTS program_options) # Refer to comments in cmake/Modules/FindBoost.cmake
     if(Boost_FOUND)
         add_definitions(-DSOPLEX_WITH_BOOST)
+        set(SOPLEX_HAVE_BOOST 1)
         include_directories(${Boost_INCLUDE_DIRS})
         if(NOT Boost_VERSION_MACRO)
            set(Boost_VERSION_MACRO ${Boost_VERSION})
@@ -182,6 +184,8 @@ else()
     will be built and NOT the binary. Boost with program_options is required to build the binary.")
 endif()
 
+configure_file("${PROJECT_SOURCE_DIR}/src/soplex/rational.h.in"
+               "${PROJECT_SOURCE_DIR}/src/soplex/rational.h")
 
 # enable all warnings and explicitly switch on colored output for ninja
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")

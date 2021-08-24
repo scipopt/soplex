@@ -94,11 +94,4 @@ void Param::setEpsilonPivot(Real eps)
    s_epsilon_pivot = eps;
 }
 
-
-template <>
-Real spxFrexp(Real y, int* exp)
-{
-   return frexp(y, exp);
-}
-
 } // namespace soplex
