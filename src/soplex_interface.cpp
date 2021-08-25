@@ -39,10 +39,12 @@ int SoPlex_numCols(void* soplex)
    return so->numCols();
 }
 
-#ifdef SOPLEX_WITH_GMP
-/** enables rational solving mode  **/
+/** enables rational solving mode **/
 void SoPlex_setRational(void* soplex)
 {
+#ifndef SOPLEX_WITH_GMP
+   throw SPxException("GMP is not used.");
+#else
    SoPlex* so = (SoPlex*)(soplex);
    so->setIntParam(SoPlex::READMODE, SoPlex::READMODE_RATIONAL);
    so->setIntParam(SoPlex::SOLVEMODE, SoPlex::SOLVEMODE_RATIONAL);
@@ -50,8 +52,8 @@ void SoPlex_setRational(void* soplex)
    so->setIntParam(SoPlex::SYNCMODE, SoPlex::SYNCMODE_AUTO);
    so->setRealParam(SoPlex::FEASTOL, 0.0);
    so->setRealParam(SoPlex::OPTTOL, 0.0);
-}
 #endif
+}
 
 /** sets integer parameter value **/
 void SoPlex_setIntParam(void* soplex, int paramcode, int paramvalue)
@@ -91,7 +93,6 @@ void SoPlex_addColReal(
    so->addColReal(LPCol(objval, col, ub, lb));
 }
 
-#ifdef SOPLEX_WITH_GMP
 /** adds a single rational column **/
 void SoPlex_addColRational(
    void* soplex,
@@ -107,6 +108,9 @@ void SoPlex_addColRational(
    long ubdenom
 )
 {
+#ifndef SOPLEX_WITH_GMP
+   throw SPxException("GMP is not used.");
+#else
    SoPlex* so = (SoPlex*)(soplex);
    DSVectorRational col(nnonzeros);
 
@@ -148,8 +152,8 @@ void SoPlex_addColRational(
    }
 
    so->addColRational(LPColRational(objval, col, upper, lower));
-}
 #endif
+}
 
 /** adds a single (floating point) row **/
 void SoPlex_addRowReal(
@@ -174,7 +178,6 @@ void SoPlex_addRowReal(
    so->addRowReal(LPRow(lb, row, ub));
 }
 
-#ifdef SOPLEX_WITH_GMP
 /** adds a single rational row **/
 void SoPlex_addRowRational(
    void* soplex,
@@ -188,6 +191,9 @@ void SoPlex_addRowRational(
    long ubdenom
 )
 {
+#ifndef SOPLEX_WITH_GMP
+   throw SPxException("GMP is not used.");
+#else
    SoPlex* so = (SoPlex*)(soplex);
    DSVectorRational row(nnonzeros);
 
@@ -222,8 +228,8 @@ void SoPlex_addRowRational(
    }
 
    so->addRowRational(LPRowRational(lower, row, upper));
-}
 #endif
+}
 
 /** gets primal solution **/
 void SoPlex_getPrimalReal(void* soplex, double* primal, int dim)
@@ -271,10 +277,12 @@ void SoPlex_changeObjReal(void* soplex, double* obj, int dim)
    return so->changeObjReal(objective);
 }
 
-#ifdef SOPLEX_WITH_GMP
 /** changes rational objective function vector to obj **/
 void SoPlex_changeObjRational(void* soplex, long* objnums, long* objdenoms, int dim)
 {
+#ifndef SOPLEX_WITH_GMP
+   throw SPxException("GMP is not used.");
+#else
    SoPlex* so = (SoPlex*)(soplex);
    Rational* objrational = new Rational [dim];
 
@@ -291,8 +299,8 @@ void SoPlex_changeObjRational(void* soplex, long* objnums, long* objdenoms, int 
 
    VectorRational objective(dim, objrational);
    return so->changeObjRational(objective);
-}
 #endif
+}
 
 /** changes left-hand side vector for constraints to lhs **/
 void SoPlex_changeLhsReal(void* soplex, double* lhs, int dim)
@@ -302,10 +310,12 @@ void SoPlex_changeLhsReal(void* soplex, double* lhs, int dim)
    return so->changeLhsReal(lhsvec);
 }
 
-#ifdef SOPLEX_WITH_GMP
 /** changes rational left-hand side vector for constraints to lhs **/
 void SoPlex_changeLhsRational(void* soplex, long* lhsnums, long* lhsdenoms, int dim)
 {
+#ifndef SOPLEX_WITH_GMP
+   throw SPxException("GMP is not used.");
+#else
    SoPlex* so = (SoPlex*)(soplex);
    Rational* lhsrational = new Rational [dim];
 
@@ -322,8 +332,8 @@ void SoPlex_changeLhsRational(void* soplex, long* lhsnums, long* lhsdenoms, int 
 
    VectorRational lhs(dim, lhsrational);
    return so->changeLhsRational(lhs);
-}
 #endif
+}
 
 /** changes right-hand side vector for constraints to rhs **/
 void SoPlex_changeRhsReal(void* soplex, double* rhs, int dim)
@@ -333,10 +343,12 @@ void SoPlex_changeRhsReal(void* soplex, double* rhs, int dim)
    return so->changeRhsReal(rhsvec);
 }
 
-#ifdef SOPLEX_WITH_GMP
 /** changes rational right-hand side vector for constraints to rhs **/
 void SoPlex_changeRhsRational(void* soplex, long* rhsnums, long* rhsdenoms, int dim)
 {
+#ifndef SOPLEX_WITH_GMP
+   throw SPxException("GMP is not used.");
+#else
    SoPlex* so = (SoPlex*)(soplex);
    Rational* rhsrational = new Rational [dim];
 
@@ -353,8 +365,8 @@ void SoPlex_changeRhsRational(void* soplex, long* rhsnums, long* rhsdenoms, int 
 
    VectorRational rhs(dim, rhsrational);
    return so->changeRhsRational(rhs);
-}
 #endif
+}
 
 /** write LP to file **/
 void SoPlex_writeFileReal(void* soplex, char* filename)
@@ -393,7 +405,6 @@ void SoPlex_changeVarBoundsReal(void* soplex, int colidx, double lb, double ub)
    return so->changeBoundsReal(colidx, lb, ub);
 }
 
-#ifdef SOPLEX_WITH_GMP
 /** changes rational bounds of a column to lbnum/lbdenom and ubnum/ubdenom **/
 void SoPlex_changeVarBoundsRational(
    void* soplex,
@@ -404,6 +415,9 @@ void SoPlex_changeVarBoundsRational(
    long ubdenom
 )
 {
+#ifndef SOPLEX_WITH_GMP
+   throw SPxException("GMP is not used.");
+#else
    SoPlex* so = (SoPlex*)(soplex);
 
    /* get rational lower bound */
@@ -421,8 +435,8 @@ void SoPlex_changeVarBoundsRational(
    mpq_clear(ub);
 
    return so->changeBoundsRational(colidx, lower, upper);
-}
 #endif
+}
 
 /** changes upper bound of column to ub **/
 void SoPlex_changeVarUpperReal(void* soplex, int colidx, double ub)

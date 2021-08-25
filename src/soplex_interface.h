@@ -18,10 +18,8 @@ int SoPlex_numRows(void* soplex);
 /** returns number of columns **/
 int SoPlex_numCols(void* soplex);
 
-#ifdef SOPLEX_WITH_GMP
 /** enables rational solving mode  **/
 void SoPlex_setRational(void* soplex);
-#endif
 
 /** sets integer parameter value **/
 void SoPlex_setIntParam(void* soplex, int paramcode, int paramvalue);
@@ -40,7 +38,6 @@ void SoPlex_addColReal(
    double ub
 );
 
-#ifdef SOPLEX_WITH_GMP
 /** adds a single rational column **/
 void SoPlex_addColRational(
    void* soplex,
@@ -55,7 +52,6 @@ void SoPlex_addColRational(
    long ubnum,
    long ubdenom
 );
-#endif
 
 /** adds a single (floating point) column **/
 void SoPlex_addRowReal(
@@ -67,7 +63,6 @@ void SoPlex_addRowReal(
    double ub
 );
 
-#ifdef SOPLEX_WITH_GMP
 /** adds a single rational row **/
 void SoPlex_addRowRational(
    void* soplex,
@@ -80,7 +75,6 @@ void SoPlex_addRowRational(
    long ubnum,
    long ubdenom
 );
-#endif
 
 /** gets primal solution **/
 void SoPlex_getPrimalReal(void* soplex, double* primal, int dim);
@@ -97,26 +91,20 @@ int SoPlex_optimize(void* soplex);
 /** changes objective function vector to obj **/
 void SoPlex_changeObjReal(void* soplex, double* obj, int dim);
 
-#ifdef SOPLEX_WITH_GMP
 /** changes rational objective function vector to obj **/
 void SoPlex_changeObjRational(void* soplex, long* objnums, long* objdenoms, int dim);
-#endif
 
 /** changes left-hand side vector for constraints to lhs **/
 void SoPlex_changeLhsReal(void* soplex, double* lhs, int dim);
 
-#ifdef SOPLEX_WITH_GMP
 /** changes rational left-hand side vector for constraints to lhs **/
 void SoPlex_changeLhsRational(void* soplex, long* lhsnums, long* lhsdenoms, int dim);
-#endif
 
 /** changes right-hand side vector for constraints to rhs **/
 void SoPlex_changeRhsReal(void* soplex, double* rhs, int dim);
 
-#ifdef SOPLEX_WITH_GMP
 /** changes rational right-hand side vector for constraints to rhs **/
 void SoPlex_changeRhsRational(void* soplex, long* rhsnums, long* rhsdenoms, int dim);
-#endif
 
 /** write LP to file **/
 void SoPlex_writeFileReal(void* soplex, char* filename);
@@ -133,7 +121,6 @@ void SoPlex_changeBoundsReal(void* soplex, double* lb, double* ub, int dim);
 /** changes bounds of a column to lb and ub **/
 void SoPlex_changeVarBoundsReal(void* soplex, int colidx, double lb, double ub);
 
-#ifdef SOPLEX_WITH_GMP
 /** changes rational bounds of a column to lbnum/lbdenom and ubnum/ubdenom **/
 void SoPlex_changeVarBoundsRational(
    void* soplex,
@@ -143,7 +130,6 @@ void SoPlex_changeVarBoundsRational(
    long ubnum,
    long ubdenom
 );
-#endif
 
 /** changes upper bound of column to ub **/
 void SoPlex_changeVarUpperReal(void* soplex, int colidx, double ub);
