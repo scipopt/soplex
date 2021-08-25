@@ -32,9 +32,18 @@
    }
    #else
    #include <boost/multiprecision/cpp_int.hpp>
+   #include <boost/multiprecision/detail/default_ops.hpp>
    using namespace boost::multiprecision;
    using Rational = cpp_rational;
    using Integer = cpp_int;
+   inline void SpxLcm(Integer& result, Integer a, Integer b)
+   {
+      result = boost::multiprecision::lcm(a, b);
+   }
+   inline void SpxGcd(Integer& result, Integer a, Integer b)
+   {
+      result = boost::multiprecision::gcd(a, b);
+   }
    #endif
    inline void printRational(Rational r)
    {
@@ -73,7 +82,11 @@
 
    inline void invert(Rational& r)
    {
+#ifdef SOPLEX_WITH_GMP
       mpq_inv(r.backend().data(), r.backend().data());
+#else
+      r = 1 / r;
+#endif
    }
 
    /// round up to next power of two
@@ -218,6 +231,12 @@
 
             s.erase(pos, 1);
             assert(std::all_of(s.begin()+1, s.end(), ::isdigit));
+            // remove padding 0s
+            if(s[0] == '-')
+               s.erase(1, std::min(s.substr(1).find_first_not_of('0'), s.size()-1));
+            else
+               s.erase(0, std::min(s.find_first_not_of('0'), s.size()-1));
+
             s.append("/");
             s.append(den);
             res = Rational(s);

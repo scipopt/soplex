@@ -61,6 +61,8 @@
 
 #ifdef SOPLEX_WITH_GMP
 #include <boost/multiprecision/gmp.hpp>
+#else
+#include <boost/multiprecision/cpp_int.hpp>
 #endif
 
 #endif
@@ -424,17 +426,29 @@ using namespace boost::multiprecision;
 
 #ifdef SOPLEX_WITH_GMP
 template<boost::multiprecision::expression_template_option eto>
-number<gmp_rational, eto> ldexp(number<gmp_rational,eto>, int exp)
+inline number<gmp_rational, eto> ldexp(number<gmp_rational,eto>, int exp)
 {
    assert(false);
    return number<gmp_rational>();
 }
 
 template<boost::multiprecision::expression_template_option eto>
-number<gmp_rational, eto> frexp(number<gmp_rational,eto>, int* exp)
+inline number<gmp_rational, eto> frexp(number<gmp_rational,eto>, int* exp)
 {
    assert(false);
    return number<gmp_rational>();
+}
+#else
+inline cpp_rational ldexp(cpp_rational r, int exp)
+{
+   assert(false);
+   return cpp_rational();
+}
+
+inline cpp_rational frexp(cpp_rational, int* exp)
+{
+   assert(false);
+   return cpp_rational();
 }
 #endif
 

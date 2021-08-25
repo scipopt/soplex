@@ -40,7 +40,7 @@ namespace soplex
 template <class R, class S>
 inline bool EQ(R a, S b, R eps = Param::epsilon())
 {
-   return spxAbs(a - b) <= eps;
+   return spxAbs(R(a - b)) <= eps;
 }
 
 /// returns \c true iff |a-b| > eps

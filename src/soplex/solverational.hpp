@@ -1917,7 +1917,7 @@ void SoPlexBase<R>::_project(SolRational& sol)
 
    for(int i = _beforeLiftCols; i < numColsRational() && sol._isDualFeasible; i++)
    {
-      if(spxAbs(maxValue * sol._redCost[i]) > _rationalOpttol)
+      if(spxAbs(Rational(maxValue * sol._redCost[i])) > _rationalOpttol)
       {
          MSG_INFO1(spxout, spxout << "Warning: lost dual solution during project phase.\n");
          sol._isDualFeasible = false;
