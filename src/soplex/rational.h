@@ -20,7 +20,7 @@
    #if 1
    #include <boost/multiprecision/gmp.hpp>
    using namespace boost::multiprecision;
-   using Rational = number<gmp_rational, et_off>;
+   using Rational = number<gmp_rational, et_on>;
    using Integer = mpz_int;
    inline void SpxLcm(Integer& result, Integer a, Integer b)
    {
@@ -82,32 +82,34 @@
 
    inline void invert(Rational& r)
    {
-#ifdef SOPLEX_WITH_GMP
-      mpq_inv(r.backend().data(), r.backend().data());
-#else
-      r = 1 / r;
-#endif
+      r = Rational(denominator(r), numerator(r));
    }
 
    /// round up to next power of two
    inline void powRound(Rational& r)
    {
       Integer roundval;
+      Integer den;
+      Integer num;
 
       MSG_DEBUG(std::cout << "rounding " << r.str() <<
                " to power of two" << "\n");
 
-      roundval = denominator(r) / numerator(r);
+      num = numerator(r);
+      den = denominator(r);
+      roundval = num / den;
 
       printInteger(roundval);
+      printRational(r);
 
       MSG_DEBUG(std::cout << "   --> " << roundval.str() << "\n");
 
       size_t binlog = roundval == 0 ? 1 : msb(roundval) + 1;
+      Integer base = 2;
 
       MSG_DEBUG(std::cout << "   --> 2^" << binlog << "\n");
 
-      roundval = 2 ^ binlog;
+      roundval = boost::multiprecision::pow(base, binlog);
 
       MSG_DEBUG(std::cout << "   --> " << roundval.str() << "\n");
 
