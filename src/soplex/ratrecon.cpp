@@ -22,7 +22,7 @@
 
 namespace soplex
 {
-#ifdef SOPLEX_WITH_GMP
+#ifdef SOPLEX_WITH_BOOST
 
 /** this reconstruction routine will set x equal to the mpq vector where each component is the best rational
  *  approximation of xnum / denom with where the GCD of denominators of x is at most Dbound; it will return true on
@@ -46,7 +46,7 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
    Integer gcd(1);
 
 #if 1
-   Dbound = denomBoundSquared.convert_to<Integer>(); /* this is the working bound on the denominator size */
+   Dbound = numerator(denomBoundSquared) / denominator(denomBoundSquared); /* this is the working bound on the denominator size */
 #else
    Dbound = denom; /* this is the working bound on the denominator size */
 #endif
@@ -160,8 +160,13 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
             }
 
             /* Assign the values */
-            resvec[j] = Rational(p[1],q[1]);
+            if( q[1] >= 0 )
+               resvec[j] = Rational(p[1],q[1]);
+            else
+               resvec[j] = Rational(-p[1],-q[1]);
+#ifdef SOPLEX_WITH_GMP
             mpq_canonicalize(resvec[j].backend().data());
+#endif
             SpxGcd(temp, gcd, denominator(resvec[j]));
             gcd *= temp;
 
@@ -177,7 +182,6 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
 
    return rval;
 }
-#endif
 
 
 
@@ -185,7 +189,6 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
 bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
                        const DIdxSet* indexSet)
 {
-#ifdef SOPLEX_WITH_GMP
    std::vector<Integer> xnum(input.dim()); /* numerator of input vector */
    Integer denom = 1; /* common denominator of input vector */
    int rval = true;
@@ -230,9 +233,6 @@ bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
    rval = Reconstruct(input, xnum.data(), denom, dim, denomBoundSquared, indexSet);
 
    return rval;
-#else
-   return false;
-#endif
 }
 
 
@@ -289,4 +289,5 @@ bool reconstructSol(SolRational& solution)
 #endif
    return true;
 }
+#endif
 } // namespace soplex

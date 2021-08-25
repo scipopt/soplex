@@ -6105,7 +6105,7 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
    {
    // primal feasibility tolerance; passed to the floating point solver only when calling solve()
    case SoPlexBase<R>::FEASTOL:
-#ifndef SOPLEX_WITH_GMP
+#ifndef SOPLEX_WITH_BOOST
       if(value < DEFAULT_EPS_PIVOT)
       {
          MSG_WARNING(spxout, spxout << "Cannot set feasibility tolerance to small value " << value <<

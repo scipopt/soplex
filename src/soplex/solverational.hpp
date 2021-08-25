@@ -1297,13 +1297,11 @@ void SoPlexBase<R>::_performOptIRStable(
       {
          _rationalLP->addPrimalActivity(_primalDualDiff, sol._slacks);
 #ifndef NDEBUG
-#ifdef SOPLEX_WITH_GMP
          {
             VectorRational activity(numRowsRational());
             _rationalLP->computePrimalActivity(sol._primal, activity);
             assert(sol._slacks == activity);
          }
-#endif
 #endif
       }
       else
@@ -2942,10 +2940,8 @@ void SoPlexBase<R>::_untransformFeasibility(SolRational& sol, bool infeasible)
                      && _feasUpper[c] < 0);
       assert(shifted || !_lowerFinite(_colTypes[c]) || _feasLower[c] == lowerRational(c));
       assert(shifted || !_upperFinite(_colTypes[c]) || _feasUpper[c] == upperRational(c));
-#ifdef SOPLEX_WITH_GMP
       assert(upperRational(c) >= _rationalPosInfty || lowerRational(c) <= _rationalNegInfty
              || _feasLower[c] - lowerRational(c) == _feasUpper[c] - upperRational(c));
-#endif
 
       if(shifted)
       {
@@ -3014,7 +3010,6 @@ void SoPlexBase<R>::_untransformFeasibility(SolRational& sol, bool infeasible)
    _statistics->transformTime->stop();
 
 #ifndef NDEBUG
-#ifdef SOPLEX_WITH_GMP
 
    if(sol._isPrimalFeasible)
    {
@@ -3023,7 +3018,6 @@ void SoPlexBase<R>::_untransformFeasibility(SolRational& sol, bool infeasible)
       assert(sol._slacks == activity);
    }
 
-#endif
 #endif
 }
 
@@ -4165,10 +4159,8 @@ void SoPlexBase<R>::_factorizeColumnRational(SolRational& sol,
          basisStatusCols[i] = SPxSolverBase<R>::FIXED;
       }
 
-#ifdef SOPLEX_WITH_GMP
       assert(basisStatusCols[i] != SPxSolverBase<R>::BASIC
              || basicDual * colVectorRational(i) == objRational(i));
-#endif
 
       if(basisStatusCols[i] == SPxSolverBase<R>::BASIC || basisStatusCols[i] == SPxSolverBase<R>::FIXED)
          continue;

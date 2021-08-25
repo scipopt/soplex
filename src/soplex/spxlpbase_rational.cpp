@@ -33,7 +33,7 @@
 
 namespace soplex
 {
-
+#ifdef SOPLEX_WITH_BOOST
 template<>
 void SPxLPBase<Rational>::computePrimalActivity(const VectorBase<Rational>& primal,
       VectorBase<Rational>& activity, const bool unscaled) const
@@ -1692,7 +1692,7 @@ static void LPFwriteSVector(
       {
          // insert a line break every NUM_ENTRIES_PER_LINE columns or whenever max line length is nearly exceeded
          if(num_coeffs == NUM_ENTRIES_PER_LINE ||
-               (long long)(p_output.tellp()) - pos + (long long)(coeff.str().length() + 100) > MAX_LINE_WRITE_LEN)
+               (long long)(p_output.tellp()) - pos + (long long) (coeff.str().length() + 100) > MAX_LINE_WRITE_LEN)
          {
             num_coeffs = 0;
             p_output << "\n\t";
@@ -2253,4 +2253,5 @@ void SPxLPBase<Rational>::buildDualProblem(SPxLPBase<Rational>& dualLP, SPxRowId
 // ---------------------------------------------------------------------------------------------------------------------
 
 template class SPxLPBase < Rational >;
+#endif
 } // namespace soplex

@@ -184,6 +184,7 @@ if(BOOST)
         set(SOPLEX_HAVE_BOOST 0)
     endif()
 else()
+    set(SOPLEX_HAVE_BOOST 0)
     message(WARNING "When building without Boost, ONLY the SoPlex library \
     will be built and NOT the binary. Boost with program_options is required to build the binary.")
 endif()
