@@ -20,7 +20,7 @@ using namespace soplex;
    #if @SOPLEX_HAVE_GMP@
    #include <boost/multiprecision/gmp.hpp>
    using namespace boost::multiprecision;
-   using Rational = number<gmp_rational, et_on>;
+   using Rational = number<gmp_rational, et_off>;
    using Integer = mpz_int;
    inline void SpxLcm(Integer& result, Integer a, Integer b)
    {
