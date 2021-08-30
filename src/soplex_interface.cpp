@@ -43,7 +43,7 @@ int SoPlex_numCols(void* soplex)
 void SoPlex_setRational(void* soplex)
 {
 #ifndef SOPLEX_WITH_GMP
-   throw SPxException("GMP is not used.");
+   throw SPxException("Rational functions cannot be used when built without GMP.");
 #else
    SoPlex* so = (SoPlex*)(soplex);
    so->setIntParam(SoPlex::READMODE, SoPlex::READMODE_RATIONAL);
@@ -109,7 +109,7 @@ void SoPlex_addColRational(
 )
 {
 #ifndef SOPLEX_WITH_GMP
-   throw SPxException("GMP is not used.");
+   throw SPxException("Rational functions cannot be used when built without GMP.");
 #else
    SoPlex* so = (SoPlex*)(soplex);
    DSVectorRational col(nnonzeros);
@@ -192,7 +192,7 @@ void SoPlex_addRowRational(
 )
 {
 #ifndef SOPLEX_WITH_GMP
-   throw SPxException("GMP is not used.");
+   throw SPxException("Rational functions cannot be used when built without GMP.");
 #else
    SoPlex* so = (SoPlex*)(soplex);
    DSVectorRational row(nnonzeros);
@@ -281,7 +281,7 @@ void SoPlex_changeObjReal(void* soplex, double* obj, int dim)
 void SoPlex_changeObjRational(void* soplex, long* objnums, long* objdenoms, int dim)
 {
 #ifndef SOPLEX_WITH_GMP
-   throw SPxException("GMP is not used.");
+   throw SPxException("Rational functions cannot be used when built without GMP.");
 #else
    SoPlex* so = (SoPlex*)(soplex);
    Rational* objrational = new Rational [dim];
@@ -314,7 +314,7 @@ void SoPlex_changeLhsReal(void* soplex, double* lhs, int dim)
 void SoPlex_changeLhsRational(void* soplex, long* lhsnums, long* lhsdenoms, int dim)
 {
 #ifndef SOPLEX_WITH_GMP
-   throw SPxException("GMP is not used.");
+   throw SPxException("Rational functions cannot be used when built without GMP.");
 #else
    SoPlex* so = (SoPlex*)(soplex);
    Rational* lhsrational = new Rational [dim];
@@ -347,7 +347,7 @@ void SoPlex_changeRhsReal(void* soplex, double* rhs, int dim)
 void SoPlex_changeRhsRational(void* soplex, long* rhsnums, long* rhsdenoms, int dim)
 {
 #ifndef SOPLEX_WITH_GMP
-   throw SPxException("GMP is not used.");
+   throw SPxException("Rational functions cannot be used when built without GMP.");
 #else
    SoPlex* so = (SoPlex*)(soplex);
    Rational* rhsrational = new Rational [dim];
@@ -416,7 +416,7 @@ void SoPlex_changeVarBoundsRational(
 )
 {
 #ifndef SOPLEX_WITH_GMP
-   throw SPxException("GMP is not used.");
+   throw SPxException("Rational functions cannot be used when built without GMP.");
 #else
    SoPlex* so = (SoPlex*)(soplex);
 
