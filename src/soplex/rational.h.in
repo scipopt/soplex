@@ -254,7 +254,7 @@ using namespace soplex;
 
    //    Rational(Integer a, Integer b)
    //    {
-   //       this->val = a/b;  
+   //       this->val = a/b;
    //    }
 
    //    /// assignment operator

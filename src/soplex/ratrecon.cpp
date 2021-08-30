@@ -22,13 +22,13 @@
 
 namespace soplex
 {
-#ifdef SOPLEX_WITH_BOOST
 
 /** this reconstruction routine will set x equal to the mpq vector where each component is the best rational
  *  approximation of xnum / denom with where the GCD of denominators of x is at most Dbound; it will return true on
  *  success and false if more accuracy is required: specifically if componentwise rational reconstruction does not
  *  produce such a vector
  */
+#ifdef SOPLEX_WITH_BOOST
 static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int dim,
                        const Rational& denomBoundSquared, const DIdxSet* indexSet = 0)
 {
@@ -182,6 +182,7 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
 
    return rval;
 }
+#endif
 
 
 
@@ -189,6 +190,10 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
 bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
                        const DIdxSet* indexSet)
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return false;
+#else
    std::vector<Integer> xnum(input.dim()); /* numerator of input vector */
    Integer denom = 1; /* common denominator of input vector */
    int rval = true;
@@ -233,6 +238,7 @@ bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
    rval = Reconstruct(input, xnum.data(), denom, dim, denomBoundSquared, indexSet);
 
    return rval;
+#endif
 }
 
 
@@ -289,5 +295,4 @@ bool reconstructSol(SolRational& solution)
 #endif
    return true;
 }
-#endif
 } // namespace soplex

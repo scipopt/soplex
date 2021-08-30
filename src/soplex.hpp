@@ -803,6 +803,10 @@ bool SoPlexBase<R>::getDualFarkasReal(R* vector, int dim)
 template <class R>
 bool SoPlexBase<R>::getPrimalRational(mpq_t* vector, const int size)
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return false;
+#else
    assert(size >= numColsRational());
 
    if(hasSol())
@@ -816,6 +820,7 @@ bool SoPlexBase<R>::getPrimalRational(mpq_t* vector, const int size)
    }
    else
       return false;
+#endif
 }
 
 
@@ -823,6 +828,10 @@ bool SoPlexBase<R>::getPrimalRational(mpq_t* vector, const int size)
 template <class R>
 bool SoPlexBase<R>::getSlacksRational(mpq_t* vector, const int size)
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return false;
+#else
    assert(size >= numRowsRational());
 
    if(hasSol())
@@ -836,6 +845,7 @@ bool SoPlexBase<R>::getSlacksRational(mpq_t* vector, const int size)
    }
    else
       return false;
+#endif
 }
 
 
@@ -844,6 +854,10 @@ bool SoPlexBase<R>::getSlacksRational(mpq_t* vector, const int size)
 template <class R>
 bool SoPlexBase<R>::getPrimalRayRational(mpq_t* vector, const int size)
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return false;
+#else
    assert(size >= numColsRational());
 
    if(hasPrimalRay())
@@ -857,6 +871,7 @@ bool SoPlexBase<R>::getPrimalRayRational(mpq_t* vector, const int size)
    }
    else
       return false;
+#endif
 }
 
 
@@ -865,6 +880,10 @@ bool SoPlexBase<R>::getPrimalRayRational(mpq_t* vector, const int size)
 template <class R>
 bool SoPlexBase<R>::getDualRational(mpq_t* vector, const int size)
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return false;
+#else
    assert(size >= numRowsRational());
 
    if(hasSol())
@@ -878,6 +897,7 @@ bool SoPlexBase<R>::getDualRational(mpq_t* vector, const int size)
    }
    else
       return false;
+#endif
 }
 
 
@@ -886,6 +906,10 @@ bool SoPlexBase<R>::getDualRational(mpq_t* vector, const int size)
 template <class R>
 bool SoPlexBase<R>::getRedCostRational(mpq_t* vector, const int size)
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return false;
+#else
    assert(size >= numColsRational());
 
    if(hasSol())
@@ -899,6 +923,7 @@ bool SoPlexBase<R>::getRedCostRational(mpq_t* vector, const int size)
    }
    else
       return false;
+#endif
 }
 
 
@@ -907,6 +932,10 @@ bool SoPlexBase<R>::getRedCostRational(mpq_t* vector, const int size)
 template <class R>
 bool SoPlexBase<R>::getDualFarkasRational(mpq_t* vector, const int size)
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return false;
+#else
    assert(size >= numRowsRational());
 
    if(hasDualFarkas())
@@ -920,6 +949,7 @@ bool SoPlexBase<R>::getDualFarkasRational(mpq_t* vector, const int size)
    }
    else
       return false;
+#endif
 }
 #endif
 
@@ -6539,6 +6569,10 @@ template <class R>
 bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVals,
                                  const bool quiet) const
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return false;
+#else
    bool result = true;
    bool nRowsMatch = true;
    bool nColsMatch = true;
@@ -6821,6 +6855,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
    }
 
    return result;
+#endif
 }
 
 
@@ -9443,6 +9478,7 @@ void SoPlexBase<R>::printSolutionStatistics(std::ostream& os)
    {
       Rational maxviol;
       Rational sumviol;
+#ifdef SOPLEX_WITH_BOOST
 
       os << "Violation (rational): \n";
 
@@ -9465,6 +9501,7 @@ void SoPlexBase<R>::printSolutionStatistics(std::ostream& os)
          os << "  Max/sum dual      : " << maxviol.str() << " / " << sumviol.str() << "\n";
       else
          os << "  Max/sum dual      : - / -\n";
+#endif
    }
    else
    {

@@ -63,6 +63,10 @@
 
 #include "soplex/spxlpbase.h"
 
+#ifdef SOPLEX_WITH_GMP
+#include <gmp.h>
+#endif
+
 #ifdef SOPLEX_WITH_BOOST
 #ifdef SOPLEX_WITH_MPFR
 // For multiple precision

@@ -28,6 +28,9 @@ namespace soplex
 template <class R>
 void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#else
    bool hasUnboundedRay = false;
    bool infeasibilityNotCertified = false;
    bool unboundednessNotCertified = false;
@@ -370,6 +373,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
 
    // stop timing
    _statistics->solvingTime->stop();
+#endif
 }
 
 
@@ -389,6 +393,9 @@ void SoPlexBase<R>::_performOptIRStable(
    bool& stoppedIter,
    bool& error)
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#else
    // start rational solving timing
    _statistics->rationalTime->start();
 
@@ -1521,6 +1528,7 @@ void SoPlexBase<R>::_performOptIRStable(
 
    // stop rational solving time
    _statistics->rationalTime->stop();
+#endif
 }
 
 
@@ -1533,6 +1541,9 @@ void SoPlexBase<R>::_performUnboundedIRStable(
    bool& stoppedIter,
    bool& error)
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#else
    bool primalFeasible;
    bool dualFeasible;
    bool infeasible;
@@ -1587,6 +1598,7 @@ void SoPlexBase<R>::_performUnboundedIRStable(
 
    // restore problem
    _untransformUnbounded(sol, hasUnboundedRay);
+#endif
 }
 
 
@@ -1600,6 +1612,9 @@ void SoPlexBase<R>::_performFeasIRStable(
    bool& stoppedIter,
    bool& error)
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#else
    bool primalFeasible;
    bool dualFeasible;
    bool infeasible;
@@ -1689,6 +1704,7 @@ void SoPlexBase<R>::_performFeasIRStable(
 
    // restore problem
    _untransformFeasibility(sol, withDualFarkas);
+#endif
 }
 
 
@@ -1697,6 +1713,9 @@ void SoPlexBase<R>::_performFeasIRStable(
 template <class R>
 void SoPlexBase<R>::_lift()
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#else
    MSG_DEBUG(std::cout << "Reducing matrix coefficients by lifting.\n");
 
    // start timing
@@ -1871,6 +1890,7 @@ void SoPlexBase<R>::_lift()
       MSG_INFO1(spxout, spxout << "Added " << numColsRational() - _beforeLiftCols << " columns and "
                 << numRowsRational() - _beforeLiftRows << " rows to reduce large matrix coefficients\n.");
    }
+#endif
 }
 
 
@@ -1879,6 +1899,9 @@ void SoPlexBase<R>::_lift()
 template <class R>
 void SoPlexBase<R>::_project(SolRational& sol)
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#else
    // start timing
    _statistics->transformTime->start();
 
@@ -1968,6 +1991,7 @@ void SoPlexBase<R>::_project(SolRational& sol)
 
    // stop timing
    _statistics->transformTime->stop();
+#endif
 }
 
 
@@ -3051,6 +3075,9 @@ void SoPlexBase<R>::_untransformFeasibility(SolRational& sol, bool infeasible)
 template <class R>
 void SoPlexBase<R>::_computeInfeasBox(SolRational& sol, bool transformed)
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#else
    assert(sol.hasDualFarkas());
 
    const VectorRational& lower = transformed ? _feasLower : lowerRational();
@@ -3280,6 +3307,7 @@ void SoPlexBase<R>::_computeInfeasBox(SolRational& sol, bool transformed)
                 "Computed Farkas box: provably no feasible solutions with components less than "
                 << B.str() << " in absolute value.\n");
    }
+#endif
 }
 
 
@@ -3293,6 +3321,10 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
       DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
       DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols)
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return SPxSolverBase<R>::ERROR;
+#else
    assert(_isConsistent());
 
    assert(_solver.nRows() == numRowsRational());
@@ -3555,6 +3587,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
    }
 
    return result;
+#endif
 }
 
 /// solves real LP with recovery mechanism
@@ -3770,6 +3803,9 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
 template <class R>
 void SoPlexBase<R>::_computeBasisInverseRational()
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#else
    assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED
           || _rationalLUSolver.status() == SLinSolverRational::TIME);
 
@@ -3818,6 +3854,7 @@ void SoPlexBase<R>::_computeBasisInverseRational()
    }
 
    return;
+#endif
 }
 
 
@@ -4293,6 +4330,10 @@ bool SoPlexBase<R>::_reconstructSolutionRational(SolRational& sol,
       DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
       const Rational& denomBoundSquared)
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return false;
+#else
    bool success;
    bool isSolBasic;
    DIdxSet basicIndices(numColsRational());
@@ -4551,5 +4592,6 @@ bool SoPlexBase<R>::_reconstructSolutionRational(SolRational& sol,
    _statistics->reconstructionTime->stop();
 
    return success;
+#endif
 }
 } // namespace soplex
