@@ -120,6 +120,9 @@ LIBDIR		=	lib
 INCLUDEDIR	=	include
 NAME		   =	soplex
 
+# skip config header
+CXXFLAGS		+=  -DNO_CONFIG_HEADER
+
 LIBOBJ = soplex/clufactor_rational.o \
 				soplex/didxset.o \
 				soplex/gzstream.o \
