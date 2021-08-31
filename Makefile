@@ -121,7 +121,7 @@ INCLUDEDIR	=	include
 NAME		   =	soplex
 
 # skip config header
-CXXFLAGS		+=  -DNO_CONFIG_HEADER
+FLAGS		+=  -DNO_CONFIG_HEADER
 
 LIBOBJ = soplex/clufactor_rational.o \
 				soplex/didxset.o \
@@ -245,15 +245,16 @@ endif
 GMPDEP	:=	$(SRCDIR)/depend.gmp
 GMPSRC	:=	$(shell cat $(GMPDEP))
 ifeq ($(GMP),true)
-CPPFLAGS	+= -DSOPLEX_WITH_GMP $(GMP_CPPFLAGS)
+CPPFLAGS	+= $(GMP_CPPFLAGS)
 LDFLAGS	+= $(GMP_LDFLAGS)
+FLAGS		+=  -DSOPLEX_WITH_GMP
 else
 GMP_LDFLAGS	=
 GMP_CPPFLAGS	=
 endif
 
 ifeq ($(MPFR),true)
-CPPFLAGS += -DSOPLEX_WITH_MPFR
+FLAGS += -DSOPLEX_WITH_MPFR
 LDFLAGS += -lmpfr
 else
 # Flags for cpp mpf
@@ -262,9 +263,9 @@ endif
 # For boost program options
 ifeq ($(BOOST),true)
 	LDFLAGS += $(BOOST_LDFLAGS)
-	CPPFLAGS += -DSOPLEX_WITH_BOOST
+	FLAGS += -DSOPLEX_WITH_BOOST
 	ifeq ($(MPFR),false)
-		CPPFLAGS += -DSOPLEX_WITH_CPPMPF
+		FLAGS += -DSOPLEX_WITH_CPPMPF
 	endif
 	else
 		BOOST_LDFLAGS =
@@ -273,7 +274,7 @@ endif
 # For quadmath support
 ifeq ($(QUADMATH),true)
 	LDFLAGS += $(QUADMATH_LDFLAGS)
-	CPPFLAGS += -DSOPLEX_WITH_FLOAT128
+	FLAGS += -DSOPLEX_WITH_FLOAT128
 else
 	QUADMATH_LDFLAGS =
 endif
@@ -285,7 +286,7 @@ ifeq ($(ZLIB_LDFLAGS),)
 ZLIB		=	false
 endif
 ifeq ($(ZLIB),true)
-CPPFLAGS	+=	-DSOPLEX_WITH_ZLIB $(ZLIB_FLAGS)
+FLAGS	+=	-DSOPLEX_WITH_ZLIB $(ZLIB_FLAGS)
 LDFLAGS		+=	$(ZLIB_LDFLAGS)
 else
 ZLIB_LDFLAGS	=
@@ -295,7 +296,7 @@ endif
 EGLIBDEP	:=	$(SRCDIR)/depend.eglib
 EGLIBSRC	:=	$(shell cat $(EGLIBDEP))
 ifeq ($(EGLIB),true)
-CPPFLAGS	+=	-DSOPLEX_WITH_EGLIB -I$(LIBDIR)/eglib.$(OSTYPE).$(ARCH).$(COMP)/include
+FLAGS	+=	-DSOPLEX_WITH_EGLIB -I$(LIBDIR)/eglib.$(OSTYPE).$(ARCH).$(COMP)/include
 LDFLAGS		+=	$(LIBDIR)/eglib.$(OSTYPE).$(ARCH).$(COMP)/lib/EGlib.a
 SOFTLINKS	+=	$(LIBDIR)/eglib.$(OSTYPE).$(ARCH).$(COMP)
 LINKSINFO	+=	"\n  -> \"eglib.$(OSTYPE).$(ARCH).$(COMP)\" is a directory containing the EGlib installation, i.e., \"eglib.$(OSTYPE).$(ARCH).$(COMP)/include/EGlib.h\" and \"eglib.$(OSTYPE).$(ARCH).$(COMP)/lib/EGlib.a\" should exist.\n"
@@ -473,19 +474,19 @@ $(LIBDIR):
 
 .PHONY: depend
 depend:
-		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) $(CXXFLAGS)\
+		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS)\
 		$(BINSRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
 		>$(DEPEND)'
-		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) $(CXXFLAGS)\
+		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS)\
 		$(EXAMPLESRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
 		>>$(DEPEND)'
-		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) $(CXXFLAGS)\
+		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS)\
 		$(LIBSRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(LIBOBJDIR\)/\1.o|g'\'' \
 		>>$(DEPEND)'
-		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) $(CXXFLAGS)\
+		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS)\
 		$(LIBSRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(LIBOBJSUBDIR\)/\1.o|g'\'' \
 		>>$(DEPEND)'
@@ -498,12 +499,12 @@ depend:
 $(BINOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 		@-mkdir -p $(BINOBJDIR)
 		@echo "-> compiling $@"
-		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) $(CXX_c)$< $(CXX_o)$@
+		$(CXX) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) $(CXX_c)$< $(CXX_o)$@
 
 $(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 		@-mkdir -p $(LIBOBJSUBDIR)
 		@echo "-> compiling $@"
-		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LIBOFLAGS) $(CXX_c)$< $(CXX_o)$@
+		$(CXX) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS) $(LIBOFLAGS) $(CXX_c)$< $(CXX_o)$@
 
 
 -include $(LASTSETTINGS)
