@@ -162,7 +162,6 @@ else()
    set(SOPLEX_HAVE_FLOAT128 0)
 endif()
 
-
 if(BOOST)
     find_package(Boost 1.58.0 COMPONENTS program_options) # Refer to comments in cmake/Modules/FindBoost.cmake
     if(Boost_FOUND)
@@ -188,9 +187,6 @@ else()
     message(WARNING "When building without Boost, ONLY the SoPlex library \
     will be built and NOT the binary. Boost with program_options is required to build the binary.")
 endif()
-
-configure_file("${PROJECT_SOURCE_DIR}/src/soplex/rational.h.in"
-               "${PROJECT_SOURCE_DIR}/src/soplex/rational.h")
 
 # enable all warnings and explicitly switch on colored output for ninja
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")

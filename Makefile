@@ -126,7 +126,6 @@ LIBOBJ = soplex/clufactor_rational.o \
 				soplex/idxset.o \
 				soplex/mpsinput.o \
 				soplex/nameset.o \
-				soplex/rational.o \
 				soplex/ratrecon.o \
 				soplex/slufactor_rational.o \
 				soplex/spxdefines.o \

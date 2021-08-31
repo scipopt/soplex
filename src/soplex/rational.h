@@ -14,10 +14,10 @@
 #include "soplex/spxdefines.h"
 
 using namespace soplex;
-#if @SOPLEX_HAVE_BOOST@
+#ifdef SOPLEX_WITH_BOOST
 #include <boost/multiprecision/number.hpp>
 
-#if @SOPLEX_HAVE_GMP@
+#ifdef SOPLEX_WITH_GMP
 #include <boost/multiprecision/gmp.hpp>
 using namespace boost::multiprecision;
 using Rational = number<gmp_rational, et_off>;
@@ -106,7 +106,7 @@ inline void powRound(Rational& r)
 
    MSG_DEBUG(std::cout << "   --> 2^" << binlog << "\n");
 
-   roundval = boost::multiprecision::pow(base, binlog);
+   roundval = boost::multiprecision::pow(base, (unsigned int)binlog);
 
    MSG_DEBUG(std::cout << "   --> " << str(roundval) << "\n");
 
@@ -123,7 +123,7 @@ inline int sizeInBase(const Rational R, const int base)
    size_t densize = msb(denominator(R)) + 1;
    size_t numsize = msb(numerator(R)) + 1;
 
-   return densize + numsize;
+   return (int) (densize + numsize);
 }
 /// Total size of rational vector.
 inline int totalSizeRational(const Rational* vector, const int length, const int base)
@@ -219,7 +219,7 @@ inline Rational ratFromString(const char* desc)
 
          if(it != s.end())
          {
-            int exponentidx = it - s.begin();
+            int exponentidx = int(it - s.begin());
             mult = std::stoi(s.substr(exponentidx + 1, s.length()));
             s = s.substr(0, exponentidx);
          }

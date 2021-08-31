@@ -211,7 +211,7 @@ bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
 
       for(int i = 0; i < dim; i++)
       {
-         xnum[i] = denom * numerator(input[i]);
+         xnum[i] = denom * Integer(numerator(input[i]));
          xnum[i] = xnum[i] / Integer(denominator(input[i]));
       }
    }
@@ -229,7 +229,7 @@ bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
          int k = indexSet->index(i);
          assert(k >= 0);
          assert(k < input.dim());
-         xnum[k] = denom * numerator(input[k]);
+         xnum[k] = denom * Integer(numerator(input[k]));
          xnum[k] = xnum[k] / Integer(denominator(input[k]));
       }
    }
