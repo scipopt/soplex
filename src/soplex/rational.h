@@ -21,7 +21,7 @@ using namespace soplex;
 #include <boost/multiprecision/gmp.hpp>
 using namespace boost::multiprecision;
 using Rational = number<gmp_rational, et_off>;
-using Integer = mpz_int;
+using Integer = number<gmp_int, et_off>;
 inline void SpxLcm(Integer& result, Integer a, Integer b)
 {
    mpz_lcm(result.backend().data(), a.backend().data(), b.backend().data());
