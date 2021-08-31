@@ -15,236 +15,247 @@
 
 using namespace soplex;
 #if @SOPLEX_HAVE_BOOST@
-   #include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/number.hpp>
 
-   #if @SOPLEX_HAVE_GMP@
-   #include <boost/multiprecision/gmp.hpp>
-   using namespace boost::multiprecision;
-   using Rational = number<gmp_rational, et_off>;
-   using Integer = mpz_int;
-   inline void SpxLcm(Integer& result, Integer a, Integer b)
-   {
-      mpz_lcm(result.backend().data(), a.backend().data(), b.backend().data());
-   }
-   inline void SpxGcd(Integer& result, Integer a, Integer b)
-   {
-      mpz_gcd(result.backend().data(), a.backend().data(), b.backend().data());
-   }
-   #else
-   #include <boost/multiprecision/cpp_int.hpp>
-   #include <boost/multiprecision/detail/default_ops.hpp>
-   using namespace boost::multiprecision;
-   using Rational = cpp_rational;
-   using Integer = cpp_int;
-   inline void SpxLcm(Integer& result, Integer a, Integer b)
-   {
-      result = boost::multiprecision::lcm(a, b);
-   }
-   inline void SpxGcd(Integer& result, Integer a, Integer b)
-   {
-      result = boost::multiprecision::gcd(a, b);
-   }
-   #endif
-   inline void printRational(Rational r)
-   {
-      std::cout << r << std::endl;
-   }
-
-   inline void printInteger(Integer r)
-   {
-      std::cout << r << std::endl;
-   }
-   inline bool isAdjacentTo(const Rational& r, const double& d)
-   {
-      double x = (double) r;
-      double a;
-      double b;
-      Rational tmp = x;
-
-      // the rational value is representable in double precision
-      if( tmp == r)
-         return true;
-      // the rounded value is smaller than the rational value
-      else if(tmp < r)
-      {
-         a = x;
-         b = (double)nextafter(a, 1e100);
-      }
-      // the rounded value is larger than the rational value
-      else
-      {
-         b = x;
-         a = (double)nextafter(b, -1e100);
-      }
-
-      return ((a == d) || (b == d));
-   }
-
-   inline void invert(Rational& r)
-   {
-      r = Rational(denominator(r), numerator(r));
-   }
-
-   /// round up to next power of two
-   inline void powRound(Rational& r)
-   {
-      Integer roundval;
-      Integer den;
-      Integer num;
-
-      MSG_DEBUG(std::cout << "rounding " <<str(r) <<
-               " to power of two" << "\n");
-
-      num = numerator(r);
-      den = denominator(r);
-      roundval = num / den;
-
-      MSG_DEBUG(std::cout << "   --> " <<str(roundval) << "\n");
-
-      size_t binlog = roundval == 0 ? 1 : msb(roundval) + 1;
-      Integer base = 2;
-
-      MSG_DEBUG(std::cout << "   --> 2^" << binlog << "\n");
-
-      roundval = boost::multiprecision::pow(base, binlog);
-
-      MSG_DEBUG(std::cout << "   --> " <<str(roundval) << "\n");
-
-      r = roundval;
-
-      MSG_DEBUG(std::cout << "   --> " <<str(r) << "\n");
-   }
-
-   /// Size in specified base (bit size for base 2)
-   inline int sizeInBase(const Rational R, const int base)
-   {
-      assert(base == 2);
-
-      size_t densize = msb(denominator(R)) + 1;
-      size_t numsize = msb(numerator(R)) + 1;
-
-      return densize + numsize;
-   }
-   /// Total size of rational vector.
-   inline int totalSizeRational(const Rational* vector, const int length, const int base)
-   {
-      assert(vector != 0);
-      assert(length >= 0);
-      assert(base >= 0);
-
-      int size = 0;
-
-      for(int i = 0; i < length; i++)
-         size += sizeInBase(vector[i], base);
-
-      return size;
-   }
-
-   /// Size of least common multiple of denominators in rational vector.
-   inline int dlcmSizeRational(const Rational* vector, const int length, const int base)
-   {
-      assert(vector != 0);
-      assert(length >= 0);
-      assert(base == 2);
-
-      Integer lcm;
-
-      for(int i = 0; i < length; i++)
-         SpxLcm(lcm, lcm, denominator(vector[i]));
-
-      int size = msb(lcm) + 1;
-
-      return size;
-   }
-
-   /// Size of largest denominator in rational vector.
-   inline int dmaxSizeRational(const Rational* vector, const int length, const int base)
-   {
-      assert(vector != 0);
-      assert(length >= 0);
-      assert(base == 2);
-
-      size_t dmax = 0;
-
-      for(int i = 0; i < length; i++)
-      {
-         size_t dsize = msb(denominator(vector[i])) + 1;
-
-         if(dsize > dmax)
-            dmax = dsize;
-      }
-
-      return (int)dmax;
-   }
-
-   /* find substring, ignore case */
-   static
-   std::string::const_iterator findSubStringIC(const std::string & substr, const std::string & str)
-   {
-      auto it = std::search(
-         str.begin(), str.end(),
-         substr.begin(),   substr.end(),
-         [](char ch1, char ch2) { return std::toupper(ch1) == std::toupper(ch2); }
-      );
-      return it;
-   }
-
-   inline Rational ratFromString(const char* desc)
-   {
-      Rational res;
-      if( 0 == strcmp(desc, "inf") )
-      {
-         res = 1e100;
-      }
-      else if ( 0 == strcmp(desc, "-inf") )
-      {
-         res = -1e100;
-      }
-      else
-      {
-         std::string s(desc);
-         /* case 1: string is given in nom/den format */
-         if( s.find('.') == std::string::npos )
-            res = Rational(desc);
-         /* case 2: string is given as base-10 decimal number */
-         else
-         {
-            std::string::const_iterator it = findSubStringIC("e", s);
-            int mult = 0;
-            if( it != s.end() )
-            {
-               int exponentidx = it - s.begin();
-               mult = std::stoi(s.substr(exponentidx + 1, s.length()));
-               s = s.substr(0, exponentidx);
-            }
-            // std::cout << s << std::endl;
-            if( s[0] == '.' )
-               s.insert(0, "0");
-            size_t pos = s.find('.');
-            size_t exp = s.length() - 1 - pos;
-            std::string den("1");
-            for( size_t i = 0; i < exp; ++i )
-               den.append("0");
-
-            s.erase(pos, 1);
-            assert(std::all_of(s.begin()+1, s.end(), ::isdigit));
-            // remove padding 0s
-            if(s[0] == '-')
-               s.erase(1, std::min(s.substr(1).find_first_not_of('0'), s.size()-1));
-            else
-               s.erase(0, std::min(s.find_first_not_of('0'), s.size()-1));
-
-            s.append("/");
-            s.append(den);
-            res = Rational(s);
-            res *= pow(10, mult);
-         }
-      }
-      return res;
-   }
+#if @SOPLEX_HAVE_GMP@
+#include <boost/multiprecision/gmp.hpp>
+using namespace boost::multiprecision;
+using Rational = number<gmp_rational, et_off>;
+using Integer = mpz_int;
+inline void SpxLcm(Integer& result, Integer a, Integer b)
+{
+   mpz_lcm(result.backend().data(), a.backend().data(), b.backend().data());
+}
+inline void SpxGcd(Integer& result, Integer a, Integer b)
+{
+   mpz_gcd(result.backend().data(), a.backend().data(), b.backend().data());
+}
 #else
-   using Rational = double;
-   using Integer = int;
+#include <boost/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/detail/default_ops.hpp>
+using namespace boost::multiprecision;
+using Rational = cpp_rational;
+using Integer = cpp_int;
+inline void SpxLcm(Integer& result, Integer a, Integer b)
+{
+   result = boost::multiprecision::lcm(a, b);
+}
+inline void SpxGcd(Integer& result, Integer a, Integer b)
+{
+   result = boost::multiprecision::gcd(a, b);
+}
+#endif
+inline void printRational(Rational r)
+{
+   std::cout << r << std::endl;
+}
+
+inline void printInteger(Integer r)
+{
+   std::cout << r << std::endl;
+}
+inline bool isAdjacentTo(const Rational& r, const double& d)
+{
+   double x = (double) r;
+   double a;
+   double b;
+   Rational tmp = x;
+
+   // the rational value is representable in double precision
+   if(tmp == r)
+      return true;
+   // the rounded value is smaller than the rational value
+   else if(tmp < r)
+   {
+      a = x;
+      b = (double)nextafter(a, 1e100);
+   }
+   // the rounded value is larger than the rational value
+   else
+   {
+      b = x;
+      a = (double)nextafter(b, -1e100);
+   }
+
+   return ((a == d) || (b == d));
+}
+
+inline void invert(Rational& r)
+{
+   r = Rational(denominator(r), numerator(r));
+}
+
+/// round up to next power of two
+inline void powRound(Rational& r)
+{
+   Integer roundval;
+   Integer den;
+   Integer num;
+
+   MSG_DEBUG(std::cout << "rounding " << str(r) <<
+             " to power of two" << "\n");
+
+   num = numerator(r);
+   den = denominator(r);
+   roundval = num / den;
+
+   MSG_DEBUG(std::cout << "   --> " << str(roundval) << "\n");
+
+   size_t binlog = roundval == 0 ? 1 : msb(roundval) + 1;
+   Integer base = 2;
+
+   MSG_DEBUG(std::cout << "   --> 2^" << binlog << "\n");
+
+   roundval = boost::multiprecision::pow(base, binlog);
+
+   MSG_DEBUG(std::cout << "   --> " << str(roundval) << "\n");
+
+   r = roundval;
+
+   MSG_DEBUG(std::cout << "   --> " << str(r) << "\n");
+}
+
+/// Size in specified base (bit size for base 2)
+inline int sizeInBase(const Rational R, const int base)
+{
+   assert(base == 2);
+
+   size_t densize = msb(denominator(R)) + 1;
+   size_t numsize = msb(numerator(R)) + 1;
+
+   return densize + numsize;
+}
+/// Total size of rational vector.
+inline int totalSizeRational(const Rational* vector, const int length, const int base)
+{
+   assert(vector != 0);
+   assert(length >= 0);
+   assert(base >= 0);
+
+   int size = 0;
+
+   for(int i = 0; i < length; i++)
+      size += sizeInBase(vector[i], base);
+
+   return size;
+}
+
+/// Size of least common multiple of denominators in rational vector.
+inline int dlcmSizeRational(const Rational* vector, const int length, const int base)
+{
+   assert(vector != 0);
+   assert(length >= 0);
+   assert(base == 2);
+
+   Integer lcm;
+
+   for(int i = 0; i < length; i++)
+      SpxLcm(lcm, lcm, denominator(vector[i]));
+
+   int size = msb(lcm) + 1;
+
+   return size;
+}
+
+/// Size of largest denominator in rational vector.
+inline int dmaxSizeRational(const Rational* vector, const int length, const int base)
+{
+   assert(vector != 0);
+   assert(length >= 0);
+   assert(base == 2);
+
+   size_t dmax = 0;
+
+   for(int i = 0; i < length; i++)
+   {
+      size_t dsize = msb(denominator(vector[i])) + 1;
+
+      if(dsize > dmax)
+         dmax = dsize;
+   }
+
+   return (int)dmax;
+}
+
+/* find substring, ignore case */
+static
+std::string::const_iterator findSubStringIC(const std::string& substr, const std::string& str)
+{
+   auto it = std::search(
+                str.begin(), str.end(),
+                substr.begin(),   substr.end(),
+                [](char ch1, char ch2)
+   {
+      return std::toupper(ch1) == std::toupper(ch2);
+   }
+             );
+   return it;
+}
+
+inline Rational ratFromString(const char* desc)
+{
+   Rational res;
+
+   if(0 == strcmp(desc, "inf"))
+   {
+      res = 1e100;
+   }
+   else if(0 == strcmp(desc, "-inf"))
+   {
+      res = -1e100;
+   }
+   else
+   {
+      std::string s(desc);
+
+      /* case 1: string is given in nom/den format */
+      if(s.find('.') == std::string::npos)
+         res = Rational(desc);
+      /* case 2: string is given as base-10 decimal number */
+      else
+      {
+         std::string::const_iterator it = findSubStringIC("e", s);
+         int mult = 0;
+
+         if(it != s.end())
+         {
+            int exponentidx = it - s.begin();
+            mult = std::stoi(s.substr(exponentidx + 1, s.length()));
+            s = s.substr(0, exponentidx);
+         }
+
+         // std::cout << s << std::endl;
+         if(s[0] == '.')
+            s.insert(0, "0");
+
+         size_t pos = s.find('.');
+         size_t exp = s.length() - 1 - pos;
+         std::string den("1");
+
+         for(size_t i = 0; i < exp; ++i)
+            den.append("0");
+
+         s.erase(pos, 1);
+         assert(std::all_of(s.begin() + 1, s.end(), ::isdigit));
+
+         // remove padding 0s
+         if(s[0] == '-')
+            s.erase(1, std::min(s.substr(1).find_first_not_of('0'), s.size() - 1));
+         else
+            s.erase(0, std::min(s.find_first_not_of('0'), s.size() - 1));
+
+         s.append("/");
+         s.append(den);
+         res = Rational(s);
+         res *= pow(10, mult);
+      }
+   }
+
+   return res;
+}
+#else
+using Rational = double;
+using Integer = int;
 
 
 #endif

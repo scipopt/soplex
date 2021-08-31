@@ -785,9 +785,9 @@ void SoPlexBase<R>::_performOptIRStable(
                 << std::setw(10) << _statistics->solvingTime->time() << " & "
                 << std::setw(10) << _statistics->rationalTime->time() << " & "
                 << std::setw(10) << boundsViolation > sideViolation ? boundsViolation :
-                      sideViolation << " & "
+                sideViolation << " & "
                 << std::setw(10) << redCostViolation > dualViolation ? redCostViolation :
-                      dualViolation << "\n");
+                dualViolation << "\n");
 
       // terminate if tolerances are satisfied
       primalFeasible = (boundsViolation <= _rationalFeastol && sideViolation <= _rationalFeastol);
@@ -1753,7 +1753,8 @@ void SoPlexBase<R>::_lift()
 
          if(spxAbs(value) > maxValue)
          {
-            MSG_DEBUG(std::cout << "   --> nonzero " << k << " has value " << value.str() << " in row " << colVector.index(k) << "\n");
+            MSG_DEBUG(std::cout << "   --> nonzero " << k << " has value " << value.str() << " in row " <<
+                      colVector.index(k) << "\n");
 
             // add new column equal to maxValue times original column
             if(!addedLiftingRow)
@@ -1821,7 +1822,8 @@ void SoPlexBase<R>::_lift()
 
          if(spxAbs(value) < minValue)
          {
-            MSG_DEBUG(std::cout << "   --> nonzero " << k << " has value " << value.str() << " in row " << colVector.index(k) << "\n");
+            MSG_DEBUG(std::cout << "   --> nonzero " << k << " has value " << value.str() << " in row " <<
+                      colVector.index(k) << "\n");
 
             // add new column equal to maxValue times original column
             if(!addedLiftingRow)
@@ -1890,6 +1892,7 @@ void SoPlexBase<R>::_lift()
       MSG_INFO1(spxout, spxout << "Added " << numColsRational() - _beforeLiftCols << " columns and "
                 << numRowsRational() - _beforeLiftRows << " rows to reduce large matrix coefficients\n.");
    }
+
 #endif
 }
 
@@ -3142,7 +3145,8 @@ void SoPlexBase<R>::_computeInfeasBox(SolRational& sol, bool transformed)
       }
    }
 
-   MSG_DEBUG(std::cout << "max ytransA*[x_l,x_u] = " << (isTempFinite ? temp.str() : "infinite") << "\n");
+   MSG_DEBUG(std::cout << "max ytransA*[x_l,x_u] = " << (isTempFinite ? temp.str() : "infinite") <<
+             "\n");
 
    // ytransb - temp is the increase in the dual objective along the Farkas ray; if this is positive, the dual is
    // unbounded and certifies primal infeasibility
@@ -3307,6 +3311,7 @@ void SoPlexBase<R>::_computeInfeasBox(SolRational& sol, bool transformed)
                 "Computed Farkas box: provably no feasible solutions with components less than "
                 << B.str() << " in absolute value.\n");
    }
+
 #endif
 }
 
@@ -4386,7 +4391,7 @@ bool SoPlexBase<R>::_reconstructSolutionRational(SolRational& sol,
       if(_lowerFinite(_colTypes[c]) && _workSol._primal[c] < lowerRational(c))
       {
          MSG_DEBUG(std::cout << "Lower bound of variable " << c << " violated by " <<
-                                 (lowerRational(c) - _workSol._primal[c]).str() << "\n");
+                   (lowerRational(c) - _workSol._primal[c]).str() << "\n");
          MSG_INFO1(spxout, spxout << "Reconstructed solution primal infeasible (1).\n");
          _statistics->reconstructionTime->stop();
          return false;
@@ -4395,7 +4400,7 @@ bool SoPlexBase<R>::_reconstructSolutionRational(SolRational& sol,
       if(_upperFinite(_colTypes[c]) && _workSol._primal[c] > upperRational(c))
       {
          MSG_DEBUG(std::cout << "Upper bound of variable " << c << " violated by " <<
-                               (_workSol._primal[c] - upperRational(c)).str() << "\n");
+                   (_workSol._primal[c] - upperRational(c)).str() << "\n");
          MSG_INFO1(spxout, spxout << "Reconstructed solution primal infeasible (2).\n");
          _statistics->reconstructionTime->stop();
          return false;
@@ -4434,7 +4439,7 @@ bool SoPlexBase<R>::_reconstructSolutionRational(SolRational& sol,
       if(_upperFinite(_rowTypes[r]) && _workSol._slacks[r] > rhsRational(r))
       {
          MSG_DEBUG(std::cout << "Rhs of row " << r << " violated by " <<
-                      (_workSol._slacks[r] - rhsRational(r)) << "\n");
+                   (_workSol._slacks[r] - rhsRational(r)) << "\n");
          MSG_INFO1(spxout, spxout << "Reconstructed solution primal infeasible (4).\n");
          _statistics->reconstructionTime->stop();
          return false;

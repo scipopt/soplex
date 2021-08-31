@@ -46,7 +46,8 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
    Integer gcd(1);
 
 #if 1
-   Dbound = numerator(denomBoundSquared) / denominator(denomBoundSquared); /* this is the working bound on the denominator size */
+   Dbound = numerator(denomBoundSquared) / denominator(
+               denomBoundSquared); /* this is the working bound on the denominator size */
 #else
    Dbound = denom; /* this is the working bound on the denominator size */
 #endif
@@ -59,7 +60,7 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
    /* if Dbound is below 2^24 increase it to this value, this avoids changing input vectors that have low denominator
     * because they are floating point representable
     */
-   if( Dbound < 16777216 )
+   if(Dbound < 16777216)
       Dbound = 16777216;
 
    /* The following represent a_i, the cont frac representation and p_i/q_i, the convergents */
@@ -80,7 +81,7 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
       MSG_DEBUG(std::cout << "  --> component " << j << " = " << &xnum[j] << " / denom\n");
 
       /* if xnum =0 , then just leave x[j] as zero */
-      if( xnum[j] != 0)
+      if(xnum[j] != 0)
       {
          /* setup n and d for computing a_i the cont. frac. rep */
          tn = xnum[j];
@@ -91,7 +92,7 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
          tn = tn / temp;
          td = td / temp;
 
-         if( td <= Dbound )
+         if(td <= Dbound)
          {
             MSG_DEBUG(std::cout << "marker 1\n");
 
@@ -122,7 +123,7 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
             done = 0;
 
             /* if q is already big, skip loop */
-            if( q[2] > Dbound )
+            if(q[2] > Dbound)
             {
                MSG_DEBUG(std::cout << "marker 3\n");
                done = 1;
@@ -151,7 +152,7 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
                q[2] =  q[0];
                q[2] += q[1] * ai;
 
-               if( q[2] > Dbound )
+               if(q[2] > Dbound)
                   done = 1;
 
                cfcnt++;
@@ -160,17 +161,18 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
             }
 
             /* Assign the values */
-            if( q[1] >= 0 )
-               resvec[j] = Rational(p[1],q[1]);
+            if(q[1] >= 0)
+               resvec[j] = Rational(p[1], q[1]);
             else
-               resvec[j] = Rational(-p[1],-q[1]);
+               resvec[j] = Rational(-p[1], -q[1]);
+
 #ifdef SOPLEX_WITH_GMP
             mpq_canonicalize(resvec[j].backend().data());
 #endif
             SpxGcd(temp, gcd, denominator(resvec[j]));
             gcd *= temp;
 
-            if( gcd > Dbound )
+            if(gcd > Dbound)
             {
                MSG_DEBUG(std::cout << "terminating with gcd " << &gcd << " exceeding Dbound " << &Dbound << "\n");
                rval = false;

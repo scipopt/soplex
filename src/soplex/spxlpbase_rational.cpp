@@ -1171,9 +1171,9 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
             else
             {
                try
-         {
-            val = ratFromString(mps.field5());
-         }
+               {
+                  val = ratFromString(mps.field5());
+               }
                catch(const std::exception& e)
                {
                   MSG_WARNING((*spxout), (*spxout) << "WMPSRD04 Warning: malformed rational value in MPS file\n");
@@ -1398,15 +1398,16 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
             else if(!strcmp(mps.field4(), "Inf") || !strcmp(mps.field4(), "inf")
                     || !strcmp(mps.field4(), "+Inf") || !strcmp(mps.field4(), "+inf"))
                val = infinity;
-            else try
-            {
-               val = ratFromString(mps.field4());
-            }
-            catch(const std::exception& e)
-            {
-               MSG_WARNING((*spxout), (*spxout) << "WMPSRD07 Warning: malformed rational value in MPS file\n");
-               std::cerr << e.what() << '\n';
-            }
+            else
+               try
+               {
+                  val = ratFromString(mps.field4());
+               }
+               catch(const std::exception& e)
+               {
+                  MSG_WARNING((*spxout), (*spxout) << "WMPSRD07 Warning: malformed rational value in MPS file\n");
+                  std::cerr << e.what() << '\n';
+               }
 
             // ILOG extension (Integer Bound)
             if(mps.field1()[1] == 'I')
@@ -1704,7 +1705,7 @@ static void LPFwriteSVector(
       {
          // insert a line break every NUM_ENTRIES_PER_LINE columns or whenever max line length is nearly exceeded
          if(num_coeffs == NUM_ENTRIES_PER_LINE ||
-               (long long)(p_output.tellp()) - pos + (long long) (coeff.str().length() + 100) > MAX_LINE_WRITE_LEN)
+               (long long)(p_output.tellp()) - pos + (long long)(coeff.str().length() + 100) > MAX_LINE_WRITE_LEN)
          {
             num_coeffs = 0;
             p_output << "\n\t";
@@ -1776,7 +1777,7 @@ static void LPFwriteRow(
    long long sidelen;
    sidelen = (p_lhs == p_rhs
               || double(p_lhs) <= double(-infinity)) ? (long long)p_rhs.str().length()
-                    : (long long)p_lhs.str().length();
+             : (long long)p_lhs.str().length();
 
    // insert a line break if max line length is in danger of being exceeded
    if((long long)(p_output.tellp()) - pos + sidelen + (long long)100 > MAX_LINE_WRITE_LEN)

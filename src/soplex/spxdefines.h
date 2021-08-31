@@ -426,14 +426,14 @@ using namespace boost::multiprecision;
 
 #ifdef SOPLEX_WITH_GMP
 template<boost::multiprecision::expression_template_option eto>
-inline number<gmp_rational, eto> ldexp(number<gmp_rational,eto>, int exp)
+inline number<gmp_rational, eto> ldexp(number<gmp_rational, eto>, int exp)
 {
    assert(false);
    return number<gmp_rational>();
 }
 
 template<boost::multiprecision::expression_template_option eto>
-inline number<gmp_rational, eto> frexp(number<gmp_rational,eto>, int* exp)
+inline number<gmp_rational, eto> frexp(number<gmp_rational, eto>, int* exp)
 {
    assert(false);
    return number<gmp_rational>();
@@ -476,7 +476,7 @@ number<T, ep> spxSqrt(number<T, ep> a)
 // the nextafter function
 template <typename T, expression_template_option eto>
 number<T, eto> spxNextafter(number<T, eto> x,
-      number<T, eto> y)
+                            number<T, eto> y)
 {
    using namespace std;
    using namespace boost::math;
@@ -511,7 +511,7 @@ inline number<T, et> maxAbs(
 
 template <typename T, expression_template_option et>
 inline number<T, et> relDiff(number<T, et> a,
-      number<T, et> b)
+                             number<T, et> b)
 {
    return (a - b) / (maxAbs(a, b) > 1.0 ? maxAbs(a, b) : 1.0);
 }
