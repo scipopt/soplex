@@ -123,7 +123,7 @@ inline int sizeInBase(const Rational R, const int base)
    size_t densize = msb(denominator(R)) + 1;
    size_t numsize = msb(numerator(R)) + 1;
 
-   return (int) (densize + numsize);
+   return (int)(densize + numsize);
 }
 /// Total size of rational vector.
 inline int totalSizeRational(const Rational* vector, const int length, const int base)
