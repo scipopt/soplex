@@ -42,6 +42,13 @@
 
 #include <cstdlib>
 
+/*
+ * include build configuration flags
+ */
+#ifndef NO_CONFIG_HEADER
+#include "soplex/config.h"
+#endif
+
 #ifdef SOPLEX_WITH_BOOST
 #include "boost/multiprecision/number.hpp"
 #ifdef SOPLEX_WITH_FLOAT128

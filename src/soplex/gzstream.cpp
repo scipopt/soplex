@@ -1,3 +1,4 @@
+#include "soplex/spxdefines.h"
 #ifdef SOPLEX_WITH_ZLIB
 
 // ============================================================================

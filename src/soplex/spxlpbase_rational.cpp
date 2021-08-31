@@ -2269,4 +2269,7 @@ void SPxLPBase<Rational>::buildDualProblem(SPxLPBase<Rational>& dualLP, SPxRowId
 // ---------------------------------------------------------------------------------------------------------------------
 
 template class SPxLPBase < Rational >;
+#ifdef SOPLEX_WITH_BOOST
+template class SPxLPBase < Real >;
+#endif
 } // namespace soplex
