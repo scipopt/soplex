@@ -42,7 +42,7 @@ int SoPlex_numCols(void* soplex)
 /** enables rational solving mode **/
 void SoPlex_setRational(void* soplex)
 {
-#if !defined(SOPLEX_WITH_GMP) || !defined(SOPLEX_WITH_BOOST)
+#  if !defined(SOPLEX_WITH_GMP) || !defined(SOPLEX_WITH_BOOST)
    throw SPxException("Rational functions cannot be used when built without GMP.");
 #else
    SoPlex* so = (SoPlex*)(soplex);
@@ -386,7 +386,7 @@ double SoPlex_objValueReal(void* soplex)
 char* SoPlex_objValueRationalString(void* soplex)
 {
    SoPlex* so = (SoPlex*)(soplex);
-   return const_cast<char*>(so->objValueRational().str() 0).c_str());
+   return const_cast<char*>(so->objValueRational().str().c_str());
 }
 
 /** changes vectors of column bounds to lb and ub **/
