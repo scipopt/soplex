@@ -11,5 +11,8 @@
 #cmakedefine SOPLEX_WITH_ZLIB
 #cmakedefine SOPLEX_WITH_GMP
 #cmakedefine SOPLEX_WITH_BOOST
+#cmakedefine SOPLEX_WITH_CPPMPF
+#cmakedefine SOPLEX_WITH_MPFR
+#cmakedefine SOPLEX_WITH_FLOAT128
 
 #endif

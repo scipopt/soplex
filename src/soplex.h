@@ -2444,9 +2444,9 @@ typedef SoPlexBase<Real> SoPlex;
 } // namespace soplex
 
 // General templated function
+#include "soplex/solvedbds.hpp"
 #include "soplex.hpp"
 #include "soplex/solverational.hpp"
-#include "soplex/solvedbds.hpp"
 #include "soplex/testsoplex.hpp"
 #include "soplex/solvereal.hpp"
 

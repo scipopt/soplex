@@ -485,9 +485,6 @@ template <typename T, expression_template_option eto>
 number<T, eto> spxNextafter(number<T, eto> x,
                             number<T, eto> y)
 {
-   using namespace std;
-   using namespace boost::math;
-
    // Turns out that nextafter is not supported in the mpfr library? The mpfr
    // library does a different function named nextabove. Probably a
    // replacement? I've made an issue about this.
@@ -523,6 +520,7 @@ inline number<T, et> relDiff(number<T, et> a,
    return (a - b) / (maxAbs(a, b) > 1.0 ? maxAbs(a, b) : 1.0);
 }
 #endif
+using namespace soplex;
 
 } // namespace soplex
 

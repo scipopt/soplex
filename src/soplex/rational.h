@@ -254,10 +254,11 @@ inline Rational ratFromString(const char* desc)
    return res;
 }
 #else
-using Rational = double;
+using Rational = float;
 using Integer = int;
 
 
 #endif
 
 #endif
+using namespace soplex;
