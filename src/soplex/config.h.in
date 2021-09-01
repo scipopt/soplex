@@ -1,5 +1,5 @@
-#ifndef __CONFIG_H__
-#define __CONFIG_H__
+#ifndef __SPXCONFIG_H__
+#define __SPXCONFIG_H__
 
 #cmakedefine CMAKE_BUILD_TYPE "@CMAKE_BUILD_TYPE@"
 #define SOPLEX_VERSION_MAJOR @SOPLEX_VERSION_MAJOR@
