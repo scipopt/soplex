@@ -2268,5 +2268,4 @@ void SPxLPBase<Rational>::buildDualProblem(SPxLPBase<Rational>& dualLP, SPxRowId
 //  Explicit instantiation
 // ---------------------------------------------------------------------------------------------------------------------
 template class SPxLPBase < Rational >;
-template class SPxLPBase < float >;
 } // namespace soplex
