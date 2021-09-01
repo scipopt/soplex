@@ -108,10 +108,10 @@ LDFLAGS		=
 ARFLAGS		=	cr
 DFLAGS		=	-MM
 
-GMP_LDFLAGS	= -lgmp
+GMP_LDFLAGS	= 	-lgmp
 GMP_CPPFLAGS	=
-BOOST_LDFLAGS = -lboost_program_options
-QUADMATH_LDFLAGS = -lquadmath
+BOOST_LDFLAGS 	= 	-lboost_program_options
+QUADMATH_LDFLAGS = 	-lquadmath
 
 SOPLEXDIR	=	$(realpath .)
 SRCDIR		=	src
@@ -142,6 +142,7 @@ LIBOBJ = soplex/clufactor_rational.o \
 
 BINOBJ		=	soplexmain.o
 EXAMPLEOBJ	=	example.o
+LIBCOBJ		=	soplex_interface.o
 REPOSIT		=	# template repository, explicitly empty  #spxproof.o
 
 BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
@@ -163,7 +164,7 @@ GCCWARN		=	-pedantic -Wall -W -Wpointer-arith -Wcast-align -Wwrite-strings \
 			-Wcast-qual \
 			-Wmissing-declarations \
 			-Wno-unused-parameter -Wno-strict-overflow -Wno-long-long \
-	    -Wno-sign-conversion
+		        -Wno-sign-conversion
 #			-Wold-style-cast
 #			-Weffc++
 
@@ -215,6 +216,11 @@ EXAMPLEFILE	=	$(BINDIR)/$(EXAMPLENAME)$(EXEEXTENSION)
 LIBFILE		=	$(LIBDIR)/lib$(LIBNAME).$(LIBEXT)
 LIBSHORTLINK	=	$(LIBDIR)/lib$(NAME).$(LIBEXT)
 LIBLINK		=	$(LIBDIR)/lib$(NAME).$(BASE).$(LIBEXT)
+
+LIBCFILE	=	$(LIBDIR)/lib$(NAME)c-$(VERSION).$(BASE).$(LIBEXT)
+LIBCSHORTLINK	=	$(LIBDIR)/lib$(NAME)c.$(LIBEXT)
+LIBCLINK	=	$(LIBDIR)/lib$(NAME)c.$(BASE).$(LIBEXT)
+
 BINLINK		=	$(BINDIR)/$(NAME).$(BASE)$(EXEEXTENSION)
 BINSHORTLINK	=	$(BINDIR)/$(NAME)$(EXEEXTENSION)
 DEPEND		=	src/depend
@@ -226,6 +232,7 @@ LIBOBJSUBDIR = 	$(LIBOBJDIR)/soplex
 BINOBJFILES	=	$(addprefix $(BINOBJDIR)/,$(BINOBJ))
 EXAMPLEOBJFILES	=	$(addprefix $(BINOBJDIR)/,$(EXAMPLEOBJ))
 LIBOBJFILES	=	$(addprefix $(LIBOBJDIR)/,$(LIBOBJ))
+LIBCOBJFILES	=	$(addprefix $(LIBOBJDIR)/,$(LIBCOBJ))
 BINSRC		=	$(addprefix $(SRCDIR)/,$(BINOBJ:.o=.cpp))
 EXAMPLESRC	=	$(addprefix $(SRCDIR)/,$(EXAMPLEOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
@@ -321,7 +328,7 @@ endif
 #-----------------------------------------------------------------------------
 
 ifeq ($(VERBOSE),false)
-.SILENT:	$(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK) $(BINFILE) example $(EXAMPLEOBJFILES) $(LIBFILE) $(BINOBJFILES) $(LIBOBJFILES)
+.SILENT:	$(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK) $(BINFILE) example $(EXAMPLEOBJFILES) $(LIBFILE) $(LIBCFILE) $(BINOBJFILES) $(LIBOBJFILES)
 MAKE		+= -s
 endif
 
@@ -348,6 +355,10 @@ endif
 $(LIBLINK) $(LIBSHORTLINK):	$(LIBFILE)
 		@rm -f $@
 		cd $(dir $@) && $(LN_s) $(notdir $(LIBFILE)) $(notdir $@)
+
+$(LIBCLINK) $(LIBCSHORTLINK):	$(LIBCFILE)
+		@rm -f $@
+		cd $(dir $@) && $(LN_s) $(notdir $(LIBCFILE)) $(notdir $@)
 
 $(BINLINK) $(BINSHORTLINK):	$(BINFILE)
 		@rm -f $@
@@ -378,6 +389,11 @@ example:	$(LIBOBJFILES) $(EXAMPLEOBJFILES) | $(BINDIR) $(EXAMPLEOBJDIR)
 makelibfile:	preprocess
 		@$(MAKE) $(LIBFILE) $(LIBLINK) $(LIBSHORTLINK)
 
+.PHONY: makelibcfile
+makelibcfile: preprocess
+		@$(MAKE) $(LIBCFILE) $(LIBCSHAREDLINK) $(LIBCSHORTLINK)
+
+# original library
 $(LIBFILE):	$(LIBOBJFILES) | $(LIBDIR) $(LIBOBJDIR)
 		@echo "-> generating library $@"
 		-rm -f $(LIBFILE)
@@ -385,6 +401,19 @@ ifeq ($(SHARED),true)
 		$(LIBBUILD) $(LIBBUILDFLAGS) $(LIBBUILD_o)$@ $(LIBOBJFILES) $(REPOSIT) $(LDFLAGS)
 else
 		$(LIBBUILD) $(LIBBUILDFLAGS) $(LIBBUILD_o)$@ $(LIBOBJFILES) $(REPOSIT)
+endif
+ifneq ($(RANLIB),)
+		$(RANLIB) $@
+endif
+
+# C interface
+$(LIBCFILE): $(LIBOBJFILES) $(LIBCOBJFILES) | $(LIBDIR) $(LIBOBJDIR)
+		@echo "-> generating library $@"
+		-rm -f $(LIBCFILE)
+ifeq ($(SHARED),true)
+		$(LIBBUILD) $(LIBBUILDFLAGS) $(LIBBUILD_o)$@ $(LIBOBJFILES) $(LIBCOBJFILES) $(REPOSIT) $(LDFLAGS)
+else
+		$(LIBBUILD) $(LIBBUILDFLAGS) $(LIBBUILD_o)$@ $(LIBOBJFILES) $(LIBCOBJFILES) $(REPOSIT)
 endif
 ifneq ($(RANLIB),)
 		$(RANLIB) $@

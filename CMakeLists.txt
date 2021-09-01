@@ -210,6 +210,7 @@ endif()
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/soplex/config.h.in ${PROJECT_BINARY_DIR}/soplex/config.h @ONLY)
 
 add_subdirectory(src)
+add_subdirectory(tests/c_interface)
 add_subdirectory(check)
 
 enable_testing()
