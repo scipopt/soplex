@@ -148,6 +148,10 @@ set_target_properties(libsoplexshared PROPERTIES
     VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}.${SOPLEX_VERSION_SUB}
     SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
 add_dependencies(libsoplexshared soplex_update_githash libsoplex)
+target_include_directories(libsoplexshared PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>)
 target_link_libraries(libsoplexshared libsoplex ${libs})
 set_target_properties(libsoplexshared PROPERTIES CXX_VISIBILITY_PRESET default)
 
