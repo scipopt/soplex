@@ -1,4 +1,4 @@
-   #include "soplex.h"
+#include "soplex.h"
 #include "soplex_interface.h"
 #include <iostream>
 
@@ -241,6 +241,9 @@ void SoPlex_getPrimalReal(void* soplex, double* primal, int dim)
 /** gets rational primal solution as a string **/
 char* SoPlex_getPrimalRationalString(void* soplex, int dim)
 {
+#if !defined(SOPLEX_WITH_GMP) || !defined(SOPLEX_WITH_BOOST)
+   throw SPxException("Rational functions cannot be used when built without GMP.");
+#else
    SoPlex* so = (SoPlex*)(soplex);
    VectorRational primal(dim);
    std::string primalstring;
@@ -253,6 +256,7 @@ char* SoPlex_getPrimalRationalString(void* soplex, int dim)
    }
 
    return const_cast<char*>(primalstring.c_str());
+#endif
 }
 
 /** gets dual solution **/
@@ -385,8 +389,12 @@ double SoPlex_objValueReal(void* soplex)
 /** returns the rational objective value (as a string) if a primal solution is available **/
 char* SoPlex_objValueRationalString(void* soplex)
 {
+#if !defined(SOPLEX_WITH_GMP) || !defined(SOPLEX_WITH_BOOST)
+   throw SPxException("Rational functions cannot be used when built without GMP.");
+#else
    SoPlex* so = (SoPlex*)(soplex);
    return const_cast<char*>(so->objValueRational().str().c_str());
+#endif
 }
 
 /** changes vectors of column bounds to lb and ub **/
