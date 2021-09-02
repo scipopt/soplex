@@ -2878,6 +2878,10 @@ void SoPlexBase<R>::changeLhsRational(int i, const mpq_t* lhs)
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#else
+
    _rationalLP->changeLhs(i, lhs);
    _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
 
@@ -2885,6 +2889,7 @@ void SoPlexBase<R>::changeLhsRational(int i, const mpq_t* lhs)
       _changeLhsReal(i, R(lhsRational(i)));
 
    _invalidateSolution();
+#endif
 }
 #endif
 
@@ -2922,6 +2927,10 @@ void SoPlexBase<R>::changeRhsRational(const mpq_t* rhs, int rhsSize)
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#else
+
    for(int i = 0; i < rhsSize; i++)
    {
       _rationalLP->changeRhs(i, Rational(rhs[i]));
@@ -2932,6 +2941,7 @@ void SoPlexBase<R>::changeRhsRational(const mpq_t* rhs, int rhsSize)
       _changeRhsReal(VectorBase<R>(rhsRational()));
 
    _invalidateSolution();
+#endif
 }
 #endif
 
@@ -3009,6 +3019,9 @@ void SoPlexBase<R>::changeRangeRational(int i, const mpq_t* lhs, const mpq_t* rh
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#else
    _rationalLP->changeRange(i, lhs, rhs);
    _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
 
@@ -3016,6 +3029,7 @@ void SoPlexBase<R>::changeRangeRational(int i, const mpq_t* lhs, const mpq_t* rh
       _changeRangeReal(i, R(lhsRational(i)), R(rhsRational(i)));
 
    _invalidateSolution();
+#endif
 }
 #endif
 
@@ -3094,6 +3108,9 @@ void SoPlexBase<R>::changeLowerRational(int i, const mpq_t* lower)
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#else
    _rationalLP->changeLower(i, lower);
    _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
 
@@ -3101,6 +3118,7 @@ void SoPlexBase<R>::changeLowerRational(int i, const mpq_t* lower)
       _changeLowerReal(i, R(lowerRational(i)));
 
    _invalidateSolution();
+#endif
 }
 #endif
 
@@ -3159,6 +3177,9 @@ void SoPlexBase<R>::changeUpperRational(int i, const mpq_t* upper)
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#else
    _rationalLP->changeUpper(i, upper);
    _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
 
@@ -3166,6 +3187,7 @@ void SoPlexBase<R>::changeUpperRational(int i, const mpq_t* upper)
       _changeUpperReal(i, R(upperRational(i)));
 
    _invalidateSolution();
+#endif
 }
 #endif
 
@@ -3223,6 +3245,9 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#else
    _rationalLP->changeBounds(i, lower, upper);
    _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
 
@@ -3230,6 +3255,7 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
       _changeBoundsReal(i, R(lowerRational(i)), R(upperRational(i)));
 
    _invalidateSolution();
+#endif
 }
 #endif
 
@@ -3283,12 +3309,16 @@ void SoPlexBase<R>::changeObjRational(int i, const mpq_t* obj)
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#else
    _rationalLP->changeObj(i, obj);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO)
       _realLP->changeObj(i, R(objRational(i)));
 
    _invalidateSolution();
+#endif
 }
 #endif
 
@@ -3322,12 +3352,16 @@ void SoPlexBase<R>::changeElementRational(int i, int j, const mpq_t* val)
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#else
    _rationalLP->changeElement(i, j, val);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO)
       _changeElementReal(i, j, mpq_get_d(*val));
 
    _invalidateSolution();
+#endif
 }
 #endif
 
