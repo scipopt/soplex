@@ -63,6 +63,10 @@
 
 #include "soplex/spxlpbase.h"
 
+#ifdef SOPLEX_WITH_GMP
+#include <gmp.h>
+#endif
+
 #ifdef SOPLEX_WITH_BOOST
 #ifdef SOPLEX_WITH_MPFR
 // For multiple precision
@@ -2440,9 +2444,9 @@ typedef SoPlexBase<Real> SoPlex;
 } // namespace soplex
 
 // General templated function
+#include "soplex/solvedbds.hpp"
 #include "soplex.hpp"
 #include "soplex/solverational.hpp"
-#include "soplex/solvedbds.hpp"
 #include "soplex/testsoplex.hpp"
 #include "soplex/solvereal.hpp"
 

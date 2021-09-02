@@ -15,11 +15,10 @@
 #include <iostream>
 #include <assert.h>
 
+#include "soplex/spxdefines.h"
 #include "soplex.h"
 #include "soplex/statistics.h"
 #include "soplex/sorter.h"
-
-#include "soplex/spxdefines.h"
 
 //#define NO_TOL
 #define USE_FEASTOL

@@ -42,7 +42,7 @@ int SoPlex_numCols(void* soplex)
 /** enables rational solving mode **/
 void SoPlex_setRational(void* soplex)
 {
-#ifndef SOPLEX_WITH_GMP
+#  if !defined(SOPLEX_WITH_GMP) || !defined(SOPLEX_WITH_BOOST)
    throw SPxException("Rational functions cannot be used when built without GMP.");
 #else
    SoPlex* so = (SoPlex*)(soplex);
@@ -108,7 +108,7 @@ void SoPlex_addColRational(
    long ubdenom
 )
 {
-#ifndef SOPLEX_WITH_GMP
+#if !defined(SOPLEX_WITH_GMP) || !defined(SOPLEX_WITH_BOOST)
    throw SPxException("Rational functions cannot be used when built without GMP.");
 #else
    SoPlex* so = (SoPlex*)(soplex);
@@ -191,7 +191,7 @@ void SoPlex_addRowRational(
    long ubdenom
 )
 {
-#ifndef SOPLEX_WITH_GMP
+#if !defined(SOPLEX_WITH_GMP) || !defined(SOPLEX_WITH_BOOST)
    throw SPxException("Rational functions cannot be used when built without GMP.");
 #else
    SoPlex* so = (SoPlex*)(soplex);
@@ -241,6 +241,9 @@ void SoPlex_getPrimalReal(void* soplex, double* primal, int dim)
 /** gets rational primal solution as a string **/
 char* SoPlex_getPrimalRationalString(void* soplex, int dim)
 {
+#if !defined(SOPLEX_WITH_GMP) || !defined(SOPLEX_WITH_BOOST)
+   throw SPxException("Rational functions cannot be used when built without GMP.");
+#else
    SoPlex* so = (SoPlex*)(soplex);
    VectorRational primal(dim);
    std::string primalstring;
@@ -248,11 +251,12 @@ char* SoPlex_getPrimalRationalString(void* soplex, int dim)
 
    for(int i = 0; i < dim; ++i)
    {
-      primalstring.append(rationalToString(primal[i], 0));
+      primalstring.append(primal[i].str());
       primalstring.append(" ");
    }
 
    return const_cast<char*>(primalstring.c_str());
+#endif
 }
 
 /** gets dual solution **/
@@ -280,7 +284,7 @@ void SoPlex_changeObjReal(void* soplex, double* obj, int dim)
 /** changes rational objective function vector to obj **/
 void SoPlex_changeObjRational(void* soplex, long* objnums, long* objdenoms, int dim)
 {
-#ifndef SOPLEX_WITH_GMP
+#if !defined(SOPLEX_WITH_GMP) || !defined(SOPLEX_WITH_BOOST)
    throw SPxException("Rational functions cannot be used when built without GMP.");
 #else
    SoPlex* so = (SoPlex*)(soplex);
@@ -313,7 +317,7 @@ void SoPlex_changeLhsReal(void* soplex, double* lhs, int dim)
 /** changes rational left-hand side vector for constraints to lhs **/
 void SoPlex_changeLhsRational(void* soplex, long* lhsnums, long* lhsdenoms, int dim)
 {
-#ifndef SOPLEX_WITH_GMP
+#if !defined(SOPLEX_WITH_GMP) || !defined(SOPLEX_WITH_BOOST)
    throw SPxException("Rational functions cannot be used when built without GMP.");
 #else
    SoPlex* so = (SoPlex*)(soplex);
@@ -346,7 +350,7 @@ void SoPlex_changeRhsReal(void* soplex, double* rhs, int dim)
 /** changes rational right-hand side vector for constraints to rhs **/
 void SoPlex_changeRhsRational(void* soplex, long* rhsnums, long* rhsdenoms, int dim)
 {
-#ifndef SOPLEX_WITH_GMP
+#if !defined(SOPLEX_WITH_GMP) || !defined(SOPLEX_WITH_BOOST)
    throw SPxException("Rational functions cannot be used when built without GMP.");
 #else
    SoPlex* so = (SoPlex*)(soplex);
@@ -385,8 +389,12 @@ double SoPlex_objValueReal(void* soplex)
 /** returns the rational objective value (as a string) if a primal solution is available **/
 char* SoPlex_objValueRationalString(void* soplex)
 {
+#if !defined(SOPLEX_WITH_GMP) || !defined(SOPLEX_WITH_BOOST)
+   throw SPxException("Rational functions cannot be used when built without GMP.");
+#else
    SoPlex* so = (SoPlex*)(soplex);
-   return const_cast<char*>(rationalToString(so->objValueRational(), 0).c_str());
+   return const_cast<char*>(so->objValueRational().str().c_str());
+#endif
 }
 
 /** changes vectors of column bounds to lb and ub **/
@@ -415,7 +423,7 @@ void SoPlex_changeVarBoundsRational(
    long ubdenom
 )
 {
-#ifndef SOPLEX_WITH_GMP
+#if !defined(SOPLEX_WITH_GMP) || !defined(SOPLEX_WITH_BOOST)
    throw SPxException("Rational functions cannot be used when built without GMP.");
 #else
    SoPlex* so = (SoPlex*)(soplex);

@@ -954,7 +954,7 @@ void SPxScaler<R>::computeExpVec(const std::vector<R>& vec, DataArray<int>& vecE
 
    for(unsigned i = 0; i < vec.size(); ++i)
    {
-      frexp(vec[i], &(vecExp[int(i)]));
+      spxFrexp(vec[i], &(vecExp[int(i)]));
       vecExp[int(i)] -= 1;
    }
 }

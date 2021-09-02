@@ -545,7 +545,7 @@ int main() {
    for (int i = 0; i < 4; i++)
    {
       RtoSRational = RtoSDoubleIn[i];
-      RtoSStream << rationalToString(RtoSRational);
+      RtoSStream << RtoSRational.str();
       RtoSStream >> RtoSDoubleOut;
       RtoSStream.clear();
       if( !isEqual(RtoSDoubleIn[i], RtoSDoubleOut) )
