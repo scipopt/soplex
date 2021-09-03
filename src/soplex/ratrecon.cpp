@@ -45,12 +45,8 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
    Integer Dbound;
    Integer gcd(1);
 
-#if 1
    Dbound = numerator(denomBoundSquared) / denominator(
                denomBoundSquared); /* this is the working bound on the denominator size */
-#else
-   Dbound = denom; /* this is the working bound on the denominator size */
-#endif
 
    Dbound = sqrt(Dbound);
 
@@ -160,15 +156,14 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
                MSG_DEBUG(std::cout << "  --> convergent denominator = " << &q[2] << "\n");
             }
 
+            assert(q[1] != 0);
+
             /* Assign the values */
             if(q[1] >= 0)
                resvec[j] = Rational(p[1], q[1]);
             else
                resvec[j] = Rational(-p[1], -q[1]);
 
-#ifdef SOPLEX_WITH_GMP
-            mpq_canonicalize(resvec[j].backend().data());
-#endif
             SpxGcd(temp, gcd, denominator(resvec[j]));
             gcd *= temp;
 

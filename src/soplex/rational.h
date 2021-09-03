@@ -275,4 +275,3 @@ inline int dmaxSizeRational(const Rational* vector, const int length, const int 
 }
 
 #endif
-using namespace soplex;
