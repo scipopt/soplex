@@ -261,4 +261,3 @@ using Integer = int;
 #endif
 
 #endif
-using namespace soplex;
