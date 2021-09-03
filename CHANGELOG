@@ -3,6 +3,9 @@ next major Release
 
 features:
 
+- improved the buildsystem by addinng a cmake-configurable `config.h.in` header in the same fashion as it is handled in SCIP
+- removed SoPlex internal `Rational` class and use instead the boost multiprecision library for rational numbers; this enables the possibility of doing a rational LP solve, even without lining GMP
+
 interface & parameters:
 
 - added intterupt flag to optimize() (default NULL)
