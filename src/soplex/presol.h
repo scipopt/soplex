@@ -37,12 +37,15 @@ namespace soplex{
    class Presol : public SPxSimplifier<R> {
    private:
 
+      const papilo::VerbosityLevel verbosityLevel = papilo::VerbosityLevel::kQuiet;
+
       VectorBase<R> m_prim;       ///< unsimplified primal solution VectorBase<R>.
       VectorBase<R> m_slack;      ///< unsimplified slack VectorBase<R>.
       VectorBase<R> m_dual;       ///< unsimplified dual solution VectorBase<R>.
       VectorBase<R> m_redCost;    ///< unsimplified reduced cost VectorBase<R>.
       DataArray<typename SPxSolverBase<R>::VarStatus> m_cBasisStat; ///< basis status of columns.
       DataArray<typename SPxSolverBase<R>::VarStatus> m_rBasisStat; ///< basis status of rows.
+
 
       papilo::PostsolveStorage<R>
           postsolveStorage;        ///< storede postsolve to recalculate the original solution
@@ -134,11 +137,11 @@ namespace soplex{
 
 
       virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R> &lp, R eps, R delta) {
-         return simplify(lp, eps, delta, delta, false);
+         return simplify(lp, eps, delta, delta, false, 0);
       }
 
       virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R> &lp, R eps, R ftol, R otol,
-                                                         bool keepbounds);
+                                                         bool keepbounds, uint32_t seed);
 
       virtual void unsimplify(const VectorBase<R> &, const VectorBase<R> &, const VectorBase<R> &,
                               const VectorBase<R> &,
@@ -211,7 +214,7 @@ namespace soplex{
 
       void init(const SPxLPBase <R> &lp);
 
-      void configurePapilo(papilo::Presolve<R> &presolve, R feasTolerance, R epsilon) const;
+      void configurePapilo(papilo::Presolve<R> &presolve, R feasTolerance, R epsilon, uint32_t seed) const;
 
       void applyPresolveResultsToColumns(SPxLPBase <R> &lp, const papilo::Problem<R> &problem,
                                          const papilo::PresolveResult<R> &res) const;
@@ -279,11 +282,11 @@ namespace soplex{
      reducedSolution.dual.resize(nRowsReduced);
      reducedSolution.rowBasisStatus.resize(nRowsReduced);
 
-     R switch_sign = SPxLPBase<R>::MAXIMIZE ? -1 : 1;
-
-     // assign values of variables in reduced LP
      // NOTE: for maximization problems, we have to switch signs of dual and
      // reduced cost values, since simplifier assumes minimization problem
+     R switch_sign = m_thesense == SPxLPBase<R>::MAXIMIZE ? -1 : 1;
+
+     // assign values of variables in reduced LP
      for (int j = 0; j < nColsReduced; ++j) {
        reducedSolution.primal[j] = isZero(x[j], this->epsZero()) ? 0.0 : x[j];
        reducedSolution.reducedCosts[j] =
@@ -301,6 +304,7 @@ namespace soplex{
      num.setEpsilon(m_epsilon);
      num.setFeasTol(m_feastol);
      papilo::Message msg{};
+     msg.setVerbosityLevel(verbosityLevel);
      papilo::Postsolve<R> postsolve{msg, num};
      postsolve.undo(reducedSolution, originalSolution, postsolveStorage);
 
@@ -416,9 +420,14 @@ namespace soplex{
 
 
    template<class R>
-   typename SPxSimplifier<R>::Result Presol<R>::simplify(SPxLPBase<R> &lp, R eps, R ftol, R otol, bool keepbounds) {
+   typename SPxSimplifier<R>::Result Presol<R>::simplify(SPxLPBase<R> &lp, R eps, R ftol, R otol, bool keepbounds, uint32_t seed) {
 
       //TODO: how to use the keepbounds parameter?
+
+      m_thesense = lp.spxSense();
+      m_keepbounds = keepbounds;
+      this->m_timeUsed->reset();
+      this->m_timeUsed->start();
 
       init(lp);
       papilo::Problem<R> problem = buildProblem(lp);
@@ -427,7 +436,7 @@ namespace soplex{
       // TODO: add new parameter to SoPlex or just code it hard?
       int modifyconsfac = 1;
 
-      configurePapilo(presolve, ftol, eps);
+      configurePapilo(presolve, ftol, eps, seed);
       MSG_INFO1((*this->spxout), (*this->spxout) << " --- starting PaPILO" << std::endl;)
 
       papilo::PresolveResult<R> res = presolve.apply(problem);
@@ -444,21 +453,22 @@ namespace soplex{
             MSG_INFO1((*this->spxout), (*this->spxout) << "==== Presolving detected unboundedness of the problem" << std::endl;)
             return SPxSimplifier<R>::UNBOUNDED;
          case papilo::PresolveStatus::kUnchanged:
-           m_noChanges = true;
+            // since Soplex has no state unchanged store the value in a new variable
+            m_noChanges = true;
             MSG_INFO1((*this->spxout), (*this->spxout) << "==== Presolving found nothing " << std::endl;)
             return SPxSimplifier<R>::OKAY;
          case papilo::PresolveStatus::kReduced:
             break;
       }
 
-      int newnnz = problem.getConstraintMatrix().getNnz();
+      int newNonzeros = problem.getConstraintMatrix().getNnz();
 
-      if( newnnz == 0 || ((problem.getNRows() <= modifyconsfac * lp.nRows() ||
-                           newnnz <= modifyconsfac * lp.nNzos())))
+      if(newNonzeros == 0 || ((problem.getNRows() <= modifyconsfac * lp.nRows() ||
+            newNonzeros <= modifyconsfac * lp.nNzos())))
       {
          MSG_INFO1((*this->spxout), (*this->spxout) << " --- presolved problem has " << problem.getNRows() << " rows, "
                                                     << problem.getNCols() << " cols and "
-                                                    << newnnz << " non-zeros"
+                                                    << newNonzeros << " non-zeros"
                                                     << std::endl;)
          postsolveStorage = res.postsolve;
          // remove all constraints and variables
@@ -468,7 +478,7 @@ namespace soplex{
            lp.removeRow(i);
          applyPresolveResultsToColumns(lp, problem, res);
          applyPresolveResultsToRows(lp, problem, res);
-         assert(newnnz == lp.nNzos());
+         assert(newNonzeros == lp.nNzos());
       }
       else {
         m_noChanges = true;
@@ -477,7 +487,7 @@ namespace soplex{
                       << " --- presolve results smaller than the modifyconsfac"
                       << std::endl;)
       }
-      if(newnnz == 0)
+      if(newNonzeros == 0)
          m_result = SPxSimplifier<R>::VANISHED;
       return m_result;
    }
@@ -494,16 +504,15 @@ namespace soplex{
    }
 
    template<class R>
-   void Presol<R>::configurePapilo(papilo::Presolve<R> &presolve, R feasTolerance, R epsilon) const {
+   void Presol<R>::configurePapilo(papilo::Presolve<R> &presolve, R feasTolerance, R epsilon, uint32_t seed) const {
 
      /* communicate the SOPLEX parameters to the presolve libary */
 
       /* communicate the random seed */
-     // TODO: set random seed
-     //  presolve.getPresolveOptions().randomseed =
-     //      SCIPinitializeRandomSeed(scip, (unsigned int)data->randomseed);
+       presolve.getPresolveOptions().randomseed = (unsigned int) seed;
+
      /* set number of threads to be used for presolve */
-     // TODO: set threads for PaPILO
+     // TODO: set threads for PaPILO? Can Soplex be run with multiple threads?
      //      presolve.getPresolveOptions().threads = data->threads;
 
      //TODO: set timelimit
@@ -512,21 +521,19 @@ namespace soplex{
       presolve.getPresolveOptions().dualreds = 0;
       presolve.getPresolveOptions().feastol = double(feasTolerance);
       presolve.getPresolveOptions().epsilon = double(epsilon);
-      //TODO: set huge value
+      //TODO: has Soplex an parameter to define infinity?
       //      presolve.getPresolveOptions().hugeval = data->hugebound;
       presolve.getPresolveOptions().detectlindep = 0;
       presolve.getPresolveOptions().componentsmaxint = -1;
       presolve.getPresolveOptions().calculate_basis_for_dual = true;
 
-      presolve.setVerbosityLevel(papilo::VerbosityLevel::kQuiet);
-      /*presolve.setVerbosityLevel(papilo::VerbosityLevel::kDetailed);*/
-
+      presolve.setVerbosityLevel(verbosityLevel);
 
       /* enable lp presolvers with dual postsolve*/
       using uptr = std::unique_ptr<papilo::PresolveMethod<R>>;
 
       /* fast presolvers*/
-      //TODO: assert fails in substiution
+      //TODO: assert fails in substitution
 //      presolve.addPresolveMethod(uptr(new papilo::SingletonCols<R>()));
       presolve.addPresolveMethod(uptr(new papilo::ConstraintPropagation<R>()));
 

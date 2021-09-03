@@ -1534,7 +1534,7 @@ public:
    }
    /// simplify SPxLPBase<R> \p lp with independent primal and dual feasibility tolerance.
    virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
-         bool keepbounds = false);
+         bool keepbounds = false, uint32_t seed = 0);
 
    /// reconstructs an optimal solution for the unsimplified LP.
    virtual void unsimplify(const VectorBase<R>& x, const VectorBase<R>& y, const VectorBase<R>& s,

@@ -5051,7 +5051,7 @@ void SPxMainSM<R>::fixColumn(SPxLPBase<R>& lp, int j, bool correctIdx)
 
 template <class R>
 typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
-      bool keepbounds)
+      bool keepbounds, uint32_t seed)
 {
    // transfer message handler
    this->spxout = lp.spxout;

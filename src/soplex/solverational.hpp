@@ -3384,7 +3384,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
          // do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used
          bool keepbounds = intParam(SoPlexBase<R>::RATIOTESTER) == SoPlexBase<R>::RATIOTESTER_BOUNDFLIPPING;
          simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlexBase<R>::EPSILON_ZERO),
-                                realParam(SoPlexBase<R>::FPFEASTOL), realParam(SoPlexBase<R>::FPOPTTOL), keepbounds);
+                                realParam(SoPlexBase<R>::FPFEASTOL), realParam(SoPlexBase<R>::FPOPTTOL), keepbounds, _solver.random.getSeed());
       }
 
       // apply scaling after the simplification

@@ -182,10 +182,11 @@ public:
    //-------------------------------------
    /**@name Simplifying / unsimplifying */
    ///@{
+   // TODO: why is this function needed?
    /// simplify SPxLP \p lp with identical primal and dual feasibility tolerance.
    virtual Result simplify(SPxLPBase<R>& lp, R eps, R delta) = 0;
    /// simplify SPxLP \p lp with independent primal and dual feasibility tolerance.
-   virtual Result simplify(SPxLPBase<R>& lp, R eps, R feastol, R opttol, bool keepbounds = false) = 0;
+   virtual Result simplify(SPxLPBase<R>& lp, R eps, R feastol, R opttol, bool keepbounds = false, uint32_t seed = 0) = 0;
    /// reconstructs an optimal solution for the unsimplified LP.
    virtual void unsimplify(const VectorBase<R>&, const VectorBase<R>&, const VectorBase<R>&,
                            const VectorBase<R>&,
