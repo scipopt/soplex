@@ -68,6 +68,13 @@ void printUsage(const char* const argv[], int idx)
       "algorithmic settings (* indicates default):\n"
       "  --readmode=<value>     choose reading mode for <lpfile> (0* - floating-point, 1 - rational)\n"
       "  --solvemode=<value>    choose solving mode (0 - floating-point solve, 1* - auto, 2 - force iterative refinement)\n"
+      "  --arithmetic=<value>   choose base arithmetic type (0 - double, 1 - quadprecision, 2 - higher multiprecision)\n"
+#ifdef SOPLEX_WITH_MPFR
+      "  --precision=<value>    choose precision for multiprecision solve (only active when arithmetic=2 minimal value = 50)\n"
+#endif
+#ifdef SOPLEX_WITH_CPPMPF
+      "  --precision=<value>    choose precision for multiprecision solve (only active when arithmetic=2, possible values 50,100,200, compile with mpfr for arbitrary precision)\n"
+#endif
       "  -s<value>              choose simplifier/presolver (0 - off, 1* - auto)\n"
       "  -g<value>              choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric, 5 - least squares, 6 - geometric-equilibrium)\n"
       "  -p<value>              choose pricing (0* - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)\n"
@@ -209,7 +216,7 @@ static void checkSolutionRational(SoPlexBase<R>& soplex)
                    Rational maxviol = boundviol > rowviol ? boundviol : rowviol;
                    bool feasible = (maxviol <= soplex.realParam(SoPlexBase<R>::FEASTOL));
                    soplex.spxout << "Primal solution " << (feasible ? "feasible" : "infeasible") <<
-                   " in original problem (max. violation = " << maxviol.str() << ").\n"
+                   " in original problem (max. violation = " << maxviol << ").\n"
                   );
       }
       else
@@ -235,7 +242,7 @@ static void checkSolutionRational(SoPlexBase<R>& soplex)
                    Rational maxviol = redcostviol > dualviol ? redcostviol : dualviol;
                    bool feasible = (maxviol <= soplex.realParam(SoPlexBase<R>::OPTTOL));
                    soplex.spxout << "Dual solution " << (feasible ? "feasible" : "infeasible") <<
-                   " in original problem (max. violation = " << maxviol.str() << ").\n"
+                   " in original problem (max. violation = " << maxviol << ").\n"
                   );
       }
       else
@@ -498,17 +505,18 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
       }
 }
 
-/// runs SoPlexBase command line
-int main(int argc, char* argv[])
+// Runs SoPlex with the parsed boost variables map
+template <class R>
+int runSoPlex(int argc, char* argv[])
 {
    ///@todo the EGlib version info should be printed after the SoPlexBase version info
    // initialize EGlib's GMP memory management before any rational numbers are created
    EGlpNumStart();
 
-   SoPlexBase<Real>* soplex = nullptr;
+   SoPlexBase<R>* soplex = nullptr;
 
    Timer* readingTime = nullptr;
-   Validation<Real>* validation = nullptr;
+   Validation<R>* validation = nullptr;
    int optidx;
 
    const char* lpfilename = nullptr;
@@ -537,14 +545,14 @@ int main(int argc, char* argv[])
       readingTime = TimerFactory::createTimer(Timer::USER_TIME);
       soplex = nullptr;
       spx_alloc(soplex);
-      new(soplex) SoPlexBase<Real>();
+      new(soplex) SoPlexBase<R>();
 
       soplex->printVersion();
       MSG_INFO1(soplex->spxout, soplex->spxout << SOPLEX_COPYRIGHT << std::endl << std::endl);
 
       validation = nullptr;
       spx_alloc(validation);
-      new(validation) Validation<Real>();
+      new(validation) Validation<R>();
 
       // no options were given
       if(argc <= 1)
@@ -703,6 +711,16 @@ int main(int argc, char* argv[])
                   returnValue = 1;
                   goto TERMINATE_FREESTRINGS;
                }
+            }
+            // --arithmetic=<value> : base arithmetic type, directly handled in main()
+            else if(strncmp(option, "arithmetic=", 11) == 0)
+            {
+               continue;
+            }
+            // --precision=<value> : arithmetic precision, directly handled in main()
+            else if(strncmp(option, "precision=", 10) == 0)
+            {
+               continue;
             }
             // --<type>:<name>=<val> :  change parameter value using syntax of settings file entries
             else if(!soplex->parseSettingsString(option))
@@ -1025,7 +1043,7 @@ int main(int argc, char* argv[])
       printDualSolution(*soplex, colnames, rownames, printDual, printDualRational);
 
       if(checkSol)
-         checkSolution<Real>(*soplex); // The type needs to get fixed here
+         checkSolution<R>(*soplex); // The type needs to get fixed here
 
       if(displayStatistics)
       {
@@ -1084,9 +1102,6 @@ TERMINATE:
       spx_free(validation);
    }
 
-   Rational::disableListMem();
-   EGlpNumClear();
-
    if(nullptr != readingTime)
    {
       readingTime->~Timer();
@@ -1094,4 +1109,151 @@ TERMINATE:
    }
 
    return returnValue;
+}
+
+/// runs SoPlexBase command line
+int main(int argc, char* argv[])
+{
+   int arithmetic = 0;
+   int precision = 50;
+   int optidx;
+
+   // find out which precision/solvemode soplex should be run in. the rest happens in runSoPlex
+   // no options were given
+   if(argc <= 1)
+   {
+      printUsage(argv, 0);
+      return 1;
+   }
+
+   // read arguments from command line
+   for(optidx = 1; optidx < argc; optidx++)
+   {
+      char* option = argv[optidx];
+
+      // we reached <lpfile>
+      if(option[0] != '-')
+         continue;
+
+      // option string must start with '-', must contain at least two characters, and exactly two characters if and
+      // only if it is -x, -y, -q, or -c
+      if(option[0] != '-' || option[1] == '\0'
+            || ((option[2] == '\0') != (option[1] == 'x' || option[1] == 'X' || option[1] == 'y'
+                                       || option[1] == 'Y' || option[1] == 'q' || option[1] == 'c')))
+      {
+         printUsage(argv, optidx);
+         return 1;
+      }
+
+      switch(option[1])
+      {
+      case '-' :
+         option = &option[2];
+         // --solvemode=<value> : choose solving mode (0* - floating-point solve, 1 - auto, 2 - force iterative refinement, 3 - multiprecison, 4 - quadprecision)
+         // only need to do something here if multi or quad, the rest is handled in runSoPlex
+         if(strncmp(option, "arithmetic=", 11) == 0)
+         {
+            if( option[11] == '1')
+            {
+#ifndef SOPLEX_WITH_FLOAT128
+               MSG_ERROR(std::cerr << "Cannot set arithmetic type to quadprecision - Soplex compiled without quadprecision support\n";)
+               printUsage(argv, 0);
+               return 1;
+#else
+               arithmetic = 1;
+#endif
+            }
+            else if( option[11] == '2' )
+            {
+#ifndef SOPLEX_WITH_BOOST
+               MSG_ERROR(std::cerr << "Cannot set arithmetic type to multiprecision - Soplex compiled without boost\n";)
+               printUsage(argv, 0);
+               return 1;
+#else
+               arithmetic = 2;
+#endif
+            }
+         }
+         // set precision
+         else if( strncmp(option, "precision=", 10) == 0)
+         {
+            precision = atoi(option+10);
+         }
+         break;
+      default:
+         break;
+      }
+   }
+
+   switch(arithmetic)
+   {
+   case 0:                 // double
+      runSoPlex<Real>(argc, argv);
+      break;
+
+#ifdef SOPLEX_WITH_BOOST
+#ifdef SOPLEX_WITH_FLOAT128
+   case 1:                // quadprecision
+#if BOOST_VERSION < 107000
+      std::cerr << "Error: Boost version too old." << std:: endl <<
+               "In order to use the quadprecision feature of SoPlex," <<
+               " Boost Version 1.70.0 or higher is required." << std::endl << \
+               "Included Boost version is " << BOOST_VERSION / 100000 << "."  // maj. version
+               << BOOST_VERSION / 100 % 1000 << "."  // min. version
+               << BOOST_VERSION % 100                // patch version;
+               << std::endl;
+#else
+      using namespace boost::multiprecision;
+      using Quad = boost::multiprecision::float128;
+      runSoPlex<Quad>(argc, argv);
+#endif
+      break;
+#endif
+   case 2:                 // soplex mpf
+      using namespace boost::multiprecision;
+
+#if BOOST_VERSION < 107000
+      std::cerr << "Error: Boost version too old." << std:: endl <<
+               "In order to use the multiprecision feature of SoPlex," <<
+               " Boost Version 1.70.0 or higher is required." << std::endl << \
+               "Included Boost version is " << BOOST_VERSION / 100000 << "."  // maj. version
+               << BOOST_VERSION / 100 % 1000 << "."  // min. version
+               << BOOST_VERSION % 100                // patch version;
+               << std::endl;
+#else
+#ifdef SOPLEX_WITH_MPFR
+
+      // et_off means the expression templates options is turned off. TODO:
+      // The documentation also mentions about static vs dynamic memory
+      // allocation for the mpfr types. Is it relevant here? I probably also
+      // need to have the mpfr_float_eto in the global soplex namespace
+      using multiprecision = number<mpfr_float_backend<0>, et_off>;
+      multiprecision::default_precision(precision);
+      runSoPlex<multiprecision>(argc, argv);
+#endif  // SOPLEX_WITH_MPFR
+
+#ifdef SOPLEX_WITH_CPPMPF
+      // It seems that precision cannot be set on run time for cpp_float
+      // backend for boost::number. So a precision of 50 decimal points is
+      // set.
+      using multiprecision1 = number<cpp_dec_float<50>, et_off>;
+      using multiprecision2 = number<cpp_dec_float<100>, et_off>;
+      using multiprecision3 = number<cpp_dec_float<200>, et_off>;
+
+      if(precision <= 50)
+         runSoPlex<multiprecision1>(argc, argv);
+      else if(precision <= 100)
+         runSoPlex<multiprecision2>(argc, argv);
+      else
+         runSoPlex<multiprecision3>(argc, argv);
+
+#endif  // SOPLEX_WITH_CPPMPF
+#endif
+      break;
+#endif
+
+   default:
+      std::cerr << "Wrong value for the arithmetic mode\n";
+      return 0;
+   }
 }

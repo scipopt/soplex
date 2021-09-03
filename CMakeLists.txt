@@ -158,7 +158,7 @@ else()
 endif()
 
 if(BOOST)
-    find_package(Boost 1.58.0 COMPONENTS program_options) # Refer to comments in cmake/Modules/FindBoost.cmake
+    find_package(Boost 1.58.0) # Refer to comments in cmake/Modules/FindBoost.cmake
     if(Boost_FOUND)
         set(SOPLEX_WITH_BOOST on)
         include_directories(${Boost_INCLUDE_DIRS})
@@ -170,14 +170,8 @@ if(BOOST)
                             Found version is ${Boost_VERSION_STRING}")
         endif()
     else()
-        message(WARNING "${Red}Boost could not be found! ONLY the SoPlex library can be built without Boost. \
-                         The SoPlex binary will NOT be built${ColourReset}. If you require the binary, please \
-                         make sure Boost is installed and your BOOST_ROOT environment variable is set.")
         set(BOOST off)
     endif()
-else()
-    message(WARNING "When building without Boost, ONLY the SoPlex library \
-    will be built and NOT the binary. Boost with program_options is required to build the binary.")
 endif()
 
 # enable all warnings and explicitly switch on colored output for ninja

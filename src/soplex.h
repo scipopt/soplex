@@ -1557,10 +1557,8 @@ public:
    /// reads settings file; returns true on success
    bool loadSettingsFile(const char* filename);
 
-#ifdef SOPLEX_WITH_BOOST
    /// parses one setting string and returns true on success; note that string is modified
-   bool parseSettingsString(const std::string str, boost::any val);
-#endif
+   bool parseSettingsString(char* str);
 
    ///@}
 
