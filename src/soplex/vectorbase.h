@@ -29,6 +29,7 @@
 
 #include "soplex/spxdefines.h"
 #include "soplex/stablesum.h"
+#include "soplex/rational.h"
 
 namespace soplex
 {
@@ -625,7 +626,7 @@ Rational VectorBase<Rational>::operator*(const VectorBase<Rational>& vec) const
    assert(vec.dim() == dim());
 
    if(dim() <= 0 || vec.dim() <= 0)
-      return 0;
+      return Rational();
 
    Rational x = val[0];
    x *= vec.val[0];
@@ -633,7 +634,7 @@ Rational VectorBase<Rational>::operator*(const VectorBase<Rational>& vec) const
    auto dimen = dim();
 
    for(decltype(dimen) i = 1; i < dimen; i++)
-      x.addProduct(val[i], vec.val[i]);
+      x += val[i] * vec.val[i];
 
    return x;
 }

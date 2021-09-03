@@ -7,7 +7,6 @@ set(sources
     soplex/idxset.cpp
     soplex/mpsinput.cpp
     soplex/nameset.cpp
-    soplex/rational.cpp
     soplex/ratrecon.cpp
     soplex/slufactor_rational.cpp
     soplex/spxdefines.cpp
@@ -125,6 +124,10 @@ set_target_properties(libsoplex-pic PROPERTIES
     VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}.${SOPLEX_VERSION_SUB}
     SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
 add_dependencies(libsoplex-pic soplex_update_githash)
+target_include_directories(libsoplex-pic PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>)
 target_link_libraries(libsoplex-pic ${libs})
 
 # create soplex library without pic
@@ -133,6 +136,10 @@ set_target_properties(libsoplex PROPERTIES
     VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}.${SOPLEX_VERSION_SUB}
     SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
 add_dependencies(libsoplex soplex_update_githash)
+target_include_directories(libsoplex PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>)
 target_link_libraries(libsoplex ${libs})
 
 # create C shared library
@@ -141,6 +148,10 @@ set_target_properties(libsoplexshared PROPERTIES
     VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}.${SOPLEX_VERSION_SUB}
     SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
 add_dependencies(libsoplexshared soplex_update_githash libsoplex)
+target_include_directories(libsoplexshared PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>)
 target_link_libraries(libsoplexshared libsoplex ${libs})
 set_target_properties(libsoplexshared PROPERTIES CXX_VISIBILITY_PRESET default)
 
@@ -173,7 +184,7 @@ set_target_properties(libsoplexshared PROPERTIES
     MACOSX_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 # install the header files of soplex
-install(FILES ${headers} DESTINATION include/soplex)
+install(FILES ${headers} ${PROJECT_BINARY_DIR}/soplex/config.h DESTINATION include/soplex)
 install(FILES soplex.h soplex.hpp soplex_interface.h DESTINATION include)
 
 if(BOOST)
@@ -196,7 +207,7 @@ export(TARGETS libsoplex libsoplex-pic libsoplexshared
   FILE "${CMAKE_BINARY_DIR}/soplex-targets.cmake")
 
 #configure the config file for the build tree
-set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src")
+set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src" "${PROJECT_BINARY_DIR}")
 configure_file(${PROJECT_SOURCE_DIR}/soplex-config.cmake.in
   "${CMAKE_BINARY_DIR}/soplex-config.cmake" @ONLY)
 

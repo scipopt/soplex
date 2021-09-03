@@ -42,8 +42,36 @@
 
 #include <cstdlib>
 
+/*
+ * include build configuration flags
+ */
+#ifndef NO_CONFIG_HEADER
+#include "soplex/config.h"
+#endif
+
 #ifdef SOPLEX_WITH_BOOST
 #include "boost/multiprecision/number.hpp"
+#ifdef SOPLEX_WITH_FLOAT128
+#include <boost/multiprecision/float128.hpp>
+#endif
+
+#ifdef SOPLEX_WITH_MPFR
+// For multiple precision
+#include <boost/multiprecision/mpfr.hpp>
+#ifndef NDEBUG
+#include "boost/multiprecision/debug_adaptor.hpp" // For debuging mpf numbers
+#endif // NDEBUG
+#endif // SOPLEX_WITH_MPFR
+#ifdef SOPLEX_WITH_CPPMPF
+#include <boost/multiprecision/cpp_dec_float.hpp>
+#endif  // SOPLEX_WITH_CPPMPF
+
+#ifdef SOPLEX_WITH_GMP
+#include <boost/multiprecision/gmp.hpp>
+#else
+#include <boost/multiprecision/cpp_int.hpp>
+#endif
+
 #endif
 
 namespace soplex
@@ -400,13 +428,41 @@ inline int spxSnprintf(
 }
 
 #ifdef SOPLEX_WITH_BOOST
+
+using namespace boost::multiprecision;
+
+#ifdef SOPLEX_WITH_GMP
+template<boost::multiprecision::expression_template_option eto>
+inline number<gmp_rational, eto> ldexp(number<gmp_rational, eto>, int exp)
+{
+   assert(false);
+   return number<gmp_rational>();
+}
+
+template<boost::multiprecision::expression_template_option eto>
+inline number<gmp_rational, eto> frexp(number<gmp_rational, eto>, int* exp)
+{
+   assert(false);
+   return number<gmp_rational>();
+}
+#else
+inline cpp_rational ldexp(cpp_rational r, int exp)
+{
+   assert(false);
+   return cpp_rational();
+}
+
+inline cpp_rational frexp(cpp_rational, int* exp)
+{
+   assert(false);
+   return cpp_rational();
+}
+#endif
+
 // wrapped frexp function
 template <typename T, boost::multiprecision::expression_template_option eto>
 boost::multiprecision::number<T, eto> spxFrexp(boost::multiprecision::number<T, eto> y, int* exp)
 {
-   using namespace std;
-   using namespace boost::math::tools;
-
    return frexp(y, exp);
 }
 
@@ -414,24 +470,21 @@ boost::multiprecision::number<T, eto> spxFrexp(boost::multiprecision::number<T, 
 template <typename T, boost::multiprecision::expression_template_option eto>
 boost::multiprecision::number<T> spxLdexp(boost::multiprecision::number<T, eto> x, int exp)
 {
-   return boost::multiprecision::ldexp(x, exp);
+   return ldexp(x, exp);
 }
 
 // Overloaded function to return the square-root
-template <typename T, boost::multiprecision::expression_template_option ep>
-boost::multiprecision::number<T, ep> spxSqrt(boost::multiprecision::number<T, ep> a)
+template <typename T, expression_template_option ep>
+number<T, ep> spxSqrt(number<T, ep> a)
 {
-   return boost::multiprecision::sqrt(a);
+   return sqrt(a);
 }
 
 // the nextafter function
-template <typename T, boost::multiprecision::expression_template_option eto>
-boost::multiprecision::number<T, eto> spxNextafter(boost::multiprecision::number<T, eto> x,
-      boost::multiprecision::number<T, eto> y)
+template <typename T, expression_template_option eto>
+number<T, eto> spxNextafter(number<T, eto> x,
+                            number<T, eto> y)
 {
-   using namespace std;
-   using namespace boost::math;
-
    // Turns out that nextafter is not supported in the mpfr library? The mpfr
    // library does a different function named nextabove. Probably a
    // replacement? I've made an issue about this.
@@ -444,15 +497,15 @@ boost::multiprecision::number<T, eto> spxNextafter(boost::multiprecision::number
 
 // Returns the square root
 template <typename T>
-boost::multiprecision::number<T> spxSqrt(boost::multiprecision::number<T> a)
+number<T> spxSqrt(number<T> a)
 {
-   return boost::multiprecision::sqrt(a);
+   return sqrt(a);
 }
 
 /// returns max(|a|,|b|)
-template <typename T, boost::multiprecision::expression_template_option et>
-inline boost::multiprecision::number<T, et> maxAbs(
-   boost::multiprecision::number<T, et> a, boost::multiprecision::number<T, et> b)
+template <typename T, expression_template_option et>
+inline number<T, et> maxAbs(
+   number<T, et> a, number<T, et> b)
 {
    const auto absa = spxAbs(a);
    const auto absb = spxAbs(b);
@@ -460,13 +513,14 @@ inline boost::multiprecision::number<T, et> maxAbs(
    return absa > absb ? absa : absb;
 }
 
-template <typename T, boost::multiprecision::expression_template_option et>
-inline boost::multiprecision::number<T, et> relDiff(boost::multiprecision::number<T, et> a,
-      boost::multiprecision::number<T, et> b)
+template <typename T, expression_template_option et>
+inline number<T, et> relDiff(number<T, et> a,
+                             number<T, et> b)
 {
    return (a - b) / (maxAbs(a, b) > 1.0 ? maxAbs(a, b) : 1.0);
 }
 #endif
+using namespace soplex;
 
 } // namespace soplex
 
