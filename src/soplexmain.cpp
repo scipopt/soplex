@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2021 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -1139,7 +1139,7 @@ int main(int argc, char* argv[])
       // only if it is -x, -y, -q, or -c
       if(option[0] != '-' || option[1] == '\0'
             || ((option[2] == '\0') != (option[1] == 'x' || option[1] == 'X' || option[1] == 'y'
-                                       || option[1] == 'Y' || option[1] == 'q' || option[1] == 'c')))
+                                        || option[1] == 'Y' || option[1] == 'q' || option[1] == 'c')))
       {
          printUsage(argv, optidx);
          return 1;
@@ -1149,24 +1149,27 @@ int main(int argc, char* argv[])
       {
       case '-' :
          option = &option[2];
+
          // --solvemode=<value> : choose solving mode (0* - floating-point solve, 1 - auto, 2 - force iterative refinement, 3 - multiprecison, 4 - quadprecision)
          // only need to do something here if multi or quad, the rest is handled in runSoPlex
          if(strncmp(option, "arithmetic=", 11) == 0)
          {
-            if( option[11] == '1')
+            if(option[11] == '1')
             {
 #ifndef SOPLEX_WITH_FLOAT128
-               MSG_ERROR(std::cerr << "Cannot set arithmetic type to quadprecision - Soplex compiled without quadprecision support\n";)
+               MSG_ERROR(std::cerr <<
+                         "Cannot set arithmetic type to quadprecision - Soplex compiled without quadprecision support\n";)
                printUsage(argv, 0);
                return 1;
 #else
                arithmetic = 1;
 #endif
             }
-            else if( option[11] == '2' )
+            else if(option[11] == '2')
             {
 #ifndef SOPLEX_WITH_BOOST
-               MSG_ERROR(std::cerr << "Cannot set arithmetic type to multiprecision - Soplex compiled without boost\n";)
+               MSG_ERROR(std::cerr <<
+                         "Cannot set arithmetic type to multiprecision - Soplex compiled without boost\n";)
                printUsage(argv, 0);
                return 1;
 #else
@@ -1175,11 +1178,13 @@ int main(int argc, char* argv[])
             }
          }
          // set precision
-         else if( strncmp(option, "precision=", 10) == 0)
+         else if(strncmp(option, "precision=", 10) == 0)
          {
-            precision = atoi(option+10);
+            precision = atoi(option + 10);
          }
+
          break;
+
       default:
          break;
       }
@@ -1193,15 +1198,16 @@ int main(int argc, char* argv[])
 
 #ifdef SOPLEX_WITH_BOOST
 #ifdef SOPLEX_WITH_FLOAT128
+
    case 1:                // quadprecision
 #if BOOST_VERSION < 107000
       std::cerr << "Error: Boost version too old." << std:: endl <<
-               "In order to use the quadprecision feature of SoPlex," <<
-               " Boost Version 1.70.0 or higher is required." << std::endl << \
-               "Included Boost version is " << BOOST_VERSION / 100000 << "."  // maj. version
-               << BOOST_VERSION / 100 % 1000 << "."  // min. version
-               << BOOST_VERSION % 100                // patch version;
-               << std::endl;
+                "In order to use the quadprecision feature of SoPlex," <<
+                " Boost Version 1.70.0 or higher is required." << std::endl << \
+                "Included Boost version is " << BOOST_VERSION / 100000 << "."  // maj. version
+                << BOOST_VERSION / 100 % 1000 << "."  // min. version
+                << BOOST_VERSION % 100                // patch version;
+                << std::endl;
 #else
       using namespace boost::multiprecision;
       using Quad = boost::multiprecision::float128;
@@ -1209,17 +1215,18 @@ int main(int argc, char* argv[])
 #endif
       break;
 #endif
+
    case 2:                 // soplex mpf
       using namespace boost::multiprecision;
 
 #if BOOST_VERSION < 107000
       std::cerr << "Error: Boost version too old." << std:: endl <<
-               "In order to use the multiprecision feature of SoPlex," <<
-               " Boost Version 1.70.0 or higher is required." << std::endl << \
-               "Included Boost version is " << BOOST_VERSION / 100000 << "."  // maj. version
-               << BOOST_VERSION / 100 % 1000 << "."  // min. version
-               << BOOST_VERSION % 100                // patch version;
-               << std::endl;
+                "In order to use the multiprecision feature of SoPlex," <<
+                " Boost Version 1.70.0 or higher is required." << std::endl << \
+                "Included Boost version is " << BOOST_VERSION / 100000 << "."  // maj. version
+                << BOOST_VERSION / 100 % 1000 << "."  // min. version
+                << BOOST_VERSION % 100                // patch version;
+                << std::endl;
 #else
 #ifdef SOPLEX_WITH_MPFR
 
