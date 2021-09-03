@@ -3,9 +3,13 @@ next major Release
 
 features:
 
+- reverted dependency on the Boost program options library, while still keeping the possibility of using higher precisions as SoPLex base arithmetic type.
+- changed the command-line argument for running soplex with higher precision; formerly the multiprecision mode was triggered by setting `solvemode=3` (multiprecision), or `solvemode=4` (quadprecision); Now higher precision arithmetic has its own argument `arithmetic` (0 - double, 1 - quadprecision, 2 - multiprecision); This makes it possible to also use rational solving mode in combination with multiprecision
+
 interface & parameters:
 
 - added intterupt flag to optimize() (default NULL)
+
 
 performance:
 
