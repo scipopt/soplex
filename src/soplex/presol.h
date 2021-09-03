@@ -37,36 +37,29 @@ namespace soplex{
    class Presol : public SPxSimplifier<R> {
    private:
 
-
-      //------------------------------------
-      ///@name Data
-      ///@{
-      ///
       VectorBase<R> m_prim;       ///< unsimplified primal solution VectorBase<R>.
       VectorBase<R> m_slack;      ///< unsimplified slack VectorBase<R>.
       VectorBase<R> m_dual;       ///< unsimplified dual solution VectorBase<R>.
       VectorBase<R> m_redCost;    ///< unsimplified reduced cost VectorBase<R>.
       DataArray<typename SPxSolverBase<R>::VarStatus> m_cBasisStat; ///< basis status of columns.
       DataArray<typename SPxSolverBase<R>::VarStatus> m_rBasisStat; ///< basis status of rows.
-      DataArray<int> m_cIdx;       ///< column index VectorBase<R> in original LP.
-      DataArray<int> m_rIdx;       ///< row index VectorBase<R> in original LP.
-      papilo::PostsolveStorage<R>
-          postsolveStorage;       ///< postsolveInformation to recalculate the problem
-      bool m_noChanges = false;
-      papilo::Num<R> num{};        ///< stored numerics for PaPILO
 
-      bool m_postsolved; ///< status of postsolving.
-      R m_epsilon;    ///< epsilon zero.
-      R m_feastol;    ///< primal feasibility tolerance.
-      R m_opttol;     ///< dual feasibility tolerance.
+      papilo::PostsolveStorage<R>
+          postsolveStorage;        ///< storede postsolve to recalculate the original solution
+      bool m_noChanges = false;    ///< did PaPILO reduce the problem?
+
+      bool m_postsolved;           ///< was the solution already postsolve?
+      R m_epsilon;                 ///< epsilon zero.
+      R m_feastol;                 ///< primal feasibility tolerance.
+      R m_opttol;                  ///< dual feasibility tolerance.
       DataArray<int> m_stat;       ///< preprocessing history.
       typename SPxLPBase<R>::SPxSense m_thesense;   ///< optimization sense.
-      bool m_keepbounds;  ///< keep some bounds (for boundflipping)
-      int m_addedcols;  ///< columns added by handleRowObjectives()
+
+      // TODO: the following parameters were ignored? Maybe I don't exactly know what they suppose to be
+      bool m_keepbounds;           ///< keep some bounds (for boundflipping)
       typename SPxSimplifier<R>::Result m_result;     ///< result of the simplification.
-      R m_cutoffbound;  ///< the cutoff bound that is found by heuristics
-      R m_pseudoobj;    ///< the pseudo objective function value
-      ///@}
+//      R m_cutoffbound;             ///< the cutoff bound that is found by heuristics
+//      R m_pseudoobj;               ///< the pseudo objective function value
 
    protected:
 
@@ -93,21 +86,17 @@ namespace soplex{
       /// default constructor.
       explicit Presol(Timer::TYPE ttype = Timer::USER_TIME)
               : SPxSimplifier<R>("PaPILO", ttype), m_postsolved(false), m_epsilon(DEFAULT_EPS_ZERO),
-                m_feastol(DEFAULT_BND_VIOL), m_opttol(DEFAULT_BND_VIOL), m_stat(16), m_thesense(SPxLPBase<R>::MAXIMIZE),
-                m_keepbounds(false), m_addedcols(0), m_result(this->OKAY), m_cutoffbound(R(-infinity)),
-                m_pseudoobj(R(-infinity)) { ; };
+                m_feastol(DEFAULT_BND_VIOL), m_opttol(DEFAULT_BND_VIOL), m_thesense(SPxLPBase<R>::MAXIMIZE),
+                m_keepbounds(false), m_result(this->OKAY)
+     { ; };
 
       /// copy constructor.
       Presol(const Presol &old)
               : SPxSimplifier<R>(old), m_prim(old.m_prim), m_slack(old.m_slack), m_dual(old.m_dual),
                 m_redCost(old.m_redCost), m_cBasisStat(old.m_cBasisStat), m_rBasisStat(old.m_rBasisStat),
-                m_cIdx(old.m_cIdx), m_rIdx(old.m_rIdx)
-              ,
-            postsolveStorage(old.postsolveStorage)
-              , m_postsolved(old.m_postsolved), m_epsilon(old.m_epsilon), m_feastol(old.m_feastol),
-                m_opttol(old.m_opttol), m_stat(old.m_stat), m_thesense(old.m_thesense), m_keepbounds(old.m_keepbounds),
-                m_addedcols(old.m_addedcols), m_result(old.m_result), m_cutoffbound(old.m_cutoffbound),
-                m_pseudoobj(old.m_pseudoobj) {
+                postsolveStorage(old.postsolveStorage), m_postsolved(old.m_postsolved), m_epsilon(old.m_epsilon),
+                m_feastol(old.m_feastol), m_opttol(old.m_opttol),  m_thesense(old.m_thesense), m_keepbounds(old.m_keepbounds),
+                 m_result(old.m_result) {
          ;
       }
 
@@ -122,19 +111,13 @@ namespace soplex{
             m_redCost = rhs.m_redCost;
             m_cBasisStat = rhs.m_cBasisStat;
             m_rBasisStat = rhs.m_rBasisStat;
-            m_cIdx = rhs.m_cIdx;
-            m_rIdx = rhs.m_rIdx;
             m_postsolved = rhs.m_postsolved;
             m_epsilon = rhs.m_epsilon;
             m_feastol = rhs.m_feastol;
             m_opttol = rhs.m_opttol;
-            m_stat = rhs.m_stat;
             m_thesense = rhs.m_thesense;
             m_keepbounds = rhs.m_keepbounds;
-            m_addedcols = rhs.m_addedcols;
             m_result = rhs.m_result;
-            m_cutoffbound = rhs.m_cutoffbound;
-            m_pseudoobj = rhs.m_pseudoobj;
             postsolveStorage = rhs.postsolveStorage;
          }
          return *this;
@@ -296,27 +279,27 @@ namespace soplex{
      reducedSolution.dual.resize(nRowsReduced);
      reducedSolution.rowBasisStatus.resize(nRowsReduced);
 
+     R switch_sign = SPxLPBase<R>::MAXIMIZE ? -1 : 1;
 
      // assign values of variables in reduced LP
-     // TODO: NOTE: for maximization problems, we have to switch signs of dual and
+     // NOTE: for maximization problems, we have to switch signs of dual and
      // reduced cost values, since simplifier assumes minimization problem
      for (int j = 0; j < nColsReduced; ++j) {
        reducedSolution.primal[j] = isZero(x[j], this->epsZero()) ? 0.0 : x[j];
        reducedSolution.reducedCosts[j] =
-           isZero(r[j], this->epsZero()) ? 0.0 : r[j];
-       //               : (m_thesense == SPxLPBase<R>::MAXIMIZE ? -r[j] : r[j]);
+           isZero(r[j], this->epsZero()) ? 0.0 : switch_sign * r[j];
        reducedSolution.varBasisStatus[j] = convertToPapiloStatus(cols[j]);
-
      }
 
-
      for (int i = 0; i < nRowsReduced; ++i) {
-       reducedSolution.dual[i] = isZero(y[i], this->epsZero()) ? 0.0 : y[i];
-       //               : (m_thesense == SPxLPBase<R>::MAXIMIZE ? -y[i] : y[i]);
+       reducedSolution.dual[i] = isZero(y[i], this->epsZero()) ? 0.0 : switch_sign * y[i];
        reducedSolution.rowBasisStatus[i] = convertToPapiloStatus(rows[i]);
      }
 
      /* since PaPILO verbosity is quiet it's irrelevant what's the messager*/
+     papilo::Num<R> num {};
+     num.setEpsilon(m_epsilon);
+     num.setFeasTol(m_feastol);
      papilo::Message msg{};
      papilo::Postsolve<R> postsolve{msg, num};
      postsolve.undo(reducedSolution, originalSolution, postsolveStorage);
@@ -435,18 +418,16 @@ namespace soplex{
    template<class R>
    typename SPxSimplifier<R>::Result Presol<R>::simplify(SPxLPBase<R> &lp, R eps, R ftol, R otol, bool keepbounds) {
 
+      //TODO: how to use the keepbounds parameter?
+
       init(lp);
       papilo::Problem<R> problem = buildProblem(lp);
       papilo::Presolve<R> presolve;
 
-      // TODO: parameterize Variable
+      // TODO: add new parameter to SoPlex or just code it hard?
       int modifyconsfac = 1;
 
       configurePapilo(presolve, ftol, eps);
-      papilo::Num<R> n {};
-      n.setFeasTol(ftol);
-      n.setEpsilon(eps);
-      num = n;
       MSG_INFO1((*this->spxout), (*this->spxout) << " --- starting PaPILO" << std::endl;)
 
       papilo::PresolveResult<R> res = presolve.apply(problem);
@@ -510,8 +491,6 @@ namespace soplex{
       m_redCost.reDim(lp.nCols());
       m_cBasisStat.reSize(lp.nCols());
       m_rBasisStat.reSize(lp.nRows());
-      m_cIdx.reSize(lp.nCols());
-      m_rIdx.reSize(lp.nRows());
    }
 
    template<class R>
@@ -539,35 +518,40 @@ namespace soplex{
       presolve.getPresolveOptions().componentsmaxint = -1;
       presolve.getPresolveOptions().calculate_basis_for_dual = true;
 
-//      presolve.setVerbosityLevel(papilo::VerbosityLevel::kQuiet);
-      presolve.setVerbosityLevel(papilo::VerbosityLevel::kDetailed);
+      presolve.setVerbosityLevel(papilo::VerbosityLevel::kQuiet);
+      /*presolve.setVerbosityLevel(papilo::VerbosityLevel::kDetailed);*/
 
 
       /* enable lp presolvers with dual postsolve*/
       using uptr = std::unique_ptr<papilo::PresolveMethod<R>>;
 
       /* fast presolvers*/
-      presolve.addPresolveMethod(uptr(new papilo::SingletonCols<R>()));
+      //TODO: assert fails in substiution
+//      presolve.addPresolveMethod(uptr(new papilo::SingletonCols<R>()));
       presolve.addPresolveMethod(uptr(new papilo::ConstraintPropagation<R>()));
 
       /* medium presolver */
       presolve.addPresolveMethod(uptr(new papilo::ParallelRowDetection<R>()));
       presolve.addPresolveMethod(uptr(new papilo::ParallelColDetection<R>()));
-      presolve.addPresolveMethod(uptr(new papilo::SingletonStuffing<R>()));
+//      presolve.addPresolveMethod(uptr(new papilo::SingletonStuffing<R>()));
       presolve.addPresolveMethod(uptr(new papilo::DualFix<R>()));
       presolve.addPresolveMethod(uptr(new papilo::FixContinuous<R>()));
 
       /* exhaustive presolvers*/
      presolve.addPresolveMethod(uptr(new papilo::DominatedCols<R>()));
-      // TODO: these method don't support dual presolve
-      //  presolve.addPresolveMethod(uptr(new papilo::SimpleSubstitution<R>()));
-      //  presolve.addPresolveMethod(uptr(new papilo::DualInfer<R>()));
-      //  presolve.addPresolveMethod(uptr(new papilo::Substitution<R>()));
-      //  presolve.addPresolveMethod(uptr(new papilo::Sparsify<R>()));
-      //  presolve.getPresolveOptions().removeslackvars = false;
-      //  presolve.getPresolveOptions().maxfillinpersubstitution =
-      //     data->maxfillinpersubstitution;
-      //  presolve.getPresolveOptions().maxshiftperrow = data->maxshiftperrow;
+
+     /**
+      * TODO: PaPILO doesn't support dualpostsolve for those presolvers
+      *  presolve.addPresolveMethod(uptr(new papilo::SimpleSubstitution<R>()));
+      *  presolve.addPresolveMethod(uptr(new papilo::DualInfer<R>()));
+      *  presolve.addPresolveMethod(uptr(new papilo::Substitution<R>()));
+      *  presolve.addPresolveMethod(uptr(new papilo::Sparsify<R>()));
+      *  presolve.getPresolveOptions().removeslackvars = false;
+      *  presolve.getPresolveOptions().maxfillinpersubstitution
+      *   =data->maxfillinpersubstitution;
+      *  presolve.getPresolveOptions().maxshiftperrow = data->maxshiftperrow;
+      */
+
 
    }
 
