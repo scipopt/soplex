@@ -45,7 +45,7 @@
 /*
  * include build configuration flags
  */
-#ifndef NO_CONFIG_HEADER
+#ifndef SOPLEX_NO_CONFIG_HEADER
 #include "soplex/config.h"
 #endif
 

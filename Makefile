@@ -121,7 +121,7 @@ INCLUDEDIR	=	include
 NAME		   =	soplex
 
 # skip config header
-FLAGS		+=  -DNO_CONFIG_HEADER
+FLAGS		+=  -DSOPLEX_NO_CONFIG_HEADER
 
 LIBOBJ = soplex/clufactor_rational.o \
 				soplex/didxset.o \
