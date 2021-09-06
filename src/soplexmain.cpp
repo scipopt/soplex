@@ -1115,7 +1115,7 @@ TERMINATE:
 int main(int argc, char* argv[])
 {
    int arithmetic = 0;
-   int precision;
+   int precision = 50;
    int optidx;
 
    // find out which precision/solvemode soplex should be run in. the rest happens in runSoPlex
@@ -1181,6 +1181,9 @@ int main(int argc, char* argv[])
          else if(strncmp(option, "precision=", 10) == 0)
          {
             precision = atoi(option + 10);
+#ifndef SOPLEX_WITH_BOOST
+            MSG_ERROR(std::cerr << "Setting non-default precision to value" << precision << "without Boost has no effect\n";)
+#endif
          }
 
          break;
