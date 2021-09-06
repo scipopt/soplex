@@ -254,7 +254,7 @@ inline Rational ratFromString(const char* desc)
    return res;
 }
 #else
-using Rational = float;
+using Rational = double;
 using Integer = int;
 
 
