@@ -1115,7 +1115,7 @@ TERMINATE:
 int main(int argc, char* argv[])
 {
    int arithmetic = 0;
-   int precision = 50;
+   int precision;
    int optidx;
 
    // find out which precision/solvemode soplex should be run in. the rest happens in runSoPlex
