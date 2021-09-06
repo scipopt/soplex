@@ -164,11 +164,11 @@ if(PAPILO)
     message(STATUS "Finding PAPILO")
     find_package(PAPILO CONFIG REQUIRED)
     message(STATUS "Finding PAPILO - found")
-    add_definitions(-DSOPLEX_WITH_PAPILO=ON)
+    set(SOPLEX_WITH_PAPILO on)
 else()
     message(STATUS "Support PAPILO: OFF")
     set(PAPILO_IMPORTED_TARGETS "")
-    add_definitions(-DSOPLEX_WITH_PAPILO=OFF)
+    set(SOPLEX_WITH_PAPILO off)
 endif()
 
 # use C++14 standard
