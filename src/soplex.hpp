@@ -230,7 +230,7 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
    description[SoPlexBase<R>::SIMPLIFIER] = "simplifier (0 - off, 1 - internal, 2 - PaPILO)";
    lower[SoPlexBase<R>::SIMPLIFIER] = 0;
    upper[SoPlexBase<R>::SIMPLIFIER] = 2;
-   defaultValue[SoPlexBase<R>::SIMPLIFIER] = SoPlexBase<R>::PRESOLVING_PAPILO;
+   defaultValue[SoPlexBase<R>::SIMPLIFIER] = SoPlexBase<R>::SIMPLIFIER_PAPILO;
 
    // type of scaler
    name[SoPlexBase<R>::SCALER] = "scaler";
@@ -5838,24 +5838,24 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
    case SoPlexBase<R>::SIMPLIFIER:
       switch(value)
       {
-      case PRESOLVING_OFF:
+      case SIMPLIFIER_OFF:
          _simplifier = 0;
          break;
-      case PRESOLVING_INTERNAL:
+      case SIMPLIFIER_INTERNAL:
          _simplifier = &_simplifierMainSM;
          assert(_simplifier != 0);
          break;
-      case PRESOLVING_PAPILO:
+      case SIMPLIFIER_PAPILO:
 #ifdef SOPLEX_WITH_PAPILO
          _simplifier = &_presol_papilo;
          assert  (_simplifier != 0);
+         break;
 #else
-         MSG_INFO1((*this->spxout), (*this->spxout) << " --- PaPILO not specified- using fallback presolving" << std::endl;)
+         MSG_ERROR((*this->spxout), (*this->spxout) << " --- PaPILO not specified please build SoPlex with PaPILO-" << std::endl;)
          _simplifier = &_simplifierMainSM;
          assert(_simplifier != 0);
+         return false;
 #endif
-            break;
-
       default:
          return false;
       }
@@ -7804,17 +7804,17 @@ void SoPlexBase<R>::_enableSimplifierAndScaler()
    int i = intParam(SoPlexBase<R>::SIMPLIFIER);
    switch(i)
    {
-   case PRESOLVING_OFF:
+   case SIMPLIFIER_OFF:
       _simplifier = 0;
       break;
 
-   case PRESOLVING_INTERNAL:
+   case SIMPLIFIER_INTERNAL:
       _simplifier = &_simplifierMainSM;
       assert(_simplifier != 0);
       _simplifier->setMinReduction(realParam(MINRED));
       break;
 
-   case PRESOLVING_PAPILO:
+   case SIMPLIFIER_PAPILO:
       #ifdef SOPLEX_WITH_PAPILO
          _simplifier = &_presol_papilo;
          assert(_simplifier != 0);

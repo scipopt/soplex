@@ -1155,13 +1155,13 @@ public:
    enum
    {
       /// no simplifier
-      PRESOLVING_OFF = 0,
+      SIMPLIFIER_OFF = 0,
 
       /// automatic choice
-      PRESOLVING_INTERNAL = 1,
+      SIMPLIFIER_INTERNAL = 1,
 
       /// automatic choice
-      PRESOLVING_PAPILO = 2
+      SIMPLIFIER_PAPILO = 2
    };
 
    /// values for parameter SCALER

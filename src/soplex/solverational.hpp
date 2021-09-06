@@ -3626,7 +3626,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
    int type = intParam(SoPlexBase<R>::ALGORITHM);
 
    if(forceNoSimplifier)
-      setIntParam(SoPlexBase<R>::SIMPLIFIER, SoPlexBase<R>::PRESOLVING_OFF);
+      setIntParam(SoPlexBase<R>::SIMPLIFIER, SoPlexBase<R>::SIMPLIFIER_OFF);
 
    while(true)
    {
@@ -3648,15 +3648,14 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
       }
 
       if(!turnedoffPre
-            && (intParam(SoPlexBase<R>::SIMPLIFIER) != SoPlexBase<R>::PRESOLVING_OFF
-                || intParam(SoPlexBase<R>::SCALER) != SoPlexBase<R>::SCALER_OFF))
+            && (intParam(SoPlexBase<R>::SIMPLIFIER) != SoPlexBase<R>::SIMPLIFIER_OFF || intParam(SoPlexBase<R>::SCALER) != SoPlexBase<R>::SCALER_OFF))
       {
          MSG_INFO1(spxout, spxout << "Turning off preprocessing." << std::endl);
 
          turnedoffPre = true;
 
          setIntParam(SoPlexBase<R>::SCALER, SoPlexBase<R>::SCALER_OFF);
-         setIntParam(SoPlexBase<R>::SIMPLIFIER, SoPlexBase<R>::PRESOLVING_OFF);
+         setIntParam(SoPlexBase<R>::SIMPLIFIER, SoPlexBase<R>::SIMPLIFIER_OFF);
 
          fromScratch = true;
          solvedFromScratch = true;
@@ -3715,10 +3714,10 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
       {
          MSG_INFO1(spxout, spxout << "Switching simplification." << std::endl);
 
-         if(simplifier == int(SoPlexBase<R>::PRESOLVING_OFF))
-            setIntParam(SoPlexBase<R>::SIMPLIFIER, SoPlexBase<R>::PRESOLVING_INTERNAL);
+         if(simplifier == int(SoPlexBase<R>::SIMPLIFIER_OFF))
+            setIntParam(SoPlexBase<R>::SIMPLIFIER, SoPlexBase<R>::SIMPLIFIER_INTERNAL);
          else
-            setIntParam(SoPlexBase<R>::SIMPLIFIER, SoPlexBase<R>::PRESOLVING_OFF);
+            setIntParam(SoPlexBase<R>::SIMPLIFIER, SoPlexBase<R>::SIMPLIFIER_OFF);
 
          fromScratch = true;
          solvedFromScratch = true;
@@ -3726,7 +3725,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
          continue;
       }
 
-      setIntParam(SoPlexBase<R>::SIMPLIFIER, SoPlexBase<R>::PRESOLVING_OFF);
+      setIntParam(SoPlexBase<R>::SIMPLIFIER, SoPlexBase<R>::SIMPLIFIER_OFF);
 
       if(!relaxedTolerances)
       {
