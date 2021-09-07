@@ -136,11 +136,11 @@ namespace soplex{
       }
 
 
-      virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R> &lp, R eps, R delta) {
-         return simplify(lp, eps, delta, delta, false, 0);
+      virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R> &lp, R eps, R delta, Real remainingTime) {
+         return simplify(lp, eps, delta, delta, remainingTime, false, 0);
       }
 
-      virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R> &lp, R eps, R ftol, R otol,
+      virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R> &lp, R eps, R ftol, R otol, Real remainingTime,
                                                          bool keepbounds, uint32_t seed);
 
       virtual void unsimplify(const VectorBase<R> &, const VectorBase<R> &, const VectorBase<R> &,
@@ -214,7 +214,7 @@ namespace soplex{
 
       void init(const SPxLPBase <R> &lp);
 
-      void configurePapilo(papilo::Presolve<R> &presolve, R feasTolerance, R epsilon, uint32_t seed) const;
+      void configurePapilo(papilo::Presolve<R> &presolve, R feasTolerance, R epsilon, uint32_t seed, Real remainingTime) const;
 
       void applyPresolveResultsToColumns(SPxLPBase <R> &lp, const papilo::Problem<R> &problem,
                                          const papilo::PresolveResult<R> &res) const;
@@ -420,10 +420,11 @@ namespace soplex{
 
 
    template<class R>
-   typename SPxSimplifier<R>::Result Presol<R>::simplify(SPxLPBase<R> &lp, R eps, R ftol, R otol, bool keepbounds, uint32_t seed) {
+   typename SPxSimplifier<R>::Result
+   Presol<R>::simplify(SPxLPBase<R> &lp, R eps, R ftol, R otol,
+                       Real remainingTime, bool keepbounds, uint32_t seed) {
 
-      //TODO: how to use the keepbounds parameter?
-
+     //TODO: how to use the keepbounds parameter?
       m_thesense = lp.spxSense();
       m_keepbounds = keepbounds;
       this->m_timeUsed->reset();
@@ -436,7 +437,7 @@ namespace soplex{
       // TODO: add new parameter to SoPlex or just code it hard?
       int modifyconsfac = 1;
 
-      configurePapilo(presolve, ftol, eps, seed);
+      configurePapilo(presolve, ftol, eps, seed, remainingTime);
       MSG_INFO1((*this->spxout), (*this->spxout) << " --- starting PaPILO" << std::endl;)
 
       papilo::PresolveResult<R> res = presolve.apply(problem);
@@ -504,20 +505,17 @@ namespace soplex{
    }
 
    template<class R>
-   void Presol<R>::configurePapilo(papilo::Presolve<R> &presolve, R feasTolerance, R epsilon, uint32_t seed) const {
-
+   void Presol<R>::configurePapilo(papilo::Presolve<R> &presolve, R feasTolerance, R epsilon, uint32_t seed, Real remainingTime) const {
      /* communicate the SOPLEX parameters to the presolve libary */
 
       /* communicate the random seed */
-       presolve.getPresolveOptions().randomseed = (unsigned int) seed;
+      presolve.getPresolveOptions().randomseed = (unsigned int) seed;
 
      /* set number of threads to be used for presolve */
-     // TODO: set threads for PaPILO? Can Soplex be run with multiple threads?
+     /* TODO: set threads for PaPILO? Can Soplex be run with multiple threads?*/
      //      presolve.getPresolveOptions().threads = data->threads;
 
-     //TODO: set timelimit
-     //      presolve.getPresolveOptions().tlim = timelimit - remaining_time
-
+      presolve.getPresolveOptions().tlim = remainingTime;
       presolve.getPresolveOptions().dualreds = 0;
       presolve.getPresolveOptions().feastol = double(feasTolerance);
       presolve.getPresolveOptions().epsilon = double(epsilon);
@@ -533,14 +531,14 @@ namespace soplex{
       using uptr = std::unique_ptr<papilo::PresolveMethod<R>>;
 
       /* fast presolvers*/
-      //TODO: assert fails in substitution
-//      presolve.addPresolveMethod(uptr(new papilo::SingletonCols<R>()));
+      //TODO: asserts fail for SingletonCols/Stuffing for setting exact
+      presolve.addPresolveMethod(uptr(new papilo::SingletonCols<R>()));
       presolve.addPresolveMethod(uptr(new papilo::ConstraintPropagation<R>()));
 
       /* medium presolver */
       presolve.addPresolveMethod(uptr(new papilo::ParallelRowDetection<R>()));
       presolve.addPresolveMethod(uptr(new papilo::ParallelColDetection<R>()));
-//      presolve.addPresolveMethod(uptr(new papilo::SingletonStuffing<R>()));
+      presolve.addPresolveMethod(uptr(new papilo::SingletonStuffing<R>()));
       presolve.addPresolveMethod(uptr(new papilo::DualFix<R>()));
       presolve.addPresolveMethod(uptr(new papilo::FixContinuous<R>()));
 

@@ -1528,12 +1528,12 @@ public:
    //**@name LP simplification */
    ///@{
    /// simplify SPxLPBase<R> \p lp with identical primal and dual feasibility tolerance.
-   virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, R eps, R delta)
+   virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, R eps, R delta, Real remainingTime)
    {
-      return simplify(lp, eps, delta, delta);
+      return simplify(lp, eps, delta, delta, remainingTime);
    }
    /// simplify SPxLPBase<R> \p lp with independent primal and dual feasibility tolerance.
-   virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
+   virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol, Real remainingTime,
          bool keepbounds = false, uint32_t seed = 0);
 
    /// reconstructs an optimal solution for the unsimplified LP.
