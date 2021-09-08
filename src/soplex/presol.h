@@ -212,7 +212,7 @@ namespace soplex{
 
    private:
 
-      void init(const SPxLPBase <R> &lp);
+      void initLocalVariables(const SPxLPBase <R> &lp);
 
       void configurePapilo(papilo::Presolve<R> &presolve, R feasTolerance, R epsilon, uint32_t seed, Real remainingTime) const;
 
@@ -282,6 +282,8 @@ namespace soplex{
      reducedSolution.dual.resize(nRowsReduced);
      reducedSolution.rowBasisStatus.resize(nRowsReduced);
 
+     m_postsolved = true;
+
      // NOTE: for maximization problems, we have to switch signs of dual and
      // reduced cost values, since simplifier assumes minimization problem
      R switch_sign = m_thesense == SPxLPBase<R>::MAXIMIZE ? -1 : 1;
@@ -297,6 +299,10 @@ namespace soplex{
      for (int i = 0; i < nRowsReduced; ++i) {
        reducedSolution.dual[i] = isZero(y[i], this->epsZero()) ? 0.0 : switch_sign * y[i];
        reducedSolution.rowBasisStatus[i] = convertToPapiloStatus(rows[i]);
+     }
+
+     // TODO: handle case that is not optimal because validation can not be
+     if(isOptimal){
      }
 
      /* since PaPILO verbosity is quiet it's irrelevant what's the messager*/
@@ -320,7 +326,6 @@ namespace soplex{
        m_rBasisStat[i] =convertToSoplexStatus(originalSolution.rowBasisStatus[i]);
      }
 
-     m_postsolved = true;
    }
 
    template <class R>
@@ -425,13 +430,9 @@ namespace soplex{
                        Real remainingTime, bool keepbounds, uint32_t seed) {
 
      //TODO: how to use the keepbounds parameter?
-      m_thesense = lp.spxSense();
       m_keepbounds = keepbounds;
-      m_postsolved = false;
-      this->m_timeUsed->reset();
-      this->m_timeUsed->start();
 
-      init(lp);
+      initLocalVariables(lp);
       papilo::Problem<R> problem = buildProblem(lp);
       papilo::Presolve<R> presolve;
 
@@ -495,14 +496,21 @@ namespace soplex{
    }
 
    template<class R>
-   void Presol<R>::init(const SPxLPBase <R> &lp) {
+   void Presol<R>::initLocalVariables(const SPxLPBase <R> &lp) {
       m_result = SPxSimplifier<R>::OKAY;
+
+      m_thesense = lp.spxSense();
+      m_postsolved = false;
+
       m_prim.reDim(lp.nCols());
       m_slack.reDim(lp.nRows());
       m_dual.reDim(lp.nRows());
       m_redCost.reDim(lp.nCols());
       m_cBasisStat.reSize(lp.nCols());
       m_rBasisStat.reSize(lp.nRows());
+
+      this->m_timeUsed->reset();
+      this->m_timeUsed->start();
    }
 
    template<class R>
@@ -537,11 +545,11 @@ namespace soplex{
       presolve.addPresolveMethod(uptr(new papilo::ConstraintPropagation<R>()));
 
       /* medium presolver */
-//      presolve.addPresolveMethod(uptr(new papilo::ParallelRowDetection<R>()));
-//      presolve.addPresolveMethod(uptr(new papilo::ParallelColDetection<R>()));
-//      presolve.addPresolveMethod(uptr(new papilo::SingletonStuffing<R>()));
-//      presolve.addPresolveMethod(uptr(new papilo::DualFix<R>()));
-//      presolve.addPresolveMethod(uptr(new papilo::FixContinuous<R>()));
+      presolve.addPresolveMethod(uptr(new papilo::ParallelRowDetection<R>()));
+      presolve.addPresolveMethod(uptr(new papilo::ParallelColDetection<R>()));
+      presolve.addPresolveMethod(uptr(new papilo::SingletonStuffing<R>()));
+      presolve.addPresolveMethod(uptr(new papilo::DualFix<R>()));
+      presolve.addPresolveMethod(uptr(new papilo::FixContinuous<R>()));
 
       /* exhaustive presolvers*/
      presolve.addPresolveMethod(uptr(new papilo::DominatedCols<R>()));
