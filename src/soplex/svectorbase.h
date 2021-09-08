@@ -323,6 +323,7 @@ public:
       {
          if(*v != 0.0)
          {
+            assert(e != nullptr);
             e->idx = *i;
             e->val = *v;
             e++;
