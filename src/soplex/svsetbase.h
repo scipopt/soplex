@@ -32,6 +32,7 @@
 #include "soplex/svectorbase.h"
 #include "soplex/classarray.h"
 #include "soplex/dataset.h"
+#include "soplex/classset.h"
 #include "soplex/datakey.h"
 #include "soplex/idlist.h"
 
@@ -107,6 +108,17 @@ private:
          : SVectorBase<R>(copy)
       {}
 
+      DLPSV(DLPSV&& copy)
+         : SVectorBase<R>(copy)
+      {}
+
+      DLPSV& operator=(DLPSV&& rhs)
+      {
+         SVectorBase<R>::operator=(std::move(rhs));
+         this->thenext = rhs.thenext;
+         this->theprev = rhs.theprev;
+         return *this;
+      }
       ///@}
 
       // ---------------------------------------------------------------------------------------------------------------
@@ -144,7 +156,7 @@ private:
    /**@name Data */
    ///@{
 
-   DataSet < DLPSV > set;  ///< %set of SVectorBase%s
+   ClassSet < DLPSV > set;  ///< %set of SVectorBase%s
    IdList < DLPSV > list;  ///< doubly linked list for non-zero management
    int unusedMem;  ///< an estimate of the unused memory (the difference of max() and size() summed up over all vectors) due to deleteVec() and xtend()
    int numUnusedMemUpdates;  ///< counter for how often unusedMem has been updated since last exact value

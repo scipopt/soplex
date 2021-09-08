@@ -652,6 +652,19 @@ public:
       return *this;
    }
 
+   /// move assignemnt operator.
+   SVectorBase<R>& operator=(const SVectorBase<R>&& sv)
+   {
+      if(this != &sv)
+      {
+         this->m_elem = sv.m_elem;
+         this->memsize = sv.memsize;
+         this->memused = sv.memused;
+      }
+
+      return *this;
+   }
+
    /// Assignment operator.
    template < class S >
    SVectorBase<R>& operator=(const SVectorBase<S>& sv)
