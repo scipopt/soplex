@@ -37,7 +37,7 @@ namespace soplex{
    class Presol : public SPxSimplifier<R> {
    private:
 
-      const papilo::VerbosityLevel verbosityLevel = papilo::VerbosityLevel::kQuiet;
+      const papilo::VerbosityLevel verbosityLevel = papilo::VerbosityLevel::kDetailed;
 
       VectorBase<R> m_prim;       ///< unsimplified primal solution VectorBase<R>.
       VectorBase<R> m_slack;      ///< unsimplified slack VectorBase<R>.
@@ -427,6 +427,7 @@ namespace soplex{
      //TODO: how to use the keepbounds parameter?
       m_thesense = lp.spxSense();
       m_keepbounds = keepbounds;
+      m_postsolved = false;
       this->m_timeUsed->reset();
       this->m_timeUsed->start();
 
@@ -536,11 +537,11 @@ namespace soplex{
       presolve.addPresolveMethod(uptr(new papilo::ConstraintPropagation<R>()));
 
       /* medium presolver */
-      presolve.addPresolveMethod(uptr(new papilo::ParallelRowDetection<R>()));
-      presolve.addPresolveMethod(uptr(new papilo::ParallelColDetection<R>()));
-      presolve.addPresolveMethod(uptr(new papilo::SingletonStuffing<R>()));
-      presolve.addPresolveMethod(uptr(new papilo::DualFix<R>()));
-      presolve.addPresolveMethod(uptr(new papilo::FixContinuous<R>()));
+//      presolve.addPresolveMethod(uptr(new papilo::ParallelRowDetection<R>()));
+//      presolve.addPresolveMethod(uptr(new papilo::ParallelColDetection<R>()));
+//      presolve.addPresolveMethod(uptr(new papilo::SingletonStuffing<R>()));
+//      presolve.addPresolveMethod(uptr(new papilo::DualFix<R>()));
+//      presolve.addPresolveMethod(uptr(new papilo::FixContinuous<R>()));
 
       /* exhaustive presolvers*/
      presolve.addPresolveMethod(uptr(new papilo::DominatedCols<R>()));
