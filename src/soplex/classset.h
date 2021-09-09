@@ -494,6 +494,7 @@ public:
       *lastfree = -newmax - 1;
 
       spx_alloc(newMem, newmax);
+
       /* call copy constructor for first elements */
       for(i = 0; i < max(); i++)
       {
@@ -561,6 +562,7 @@ public:
       firstfree = -themax - 1;
 
       spx_alloc(theitem, themax);
+
       /* call default constructor for each element */
       for(int i = 0; i < themax; i++)
          new(&(theitem[i])) Item();
