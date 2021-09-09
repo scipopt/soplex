@@ -27,12 +27,12 @@
 #include "soplex/spxout.h"
 #include "soplex/mpsinput.h"
 #include "soplex/exceptions.h"
+#include "soplex/rational.h"
 
 #define MAX_LINE_WRITE_LEN 65536   ///< maximum length allowed for writing lines
 
 namespace soplex
 {
-
 template<>
 void SPxLPBase<Rational>::computePrimalActivity(const VectorBase<Rational>& primal,
       VectorBase<Rational>& activity, const bool unscaled) const
@@ -157,6 +157,7 @@ Rational SPxLPBase<Rational>::minAbsNzo(bool /* unscaled */) const
 /** If only a sign is encountered, the number is assumed to be \c sign * 1.  This routine will not catch malformatted
  *  numbers like .e10 !
  */
+#ifdef SOPLEX_WITH_BOOST
 static Rational LPFreadValue(char*& pos, SPxOut* spxout, const int lineno = -1)
 {
    assert(LPFisValue(pos));
@@ -253,10 +254,15 @@ static Rational LPFreadValue(char*& pos, SPxOut* spxout, const int lineno = -1)
 
       *t = '\0';
 
-      if(!value.readString(tmp))
+      try
+      {
+         value = ratFromString(tmp);
+      }
+      catch(const std::exception& e)
       {
          MSG_WARNING((*spxout), (*spxout) << "WLPFRD04 Warning: In line " << lineno <<
                      ": malformed rational value in LP file\n");
+         std::cerr << e.what() << '\n';
       }
    }
 
@@ -331,7 +337,7 @@ static Rational LPFreadInfinity(char*& pos)
    sense *= Rational(infinity);
    return sense;
 }
-
+#endif
 
 
 /// Read LP in "CPLEX LP File Format".
@@ -358,6 +364,10 @@ bool SPxLPBase<Rational>::readLPF(
    NameSet*      p_cnames,               ///< column names.
    DIdxSet*      p_intvars)              ///< integer variables.
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return false;
+#else
    enum
    {
       START, OBJECTIVE, CONSTRAINTS, BOUNDS, INTEGERS, BINARIES
@@ -888,8 +898,10 @@ syntax_error:
       spx_free(rnames);
 
    return finished;
+#endif
 }
 
+#ifdef SOPLEX_WITH_BOOST
 /// Process ROWS section.
 static void MPSreadRows(MPSInput& mps, LPRowSetBase<Rational>& rset, NameSet& rnames,
                         SPxOut* spxout)
@@ -1031,11 +1043,15 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
          }
       }
 
-      if(!val.readString(mps.field3()))
+      try
+      {
+         val = ratFromString(mps.field3());
+      }
+      catch(const std::exception& e)
       {
          MSG_WARNING((*spxout), (*spxout) << "WMPSRD01 Warning: malformed rational value in MPS file\n");
+         std::cerr << e.what() << '\n';
       }
-
 
       if(!strcmp(mps.field2(), mps.objName()))
          col.setObj(val);
@@ -1051,9 +1067,14 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
       {
          assert(mps.field4() != 0);
 
-         if(!val.readString(mps.field5()))
+         try
+         {
+            val = ratFromString(mps.field5());
+         }
+         catch(const std::exception& e)
          {
             MSG_WARNING((*spxout), (*spxout) << "WMPSRD02 Warning: malformed rational value in MPS file\n");
+            std::cerr << e.what() << '\n';
          }
 
          if(!strcmp(mps.field4(), mps.objName()))
@@ -1124,9 +1145,14 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
             mps.entryIgnored("RHS", mps.field1(), "row", mps.field2());
          else
          {
-            if(!val.readString(mps.field3()))
+            try
+            {
+               val = ratFromString(mps.field3());
+            }
+            catch(const std::exception& e)
             {
                MSG_WARNING((*spxout), (*spxout) << "WMPSRD03 Warning: malformed rational value in MPS file\n");
+               std::cerr << e.what() << '\n';
             }
 
             // LE or EQ
@@ -1144,9 +1170,14 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
                mps.entryIgnored("RHS", mps.field1(), "row", mps.field4());
             else
             {
-               if(!val.readString(mps.field5()))
+               try
+               {
+                  val = ratFromString(mps.field5());
+               }
+               catch(const std::exception& e)
                {
                   MSG_WARNING((*spxout), (*spxout) << "WMPSRD04 Warning: malformed rational value in MPS file\n");
+                  std::cerr << e.what() << '\n';
                }
 
                // LE or EQ
@@ -1217,9 +1248,14 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
             mps.entryIgnored("Range", mps.field1(), "row", mps.field2());
          else
          {
-            if(!val.readString(mps.field3()))
+            try
+            {
+               val = ratFromString(mps.field3());
+            }
+            catch(const std::exception& e)
             {
                MSG_WARNING((*spxout), (*spxout) << "WMPSRD05 Warning: malformed rational value in MPS file\n");
+               std::cerr << e.what() << '\n';
             }
 
             // EQ
@@ -1255,9 +1291,14 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
                mps.entryIgnored("Range", mps.field1(), "row", mps.field4());
             else
             {
-               if(!val.readString(mps.field5()))
+               try
+               {
+                  val = ratFromString(mps.field5());
+               }
+               catch(const std::exception& e)
                {
                   MSG_WARNING((*spxout), (*spxout) << "WMPSRD06 Warning: malformed rational value in MPS file\n");
+                  std::cerr << e.what() << '\n';
                }
 
                // EQ
@@ -1357,13 +1398,16 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
             else if(!strcmp(mps.field4(), "Inf") || !strcmp(mps.field4(), "inf")
                     || !strcmp(mps.field4(), "+Inf") || !strcmp(mps.field4(), "+inf"))
                val = infinity;
-            else if(!val.readString(mps.field4()))
-            {
-               MSG_WARNING((*spxout), (*spxout) << "WMPSRD07 Warning: malformed rational value in MPS file line "
-                           << mps.lineno() << ": " << mps.field4() << "\n");
-               mps.syntaxError();
-               return;
-            }
+            else
+               try
+               {
+                  val = ratFromString(mps.field4());
+               }
+               catch(const std::exception& e)
+               {
+                  MSG_WARNING((*spxout), (*spxout) << "WMPSRD07 Warning: malformed rational value in MPS file\n");
+                  std::cerr << e.what() << '\n';
+               }
 
             // ILOG extension (Integer Bound)
             if(mps.field1()[1] == 'I')
@@ -1432,7 +1476,7 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
 
    mps.syntaxError();
 }
-
+#endif
 
 
 /// Read LP in MPS File Format.
@@ -1455,6 +1499,10 @@ bool SPxLPBase<Rational>::readMPS(
    NameSet*      p_cnames,          ///< column names.
    DIdxSet*      p_intvars)         ///< integer variables.
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return false;
+#else
    LPRowSetBase<Rational>& rset = *this;
    LPColSetBase<Rational>& cset = *this;
    NameSet* rnames;
@@ -1562,6 +1610,7 @@ bool SPxLPBase<Rational>::readMPS(
    }
 
    return !mps.hasError();
+#endif
 }
 
 
@@ -1570,6 +1619,7 @@ bool SPxLPBase<Rational>::readMPS(
 // Specialization for writing LP format
 // ---------------------------------------------------------------------------------------------------------------------
 
+#ifdef SOPLEX_WITH_BOOST
 // get the name of a row or construct one
 static const char* LPFgetRowName(
    const SPxLPBase<Rational>& p_lp,
@@ -1655,8 +1705,7 @@ static void LPFwriteSVector(
       {
          // insert a line break every NUM_ENTRIES_PER_LINE columns or whenever max line length is nearly exceeded
          if(num_coeffs == NUM_ENTRIES_PER_LINE ||
-               (long long)(p_output.tellp()) - pos + (long long)(rationalToString(coeff,
-                     false).length() + 100) > MAX_LINE_WRITE_LEN)
+               (long long)(p_output.tellp()) - pos + (long long)(coeff.str().length() + 100) > MAX_LINE_WRITE_LEN)
          {
             num_coeffs = 0;
             p_output << "\n\t";
@@ -1727,8 +1776,8 @@ static void LPFwriteRow(
 
    long long sidelen;
    sidelen = (p_lhs == p_rhs
-              || double(p_lhs) <= double(-infinity)) ? (long long)rationalToString(p_rhs,
-                    false).length() : (long long)rationalToString(p_lhs, false).length();
+              || double(p_lhs) <= double(-infinity)) ? (long long)p_rhs.str().length()
+             : (long long)p_lhs.str().length();
 
    // insert a line break if max line length is in danger of being exceeded
    if((long long)(p_output.tellp()) - pos + sidelen + (long long)100 > MAX_LINE_WRITE_LEN)
@@ -1889,7 +1938,7 @@ static void LPFwriteGenerals(
       if(p_intvars->pos(j) >= 0)
          p_output << "  " << getColName(p_lp, j, p_cnames, name) << "\n";
 }
-
+#endif
 
 
 /// Write LP in LP Format.
@@ -1901,13 +1950,16 @@ void SPxLPBase<Rational>::writeLPF(
    const DIdxSet* p_intvars          ///< integer variables
 ) const
 {
-
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#else
    LPFwriteObjective(*this, p_output, p_cnames, spxout);
    LPFwriteRows(*this, p_output, p_rnames, p_cnames, spxout);
    LPFwriteBounds(*this, p_output, p_cnames, spxout);
    LPFwriteGenerals(*this, p_output, p_cnames, p_intvars);
 
    p_output << "End" << std::endl;
+#endif
 }
 
 
@@ -2215,6 +2267,5 @@ void SPxLPBase<Rational>::buildDualProblem(SPxLPBase<Rational>& dualLP, SPxRowId
 // ---------------------------------------------------------------------------------------------------------------------
 //  Explicit instantiation
 // ---------------------------------------------------------------------------------------------------------------------
-
 template class SPxLPBase < Rational >;
 } // namespace soplex

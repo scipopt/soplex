@@ -128,7 +128,7 @@ static void checkSolutionRational(SoPlexBase<R>& soplex)
                    Rational maxviol = boundviol > rowviol ? boundviol : rowviol;
                    bool feasible = (maxviol <= soplex.realParam(SoPlexBase<R>::FEASTOL));
                    soplex.spxout << "Primal solution " << (feasible ? "feasible" : "infeasible") <<
-                   " in original problem (max. violation = " << rationalToString(maxviol) << ").\n"
+                   " in original problem (max. violation = " << maxviol.str() << ").\n"
                   );
       }
       else
@@ -154,7 +154,7 @@ static void checkSolutionRational(SoPlexBase<R>& soplex)
                    Rational maxviol = redcostviol > dualviol ? redcostviol : dualviol;
                    bool feasible = (maxviol <= soplex.realParam(SoPlexBase<R>::OPTTOL));
                    soplex.spxout << "Dual solution " << (feasible ? "feasible" : "infeasible") <<
-                   " in original problem (max. violation = " << rationalToString(maxviol) << ").\n"
+                   " in original problem (max. violation = " << maxviol.str() << ").\n"
                   );
       }
       else
@@ -430,8 +430,6 @@ int main(int argc, char* argv[])
    // because EGlpNumClear() calls mpq_clear() for all mpq_t variables, we need to destroy all objects of class Rational
    // beforehand; hence all Rational objects and all data that uses Rational objects must be allocated dynamically via
    // spx_alloc() and freed here; disabling the list memory is crucial
-   Rational::disableListMem();
-   EGlpNumClear();
 
    return retVal;
 }
