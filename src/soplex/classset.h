@@ -13,11 +13,11 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file  dataset.h
- * @brief Set of data objects.
+/**@file  classset.h
+ * @brief Set of class objects.
  */
-#ifndef _DATASET_H_
-#define _DATASET_H_
+#ifndef _CLASSSET_H_
+#define _CLASSSET_H_
 
 
 #include <string.h>
@@ -25,52 +25,54 @@
 
 #include "soplex/array.h"
 #include "soplex/dataarray.h"
+#include "soplex/classarray.h"
 #include "soplex/datakey.h"
 #include "soplex/spxalloc.h"
 #include "soplex/exceptions.h"
+#include "soplex/svectorbase.h"
 
 namespace soplex
 {
-/**@class DataSet
-   @brief   Set of data objects.
+/**@class ClassSet
+   @brief   Set of class objects.
    @ingroup Elementary
 
-   Class DataSet manages of sets of data objects  of a
-   template type DATA. For constructing a DataSet the maximum number
+   Class ClassSet manages of sets of class objects  of a
+   template type T. For constructing a ClassSet the maximum number
    of entries must be given. The current maximum number may be inquired
    with method max().
 
-   Adding more then max() elements to a DataSet will core dump. However,
+   Adding more then max() elements to a ClassSet will core dump. However,
    method reMax() allows to reset max() without loss of elements currently
-   in the DataSet. The current number of elements in a DataSet is returned
+   in the ClassSet. The current number of elements in a ClassSet is returned
    by method num().
 
-   Adding elements to a DataSet is done via methods add() or create(),
-   while remove() removes elements from a DataSet. When adding an element
-   to a DataSet the new element is assigned a DataKey. DataKeys serve to
-   access DATA elements in a set via a version of the subscript
+   Adding elements to a ClassSet is done via methods add() or create(),
+   while remove() removes elements from a ClassSet. When adding an element
+   to a ClassSet the new element is assigned a DataKey. DataKeys serve to
+   access CLASS elements in a set via a version of the subscript
    operator[](DataKey).
 
-   For convenience all elements in a DataSet are implicitely numbered
+   For convenience all elements in a ClassSet are implicitely numbered
    from 0 through num()-1 and can be accessed with these numbers
    using a 2nd subscript operator[](int). The reason for providing
-   DataKeys to access elements of a DataSet is that the Key of an
+   DataKeys to access elements of a ClassSet is that the Key of an
    element remains unchanged as long as the element is a member of the
-   DataSet, while the numbers will change in an undefined way, if
-   other elements are added to or removed from the DataSet.
+   ClassSet, while the numbers will change in an undefined way, if
+   other elements are added to or removed from the ClassSet.
 
-   The elements in a DataSet and their DataKeys are stored in two arrays:
-   - theitem keeps the elements data along with their number stored in item.
-   - thekey  keeps the DataKey::idx's of the elements in a DataSet.
+   The elements in a ClassSet and their DataKeys are stored in two arrays:
+   - theitem keeps the objects along with their number stored in item.
+   - thekey  keeps the DataKey::idx's of the elements in a ClassSet.
 
    Both arrays have size themax.
 
    In #thekey only elements 0 thru thenum-1 contain DataKey::idx%'s of
-   valid elements, i.e., elements currently in the DataSet.
-   The current number of elements in the DataSet is counted in thenum.
+   valid elements, i.e., elements currently in the ClassSet.
+   The current number of elements in the ClassSet is counted in thenum.
 
    In #theitem only elements 0 thru thesize-1 are used, but only some of
-   them actually contain real data elements of the DataSet. They are
+   them actually contain real class elements of the ClassSet. They are
    recognized by having info >= 0, which gives the number of that
    element. Otherwise info < 0 indicates an unused element. Unused
    elements are linked in a single linked list: starting with element
@@ -78,16 +80,10 @@ namespace soplex
    <tt>-info-1.</tt> The last free element in the list is marked by
    <tt>info == -themax-1.</tt> Finally all elements in theitem with
    <tt>index >= thesize</tt> are unused as well.
-
-   @warning malloc/realloc and memcpy are used to handle the members
-      of the set. If you use DataSet with something that is not
-      a \ref DataObjects "Data Object" you will be in severe trouble.
 */
-template<class DATA>
-class DataSet
+template<class T>
+class ClassSet
 {
-   static_assert(std::is_trivially_copyable<DATA>::value,
-                 "Only trivially copyable types are allowed with DataSet, since it does memcopy");
 protected:
 
    //-----------------------------------
@@ -96,10 +92,10 @@ protected:
    ///
    struct Item
    {
-      DATA data;       ///< data element
+      T data;           ///< T element
       int  info;       ///< element number. info \f$\in\f$ [0,thesize-1]
       ///< iff element is used
-   }* theitem;         ///< array of elements in the DataSet
+   }* theitem;         ///< array of elements in the ClassSet
    ///@}
 
    //-----------------------------------
@@ -108,7 +104,7 @@ protected:
    DataKey* thekey;    ///< DataKey::idx's of elements
    int themax;         ///< length of arrays theitem and thekey
    int thesize;        ///< highest used element in theitem
-   int thenum;         ///< number of elements in DataSet
+   int thenum;         ///< number of elements in ClassSet
    int firstfree;      ///< first unused element in theitem
    ///@}
 
@@ -116,35 +112,36 @@ public:
 
    //-----------------------------------
    /**@name Extension
-    *  Whenever a new element is added to a DataSet, the latter assigns it a
-    *  DataKey. For this all methods that extend a DataSet by one ore more
+    *  Whenever a new element is added to a ClassSet, the latter assigns it a
+    *  DataKey. For this all methods that extend a ClassSet by one ore more
     *  elements are provided with two signatures, one of them having a
     *  parameter for returning the assigned DataKey(s).
     */
    ///@{
    /// adds an element.
-   void add(DataKey& newkey, const DATA& item)
+   void add(DataKey& newkey, const T& item)
    {
-      DATA* data = create(newkey);
+      T* newelem = create(newkey);
 
-      assert(data != 0);
+      assert(newelem != 0);
 
-      *data = item;
+      *newelem = item;
    }
    /// adds element \p item.
    /**@return 0 on success and non-zero, if an error occured.
     */
-   void add(const DATA& item)
+   void add(const T& item)
    {
-      DATA* data = create();
+      T* newelem = create();
 
-      assert(data != 0);
 
-      *data = item;
+      assert(newelem != 0);
+
+      *newelem = item;
    }
 
    /// add several items.
-   void add(DataKey newkey[], const DATA* item, int n)
+   void add(DataKey newkey[], const T* item, int n)
    {
       assert(n         >= 0);
       assert(num() + n <= max());
@@ -154,7 +151,7 @@ public:
    }
 
    /// adds \p n elements from \p items.
-   void add(const DATA* items, int n)
+   void add(const T* items, int n)
    {
       assert(n         >= 0);
       assert(num() + n <= max());
@@ -164,7 +161,7 @@ public:
    }
 
    /// adds several new items.
-   void add(DataKey newkey[], const DataSet < DATA >& set)
+   void add(DataKey newkey[], const ClassSet < T >& set)
    {
       assert(num() + set.num() <= max());
 
@@ -173,7 +170,7 @@ public:
    }
 
    /// adds all elements of \p set.
-   void add(const DataSet < DATA >& set)
+   void add(const ClassSet < T >& set)
    {
       assert(num() + set.num() <= max());
 
@@ -181,10 +178,10 @@ public:
          add(set[i]);
    }
 
-   /// creates new data element in DataSet.
+   /// creates new class element in ClassSet.
    /**@return Pointer to the newly created element.
     */
-   DATA* create(DataKey& newkey)
+   T* create(DataKey& newkey)
    {
       assert(num() < max());
 
@@ -202,10 +199,10 @@ public:
 
       return &(theitem[newkey.idx].data);
    }
-   /// creates new (uninitialized) data element in DataSet.
+   /// creates new (uninitialized) class element in ClassSet.
    /**@return Pointer to the newly created element.
     */
-   DATA* create()
+   T* create()
    {
       DataKey tmp;
       return create(tmp);
@@ -214,7 +211,7 @@ public:
 
    //-----------------------------------
    /**@name Shrinkage
-    * When elements are removed from a DataSet, the remaining ones are
+    * When elements are removed from a ClassSet, the remaining ones are
     * renumbered from 0 through the new size()-1. How this renumbering is
     * performed will not be revealed, since it might be target of future
     * changes. However, some methods provide a parameter
@@ -223,7 +220,7 @@ public:
     * the element numbered i prior to the removal operation has been removed
     * from the set. Otherwise, <tt>perm[i] = j >= 0</tt> means that the
     * element with number i prior to the removal operation has been
-    * renumbered to j. Removing a single element from a DataSet yields a
+    * renumbered to j. Removing a single element from a ClassSet yields a
     * simple renumbering of the elements: The last element in the set
     * (i.e., element num()-1) is moved to the index of the removed element.
     */
@@ -261,7 +258,7 @@ public:
    }
 
    /// remove multiple elements.
-   /** This method removes all elements for the DataSet with an
+   /** This method removes all elements for the ClassSet with an
     *  index i such that \p perm[i] < 0. Upon completion, \p perm contains
     *  the new numbering of elements.
     */
@@ -351,33 +348,33 @@ public:
 
    //-----------------------------------
    /**@name Access
-    * When accessing elements from a DataSet with one of the index
+    * When accessing elements from a ClassSet with one of the index
     * operators, it must be ensured that the index is valid for the
-    * DataSet. If this is not known afore, it is the programmers
+    * ClassSet. If this is not known afore, it is the programmers
     * responsability to ensure this using the inquiry methods below.
     */
    ///@{
    ///
-   DATA& operator[](int n)
+   T& operator[](int n)
    {
       assert(n >= 0 && n < thenum);
       return theitem[thekey[n].idx].data;
    }
    /// returns element number \p n.
-   const DATA& operator[](int n) const
+   const T& operator[](int n) const
    {
       assert(n >= 0 && n < thenum);
       return theitem[thekey[n].idx].data;
    }
 
    ///
-   DATA& operator[](const DataKey& k)
+   T& operator[](const DataKey& k)
    {
       assert(k.idx < thesize);
       return theitem[k.idx].data;
    }
    /// returns element with DataKey \p k.
-   const DATA& operator[](const DataKey& k) const
+   const T& operator[](const DataKey& k) const
    {
       assert(k.idx < thesize);
       return theitem[k.idx].data;
@@ -387,39 +384,39 @@ public:
    //-----------------------------------
    /**@name Inquiry */
    ///@{
-   /// returns maximum number of elements that would fit into DataSet.
+   /// returns maximum number of elements that would fit into ClassSet.
    int max() const
    {
       return themax;
    }
 
-   /// returns number of elements currently in DataSet.
+   /// returns number of elements currently in ClassSet.
    int num() const
    {
       return thenum;
    }
 
-   /// returns the maximum DataKey::idx currently in DataSet.
+   /// returns the maximum DataKey::idx currently in ClassSet.
    int size() const
    {
       return thesize;
    }
 
-   /// returns DataKey of \p n 'th element in DataSet.
+   /// returns DataKey of \p n 'th element in ClassSet.
    DataKey key(int n) const
    {
       assert(n >= 0 && n < num());
       return thekey[n];
    }
 
-   /// returns DataKey of element \p item in DataSet.
-   DataKey key(const DATA* item) const
+   /// returns DataKey of element \p item in ClassSet.
+   DataKey key(const T* item) const
    {
       assert(number(item) >= 0);
       return thekey[number(item)];
    }
 
-   /// returns the number of the element with DataKey \p k in DataSet or -1,
+   /// returns the number of the element with DataKey \p k in ClassSet or -1,
    /// if it doesn't exist.
    int number(const DataKey& k) const
    {
@@ -430,9 +427,9 @@ public:
    }
 
    /**@todo Please check whether this is correctly implemented! */
-   /// returns the number of element \p item in DataSet,
+   /// returns the number of element \p item in ClassSet,
    /// throws exception if it doesn't exist.
-   int number(const DATA* item) const
+   int number(const T* item) const
    {
       ptrdiff_t idx = reinterpret_cast<const struct Item*>(item) - theitem;
 
@@ -442,20 +439,20 @@ public:
       return theitem[idx].info;
    }
 
-   /// Is \p k a valid DataKey of an element in DataSet?
+   /// Is \p k a valid DataKey of an element in ClassSet?
    bool has(const DataKey& k) const
    {
       return theitem[k.idx].info >= 0;
    }
 
-   /// Is \p n a valid number of an element in DataSet?
+   /// Is \p n a valid number of an element in ClassSet?
    bool has(int n) const
    {
       return (n >= 0 && n < num());
    }
 
-   /// Does \p item belong to DataSet?
-   bool has(const DATA* item) const
+   /// Does \p item belong to ClassSet?
+   bool has(const T* item) const
    {
       int n;
 
@@ -478,14 +475,15 @@ public:
    /// resets max() to \p newmax.
    /** This method will not succeed if \p newmax < size(), in which case
     *  \p newmax == size() will be taken. As generally this method involves
-    *  copying the #DataSet%s elements in memory, reMax() returns the
-    *  number of bytes the addresses of elements in the DataSet have been
+    *  copying the #ClassSet%s elements in memory, reMax() returns the
+    *  number of bytes the addresses of elements in the ClassSet have been
     *  moved. Note, that this is identical for all elements in the
-    *  DataSet.
+    *  ClassSet.
     */
    ptrdiff_t reMax(int newmax = 0)
    {
-      struct Item* old_theitem = theitem;
+      int i;
+      Item* newMem = 0;
       newmax = (newmax < size()) ? size() : newmax;
 
       int* lastfree = &firstfree;
@@ -495,12 +493,30 @@ public:
 
       *lastfree = -newmax - 1;
 
+      spx_alloc(newMem, newmax);
+
+      /* call copy constructor for first elements */
+      for(i = 0; i < max(); i++)
+      {
+         newMem[i].data = std::move(theitem[i].data);
+         newMem[i].info = theitem[i].info;
+      }
+
+      /* call default constructor for remaining elements */
+      for(; i < newmax; i++)
+         new(&(newMem[i])) Item();
+
+      /* compute pointer difference */
+      ptrdiff_t pshift = reinterpret_cast<char*>(newMem) - reinterpret_cast<char*>(theitem);
+
+      spx_free(theitem);
+
+      theitem = newMem;
       themax = newmax;
-      spx_realloc(theitem, themax);
+
       spx_realloc(thekey,  themax);
 
-      return reinterpret_cast<char*>(theitem)
-             - reinterpret_cast<char*>(old_theitem);
+      return pshift;
    }
 
    /// consistency check.
@@ -509,20 +525,20 @@ public:
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
       if(theitem == 0 || thekey == 0)
-         return MSGinconsistent("DataSet");
+         return MSGinconsistent("ClassSet");
 
       if(thesize > themax || thenum > themax || thenum > thesize)
-         return MSGinconsistent("DataSet");
+         return MSGinconsistent("ClassSet");
 
       if(thesize == thenum && firstfree != -themax - 1)
-         return MSGinconsistent("DataSet");
+         return MSGinconsistent("ClassSet");
 
       if(thesize != thenum && firstfree == -themax - 1)
-         return MSGinconsistent("DataSet");
+         return MSGinconsistent("ClassSet");
 
       for(int i = 0; i < thenum; ++i)
          if(theitem[thekey[i].idx].info != i)
-            return MSGinconsistent("DataSet");
+            return MSGinconsistent("ClassSet");
 
 #endif
 
@@ -535,7 +551,7 @@ public:
    ///@{
    /// default constructor.
    explicit
-   DataSet(int pmax = 8)
+   ClassSet(int pmax = 8)
       : theitem(0)
       , thekey(0)
       , themax(pmax < 1 ? 8 : pmax)
@@ -546,6 +562,10 @@ public:
       firstfree = -themax - 1;
 
       spx_alloc(theitem, themax);
+
+      /* call default constructor for each element */
+      for(int i = 0; i < themax; i++)
+         new(&(theitem[i])) Item();
 
       try
       {
@@ -561,7 +581,7 @@ public:
    }
 
    /// copy constructor.
-   DataSet(const DataSet& old)
+   ClassSet(const ClassSet& old)
       : theitem(0)
       , thekey(0)
       , themax(old.themax)
@@ -574,6 +594,16 @@ public:
 
       spx_alloc(theitem, themax);
 
+      /* call copy constructor for first elements */
+      int i;
+
+      for(i = 0; i < old.thenum; i++)
+         new(&(theitem[i])) Item(old.theitem[i]);
+
+      /* call default constructor for remaining elements */
+      for(; i < old.themax; i++)
+         new(&(theitem[i])) Item();
+
       try
       {
          spx_alloc(thekey, themax);
@@ -584,19 +614,18 @@ public:
          throw x;
       }
 
-      memcpy(theitem, old.theitem, themax * sizeof(*theitem));
       memcpy(thekey,  old.thekey,  themax * sizeof(*thekey));
 
       assert(isConsistent());
    }
 
    /// assignment operator.
-   /** The assignment operator involves #reMax()%ing the lvalue DataSet
+   /** The assignment operator involves #reMax()%ing the lvalue ClassSet
     *  to the size needed for copying all elements of the rvalue. After the
     *  assignment all DataKeys from the lvalue are valid for the rvalue as
-    *  well. They refer to a copy of the corresponding data elements.
+    *  well. They refer to a copy of the corresponding class elements.
     */
-   DataSet < DATA >& operator=(const DataSet < DATA >& rhs)
+   ClassSet < T >& operator=(const ClassSet < T >& rhs)
    {
       if(this != &rhs)
       {
@@ -608,7 +637,7 @@ public:
          clear();
 
          for(i = 0; i < rhs.size(); ++i)
-            memcpy(&theitem[i], &rhs.theitem[i], sizeof(*theitem));
+            theitem[i] = std::move(rhs.theitem[i]);
 
          for(i = 0; i < rhs.num(); ++i)
             thekey[i] = rhs.thekey[i];
@@ -636,7 +665,7 @@ public:
    }
 
    /// destructor.
-   ~DataSet()
+   ~ClassSet()
    {
       if(theitem)
          spx_free(theitem);
@@ -648,4 +677,4 @@ public:
 };
 
 } // namespace soplex
-#endif // _DATASET_H_
+#endif // _CLASSSET_H_

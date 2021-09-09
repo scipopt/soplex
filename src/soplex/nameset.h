@@ -128,6 +128,12 @@ public:
       Name(const char* str)
          : name(str)
       {}
+
+      Name& operator=(const Name& old)
+      {
+         name = old.name;
+         return *this;
+      }
       ///@}
    };
 

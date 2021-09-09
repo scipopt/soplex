@@ -618,6 +618,8 @@ public:
       setMem(n, p_mem);
    }
 
+   SVectorBase<R>(const SVectorBase<R>& sv) = default;
+
    /// Assignment operator.
    template < class S >
    SVectorBase<R>& operator=(const VectorBase<S>& vec);
@@ -648,6 +650,19 @@ public:
          }
 
          set_size(nnz);
+      }
+
+      return *this;
+   }
+
+   /// move assignement operator.
+   SVectorBase<R>& operator=(const SVectorBase<R>&& sv)
+   {
+      if(this != &sv)
+      {
+         this->m_elem = sv.m_elem;
+         this->memsize = sv.memsize;
+         this->memused = sv.memused;
       }
 
       return *this;

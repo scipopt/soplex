@@ -21,6 +21,7 @@ set(headers
     soplex/array.h
     soplex/basevectors.h
     soplex/classarray.h
+    soplex/classset.h
     soplex/clufactor.h
     soplex/clufactor_rational.h
     soplex/cring.h

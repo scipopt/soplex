@@ -13,6 +13,8 @@ interface & parameters:
 performance:
 
 code quality:
+- fixed deprecated copy compiler warnings that occur with newer compilers
+- added a ClassSet<T> class that functions in the same way as DataSet<T> for types that are not data-types 
 
 fixed bugs:
 
