@@ -87,7 +87,7 @@ template<class DATA>
 class DataSet
 {
    static_assert(std::is_trivially_copyable<DATA>::value,
-                 "Only trivially copyable types are allowed with DataArray, since it does memcopy");
+                 "Only trivially copyable types are allowed with DataSet, since it does memcopy");
 protected:
 
    //-----------------------------------
