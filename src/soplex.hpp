@@ -580,6 +580,13 @@ SoPlexBase<R>::Settings::RealParam::RealParam()
    lower[SoPlexBase<R>::MIN_MARKOWITZ] = 0.0001;
    upper[SoPlexBase<R>::MIN_MARKOWITZ] = 0.9999;
    defaultValue[SoPlexBase<R>::MIN_MARKOWITZ] = 0.01;
+
+   // modification
+   name[SoPlexBase<R>::PRESOL_MODIFYCONSFAC] = "presol_modifyconsfac";
+   description[SoPlexBase<R>::PRESOL_MODIFYCONSFAC] = "modify constraints when the number of nonzeros or rows is at most this factor times the number of nonzeros or rows before presolving";
+   lower[SoPlexBase<R>::PRESOL_MODIFYCONSFAC] = 0;
+   upper[SoPlexBase<R>::PRESOL_MODIFYCONSFAC] = 1;
+   defaultValue[SoPlexBase<R>::PRESOL_MODIFYCONSFAC] = 0.8;
 }
 
 template <class R>
@@ -6330,6 +6337,12 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
    case SoPlexBase<R>::MIN_MARKOWITZ:
       _slufactor.setMarkowitz(value);
       break;
+
+   case SoPlexBase<R>::PRESOL_MODIFYCONSFAC:
+#ifdef SOPLEX_WITH_PAPILO
+       _presol_papilo.setModifyConsFrac(value);
+#endif
+     break;
 
    default:
       return false;

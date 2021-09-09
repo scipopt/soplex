@@ -55,6 +55,7 @@ namespace soplex{
       R m_epsilon;                 ///< epsilon zero.
       R m_feastol;                 ///< primal feasibility tolerance.
       R m_opttol;                  ///< dual feasibility tolerance.
+      R modifyConsFac;             ///<
       DataArray<int> m_stat;       ///< preprocessing history.
       typename SPxLPBase<R>::SPxSense m_thesense;   ///< optimization sense.
 
@@ -87,9 +88,10 @@ namespace soplex{
       ///@name Constructors / destructors
       ///@{
       /// default constructor.
+      //TODO: how to set the DEFAULT constructor and not declare it multiple times
       explicit Presol(Timer::TYPE ttype = Timer::USER_TIME)
               : SPxSimplifier<R>("PaPILO", ttype), m_postsolved(false), m_epsilon(DEFAULT_EPS_ZERO),
-                m_feastol(DEFAULT_BND_VIOL), m_opttol(DEFAULT_BND_VIOL), m_thesense(SPxLPBase<R>::MAXIMIZE),
+                m_feastol(DEFAULT_BND_VIOL), m_opttol(DEFAULT_BND_VIOL), modifyConsFac(0.8), m_thesense(SPxLPBase<R>::MAXIMIZE),
                 m_keepbounds(false), m_result(this->OKAY)
      { ; };
 
@@ -98,8 +100,8 @@ namespace soplex{
               : SPxSimplifier<R>(old), m_prim(old.m_prim), m_slack(old.m_slack), m_dual(old.m_dual),
                 m_redCost(old.m_redCost), m_cBasisStat(old.m_cBasisStat), m_rBasisStat(old.m_rBasisStat),
                 postsolveStorage(old.postsolveStorage), m_postsolved(old.m_postsolved), m_epsilon(old.m_epsilon),
-                m_feastol(old.m_feastol), m_opttol(old.m_opttol),  m_thesense(old.m_thesense), m_keepbounds(old.m_keepbounds),
-                 m_result(old.m_result) {
+                m_feastol(old.m_feastol), m_opttol(old.m_opttol),modifyConsFac(old.modifyConsFac), m_thesense(old.m_thesense),
+                m_keepbounds(old.m_keepbounds), m_result(old.m_result) {
          ;
       }
 
@@ -122,6 +124,7 @@ namespace soplex{
             m_keepbounds = rhs.m_keepbounds;
             m_result = rhs.m_result;
             postsolveStorage = rhs.postsolveStorage;
+            modifyConsFac = rhs.modifyConsFac;
          }
          return *this;
       }
@@ -135,6 +138,10 @@ namespace soplex{
          return new Presol(*this);
       }
 
+      void
+      setModifyConsFrac(R value){
+        modifyConsFac = value;
+      }
 
       virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R> &lp, R eps, R delta, Real remainingTime) {
          return simplify(lp, eps, delta, delta, remainingTime, false, 0);
@@ -301,10 +308,6 @@ namespace soplex{
        reducedSolution.rowBasisStatus[i] = convertToPapiloStatus(rows[i]);
      }
 
-     // TODO: handle case that is not optimal because validation can not be
-     if(isOptimal){
-     }
-
      /* since PaPILO verbosity is quiet it's irrelevant what's the messager*/
      papilo::Num<R> num {};
      num.setEpsilon(m_epsilon);
@@ -436,9 +439,6 @@ namespace soplex{
       papilo::Problem<R> problem = buildProblem(lp);
       papilo::Presolve<R> presolve;
 
-      // TODO: add new parameter to SoPlex or just code it hard?
-      int modifyconsfac = 1;
-
       configurePapilo(presolve, ftol, eps, seed, remainingTime);
       MSG_INFO1((*this->spxout), (*this->spxout) << " --- starting PaPILO" << std::endl;)
 
@@ -466,8 +466,8 @@ namespace soplex{
 
       int newNonzeros = problem.getConstraintMatrix().getNnz();
 
-      if(newNonzeros == 0 || ((problem.getNRows() <= modifyconsfac * lp.nRows() ||
-            newNonzeros <= modifyconsfac * lp.nNzos())))
+      if(newNonzeros == 0 || ((problem.getNRows() <= modifyConsFac * lp.nRows() ||
+            newNonzeros <= modifyConsFac * lp.nNzos())))
       {
          MSG_INFO1((*this->spxout), (*this->spxout) << " --- presolved problem has " << problem.getNRows() << " rows, "
                                                     << problem.getNCols() << " cols and "
@@ -528,7 +528,7 @@ namespace soplex{
       presolve.getPresolveOptions().dualreds = 0;
       presolve.getPresolveOptions().feastol = double(feasTolerance);
       presolve.getPresolveOptions().epsilon = double(epsilon);
-      //TODO: has Soplex an parameter to define infinity?
+      //TODO: has Soplex an parameter to define infinity? otherwise I would use the default
       //      presolve.getPresolveOptions().hugeval = data->hugebound;
       presolve.getPresolveOptions().detectlindep = 0;
       presolve.getPresolveOptions().componentsmaxint = -1;
@@ -540,7 +540,6 @@ namespace soplex{
       using uptr = std::unique_ptr<papilo::PresolveMethod<R>>;
 
       /* fast presolvers*/
-      //TODO: asserts fail for SingletonCols/Stuffing for setting exact
       presolve.addPresolveMethod(uptr(new papilo::SingletonCols<R>()));
       presolve.addPresolveMethod(uptr(new papilo::ConstraintPropagation<R>()));
 

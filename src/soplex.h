@@ -1409,8 +1409,11 @@ public:
       /// minimal Markowitz threshold to control sparsity/stability in LU factorization
       MIN_MARKOWITZ = 24,
 
+      /// minimal modification threshold to apply presolve reductions
+      PRESOL_MODIFYCONSFAC = 25,
+
       /// number of real parameters
-      REALPARAM_COUNT = 25
+      REALPARAM_COUNT = 26
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
