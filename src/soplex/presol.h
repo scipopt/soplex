@@ -37,7 +37,7 @@ namespace soplex{
    class Presol : public SPxSimplifier<R> {
    private:
 
-      const papilo::VerbosityLevel verbosityLevel = papilo::VerbosityLevel::kDetailed;
+      const papilo::VerbosityLevel verbosityLevel = papilo::VerbosityLevel::kQuiet;
 
       VectorBase<R> m_prim;       ///< unsimplified primal solution VectorBase<R>.
       VectorBase<R> m_slack;      ///< unsimplified slack VectorBase<R>.
