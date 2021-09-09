@@ -1157,10 +1157,10 @@ public:
       /// no simplifier
       SIMPLIFIER_OFF = 0,
 
-      /// automatic choice
-      SIMPLIFIER_INTERNAL = 1,
+      /// previous automatic choice
+      SIMPLIFIER_AUTO = 1,
 
-      /// automatic choice
+      /// using the presolve lib papilo
       SIMPLIFIER_PAPILO = 2
    };
 

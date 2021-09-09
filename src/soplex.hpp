@@ -5848,7 +5848,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       case SIMPLIFIER_OFF:
          _simplifier = 0;
          break;
-      case SIMPLIFIER_INTERNAL:
+      case SIMPLIFIER_AUTO:
          _simplifier = &_simplifierMainSM;
          assert(_simplifier != 0);
          break;
@@ -7821,7 +7821,7 @@ void SoPlexBase<R>::_enableSimplifierAndScaler()
       _simplifier = 0;
       break;
 
-   case SIMPLIFIER_INTERNAL:
+   case SIMPLIFIER_AUTO:
       _simplifier = &_simplifierMainSM;
       assert(_simplifier != 0);
       _simplifier->setMinReduction(realParam(MINRED));
