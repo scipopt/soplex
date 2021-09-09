@@ -1158,7 +1158,7 @@ public:
       SIMPLIFIER_OFF = 0,
 
       /// using internal presoling methods
-     SIMPLIFIER_INTERNAL = 1,
+      SIMPLIFIER_INTERNAL = 1,
 
       /// using the presolve lib papilo
       SIMPLIFIER_PAPILO = 2
