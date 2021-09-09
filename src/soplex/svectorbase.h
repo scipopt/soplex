@@ -617,6 +617,8 @@ public:
       setMem(n, p_mem);
    }
 
+   SVectorBase<R>(const SVectorBase<R>& sv) = default;
+
    /// Assignment operator.
    template < class S >
    SVectorBase<R>& operator=(const VectorBase<S>& vec);

@@ -38,7 +38,7 @@ namespace soplex
    @ingroup Elementary
 
    Class ClassSet manages of sets of class objects  of a
-   template type CLASS. For constructing a ClassSet the maximum number
+   template type T. For constructing a ClassSet the maximum number
    of entries must be given. The current maximum number may be inquired
    with method max().
 
@@ -62,7 +62,7 @@ namespace soplex
    other elements are added to or removed from the ClassSet.
 
    The elements in a ClassSet and their DataKeys are stored in two arrays:
-   - theitem keeps the elements class along with their number stored in item.
+   - theitem keeps the objects along with their number stored in item.
    - thekey  keeps the DataKey::idx's of the elements in a ClassSet.
 
    Both arrays have size themax.
@@ -80,10 +80,6 @@ namespace soplex
    <tt>-info-1.</tt> The last free element in the list is marked by
    <tt>info == -themax-1.</tt> Finally all elements in theitem with
    <tt>index >= thesize</tt> are unused as well.
-
-   @warning malloc/realloc and memcpy are used to handle the members
-      of the set. If you use ClassSet with something that is not
-      a \ref DataObjects "Data Object" you will be in severe trouble.
 */
 template<class T>
 class ClassSet
