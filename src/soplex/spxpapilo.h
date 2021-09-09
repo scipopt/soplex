@@ -55,7 +55,7 @@ namespace soplex{
       R m_epsilon;                 ///< epsilon zero.
       R m_feastol;                 ///< primal feasibility tolerance.
       R m_opttol;                  ///< dual feasibility tolerance.
-      R modifyConsFac;             ///<
+      R modifyRowsFac;             ///<
       DataArray<int> m_stat;       ///< preprocessing history.
       typename SPxLPBase<R>::SPxSense m_thesense;   ///< optimization sense.
 
@@ -91,7 +91,7 @@ namespace soplex{
       //TODO: how to set the DEFAULT constructor and not declare it multiple times
       explicit Presol(Timer::TYPE ttype = Timer::USER_TIME)
               : SPxSimplifier<R>("PaPILO", ttype), m_postsolved(false), m_epsilon(DEFAULT_EPS_ZERO),
-                m_feastol(DEFAULT_BND_VIOL), m_opttol(DEFAULT_BND_VIOL), modifyConsFac(0.8), m_thesense(SPxLPBase<R>::MAXIMIZE),
+                m_feastol(DEFAULT_BND_VIOL), m_opttol(DEFAULT_BND_VIOL), modifyRowsFac(0.8), m_thesense(SPxLPBase<R>::MAXIMIZE),
                 m_keepbounds(false), m_result(this->OKAY)
      { ; };
 
@@ -100,7 +100,8 @@ namespace soplex{
               : SPxSimplifier<R>(old), m_prim(old.m_prim), m_slack(old.m_slack), m_dual(old.m_dual),
                 m_redCost(old.m_redCost), m_cBasisStat(old.m_cBasisStat), m_rBasisStat(old.m_rBasisStat),
                 postsolveStorage(old.postsolveStorage), m_postsolved(old.m_postsolved), m_epsilon(old.m_epsilon),
-                m_feastol(old.m_feastol), m_opttol(old.m_opttol),modifyConsFac(old.modifyConsFac), m_thesense(old.m_thesense),
+                m_feastol(old.m_feastol), m_opttol(old.m_opttol),
+            modifyRowsFac(old.modifyRowsFac), m_thesense(old.m_thesense),
                 m_keepbounds(old.m_keepbounds), m_result(old.m_result) {
          ;
       }
@@ -124,7 +125,7 @@ namespace soplex{
             m_keepbounds = rhs.m_keepbounds;
             m_result = rhs.m_result;
             postsolveStorage = rhs.postsolveStorage;
-            modifyConsFac = rhs.modifyConsFac;
+            modifyRowsFac = rhs.modifyRowsFac;
          }
          return *this;
       }
@@ -139,8 +140,7 @@ namespace soplex{
       }
 
       void
-      setModifyConsFrac(R value){
-        modifyConsFac = value;
+      setModifyConsFrac(R value){ modifyRowsFac = value;
       }
 
       virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R> &lp, R eps, R delta, Real remainingTime) {
@@ -466,8 +466,8 @@ namespace soplex{
 
       int newNonzeros = problem.getConstraintMatrix().getNnz();
 
-      if(newNonzeros == 0 || ((problem.getNRows() <= modifyConsFac * lp.nRows() ||
-            newNonzeros <= modifyConsFac * lp.nNzos())))
+      if(newNonzeros == 0 || ((problem.getNRows() <= modifyRowsFac * lp.nRows() ||
+            newNonzeros <= modifyRowsFac * lp.nNzos())))
       {
          MSG_INFO1((*this->spxout), (*this->spxout) << " --- presolved problem has " << problem.getNRows() << " rows, "
                                                     << problem.getNCols() << " cols and "

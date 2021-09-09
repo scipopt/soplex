@@ -22,13 +22,13 @@
 
 #include <string.h>
 
-#include "soplex/spxgithash.h"
-#include "soplex/spxdefines.h"
 #include "soplex/basevectors.h"
-#include "soplex/spxsolver.h"
 #include "soplex/slufactor.h"
 #include "soplex/slufactor_rational.h"
-#include "soplex/presol.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxgithash.h"
+#include "soplex/spxpapilo.h"
+#include "soplex/spxsolver.h"
 
 ///@todo try to move to cpp file by forward declaration
 #include "soplex/spxsimplifier.h"
@@ -1410,7 +1410,7 @@ public:
       MIN_MARKOWITZ = 24,
 
       /// minimal modification threshold to apply presolve reductions
-      PRESOL_MODIFYCONSFAC = 25,
+     SIMPLIFIER_MODIFYROWFAC = 25,
 
       /// number of real parameters
       REALPARAM_COUNT = 26
@@ -1649,7 +1649,7 @@ private:
    SPxSolverBase<R> _solver;
    SLUFactor<R> _slufactor;
    SPxMainSM<R> _simplifierMainSM;
-   Presol<R> _presol_papilo;
+   Presol<R> _simplifierPaPILO;
    SPxEquiliSC<R> _scalerUniequi;
    SPxEquiliSC<R> _scalerBiequi;
    SPxGeometSC<R> _scalerGeo1;

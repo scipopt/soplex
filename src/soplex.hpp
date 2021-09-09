@@ -582,11 +582,11 @@ SoPlexBase<R>::Settings::RealParam::RealParam()
    defaultValue[SoPlexBase<R>::MIN_MARKOWITZ] = 0.01;
 
    // modification
-   name[SoPlexBase<R>::PRESOL_MODIFYCONSFAC] = "presol_modifyconsfac";
-   description[SoPlexBase<R>::PRESOL_MODIFYCONSFAC] = "modify constraints when the number of nonzeros or rows is at most this factor times the number of nonzeros or rows before presolving";
-   lower[SoPlexBase<R>::PRESOL_MODIFYCONSFAC] = 0;
-   upper[SoPlexBase<R>::PRESOL_MODIFYCONSFAC] = 1;
-   defaultValue[SoPlexBase<R>::PRESOL_MODIFYCONSFAC] = 0.8;
+   name[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = "simplifier_modifyrowfac";
+   description[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = "modify constraints when the number of nonzeros or rows is at most this factor times the number of nonzeros or rows before presolving";
+   lower[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 0;
+   upper[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 1;
+   defaultValue[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 0.8;
 }
 
 template <class R>
@@ -1390,7 +1390,7 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
       _solver = rhs._solver;
       _slufactor = rhs._slufactor;
       _simplifierMainSM = rhs._simplifierMainSM;
-      _presol_papilo = rhs._presol_papilo;
+      _simplifierPaPILO = rhs._simplifierPaPILO;
       _scalerUniequi = rhs._scalerUniequi;
       _scalerBiequi = rhs._scalerBiequi;
       _scalerGeo1 = rhs._scalerGeo1;
@@ -5854,7 +5854,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
          break;
       case SIMPLIFIER_PAPILO:
 #ifdef SOPLEX_WITH_PAPILO
-         _simplifier = &_presol_papilo;
+         _simplifier = &_simplifierPaPILO;
          assert  (_simplifier != 0);
          break;
 #else
@@ -6338,9 +6338,9 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
       _slufactor.setMarkowitz(value);
       break;
 
-   case SoPlexBase<R>::PRESOL_MODIFYCONSFAC:
+   case SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC:
 #ifdef SOPLEX_WITH_PAPILO
-       _presol_papilo.setModifyConsFrac(value);
+     _simplifierPaPILO.setModifyConsFrac(value);
 #endif
      break;
 
@@ -7829,7 +7829,7 @@ void SoPlexBase<R>::_enableSimplifierAndScaler()
 
    case SIMPLIFIER_PAPILO:
       #ifdef SOPLEX_WITH_PAPILO
-         _simplifier = &_presol_papilo;
+         _simplifier = &_simplifierPaPILO;
          assert(_simplifier != 0);
       #else
          _simplifier = &_simplifierMainSM;
