@@ -1154,11 +1154,11 @@ public:
    /// values for parameter SIMPLIFIER
    enum
    {
-      /// no simplifier
+      /// disabling presolving
       SIMPLIFIER_OFF = 0,
 
-      /// previous automatic choice
-      SIMPLIFIER_AUTO = 1,
+      /// using internal presoling methods
+     SIMPLIFIER_INTERNAL = 1,
 
       /// using the presolve lib papilo
       SIMPLIFIER_PAPILO = 2
