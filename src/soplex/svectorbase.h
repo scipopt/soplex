@@ -655,7 +655,7 @@ public:
       return *this;
    }
 
-   /// move assignemnt operator.
+   /// move assignement operator.
    SVectorBase<R>& operator=(const SVectorBase<R>&& sv)
    {
       if(this != &sv)
