@@ -68,8 +68,8 @@ endif()
 # set the correct rpath for OS X
 set(CMAKE_MACOSX_RPATH ON)
 
-# use C++11 standard
-set(CMAKE_CXX_STANDARD 11)
+# use C++14 standard
+set(CMAKE_CXX_STANDARD 14)
 
 # set function visibility default to hidden
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
@@ -174,9 +174,6 @@ else()
     set(PAPILO_IMPORTED_TARGETS "")
     set(SOPLEX_WITH_PAPILO off)
 endif()
-
-# use C++14 standard
-set(CMAKE_CXX_STANDARD 14)
 
 if(BOOST)
     find_package(Boost 1.58.0) # Refer to comments in cmake/Modules/FindBoost.cmake
