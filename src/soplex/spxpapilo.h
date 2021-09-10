@@ -464,6 +464,7 @@ namespace soplex{
             break;
       }
 
+
       int newNonzeros = problem.getConstraintMatrix().getNnz();
 
       if(newNonzeros == 0 || ((problem.getNRows() <= modifyRowsFac * lp.nRows() ||
@@ -491,7 +492,10 @@ namespace soplex{
                       << std::endl;)
       }
       if(newNonzeros == 0)
-         m_result = SPxSimplifier<R>::VANISHED;
+      {
+        m_result = SPxSimplifier<R>::VANISHED;
+        postsolveStorage = res.postsolve;
+      }
       return m_result;
    }
 
