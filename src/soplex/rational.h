@@ -115,68 +115,6 @@ inline void powRound(Rational& r)
    MSG_DEBUG(std::cout << "   --> " << str(r) << "\n");
 }
 
-/// Size in specified base (bit size for base 2)
-inline int sizeInBase(const Rational R, const int base)
-{
-   assert(base == 2);
-
-   size_t densize = msb(denominator(R)) + 1;
-   size_t numsize = msb(numerator(R)) + 1;
-
-   return (int)(densize + numsize);
-}
-/// Total size of rational vector.
-inline int totalSizeRational(const Rational* vector, const int length, const int base)
-{
-   assert(vector != 0);
-   assert(length >= 0);
-   assert(base >= 0);
-
-   int size = 0;
-
-   for(int i = 0; i < length; i++)
-      size += sizeInBase(vector[i], base);
-
-   return size;
-}
-
-/// Size of least common multiple of denominators in rational vector.
-inline int dlcmSizeRational(const Rational* vector, const int length, const int base)
-{
-   assert(vector != 0);
-   assert(length >= 0);
-   assert(base == 2);
-
-   Integer lcm;
-
-   for(int i = 0; i < length; i++)
-      SpxLcm(lcm, lcm, denominator(vector[i]));
-
-   int size = msb(lcm) + 1;
-
-   return size;
-}
-
-/// Size of largest denominator in rational vector.
-inline int dmaxSizeRational(const Rational* vector, const int length, const int base)
-{
-   assert(vector != 0);
-   assert(length >= 0);
-   assert(base == 2);
-
-   size_t dmax = 0;
-
-   for(int i = 0; i < length; i++)
-   {
-      size_t dsize = msb(denominator(vector[i])) + 1;
-
-      if(dsize > dmax)
-         dmax = dsize;
-   }
-
-   return (int)dmax;
-}
-
 /* find substring, ignore case */
 static
 std::string::const_iterator findSubStringIC(const std::string& substr, const std::string& str)
@@ -256,8 +194,84 @@ inline Rational ratFromString(const char* desc)
 #else
 using Rational = double;
 using Integer = int;
-
-
 #endif
+
+/// Size in specified base (bit size for base 2)
+inline int sizeInBase(const Rational R, const int base)
+{
+   assert(base == 2);
+
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return 0;
+#else
+   size_t densize = msb(denominator(R)) + 1;
+   size_t numsize = msb(numerator(R)) + 1;
+
+   return (int)(densize + numsize);
+#endif
+}
+/// Total size of rational vector.
+inline int totalSizeRational(const Rational* vector, const int length, const int base)
+{
+   assert(vector != 0);
+   assert(length >= 0);
+   assert(base >= 0);
+
+   int size = 0;
+
+   for(int i = 0; i < length; i++)
+      size += sizeInBase(vector[i], base);
+
+   return size;
+}
+
+/// Size of least common multiple of denominators in rational vector.
+inline int dlcmSizeRational(const Rational* vector, const int length, const int base)
+{
+   assert(vector != 0);
+   assert(length >= 0);
+   assert(base == 2);
+
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return 0;
+#else
+
+   Integer lcm;
+
+   for(int i = 0; i < length; i++)
+      SpxLcm(lcm, lcm, denominator(vector[i]));
+
+   int size = msb(lcm) + 1;
+
+   return size;
+#endif
+}
+
+/// Size of largest denominator in rational vector.
+inline int dmaxSizeRational(const Rational* vector, const int length, const int base)
+{
+   assert(vector != 0);
+   assert(length >= 0);
+   assert(base == 2);
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return 0;
+#else
+
+   size_t dmax = 0;
+
+   for(int i = 0; i < length; i++)
+   {
+      size_t dsize = msb(denominator(vector[i])) + 1;
+
+      if(dsize > dmax)
+         dmax = dsize;
+   }
+
+   return (int)dmax;
+#endif
+}
 
 #endif

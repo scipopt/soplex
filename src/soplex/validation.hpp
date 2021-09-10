@@ -19,14 +19,8 @@
 
 #include "soplex/validation.h"
 
-#ifdef SOPLEX_WITH_BOOST
-#include "boost/lexical_cast.hpp"
-#endif
-
 namespace soplex
 {
-
-#ifdef SOPLEX_WITH_BOOST
 
 template <class R>
 bool Validation<R>::updateExternalSolution(const std::string& solution)
@@ -40,13 +34,18 @@ bool Validation<R>::updateExternalSolution(const std::string& solution)
    }
    else if(solution == "-infinity")
    {
-      return false;
+      return true;
    }
    else
    {
-      // This will throw boost::bad_lexical cast if bad cast. Will be caught
-      // by the catch in soplexmain.cpp
-      boost::lexical_cast<double>(solution);
+      char* tailptr;
+      strtod(solution.c_str(), &tailptr);
+
+      if(*tailptr)
+      {
+         //conversion failed because the input wasn't a number
+         return false;
+      }
    }
 
    return true;
@@ -57,8 +56,15 @@ bool Validation<R>::updateExternalSolution(const std::string& solution)
 template <class R>
 bool Validation<R>::updateValidationTolerance(const std::string& tolerance)
 {
-   // Will throw boost::bad_lexical_cast if conversion fails
-   validatetolerance = boost::lexical_cast<R>(tolerance);
+   char* tailptr;
+   validatetolerance = strtod(tolerance.c_str(), &tailptr);
+
+   if(*tailptr)
+   {
+      //conversion failed because the input wasn't a number
+      return false;
+   }
+
    return true;
 }
 
@@ -90,8 +96,7 @@ void Validation<R>::validateSolveReal(SoPlexBase<R>& soplex)
    }
    else
    {
-      // This will not throw here because it was checked in updateExternalSolution()
-      sol = boost::lexical_cast<R>(validatesolution);
+      sol = atof(validatesolution.c_str());
    }
 
    objViolation = spxAbs(sol - soplex.objValueReal());
@@ -162,6 +167,5 @@ void Validation<R>::validateSolveReal(SoPlexBase<R>& soplex)
    os << "   Dual             : " << std::scientific << std::setprecision(
          8) << maxDualViolation << std::fixed << "\n";
 }
-#endif
 
 } // namespace soplex

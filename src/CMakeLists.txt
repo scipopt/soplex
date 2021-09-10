@@ -156,22 +156,20 @@ target_include_directories(libsoplexshared PUBLIC
 target_link_libraries(libsoplexshared libsoplex ${libs})
 set_target_properties(libsoplexshared PROPERTIES CXX_VISIBILITY_PRESET default)
 
-if(BOOST)
-    # create soplex binary using library without pic
-    add_executable(soplex soplexmain.cpp)
-    target_link_libraries(soplex LINK_PUBLIC libsoplex ${Boost_LIBRARIES})
+# create soplex binary using library without pic
+add_executable(soplex soplexmain.cpp)
+target_link_libraries(soplex LINK_PUBLIC libsoplex ${Boost_LIBRARIES})
 
-    if(CMAKE_BUILD_TYPE EQUAL "Debug")
-        find_package(Sanitizers)
-        add_sanitizers(soplex)
-    endif()
-
-    add_executable(example EXCLUDE_FROM_ALL example.cpp)
-    target_link_libraries(example libsoplex)
-
-    # set the install rpath to the installed destination
-    set_target_properties(soplex PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+if(CMAKE_BUILD_TYPE EQUAL "Debug")
+   find_package(Sanitizers)
+   add_sanitizers(soplex)
 endif()
+
+add_executable(example EXCLUDE_FROM_ALL example.cpp)
+target_link_libraries(example libsoplex)
+
+# set the install rpath to the installed destination
+set_target_properties(soplex PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 # on UNIX system the 'lib' prefix is automatically added
 set_target_properties(libsoplex PROPERTIES
@@ -188,20 +186,12 @@ set_target_properties(libsoplexshared PROPERTIES
 install(FILES ${headers} ${PROJECT_BINARY_DIR}/soplex/config.h DESTINATION include/soplex)
 install(FILES soplex.h soplex.hpp soplex_interface.h DESTINATION include)
 
-if(BOOST)
 # install the binary and the library to appropriate lcoations and add them to an export group
 install(TARGETS soplex libsoplex libsoplex-pic libsoplexshared EXPORT soplex-targets
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin
         INCLUDES DESTINATION include)
-else()
-# install the the library to appropriate lcoations and add them to an export group
-install(TARGETS libsoplex libsoplex-pic EXPORT soplex-targets
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        INCLUDES DESTINATION include)
-endif()
 
 # Add library targets to the build-tree export set
 export(TARGETS libsoplex libsoplex-pic libsoplexshared

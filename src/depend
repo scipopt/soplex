@@ -67,7 +67,7 @@ $(BINOBJDIR)/soplexmain.o: src/soplexmain.cpp src/soplex.h src/soplex/spxgithash
  src/soplex/ratrecon.h src/soplex/sol.h src/soplex/solvedbds.hpp \
  src/soplex/testsoplex.hpp src/soplex/solvereal.hpp \
  src/soplex/validation.h src/soplex/validation.hpp \
- src/soplex/statistics.h src/soplex/args.hpp
+ src/soplex/statistics.h
 $(BINOBJDIR)/example.o: src/example.cpp src/soplex.h src/soplex/spxgithash.h \
  src/soplex/spxdefines.h src/soplex/spxdefines.hpp \
  src/soplex/basevectors.h src/soplex/spxdefines.h src/soplex/rational.h \
