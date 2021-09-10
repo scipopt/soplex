@@ -14,7 +14,120 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-#ifdef SOPLEX_WITH_PAPILO
+#ifndef SOPLEX_WITH_PAPILO
+
+namespace soplex {
+
+template <class R> class Presol : public SPxSimplifier<R> {
+
+public:
+
+  const VectorBase<R> &emptyVector = VectorBase<R>();
+
+
+  //------------------------------------
+  ///@name Constructors / destructors
+  ///@{
+  /// default constructor.
+  explicit Presol(Timer::TYPE ttype = Timer::USER_TIME) : SPxSimplifier<R>("PaPILO", ttype)
+  { ; };
+
+  /// copy constructor.
+  Presol(const Presol &old) : SPxSimplifier<R>(old) { ; }
+
+  /// assignment operator
+  Presol &operator=(const Presol &rhs) {
+    return *this;
+  }
+
+  /// destructor.
+  virtual ~Presol() {
+    ;
+  }
+
+  SPxSimplifier<R> *clone() const {
+    return new Presol(*this);
+  }
+
+  virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R> &lp, R eps, R delta, Real remainingTime) {
+    return SPxSimplifier<R>::OKAY;
+  }
+
+  virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R> &lp, R eps, R ftol, R otol, Real remainingTime,
+                                                     bool keepbounds, uint32_t seed){
+    assert(false);
+    return SPxSimplifier<R>::OKAY;
+  };
+
+  virtual void unsimplify(const VectorBase<R> &, const VectorBase<R> &,
+                          const VectorBase<R> &, const VectorBase<R> &,
+                          const typename SPxSolverBase<R>::VarStatus[],
+                          const typename SPxSolverBase<R>::VarStatus[],
+                          bool isOptimal) {
+    assert(false);
+  };
+
+  /// returns result status of the simplification
+  virtual typename SPxSimplifier<R>::Result result() const {
+    assert(false);
+    return SPxSimplifier<R>::OKAY;
+  }
+
+  /// specifies whether an optimal solution has already been unsimplified.
+  virtual bool isUnsimplified() const {
+    assert(false);
+    return false;
+  }
+
+  /// returns a reference to the unsimplified primal solution.
+  virtual const VectorBase<R> &unsimplifiedPrimal() {
+    assert(false);
+    return emptyVector;
+  }
+
+  /// returns a reference to the unsimplified dual solution.
+  virtual const VectorBase<R> &unsimplifiedDual() {
+    assert(false);
+    return emptyVector;
+  }
+
+  /// returns a reference to the unsimplified slack values.
+  virtual const VectorBase<R> &unsimplifiedSlacks() {
+    assert(false);
+    return emptyVector;
+  }
+
+  /// returns a reference to the unsimplified reduced costs.
+  virtual const VectorBase<R> &unsimplifiedRedCost() {
+    assert(false);
+    return emptyVector;
+  }
+
+  /// gets basis status for a single row.
+  virtual typename SPxSolverBase<R>::VarStatus getBasisRowStatus(int i) const {
+    assert(false);
+    return SPxSolverBase<R>::UNDEFINED;
+  }
+
+  /// gets basis status for a single column.
+  virtual typename SPxSolverBase<R>::VarStatus getBasisColStatus(int j) const {
+    assert(false);
+    return SPxSolverBase<R>::UNDEFINED;
+  }
+
+  /// get optimal basis.
+  virtual void getBasis(typename SPxSolverBase<R>::VarStatus rows[],
+                        typename SPxSolverBase<R>::VarStatus cols[], const int rowsSize = -1,
+                        const int colsSize = -1) const {
+    assert(false);
+  }
+
+};
+
+}
+
+
+#else
 
 #include <memory>
 
@@ -48,10 +161,10 @@ namespace soplex{
 
 
       papilo::PostsolveStorage<R>
-          postsolveStorage;        ///< storede postsolve to recalculate the original solution
-      bool m_noChanges = false;    ///< did PaPILO reduce the problem?
+          postsolveStorage;        ///< stored postsolve to recalculate the original solution
+      bool noChanges = false;    ///< did PaPILO reduce the problem?
 
-      bool m_postsolved;           ///< was the solution already postsolve?
+      bool postsolved;           ///< was the solution already postsolve?
       R m_epsilon;                 ///< epsilon zero.
       R m_feastol;                 ///< primal feasibility tolerance.
       R m_opttol;                  ///< dual feasibility tolerance.
@@ -62,22 +175,17 @@ namespace soplex{
       // TODO: the following parameters were ignored? Maybe I don't exactly know what they suppose to be
       bool m_keepbounds;           ///< keep some bounds (for boundflipping)
       typename SPxSimplifier<R>::Result m_result;     ///< result of the simplification.
-//      R m_cutoffbound;             ///< the cutoff bound that is found by heuristics
-//      R m_pseudoobj;               ///< the pseudo objective function value
 
    protected:
 
-      ///
-      R epsZero() const {
+     R epsZero() const {
          return m_epsilon;
       }
 
-      ///
       R feastol() const {
          return m_feastol;
       }
 
-      ///
       R opttol() const {
          return m_opttol;
       }
@@ -88,9 +196,8 @@ namespace soplex{
       ///@name Constructors / destructors
       ///@{
       /// default constructor.
-      //TODO: how to set the DEFAULT constructor and not declare it multiple times
       explicit Presol(Timer::TYPE ttype = Timer::USER_TIME)
-              : SPxSimplifier<R>("PaPILO", ttype), m_postsolved(false), m_epsilon(DEFAULT_EPS_ZERO),
+              : SPxSimplifier<R>("PaPILO", ttype), postsolved(false), m_epsilon(DEFAULT_EPS_ZERO),
                 m_feastol(DEFAULT_BND_VIOL), m_opttol(DEFAULT_BND_VIOL), modifyRowsFac(0.8), m_thesense(SPxLPBase<R>::MAXIMIZE),
                 m_keepbounds(false), m_result(this->OKAY)
      { ; };
@@ -99,7 +206,7 @@ namespace soplex{
       Presol(const Presol &old)
               : SPxSimplifier<R>(old), m_prim(old.m_prim), m_slack(old.m_slack), m_dual(old.m_dual),
                 m_redCost(old.m_redCost), m_cBasisStat(old.m_cBasisStat), m_rBasisStat(old.m_rBasisStat),
-                postsolveStorage(old.postsolveStorage), m_postsolved(old.m_postsolved), m_epsilon(old.m_epsilon),
+                postsolveStorage(old.postsolveStorage), postsolved(old.postsolved), m_epsilon(old.m_epsilon),
                 m_feastol(old.m_feastol), m_opttol(old.m_opttol),
             modifyRowsFac(old.modifyRowsFac), m_thesense(old.m_thesense),
                 m_keepbounds(old.m_keepbounds), m_result(old.m_result) {
@@ -117,7 +224,7 @@ namespace soplex{
             m_redCost = rhs.m_redCost;
             m_cBasisStat = rhs.m_cBasisStat;
             m_rBasisStat = rhs.m_rBasisStat;
-            m_postsolved = rhs.m_postsolved;
+            postsolved = rhs.postsolved;
             m_epsilon = rhs.m_epsilon;
             m_feastol = rhs.m_feastol;
             m_opttol = rhs.m_opttol;
@@ -163,42 +270,42 @@ namespace soplex{
 
       /// specifies whether an optimal solution has already been unsimplified.
       virtual bool isUnsimplified() const {
-         return m_postsolved;
+         return postsolved;
       }
 
       /// returns a reference to the unsimplified primal solution.
       virtual const VectorBase<R> &unsimplifiedPrimal() {
-         assert(m_postsolved);
+         assert(postsolved);
          return m_prim;
       }
 
       /// returns a reference to the unsimplified dual solution.
       virtual const VectorBase<R> &unsimplifiedDual() {
-         assert(m_postsolved);
+         assert(postsolved);
          return m_dual;
       }
 
       /// returns a reference to the unsimplified slack values.
       virtual const VectorBase<R> &unsimplifiedSlacks() {
-         assert(m_postsolved);
+         assert(postsolved);
          return m_slack;
       }
 
       /// returns a reference to the unsimplified reduced costs.
       virtual const VectorBase<R> &unsimplifiedRedCost() {
-         assert(m_postsolved);
+         assert(postsolved);
          return m_redCost;
       }
 
       /// gets basis status for a single row.
       virtual typename SPxSolverBase<R>::VarStatus getBasisRowStatus(int i) const {
-         assert(m_postsolved);
+         assert(postsolved);
          return m_rBasisStat[i];
       }
 
       /// gets basis status for a single column.
       virtual typename SPxSolverBase<R>::VarStatus getBasisColStatus(int j) const {
-         assert(m_postsolved);
+         assert(postsolved);
          return m_cBasisStat[j];
       }
 
@@ -206,7 +313,7 @@ namespace soplex{
       virtual void getBasis(typename SPxSolverBase<R>::VarStatus rows[],
                             typename SPxSolverBase<R>::VarStatus cols[], const int rowsSize = -1,
                             const int colsSize = -1) const {
-         assert(m_postsolved);
+         assert(postsolved);
          assert(rowsSize < 0 || rowsSize >= m_rBasisStat.size());
          assert(colsSize < 0 || colsSize >= m_cBasisStat.size());
 
@@ -254,7 +361,7 @@ namespace soplex{
      assert(nRowsReduced == s.dim());
 
      //if presolving made no changes then copy the reduced solution to the original
-     if (m_noChanges) {
+     if (noChanges) {
        for (int j = 0; j < nColsReduced; ++j) {
          m_prim[j] = x[j];
          m_redCost[j] = r[j];
@@ -266,7 +373,7 @@ namespace soplex{
          m_slack[i] = s[i];
          m_rBasisStat[i] = rows[i];
        }
-       m_postsolved = true;
+       postsolved = true;
        return;
      }
      assert(nColsReduced == (int)postsolveStorage.origcol_mapping.size());
@@ -289,7 +396,7 @@ namespace soplex{
      reducedSolution.dual.resize(nRowsReduced);
      reducedSolution.rowBasisStatus.resize(nRowsReduced);
 
-     m_postsolved = true;
+     postsolved = true;
 
      // NOTE: for maximization problems, we have to switch signs of dual and
      // reduced cost values, since simplifier assumes minimization problem
@@ -457,7 +564,7 @@ namespace soplex{
             return SPxSimplifier<R>::UNBOUNDED;
          case papilo::PresolveStatus::kUnchanged:
             // since Soplex has no state unchanged store the value in a new variable
-            m_noChanges = true;
+            noChanges = true;
             MSG_INFO1((*this->spxout), (*this->spxout) << "==== Presolving found nothing " << std::endl;)
             return SPxSimplifier<R>::OKAY;
          case papilo::PresolveStatus::kReduced:
@@ -485,7 +592,7 @@ namespace soplex{
          assert(newNonzeros == lp.nNzos());
       }
       else {
-        m_noChanges = true;
+        noChanges = true;
         MSG_INFO1((*this->spxout),
                   (*this->spxout)
                       << " --- presolve results smaller than the modifyconsfac"
@@ -493,6 +600,10 @@ namespace soplex{
       }
       if(newNonzeros == 0)
       {
+        MSG_INFO1((*this->spxout),
+                  (*this->spxout)
+                      << " --- problem vanished during presolving"
+                      << std::endl;)
         m_result = SPxSimplifier<R>::VANISHED;
         postsolveStorage = res.postsolve;
       }
@@ -504,7 +615,7 @@ namespace soplex{
       m_result = SPxSimplifier<R>::OKAY;
 
       m_thesense = lp.spxSense();
-      m_postsolved = false;
+      postsolved = false;
 
       m_prim.reDim(lp.nCols());
       m_slack.reDim(lp.nRows());

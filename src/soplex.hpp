@@ -5858,7 +5858,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
          assert  (_simplifier != 0);
          break;
 #else
-         MSG_ERROR((*this->spxout), (*this->spxout) << " --- PaPILO not specified please build SoPlex with PaPILO-" << std::endl;)
+//         MSG_ERROR((*this->spxout), (*this->spxout) << " --- PaPILO not specified please build SoPlex with PaPILO-" << std::endl;)
          _simplifier = &_simplifierMainSM;
          assert(_simplifier != 0);
          return false;
@@ -7814,8 +7814,7 @@ template <class R>
 void SoPlexBase<R>::_enableSimplifierAndScaler()
 {
    // type of simplifier
-   int i = intParam(SoPlexBase<R>::SIMPLIFIER);
-   switch(i)
+  switch(intParam(SoPlexBase<R>::SIMPLIFIER))
    {
    case SIMPLIFIER_OFF:
       _simplifier = 0;

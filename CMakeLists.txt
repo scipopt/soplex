@@ -164,7 +164,7 @@ endif()
 # look for presolvelib PaPILO
 if(PAPILO)
     message(STATUS "Finding PAPILO")
-    #TODO: define minimum version
+    #TODO: define minimum version- not working
 #    find_package(PAPILO CONFIG ${PAPILO_MIN_VERSION} REQUIRED)
     find_package(PAPILO CONFIG REQUIRED)
     message(STATUS "Finding PAPILO - found")

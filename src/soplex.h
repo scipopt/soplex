@@ -22,13 +22,12 @@
 
 #include <string.h>
 
+#include "soplex/spxgithash.h"
+#include "soplex/spxdefines.h"
 #include "soplex/basevectors.h"
+#include "soplex/spxsolver.h"
 #include "soplex/slufactor.h"
 #include "soplex/slufactor_rational.h"
-#include "soplex/spxdefines.h"
-#include "soplex/spxgithash.h"
-#include "soplex/spxpapilo.h"
-#include "soplex/spxsolver.h"
 
 ///@todo try to move to cpp file by forward declaration
 #include "soplex/spxsimplifier.h"
@@ -63,6 +62,8 @@
 #include "soplex/sol.h"
 
 #include "soplex/spxlpbase.h"
+
+#include "soplex/spxpapilo.h"
 
 #ifdef SOPLEX_WITH_GMP
 #include <gmp.h>

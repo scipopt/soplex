@@ -80,6 +80,7 @@ set(headers
     soplex/spxmainsm.h
     soplex/spxout.h
     soplex/spxparmultpr.h
+    soplex/spxpapilo.h
     soplex/spxpricer.h
     soplex/spxratiotester.h
     soplex/spxscaler.h
