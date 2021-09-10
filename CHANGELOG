@@ -5,7 +5,7 @@ features:
 
 - improved the buildsystem by adding a cmake-configurable `config.h.in` header in the same fashion as it is handled in SCIP
 - replaced SoPlex internal `Rational` class by the boost multiprecision library for rational numbers; this enables the possibility of performing a rational LP solve, even without linking GMP
-- reverted dependency on the Boost program options library, while still keeping the possibility of using higher precisions as SoPLex base arithmetic type.
+- restored classic command line interface to remove dependency on the Boost program options library
 - changed the command-line argument for running soplex with higher precision; formerly the multiprecision mode was triggered by setting `solvemode=3` (multiprecision), or `solvemode=4` (quadprecision); Now higher precision arithmetic has its own argument `arithmetic` (0 - double, 1 - quadprecision, 2 - multiprecision); This makes it possible to also use rational solving mode in combination with multiprecision
 
 interface & parameters:

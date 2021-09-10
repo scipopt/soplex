@@ -19,10 +19,6 @@
 
 #include "soplex/validation.h"
 
-#ifdef SOPLEX_WITH_BOOST
-#include "boost/lexical_cast.hpp"
-#endif
-
 namespace soplex
 {
 
@@ -100,12 +96,7 @@ void Validation<R>::validateSolveReal(SoPlexBase<R>& soplex)
    }
    else
    {
-      // This will not throw here because it was checked in updateExternalSolution()
-#ifdef SOPLEX_WITH_BOOST
-      sol = boost::lexical_cast<R>(validatesolution);
-#else
       sol = atof(validatesolution.c_str());
-#endif
    }
 
    objViolation = spxAbs(sol - soplex.objValueReal());
