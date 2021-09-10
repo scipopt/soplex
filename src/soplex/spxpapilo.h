@@ -598,15 +598,6 @@ namespace soplex{
                       << " --- presolve results smaller than the modifyconsfac"
                       << std::endl;)
       }
-      if(newNonzeros == 0)
-      {
-        MSG_INFO1((*this->spxout),
-                  (*this->spxout)
-                      << " --- problem vanished during presolving"
-                      << std::endl;)
-        m_result = SPxSimplifier<R>::VANISHED;
-        postsolveStorage = res.postsolve;
-      }
       return m_result;
    }
 
