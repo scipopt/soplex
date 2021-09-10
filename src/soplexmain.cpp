@@ -1115,9 +1115,7 @@ TERMINATE:
 int main(int argc, char* argv[])
 {
    int arithmetic = 0;
-#ifdef SOPLEX_WITH_BOOST
-   int precision;
-#endif
+   int precision = 0;
    int optidx;
 
    // find out which precision/solvemode soplex should be run in. the rest happens in runSoPlex
@@ -1152,7 +1150,7 @@ int main(int argc, char* argv[])
       case '-' :
          option = &option[2];
 
-         // --solvemode=<value> : choose solving mode (0* - floating-point solve, 1 - auto, 2 - force iterative refinement, 3 - multiprecison, 4 - quadprecision)
+         // --arithmetic=<value> : choose base arithmetic type (0 - double, 1 - quadprecision, 2 - higher multiprecision)
          // only need to do something here if multi or quad, the rest is handled in runSoPlex
          if(strncmp(option, "arithmetic=", 11) == 0)
          {
@@ -1176,15 +1174,19 @@ int main(int argc, char* argv[])
                return 1;
 #else
                arithmetic = 2;
+
+               // default precision in multiprecision solve is 50
+               if(precision == 0)
+                  precision = 50;
+
 #endif
             }
          }
          // set precision
          else if(strncmp(option, "precision=", 10) == 0)
          {
-#ifdef SOPLEX_WITH_BOOST
             precision = atoi(option + 10);
-#else
+#ifndef SOPLEX_WITH_BOOST
             MSG_ERROR(std::cerr << "Setting precision to non-default value without Boost has no effect\n";)
 #endif
          }
@@ -1194,6 +1196,12 @@ int main(int argc, char* argv[])
       default:
          break;
       }
+   }
+
+   if(precision != 0 && arithmetic != 2)
+   {
+      MSG_ERROR(std::cerr <<
+                "Setting precision to non-default value without enabling multiprecision solve has no effect\n";)
    }
 
    switch(arithmetic)
