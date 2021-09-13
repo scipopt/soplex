@@ -518,7 +518,6 @@ namespace soplex{
             const Nonzero<R> element = rowVector.element(j);
             indices[j] = element.idx;
             rowValues[j] = element.val;
-            std::cout << "writing " <<  indices[j] << " value " << rowValues[j] << "\n";
          }
          builder.addRowEntries(i, rowlength, indices, rowValues);
 
