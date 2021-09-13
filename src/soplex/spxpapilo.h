@@ -421,6 +421,9 @@ namespace soplex{
      num.setFeasTol(m_feastol);
      papilo::Message msg{};
      msg.setVerbosityLevel(verbosityLevel);
+#ifdef SOPLEX_DEBUG
+     msg.setVerbosityLevel(papilo::VerbosityLevel::kQuiet;);
+#endif
      papilo::Postsolve<R> postsolve{msg, num};
      postsolve.undo(reducedSolution, originalSolution, postsolveStorage);
 
@@ -541,6 +544,9 @@ namespace soplex{
      //TODO: how to use the keepbounds parameter?
       m_keepbounds = keepbounds;
 
+      if(m_keepbounds)
+        MSG_WARNING((*this->spxout), (*this->spxout) << "==== PaPILO doesn't handle parameter keepbounds" << std::endl;)
+
       initLocalVariables(lp);
       papilo::Problem<R> problem = buildProblem(lp);
       papilo::Presolve<R> presolve;
@@ -633,14 +639,14 @@ namespace soplex{
       presolve.getPresolveOptions().dualreds = 0;
       presolve.getPresolveOptions().feastol = double(feasTolerance);
       presolve.getPresolveOptions().epsilon = double(epsilon);
-      //TODO: has Soplex an parameter to define infinity? otherwise I would use the default
-      //      presolve.getPresolveOptions().hugeval = data->hugebound;
       presolve.getPresolveOptions().detectlindep = 0;
       presolve.getPresolveOptions().componentsmaxint = -1;
       presolve.getPresolveOptions().calculate_basis_for_dual = true;
 
       presolve.setVerbosityLevel(verbosityLevel);
-
+#ifdef SOPLEX_DEBUG
+      presolve.setVerbosityLevel(papilo::VerbosityLevel::kQuiet;);
+#endif
       /* enable lp presolvers with dual postsolve*/
       using uptr = std::unique_ptr<papilo::PresolveMethod<R>>;
 
