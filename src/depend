@@ -105,7 +105,7 @@ $(BINOBJDIR)/example.o: src/example.cpp src/soplex.h src/soplex/spxgithash.h \
  src/soplex/spxquality.hpp src/soplex/slufactor.h \
  src/soplex/slufactor_rational.h src/soplex/slinsolver_rational.h \
  src/soplex/clufactor_rational.h src/soplex/spxsimplifier.h \
- src/soplex/spxmainsm.h src/soplex/spxsimplifier.h \
+ src/soplex/spxmainsm.h src/soplex/spxsimplifier.h src/soplex/spxpapilo.h \
  src/soplex/spxmainsm.hpp src/soplex/spxmainsm.h src/soplex/spxscaler.h \
  src/soplex/spxequilisc.h src/soplex/spxequilisc.hpp \
  src/soplex/spxequilisc.h src/soplex.h src/soplex/spxleastsqsc.h \
