@@ -1162,7 +1162,10 @@ public:
       SIMPLIFIER_INTERNAL = 1,
 
       /// using the presolve lib papilo
-      SIMPLIFIER_PAPILO = 2
+      SIMPLIFIER_PAPILO = 2,
+
+     /// @deprecated: only to provide backwards compatibility (use INTERNAL instead)
+      SIMPLIFIER_AUTO = 3
    };
 
    /// values for parameter SCALER
