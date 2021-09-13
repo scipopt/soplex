@@ -130,7 +130,8 @@ target_include_directories(libsoplex-pic PUBLIC
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:include>)
-target_link_libraries(libsoplex-pic ${libs})
+target_link_libraries(libsoplex-pic ${libs}
+    ${PAPILO_IMPORTED_TARGETS})
 
 # create soplex library without pic
 add_library(libsoplex STATIC ${sources})
@@ -142,7 +143,8 @@ target_include_directories(libsoplex PUBLIC
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:include>)
-target_link_libraries(libsoplex ${libs})
+target_link_libraries(libsoplex ${libs}
+    ${PAPILO_IMPORTED_TARGETS})
 
 # create C shared library
 add_library(libsoplexshared SHARED soplex_interface.cpp ${sources})
