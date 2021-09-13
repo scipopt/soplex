@@ -130,7 +130,6 @@ target_include_directories(libsoplex-pic PUBLIC
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:include>)
-message(${libs})
 target_link_libraries(libsoplex-pic ${libs})
 
 # create soplex library without pic
