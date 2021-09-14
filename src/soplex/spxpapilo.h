@@ -24,9 +24,6 @@ template <class R> class Presol : public SPxSimplifier<R>
 
 public:
 
-   const VectorBase<R>& emptyVector = VectorBase<R>();
-
-
    //------------------------------------
    ///@name Constructors / destructors
    ///@{
@@ -95,6 +92,7 @@ public:
    virtual const VectorBase<R>& unsimplifiedPrimal()
    {
       assert(false);
+      const VectorBase<R>& emptyVector = VectorBase<R>();
       return emptyVector;
    }
 
@@ -102,6 +100,7 @@ public:
    virtual const VectorBase<R>& unsimplifiedDual()
    {
       assert(false);
+      const VectorBase<R>& emptyVector = VectorBase<R>();
       return emptyVector;
    }
 
@@ -109,6 +108,7 @@ public:
    virtual const VectorBase<R>& unsimplifiedSlacks()
    {
       assert(false);
+      const VectorBase<R>& emptyVector = VectorBase<R>();
       return emptyVector;
    }
 
@@ -116,6 +116,7 @@ public:
    virtual const VectorBase<R>& unsimplifiedRedCost()
    {
       assert(false);
+      const VectorBase<R>& emptyVector = VectorBase<R>();
       return emptyVector;
    }
 
