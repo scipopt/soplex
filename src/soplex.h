@@ -1159,13 +1159,13 @@ public:
       SIMPLIFIER_OFF = 0,
 
       /// using internal presoling methods
-      SIMPLIFIER_INTERNAL = 1,
+      SIMPLIFIER_INTERNAL = 3,
 
       /// using the presolve lib papilo
       SIMPLIFIER_PAPILO = 2,
 
      /// @deprecated: only to provide backwards compatibility (use INTERNAL instead)
-      SIMPLIFIER_AUTO = 3
+      SIMPLIFIER_AUTO = 1
    };
 
    /// values for parameter SCALER
