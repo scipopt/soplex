@@ -92,7 +92,7 @@ public:
    virtual const VectorBase<R>& unsimplifiedPrimal()
    {
       assert(false);
-      const VectorBase<R>& emptyVector = VectorBase<R>();
+      static const VectorBase<R>& emptyVector = VectorBase<R>();
       return emptyVector;
    }
 
@@ -100,7 +100,7 @@ public:
    virtual const VectorBase<R>& unsimplifiedDual()
    {
       assert(false);
-      const VectorBase<R>& emptyVector = VectorBase<R>();
+      static const VectorBase<R>& emptyVector = VectorBase<R>();
       return emptyVector;
    }
 
@@ -108,7 +108,7 @@ public:
    virtual const VectorBase<R>& unsimplifiedSlacks()
    {
       assert(false);
-      const VectorBase<R>& emptyVector = VectorBase<R>();
+      static const VectorBase<R>& emptyVector = VectorBase<R>();
       return emptyVector;
    }
 
@@ -116,7 +116,7 @@ public:
    virtual const VectorBase<R>& unsimplifiedRedCost()
    {
       assert(false);
-      const VectorBase<R>& emptyVector = VectorBase<R>();
+      static const VectorBase<R>& emptyVector = VectorBase<R>();
       return emptyVector;
    }
 
