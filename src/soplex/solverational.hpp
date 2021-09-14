@@ -3385,7 +3385,8 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
          bool keepbounds = intParam(SoPlexBase<R>::RATIOTESTER) == SoPlexBase<R>::RATIOTESTER_BOUNDFLIPPING;
          Real remainingTime = _solver.getMaxTime() - _solver.time();
          simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlexBase<R>::EPSILON_ZERO),
-                                realParam(SoPlexBase<R>::FPFEASTOL), realParam(SoPlexBase<R>::FPOPTTOL), remainingTime, keepbounds, _solver.random.getSeed());
+                                realParam(SoPlexBase<R>::FPFEASTOL), realParam(SoPlexBase<R>::FPOPTTOL), remainingTime, keepbounds,
+                                _solver.random.getSeed());
       }
 
       // apply scaling after the simplification
@@ -3649,7 +3650,8 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
       }
 
       if(!turnedoffPre
-            && (intParam(SoPlexBase<R>::SIMPLIFIER) != SoPlexBase<R>::SIMPLIFIER_OFF || intParam(SoPlexBase<R>::SCALER) != SoPlexBase<R>::SCALER_OFF))
+            && (intParam(SoPlexBase<R>::SIMPLIFIER) != SoPlexBase<R>::SIMPLIFIER_OFF
+                || intParam(SoPlexBase<R>::SCALER) != SoPlexBase<R>::SCALER_OFF))
       {
          MSG_INFO1(spxout, spxout << "Turning off preprocessing." << std::endl);
 

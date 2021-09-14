@@ -583,7 +583,8 @@ SoPlexBase<R>::Settings::RealParam::RealParam()
 
    // modification
    name[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = "simplifier_modifyrowfac";
-   description[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = "modify constraints when the number of nonzeros or rows is at most this factor times the number of nonzeros or rows before presolving";
+   description[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] =
+      "modify constraints when the number of nonzeros or rows is at most this factor times the number of nonzeros or rows before presolving";
    lower[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 0;
    upper[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 1;
    defaultValue[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 0.8;
@@ -5848,22 +5849,25 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       case SIMPLIFIER_OFF:
          _simplifier = 0;
          break;
+
       case SIMPLIFIER_INTERNAL:
       case SIMPLIFIER_AUTO:
          _simplifier = &_simplifierMainSM;
          assert(_simplifier != 0);
          break;
+
       case SIMPLIFIER_PAPILO:
 #ifdef SOPLEX_WITH_PAPILO
          _simplifier = &_simplifierPaPILO;
-         assert  (_simplifier != 0);
+         assert(_simplifier != 0);
          break;
 #else
-//         MSG_ERROR((*this->spxout), (*this->spxout) << " --- PaPILO not specified please build SoPlex with PaPILO-" << std::endl;)
+         //         MSG_ERROR((*this->spxout), (*this->spxout) << " --- PaPILO not specified please build SoPlex with PaPILO-" << std::endl;)
          _simplifier = &_simplifierMainSM;
          assert(_simplifier != 0);
          return false;
 #endif
+
       default:
          return false;
       }
@@ -6341,9 +6345,9 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
 
    case SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC:
 #ifdef SOPLEX_WITH_PAPILO
-     _simplifierPaPILO.setModifyConsFrac(value);
+      _simplifierPaPILO.setModifyConsFrac(value);
 #endif
-     break;
+      break;
 
    default:
       return false;
@@ -7815,11 +7819,12 @@ template <class R>
 void SoPlexBase<R>::_enableSimplifierAndScaler()
 {
    // type of simplifier
-  switch(intParam(SoPlexBase<R>::SIMPLIFIER))
+   switch(intParam(SoPlexBase<R>::SIMPLIFIER))
    {
    case SIMPLIFIER_OFF:
       _simplifier = 0;
       break;
+
    case SIMPLIFIER_AUTO:
    case SIMPLIFIER_INTERNAL:
       _simplifier = &_simplifierMainSM;
@@ -7828,15 +7833,15 @@ void SoPlexBase<R>::_enableSimplifierAndScaler()
       break;
 
    case SIMPLIFIER_PAPILO:
-      #ifdef SOPLEX_WITH_PAPILO
-         _simplifier = &_simplifierPaPILO;
-         assert(_simplifier != 0);
-      #else
-         _simplifier = &_simplifierMainSM;
-         assert(_simplifier != 0);
-         _simplifier->setMinReduction(realParam(MINRED));
-      #endif
-         break;
+#ifdef SOPLEX_WITH_PAPILO
+      _simplifier = &_simplifierPaPILO;
+      assert(_simplifier != 0);
+#else
+      _simplifier = &_simplifierMainSM;
+      assert(_simplifier != 0);
+      _simplifier->setMinReduction(realParam(MINRED));
+#endif
+      break;
 
    default:
       break;

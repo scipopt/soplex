@@ -1164,7 +1164,7 @@ public:
       /// using the presolve lib papilo
       SIMPLIFIER_PAPILO = 2,
 
-     /// @deprecated: only to provide backwards compatibility (use INTERNAL instead)
+      /// @deprecated: only to provide backwards compatibility (use INTERNAL instead)
       SIMPLIFIER_AUTO = 1
    };
 
@@ -1414,7 +1414,7 @@ public:
       MIN_MARKOWITZ = 24,
 
       /// minimal modification threshold to apply presolve reductions
-     SIMPLIFIER_MODIFYROWFAC = 25,
+      SIMPLIFIER_MODIFYROWFAC = 25,
 
       /// number of real parameters
       REALPARAM_COUNT = 26

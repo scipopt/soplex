@@ -5050,7 +5050,8 @@ void SPxMainSM<R>::fixColumn(SPxLPBase<R>& lp, int j, bool correctIdx)
 }
 
 template <class R>
-typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol, Real remainingTime,
+typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
+      Real remainingTime,
       bool keepbounds, uint32_t seed)
 {
    // transfer message handler
