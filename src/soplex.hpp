@@ -5862,7 +5862,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
          assert(_simplifier != 0);
          break;
 #else
-         MSG_WARNING((*this->spxout), (*this->spxout) << " --- PaPILO not specified please build SoPlex with PaPILO- switched to internal presolver-" << std::endl;)
+         //         MSG_ERROR((*this->spxout), (*this->spxout) << " --- PaPILO not specified please build SoPlex with PaPILO-" << std::endl;)
          _simplifier = &_simplifierMainSM;
          assert(_simplifier != 0);
          return false;
