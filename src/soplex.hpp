@@ -29,6 +29,7 @@
 
 #ifndef _MSC_VER
 #include <strings.h>
+#include "soplex/spxdefines.h"
 #endif
 
 namespace soplex
@@ -5862,7 +5863,8 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
          assert(_simplifier != 0);
          break;
 #else
-         //         MSG_ERROR((*this->spxout), (*this->spxout) << " --- PaPILO not specified please build SoPlex with PaPILO-" << std::endl;)
+         MSG_ERROR(std::cerr <<
+                   "ERROR: SoPlex build without presolving library PaPILO! using internal presolver" << std::endl;)
          _simplifier = &_simplifierMainSM;
          assert(_simplifier != 0);
          return false;
