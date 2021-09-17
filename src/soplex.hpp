@@ -29,7 +29,6 @@
 
 #ifndef _MSC_VER
 #include <strings.h>
-#include "soplex/spxdefines.h"
 #endif
 
 namespace soplex
