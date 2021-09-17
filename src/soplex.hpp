@@ -6628,7 +6628,8 @@ void SoPlexBase<R>::printVersion() const
 
 
 #ifdef SOPLEX_WITH_PAPILO
-   MSG_INFO1(spxout, spxout << " [PAPILO  " << PAPILO_VERSION_MAJOR << "." << PAPILO_VERSION_MINOR  << "." << PAPILO_VERSION_PATCH << " {" <<  PAPILO_GITHASH << "}]\n");
+   MSG_INFO1(spxout, spxout << " [PAPILO  " << PAPILO_VERSION_MAJOR << "." << PAPILO_VERSION_MINOR  <<
+             "." << PAPILO_VERSION_PATCH << " {" <<  PAPILO_GITHASH << "}]\n");
 #else
    MSG_INFO1(spxout, spxout << " [PAPILO: not integrated]");
 #endif
