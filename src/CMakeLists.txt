@@ -1,18 +1,15 @@
 include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(sources
-    soplex/clufactor_rational.cpp
     soplex/didxset.cpp
     soplex/gzstream.cpp
     soplex/idxset.cpp
     soplex/mpsinput.cpp
     soplex/nameset.cpp
     soplex/ratrecon.cpp
-    soplex/slufactor_rational.cpp
     soplex/spxdefines.cpp
     soplex/spxgithash.cpp
     soplex/spxid.cpp
-    soplex/spxlpbase_rational.cpp
     soplex/spxout.cpp
     soplex/usertimer.cpp
     soplex/wallclocktimer.cpp)

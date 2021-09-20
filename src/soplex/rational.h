@@ -196,6 +196,11 @@ inline Rational ratFromString(const char* desc)
    return res;
 }
 #else
+
+#ifndef SOPLEX_WITH_GMP
+using mpq_t = char;
+#endif
+
 using Integer = int;
 // this is a placeholder class to ensure compilation when boost ist not linked. Rationals need BOOST in order to function.
 class Rational {

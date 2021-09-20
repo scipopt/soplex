@@ -2888,6 +2888,7 @@ public:
 
 // For the general templated functions
 #include "spxlpbase_real.hpp"
+#include "spxlpbase_rational.hpp"
 
 /* reset the SOPLEX_DEBUG flag to its original value */
 #undef SOPLEX_DEBUG

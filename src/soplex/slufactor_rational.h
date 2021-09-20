@@ -299,4 +299,5 @@ private:
 };
 
 } // namespace soplex
+#include "slufactor_rational.hpp"
 #endif // _SLUFACTOR_RATIONAL_H_

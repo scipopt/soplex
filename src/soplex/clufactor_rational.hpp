@@ -14,14 +14,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include <assert.h>
-
-#include "soplex/spxdefines.h"
-#include "soplex/clufactor_rational.h"
 #include "soplex/cring.h"
-#include "soplex/spxalloc.h"
-#include "soplex/exceptions.h"
-#include "soplex/basevectors.h"
-#include "soplex/rational.h"
 
 namespace soplex
 {
@@ -32,11 +25,11 @@ namespace soplex
 #define MARKER     1e-100
 */
 
-static const Real verySparseFactor = 0.001;
-static const Real verySparseFactor4right = 0.2;
+static const Real verySparseFactorRat = 0.001;
+static const Real verySparseFactor4rightRat = 0.2;
 
 /* generic heap management */
-static void enQueueMax(int* heap, int* size, int elem)
+static void enQueueMaxRat(int* heap, int* size, int elem)
 {
    int i, j;
 
@@ -67,7 +60,7 @@ static void enQueueMax(int* heap, int* size, int elem)
 #endif  /* SOPLEX_DEBUG */
 }
 
-static int deQueueMax(int* heap, int* size)
+static int deQueueMaxRat(int* heap, int* size)
 {
    int e, elem;
    int i, j, s;
@@ -121,7 +114,7 @@ static int deQueueMax(int* heap, int* size)
    return elem;
 }
 
-static void enQueueMin(int* heap, int* size, int elem)
+static void enQueueMinRat(int* heap, int* size, int elem)
 {
    int i, j;
 
@@ -152,7 +145,7 @@ static void enQueueMin(int* heap, int* size, int elem)
 #endif  /* SOPLEX_DEBUG */
 }
 
-static int deQueueMin(int* heap, int* size)
+static int deQueueMinRat(int* heap, int* size)
 {
    int e, elem;
    int i, j, s;
@@ -924,14 +917,14 @@ void CLUFactorRational::forestUpdate(int p_col, Rational* p_work, int num, int* 
 
       nzCnt -= i;
 
-      if(i < verySparseFactor * (dim - c))      // few nonzeros to be eliminated
+      if(i < verySparseFactorRat * (dim - c))      // few nonzeros to be eliminated
       {
          /**
           *          The following assert is obviously violated if this method is called
           *          with nonzero==0.
           *
           *          @todo Use an extra member variable as a buffer for the heap instead of
-          *                misusing nonz and num. The method enQueueMin() seems to
+          *                misusing nonz and num. The method enQueueMinRat() seems to
           *                sort the nonzeros or something, for which it only needs
           *                some empty vector of size num.
           */
@@ -945,7 +938,7 @@ void CLUFactorRational::forestUpdate(int p_col, Rational* p_work, int num, int* 
          {
             k = ridx[i];
             p_work[k] = rval[i];
-            enQueueMin(nonz, &num, cperm[k]);
+            enQueueMinRat(nonz, &num, cperm[k]);
             m = --(clen[k]) + cbeg[k];
 
             for(h = m; cidx[h] != rowno; --h)
@@ -976,7 +969,7 @@ void CLUFactorRational::forestUpdate(int p_col, Rational* p_work, int num, int* 
                assert(p_work[corig[nonz[i]]] != 0);
 
 #endif // NDEBUG
-            i = deQueueMin(nonz, &num);
+            i = deQueueMinRat(nonz, &num);
 
             if(i == r)
                break;
@@ -1010,7 +1003,7 @@ void CLUFactorRational::forestUpdate(int p_col, Rational* p_work, int num, int* 
                Rational y = p_work[jj];
 
                if(y == 0)
-                  enQueueMin(nonz, &num, cperm[jj]);
+                  enQueueMinRat(nonz, &num, cperm[jj]);
 
                y -= x * rval[j];
 
@@ -4217,7 +4210,7 @@ int CLUFactorRational::solveUleft(Rational* vec, int* vecidx,
     */
 
    for(i = 0; i < rhsn;)
-      enQueueMin(rhsidx, &i, cperm[rhsidx[i]]);
+      enQueueMinRat(rhsidx, &i, cperm[rhsidx[i]]);
 
    ridx = u.row.idx;
 
@@ -4231,7 +4224,7 @@ int CLUFactorRational::solveUleft(Rational* vec, int* vecidx,
 
    while(rhsn > 0)
    {
-      i = deQueueMin(rhsidx, &rhsn);
+      i = deQueueMinRat(rhsidx, &rhsn);
       assert(i >= 0 && i < thedim);
       c = corig[i];
       assert(c >= 0 && c < thedim);
@@ -4263,7 +4256,7 @@ int CLUFactorRational::solveUleft(Rational* vec, int* vecidx,
                if(y != 0)
                {
                   rhs[j] = y;
-                  enQueueMin(rhsidx, &rhsn, cperm[j]);
+                  enQueueMinRat(rhsidx, &rhsn, cperm[j]);
                }
             }
             else
@@ -4296,7 +4289,7 @@ void CLUFactorRational::solveUleftNoNZ(Rational* vec, Rational* rhs, int* rhsidx
     */
 
    for(i = 0; i < rhsn;)
-      enQueueMin(rhsidx, &i, cperm[rhsidx[i]]);
+      enQueueMinRat(rhsidx, &i, cperm[rhsidx[i]]);
 
    ridx = u.row.idx;
 
@@ -4308,7 +4301,7 @@ void CLUFactorRational::solveUleftNoNZ(Rational* vec, Rational* rhs, int* rhsidx
 
    while(rhsn > 0)
    {
-      i = deQueueMin(rhsidx, &rhsn);
+      i = deQueueMinRat(rhsidx, &rhsn);
       assert(i >= 0 && i < thedim);
       c = corig[i];
       assert(c >= 0 && c < thedim);
@@ -4339,7 +4332,7 @@ void CLUFactorRational::solveUleftNoNZ(Rational* vec, Rational* rhs, int* rhsidx
                if(y != 0)
                {
                   rhs[j] = y;
-                  enQueueMin(rhsidx, &rhsn, cperm[j]);
+                  enQueueMinRat(rhsidx, &rhsn, cperm[j]);
                }
             }
             else
@@ -4484,13 +4477,13 @@ int CLUFactorRational::solveLleft(Rational* vec, int* nonz, int rn)
    /*  move rhsidx to a heap
     */
    for(i = 0; i < rn;)
-      enQueueMax(nonz, &i, rperm[nonz[i]]);
+      enQueueMaxRat(nonz, &i, rperm[nonz[i]]);
 
    last = nonz + thedim;
 
    while(rn > 0)
    {
-      i = deQueueMax(nonz, &rn);
+      i = deQueueMaxRat(nonz, &rn);
       r = rorig[i];
       x = vec[r];
 
@@ -4516,7 +4509,7 @@ int CLUFactorRational::solveLleft(Rational* vec, int* nonz, int rn)
                if(y != 0)
                {
                   vec[m] = y;
-                  enQueueMax(nonz, &rn, rperm[m]);
+                  enQueueMaxRat(nonz, &rn, rperm[m]);
                }
             }
             else
@@ -5032,7 +5025,7 @@ int CLUFactorRational::vSolveUright(Rational* vec, int* vidx,
    {
       /*      Find nonzero with highest permuted row index and setup i and r
        */
-      i = deQueueMax(ridx, &rn);
+      i = deQueueMaxRat(ridx, &rn);
       assert(i >= 0 && i < thedim);
       r = rorig[i];
       assert(r >= 0 && r < thedim);
@@ -5064,7 +5057,7 @@ int CLUFactorRational::vSolveUright(Rational* vec, int* vidx,
                if(y != 0)
                {
                   rhs[k] = y;
-                  enQueueMax(ridx, &rn, rperm[k]);
+                  enQueueMaxRat(ridx, &rn, rperm[k]);
                }
             }
             else
@@ -5075,7 +5068,7 @@ int CLUFactorRational::vSolveUright(Rational* vec, int* vidx,
             }
          }
 
-         if(rn > i * verySparseFactor4right)
+         if(rn > i * verySparseFactor4rightRat)
          {
             /* continue with dense case */
             for(i = *ridx; i >= 0; --i)
@@ -5134,7 +5127,7 @@ void CLUFactorRational::vSolveUrightNoNZ(Rational* vec, Rational* rhs, int* ridx
 
    while(rn > 0)
    {
-      if(rn > *ridx * verySparseFactor4right)
+      if(rn > *ridx * verySparseFactor4rightRat)
       {
          /* continue with dense case */
          for(i = *ridx; i >= 0; --i)
@@ -5166,7 +5159,7 @@ void CLUFactorRational::vSolveUrightNoNZ(Rational* vec, Rational* rhs, int* ridx
 
       /*      Find nonzero with highest permuted row index and setup i and r
        */
-      i = deQueueMax(ridx, &rn);
+      i = deQueueMaxRat(ridx, &rn);
 
       assert(i >= 0 && i < thedim);
 
@@ -5199,7 +5192,7 @@ void CLUFactorRational::vSolveUrightNoNZ(Rational* vec, Rational* rhs, int* ridx
                if(y != 0)
                {
                   rhs[k] = y;
-                  enQueueMax(ridx, &rn, rperm[k]);
+                  enQueueMaxRat(ridx, &rn, rperm[k]);
                }
             }
             else
@@ -5243,17 +5236,17 @@ int CLUFactorRational::vSolveUright2(Rational* vec, int* vidx, Rational* rhs, in
       /*      Find nonzero with highest permuted row index and setup i and r
        */
       if(rn <= 0)
-         i = deQueueMax(ridx2, &rn2);
+         i = deQueueMaxRat(ridx2, &rn2);
       else if(rn2 <= 0)
-         i = deQueueMax(ridx, &rn);
+         i = deQueueMaxRat(ridx, &rn);
       else if(*ridx2 > *ridx)
-         i = deQueueMax(ridx2, &rn2);
+         i = deQueueMaxRat(ridx2, &rn2);
       else if(*ridx2 < *ridx)
-         i = deQueueMax(ridx, &rn);
+         i = deQueueMaxRat(ridx, &rn);
       else
       {
-         (void) deQueueMax(ridx, &rn);
-         i = deQueueMax(ridx2, &rn2);
+         (void) deQueueMaxRat(ridx, &rn);
+         i = deQueueMaxRat(ridx2, &rn2);
       }
 
       assert(i >= 0 && i < thedim);
@@ -5291,7 +5284,7 @@ int CLUFactorRational::vSolveUright2(Rational* vec, int* vidx, Rational* rhs, in
                   if(y2 != 0)
                   {
                      rhs2[k] = y2;
-                     enQueueMax(ridx2, &rn2, rperm[k]);
+                     enQueueMaxRat(ridx2, &rn2, rperm[k]);
                   }
                }
                else
@@ -5310,7 +5303,7 @@ int CLUFactorRational::vSolveUright2(Rational* vec, int* vidx, Rational* rhs, in
                   if(y != 0)
                   {
                      rhs[k] = y;
-                     enQueueMax(ridx, &rn, rperm[k]);
+                     enQueueMaxRat(ridx, &rn, rperm[k]);
                   }
                }
                else
@@ -5336,7 +5329,7 @@ int CLUFactorRational::vSolveUright2(Rational* vec, int* vidx, Rational* rhs, in
                   if(y != 0)
                   {
                      rhs[k] = y;
-                     enQueueMax(ridx, &rn, rperm[k]);
+                     enQueueMaxRat(ridx, &rn, rperm[k]);
                   }
                }
                else
@@ -5370,7 +5363,7 @@ int CLUFactorRational::vSolveUright2(Rational* vec, int* vidx, Rational* rhs, in
                if(y2 != 0)
                {
                   rhs2[k] = y2;
-                  enQueueMax(ridx2, &rn2, rperm[k]);
+                  enQueueMaxRat(ridx2, &rn2, rperm[k]);
                }
             }
             else
@@ -5382,7 +5375,7 @@ int CLUFactorRational::vSolveUright2(Rational* vec, int* vidx, Rational* rhs, in
          }
       }
 
-      if(rn + rn2 > i * verySparseFactor4right)
+      if(rn + rn2 > i * verySparseFactor4rightRat)
       {
          /* continue with dense case */
          if(*ridx > *ridx2)
@@ -5565,7 +5558,7 @@ int CLUFactorRational::vSolveRight4update(Rational* vec,
 
          if(x != 0)
          {
-            enQueueMax(ridx, &j, rperm[*it++ = k]);
+            enQueueMaxRat(ridx, &j, rperm[*it++ = k]);
             forest[k] = x;
          }
          else
@@ -5589,7 +5582,7 @@ int CLUFactorRational::vSolveRight4update(Rational* vec,
          x = rhs[k];
 
          if(x != 0)
-            enQueueMax(ridx, &j, rperm[k]);
+            enQueueMaxRat(ridx, &j, rperm[k]);
          else
             rhs[k] = 0;
       }
@@ -5634,7 +5627,7 @@ int CLUFactorRational::vSolveRight4update2(Rational* vec,
 
          if(x != 0)
          {
-            enQueueMax(ridx, &j, rperm[*it++ = k]);
+            enQueueMaxRat(ridx, &j, rperm[*it++ = k]);
             forest[k] = x;
          }
          else
@@ -5658,7 +5651,7 @@ int CLUFactorRational::vSolveRight4update2(Rational* vec,
          x = rhs[k];
 
          if(x != 0)
-            enQueueMax(ridx, &j, rperm[k]);
+            enQueueMaxRat(ridx, &j, rperm[k]);
          else
             rhs[k] = 0;
       }
@@ -5666,7 +5659,7 @@ int CLUFactorRational::vSolveRight4update2(Rational* vec,
       rn = j;
    }
 
-   if(rn2 > thedim * verySparseFactor4right)
+   if(rn2 > thedim * verySparseFactor4rightRat)
    {
       ridx2[0] = thedim - 1;
       /* ridx2[1] = thedim - 2; */
@@ -5690,7 +5683,7 @@ int CLUFactorRational::vSolveRight4update2(Rational* vec,
          if(x == 0)
          {
             /*              maxabs = (maxabs < -x) ? -x : maxabs;  */
-            enQueueMax(ridx2, &j, rperm[k]);
+            enQueueMaxRat(ridx2, &j, rperm[k]);
          }
          else
             rhs2[k] = 0;
@@ -5752,7 +5745,7 @@ int CLUFactorRational::vSolveRight4update3(Rational* vec,
 
          if(x != 0)
          {
-            enQueueMax(ridx, &j, rperm[*it++ = k]);
+            enQueueMaxRat(ridx, &j, rperm[*it++ = k]);
             forest[k] = x;
          }
          else
@@ -5776,7 +5769,7 @@ int CLUFactorRational::vSolveRight4update3(Rational* vec,
          x = rhs[k];
 
          if(x != 0)
-            enQueueMax(ridx, &j, rperm[k]);
+            enQueueMaxRat(ridx, &j, rperm[k]);
          else
             rhs[k] = 0;
       }
@@ -5784,7 +5777,7 @@ int CLUFactorRational::vSolveRight4update3(Rational* vec,
       rn = j;
    }
 
-   if(rn2 > thedim * verySparseFactor4right)
+   if(rn2 > thedim * verySparseFactor4rightRat)
    {
       ridx2[0] = thedim - 1;
    }
@@ -5804,7 +5797,7 @@ int CLUFactorRational::vSolveRight4update3(Rational* vec,
 
          if(x == 0)
          {
-            enQueueMax(ridx2, &j, rperm[k]);
+            enQueueMaxRat(ridx2, &j, rperm[k]);
          }
          else
             rhs2[k] = 0;
@@ -5813,7 +5806,7 @@ int CLUFactorRational::vSolveRight4update3(Rational* vec,
       rn2 = j;
    }
 
-   if(rn3 > thedim * verySparseFactor4right)
+   if(rn3 > thedim * verySparseFactor4rightRat)
    {
       ridx3[0] = thedim - 1;
    }
@@ -5833,7 +5826,7 @@ int CLUFactorRational::vSolveRight4update3(Rational* vec,
 
          if(x == 0)
          {
-            enQueueMax(ridx3, &j, rperm[k]);
+            enQueueMaxRat(ridx3, &j, rperm[k]);
          }
          else
             rhs3[k] = 0;
@@ -5863,7 +5856,7 @@ void CLUFactorRational::vSolveRightNoNZ(Rational* vec2,                         
    rn2 = vSolveLright(rhs2, ridx2, rn2);
    assert(rn2 >= 0 && rn2 <= thedim);
 
-   if(rn2 > thedim * verySparseFactor4right)
+   if(rn2 > thedim * verySparseFactor4rightRat)
    {
       *ridx2 = thedim - 1;
    }
@@ -5886,7 +5879,7 @@ void CLUFactorRational::vSolveRightNoNZ(Rational* vec2,                         
          if(x == 0)
          {
             /*              maxabs = (maxabs < -x) ? -x : maxabs;  */
-            enQueueMax(ridx2, &j, rperm[k]);
+            enQueueMaxRat(ridx2, &j, rperm[k]);
          }
          else
             rhs2[k] = 0;
