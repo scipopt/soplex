@@ -967,7 +967,6 @@ SLUFactorRational::~SLUFactorRational()
    freeAll();
 }
 
-#ifdef SOPLEX_WITH_BOOST
 static Rational betterThreshold(Rational th)
 {
    assert(th < 1);
@@ -983,14 +982,9 @@ static Rational betterThreshold(Rational th)
 
    return th;
 }
-#endif
 
 SLUFactorRational::Status SLUFactorRational::load(const SVectorRational* matrix[], int dm)
 {
-#ifndef SOPLEX_WITH_BOOST
-   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
-   return OK;
-#else
    assert(dm     >= 0);
    assert(matrix != 0);
 
@@ -1098,7 +1092,6 @@ SLUFactorRational::Status SLUFactorRational::load(const SVectorRational* matrix[
 
    assert(isConsistent());
    return Status(stat);
-#endif
 }
 
 

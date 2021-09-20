@@ -157,7 +157,6 @@ Rational SPxLPBase<Rational>::minAbsNzo(bool /* unscaled */) const
 /** If only a sign is encountered, the number is assumed to be \c sign * 1.  This routine will not catch malformatted
  *  numbers like .e10 !
  */
-#ifdef SOPLEX_WITH_BOOST
 static Rational LPFreadValue(char*& pos, SPxOut* spxout, const int lineno = -1)
 {
    assert(LPFisValue(pos));
@@ -337,8 +336,6 @@ static Rational LPFreadInfinity(char*& pos)
    sense *= Rational(infinity);
    return sense;
 }
-#endif
-
 
 /// Read LP in "CPLEX LP File Format".
 /** The specification is taken from the ILOG CPLEX 7.0 Reference Manual, Appendix E, Page 527.
@@ -364,10 +361,6 @@ bool SPxLPBase<Rational>::readLPF(
    NameSet*      p_cnames,               ///< column names.
    DIdxSet*      p_intvars)              ///< integer variables.
 {
-#ifndef SOPLEX_WITH_BOOST
-   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
-   return false;
-#else
    enum
    {
       START, OBJECTIVE, CONSTRAINTS, BOUNDS, INTEGERS, BINARIES
@@ -898,10 +891,8 @@ syntax_error:
       spx_free(rnames);
 
    return finished;
-#endif
 }
 
-#ifdef SOPLEX_WITH_BOOST
 /// Process ROWS section.
 static void MPSreadRows(MPSInput& mps, LPRowSetBase<Rational>& rset, NameSet& rnames,
                         SPxOut* spxout)
@@ -1476,8 +1467,6 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
 
    mps.syntaxError();
 }
-#endif
-
 
 /// Read LP in MPS File Format.
 /**
@@ -1499,10 +1488,6 @@ bool SPxLPBase<Rational>::readMPS(
    NameSet*      p_cnames,          ///< column names.
    DIdxSet*      p_intvars)         ///< integer variables.
 {
-#ifndef SOPLEX_WITH_BOOST
-   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
-   return false;
-#else
    LPRowSetBase<Rational>& rset = *this;
    LPColSetBase<Rational>& cset = *this;
    NameSet* rnames;
@@ -1610,7 +1595,6 @@ bool SPxLPBase<Rational>::readMPS(
    }
 
    return !mps.hasError();
-#endif
 }
 
 
@@ -1619,7 +1603,6 @@ bool SPxLPBase<Rational>::readMPS(
 // Specialization for writing LP format
 // ---------------------------------------------------------------------------------------------------------------------
 
-#ifdef SOPLEX_WITH_BOOST
 // get the name of a row or construct one
 static const char* LPFgetRowName(
    const SPxLPBase<Rational>& p_lp,
@@ -1938,7 +1921,6 @@ static void LPFwriteGenerals(
       if(p_intvars->pos(j) >= 0)
          p_output << "  " << getColName(p_lp, j, p_cnames, name) << "\n";
 }
-#endif
 
 
 /// Write LP in LP Format.
@@ -1950,16 +1932,12 @@ void SPxLPBase<Rational>::writeLPF(
    const DIdxSet* p_intvars          ///< integer variables
 ) const
 {
-#ifndef SOPLEX_WITH_BOOST
-   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
-#else
    LPFwriteObjective(*this, p_output, p_cnames, spxout);
    LPFwriteRows(*this, p_output, p_rnames, p_cnames, spxout);
    LPFwriteBounds(*this, p_output, p_cnames, spxout);
    LPFwriteGenerals(*this, p_output, p_cnames, p_intvars);
 
    p_output << "End" << std::endl;
-#endif
 }
 
 

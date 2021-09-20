@@ -110,7 +110,6 @@ DFLAGS		=	-MM
 
 GMP_LDFLAGS	= 	-lgmp
 GMP_CPPFLAGS	=
-BOOST_LDFLAGS 	= 	-lboost_program_options
 QUADMATH_LDFLAGS = 	-lquadmath
 
 SOPLEXDIR	=	$(realpath .)
@@ -334,12 +333,7 @@ endif
 
 .PHONY: all
 all:		makelibfile
-ifeq ($(BOOST),true)
 		@$(MAKE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
-else
-		@echo "using make without Boost means only the SoPlex library will be built."
-		@echo "To build the binary, set BOOST=true and make sure Boost with program_options is available"
-endif
 
 .PHONY: preprocess
 preprocess:	checkdefines

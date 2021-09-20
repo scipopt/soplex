@@ -13,6 +13,10 @@
 #include <string>
 #include "soplex/spxdefines.h"
 
+#ifdef SOPLEX_WITH_GMP
+#include <gmp.h>
+#endif
+
 using namespace soplex;
 #ifdef SOPLEX_WITH_BOOST
 #include <boost/multiprecision/number.hpp>
@@ -192,8 +196,267 @@ inline Rational ratFromString(const char* desc)
    return res;
 }
 #else
-using Rational = double;
 using Integer = int;
+// this is a placeholder class to ensure compilation when boost ist not linked. Rationals need BOOST in order to function.
+class Rational {
+
+private:
+   double val;
+
+public:
+
+   ///@name Construction and destruction
+   ///@{
+
+   inline void rationalErrorMessage() const
+   {
+      MSG_ERROR(std::cerr << "Using rational methods without linking boost is not supported" << std::endl;)
+   };
+
+   /// default constructor
+   inline Rational(){rationalErrorMessage();};
+   /// copy constructor
+   inline Rational(const Rational& r){rationalErrorMessage();};
+   /// constructor from long double
+   inline Rational(const long double& r){rationalErrorMessage();};
+   /// constructor from double
+   inline Rational(const double& r){rationalErrorMessage();};
+   ///constructor from int
+   inline Rational(const int& i){rationalErrorMessage();};
+   /// constructor from Integer
+   inline Rational(const Integer& num, const Integer& den){rationalErrorMessage();};
+   /// constructor from mpq_t (GMP only)
+   inline Rational(const mpq_t& q){rationalErrorMessage();};
+#ifdef SOPLEX_WITH_BOOST
+   // constructor from boost number
+   inline template <typename T, boost::multiprecision::expression_template_option eto>
+   Rational(const boost::multiprecision::number<T, eto>& q){rationalErrorMessage();};
+#endif
+   /// destructor
+   inline ~Rational(){rationalErrorMessage();};
+
+   /// assignment operator
+   inline Rational& operator=(const Rational&){rationalErrorMessage();return *this;};
+   /// assignment operator from long double
+   inline Rational& operator=(const long double& r){rationalErrorMessage();return *this;};
+   /// assignment operator from double
+   inline Rational& operator=(const double& r){rationalErrorMessage();return *this;};
+   /// assignment operator from int
+   inline Rational& operator=(const int& i){rationalErrorMessage();return *this;};
+   /// assignment operator from mpq_t
+   inline Rational& operator=(const mpq_t& q){rationalErrorMessage();return *this;};
+
+   inline void assign(const Rational&){rationalErrorMessage();};
+   inline void assign(const long double& r){rationalErrorMessage();};
+   inline void assign(const double& r){rationalErrorMessage();};
+   inline void assign(const int& i){rationalErrorMessage();};
+
+   ///@name Typecasts
+   ///@{
+
+   inline operator double() const {return 0;};
+   inline operator long double() const {return 0;};
+   inline operator float() const {return 0;};
+#ifdef SOPLEX_WITH_BOOST
+#ifndef SOPLEX_WITH_CPPMPF
+   // Operator to typecast Rational to one of the Boost Number types
+   inline template <typename T, boost::multiprecision::expression_template_option eto>
+   operator boost::multiprecision::number<T, eto>() const{rationalErrorMessage();return val;};
+#else
+   // Operator to typecast Rational to one of the Boost Number types
+   inline template <unsigned bits, boost::multiprecision::expression_template_option eto>
+   operator boost::multiprecision::number<boost::multiprecision::backends::cpp_dec_float<bits>, eto>()
+   const {rationalErrorMessage();return val;};
+#endif
+#endif
+
+   ///@name Typecasts
+   ///@{
+
+   ///@}
+
+
+   ///@name Arithmetic operators
+   ///@{
+
+   /// addition operator
+   inline Rational operator+(const Rational& r) const {rationalErrorMessage();return *this; }
+   /// addition assignment operator
+   inline Rational operator+=(const Rational& r) {rationalErrorMessage();return *this; }
+   /// addition operator for doubles
+   inline Rational operator+(const double& r) const {rationalErrorMessage();return *this; }
+   /// addition assignment operator  for doubles
+   inline Rational operator+=(const double& r) {rationalErrorMessage();return *this; }
+   /// addition operator for ints
+   inline Rational operator+(const int& r) const {rationalErrorMessage();return *this; }
+   /// addition assignment operator  for ints
+   inline Rational operator+=(const int& r) {rationalErrorMessage();return *this; }
+   /// subtraction operator
+   inline Rational operator-(const Rational& r) const {rationalErrorMessage();return *this; }
+   /// subtraction assignment operator
+   inline Rational operator-=(const Rational& r) {rationalErrorMessage();return *this; }
+   /// subtraction operator for doubles
+   inline Rational operator-(const double& r) const {rationalErrorMessage();return *this; }
+   /// subtraction assignment operator for doubles
+   inline Rational operator-=(const double& r) {rationalErrorMessage();return *this; }
+   /// subtraction operator for ints
+   inline Rational operator-(const int& r) const {rationalErrorMessage();return *this; }
+   /// subtraction assignment operator for ints
+   inline Rational operator-=(const int& r) {rationalErrorMessage();return *this; }
+   /// multiplication operator
+   inline Rational operator*(const Rational& r) const {rationalErrorMessage();return *this; }
+   /// multiplication assignment operator operator
+   inline Rational operator*=(const Rational& r) {rationalErrorMessage();return *this; }
+   /// multiplication operator for doubles
+   inline Rational operator*(const double& r) const {rationalErrorMessage();return *this; }
+   /// multiplication assignment operator for doubles
+   inline Rational operator*=(const double& r) {rationalErrorMessage();return *this; }
+   /// multiplication operator for ints
+   inline Rational operator*(const int& r) const {rationalErrorMessage();return *this; }
+   /// multiplication assignment operator for ints
+   inline Rational operator*=(const int& r) {rationalErrorMessage();return *this; }
+   /// division operator
+   inline Rational operator/(const Rational& r) const {rationalErrorMessage();return *this; }
+   /// division assignment operator
+   inline Rational operator/=(const Rational& r) {rationalErrorMessage();return *this; }
+   /// division operator for doubles
+   inline Rational operator/(const double& r) const {rationalErrorMessage();return *this; }
+   /// division assignment operator for doubles
+   inline Rational operator/=(const double& r) {rationalErrorMessage();return *this; }
+   /// division operator for ints
+   inline Rational operator/(const int& r) const {rationalErrorMessage();return *this; }
+   /// division assignment operator for ints
+   inline Rational operator/=(const int& r) {rationalErrorMessage();return *this; }
+   /// add product of two rationals
+   Rational& addProduct(const Rational& r, const Rational& s) {rationalErrorMessage();return *this; }
+
+   /// subtract product of two rationals
+   Rational& subProduct(const Rational& r, const Rational& s) {rationalErrorMessage();return *this; }
+
+   /// add quotient of two rationals, r divided by s
+   Rational& addQuotient(const Rational& r, const Rational& s) {rationalErrorMessage();return *this; }
+
+   /// subtract quotient of two rationals, r divided by s
+   Rational& subQuotient(const Rational& r, const Rational& s) {rationalErrorMessage();return *this; }
+
+   ///@}
+
+
+   ///@name Methods for checking exactness of doubles
+   ///@{
+
+   /// checks if \p d is exactly equal to the Rational and if not, if it is one of the two adjacent doubles
+   inline bool isAdjacentTo(const double& d) const{rationalErrorMessage();return false;};
+
+   ///@}
+
+
+   ///@name Methods for querying size
+   ///@{
+
+   /// Size in specified base (bit size for base 2)
+   int sizeInBase(const int base = 2) const{rationalErrorMessage();return 0;};
+
+   ///@}
+
+
+   ///@name Conversion from and to String
+   ///@{
+   inline friend std::ostream& operator<<(std::ostream& os, const Rational& r){r.rationalErrorMessage();return os;};
+   inline std::string str() const {this->rationalErrorMessage(); return std::string("");};
+   ///@}
+
+   ///@name Friends
+   ///@{
+
+   inline friend int compareRational(const Rational& r, const Rational& s){r.rationalErrorMessage(); return 0;};
+   inline friend bool operator!=(const Rational& r, const Rational& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator==(const Rational& r, const Rational& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator<(const Rational& r, const Rational& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator<=(const Rational& r, const Rational& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator>(const Rational& r, const Rational& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator>=(const Rational& r, const Rational& s){r.rationalErrorMessage(); return false;};
+
+   inline friend bool operator!=(const Rational& r, const double& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator==(const Rational& r, const double& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator<(const Rational& r, const double& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator<=(const Rational& r, const double& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator>(const Rational& r, const double& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator>=(const Rational& r, const double& s){r.rationalErrorMessage(); return false;};
+
+   inline friend bool operator!=(const double& r, const Rational& s){s.rationalErrorMessage(); return false;};
+   inline friend bool operator==(const double& r, const Rational& s){s.rationalErrorMessage(); return false;};
+   inline friend bool operator<(const double& r, const Rational& s){s.rationalErrorMessage(); return false;};
+   inline friend bool operator<=(const double& r, const Rational& s){s.rationalErrorMessage(); return false;};
+   inline friend bool operator>(const double& r, const Rational& s){s.rationalErrorMessage(); return false;};
+   inline friend bool operator>=(const double& r, const Rational& s){s.rationalErrorMessage(); return false;};
+
+   inline friend bool operator!=(const Rational& r, const long double& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator==(const Rational& r, const long double& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator<(const Rational& r, const long double& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator<=(const Rational& r, const long double& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator>(const Rational& r, const long double& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator>=(const Rational& r, const long double& s){r.rationalErrorMessage(); return false;};
+
+   inline friend bool operator!=(const long double& r, const Rational& s){s.rationalErrorMessage(); return false;};
+   inline friend bool operator==(const long double& r, const Rational& s){s.rationalErrorMessage(); return false;};
+   inline friend bool operator<(const long double& r, const Rational& s){s.rationalErrorMessage(); return false;};
+   inline friend bool operator<=(const long double& r, const Rational& s){s.rationalErrorMessage(); return false;};
+   inline friend bool operator>(const long double& r, const Rational& s){s.rationalErrorMessage(); return false;};
+   inline friend bool operator>=(const long double& r, const Rational& s){s.rationalErrorMessage(); return false;};
+
+   inline friend bool operator!=(const Rational& r, const float& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator==(const Rational& r, const float& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator<(const Rational& r, const float& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator<=(const Rational& r, const float& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator>(const Rational& r, const float& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator>=(const Rational& r, const float& s){r.rationalErrorMessage(); return false;};
+
+   inline friend bool operator!=(const float& r, const Rational& s){s.rationalErrorMessage(); return false;};
+   inline friend bool operator==(const float& r, const Rational& s){s.rationalErrorMessage(); return false;};
+   inline friend bool operator<(const float& r, const Rational& s){s.rationalErrorMessage(); return false;};
+   inline friend bool operator<=(const float& r, const Rational& s){s.rationalErrorMessage(); return false;};
+   inline friend bool operator>(const float& r, const Rational& s){s.rationalErrorMessage(); return false;};
+   inline friend bool operator>=(const float& r, const Rational& s){s.rationalErrorMessage(); return false;};
+
+   inline friend Rational operator+(const double& d, const Rational& r){r.rationalErrorMessage(); return r;};
+   inline friend Rational operator-(const double& d, const Rational& r){r.rationalErrorMessage(); return r;};
+   inline friend Rational operator*(const double& d, const Rational& r){r.rationalErrorMessage(); return r;};
+   inline friend Rational operator/(const double& d, const Rational& r){r.rationalErrorMessage(); return r;};
+
+   inline friend bool operator!=(const Rational& r, const int& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator==(const Rational& r, const int& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator<(const Rational& r, const int& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator<=(const Rational& r, const int& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator>(const Rational& r, const int& s){r.rationalErrorMessage(); return false;};
+   inline friend bool operator>=(const Rational& r, const int& s){r.rationalErrorMessage(); return false;};
+
+   inline friend bool operator!=(const int& r, const Rational& s){s.rationalErrorMessage(); return false;};
+   inline friend bool operator==(const int& r, const Rational& s){s.rationalErrorMessage(); return false;};
+   inline friend bool operator<(const int& r, const Rational& s){s.rationalErrorMessage(); return false;};
+   inline friend bool operator<=(const int& r, const Rational& s){s.rationalErrorMessage(); return false;};
+   inline friend bool operator>(const int& r, const Rational& s){s.rationalErrorMessage(); return false;};
+   inline friend bool operator>=(const int& r, const Rational& s){s.rationalErrorMessage(); return false;};
+
+   inline friend Rational operator+(const int& d, const Rational& r){r.rationalErrorMessage(); return r;};
+   inline friend Rational operator-(const int& d, const Rational& r){r.rationalErrorMessage(); return r;};
+   inline friend Rational operator*(const int& d, const Rational& r){r.rationalErrorMessage(); return r;};
+   inline friend Rational operator/(const int& d, const Rational& r){r.rationalErrorMessage(); return r;};
+
+   inline friend Rational spxAbs(const Rational& r){r.rationalErrorMessage(); return r;};
+   inline friend int sign(const Rational& r){r.rationalErrorMessage(); return 0;};
+   inline friend Rational operator-(const Rational& q){q.rationalErrorMessage(); return q;};///@name Construction and destruction
+   ///@{
+};
+
+   inline Integer numerator(const Rational& r){r.rationalErrorMessage(); return 0;}
+   inline Integer denominator(const Rational& r){r.rationalErrorMessage(); return 0;}
+   inline Rational ratFromString(const char* desc){return Rational();}
+   inline void SpxLcm(Integer& result, Integer a, Integer b){}
+   inline void SpxGcd(Integer& result, Integer a, Integer b){}
+   inline void divide_qr(Integer& result, Integer& result2, Integer a, Integer b){}
+   inline void invert(Rational& r){r.rationalErrorMessage();}
+   inline void powRound(Rational& r){r.rationalErrorMessage();}
 #endif
 
 /// Size in specified base (bit size for base 2)
