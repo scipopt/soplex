@@ -820,6 +820,7 @@ bool SoPlexBase<R>::getPrimalRational(mpq_t* vector, const int size)
    }
    else
       return false;
+
 #endif
 }
 
@@ -845,6 +846,7 @@ bool SoPlexBase<R>::getSlacksRational(mpq_t* vector, const int size)
    }
    else
       return false;
+
 #endif
 }
 
@@ -871,6 +873,7 @@ bool SoPlexBase<R>::getPrimalRayRational(mpq_t* vector, const int size)
    }
    else
       return false;
+
 #endif
 }
 
@@ -897,6 +900,7 @@ bool SoPlexBase<R>::getDualRational(mpq_t* vector, const int size)
    }
    else
       return false;
+
 #endif
 }
 
@@ -923,6 +927,7 @@ bool SoPlexBase<R>::getRedCostRational(mpq_t* vector, const int size)
    }
    else
       return false;
+
 #endif
 }
 
@@ -949,6 +954,7 @@ bool SoPlexBase<R>::getDualFarkasRational(mpq_t* vector, const int size)
    }
    else
       return false;
+
 #endif
 }
 #endif
