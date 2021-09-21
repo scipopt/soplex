@@ -79,10 +79,10 @@ void SoPlex_addRowRational(
 /** gets primal solution **/
 void SoPlex_getPrimalReal(void* soplex, double* primal, int dim);
 
-/** gets rational primal solution in a char pointer.
-*   The caller needs to ensure the char* array is of sufficient length.
+/** Returns rational primal solution in a char pointer.
+*   The caller needs to ensure the char array is freed.
 **/
-void SoPlex_getPrimalRationalString(void* soplex, char* solution, int dim);
+char* SoPlex_getPrimalRationalString(void* soplex, int dim);
 
 /** gets dual solution **/
 void SoPlex_getDualReal(void* soplex, double* dual, int dim);
@@ -114,10 +114,10 @@ void SoPlex_writeFileReal(void* soplex, char* filename);
 /** returns the objective value if a primal solution is available **/
 double SoPlex_objValueReal(void* soplex);
 
-/** copies the rational objective value (as a string) to a char pointer if a primal solution is available.
-*   The caller needs to ensure the char array is of sufficient length.
+/** Returns the rational objective value (as a string) if a primal solution is available.
+*   The caller needs to ensure the char array is freed.
 **/
-void SoPlex_objValueRationalString(void* soplex, char* value);
+char* SoPlex_objValueRationalString(void* soplex);
 
 /** changes vectors of column bounds to lb and ub **/
 void SoPlex_changeBoundsReal(void* soplex, double* lb, double* ub, int dim);
