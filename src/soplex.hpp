@@ -9654,7 +9654,6 @@ void SoPlexBase<R>::printSolutionStatistics(std::ostream& os)
    {
       Rational maxviol;
       Rational sumviol;
-#ifdef SOPLEX_WITH_BOOST
 
       os << "Violation (rational): \n";
 
@@ -9677,8 +9676,6 @@ void SoPlexBase<R>::printSolutionStatistics(std::ostream& os)
          os << "  Max/sum dual      : " << maxviol.str() << " / " << sumviol.str() << "\n";
       else
          os << "  Max/sum dual      : - / -\n";
-
-#endif
    }
    else
    {
