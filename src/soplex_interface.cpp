@@ -208,7 +208,9 @@ void SoPlex_getPrimalReal(void* soplex, double* primal, int dim)
    so->getPrimalReal(primal, dim);
 }
 
-/** gets rational primal solution as a string **/
+/** Returns rational primal solution in a char pointer.
+*   The caller needs to ensure the char array is freed.
+**/
 char* SoPlex_getPrimalRationalString(void* soplex, int dim)
 {
 #ifndef SOPLEX_WITH_BOOST
@@ -217,6 +219,8 @@ char* SoPlex_getPrimalRationalString(void* soplex, int dim)
    SoPlex* so = (SoPlex*)(soplex);
    VectorRational primal(dim);
    std::string primalstring;
+   char* rawstring;
+
    so->getPrimalRational(primal);
 
    for(int i = 0; i < dim; ++i)
@@ -225,7 +229,9 @@ char* SoPlex_getPrimalRationalString(void* soplex, int dim)
       primalstring.append(" ");
    }
 
-   return const_cast<char*>(primalstring.c_str());
+   rawstring = new char[strlen(primalstring.c_str()) + 1];
+   strcpy(rawstring, primalstring.c_str());
+   return rawstring;
 #endif
 }
 
@@ -344,14 +350,21 @@ double SoPlex_objValueReal(void* soplex)
    return so->objValueReal();
 }
 
-/** returns the rational objective value (as a string) if a primal solution is available **/
+/** Returns the rational objective value (as a string) if a primal solution is available.
+*   The caller needs to ensure the char array is freed.
+**/
 char* SoPlex_objValueRationalString(void* soplex)
 {
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
 #else
+   char* value;
+   std::string objstring;
    SoPlex* so = (SoPlex*)(soplex);
-   return const_cast<char*>(so->objValueRational().str().c_str());
+   objstring = so->objValueRational().str();
+   value = new char[strlen(objstring.c_str()) + 1];
+   strcpy(value, objstring.c_str());
+   return value;
 #endif
 }
 
