@@ -222,11 +222,13 @@ char* SoPlex_getPrimalRationalString(void* soplex, int dim)
    char* rawstring;
 
    so->getPrimalRational(primal);
+
    for(int i = 0; i < dim; ++i)
    {
       primalstring.append(primal[i].str());
       primalstring.append(" ");
    }
+
    rawstring = new char[strlen(primalstring.c_str()) + 1];
    strcpy(rawstring, primalstring.c_str());
    return rawstring;
