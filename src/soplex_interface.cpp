@@ -224,6 +224,7 @@ void SoPlex_getPrimalRationalString(void* soplex, char* solution, int dim)
       primalstring.append(primal[i].str());
       primalstring.append(" ");
    }
+
    strcpy(solution, primalstring.c_str());
 #endif
 }
