@@ -209,7 +209,7 @@ void SoPlex_getPrimalReal(void* soplex, double* primal, int dim)
 }
 
 /** gets rational primal solution as a string **/
-char* SoPlex_getPrimalRationalString(void* soplex, int dim)
+void SoPlex_getPrimalRationalString(void* soplex, char* solution, int dim)
 {
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
@@ -224,8 +224,7 @@ char* SoPlex_getPrimalRationalString(void* soplex, int dim)
       primalstring.append(primal[i].str());
       primalstring.append(" ");
    }
-
-   return const_cast<char*>(primalstring.c_str());
+   strcpy(solution, primalstring.c_str());
 #endif
 }
 
@@ -345,13 +344,13 @@ double SoPlex_objValueReal(void* soplex)
 }
 
 /** returns the rational objective value (as a string) if a primal solution is available **/
-char* SoPlex_objValueRationalString(void* soplex)
+void SoPlex_objValueRationalString(void* soplex, char* value)
 {
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
 #else
    SoPlex* so = (SoPlex*)(soplex);
-   return const_cast<char*>(so->objValueRational().str().c_str());
+   strcpy(value, so->objValueRational().str().c_str());
 #endif
 }
 

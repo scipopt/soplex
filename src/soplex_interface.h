@@ -80,7 +80,7 @@ void SoPlex_addRowRational(
 void SoPlex_getPrimalReal(void* soplex, double* primal, int dim);
 
 /** gets rational primal solution as a string **/
-char* SoPlex_getPrimalRationalString(void* soplex, int dim);
+void SoPlex_getPrimalRationalString(void* soplex, char* solution, int dim);
 
 /** gets dual solution **/
 void SoPlex_getDualReal(void* soplex, double* dual, int dim);
@@ -113,7 +113,7 @@ void SoPlex_writeFileReal(void* soplex, char* filename);
 double SoPlex_objValueReal(void* soplex);
 
 /** returns the rational objective value (as a string) if a primal solution is available **/
-char* SoPlex_objValueRationalString(void* soplex);
+void SoPlex_objValueRationalString(void* soplex, char* value);
 
 /** changes vectors of column bounds to lb and ub **/
 void SoPlex_changeBoundsReal(void* soplex, double* lb, double* ub, int dim);
