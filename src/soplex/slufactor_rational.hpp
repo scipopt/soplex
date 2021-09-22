@@ -109,7 +109,7 @@ inline void SLUFactorRational::solve2right4update(
 
    int  m;
    int  n;
-   int  f;
+   int  f = 0;
    int* sidx = ssvec.altIndexMem();
    int  rsize = rhs.size();
    int* ridx = rhs.altIndexMem();
