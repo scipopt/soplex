@@ -455,4 +455,5 @@ protected:
 };
 
 } // namespace soplex
+#include "clufactor_rational.hpp"
 #endif // _CLUFACTOR_RATIONAL_H_

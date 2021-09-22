@@ -28,15 +28,6 @@
 #include "soplex.h"
 #include "soplex/validation.h"
 
-#ifdef SOPLEX_WITH_EGLIB
-extern "C" {
-#include "soplex/EGlib.h"
-}
-#else
-#define EGlpNumStart() {}
-#define EGlpNumClear() {}
-#endif
-
 using namespace soplex;
 
 // function prototype
@@ -509,10 +500,6 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 template <class R>
 int runSoPlex(int argc, char* argv[])
 {
-   ///@todo the EGlib version info should be printed after the SoPlexBase version info
-   // initialize EGlib's GMP memory management before any rational numbers are created
-   EGlpNumStart();
-
    SoPlexBase<R>* soplex = nullptr;
 
    Timer* readingTime = nullptr;

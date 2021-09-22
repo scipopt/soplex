@@ -2889,7 +2889,7 @@ void SoPlexBase<R>::changeLhsRational(int i, const mpq_t* lhs)
 
 #ifndef SOPLEX_WITH_BOOST
    MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
-#else
+#endif
 
    _rationalLP->changeLhs(i, lhs);
    _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
@@ -2898,7 +2898,6 @@ void SoPlexBase<R>::changeLhsRational(int i, const mpq_t* lhs)
       _changeLhsReal(i, R(lhsRational(i)));
 
    _invalidateSolution();
-#endif
 }
 #endif
 
@@ -2938,7 +2937,7 @@ void SoPlexBase<R>::changeRhsRational(const mpq_t* rhs, int rhsSize)
 
 #ifndef SOPLEX_WITH_BOOST
    MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
-#else
+#endif
 
    for(int i = 0; i < rhsSize; i++)
    {
@@ -2950,7 +2949,6 @@ void SoPlexBase<R>::changeRhsRational(const mpq_t* rhs, int rhsSize)
       _changeRhsReal(VectorBase<R>(rhsRational()));
 
    _invalidateSolution();
-#endif
 }
 #endif
 
@@ -3030,7 +3028,7 @@ void SoPlexBase<R>::changeRangeRational(int i, const mpq_t* lhs, const mpq_t* rh
 
 #ifndef SOPLEX_WITH_BOOST
    MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
-#else
+#endif
    _rationalLP->changeRange(i, lhs, rhs);
    _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
 
@@ -3038,7 +3036,6 @@ void SoPlexBase<R>::changeRangeRational(int i, const mpq_t* lhs, const mpq_t* rh
       _changeRangeReal(i, R(lhsRational(i)), R(rhsRational(i)));
 
    _invalidateSolution();
-#endif
 }
 #endif
 
@@ -3119,7 +3116,7 @@ void SoPlexBase<R>::changeLowerRational(int i, const mpq_t* lower)
 
 #ifndef SOPLEX_WITH_BOOST
    MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
-#else
+#endif
    _rationalLP->changeLower(i, lower);
    _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
 
@@ -3127,7 +3124,6 @@ void SoPlexBase<R>::changeLowerRational(int i, const mpq_t* lower)
       _changeLowerReal(i, R(lowerRational(i)));
 
    _invalidateSolution();
-#endif
 }
 #endif
 
@@ -3188,7 +3184,7 @@ void SoPlexBase<R>::changeUpperRational(int i, const mpq_t* upper)
 
 #ifndef SOPLEX_WITH_BOOST
    MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
-#else
+#endif
    _rationalLP->changeUpper(i, upper);
    _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
 
@@ -3196,7 +3192,6 @@ void SoPlexBase<R>::changeUpperRational(int i, const mpq_t* upper)
       _changeUpperReal(i, R(upperRational(i)));
 
    _invalidateSolution();
-#endif
 }
 #endif
 
@@ -3256,7 +3251,7 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
 
 #ifndef SOPLEX_WITH_BOOST
    MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
-#else
+#endif
    _rationalLP->changeBounds(i, lower, upper);
    _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
 
@@ -3264,7 +3259,6 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
       _changeBoundsReal(i, R(lowerRational(i)), R(upperRational(i)));
 
    _invalidateSolution();
-#endif
 }
 #endif
 
@@ -3320,14 +3314,13 @@ void SoPlexBase<R>::changeObjRational(int i, const mpq_t* obj)
 
 #ifndef SOPLEX_WITH_BOOST
    MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
-#else
+#endif
    _rationalLP->changeObj(i, obj);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO)
       _realLP->changeObj(i, R(objRational(i)));
 
    _invalidateSolution();
-#endif
 }
 #endif
 
@@ -3363,14 +3356,13 @@ void SoPlexBase<R>::changeElementRational(int i, int j, const mpq_t* val)
 
 #ifndef SOPLEX_WITH_BOOST
    MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
-#else
+#endif
    _rationalLP->changeElement(i, j, val);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO)
       _changeElementReal(i, j, mpq_get_d(*val));
 
    _invalidateSolution();
-#endif
 }
 #endif
 
@@ -9711,7 +9703,6 @@ void SoPlexBase<R>::printSolutionStatistics(std::ostream& os)
    {
       Rational maxviol;
       Rational sumviol;
-#ifdef SOPLEX_WITH_BOOST
 
       os << "Violation (rational): \n";
 
@@ -9734,8 +9725,6 @@ void SoPlexBase<R>::printSolutionStatistics(std::ostream& os)
          os << "  Max/sum dual      : " << maxviol.str() << " / " << sumviol.str() << "\n";
       else
          os << "  Max/sum dual      : - / -\n";
-
-#endif
    }
    else
    {

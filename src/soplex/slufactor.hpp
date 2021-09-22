@@ -23,12 +23,6 @@
 #include <assert.h>
 #include <sstream>
 
-#include "soplex/spxdefines.h"
-#include "soplex/cring.h"
-#include "soplex/spxalloc.h"
-#include "soplex/spxout.h"
-#include "soplex/exceptions.h"
-
 #ifdef SOPLEX_DEBUG
 #include <stdio.h>
 #endif
