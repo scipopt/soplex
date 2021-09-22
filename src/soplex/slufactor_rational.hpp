@@ -65,7 +65,7 @@ inline void SLUFactorRational::solveRight4update(SSVectorRational& x, const SVec
 
    int m;
    int n;
-   int f;
+   int f = 0;
 
    x.clear();
    ssvec = b;
