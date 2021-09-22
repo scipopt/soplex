@@ -180,7 +180,7 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
 }
 
 /** reconstruct a rational vector */
-bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
+inline bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
                        const DIdxSet* indexSet)
 {
    std::vector<Integer> xnum(input.dim()); /* numerator of input vector */
@@ -233,7 +233,7 @@ bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
 
 /** reconstruct a rational solution */
 /**@todo make this a method of class SoPlex */
-bool reconstructSol(SolRational& solution)
+inline bool reconstructSol(SolRational& solution)
 {
 #if 0
    VectorRational buffer;

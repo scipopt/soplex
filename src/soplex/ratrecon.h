@@ -36,4 +36,7 @@ bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
 /** reconstruct a rational solution */
 bool reconstructSol(SolRational& solution);
 } // namespace soplex
+
+#include "soplex/ratrecon.hpp"
+
 #endif // _RATRECON_H_

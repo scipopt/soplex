@@ -6,7 +6,6 @@ set(sources
     soplex/idxset.cpp
     soplex/mpsinput.cpp
     soplex/nameset.cpp
-    soplex/ratrecon.cpp
     soplex/spxdefines.cpp
     soplex/spxgithash.cpp
     soplex/spxid.cpp
