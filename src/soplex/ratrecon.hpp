@@ -181,7 +181,7 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
 
 /** reconstruct a rational vector */
 inline bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
-                       const DIdxSet* indexSet)
+                              const DIdxSet* indexSet)
 {
    std::vector<Integer> xnum(input.dim()); /* numerator of input vector */
    Integer denom = 1; /* common denominator of input vector */

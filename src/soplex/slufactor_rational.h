@@ -275,15 +275,15 @@ public:
    ///@{
    /// default constructor.
    SLUFactorRational()
-   : CLUFactorRational()
-   , vec(1)
-   , ssvec(1)
-   , usetup(false)
-   , uptype(FOREST_TOMLIN)
-   , eta(1)
-   , forest(1)
-   , minThreshold(0.01)
-   , timerType(Timer::USER_TIME)
+      : CLUFactorRational()
+      , vec(1)
+      , ssvec(1)
+      , usetup(false)
+      , uptype(FOREST_TOMLIN)
+      , eta(1)
+      , forest(1)
+      , minThreshold(0.01)
+      , timerType(Timer::USER_TIME)
    {
       row.perm    = 0;
       row.orig    = 0;
@@ -433,14 +433,14 @@ public:
 
    /// copy constructor.
    SLUFactorRational(const SLUFactorRational& old)
-   : SLinSolverRational(old)
-   , CLUFactorRational()
-   , vec(1)     // we don't need to copy it, because they are temporary vectors
-   , ssvec(1)   // we don't need to copy it, because they are temporary vectors
-   , usetup(old.usetup)
-   , eta(old.eta)
-   , forest(old.forest)
-   , timerType(old.timerType)
+      : SLinSolverRational(old)
+      , CLUFactorRational()
+      , vec(1)     // we don't need to copy it, because they are temporary vectors
+      , ssvec(1)   // we don't need to copy it, because they are temporary vectors
+      , usetup(old.usetup)
+      , eta(old.eta)
+      , forest(old.forest)
+      , timerType(old.timerType)
    {
       row.perm    = 0;
       row.orig    = 0;
