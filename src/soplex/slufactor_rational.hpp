@@ -33,7 +33,7 @@ namespace soplex
 {
 #define MINSTABILITYRAT    REAL(4e-2)
 
-void SLUFactorRational::solveRight(VectorRational& x, const VectorRational& b) //const
+inline void SLUFactorRational::solveRight(VectorRational& x, const VectorRational& b) //const
 {
 
    solveTime->start();
@@ -45,7 +45,7 @@ void SLUFactorRational::solveRight(VectorRational& x, const VectorRational& b) /
    solveTime->stop();
 }
 
-void SLUFactorRational::solveRight(SSVectorRational& x, const SVectorRational& b) //const
+inline void SLUFactorRational::solveRight(SSVectorRational& x, const SVectorRational& b) //const
 {
 
    solveTime->start();
@@ -58,7 +58,7 @@ void SLUFactorRational::solveRight(SSVectorRational& x, const SVectorRational& b
    solveTime->stop();
 }
 
-void SLUFactorRational::solveRight4update(SSVectorRational& x, const SVectorRational& b)
+inline void SLUFactorRational::solveRight4update(SSVectorRational& x, const SVectorRational& b)
 {
 
    solveTime->start();
@@ -98,7 +98,7 @@ void SLUFactorRational::solveRight4update(SSVectorRational& x, const SVectorRati
    solveTime->stop();
 }
 
-void SLUFactorRational::solve2right4update(
+inline void SLUFactorRational::solve2right4update(
    SSVectorRational&      x,
    VectorRational&        y,
    const SVectorRational& b,
@@ -148,7 +148,7 @@ void SLUFactorRational::solve2right4update(
    solveTime->stop();
 }
 
-void SLUFactorRational::solve3right4update(
+inline void SLUFactorRational::solve3right4update(
    SSVectorRational&      x,
    VectorRational&        y,
    VectorRational&        y2,
@@ -204,7 +204,7 @@ void SLUFactorRational::solve3right4update(
    solveTime->stop();
 }
 
-void SLUFactorRational::solveLeft(VectorRational& x, const VectorRational& b) //const
+inline void SLUFactorRational::solveLeft(VectorRational& x, const VectorRational& b) //const
 {
 
    solveTime->start();
@@ -218,7 +218,7 @@ void SLUFactorRational::solveLeft(VectorRational& x, const VectorRational& b) //
    solveTime->stop();
 }
 
-void SLUFactorRational::solveLeft(SSVectorRational& x, const SVectorRational& b) //const
+inline void SLUFactorRational::solveLeft(SSVectorRational& x, const SVectorRational& b) //const
 {
 
    solveTime->start();
@@ -245,7 +245,7 @@ void SLUFactorRational::solveLeft(SSVectorRational& x, const SVectorRational& b)
    solveTime->stop();
 }
 
-void SLUFactorRational::solveLeft(
+inline void SLUFactorRational::solveLeft(
    SSVectorRational&      x,
    VectorRational&        y,
    const SVectorRational& rhs1,
@@ -283,7 +283,7 @@ void SLUFactorRational::solveLeft(
    solveTime->stop();
 }
 
-void SLUFactorRational::solveLeft(
+inline void SLUFactorRational::solveLeft(
    SSVectorRational&      x,
    VectorRational&        y,
    VectorRational&        z,
@@ -321,7 +321,7 @@ void SLUFactorRational::solveLeft(
    solveTime->stop();
 }
 
-Rational SLUFactorRational::stability() const
+inline Rational SLUFactorRational::stability() const
 {
 
    if(status() != OK)
@@ -333,7 +333,7 @@ Rational SLUFactorRational::stability() const
    return initMaxabs / maxabs;
 }
 
-std::string SLUFactorRational::statistics() const
+inline std::string SLUFactorRational::statistics() const
 {
    std::stringstream s;
    s  << "Factorizations     : " << std::setw(10) << getFactorCount() << std::endl
@@ -345,7 +345,7 @@ std::string SLUFactorRational::statistics() const
    return s.str();
 }
 
-void SLUFactorRational::changeEta(int idx, SSVectorRational& et)
+inline void SLUFactorRational::changeEta(int idx, SSVectorRational& et)
 {
 
    int es = et.size(); // see altValues()
@@ -354,7 +354,7 @@ void SLUFactorRational::changeEta(int idx, SSVectorRational& et)
    et.forceSetup();
 }
 
-SLUFactorRational::Status SLUFactorRational::change(
+inline SLUFactorRational::Status SLUFactorRational::change(
    int             idx,
    const SVectorRational&  subst,
    const SSVectorRational* e)
@@ -418,7 +418,7 @@ SLUFactorRational::Status SLUFactorRational::change(
    return status();
 }
 
-void SLUFactorRational::clear()
+inline void SLUFactorRational::clear()
 {
 
    rowMemMult    = 5;          /* factor of minimum Memory * #of nonzeros */
@@ -497,7 +497,7 @@ void SLUFactorRational::clear()
  *  If this is initialised, freeAll() has to be called before.
  *  Class objects from SLUFactorRational are not copied here.
  */
-void SLUFactorRational::assign(const SLUFactorRational& old)
+inline void SLUFactorRational::assign(const SLUFactorRational& old)
 {
    unsigned int thediminc;
 
@@ -680,213 +680,7 @@ void SLUFactorRational::assign(const SLUFactorRational& old)
 
 }
 
-SLUFactorRational& SLUFactorRational::operator=(const SLUFactorRational& old)
-{
-
-   if(this != &old)
-   {
-      // we don't need to copy them, because they are temporary vectors
-      vec.clear();
-      ssvec.clear();
-
-      eta    = old.eta;
-      forest = old.forest;
-
-      freeAll();
-
-      try
-      {
-         assign(old);
-      }
-      catch(const SPxMemoryException& x)
-      {
-         freeAll();
-         throw x;
-      }
-
-      assert(isConsistent());
-   }
-
-   return *this;
-}
-
-SLUFactorRational::SLUFactorRational()
-   : CLUFactorRational()
-   , vec(1)
-   , ssvec(1)
-   , usetup(false)
-   , uptype(FOREST_TOMLIN)
-   , eta(1)
-   , forest(1)
-   , minThreshold(0.01)
-   , timerType(Timer::USER_TIME)
-{
-   row.perm    = 0;
-   row.orig    = 0;
-   col.perm    = 0;
-   col.orig    = 0;
-   u.row.elem  = 0;
-   u.row.idx   = 0;
-   u.row.start = 0;
-   u.row.len   = 0;
-   u.row.max   = 0;
-   u.col.elem  = 0;
-   u.col.idx   = 0;
-   u.col.start = 0;
-   u.col.len   = 0;
-   u.col.max   = 0;
-   l.idx       = 0;
-   l.start     = 0;
-   l.row       = 0;
-   l.ridx      = 0;
-   l.rbeg      = 0;
-   l.rorig     = 0;
-   l.rperm     = 0;
-
-   nzCnt  = 0;
-   thedim = 0;
-
-   try
-   {
-      solveTime = TimerFactory::createTimer(timerType);
-      factorTime = TimerFactory::createTimer(timerType);
-      spx_alloc(row.perm, thedim);
-      spx_alloc(row.orig, thedim);
-      spx_alloc(col.perm, thedim);
-      spx_alloc(col.orig, thedim);
-      diag.reDim(thedim);
-
-      work = vec.get_ptr();
-
-      u.row.used = 0;
-      spx_alloc(u.row.elem,  thedim);
-      u.row.val.reDim(1);
-      spx_alloc(u.row.idx,   u.row.val.dim());
-      spx_alloc(u.row.start, thedim + 1);
-      spx_alloc(u.row.len,   thedim + 1);
-      spx_alloc(u.row.max,   thedim + 1);
-
-      u.row.list.idx      = thedim;
-      u.row.start[thedim] = 0;
-      u.row.max  [thedim] = 0;
-      u.row.len  [thedim] = 0;
-
-      u.col.size = 1;
-      u.col.used = 0;
-      spx_alloc(u.col.elem,  thedim);
-      spx_alloc(u.col.idx,   u.col.size);
-      spx_alloc(u.col.start, thedim + 1);
-      spx_alloc(u.col.len,   thedim + 1);
-      spx_alloc(u.col.max,   thedim + 1);
-      u.col.val.reDim(0);
-
-      u.col.list.idx      = thedim;
-      u.col.start[thedim] = 0;
-      u.col.max[thedim]   = 0;
-      u.col.len[thedim]   = 0;
-
-      l.val.reDim(1);
-      spx_alloc(l.idx, l.val.dim());
-
-      l.startSize   = 1;
-      l.firstUpdate = 0;
-      l.firstUnused = 0;
-
-      spx_alloc(l.start, l.startSize);
-      spx_alloc(l.row,   l.startSize);
-   }
-   catch(const SPxMemoryException& x)
-   {
-      freeAll();
-      throw x;
-   }
-
-   l.rval.reDim(0);
-   l.ridx  = 0;
-   l.rbeg  = 0;
-   l.rorig = 0;
-   l.rperm = 0;
-
-   SLUFactorRational::clear(); // clear() is virtual
-
-   factorCount = 0;
-   timeLimit = -1.0;
-   solveCount  = 0;
-
-   assert(row.perm != 0);
-   assert(row.orig != 0);
-   assert(col.perm != 0);
-   assert(col.orig != 0);
-
-   assert(u.row.elem  != 0);
-   assert(u.row.idx   != 0);
-   assert(u.row.start != 0);
-   assert(u.row.len   != 0);
-   assert(u.row.max   != 0);
-
-   assert(u.col.elem  != 0);
-   assert(u.col.idx   != 0);
-   assert(u.col.start != 0);
-   assert(u.col.len   != 0);
-   assert(u.col.max   != 0);
-
-   assert(l.idx   != 0);
-   assert(l.start != 0);
-   assert(l.row   != 0);
-
-   assert(SLUFactorRational::isConsistent());
-}
-
-SLUFactorRational::SLUFactorRational(const SLUFactorRational& old)
-   : SLinSolverRational(old)
-   , CLUFactorRational()
-   , vec(1)     // we don't need to copy it, because they are temporary vectors
-   , ssvec(1)   // we don't need to copy it, because they are temporary vectors
-   , usetup(old.usetup)
-   , eta(old.eta)
-   , forest(old.forest)
-   , timerType(old.timerType)
-{
-   row.perm    = 0;
-   row.orig    = 0;
-   col.perm    = 0;
-   col.orig    = 0;
-   u.row.elem  = 0;
-   u.row.idx   = 0;
-   u.row.start = 0;
-   u.row.len   = 0;
-   u.row.max   = 0;
-   u.col.elem  = 0;
-   u.col.idx   = 0;
-   u.col.start = 0;
-   u.col.len   = 0;
-   u.col.max   = 0;
-   l.idx       = 0;
-   l.start     = 0;
-   l.row       = 0;
-   l.ridx      = 0;
-   l.rbeg      = 0;
-   l.rorig     = 0;
-   l.rperm     = 0;
-
-   solveCount = 0;
-   solveTime = TimerFactory::createTimer(timerType);
-   factorTime = TimerFactory::createTimer(timerType);
-
-   try
-   {
-      assign(old);
-   }
-   catch(const SPxMemoryException& x)
-   {
-      freeAll();
-      throw x;
-   }
-
-   assert(SLUFactorRational::isConsistent());
-}
-
-void SLUFactorRational::freeAll()
+inline void SLUFactorRational::freeAll()
 {
 
    if(row.perm)
@@ -956,7 +750,7 @@ void SLUFactorRational::freeAll()
    spx_free(factorTime);
 }
 
-SLUFactorRational::~SLUFactorRational()
+inline SLUFactorRational::~SLUFactorRational()
 {
    freeAll();
 }
@@ -977,7 +771,7 @@ static Rational betterThreshold(Rational th)
    return th;
 }
 
-SLUFactorRational::Status SLUFactorRational::load(const SVectorRational* matrix[], int dm)
+inline SLUFactorRational::Status SLUFactorRational::load(const SVectorRational* matrix[], int dm)
 {
    assert(dm     >= 0);
    assert(matrix != 0);
@@ -1089,7 +883,7 @@ SLUFactorRational::Status SLUFactorRational::load(const SVectorRational* matrix[
 }
 
 
-bool SLUFactorRational::isConsistent() const
+inline bool SLUFactorRational::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
    return CLUFactorRational::isConsistent();
@@ -1098,7 +892,7 @@ bool SLUFactorRational::isConsistent() const
 #endif
 }
 
-void SLUFactorRational::dump() const
+inline void SLUFactorRational::dump() const
 {
    CLUFactorRational::dump();
 }
