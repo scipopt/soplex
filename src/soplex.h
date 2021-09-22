@@ -79,7 +79,6 @@
 // An alias for boost multiprecision
 namespace mpf = boost::multiprecision;
 #include <boost/any.hpp>
-#include <boost/program_options.hpp>
 #endif
 
 #define DEFAULT_RANDOM_SEED   0   // used to suppress output when the seed was not changed
@@ -2426,13 +2425,6 @@ private:
    void getOriginalProblemBasisColStatus(int& nNonBasicCols);
 
    ///@}
-
-#ifdef SOPLEX_WITH_BOOST
-   // For argument parsing
-   template <class S>
-   friend int runSoPlex(const boost::program_options::variables_map& vm);
-#endif
-
 };
 
 /* Backwards compatibility */

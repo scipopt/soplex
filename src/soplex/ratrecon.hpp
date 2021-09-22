@@ -28,7 +28,6 @@ namespace soplex
  *  success and false if more accuracy is required: specifically if componentwise rational reconstruction does not
  *  produce such a vector
  */
-#ifdef SOPLEX_WITH_BOOST
 static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int dim,
                        const Rational& denomBoundSquared, const DIdxSet* indexSet = 0)
 {
@@ -39,16 +38,16 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
    assert(denom > 0);
    assert(denomBoundSquared > 0);
 
-   Integer temp;
-   Integer td;
-   Integer tn;
-   Integer Dbound;
-   Integer gcd(1);
+   Integer temp = 0;
+   Integer td = 0;
+   Integer tn = 0;
+   Integer Dbound = 0;
+   Integer gcd = 1;
 
    Dbound = numerator(denomBoundSquared) / denominator(
                denomBoundSquared); /* this is the working bound on the denominator size */
 
-   Dbound = sqrt(Dbound);
+   Dbound = (Integer) sqrt(Dbound);
 
    MSG_DEBUG(std::cout << "reconstructing " << dim << " dimensional vector with denominator bound " <<
              Dbound << "\n");
@@ -60,8 +59,8 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
       Dbound = 16777216;
 
    /* The following represent a_i, the cont frac representation and p_i/q_i, the convergents */
-   Integer a0;
-   Integer ai;
+   Integer a0 = 0;
+   Integer ai = 0;
 
    /* here we use p[2]=pk, p[1]=pk-1,p[0]=pk-2 and same for q */
    Integer p[3];
@@ -179,18 +178,11 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
 
    return rval;
 }
-#endif
-
-
 
 /** reconstruct a rational vector */
-bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
-                       const DIdxSet* indexSet)
+inline bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
+                              const DIdxSet* indexSet)
 {
-#ifndef SOPLEX_WITH_BOOST
-   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
-   return false;
-#else
    std::vector<Integer> xnum(input.dim()); /* numerator of input vector */
    Integer denom = 1; /* common denominator of input vector */
    int rval = true;
@@ -235,14 +227,13 @@ bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
    rval = Reconstruct(input, xnum.data(), denom, dim, denomBoundSquared, indexSet);
 
    return rval;
-#endif
 }
 
 
 
 /** reconstruct a rational solution */
 /**@todo make this a method of class SoPlex */
-bool reconstructSol(SolRational& solution)
+inline bool reconstructSol(SolRational& solution)
 {
 #if 0
    VectorRational buffer;
