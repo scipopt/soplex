@@ -476,7 +476,7 @@ void Presol<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
    papilo::Message msg{};
    msg.setVerbosityLevel(verbosityLevel);
 #ifdef SOPLEX_DEBUG
-   msg.setVerbosityLevel(papilo::VerbosityLevel::kQuiet;);
+   msg.setVerbosityLevel(papilo::VerbosityLevel::kInfo;);
 #endif
    papilo::Postsolve<R> postsolve {msg, num};
    postsolve.undo(reducedSolution, originalSolution, postsolveStorage);
@@ -739,7 +739,7 @@ void Presol<R>::configurePapilo(papilo::Presolve<R>& presolve, R feasTolerance, 
 
    presolve.setVerbosityLevel(verbosityLevel);
 #ifdef SOPLEX_DEBUG
-   presolve.setVerbosityLevel(papilo::VerbosityLevel::kQuiet;);
+   presolve.setVerbosityLevel(papilo::VerbosityLevel::kInfo;);
 #endif
    /* enable lp presolvers with dual postsolve*/
    using uptr = std::unique_ptr<papilo::PresolveMethod<R>>;
