@@ -640,19 +640,7 @@ Presol<R>::simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
    configurePapilo(presolve, ftol, eps, seed, remainingTime);
    MSG_INFO1((*this->spxout), (*this->spxout) << " --- starting PaPILO" << std::endl;)
 
-   //   lp.writeMPS(std::cout, NULL, NULL);
-
-
-   //   papilo::MpsWriter<R> writer;
-   //   papilo::Vec<int> rows;
-   //   papilo::Vec<int> vecs;
-   //   for(int i=0; i< problem.getNRows(); i++)
-   //     rows.push_back(i);
-   //   for(int i=0; i< problem.getNCols(); i++)
-   //     vecs.push_back(i);
-   //   writer.writeProb("problem.mps", problem, rows, vecs);
    papilo::PresolveResult<R> res = presolve.apply(problem);
-   //   writer.writeProb("presolved_problem.mps", problem, res.postsolve.origrow_mapping, res.postsolve.origcol_mapping);
 
    switch(res.status)
    {
