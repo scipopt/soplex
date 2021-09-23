@@ -12,6 +12,7 @@ features:
 interface & parameters:
 
 - added intterupt flag to optimize() (default NULL)
+- added new simplifier enum SIMPLIFIER_PAPILO and SIMPLFIER_INTERNAL (replacing the deprecated SIMPLIFIER_AUTO)
 
 
 performance:

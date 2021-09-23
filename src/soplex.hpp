@@ -5855,7 +5855,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
          break;
 #else
          MSG_ERROR(std::cerr <<
-                   "ERROR: SoPlex build without presolving library PaPILO! using internal presolver" << std::endl;)
+                   "ERROR: SoPlex built without presolving library PaPILO! using internal presolver" << std::endl;)
          _simplifier = &_simplifierMainSM;
          assert(_simplifier != 0);
          return false;
@@ -6621,10 +6621,10 @@ void SoPlexBase<R>::printVersion() const
 
 
 #ifdef SOPLEX_WITH_PAPILO
-   MSG_INFO1(spxout, spxout << " [PAPILO  " << PAPILO_VERSION_MAJOR << "." << PAPILO_VERSION_MINOR  <<
+   MSG_INFO1(spxout, spxout << " [PaPILO  " << PAPILO_VERSION_MAJOR << "." << PAPILO_VERSION_MINOR  <<
              "." << PAPILO_VERSION_PATCH << " {" <<  PAPILO_GITHASH << "}]\n");
 #else
-   MSG_INFO1(spxout, spxout << " [PAPILO: not integrated]");
+   MSG_INFO1(spxout, spxout << " [PaPILO: not available]");
 #endif
 
    MSG_INFO1(spxout, spxout << " [githash: " << getGitHash() << "]\n");
