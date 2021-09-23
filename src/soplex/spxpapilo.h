@@ -479,8 +479,13 @@ void Presol<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
    msg.setVerbosityLevel(papilo::VerbosityLevel::kInfo;);
 #endif
    papilo::Postsolve<R> postsolve {msg, num};
-   postsolve.undo(reducedSolution, originalSolution, postsolveStorage);
+   auto status = postsolve.undo(reducedSolution, originalSolution, postsolveStorage);
 
+   if(status == PostsolveStatus::kFailed && isOptimal)
+   {
+     MSG_ERROR(std::cerr << "PaPILO did not pass validation" << std::endl;)
+     assert(false);
+   }
    for(int j = 0; j < (int)postsolveStorage.nColsOriginal; ++j)
    {
       m_prim[j] = originalSolution.primal[j];
@@ -798,6 +803,8 @@ void Presol<R>::applyPresolveResultsToColumns(SPxLPBase <R>& lp, const papilo::P
 
       LPColBase<R> column(objective.coefficients[col], emptyVector, ub, lb);
       lp.addCol(column);
+      assert( lp.lower(col) == lb );
+      assert( lp.upper(col) == ub );
    }
 
    lp.changeObjOffset(objective.offset);
@@ -839,6 +846,8 @@ void Presol<R>::applyPresolveResultsToRows(SPxLPBase <R>& lp, const papilo::Prob
 
       LPRowBase<R> lpRowBase(lhs, soplexRowVector, rhs);
       lp.addRow(lpRowBase);
+      assert( lp.lhs(row) == lhs );
+      assert( lp.rhs(row) == rhs );
    }
 
    assert(problem.getNRows() == lp.nRows());
