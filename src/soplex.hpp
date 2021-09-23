@@ -5854,8 +5854,6 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
          assert(_simplifier != 0);
          break;
 #else
-         MSG_ERROR(std::cerr <<
-                   "ERROR: SoPlex built without presolving library PaPILO! using internal presolver" << std::endl;)
          _simplifier = &_simplifierMainSM;
          assert(_simplifier != 0);
          return false;

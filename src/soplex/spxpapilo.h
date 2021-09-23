@@ -483,9 +483,10 @@ void Presol<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
 
    if(status == PostsolveStatus::kFailed && isOptimal)
    {
-     MSG_ERROR(std::cerr << "PaPILO did not pass validation" << std::endl;)
-     assert(false);
+      MSG_ERROR(std::cerr << "PaPILO did not pass validation" << std::endl;)
+      assert(false);
    }
+
    for(int j = 0; j < (int)postsolveStorage.nColsOriginal; ++j)
    {
       m_prim[j] = originalSolution.primal[j];
@@ -639,7 +640,19 @@ Presol<R>::simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
    configurePapilo(presolve, ftol, eps, seed, remainingTime);
    MSG_INFO1((*this->spxout), (*this->spxout) << " --- starting PaPILO" << std::endl;)
 
+   //   lp.writeMPS(std::cout, NULL, NULL);
+
+
+   //   papilo::MpsWriter<R> writer;
+   //   papilo::Vec<int> rows;
+   //   papilo::Vec<int> vecs;
+   //   for(int i=0; i< problem.getNRows(); i++)
+   //     rows.push_back(i);
+   //   for(int i=0; i< problem.getNCols(); i++)
+   //     vecs.push_back(i);
+   //   writer.writeProb("problem.mps", problem, rows, vecs);
    papilo::PresolveResult<R> res = presolve.apply(problem);
+   //   writer.writeProb("presolved_problem.mps", problem, res.postsolve.origrow_mapping, res.postsolve.origcol_mapping);
 
    switch(res.status)
    {
@@ -803,8 +816,8 @@ void Presol<R>::applyPresolveResultsToColumns(SPxLPBase <R>& lp, const papilo::P
 
       LPColBase<R> column(objective.coefficients[col], emptyVector, ub, lb);
       lp.addCol(column);
-      assert( lp.lower(col) == lb );
-      assert( lp.upper(col) == ub );
+      assert(lp.lower(col) == lb);
+      assert(lp.upper(col) == ub);
    }
 
    lp.changeObjOffset(objective.offset);
@@ -846,8 +859,8 @@ void Presol<R>::applyPresolveResultsToRows(SPxLPBase <R>& lp, const papilo::Prob
 
       LPRowBase<R> lpRowBase(lhs, soplexRowVector, rhs);
       lp.addRow(lpRowBase);
-      assert( lp.lhs(row) == lhs );
-      assert( lp.rhs(row) == rhs );
+      assert(lp.lhs(row) == lhs);
+      assert(lp.rhs(row) == rhs);
    }
 
    assert(problem.getNRows() == lp.nRows());
