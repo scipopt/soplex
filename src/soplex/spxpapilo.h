@@ -397,9 +397,11 @@ void Presol<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
                            bool isOptimal)
 {
 
-   MSG_INFO1((*this->spxout), (*this->spxout)
-             << " --- unsimplifying solution and basis"
-             << std::endl;)
+   //   MSG_INFO1((*this->spxout), (*this->spxout)
+   std::cout
+         << " --- unsimplifying solution and basis"
+         << std::endl;
+   //             )
    int nColsReduced = x.dim();
    int nRowsReduced = y.dim();
    assert(nColsReduced <= m_prim.dim());
@@ -638,7 +640,9 @@ Presol<R>::simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
    papilo::Presolve<R> presolve;
 
    configurePapilo(presolve, ftol, eps, seed, remainingTime);
-   MSG_INFO1((*this->spxout), (*this->spxout) << " --- starting PaPILO" << std::endl;)
+   //   MSG_INFO1((*this->spxout), (*this->spxout)
+   std::cout << " --- starting PaPILO" << std::endl;
+   //                                      )
 
    papilo::PresolveResult<R> res = presolve.apply(problem);
 
@@ -646,21 +650,28 @@ Presol<R>::simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
    {
    case papilo::PresolveStatus::kInfeasible:
       m_result = SPxSimplifier<R>::INFEASIBLE;
-      MSG_INFO1((*this->spxout), (*this->spxout) << " --- presolving detected infeasibility" << std::endl;
-               )
+      //      MSG_INFO1((*this->spxout), (*this->spxout)
+      std::cout
+            << " --- presolving detected infeasibility" << std::endl;
+      //               )
       return SPxSimplifier<R>::INFEASIBLE;
 
    case papilo::PresolveStatus::kUnbndOrInfeas:
    case papilo::PresolveStatus::kUnbounded:
       m_result = SPxSimplifier<R>::UNBOUNDED;
-      MSG_INFO1((*this->spxout), (*this->spxout) <<
-                "==== Presolving detected unboundedness of the problem" << std::endl;)
+      //      MSG_INFO1((*this->spxout), (*this->spxout)
+      std::cout <<
+                "==== Presolving detected unboundedness of the problem" << std::endl;
+      //                )
       return SPxSimplifier<R>::UNBOUNDED;
 
    case papilo::PresolveStatus::kUnchanged:
       // since Soplex has no state unchanged store the value in a new variable
       noChanges = true;
-      MSG_INFO1((*this->spxout), (*this->spxout) << "==== Presolving found nothing " << std::endl;)
+      //      MSG_INFO1((*this->spxout), (*this->spxout)
+      std::cout
+            << "==== Presolving found nothing " << std::endl;
+      //)
       return SPxSimplifier<R>::OKAY;
 
    case papilo::PresolveStatus::kReduced:
@@ -673,11 +684,14 @@ Presol<R>::simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
    if(newNonzeros == 0 || ((problem.getNRows() <= modifyRowsFac * lp.nRows() ||
                             newNonzeros <= modifyRowsFac * lp.nNzos())))
    {
-      MSG_INFO1((*this->spxout), (*this->spxout) << " --- presolved problem has " << problem.getNRows() <<
-                " rows, "
-                << problem.getNCols() << " cols and "
-                << newNonzeros << " non-zeros"
-                << std::endl;)
+      //      MSG_INFO1((*this->spxout), (*this->spxout)
+      std::cout
+            << " --- presolved problem has " << problem.getNRows() <<
+            " rows, "
+            << problem.getNCols() << " cols and "
+            << newNonzeros << " non-zeros"
+            << std::endl;
+      //)
       postsolveStorage = res.postsolve;
 
       // remove all constraints and variables
@@ -694,10 +708,13 @@ Presol<R>::simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
    else
    {
       noChanges = true;
-      MSG_INFO1((*this->spxout),
-                (*this->spxout)
-                << " --- presolve results smaller than the modifyconsfac"
-                << std::endl;)
+      //      MSG_INFO1((*this->spxout),
+      //                (*this->spxout)
+      std::cout
+
+            << " --- presolve results smaller than the modifyconsfac"
+            << std::endl;
+      //)
    }
 
    return m_result;
