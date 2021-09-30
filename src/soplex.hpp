@@ -587,7 +587,7 @@ SoPlexBase<R>::Settings::RealParam::RealParam()
       "modify constraints when the number of nonzeros or rows is at most this factor times the number of nonzeros or rows before presolving";
    lower[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 0;
    upper[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 1;
-   defaultValue[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 0.8;
+   defaultValue[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 1.0;
 }
 
 template <class R>

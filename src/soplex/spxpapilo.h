@@ -223,7 +223,7 @@ public:
    /// default constructor.
    explicit Presol(Timer::TYPE ttype = Timer::USER_TIME)
       : SPxSimplifier<R>("PaPILO", ttype), postsolved(false), m_epsilon(DEFAULT_EPS_ZERO),
-        m_feastol(DEFAULT_BND_VIOL), m_opttol(DEFAULT_BND_VIOL), modifyRowsFac(0.8),
+        m_feastol(DEFAULT_BND_VIOL), m_opttol(DEFAULT_BND_VIOL), modifyRowsFac(1.0),
         m_thesense(SPxLPBase<R>::MAXIMIZE),
         m_keepbounds(false), m_result(this->OKAY)
    { ; };
