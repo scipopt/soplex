@@ -689,7 +689,9 @@ Presol<R>::simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
             << " --- presolved problem has " << problem.getNRows() <<
             " rows, "
             << problem.getNCols() << " cols and "
-            << newNonzeros << " non-zeros"
+            << newNonzeros << " non-zeros and  "
+            << presolve.getStatistics().nboundchgs << " boundchanges and "
+            << presolve.getStatistics().nsidechgs << " sidechanges"
             << std::endl;
       //)
       postsolveStorage = res.postsolve;
