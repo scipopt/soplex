@@ -146,7 +146,7 @@ if(MPFR_FOUND)
     include_directories(${MPFR_INCLUDE_DIRS})
     set(libs ${libs} ${MPFR_LIBRARIES})
 else()
-    message("SoPlex with Boost CPP multiprecision libraries.")
+    message("-- SoPlex with Boost CPP multiprecision libraries.")
     set(SOPLEX_WITH_CPPMPF on)
 endif()
 
