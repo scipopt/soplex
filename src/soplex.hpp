@@ -230,7 +230,7 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
    description[SoPlexBase<R>::SIMPLIFIER] = "simplifier (0 - off, 1 - internal, 2 - PaPILO)";
    lower[SoPlexBase<R>::SIMPLIFIER] = 0;
    upper[SoPlexBase<R>::SIMPLIFIER] = 2;
-   defaultValue[SoPlexBase<R>::SIMPLIFIER] = SoPlexBase<R>::SIMPLIFIER_PAPILO;
+   defaultValue[SoPlexBase<R>::SIMPLIFIER] = SoPlexBase<R>::SIMPLIFIER_INTERNAL;
 
    // type of scaler
    name[SoPlexBase<R>::SCALER] = "scaler";
