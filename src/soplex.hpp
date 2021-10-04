@@ -5836,6 +5836,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       break;
 
       _simplifier->setOutstream(spxout);
+
    // type of simplifier
    case SoPlexBase<R>::SIMPLIFIER:
       switch(value)
@@ -8670,7 +8671,7 @@ SoPlexBase<R>::SoPlexBase()
 
    _lastSolveMode = intParam(SoPlexBase<R>::SOLVEMODE);
 
-    _simplifierPaPILO.setOutstream(spxout);
+   _simplifierPaPILO.setOutstream(spxout);
 
    assert(_isConsistent());
 }
