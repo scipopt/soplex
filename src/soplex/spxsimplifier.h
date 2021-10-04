@@ -251,6 +251,11 @@ public:
    }
    ///@}
 
+   void setOutstream(SPxOut& newOutstream)
+   {
+      spxout = &newOutstream;
+   }
+
 };
 
 /// Pretty-printing of simplifier status

@@ -1426,6 +1426,7 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
 
       // set message handlers in members
       _solver.setOutstream(spxout);
+      _simplifier->setOutstream(spxout);
       _scalerUniequi.setOutstream(spxout);
       _scalerBiequi.setOutstream(spxout);
       _scalerGeo1.setOutstream(spxout);
@@ -5834,6 +5835,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
 
       break;
 
+      _simplifier->setOutstream(spxout);
    // type of simplifier
    case SoPlexBase<R>::SIMPLIFIER:
       switch(value)
@@ -8667,6 +8669,8 @@ SoPlexBase<R>::SoPlexBase()
    setSettings(*_currentSettings, true);
 
    _lastSolveMode = intParam(SoPlexBase<R>::SOLVEMODE);
+
+    _simplifierPaPILO.setOutstream(spxout);
 
    assert(_isConsistent());
 }
