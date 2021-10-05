@@ -58,6 +58,7 @@ set(settings
     default-row
     devex
     internalsimplifier
+    papilosimplifier
     polish1
     polish2
     steep
