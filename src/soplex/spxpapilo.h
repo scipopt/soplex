@@ -480,7 +480,7 @@ void Presol<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
    msg.setVerbosityLevel(papilo::VerbosityLevel::kInfo;);
 #endif
    papilo::Postsolve<R> postsolve {msg, num};
-   auto status = postsolve.undo(reducedSolution, originalSolution, postsolveStorage);
+   auto status = postsolve.undo(reducedSolution, originalSolution, postsolveStorage, isOptimal);
 
    if(status == PostsolveStatus::kFailed && isOptimal)
    {
