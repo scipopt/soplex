@@ -41,7 +41,7 @@ option(SANITIZE_MEMORY "should the memory sanitizer be enabled in debug mode if 
 option(SANITIZE_UNDEFINED "should the undefined behavior sanitizer be enabled in debug mode if available" ON)
 option(SANITIZE_THREAD "should the thread sanitizer be enabled in debug mode if available" OFF)
 option(COVERAGE "enable coverage support" OFF)
-option(PAPILO "should papilo library be linked" ON)
+option(PAPILO "should papilo library be linked" OFF)
 
 SET(COVERAGE_CTEST_ARGS "" CACHE STRING "additional ctest arguments for coverage")
 
