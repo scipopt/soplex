@@ -187,6 +187,7 @@ private:
    bool noChanges = false;    ///< did PaPILO reduce the problem?
 
    bool postsolved;           ///< was the solution already postsolve?
+   bool vanished = false;
    R m_epsilon;                 ///< epsilon zero.
    R m_feastol;                 ///< primal feasibility tolerance.
    R m_opttol;                  ///< dual feasibility tolerance.
@@ -401,24 +402,23 @@ void Presol<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
              << " --- unsimplifying solution and basis"
              << std::endl;
             )
-   int nColsReduced = x.dim();
-   int nRowsReduced = y.dim();
-   assert(nColsReduced <= m_prim.dim());
-   assert(nRowsReduced <= m_dual.dim());
-   assert(nColsReduced == r.dim());
-   assert(nRowsReduced == s.dim());
+
+   assert(x.dim() <= m_prim.dim());
+   assert(y.dim() <= m_dual.dim());
+   assert(x.dim() == r.dim());
+   assert(y.dim() == s.dim());
 
    //if presolving made no changes then copy the reduced solution to the original
    if(noChanges)
    {
-      for(int j = 0; j < nColsReduced; ++j)
+      for(int j = 0; j < x.dim(); ++j)
       {
          m_prim[j] = x[j];
          m_redCost[j] = r[j];
          m_cBasisStat[j] = cols[j];
       }
 
-      for(int i = 0; i < nRowsReduced; ++i)
+      for(int i = 0; i < y.dim(); ++i)
       {
          m_dual[i] = y[i];
          m_slack[i] = s[i];
@@ -429,8 +429,10 @@ void Presol<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
       return;
    }
 
-   assert(nColsReduced == (int)postsolveStorage.origcol_mapping.size());
-   assert(nRowsReduced == (int)postsolveStorage.origrow_mapping.size());
+   int nColsReduced = (int)postsolveStorage.origcol_mapping.size();
+   int nRowsReduced = (int)postsolveStorage.origrow_mapping.size();
+   assert(x.dim() == (int)postsolveStorage.origcol_mapping.size() || vanished);
+   assert(y.dim() == (int)postsolveStorage.origrow_mapping.size() || vanished);
 
    papilo::Solution<R> originalSolution{};
    papilo::Solution<R> reducedSolution{};
@@ -470,10 +472,10 @@ void Presol<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
       reducedSolution.rowBasisStatus[i] = convertToPapiloStatus(rows[i]);
    }
 
-   /* since PaPILO verbosity is quiet it's irrelevant what's the messager*/
    papilo::Num<R> num {};
    num.setEpsilon(m_epsilon);
    num.setFeasTol(m_feastol);
+   /* since PaPILO verbosity is quiet it's irrelevant what's the messager*/
    papilo::Message msg{};
    msg.setVerbosityLevel(verbosityLevel);
 #ifdef SOPLEX_DEBUG
@@ -713,6 +715,12 @@ Presol<R>::simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
                )
    }
 
+   if(newNonzeros == 0)
+   {
+      vanished = true;
+      m_result = SPxSimplifier<R>::VANISHED;
+   }
+
    return m_result;
 }
 
@@ -749,7 +757,6 @@ void Presol<R>::configurePapilo(papilo::Presolve<R>& presolve, R feasTolerance, 
    //      presolve.getPresolveOptions().threads = data->threads;
 
    presolve.getPresolveOptions().tlim = remainingTime;
-   presolve.getPresolveOptions().dualreds = 0;
    presolve.getPresolveOptions().feastol = double(feasTolerance);
    presolve.getPresolveOptions().epsilon = double(epsilon);
    presolve.getPresolveOptions().detectlindep = 0;
