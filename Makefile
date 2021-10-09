@@ -569,9 +569,6 @@ ifneq ($(MPFR), true)
 		@echo "#define SOPLEX_WITH_CPPMPF" >> $(CONFIGFILE)
 endif
 endif
-ifeq ($(GMP), true)
-		@echo "#define SOPLEX_WITH_GMP" >> $(CONFIGFILE)
-endif
 ifeq ($(MPFR), true)
 		@echo "#define SOPLEX_WITH_MPFR" >> $(CONFIGFILE)
 endif
