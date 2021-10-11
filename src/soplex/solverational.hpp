@@ -3349,8 +3349,10 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
       {
          // do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used
          bool keepbounds = intParam(SoPlexBase<R>::RATIOTESTER) == SoPlexBase<R>::RATIOTESTER_BOUNDFLIPPING;
+         Real remainingTime = _solver.getMaxTime() - _solver.time();
          simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlexBase<R>::EPSILON_ZERO),
-                                realParam(SoPlexBase<R>::FPFEASTOL), realParam(SoPlexBase<R>::FPOPTTOL), keepbounds);
+                                realParam(SoPlexBase<R>::FPFEASTOL), realParam(SoPlexBase<R>::FPOPTTOL), remainingTime, keepbounds,
+                                _solver.random.getSeed());
       }
 
       // apply scaling after the simplification
@@ -3681,7 +3683,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
          MSG_INFO1(spxout, spxout << "Switching simplification." << std::endl);
 
          if(simplifier == int(SoPlexBase<R>::SIMPLIFIER_OFF))
-            setIntParam(SoPlexBase<R>::SIMPLIFIER, SoPlexBase<R>::SIMPLIFIER_AUTO);
+            setIntParam(SoPlexBase<R>::SIMPLIFIER, SoPlexBase<R>::SIMPLIFIER_INTERNAL);
          else
             setIntParam(SoPlexBase<R>::SIMPLIFIER, SoPlexBase<R>::SIMPLIFIER_OFF);
 

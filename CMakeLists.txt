@@ -20,6 +20,7 @@ set(SOPLEX_VERSION_PATCH 2)
 set(SOPLEX_VERSION_SUB 4)
 set(SOPLEX_VERSION_API 11)
 
+
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING")
 set(CPACK_PACKAGE_VERSION_MAJOR "${SOPLEX_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${SOPLEX_VERSION_MINOR}")
@@ -40,6 +41,8 @@ option(SANITIZE_MEMORY "should the memory sanitizer be enabled in debug mode if 
 option(SANITIZE_UNDEFINED "should the undefined behavior sanitizer be enabled in debug mode if available" ON)
 option(SANITIZE_THREAD "should the thread sanitizer be enabled in debug mode if available" OFF)
 option(COVERAGE "enable coverage support" OFF)
+option(PAPILO "should papilo library be linked" OFF)
+
 SET(COVERAGE_CTEST_ARGS "" CACHE STRING "additional ctest arguments for coverage")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -64,8 +67,8 @@ endif()
 # set the correct rpath for OS X
 set(CMAKE_MACOSX_RPATH ON)
 
-# use C++11 standard
-set(CMAKE_CXX_STANDARD 11)
+# use C++14 standard
+set(CMAKE_CXX_STANDARD 14)
 
 # set function visibility default to hidden
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
@@ -159,6 +162,20 @@ if(Quadmath_FOUND)
    set(libs ${libs} ${Quadmath_LIBRARY})
 else()
    set(QUADMATH_IMPORTED_TARGET "")
+endif()
+
+# look for presolvelib PaPILO
+if(PAPILO)
+    set(PAPILO_MIN_VERSION 2.0.0.0)
+    message(STATUS "Finding PAPILO")
+    find_package(PAPILO CONFIG ${PAPILO_MIN_VERSION} REQUIRED)
+    set(libs ${libs} ${PAPILO_IMPORTED_TARGETS})
+    message(STATUS "Finding PAPILO - found")
+    set(SOPLEX_WITH_PAPILO on)
+else()
+    message(STATUS "Support PAPILO: OFF")
+    set(PAPILO_IMPORTED_TARGETS "")
+    set(SOPLEX_WITH_PAPILO off)
 endif()
 
 if(BOOST)

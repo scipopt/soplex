@@ -53,13 +53,15 @@ set(failInstances
 # define the set of settings
 #
 set(settings
-    devex
-    steep
     default
     default-col
     default-row
+    devex
+    internalsimplifier
+    papilosimplifier
     polish1
     polish2
+    steep
     )
 
 # use GREATER to work with old cmake versions

@@ -46,7 +46,7 @@
  *
  * - special support for the exact solution of LPs over the rational numbers.
  *
- * SoPlex has been used in numerous reasearch and industry projects and is the
+ * SoPlex has been used in numerous research and industry projects and is the
  * standard LP solver linked to the constraint integer programming solver <a
  * href="http://scipopt.org/">SCIP</a>.
  *

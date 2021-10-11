@@ -227,10 +227,10 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
 
    // type of simplifier
    name[SoPlexBase<R>::SIMPLIFIER] = "simplifier";
-   description[SoPlexBase<R>::SIMPLIFIER] = "simplifier (0 - off, 1 - auto)";
+   description[SoPlexBase<R>::SIMPLIFIER] = "simplifier (0 - off, 1 - internal, 2 - PaPILO)";
    lower[SoPlexBase<R>::SIMPLIFIER] = 0;
-   upper[SoPlexBase<R>::SIMPLIFIER] = 1;
-   defaultValue[SoPlexBase<R>::SIMPLIFIER] = SoPlexBase<R>::SIMPLIFIER_AUTO;
+   upper[SoPlexBase<R>::SIMPLIFIER] = 2;
+   defaultValue[SoPlexBase<R>::SIMPLIFIER] = SoPlexBase<R>::SIMPLIFIER_INTERNAL;
 
    // type of scaler
    name[SoPlexBase<R>::SCALER] = "scaler";
@@ -580,6 +580,14 @@ SoPlexBase<R>::Settings::RealParam::RealParam()
    lower[SoPlexBase<R>::MIN_MARKOWITZ] = 0.0001;
    upper[SoPlexBase<R>::MIN_MARKOWITZ] = 0.9999;
    defaultValue[SoPlexBase<R>::MIN_MARKOWITZ] = 0.01;
+
+   // modification
+   name[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = "simplifier_modifyrowfac";
+   description[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] =
+      "modify constraints when the number of nonzeros or rows is at most this factor times the number of nonzeros or rows before presolving";
+   lower[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 0;
+   upper[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 1;
+   defaultValue[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 1.0;
 }
 
 template <class R>
@@ -1383,6 +1391,7 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
       _solver = rhs._solver;
       _slufactor = rhs._slufactor;
       _simplifierMainSM = rhs._simplifierMainSM;
+      _simplifierPaPILO = rhs._simplifierPaPILO;
       _scalerUniequi = rhs._scalerUniequi;
       _scalerBiequi = rhs._scalerBiequi;
       _scalerGeo1 = rhs._scalerGeo1;
@@ -1417,6 +1426,7 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
 
       // set message handlers in members
       _solver.setOutstream(spxout);
+      _simplifier->setOutstream(spxout);
       _scalerUniequi.setOutstream(spxout);
       _scalerBiequi.setOutstream(spxout);
       _scalerGeo1.setOutstream(spxout);
@@ -5825,6 +5835,8 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
 
       break;
 
+      _simplifier->setOutstream(spxout);
+
    // type of simplifier
    case SoPlexBase<R>::SIMPLIFIER:
       switch(value)
@@ -5833,10 +5845,22 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
          _simplifier = 0;
          break;
 
+      case SIMPLIFIER_INTERNAL:
       case SIMPLIFIER_AUTO:
          _simplifier = &_simplifierMainSM;
          assert(_simplifier != 0);
          break;
+
+      case SIMPLIFIER_PAPILO:
+#ifdef SOPLEX_WITH_PAPILO
+         _simplifier = &_simplifierPaPILO;
+         assert(_simplifier != 0);
+         break;
+#else
+         _simplifier = &_simplifierMainSM;
+         assert(_simplifier != 0);
+         return false;
+#endif
 
       default:
          return false;
@@ -6313,6 +6337,12 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
       _slufactor.setMarkowitz(value);
       break;
 
+   case SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC:
+#ifdef SOPLEX_WITH_PAPILO
+      _simplifierPaPILO.setModifyConsFrac(value);
+#endif
+      break;
+
    default:
       return false;
    }
@@ -6588,6 +6618,14 @@ void SoPlexBase<R>::printVersion() const
 #endif
 #else
    MSG_INFO1(spxout, spxout << " [rational: long double]");
+#endif
+
+
+#ifdef SOPLEX_WITH_PAPILO
+   MSG_INFO1(spxout, spxout << " [PaPILO  " << PAPILO_VERSION_MAJOR << "." << PAPILO_VERSION_MINOR  <<
+             "." << PAPILO_VERSION_PATCH << " {" <<  PAPILO_GITHASH << "}]\n");
+#else
+   MSG_INFO1(spxout, spxout << " [PaPILO: not available]");
 #endif
 
    MSG_INFO1(spxout, spxout << " [githash: " << getGitHash() << "]\n");
@@ -7790,9 +7828,21 @@ void SoPlexBase<R>::_enableSimplifierAndScaler()
       break;
 
    case SIMPLIFIER_AUTO:
+   case SIMPLIFIER_INTERNAL:
       _simplifier = &_simplifierMainSM;
       assert(_simplifier != 0);
       _simplifier->setMinReduction(realParam(MINRED));
+      break;
+
+   case SIMPLIFIER_PAPILO:
+#ifdef SOPLEX_WITH_PAPILO
+      _simplifier = &_simplifierPaPILO;
+      assert(_simplifier != 0);
+#else
+      _simplifier = &_simplifierMainSM;
+      assert(_simplifier != 0);
+      _simplifier->setMinReduction(realParam(MINRED));
+#endif
       break;
 
    default:
@@ -8620,6 +8670,8 @@ SoPlexBase<R>::SoPlexBase()
    setSettings(*_currentSettings, true);
 
    _lastSolveMode = intParam(SoPlexBase<R>::SOLVEMODE);
+
+   _simplifierPaPILO.setOutstream(spxout);
 
    assert(_isConsistent());
 }

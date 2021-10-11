@@ -66,7 +66,7 @@ void printUsage(const char* const argv[], int idx)
 #ifdef SOPLEX_WITH_CPPMPF
       "  --precision=<value>    choose precision for multiprecision solve (only active when arithmetic=2, possible values 50,100,200, compile with mpfr for arbitrary precision)\n"
 #endif
-      "  -s<value>              choose simplifier/presolver (0 - off, 1* - auto)\n"
+      "  -s<value>              choose simplifier/presolver (0 - off, 1* - internal, 2*- PaPILO)\n"
       "  -g<value>              choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric, 5 - least squares, 6 - geometric-equilibrium)\n"
       "  -p<value>              choose pricing (0* - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)\n"
       "  -r<value>              choose ratio tester (0 - textbook, 1 - harris, 2 - fast, 3* - boundflipping)\n"
@@ -782,7 +782,7 @@ int runSoPlex(int argc, char* argv[])
 
          case 's' :
 
-            // -s<value> : choose simplifier/presolver (0 - off, 1* - auto)
+            // -s<value> : choose simplifier/presolver (0 - off, 1 - internal, 2* - PaPILO)
             if(!soplex->setIntParam(soplex->SIMPLIFIER, option[2] - '0'))
             {
                printUsage(argv, optidx);
