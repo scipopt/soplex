@@ -33,7 +33,8 @@ git ls-files -c | xargs tar --transform "s|^|${NAME}/|" -cvhf $NAME.tar \
     --exclude="paper/*" \
     --exclude="scripts/makedist.sh" \
     --exclude="scripts/update*.sh" \
-    --exclude="tests/*" \
+    --exclude="tests/*.cpp" \
+    --exclude="tests/Makefile" \
     --exclude="web/*"
 
 # append additional files that were excluded before
