@@ -121,6 +121,7 @@ int SPxFastRT<R>::maxDelta(
    R x, y, max;
    R u, l;
    bool leaving = this->m_type == SPxSolverBase<R>::LEAVE;
+   bool enterrowrep = !leaving && this->thesolver->theRep == SPxSolver::ROW;
 
    R mabs = maxabs;
 
@@ -144,6 +145,11 @@ int SPxFastRT<R>::maxDelta(
          /* in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables */
          if(leaving && ((iscoid && this->thesolver->isCoBasic(i)) || (!iscoid
                         && this->thesolver->isBasic(i))))
+            continue;
+
+         if(enterrowrep && this->thesolver->baseId(i).isSPxColId()
+               && this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(i))))
+               == SPxBasisBase<R>::Desc::P_FIXED)
             continue;
 
          x = upd[i];
@@ -221,6 +227,11 @@ int SPxFastRT<R>::maxDelta(
                            && this->thesolver->isBasic(i))))
                continue;
 
+            if(enterrowrep && this->thesolver->baseId(i).isSPxColId()
+                  && this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(i))))
+                  == SPxBasisBase<R>::Desc::P_FIXED)
+               continue;
+
             if(x > epsilon)
             {
                mabs = (x > mabs) ? x : mabs;
@@ -289,7 +300,8 @@ int SPxFastRT<R>::minDelta(
    int i, sel;
    R x, y, max;
    R u, l;
-   bool leaving = this->m_type == SPxSolverBase<R>::LEAVE;
+   bool leaving = (this->m_type == SPxSolverBase<R>::LEAVE);
+   bool enterrowrep = !leaving && this->thesolver->theRep == SPxSolver::ROW;
 
    R mabs = maxabs;
 
@@ -314,6 +326,11 @@ int SPxFastRT<R>::minDelta(
          /* in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables */
          if(leaving && ((iscoid && this->thesolver->isCoBasic(i)) || (!iscoid
                         && this->thesolver->isBasic(i))))
+            continue;
+
+         if(enterrowrep && this->thesolver->baseId(i).isSPxColId()
+               && this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(i))))
+               == SPxBasisBase<R>::Desc::P_FIXED)
             continue;
 
          if(x > epsilon)
@@ -388,6 +405,12 @@ int SPxFastRT<R>::minDelta(
             if(leaving && ((iscoid && this->thesolver->isCoBasic(i)) || (!iscoid
                            && this->thesolver->isBasic(i))))
                continue;
+
+            if(enterrowrep && this->thesolver->baseId(i).isSPxColId()
+                  && this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(i))))
+                  == SPxBasisBase<R>::Desc::P_FIXED)
+               continue;
+
 
             if(x > epsilon)
             {
@@ -545,6 +568,7 @@ int SPxFastRT<R>::minSelect(
    int i;
    R x, y;
    bool leaving = this->m_type == SPxSolverBase<R>::LEAVE;
+   bool enterrowrep = !leaving && this->thesolver->theRep == SPxSolver::ROW;
 
    const R* up = upBound.get_const_ptr();
    const R* low = lowBound.get_const_ptr();
@@ -564,6 +588,11 @@ int SPxFastRT<R>::minSelect(
       // in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables
       if(leaving && ((iscoid && this->thesolver->isCoBasic(i)) || (!iscoid
                      && this->thesolver->isBasic(i))))
+         continue;
+
+      if(enterrowrep && this->thesolver->baseId(i).isSPxColId()
+            && this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(i))))
+            == SPxBasisBase<R>::Desc::P_FIXED)
          continue;
 
       if(x > stab)
@@ -628,6 +657,7 @@ int SPxFastRT<R>::maxSelect(
    int i;
    R x, y;
    bool leaving = this->m_type == SPxSolverBase<R>::LEAVE;
+   bool enterrowrep = !leaving && this->thesolver->theRep == SPxSolver::ROW;
 
    const R* up = upBound.get_const_ptr();
    const R* low = lowBound.get_const_ptr();
@@ -647,6 +677,11 @@ int SPxFastRT<R>::maxSelect(
       // in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables
       if(leaving && ((iscoid && this->thesolver->isCoBasic(i)) || (!iscoid
                      && this->thesolver->isBasic(i))))
+         continue;
+
+      if(enterrowrep && this->thesolver->baseId(i).isSPxColId()
+            && this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(i))))
+            == SPxBasisBase<R>::Desc::P_FIXED)
          continue;
 
       if(x > stab)
