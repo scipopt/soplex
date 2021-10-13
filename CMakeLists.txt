@@ -179,7 +179,7 @@ else()
 endif()
 
 if(BOOST)
-    find_package(Boost 1.58.0) # Refer to comments in cmake/Modules/FindBoost.cmake
+    find_package(Boost 1.65.0) # PaPILO requires at least Boost 1.65 (on mac 1.72)
     if(Boost_FOUND)
         set(SOPLEX_WITH_BOOST on)
         include_directories(${Boost_INCLUDE_DIRS})
