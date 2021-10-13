@@ -505,12 +505,24 @@ SPxId SPxDevexPR<R>::selectEnter()
 
    enterId = selectEnterX(this->theeps);
 
+   if(enterId.isSPxColId() && this->thesolver->isBasic(SPxColId(enterId)))
+      enterId.info = 0;
+
+   if(enterId.isSPxRowId() && this->thesolver->isBasic(SPxRowId(enterId)))
+      enterId.info = 0;
+
    if(!enterId.isValid() && !refined)
    {
       refined = true;
       MSG_INFO3((*this->thesolver->spxout),
                 (*this->thesolver->spxout) << "WDEVEX02 trying refinement step..\n";)
       enterId = selectEnterX(this->theeps / DEVEX_REFINETOL);
+
+      if(enterId.isSPxColId() && this->thesolver->isBasic(SPxColId(enterId)))
+         enterId.info = 0;
+
+      if(enterId.isSPxRowId() && this->thesolver->isBasic(SPxRowId(enterId)))
+         enterId.info = 0;
    }
 
    return enterId;
