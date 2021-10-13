@@ -121,7 +121,7 @@ int SPxFastRT<R>::maxDelta(
    R x, y, max;
    R u, l;
    bool leaving = this->m_type == SPxSolverBase<R>::LEAVE;
-   bool enterrowrep = !leaving && this->thesolver->theRep == SPxSolver::ROW;
+   bool enterrowrep = !leaving && this->thesolver->theRep == SPxSolverBase<R>::ROW;
 
    R mabs = maxabs;
 
@@ -301,7 +301,7 @@ int SPxFastRT<R>::minDelta(
    R x, y, max;
    R u, l;
    bool leaving = (this->m_type == SPxSolverBase<R>::LEAVE);
-   bool enterrowrep = !leaving && this->thesolver->theRep == SPxSolver::ROW;
+   bool enterrowrep = !leaving && this->thesolver->theRep == SPxSolverBase<R>::ROW;
 
    R mabs = maxabs;
 
@@ -568,7 +568,7 @@ int SPxFastRT<R>::minSelect(
    int i;
    R x, y;
    bool leaving = this->m_type == SPxSolverBase<R>::LEAVE;
-   bool enterrowrep = !leaving && this->thesolver->theRep == SPxSolver::ROW;
+   bool enterrowrep = !leaving && this->thesolver->theRep == SPxSolverBase<R>::ROW;
 
    const R* up = upBound.get_const_ptr();
    const R* low = lowBound.get_const_ptr();
@@ -657,7 +657,7 @@ int SPxFastRT<R>::maxSelect(
    int i;
    R x, y;
    bool leaving = this->m_type == SPxSolverBase<R>::LEAVE;
-   bool enterrowrep = !leaving && this->thesolver->theRep == SPxSolver::ROW;
+   bool enterrowrep = !leaving && this->thesolver->theRep == SPxSolverBase<R>::ROW;
 
    const R* up = upBound.get_const_ptr();
    const R* low = lowBound.get_const_ptr();
