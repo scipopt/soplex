@@ -17,12 +17,15 @@
 #include <gmp.h>
 #endif
 
-using namespace soplex;
 #ifdef SOPLEX_WITH_BOOST
 #include <boost/multiprecision/number.hpp>
 
 #ifdef SOPLEX_WITH_GMP
 #include <boost/multiprecision/gmp.hpp>
+
+namespace soplex
+{
+
 using namespace boost::multiprecision;
 using Rational = number<gmp_rational, et_off>;
 using Integer = number<gmp_int, et_off>;
@@ -34,9 +37,15 @@ inline void SpxGcd(Integer& result, Integer a, Integer b)
 {
    mpz_gcd(result.backend().data(), a.backend().data(), b.backend().data());
 }
+
+} // namespace soplex
 #else
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/detail/default_ops.hpp>
+
+namespace soplex
+{
+
 using namespace boost::multiprecision;
 using Rational = cpp_rational;
 using Integer = cpp_int;
@@ -48,7 +57,13 @@ inline void SpxGcd(Integer& result, Integer a, Integer b)
 {
    result = boost::multiprecision::gcd(a, b);
 }
+
+} // namespace soplex
 #endif
+
+namespace soplex
+{
+
 inline void printRational(Rational r)
 {
    std::cout << r << std::endl;
@@ -195,6 +210,8 @@ inline Rational ratFromString(const char* desc)
 
    return res;
 }
+
+} // namespace soplex
 #else
 
 #ifndef SOPLEX_WITH_GMP
@@ -951,6 +968,9 @@ inline void powRound(Rational& r)
 }
 #endif
 
+namespace soplex
+{
+
 /// Size in specified base (bit size for base 2)
 inline int sizeInBase(const Rational R, const int base)
 {
@@ -1029,4 +1049,6 @@ inline int dmaxSizeRational(const Rational* vector, const int length, const int 
 #endif
 }
 
+} // namespace soplex
 #endif
+//}
