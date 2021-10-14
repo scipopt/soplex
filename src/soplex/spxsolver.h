@@ -617,6 +617,9 @@ public:
    /// unscales the LP and reloads the basis
    void unscaleLPandReloadBasis();
 
+   /// invalidates the basis, triggers refactorization
+   void invalidateBasis();
+
    /** Load basis from \p filename in MPS format. If \p rowNames and \p
     *  colNames are \c NULL, default names are used for the constraints and
     *  variables.

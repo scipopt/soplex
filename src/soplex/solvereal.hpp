@@ -49,6 +49,7 @@ void SoPlexBase<R>::_optimize()
 #endif
          _scaler->scale(*_realLP, true);
          _isRealLPScaled = _realLP->isScaled(); // a scaler might decide not to apply scaling
+         _solver.invalidateBasis();
 #ifdef SOPLEX_DEBUG
          _checkScaling(origLP);
 #endif
@@ -322,6 +323,7 @@ void SoPlexBase<R>::_preprocessAndSolveReal(bool applySimplifier)
       if(_scaler && !_solver.isScaled())
       {
          _scaler->scale(_solver, false);
+         _solver.invalidateBasis();
       }
 
       _solveRealLPAndRecordStatistics();
