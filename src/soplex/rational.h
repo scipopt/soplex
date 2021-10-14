@@ -23,7 +23,8 @@
 #ifdef SOPLEX_WITH_GMP
 #include <boost/multiprecision/gmp.hpp>
 
-namespace soplex{
+namespace soplex
+{
 
 using namespace boost::multiprecision;
 using Rational = number<gmp_rational, et_off>;
@@ -42,7 +43,8 @@ inline void SpxGcd(Integer& result, Integer a, Integer b)
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/detail/default_ops.hpp>
 
-namespace soplex{
+namespace soplex
+{
 
 using namespace boost::multiprecision;
 using Rational = cpp_rational;
@@ -59,7 +61,8 @@ inline void SpxGcd(Integer& result, Integer a, Integer b)
 } // namespace soplex
 #endif
 
-namespace soplex{
+namespace soplex
+{
 
 inline void printRational(Rational r)
 {
