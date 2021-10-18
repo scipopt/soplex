@@ -575,6 +575,8 @@ void SPxSolverBase<R>::setType(Type tp)
    void SPxSolverBase<R>::invalidateBasis()
    {
       SPxBasisBase<R>::invalidate();
+      unInit();
+      init();
    }
 
    template <class R>
