@@ -5835,8 +5835,6 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
 
       break;
 
-      _simplifier->setOutstream(spxout);
-
    // type of simplifier
    case SoPlexBase<R>::SIMPLIFIER:
       switch(value)
