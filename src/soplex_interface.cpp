@@ -456,3 +456,11 @@ void SoPlex_getUpperReal(void* soplex, double* ub, int dim)
    for(int i = 0; i < dim; ++i)
       ub[i] = ubvec[i];
 }
+
+/** returns status of row **/
+int SoPlex_basisRowStatus(void* soplex, int rowidx)
+{
+    SoPlex* so = (SoPlex*)(soplex);
+
+    return so->basisRowStatus(rowidx);
+}

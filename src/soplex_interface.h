@@ -137,6 +137,9 @@ void SoPlex_changeVarUpperReal(void* soplex, int colidx, double ub);
 /** changes upper bound vector of columns to ub **/
 void SoPlex_getUpperReal(void* soplex, double* ub, int dim);
 
+/** returns status of row **/
+int SoPlex_basisRowStatus(void* soplex, int rowidx);
+
 #ifdef __cplusplus
 }
 #endif
