@@ -57,7 +57,7 @@ if(NOT WIN32)
 endif()
 
 # path to e.g. findGMP module
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
+list(PREPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
 # make 'Release' the default build type
 if(NOT CMAKE_BUILD_TYPE)
