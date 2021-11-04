@@ -141,7 +141,13 @@ void SoPlex_changeVarUpperReal(void* soplex, int colidx, double ub);
 /** changes upper bound vector of columns to ub **/
 void SoPlex_getUpperReal(void* soplex, double* ub, int dim);
 
-/** returns status of row **/
+/** returns status of row
+ *  0 -> row is set to its upper bound
+ *  1 -> row is set to its lower bound
+ *  2 -> row is fixed to its identical bounds
+ *  4 -> row is basic
+ *  5 -> nothing known about basis status
+ **/
 int SoPlex_basisRowStatus(void* soplex, int rowidx);
 
 #ifdef __cplusplus
