@@ -150,6 +150,16 @@ void SoPlex_getUpperReal(void* soplex, double* ub, int dim);
  **/
 int SoPlex_basisRowStatus(void* soplex, int rowidx);
 
+/** returns status of column
+ *  0 -> column is set to its upper bound
+ *  1 -> column is set to its lower bound
+ *  2 -> column is fixed to its identical bounds
+ *  3 -> column is free and fixed to zero
+ *  4 -> column is basic
+ *  5 -> nothing known about basis status
+ **/
+int SoPlex_basisColStatus(void* soplex, int colidx);
+
 #ifdef __cplusplus
 }
 #endif
