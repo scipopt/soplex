@@ -53,19 +53,23 @@ set(failInstances
 # define the set of settings
 #
 set(settings
-    devex
-    steep
-    exact
     default
     default-col
     default-row
+    devex
+    internalsimplifier
+    papilosimplifier
     polish1
     polish2
+    steep
     )
 
-if(BOOST)
-
 # use GREATER to work with old cmake versions
+if(BOOST)
+   #need boost to run exact
+   set(settings
+       ${settings}
+       exact)
 if(${Boost_VERSION_MACRO} GREATER "106999")
     set(settings
         ${settings}
@@ -75,6 +79,7 @@ if(${Boost_VERSION_MACRO} GREATER "106999")
         ${settings}
         quad)
    endif()
+endif()
 endif()
 
 #
@@ -122,4 +127,3 @@ endmacro(add_instancetests)
 #
 add_instancetests( successInstances "Success" )
 add_instancetests( failInstances "Fail" )
-endif()

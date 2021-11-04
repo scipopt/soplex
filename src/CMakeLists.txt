@@ -1,19 +1,14 @@
 include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(sources
-    soplex/clufactor_rational.cpp
     soplex/didxset.cpp
     soplex/gzstream.cpp
     soplex/idxset.cpp
     soplex/mpsinput.cpp
     soplex/nameset.cpp
-    soplex/rational.cpp
-    soplex/ratrecon.cpp
-    soplex/slufactor_rational.cpp
     soplex/spxdefines.cpp
     soplex/spxgithash.cpp
     soplex/spxid.cpp
-    soplex/spxlpbase_rational.cpp
     soplex/spxout.cpp
     soplex/usertimer.cpp
     soplex/wallclocktimer.cpp)
@@ -22,6 +17,7 @@ set(headers
     soplex/array.h
     soplex/basevectors.h
     soplex/classarray.h
+    soplex/classset.h
     soplex/clufactor.h
     soplex/clufactor_rational.h
     soplex/cring.h
@@ -80,6 +76,7 @@ set(headers
     soplex/spxmainsm.h
     soplex/spxout.h
     soplex/spxparmultpr.h
+    soplex/spxpapilo.h
     soplex/spxpricer.h
     soplex/spxratiotester.h
     soplex/spxscaler.h
@@ -125,6 +122,10 @@ set_target_properties(libsoplex-pic PROPERTIES
     VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}.${SOPLEX_VERSION_SUB}
     SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
 add_dependencies(libsoplex-pic soplex_update_githash)
+target_include_directories(libsoplex-pic PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>)
 target_link_libraries(libsoplex-pic ${libs})
 
 # create soplex library without pic
@@ -133,6 +134,10 @@ set_target_properties(libsoplex PROPERTIES
     VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}.${SOPLEX_VERSION_SUB}
     SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
 add_dependencies(libsoplex soplex_update_githash)
+target_include_directories(libsoplex PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>)
 target_link_libraries(libsoplex ${libs})
 
 # create C shared library
@@ -141,25 +146,27 @@ set_target_properties(libsoplexshared PROPERTIES
     VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}.${SOPLEX_VERSION_SUB}
     SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
 add_dependencies(libsoplexshared soplex_update_githash libsoplex)
+target_include_directories(libsoplexshared PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>)
 target_link_libraries(libsoplexshared libsoplex ${libs})
 set_target_properties(libsoplexshared PROPERTIES CXX_VISIBILITY_PRESET default)
 
-if(BOOST)
-    # create soplex binary using library without pic
-    add_executable(soplex soplexmain.cpp)
-    target_link_libraries(soplex LINK_PUBLIC libsoplex ${Boost_LIBRARIES})
+# create soplex binary using library without pic
+add_executable(soplex soplexmain.cpp)
+target_link_libraries(soplex LINK_PUBLIC libsoplex ${Boost_LIBRARIES})
 
-    if(CMAKE_BUILD_TYPE EQUAL "Debug")
-        find_package(Sanitizers)
-        add_sanitizers(soplex)
-    endif()
-
-    add_executable(example EXCLUDE_FROM_ALL example.cpp)
-    target_link_libraries(example libsoplex)
-
-    # set the install rpath to the installed destination
-    set_target_properties(soplex PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+if(CMAKE_BUILD_TYPE EQUAL "Debug")
+   find_package(Sanitizers)
+   add_sanitizers(soplex)
 endif()
+
+add_executable(example EXCLUDE_FROM_ALL example.cpp)
+target_link_libraries(example libsoplex)
+
+# set the install rpath to the installed destination
+set_target_properties(soplex PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 # on UNIX system the 'lib' prefix is automatically added
 set_target_properties(libsoplex PROPERTIES
@@ -173,30 +180,22 @@ set_target_properties(libsoplexshared PROPERTIES
     MACOSX_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 # install the header files of soplex
-install(FILES ${headers} DESTINATION include/soplex)
+install(FILES ${headers} ${PROJECT_BINARY_DIR}/soplex/config.h DESTINATION include/soplex)
 install(FILES soplex.h soplex.hpp soplex_interface.h DESTINATION include)
 
-if(BOOST)
 # install the binary and the library to appropriate lcoations and add them to an export group
 install(TARGETS soplex libsoplex libsoplex-pic libsoplexshared EXPORT soplex-targets
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin
         INCLUDES DESTINATION include)
-else()
-# install the the library to appropriate lcoations and add them to an export group
-install(TARGETS libsoplex libsoplex-pic EXPORT soplex-targets
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        INCLUDES DESTINATION include)
-endif()
 
 # Add library targets to the build-tree export set
 export(TARGETS libsoplex libsoplex-pic libsoplexshared
   FILE "${CMAKE_BINARY_DIR}/soplex-targets.cmake")
 
 #configure the config file for the build tree
-set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src")
+set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src" "${PROJECT_BINARY_DIR}")
 configure_file(${PROJECT_SOURCE_DIR}/soplex-config.cmake.in
   "${CMAKE_BINARY_DIR}/soplex-config.cmake" @ONLY)
 

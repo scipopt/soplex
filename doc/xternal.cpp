@@ -46,7 +46,7 @@
  *
  * - special support for the exact solution of LPs over the rational numbers.
  *
- * SoPlex has been used in numerous reasearch and industry projects and is the
+ * SoPlex has been used in numerous research and industry projects and is the
  * standard LP solver linked to the constraint integer programming solver <a
  * href="http://scipopt.org/">SCIP</a>.
  *
@@ -93,7 +93,7 @@
  * <a href="http://soplex.zib.de">SoPlex</a> web page for a comprehensive list
  * of all contributors.
  *
- * @version  5.0.2.4
+ * @version  6.0.0.1
  */
 
 
@@ -396,13 +396,12 @@
  *
  * The mathematical background of the underlying methods is described in the papers
  *
- * - Ambros M. Gleixner, Daniel E. Steffy, Kati Wolter. <i>Improving the Accuracy of Linear Programming Solvers with
- *   Iterative Refinement</i>. Proc. of ISSAC '12, pages 187--194, 2012, available as <a
- *   href="http://nbn-resolving.de/urn:nbn:de:0297-zib-15451">ZIB-Report 12-19</a>.
+ * - Ambros M. Gleixner, Daniel E. Steffy. <i>Linear programming using limited-precision oracles</i>.
+ * Mathematical Pogramming. 183, pp. 525-554, 2020, available as <a
+ *   href="http://nbn-resolving.de/urn:nbn:de:0297-zib-75316">ZIB-Report 19-57</a>.
  *
- * - Ambros M. Gleixner, Daniel E. Steffy, Kati Wolter. <i>Iterative Refinement for Linear Programming</i>. <a
- *   href="http://nbn-resolving.de/urn/resolver.pl?urn:nbn:de:0297-zib-55118">ZIB-Report 15-15</a>, Zuse Institute
- *   Berlin, 2015.
+ * - Ambros M. Gleixner, Daniel E. Steffy, Kati Wolter. <i>Iterative Refinement for Linear Programming</i>.
+ *   INFORMS Journal on Computing 28 (3). pp. 449-464, available as <a href="http://nbn-resolving.de/urn/resolver.pl?urn:nbn:de:0297-zib-55118">ZIB-Report 15-15</a>.
  *
  * <b>When using SoPlex as an exact LP solver, please cite the above papers.</b>
  */

@@ -15,11 +15,10 @@
 #include <iostream>
 #include <assert.h>
 
+#include "soplex/spxdefines.h"
 #include "soplex.h"
 #include "soplex/statistics.h"
 #include "soplex/sorter.h"
-
-#include "soplex/spxdefines.h"
 
 //#define NO_TOL
 #define USE_FEASTOL
@@ -990,9 +989,11 @@ void SoPlexBase<R>::_decompSimplifyAndSolve(SPxSolverBase<R>& solver, SLUFactor<
    // apply problem simplification
    if(_simplifier != 0)
    {
+      Real remainingTime = _solver.getMaxTime() - _solver.time();
       result = _simplifier->simplify(solver, realParam(SoPlexBase<R>::EPSILON_ZERO),
                                      realParam(SoPlexBase<R>::FEASTOL),
-                                     realParam(SoPlexBase<R>::OPTTOL));
+                                     realParam(SoPlexBase<R>::OPTTOL),
+                                     remainingTime);
       solver.changeObjOffset(_simplifier->getObjoffset() + realParam(SoPlexBase<R>::OBJ_OFFSET));
    }
 

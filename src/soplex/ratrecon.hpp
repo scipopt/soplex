@@ -18,88 +18,53 @@
 
 #include "soplex/spxdefines.h"
 #include "soplex/ratrecon.h"
+#include "soplex/rational.h"
 
 namespace soplex
 {
-#ifdef SOPLEX_WITH_GMP
-static void GMPv_init(mpz_t* vect, int dim)
-{
-   for(int i = 0; i < dim; i++)
-      mpz_init(vect[i]);
-}
-
-static void GMPv_clear(mpz_t* vect, int dim)
-{
-   for(int i = 0; i < dim; i++)
-      mpz_clear(vect[i]);
-}
-
-#ifdef SOPLEX_DEBUG
-/** print integer to stream */
-static std::ostream& operator<<(std::ostream& os, const mpz_t* number)
-{
-   os << mpz_get_str(0, 10, *number);
-   return os;
-}
-#endif
 
 /** this reconstruction routine will set x equal to the mpq vector where each component is the best rational
  *  approximation of xnum / denom with where the GCD of denominators of x is at most Dbound; it will return true on
  *  success and false if more accuracy is required: specifically if componentwise rational reconstruction does not
  *  produce such a vector
  */
-static int Reconstruct(VectorRational& resvec, mpz_t* xnum, mpz_t denom, int dim,
+static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int dim,
                        const Rational& denomBoundSquared, const DIdxSet* indexSet = 0)
 {
    bool rval = true;
    int done = 0;
 
    /* denominator must be positive */
-   assert(mpz_sgn(denom) > 0);
+   assert(denom > 0);
    assert(denomBoundSquared > 0);
 
-   mpz_t temp;
-   mpz_t td;
-   mpz_t tn;
-   mpz_t Dbound;
-   mpz_t gcd;
+   Integer temp = 0;
+   Integer td = 0;
+   Integer tn = 0;
+   Integer Dbound = 0;
+   Integer gcd = 1;
 
-   mpz_init(gcd); /* stores the gcd of denominators; abort if too big */
-   mpz_set_ui(gcd, 1);
-   mpz_init(temp);
-   mpz_init(td);
-   mpz_init(tn);
-   mpz_init(Dbound);
+   Dbound = numerator(denomBoundSquared) / denominator(
+               denomBoundSquared); /* this is the working bound on the denominator size */
 
-#if 1
-   mpz_set_q(Dbound,
-             denomBoundSquared.getMpqRef()); /* this is the working bound on the denominator size */
-#else
-   mpz_set(Dbound, denom); /* this is the working bound on the denominator size */
-#endif
-
-   mpz_sqrt(Dbound, Dbound);
+   Dbound = (Integer) sqrt(Dbound);
 
    MSG_DEBUG(std::cout << "reconstructing " << dim << " dimensional vector with denominator bound " <<
-             mpz_get_str(0, 10, Dbound) << "\n");
+             Dbound << "\n");
 
    /* if Dbound is below 2^24 increase it to this value, this avoids changing input vectors that have low denominator
     * because they are floating point representable
     */
-   if(mpz_cmp_ui(Dbound, 16777216) < 0)
-      mpz_set_ui(Dbound, 16777216);
+   if(Dbound < 16777216)
+      Dbound = 16777216;
 
    /* The following represent a_i, the cont frac representation and p_i/q_i, the convergents */
-   mpz_t a0;
-   mpz_t ai;
-   mpz_init(a0);
-   mpz_init(ai);
+   Integer a0 = 0;
+   Integer ai = 0;
 
    /* here we use p[2]=pk, p[1]=pk-1,p[0]=pk-2 and same for q */
-   mpz_t p[3];
-   GMPv_init(p, 3);
-   mpz_t q[3];
-   GMPv_init(q, 3);
+   Integer p[3];
+   Integer q[3];
 
    for(int c = 0; (indexSet == 0 && c < dim) || (indexSet != 0 && c < indexSet->size()); c++)
    {
@@ -111,50 +76,49 @@ static int Reconstruct(VectorRational& resvec, mpz_t* xnum, mpz_t denom, int dim
       MSG_DEBUG(std::cout << "  --> component " << j << " = " << &xnum[j] << " / denom\n");
 
       /* if xnum =0 , then just leave x[j] as zero */
-      if(mpz_sgn(xnum[j]) != 0)
+      if(xnum[j] != 0)
       {
          /* setup n and d for computing a_i the cont. frac. rep */
-         mpz_set(tn, xnum[j]);
-         mpz_set(td, denom);
+         tn = xnum[j];
+         td = denom;
 
          /* divide tn and td by gcd */
-         mpz_gcd(temp, tn, td);
-         mpz_divexact(tn, tn, temp);
-         mpz_divexact(td, td, temp);
+         SpxGcd(temp, tn, td);
+         tn = tn / temp;
+         td = td / temp;
 
-         if(mpz_cmp(td, Dbound) <= 0)
+         if(td <= Dbound)
          {
             MSG_DEBUG(std::cout << "marker 1\n");
 
-            mpq_set_num(resvec[j].getMpqRef_w(), tn);
-            mpq_set_den(resvec[j].getMpqRef_w(), td);
+            resvec[j] = Rational(tn, td);
          }
          else
          {
             MSG_DEBUG(std::cout << "marker 2\n");
 
-            mpz_set_ui(temp, 1);
+            temp = 1;
 
-            mpz_fdiv_q(a0, tn, td);
-            mpz_fdiv_r(temp, tn, td);
-            mpz_set(tn, td);
-            mpz_set(td, temp);
-            mpz_fdiv_q(ai, tn, td);
-            mpz_fdiv_r(temp, tn, td);
-            mpz_set(tn, td);
-            mpz_set(td, temp);
+            divide_qr(tn, td, a0, temp);
 
-            mpz_set(p[1], a0);
-            mpz_set_ui(p[2], 1);
-            mpz_addmul(p[2], a0, ai);
+            tn = td;
+            td = temp;
 
-            mpz_set_ui(q[1], 1);
-            mpz_set(q[2], ai);
+            divide_qr(tn, td, ai, temp);
+            tn = td;
+            td = temp;
+
+            p[1] = a0;
+            p[2] = 1;
+            p[2] += a0 * ai;
+
+            q[1] = 1;
+            q[2] = ai;
 
             done = 0;
 
             /* if q is already big, skip loop */
-            if(mpz_cmp(q[2], Dbound) > 0)
+            if(q[2] > Dbound)
             {
                MSG_DEBUG(std::cout << "marker 3\n");
                done = 1;
@@ -162,29 +126,28 @@ static int Reconstruct(VectorRational& resvec, mpz_t* xnum, mpz_t denom, int dim
 
             int cfcnt = 2;
 
-            while(!done && mpz_cmp_ui(td, 0))
+            while(!done && td != 0)
             {
                /* update everything: compute next ai, then update convergents */
 
                /* update ai */
-               mpz_fdiv_q(ai, tn, td);
-               mpz_fdiv_r(temp, tn, td);
-               mpz_set(tn, td);
-               mpz_set(td, temp);
+               divide_qr(tn, td, ai, temp);
+               tn = td;
+               td = temp;
 
                /* shift p,q */
-               mpz_set(q[0], q[1]);
-               mpz_set(q[1], q[2]);
-               mpz_set(p[0], p[1]);
-               mpz_set(p[1], p[2]);
+               q[0] = q[1];
+               q[1] =  q[2];
+               p[0] =  p[1];
+               p[1] =  p[2];
 
                /* compute next p,q */
-               mpz_set(p[2], p[0]);
-               mpz_addmul(p[2], p[1], ai);
-               mpz_set(q[2], q[0]);
-               mpz_addmul(q[2], q[1], ai);
+               p[2] =  p[0];
+               p[2] += p[1] * ai;
+               q[2] =  q[0];
+               q[2] += q[1] * ai;
 
-               if(mpz_cmp(q[2], Dbound) > 0)
+               if(q[2] > Dbound)
                   done = 1;
 
                cfcnt++;
@@ -192,67 +155,51 @@ static int Reconstruct(VectorRational& resvec, mpz_t* xnum, mpz_t denom, int dim
                MSG_DEBUG(std::cout << "  --> convergent denominator = " << &q[2] << "\n");
             }
 
-            /* Assign the values */
-            mpq_set_num(resvec[j].getMpqRef_w(), p[1]);
-            mpq_set_den(resvec[j].getMpqRef_w(), q[1]);
-            mpq_canonicalize(resvec[j].getMpqRef_w());
-            mpz_gcd(temp, gcd, mpq_denref(resvec[j].getMpqRef()));
-            mpz_mul(gcd, gcd, temp);
+            assert(q[1] != 0);
 
-            if(mpz_cmp(gcd, Dbound) > 0)
+            /* Assign the values */
+            if(q[1] >= 0)
+               resvec[j] = Rational(p[1], q[1]);
+            else
+               resvec[j] = Rational(-p[1], -q[1]);
+
+            SpxGcd(temp, gcd, denominator(resvec[j]));
+            gcd *= temp;
+
+            if(gcd > Dbound)
             {
                MSG_DEBUG(std::cout << "terminating with gcd " << &gcd << " exceeding Dbound " << &Dbound << "\n");
                rval = false;
-               goto CLEANUP;
+               break;
             }
          }
       }
    }
 
-CLEANUP:
-   GMPv_clear(q, 3);
-   GMPv_clear(p, 3);
-   mpz_clear(td);
-   mpz_clear(tn);
-   mpz_clear(a0);
-   mpz_clear(ai);
-   mpz_clear(temp);
-   mpz_clear(Dbound);
-   mpz_clear(gcd);
-
    return rval;
 }
-#endif
-
-
 
 /** reconstruct a rational vector */
-bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
-                       const DIdxSet* indexSet)
+inline bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
+                              const DIdxSet* indexSet)
 {
-#ifdef SOPLEX_WITH_GMP
-   mpz_t* xnum = 0; /* numerator of input vector */
-   mpz_t denom; /* common denominator of input vector */
+   std::vector<Integer> xnum(input.dim()); /* numerator of input vector */
+   Integer denom = 1; /* common denominator of input vector */
    int rval = true;
    int dim;
 
    dim = input.dim();
 
-   /* convert vector to mpz format */
-   spx_alloc(xnum, dim);
-   GMPv_init(xnum, dim);
-   mpz_init_set_ui(denom, 1);
-
    /* find common denominator */
    if(indexSet == 0)
    {
       for(int i = 0; i < dim; i++)
-         mpz_lcm(denom, denom, mpq_denref(input[i].getMpqRef()));
+         SpxLcm(denom, denom, denominator(input[i]));
 
       for(int i = 0; i < dim; i++)
       {
-         mpz_mul(xnum[i], denom, mpq_numref(input[i].getMpqRef()));
-         mpz_divexact(xnum[i], xnum[i], mpq_denref(input[i].getMpqRef()));
+         xnum[i] = denom * Integer(numerator(input[i]));
+         xnum[i] = xnum[i] / Integer(denominator(input[i]));
       }
    }
    else
@@ -261,7 +208,7 @@ bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
       {
          assert(indexSet->index(i) >= 0);
          assert(indexSet->index(i) < input.dim());
-         mpz_lcm(denom, denom, mpq_denref(input[indexSet->index(i)].getMpqRef()));
+         SpxLcm(denom, denom, denominator(input[indexSet->index(i)]));
       }
 
       for(int i = 0; i < indexSet->size(); i++)
@@ -269,31 +216,24 @@ bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
          int k = indexSet->index(i);
          assert(k >= 0);
          assert(k < input.dim());
-         mpz_mul(xnum[k], denom, mpq_numref(input[k].getMpqRef()));
-         mpz_divexact(xnum[k], xnum[k], mpq_denref(input[k].getMpqRef()));
+         xnum[k] = denom * Integer(numerator(input[k]));
+         xnum[k] = xnum[k] / Integer(denominator(input[k]));
       }
    }
 
    MSG_DEBUG(std::cout << "LCM = " << mpz_get_str(0, 10, denom) << "\n");
 
    /* reconstruct */
-   rval = Reconstruct(input, xnum, denom, dim, denomBoundSquared, indexSet);
-
-   mpz_clear(denom);
-   GMPv_clear(xnum, dim);
-   spx_free(xnum);
+   rval = Reconstruct(input, xnum.data(), denom, dim, denomBoundSquared, indexSet);
 
    return rval;
-#else
-   return false;
-#endif
 }
 
 
 
 /** reconstruct a rational solution */
 /**@todo make this a method of class SoPlex */
-bool reconstructSol(SolRational& solution)
+inline bool reconstructSol(SolRational& solution)
 {
 #if 0
    VectorRational buffer;

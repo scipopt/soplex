@@ -72,22 +72,7 @@ public:
    {
       assert(p_info <= 1 && p_info >= -1);
    }
-   /// Assignment operator.
-   DataKey& operator=(const DataKey& rhs)
-   {
-      if(this != &rhs)
-      {
-         info = rhs.info;
-         idx  = rhs.idx;
-      }
 
-      return *this;
-   }
-   /// Copy constructor.
-   DataKey(const DataKey& old)
-      : info(old.info)
-      , idx(old.idx)
-   {}
    ///@}
 
    //-------------------------------------

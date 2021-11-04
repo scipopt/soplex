@@ -3360,7 +3360,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
                          << " with zero objective (" << lp.maxObj(j)
                          << ")" << std::endl;)
 
-               SVectorBase<R> col_idx_sorted(col);
+               DSVectorBase<R> col_idx_sorted(col);
 
                // sort col elements by increasing idx
                IdxCompare compare;
@@ -5051,7 +5051,8 @@ void SPxMainSM<R>::fixColumn(SPxLPBase<R>& lp, int j, bool correctIdx)
 
 template <class R>
 typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
-      bool keepbounds)
+      Real remainingTime,
+      bool keepbounds, uint32_t seed)
 {
    // transfer message handler
    this->spxout = lp.spxout;

@@ -31,7 +31,6 @@ endif
 
 INSTALLDIR	=
 
-
 #-----------------------------------------------------------------------------
 # detect host architecture
 #-----------------------------------------------------------------------------
@@ -43,7 +42,7 @@ include make/make.detecthost
 # default settings
 #-----------------------------------------------------------------------------
 
-VERSION		:=	5.0.2.4
+VERSION		:=	6.0.0.1
 SPXGITHASH	=
 
 VERBOSE		=	false
@@ -73,7 +72,6 @@ OPENSOURCE	=	true
 GMP      =  true
 MPFR     =  false
 ZLIB     =  true
-EGLIB    =  false
 BOOST    =  true
 QUADMATH =  false
 
@@ -110,7 +108,6 @@ DFLAGS		=	-MM
 
 GMP_LDFLAGS	= 	-lgmp
 GMP_CPPFLAGS	=
-BOOST_LDFLAGS 	= 	-lboost_program_options
 QUADMATH_LDFLAGS = 	-lquadmath
 
 SOPLEXDIR	=	$(realpath .)
@@ -120,19 +117,15 @@ LIBDIR		=	lib
 INCLUDEDIR	=	include
 NAME		   =	soplex
 
-LIBOBJ = soplex/clufactor_rational.o \
-				soplex/didxset.o \
+LIBOBJ = 	soplex/didxset.o \
 				soplex/gzstream.o \
 				soplex/idxset.o \
 				soplex/mpsinput.o \
 				soplex/nameset.o \
-				soplex/rational.o \
 				soplex/ratrecon.o \
-				soplex/slufactor_rational.o \
 				soplex/spxdefines.o \
 				soplex/spxgithash.o \
 				soplex/spxid.o \
-				soplex/spxlpbase_rational.o \
 				soplex/spxout.o \
 				soplex/spxscaler.o \
 				soplex/usertimer.o \
@@ -145,10 +138,11 @@ REPOSIT		=	# template repository, explicitly empty  #spxproof.o
 
 BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 
-LINKSMARKERFILE	=	$(LIBDIR)/linkscreated.$(OSTYPE).$(ARCH).$(COMP)$(LINKLIBSUFFIX).$(EGLIB)
+LINKSMARKERFILE	=	$(LIBDIR)/linkscreated.$(OSTYPE).$(ARCH).$(COMP)$(LINKLIBSUFFIX)
 LASTSETTINGS	=	$(OBJDIR)/make.lastsettings
 
 SPXGITHASHFILE	=	$(SRCDIR)/soplex/git_hash.cpp
+CONFIGFILE = $(SRCDIR)/soplex/config.h
 
 #------------------------------------------------------------------------------
 #--- NOTHING TO CHANGE FROM HERE ON -------------------------------------------
@@ -244,13 +238,12 @@ ALLSRC		=	$(BINSRC) $(EXAMPLESRC) $(LIBSRC)
 ifeq ($(OPENSOURCE), false)
 	override ZLIB	=	false
 	override GMP	=	false
-	override EGLIB	=	false
 endif
 
 GMPDEP	:=	$(SRCDIR)/depend.gmp
 GMPSRC	:=	$(shell cat $(GMPDEP))
 ifeq ($(GMP),true)
-CPPFLAGS	+= -DSOPLEX_WITH_GMP $(GMP_CPPFLAGS)
+CPPFLAGS	+= $(GMP_CPPFLAGS)
 LDFLAGS	+= $(GMP_LDFLAGS)
 else
 GMP_LDFLAGS	=
@@ -258,7 +251,6 @@ GMP_CPPFLAGS	=
 endif
 
 ifeq ($(MPFR),true)
-CPPFLAGS += -DSOPLEX_WITH_MPFR
 LDFLAGS += -lmpfr
 else
 # Flags for cpp mpf
@@ -267,18 +259,13 @@ endif
 # For boost program options
 ifeq ($(BOOST),true)
 	LDFLAGS += $(BOOST_LDFLAGS)
-	CPPFLAGS += -DSOPLEX_WITH_BOOST
-	ifeq ($(MPFR),false)
-		CPPFLAGS += -DSOPLEX_WITH_CPPMPF
-	endif
-	else
+else
 		BOOST_LDFLAGS =
 endif
 
 # For quadmath support
 ifeq ($(QUADMATH),true)
 	LDFLAGS += $(QUADMATH_LDFLAGS)
-	CPPFLAGS += -DSOPLEX_WITH_FLOAT128
 else
 	QUADMATH_LDFLAGS =
 endif
@@ -290,20 +277,11 @@ ifeq ($(ZLIB_LDFLAGS),)
 ZLIB		=	false
 endif
 ifeq ($(ZLIB),true)
-CPPFLAGS	+=	-DSOPLEX_WITH_ZLIB $(ZLIB_FLAGS)
+FLAGS	+= $(ZLIB_FLAGS)
 LDFLAGS		+=	$(ZLIB_LDFLAGS)
 else
 ZLIB_LDFLAGS	=
 ZLIB_FLAGS	=
-endif
-
-EGLIBDEP	:=	$(SRCDIR)/depend.eglib
-EGLIBSRC	:=	$(shell cat $(EGLIBDEP))
-ifeq ($(EGLIB),true)
-CPPFLAGS	+=	-DSOPLEX_WITH_EGLIB -I$(LIBDIR)/eglib.$(OSTYPE).$(ARCH).$(COMP)/include
-LDFLAGS		+=	$(LIBDIR)/eglib.$(OSTYPE).$(ARCH).$(COMP)/lib/EGlib.a
-SOFTLINKS	+=	$(LIBDIR)/eglib.$(OSTYPE).$(ARCH).$(COMP)
-LINKSINFO	+=	"\n  -> \"eglib.$(OSTYPE).$(ARCH).$(COMP)\" is a directory containing the EGlib installation, i.e., \"eglib.$(OSTYPE).$(ARCH).$(COMP)/include/EGlib.h\" and \"eglib.$(OSTYPE).$(ARCH).$(COMP)/lib/EGlib.a\" should exist.\n"
 endif
 
 ifeq ($(GMP),true)
@@ -331,12 +309,7 @@ endif
 
 .PHONY: all
 all:		makelibfile
-ifeq ($(BOOST),true)
 		@$(MAKE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
-else
-		@echo "using make without Boost means only the SoPlex library will be built."
-		@echo "To build the binary, set BOOST=true and make sure Boost with program_options is available"
-endif
 
 .PHONY: preprocess
 preprocess:	checkdefines
@@ -473,6 +446,7 @@ ifneq ($(BINOBJDIR),)
 endif
 ifneq ($(OBJDIR),)
 		@-rm -f $(LASTSETTINGS)
+		@-rm -f $(CONFIGFILE)
 		@-rmdir $(OBJDIR)
 endif
 		@-rm -f $(EXAMPLEFILE)
@@ -500,43 +474,45 @@ $(LIBDIR):
 
 .PHONY: depend
 depend:
-		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) $(CXXFLAGS)\
+		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS)\
 		$(BINSRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
 		>$(DEPEND)'
-		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) $(CXXFLAGS)\
+		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS)\
 		$(EXAMPLESRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
 		>>$(DEPEND)'
-		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) $(CXXFLAGS)\
+		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS)\
 		$(LIBSRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(LIBOBJDIR\)/\1.o|g'\'' \
 		>>$(DEPEND)'
-		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) $(CXXFLAGS)\
+		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS)\
 		$(LIBSRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(LIBOBJSUBDIR\)/\1.o|g'\'' \
 		>>$(DEPEND)'
 		@echo `grep -l "SOPLEX_WITH_GMP" $(ALLSRC)` >$(GMPDEP)
 		@echo `grep -l "SOPLEX_WITH_ZLIB" $(ALLSRC)` >$(ZLIBDEP)
-		@echo `grep -l "SOPLEX_WITH_EGLIB" $(ALLSRC)` >$(EGLIBDEP)
 
 -include	$(DEPEND)
 
 $(BINOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 		@-mkdir -p $(BINOBJDIR)
 		@echo "-> compiling $@"
-		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) $(CXX_c)$< $(CXX_o)$@
+		$(CXX) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) $(CXX_c)$< $(CXX_o)$@
 
 $(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 		@-mkdir -p $(LIBOBJSUBDIR)
 		@echo "-> compiling $@"
-		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LIBOFLAGS) $(CXX_c)$< $(CXX_o)$@
+		$(CXX) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS) $(LIBOFLAGS) $(CXX_c)$< $(CXX_o)$@
 
 
 -include $(LASTSETTINGS)
 
 .PHONY: touchexternal
-touchexternal:	$(GMPDEP) $(ZLIBDEP) $(EGLIBDEP) | $(OBJDIR)
+touchexternal:	$(GMPDEP) $(ZLIBDEP)| $(OBJDIR)
+		@rm -f $(CONFIGFILE)
+		@echo "#ifndef __SPXCONFIG_H__" >> $(CONFIGFILE)
+		@echo "#define __SPXCONFIG_H__" >> $(CONFIGFILE)
 ifneq ($(SPXGITHASH),$(LAST_SPXGITHASH))
 		@-$(MAKE) githash
 endif
@@ -550,9 +526,6 @@ ifneq ($(GMP),$(LAST_GMP))
 endif
 ifneq ($(ZLIB),$(LAST_ZLIB))
 		@-touch $(ZLIBSRC)
-endif
-ifneq ($(EGLIB),$(LAST_EGLIB))
-		@-touch $(EGLIBSRC)
 endif
 ifneq ($(SHARED),$(LAST_SHARED))
 		@-touch $(LIBSRC)
@@ -580,7 +553,6 @@ endif
 		@echo "LAST_SPXGITHASH=$(SPXGITHASH)" >> $(LASTSETTINGS)
 		@echo "LAST_GMP=$(GMP)" >> $(LASTSETTINGS)
 		@echo "LAST_ZLIB=$(ZLIB)" >> $(LASTSETTINGS)
-		@echo "LAST_EGLIB=$(EGLIB)" >> $(LASTSETTINGS)
 		@echo "LAST_SHARED=$(SHARED)" >> $(LASTSETTINGS)
 		@echo "LAST_SANITIZE=$(SANITIZE)" >> $(LASTSETTINGS)
 		@echo "LAST_USRCXXFLAGS=$(USRCXXFLAGS)" >> $(LASTSETTINGS)
@@ -588,6 +560,26 @@ endif
 		@echo "LAST_USRLDFLAGS=$(USRLDFLAGS)" >> $(LASTSETTINGS)
 		@echo "LAST_USRARFLAGS=$(USRARFLAGS)" >> $(LASTSETTINGS)
 		@echo "LAST_USRDFLAGS=$(USRDFLAGS)" >> $(LASTSETTINGS)
+ifeq ($(GMP), true)
+		@echo "#define SOPLEX_WITH_GMP" >> $(CONFIGFILE)
+endif
+ifeq ($(BOOST), true)
+		@echo "#define SOPLEX_WITH_BOOST" >> $(CONFIGFILE)
+ifneq ($(MPFR), true)
+		@echo "#define SOPLEX_WITH_CPPMPF" >> $(CONFIGFILE)
+endif
+endif
+ifeq ($(MPFR), true)
+		@echo "#define SOPLEX_WITH_MPFR" >> $(CONFIGFILE)
+endif
+ifeq ($(QUADMATH), true)
+		@echo "#define SOPLEX_WITH_FLOAT128" >> $(CONFIGFILE)
+endif
+ifeq ($(ZLIB), true)
+		@echo "#define SOPLEX_WITH_ZLIB" >> $(CONFIGFILE)
+endif
+		@echo "#endif" >> $(CONFIGFILE)
+
 
 $(LINKSMARKERFILE):
 		@$(MAKE) links
@@ -600,7 +592,7 @@ links:		| $(LIBDIR) echosoftlinks $(SOFTLINKS)
 .PHONY: echosoftlinks
 echosoftlinks:
 		@echo
-		@echo "- Current settings: OSTYPE=$(OSTYPE) ARCH=$(ARCH) COMP=$(COMP) SUFFIX=$(LINKLIBSUFFIX) EGLIB=$(EGLIB)"
+		@echo "- Current settings: OSTYPE=$(OSTYPE) ARCH=$(ARCH) COMP=$(COMP) SUFFIX=$(LINKLIBSUFFIX)"
 		@echo
 		@echo "* SoPlex needs some softlinks to external programs."
 		@echo "* Please insert the paths to the corresponding directories/libraries below."
@@ -656,11 +648,6 @@ ifneq ($(ZLIB),false)
 		$(error invalid ZLIB flag selected: ZLIB=$(ZLIB). Possible options are: true false)
 endif
 endif
-ifneq ($(EGLIB),true)
-ifneq ($(EGLIB),false)
-		$(error invalid EGLIB flag selected: EGLIB=$(EGLIB). Possible options are: true false)
-endif
-endif
 
 .PHONY: errorhints
 errorhints:
@@ -669,9 +656,6 @@ ifeq ($(ZLIB),true)
 endif
 ifeq ($(GMP),true)
 		@echo "build failed with GMP=true: if GMP is not available, try building with GMP=false"
-endif
-ifeq ($(EGLIB),true)
-		@echo "build failed with EGLIB=true: if EGlib is not available, try building with EGLIB=false"
 endif
 
 # --- EOF ---------------------------------------------------------------------

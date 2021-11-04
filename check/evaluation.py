@@ -145,7 +145,7 @@ for idx, outline in enumerate(outlines):
 
     elif section == 'qsoptex':
         if outline.startswith('Time for SOLVER:'):
-            instances[instancename]['qso:time'] = float(outline.split()[-2])
+            instances[instancename]['qso:time'] = fracttofloat(outline.split()[-2])
         elif outline.find('Problem Solved Exactly') >= 0:
             instances[instancename]['qso:stat'] = 'optimal'
         elif outline.find('Problem Is Infeasible') >= 0:
@@ -168,7 +168,7 @@ for idx, outline in enumerate(outlines):
         instances[instancename]['status'] = 'fail'
 
     elif outline.startswith('real:timelimit'):
-        instances[instancename]['timelimit'] = float(outline.split()[-1])
+        instances[instancename]['timelimit'] = fracttofloat(outline.split()[-1])
 
     elif outline.startswith('Statistics'):
         stats = True
@@ -201,11 +201,11 @@ for idx, outline in enumerate(outlines):
             instances[instancename]['rhsrows'] = int(outlines[idx+10].split()[2])
             instances[instancename]['freerows'] = int(outlines[idx+11].split()[2])
             instances[instancename]['nonzeros'] = int(outlines[idx+12].split()[2])
-            instances[instancename]['colnonzeros'] = float(outlines[idx+13].split()[3])
-            instances[instancename]['rownonzeros'] = float(outlines[idx+14].split()[3])
-            instances[instancename]['sparsity'] = float(outlines[idx+15].split()[2])
-            instances[instancename]['minabsval'] = float(outlines[idx+16].split()[4])
-            instances[instancename]['maxabsval'] = float(outlines[idx+17].split()[4])
+            instances[instancename]['colnonzeros'] = fracttofloat(outlines[idx+13].split()[3])
+            instances[instancename]['rownonzeros'] = fracttofloat(outlines[idx+14].split()[3])
+            instances[instancename]['sparsity'] = fracttofloat(outlines[idx+15].split()[2])
+            instances[instancename]['minabsval'] = fracttofloat(outlines[idx+16].split()[4])
+            instances[instancename]['maxabsval'] = fracttofloat(outlines[idx+17].split()[4])
 
         elif outline.startswith('Violation'):
             primviol = outlines[idx+2].split()[3]
@@ -218,15 +218,15 @@ for idx, outline in enumerate(outlines):
                 instances[instancename]['dviol'] = '-'
 
         elif outline.startswith('Total time'):
-            instances[instancename]['time'] = float(outline.split()[3])
-            instances[instancename]['readtime'] = float(outlines[idx+1].split()[2])
-            instances[instancename]['solvetime'] = float(outlines[idx+2].split()[2])
-            instances[instancename]['preproctime'] = float(outlines[idx+3].split()[2])
-            instances[instancename]['simplextime'] = float(outlines[idx+4].split()[2])
-            instances[instancename]['synctime'] = float(outlines[idx+5].split()[2])
-            instances[instancename]['transformtime'] = float(outlines[idx+6].split()[2])
-            instances[instancename]['rationaltime'] = float(outlines[idx+7].split()[2])
-            instances[instancename]['othertime'] = float(outlines[idx+8].split()[2])
+            instances[instancename]['time'] = fracttofloat(outline.split()[3])
+            instances[instancename]['readtime'] = fracttofloat(outlines[idx+1].split()[2])
+            instances[instancename]['solvetime'] = fracttofloat(outlines[idx+2].split()[2])
+            instances[instancename]['preproctime'] = fracttofloat(outlines[idx+3].split()[2])
+            instances[instancename]['simplextime'] = fracttofloat(outlines[idx+4].split()[2])
+            instances[instancename]['synctime'] = fracttofloat(outlines[idx+5].split()[2])
+            instances[instancename]['transformtime'] = fracttofloat(outlines[idx+6].split()[2])
+            instances[instancename]['rationaltime'] = fracttofloat(outlines[idx+7].split()[2])
+            instances[instancename]['othertime'] = fracttofloat(outlines[idx+8].split()[2])
 
         elif outline.startswith('Refinements'):
             instances[instancename]['refs'] = int(outline.split()[2])
@@ -243,15 +243,15 @@ for idx, outline in enumerate(outlines):
             instances[instancename]['dualiters'] = int(outlines[idx+4].split()[2])
             instances[instancename]['flips'] = int(outlines[idx+5].split()[3])
             instances[instancename]['polish'] = int(outlines[idx+6].split()[-1])
-            instances[instancename]['speed'] = round(float(instances[instancename]['iters'])/max(instances[instancename]['solvetime'],tolerance),2)
+            instances[instancename]['speed'] = round(fracttofloat(instances[instancename]['iters'])/max(instances[instancename]['solvetime'],tolerance),2)
 
         elif outline.startswith('LU factorizations'):
             instances[instancename]['lufacts'] = int(outline.split()[3])
-            instances[instancename]['factortime'] = float(outlines[idx+2].split()[3])
+            instances[instancename]['factortime'] = fracttofloat(outlines[idx+2].split()[3])
 
         elif outline.startswith('LU solves'):
             instances[instancename]['lusolves'] = int(outline.split()[3])
-            instances[instancename]['lusolvetime'] = float(outlines[idx+2].split()[3])
+            instances[instancename]['lusolvetime'] = fracttofloat(outlines[idx+2].split()[3])
 
         elif decomp:
             if outline.startswith('Degeneracy'):
@@ -259,8 +259,8 @@ for idx, outline in enumerate(outlines):
                 instances[instancename]['dpiv'] = int(outlines[idx + 2].split()[3])
                 instances[instancename]['primcand'] = int(outlines[idx + 3].split()[3])
                 instances[instancename]['dualcand'] = int(outlines[idx + 4].split()[3])
-                instances[instancename]['avgpdegen'] = float(outlines[idx + 5].split()[3])
-                instances[instancename]['avgddegen'] = float(outlines[idx + 6].split()[3])
+                instances[instancename]['avgpdegen'] = fracttofloat(outlines[idx + 5].split()[3])
+                instances[instancename]['avgddegen'] = fracttofloat(outlines[idx + 6].split()[3])
 
             elif outline.startswith('Algorithm Iterations'):
                 instances[instancename]['algiter'] = int(outline.split()[2])
@@ -293,7 +293,7 @@ if check_solu:
         if len(solu) == 3:
             value = solu[2]
             if typeofvalue(value) in [int,float]:
-                value = float(value)
+                value = fracttofloat(value)
         else:
             if tag == '=inf=':
                 value = 'infeasible'

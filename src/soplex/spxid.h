@@ -115,14 +115,7 @@ public:
    explicit SPxId(const SPxRowId& rid)
       : DataKey(ROW_ID, rid.idx)
    {}
-   /// assignment operator
-   SPxId& operator=(const SPxId& id)
-   {
-      if(this != &id)
-         DataKey::operator= (id);
 
-      return *this;
-   }
    /// assignment operator
    SPxId& operator=(const SPxColId& cid)
    {

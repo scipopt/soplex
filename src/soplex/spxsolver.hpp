@@ -572,6 +572,14 @@ void SPxSolverBase<R>::setType(Type tp)
    }
 
    template <class R>
+   void SPxSolverBase<R>::invalidateBasis()
+   {
+      SPxBasisBase<R>::invalidate();
+      unInit();
+      init();
+   }
+
+   template <class R>
    void SPxSolverBase<R>::clearUpdateVecs(void)
    {
       theFvec->clearUpdate();

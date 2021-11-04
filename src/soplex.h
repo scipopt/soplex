@@ -63,6 +63,12 @@
 
 #include "soplex/spxlpbase.h"
 
+#include "soplex/spxpapilo.h"
+
+#ifdef SOPLEX_WITH_GMP
+#include <gmp.h>
+#endif
+
 #ifdef SOPLEX_WITH_BOOST
 #ifdef SOPLEX_WITH_MPFR
 // For multiple precision
@@ -75,7 +81,6 @@
 // An alias for boost multiprecision
 namespace mpf = boost::multiprecision;
 #include <boost/any.hpp>
-#include <boost/program_options.hpp>
 #endif
 
 #define DEFAULT_RANDOM_SEED   0   // used to suppress output when the seed was not changed
@@ -1149,10 +1154,16 @@ public:
    /// values for parameter SIMPLIFIER
    enum
    {
-      /// no simplifier
+      /// disabling presolving
       SIMPLIFIER_OFF = 0,
 
-      /// automatic choice
+      /// using internal presoling methods
+      SIMPLIFIER_INTERNAL = 3,
+
+      /// using the presolve lib papilo
+      SIMPLIFIER_PAPILO = 2,
+
+      /// @deprecated: only to provide backwards compatibility (use INTERNAL instead)
       SIMPLIFIER_AUTO = 1
    };
 
@@ -1401,8 +1412,11 @@ public:
       /// minimal Markowitz threshold to control sparsity/stability in LU factorization
       MIN_MARKOWITZ = 24,
 
+      /// minimal modification threshold to apply presolve reductions
+      SIMPLIFIER_MODIFYROWFAC = 25,
+
       /// number of real parameters
-      REALPARAM_COUNT = 25
+      REALPARAM_COUNT = 26
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
@@ -1553,10 +1567,8 @@ public:
    /// reads settings file; returns true on success
    bool loadSettingsFile(const char* filename);
 
-#ifdef SOPLEX_WITH_BOOST
    /// parses one setting string and returns true on success; note that string is modified
-   bool parseSettingsString(const std::string str, boost::any val);
-#endif
+   bool parseSettingsString(char* str);
 
    ///@}
 
@@ -1640,6 +1652,7 @@ private:
    SPxSolverBase<R> _solver;
    SLUFactor<R> _slufactor;
    SPxMainSM<R> _simplifierMainSM;
+   Presol<R> _simplifierPaPILO;
    SPxEquiliSC<R> _scalerUniequi;
    SPxEquiliSC<R> _scalerBiequi;
    SPxGeometSC<R> _scalerGeo1;
@@ -2424,13 +2437,6 @@ private:
    void getOriginalProblemBasisColStatus(int& nNonBasicCols);
 
    ///@}
-
-#ifdef SOPLEX_WITH_BOOST
-   // For argument parsing
-   template <class S>
-   friend int runSoPlex(const boost::program_options::variables_map& vm);
-#endif
-
 };
 
 /* Backwards compatibility */
@@ -2440,9 +2446,9 @@ typedef SoPlexBase<Real> SoPlex;
 } // namespace soplex
 
 // General templated function
+#include "soplex/solvedbds.hpp"
 #include "soplex.hpp"
 #include "soplex/solverational.hpp"
-#include "soplex/solvedbds.hpp"
 #include "soplex/testsoplex.hpp"
 #include "soplex/solvereal.hpp"
 

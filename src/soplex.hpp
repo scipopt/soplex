@@ -227,10 +227,10 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
 
    // type of simplifier
    name[SoPlexBase<R>::SIMPLIFIER] = "simplifier";
-   description[SoPlexBase<R>::SIMPLIFIER] = "simplifier (0 - off, 1 - auto)";
+   description[SoPlexBase<R>::SIMPLIFIER] = "simplifier (0 - off, 1 - internal, 2 - PaPILO)";
    lower[SoPlexBase<R>::SIMPLIFIER] = 0;
-   upper[SoPlexBase<R>::SIMPLIFIER] = 1;
-   defaultValue[SoPlexBase<R>::SIMPLIFIER] = SoPlexBase<R>::SIMPLIFIER_AUTO;
+   upper[SoPlexBase<R>::SIMPLIFIER] = 2;
+   defaultValue[SoPlexBase<R>::SIMPLIFIER] = SoPlexBase<R>::SIMPLIFIER_INTERNAL;
 
    // type of scaler
    name[SoPlexBase<R>::SCALER] = "scaler";
@@ -580,6 +580,14 @@ SoPlexBase<R>::Settings::RealParam::RealParam()
    lower[SoPlexBase<R>::MIN_MARKOWITZ] = 0.0001;
    upper[SoPlexBase<R>::MIN_MARKOWITZ] = 0.9999;
    defaultValue[SoPlexBase<R>::MIN_MARKOWITZ] = 0.01;
+
+   // modification
+   name[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = "simplifier_modifyrowfac";
+   description[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] =
+      "modify constraints when the number of nonzeros or rows is at most this factor times the number of nonzeros or rows before presolving";
+   lower[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 0;
+   upper[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 1;
+   defaultValue[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 1.0;
 }
 
 template <class R>
@@ -803,6 +811,10 @@ bool SoPlexBase<R>::getDualFarkasReal(R* vector, int dim)
 template <class R>
 bool SoPlexBase<R>::getPrimalRational(mpq_t* vector, const int size)
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return false;
+#else
    assert(size >= numColsRational());
 
    if(hasSol())
@@ -810,12 +822,14 @@ bool SoPlexBase<R>::getPrimalRational(mpq_t* vector, const int size)
       _syncRationalSolution();
 
       for(int i = 0; i < numColsRational(); i++)
-         mpq_set(vector[i], _solRational._primal[i].getMpqRef());
+         mpq_set(vector[i], _solRational._primal[i].backend().data());
 
       return true;
    }
    else
       return false;
+
+#endif
 }
 
 
@@ -823,6 +837,10 @@ bool SoPlexBase<R>::getPrimalRational(mpq_t* vector, const int size)
 template <class R>
 bool SoPlexBase<R>::getSlacksRational(mpq_t* vector, const int size)
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return false;
+#else
    assert(size >= numRowsRational());
 
    if(hasSol())
@@ -830,12 +848,14 @@ bool SoPlexBase<R>::getSlacksRational(mpq_t* vector, const int size)
       _syncRationalSolution();
 
       for(int i = 0; i < numRowsRational(); i++)
-         mpq_set(vector[i], _solRational._slacks[i].getMpqRef());
+         mpq_set(vector[i], _solRational._slacks[i].backend().data());
 
       return true;
    }
    else
       return false;
+
+#endif
 }
 
 
@@ -844,6 +864,10 @@ bool SoPlexBase<R>::getSlacksRational(mpq_t* vector, const int size)
 template <class R>
 bool SoPlexBase<R>::getPrimalRayRational(mpq_t* vector, const int size)
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return false;
+#else
    assert(size >= numColsRational());
 
    if(hasPrimalRay())
@@ -851,12 +875,14 @@ bool SoPlexBase<R>::getPrimalRayRational(mpq_t* vector, const int size)
       _syncRationalSolution();
 
       for(int i = 0; i < numColsRational(); i++)
-         mpq_set(vector[i], _solRational._primalRay[i].getMpqRef());
+         mpq_set(vector[i], _solRational._primalRay[i].backend().data());
 
       return true;
    }
    else
       return false;
+
+#endif
 }
 
 
@@ -865,6 +891,10 @@ bool SoPlexBase<R>::getPrimalRayRational(mpq_t* vector, const int size)
 template <class R>
 bool SoPlexBase<R>::getDualRational(mpq_t* vector, const int size)
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return false;
+#else
    assert(size >= numRowsRational());
 
    if(hasSol())
@@ -872,12 +902,14 @@ bool SoPlexBase<R>::getDualRational(mpq_t* vector, const int size)
       _syncRationalSolution();
 
       for(int i = 0; i < numRowsRational(); i++)
-         mpq_set(vector[i], _solRational._dual[i].getMpqRef());
+         mpq_set(vector[i], _solRational._dual[i].backend().data());
 
       return true;
    }
    else
       return false;
+
+#endif
 }
 
 
@@ -886,6 +918,10 @@ bool SoPlexBase<R>::getDualRational(mpq_t* vector, const int size)
 template <class R>
 bool SoPlexBase<R>::getRedCostRational(mpq_t* vector, const int size)
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return false;
+#else
    assert(size >= numColsRational());
 
    if(hasSol())
@@ -893,12 +929,14 @@ bool SoPlexBase<R>::getRedCostRational(mpq_t* vector, const int size)
       _syncRationalSolution();
 
       for(int i = 0; i < numColsRational(); i++)
-         mpq_set(vector[i], _solRational._redCost[i].getMpqRef());
+         mpq_set(vector[i], _solRational._redCost[i].backend().data());
 
       return true;
    }
    else
       return false;
+
+#endif
 }
 
 
@@ -907,6 +945,10 @@ bool SoPlexBase<R>::getRedCostRational(mpq_t* vector, const int size)
 template <class R>
 bool SoPlexBase<R>::getDualFarkasRational(mpq_t* vector, const int size)
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return false;
+#else
    assert(size >= numRowsRational());
 
    if(hasDualFarkas())
@@ -914,12 +956,14 @@ bool SoPlexBase<R>::getDualFarkasRational(mpq_t* vector, const int size)
       _syncRationalSolution();
 
       for(int i = 0; i < numRowsRational(); i++)
-         mpq_set(vector[i], _solRational._dualFarkas[i].getMpqRef());
+         mpq_set(vector[i], _solRational._dualFarkas[i].backend().data());
 
       return true;
    }
    else
       return false;
+
+#endif
 }
 #endif
 
@@ -1347,6 +1391,7 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
       _solver = rhs._solver;
       _slufactor = rhs._slufactor;
       _simplifierMainSM = rhs._simplifierMainSM;
+      _simplifierPaPILO = rhs._simplifierPaPILO;
       _scalerUniequi = rhs._scalerUniequi;
       _scalerBiequi = rhs._scalerBiequi;
       _scalerGeo1 = rhs._scalerGeo1;
@@ -1381,6 +1426,7 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
 
       // set message handlers in members
       _solver.setOutstream(spxout);
+      _simplifier->setOutstream(spxout);
       _scalerUniequi.setOutstream(spxout);
       _scalerBiequi.setOutstream(spxout);
       _scalerGeo1.setOutstream(spxout);
@@ -2842,6 +2888,10 @@ void SoPlexBase<R>::changeLhsRational(int i, const mpq_t* lhs)
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#endif
+
    _rationalLP->changeLhs(i, lhs);
    _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
 
@@ -2885,6 +2935,10 @@ void SoPlexBase<R>::changeRhsRational(const mpq_t* rhs, int rhsSize)
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
+
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#endif
 
    for(int i = 0; i < rhsSize; i++)
    {
@@ -2973,6 +3027,9 @@ void SoPlexBase<R>::changeRangeRational(int i, const mpq_t* lhs, const mpq_t* rh
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#endif
    _rationalLP->changeRange(i, lhs, rhs);
    _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
 
@@ -3058,6 +3115,9 @@ void SoPlexBase<R>::changeLowerRational(int i, const mpq_t* lower)
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#endif
    _rationalLP->changeLower(i, lower);
    _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
 
@@ -3123,6 +3183,9 @@ void SoPlexBase<R>::changeUpperRational(int i, const mpq_t* upper)
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#endif
    _rationalLP->changeUpper(i, upper);
    _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
 
@@ -3187,6 +3250,9 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#endif
    _rationalLP->changeBounds(i, lower, upper);
    _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
 
@@ -3247,6 +3313,9 @@ void SoPlexBase<R>::changeObjRational(int i, const mpq_t* obj)
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#endif
    _rationalLP->changeObj(i, obj);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO)
@@ -3286,6 +3355,9 @@ void SoPlexBase<R>::changeElementRational(int i, int j, const mpq_t* val)
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+#endif
    _rationalLP->changeElement(i, j, val);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO)
@@ -3797,10 +3869,9 @@ bool SoPlexBase<R>::getBoundViolationRational(Rational& maxviol, Rational& sumvi
          if(viol > maxviol)
          {
             maxviol = viol;
-            MSG_DEBUG(std::cout << "increased bound violation for column " << i << ": " << rationalToString(
-                         viol)
-                      << " lower: " << rationalToString(lowerRational(i))
-                      << ", primal: " << rationalToString(primal[i]) << "\n");
+            MSG_DEBUG(std::cout << "increased bound violation for column " << i << ": " << viol.str()
+                      << " lower: " << lowerRational(i).str()
+                      << ", primal: " << primal[i].str() << "\n");
          }
       }
 
@@ -3813,10 +3884,9 @@ bool SoPlexBase<R>::getBoundViolationRational(Rational& maxviol, Rational& sumvi
          if(viol > maxviol)
          {
             maxviol = viol;
-            MSG_DEBUG(std::cout << "increased bound violation for column " << i << ": " << rationalToString(
-                         viol)
-                      << " upper: " << rationalToString(upperRational(i))
-                      << ", primal: " << rationalToString(primal[i]) << "\n");
+            MSG_DEBUG(std::cout << "increased bound violation for column " << i << ": " << viol.str()
+                      << " upper: " << upperRational(i).str()
+                      << ", primal: " << primal[i].str() << "\n");
          }
       }
    }
@@ -3857,10 +3927,9 @@ bool SoPlexBase<R>::getRowViolationRational(Rational& maxviol, Rational& sumviol
          if(viol > maxviol)
          {
             maxviol = viol;
-            MSG_DEBUG(std::cout << "increased constraint violation for row " << i << ": " << rationalToString(
-                         viol)
-                      << " lhs: " << rationalToString(lhsRational(i))
-                      << ", activity: " << rationalToString(activity[i]) << "\n");
+            MSG_DEBUG(std::cout << "increased constraint violation for row " << i << ": " << viol.str()
+                      << " lhs: " << lhsRational(i).str()
+                      << ", activity: " << activity[i].str() << "\n");
          }
       }
 
@@ -3873,10 +3942,9 @@ bool SoPlexBase<R>::getRowViolationRational(Rational& maxviol, Rational& sumviol
          if(viol > maxviol)
          {
             maxviol = viol;
-            MSG_DEBUG(std::cout << "increased constraint violation for row " << i << ": " << rationalToString(
-                         viol)
-                      << " rhs: " << rationalToString(rhsRational(i))
-                      << ", activity: " << rationalToString(activity[i]) << "\n");
+            MSG_DEBUG(std::cout << "increased constraint violation for row " << i << ": " << viol.str()
+                      << " rhs: " << rhsRational(i).str()
+                      << ", activity: " << activity[i].str() << "\n");
          }
       }
    }
@@ -3918,13 +3986,13 @@ bool SoPlexBase<R>::getRedCostViolationRational(Rational& maxviol, Rational& sum
       // basis must not necessarily hold exactly, even within tolerances; hence the following assertions are relaxed by
       // a factor of two
       assert(!_hasBasis || basisColStatus(c) != SPxSolverBase<R>::ON_LOWER
-             || spxAbs(_solRational._primal[c] - lowerRational(c)) <= 2 * _rationalFeastol);
+             || spxAbs(Rational(_solRational._primal[c] - lowerRational(c))) <= 2 * _rationalFeastol);
       assert(!_hasBasis || basisColStatus(c) != SPxSolverBase<R>::ON_UPPER
-             || spxAbs(_solRational._primal[c] - upperRational(c)) <= 2 * _rationalFeastol);
+             || spxAbs(Rational(_solRational._primal[c] - upperRational(c))) <= 2 * _rationalFeastol);
       assert(!_hasBasis || basisColStatus(c) != SPxSolverBase<R>::FIXED
-             || spxAbs(_solRational._primal[c] - lowerRational(c)) <= 2 * _rationalFeastol);
+             || spxAbs(Rational(_solRational._primal[c] - lowerRational(c))) <= 2 * _rationalFeastol);
       assert(!_hasBasis || basisColStatus(c) != SPxSolverBase<R>::FIXED
-             || spxAbs(_solRational._primal[c] - upperRational(c)) <= 2 * _rationalFeastol);
+             || spxAbs(Rational(_solRational._primal[c] - upperRational(c))) <= 2 * _rationalFeastol);
 
       if(intParam(SoPlexBase<R>::OBJSENSE) == OBJSENSE_MINIMIZE)
       {
@@ -3935,7 +4003,7 @@ bool SoPlexBase<R>::getRedCostViolationRational(Rational& maxviol, Rational& sum
             if(redcost[c] < -maxviol)
             {
                MSG_DEBUG(std::cout << "increased reduced cost violation for column " << c <<
-                         " not on upper bound: " << rationalToString(-redcost[c]) << "\n");
+                         " not on upper bound: " << -redcost[c].str() << "\n");
                maxviol = -redcost[c];
             }
          }
@@ -3947,7 +4015,7 @@ bool SoPlexBase<R>::getRedCostViolationRational(Rational& maxviol, Rational& sum
             if(redcost[c] > maxviol)
             {
                MSG_DEBUG(std::cout << "increased reduced cost violation for column " << c <<
-                         " not on lower bound: " << rationalToString(redcost[c]) << "\n");
+                         " not on lower bound: " << redcost[c].str() << "\n");
                maxviol = redcost[c];
             }
          }
@@ -3961,7 +4029,7 @@ bool SoPlexBase<R>::getRedCostViolationRational(Rational& maxviol, Rational& sum
             if(redcost[c] > maxviol)
             {
                MSG_DEBUG(std::cout << "increased reduced cost violation for column " << c <<
-                         " not on upper bound: " << rationalToString(redcost[c]) << "\n");
+                         " not on upper bound: " << redcost[c].str() << "\n");
                maxviol = redcost[c];
             }
          }
@@ -3973,7 +4041,7 @@ bool SoPlexBase<R>::getRedCostViolationRational(Rational& maxviol, Rational& sum
             if(redcost[c] < -maxviol)
             {
                MSG_DEBUG(std::cout << "increased reduced cost violation for column " << c <<
-                         " not on lower bound: " << rationalToString(-redcost[c]) << "\n");
+                         " not on lower bound: " << -redcost[c].str() << "\n");
                maxviol = -redcost[c];
             }
          }
@@ -4017,13 +4085,13 @@ bool SoPlexBase<R>::getDualViolationRational(Rational& maxviol, Rational& sumvio
       // basis must not necessarily hold exactly, even within tolerances; hence the following assertions are relaxed by
       // a factor of two
       assert(!_hasBasis || basisRowStatus(r) != SPxSolverBase<R>::ON_LOWER
-             || spxAbs(_solRational._slacks[r] - lhsRational(r)) <= 2 * _rationalFeastol);
+             || spxAbs(Rational(_solRational._slacks[r] - lhsRational(r))) <= 2 * _rationalFeastol);
       assert(!_hasBasis || basisRowStatus(r) != SPxSolverBase<R>::ON_UPPER
-             || spxAbs(_solRational._slacks[r] - rhsRational(r)) <= 2 * _rationalFeastol);
+             || spxAbs(Rational(_solRational._slacks[r] - rhsRational(r))) <= 2 * _rationalFeastol);
       assert(!_hasBasis || basisRowStatus(r) != SPxSolverBase<R>::FIXED
-             || spxAbs(_solRational._slacks[r] - lhsRational(r)) <= 2 * _rationalFeastol);
+             || spxAbs(Rational(_solRational._slacks[r] - lhsRational(r))) <= 2 * _rationalFeastol);
       assert(!_hasBasis || basisRowStatus(r) != SPxSolverBase<R>::FIXED
-             || spxAbs(_solRational._slacks[r] - rhsRational(r)) <= 2 * _rationalFeastol);
+             || spxAbs(Rational(_solRational._slacks[r] - rhsRational(r))) <= 2 * _rationalFeastol);
 
       if(intParam(SoPlexBase<R>::OBJSENSE) == OBJSENSE_MINIMIZE)
       {
@@ -4034,11 +4102,11 @@ bool SoPlexBase<R>::getDualViolationRational(Rational& maxviol, Rational& sumvio
             if(dual[r] < -maxviol)
             {
                MSG_DEBUG(std::cout << "increased dual violation for row " << r << " not on upper bound: " <<
-                         rationalToString(-dual[r])
-                         << " (slack = " << rationalToString(_solRational._slacks[r])
+                         -dual[r].str()
+                         << " (slack = " << _solRational._slacks[r].str()
                          << ", status = " << basisRowStatus(r)
-                         << ", lhs = " << rationalToString(lhsRational(r))
-                         << ", rhs = " << rationalToString(rhsRational(r)) << ")\n");
+                         << ", lhs = " << lhsRational(r).str()
+                         << ", rhs = " << rhsRational(r).str() << ")\n");
                maxviol = -dual[r];
             }
          }
@@ -4050,11 +4118,11 @@ bool SoPlexBase<R>::getDualViolationRational(Rational& maxviol, Rational& sumvio
             if(dual[r] > maxviol)
             {
                MSG_DEBUG(std::cout << "increased dual violation for row " << r << " not on lower bound: " <<
-                         rationalToString(dual[r])
-                         << " (slack = " << rationalToString(_solRational._slacks[r])
+                         dual[r].str()
+                         << " (slack = " << _solRational._slacks[r].str()
                          << ", status = " << basisRowStatus(r)
-                         << ", lhs = " << rationalToString(lhsRational(r))
-                         << ", rhs = " << rationalToString(rhsRational(r)) << ")\n");
+                         << ", lhs = " << lhsRational(r).str()
+                         << ", rhs = " << rhsRational(r) << ")\n".str());
                maxviol = dual[r];
             }
          }
@@ -4068,11 +4136,11 @@ bool SoPlexBase<R>::getDualViolationRational(Rational& maxviol, Rational& sumvio
             if(dual[r] > maxviol)
             {
                MSG_DEBUG(std::cout << "increased dual violation for row " << r << " not on upper bound: " <<
-                         rationalToString(dual[r])
-                         << " (slack = " << rationalToString(_solRational._slacks[r])
+                         dual[r].str()
+                         << " (slack = " << _solRational._slacks[r].str()
                          << ", status = " << basisRowStatus(r)
-                         << ", lhs = " << rationalToString(lhsRational(r))
-                         << ", rhs = " << rationalToString(rhsRational(r)) << ")\n");
+                         << ", lhs = " << lhsRational(r).str()
+                         << ", rhs = " << rhsRational(r).str() << ")\n");
                maxviol = dual[r];
             }
          }
@@ -4084,11 +4152,11 @@ bool SoPlexBase<R>::getDualViolationRational(Rational& maxviol, Rational& sumvio
             if(dual[r] < -maxviol)
             {
                MSG_DEBUG(std::cout << "increased dual violation for row " << r << " not on lower bound: " <<
-                         rationalToString(-dual[r])
-                         << " (slack = " << rationalToString(_solRational._slacks[r])
+                         -dual[r].str()
+                         << " (slack = " << _solRational._slacks[r].str()
                          << ", status = " << basisRowStatus(r)
-                         << ", lhs = " << rationalToString(lhsRational(r))
-                         << ", rhs = " << rationalToString(rhsRational(r)) << ")\n");
+                         << ", lhs = " << lhsRational(r).str()
+                         << ", rhs = " << rhsRational(r).str() << ")\n");
                maxviol = -dual[r];
             }
          }
@@ -5775,10 +5843,22 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
          _simplifier = 0;
          break;
 
+      case SIMPLIFIER_INTERNAL:
       case SIMPLIFIER_AUTO:
          _simplifier = &_simplifierMainSM;
          assert(_simplifier != 0);
          break;
+
+      case SIMPLIFIER_PAPILO:
+#ifdef SOPLEX_WITH_PAPILO
+         _simplifier = &_simplifierPaPILO;
+         assert(_simplifier != 0);
+         break;
+#else
+         _simplifier = &_simplifierMainSM;
+         assert(_simplifier != 0);
+         return false;
+#endif
 
       default:
          return false;
@@ -6109,7 +6189,7 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
    {
    // primal feasibility tolerance; passed to the floating point solver only when calling solve()
    case SoPlexBase<R>::FEASTOL:
-#ifndef SOPLEX_WITH_GMP
+#ifndef SOPLEX_WITH_BOOST
       if(value < DEFAULT_EPS_PIVOT)
       {
          MSG_WARNING(spxout, spxout << "Cannot set feasibility tolerance to small value " << value <<
@@ -6253,6 +6333,12 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
 
    case SoPlexBase<R>::MIN_MARKOWITZ:
       _slufactor.setMarkowitz(value);
+      break;
+
+   case SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC:
+#ifdef SOPLEX_WITH_PAPILO
+      _simplifierPaPILO.setModifyConsFrac(value);
+#endif
       break;
 
    default:
@@ -6532,6 +6618,14 @@ void SoPlexBase<R>::printVersion() const
    MSG_INFO1(spxout, spxout << " [rational: long double]");
 #endif
 
+
+#ifdef SOPLEX_WITH_PAPILO
+   MSG_INFO1(spxout, spxout << " [PaPILO  " << PAPILO_VERSION_MAJOR << "." << PAPILO_VERSION_MINOR  <<
+             "." << PAPILO_VERSION_PATCH << " {" <<  PAPILO_GITHASH << "}]\n");
+#else
+   MSG_INFO1(spxout, spxout << " [PaPILO: not available]");
+#endif
+
    MSG_INFO1(spxout, spxout << " [githash: " << getGitHash() << "]\n");
 }
 
@@ -6543,6 +6637,10 @@ template <class R>
 bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVals,
                                  const bool quiet) const
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return false;
+#else
    bool result = true;
    bool nRowsMatch = true;
    bool nColsMatch = true;
@@ -6664,7 +6762,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
                   _rationalPosInfty))
                   || (LT(_realLP->rhs()[i], R(realParam(SoPlexBase<R>::INFTY)))
                       && _rationalLP->rhs()[i] < _rationalPosInfty
-                      && !_rationalLP->rhs()[i].isAdjacentTo((double)_realLP->rhs()[i])))
+                      && !isAdjacentTo(_rationalLP->rhs()[i], (double)_realLP->rhs()[i])))
             {
                if(!quiet)
                {
@@ -6692,7 +6790,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
                   _rationalNegInfty))
                   || (GT(_realLP->lhs()[i], R(-realParam(SoPlexBase<R>::INFTY)))
                       && _rationalLP->lhs()[i] > _rationalNegInfty
-                      && !_rationalLP->lhs()[i].isAdjacentTo((double)_realLP->lhs()[i])))
+                      && !isAdjacentTo(_rationalLP->lhs()[i], (double)_realLP->lhs()[i])))
             {
                if(!quiet)
                {
@@ -6716,7 +6814,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
       {
          for(int i = 0; i < _realLP->maxObj().dim(); i++)
          {
-            if(!_rationalLP->maxObj()[i].isAdjacentTo((double)_realLP->maxObj()[i]))
+            if(!isAdjacentTo(_rationalLP->maxObj()[i], (double)_realLP->maxObj()[i]))
             {
                if(!quiet)
                {
@@ -6746,7 +6844,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
                   _rationalPosInfty))
                   || (LT(_realLP->upper()[i], R(realParam(SoPlexBase<R>::INFTY)))
                       && _rationalLP->upper()[i] < _rationalPosInfty
-                      && !_rationalLP->upper()[i].isAdjacentTo((double)_realLP->upper()[i])))
+                      && !isAdjacentTo(_rationalLP->upper()[i], (double)_realLP->upper()[i])))
             {
                if(!quiet)
                {
@@ -6774,7 +6872,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
                   _rationalNegInfty))
                   || (GT(_realLP->lower()[i], R(-realParam(SoPlexBase<R>::INFTY)))
                       && _rationalLP->lower()[i] > _rationalNegInfty
-                      && !_rationalLP->lower()[i].isAdjacentTo((double)_realLP->lower()[i])))
+                      && !isAdjacentTo(_rationalLP->lower()[i], (double)_realLP->lower()[i])))
             {
                if(!quiet)
                {
@@ -6803,7 +6901,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
       {
          for(int j = 0; j < _realLP->nRows() ; j++)
          {
-            if(!_rationalLP->colVector(i)[j].isAdjacentTo((double)_realLP->colVector(i)[j]))
+            if(!isAdjacentTo(_rationalLP->colVector(i)[j], (double)_realLP->colVector(i)[j]))
             {
                if(!quiet)
                {
@@ -6825,6 +6923,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
    }
 
    return result;
+#endif
 }
 
 
@@ -7727,9 +7826,21 @@ void SoPlexBase<R>::_enableSimplifierAndScaler()
       break;
 
    case SIMPLIFIER_AUTO:
+   case SIMPLIFIER_INTERNAL:
       _simplifier = &_simplifierMainSM;
       assert(_simplifier != 0);
       _simplifier->setMinReduction(realParam(MINRED));
+      break;
+
+   case SIMPLIFIER_PAPILO:
+#ifdef SOPLEX_WITH_PAPILO
+      _simplifier = &_simplifierPaPILO;
+      assert(_simplifier != 0);
+#else
+      _simplifier = &_simplifierMainSM;
+      assert(_simplifier != 0);
+      _simplifier->setMinReduction(realParam(MINRED));
+#endif
       break;
 
    default:
@@ -8407,7 +8518,7 @@ bool SoPlexBase<R>::_parseSettingsLine(char* line, const int lineNumber)
          }
          else if(strncmp(paramName, _currentSettings->realParam.name[param].c_str(), SET_MAX_LINE_LEN) == 0)
          {
-            R value;
+            Real value;
 
 #ifdef WITH_LONG_DOUBLE
             value = std::stold(paramValueString);
@@ -8558,6 +8669,8 @@ SoPlexBase<R>::SoPlexBase()
 
    _lastSolveMode = intParam(SoPlexBase<R>::SOLVEMODE);
 
+   _simplifierPaPILO.setOutstream(spxout);
+
    assert(_isConsistent());
 }
 
@@ -8617,45 +8730,169 @@ bool SoPlexBase<R>::loadSettingsFile(const char* filename)
 }
 
 
-#ifdef SOPLEX_WITH_BOOST
 /// parses one setting string and returns true on success
 template <class R>
-bool SoPlexBase<R>::parseSettingsString(const std::string str, boost::any val)
+bool SoPlexBase<R>::parseSettingsString(char* string)
 {
-   if(str.empty())
+   assert(string != 0);
+
+   if(string == 0)
+      return false;
+
+   char parseString[SET_MAX_LINE_LEN];
+   spxSnprintf(parseString, SET_MAX_LINE_LEN - 1, "%s", string);
+
+   char* line = parseString;
+
+   // find the start of the parameter type
+   while(*line == ' ' || *line == '\t' || *line == '\r')
+      line++;
+
+   if(*line == '\0' || *line == '\n' || *line == '#')
+      return true;
+
+   char* paramTypeString = line;
+
+   // find the end of the parameter type
+   while(*line != ' ' && *line != '\t' && *line != '\r' && *line != '\n' && *line != '#'
+         && *line != '\0' && *line != ':')
+      line++;
+
+   if(*line == ':')
    {
+      *line = '\0';
+      line++;
+   }
+   else
+   {
+      *line = '\0';
+      line++;
+
+      // search for the ':' char in the line
+      while(*line == ' ' || *line == '\t' || *line == '\r')
+         line++;
+
+      if(*line != ':')
+      {
+         MSG_INFO1(spxout, spxout <<
+                   "Error parsing setting string: no ':' separating parameter type and name.\n");
+         return false;
+      }
+
+      line++;
+   }
+
+   // find the start of the parameter name
+   while(*line == ' ' || *line == '\t' || *line == '\r')
+      line++;
+
+   if(*line == '\0' || *line == '\n' || *line == '#')
+   {
+      MSG_INFO1(spxout, spxout << "Error parsing setting string: no parameter name.\n");
       return false;
    }
 
+   char* paramName = line;
+
+   // find the end of the parameter name
+   while(*line != ' ' && *line != '\t' && *line != '\r' && *line != '\n' && *line != '#'
+         && *line != '\0' && *line != '=')
+      line++;
+
+   if(*line == '=')
+   {
+      *line = '\0';
+      line++;
+   }
+   else
+   {
+      *line = '\0';
+      line++;
+
+      // search for the '=' char in the line
+      while(*line == ' ' || *line == '\t' || *line == '\r')
+         line++;
+
+      if(*line != '=')
+      {
+         MSG_INFO1(spxout, spxout << "Error parsing setting string: no '=' after parameter name.\n");
+         return false;
+      }
+
+      line++;
+   }
+
+   // find the start of the parameter value string
+   while(*line == ' ' || *line == '\t' || *line == '\r')
+      line++;
+
+   if(*line == '\0' || *line == '\n' || *line == '#')
+   {
+      MSG_INFO1(spxout, spxout << "Error parsing setting string: no parameter value.\n");
+      return false;
+   }
+
+   char* paramValueString = line;
+
+   // find the end of the parameter value string
+   while(*line != ' ' && *line != '\t' && *line != '\r' && *line != '\n' && *line != '#'
+         && *line != '\0')
+      line++;
+
+   if(*line != '\0')
+   {
+      // check, if the rest of the line is clean
+      *line = '\0';
+      line++;
+
+      while(*line == ' ' || *line == '\t' || *line == '\r')
+         line++;
+
+      if(*line != '\0' && *line != '\n' && *line != '#')
+      {
+         MSG_INFO1(spxout, spxout << "Error parsing setting string: additional character '" << *line <<
+                   "' after parameter value.\n");
+         return false;
+      }
+   }
+
    // check whether we have a bool parameter
-   if(str.substr(0, 4) == "bool")
+   if(strncmp(paramTypeString, "bool", 4) == 0)
    {
       for(int param = 0; ; param++)
       {
-         if(param >= BOOLPARAM_COUNT)
+         if(param >= SoPlexBase<R>::BOOLPARAM_COUNT)
          {
-            MSG_INFO1(spxout, spxout << "Error parsing setting string: unknown parameter name <" << str <<
+            MSG_INFO1(spxout, spxout << "Error parsing setting string: unknown parameter name <" << paramName <<
                       ">.\n");
             return false;
          }
-         // It is 5 because the string will be "bool:whatever", there is a
-         // colon TODO This is not an efficient way to search. Worst case
-         // O(N^2), where N is the number of parameters. A more efficient way
-         // is to do the using a std::map or an std::unordered_map. Instead of
-         // O(N^2), it would be O(N) or O(N.log N)
-         else if(str.substr(5) == _currentSettings->boolParam.name[param])
+         else if(strncmp(paramName, _currentSettings->boolParam.name[param].c_str(), SET_MAX_LINE_LEN) == 0)
          {
-            // If the any_cast throws then it would be caught inside
-            // soplexmain.cpp
-
-            auto value = boost::any_cast<bool>(val);
-
-            if(value != _currentSettings->boolParam.defaultValue[param])
+            if(strncasecmp(paramValueString, "true", 4) == 0
+                  || strncasecmp(paramValueString, "TRUE", 4) == 0
+                  || strncasecmp(paramValueString, "t", 4) == 0
+                  || strncasecmp(paramValueString, "T", 4) == 0
+                  || strtol(paramValueString, NULL, 4) == 1)
             {
-               setBoolParam((BoolParam)param, value);
+               setBoolParam((SoPlexBase<R>::BoolParam)param, true);
+               break;
             }
-
-            break;
+            else if(strncasecmp(paramValueString, "false", 5) == 0
+                    || strncasecmp(paramValueString, "FALSE", 5) == 0
+                    || strncasecmp(paramValueString, "f", 5) == 0
+                    || strncasecmp(paramValueString, "F", 5) == 0
+                    || strtol(paramValueString, NULL, 5) == 0)
+            {
+               setBoolParam((SoPlexBase<R>::BoolParam)param, false);
+               break;
+            }
+            else
+            {
+               MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << paramValueString <<
+                         "> for bool parameter <" << paramName << ">.\n");
+               return false;
+            }
          }
       }
 
@@ -8663,73 +8900,67 @@ bool SoPlexBase<R>::parseSettingsString(const std::string str, boost::any val)
    }
 
    // check whether we have an integer parameter
-   if(str.substr(0, 3) == "int")
+   if(strncmp(paramTypeString, "int", 3) == 0)
    {
       for(int param = 0; ; param++)
       {
-         if(param >= INTPARAM_COUNT)
+         if(param >= SoPlexBase<R>::INTPARAM_COUNT)
          {
-            MSG_INFO1(spxout, spxout << "Error parsing setting string: unknown parameter name <" << str <<
+            MSG_INFO1(spxout, spxout << "Error parsing setting string: unknown parameter name <" << paramName <<
                       ">.\n");
             return false;
          }
-         else if(str.substr(4) == _currentSettings->intParam.name[param])
+         else if(strncmp(paramName, _currentSettings->intParam.name[param].c_str(), SET_MAX_LINE_LEN) == 0)
          {
-            // The setIntParam will check for the range of values, but I think
-            // this is un-necessary because the program options library will do
-            // this, in a better way. The if else condition is redundant, except
-            // if it gets values from SCIP. (for int:objsense this may be
-            // relevant?)
+            int value;
+            value = std::stoi(paramValueString);
 
-            auto value = boost::any_cast<int>(val);
-
-            if(value != _currentSettings->intParam.defaultValue[param])
+            if(setIntParam((SoPlexBase<R>::IntParam)param, value, false))
+               break;
+            else
             {
-               if(setIntParam((SoPlexBase<R>::IntParam)param, boost::any_cast<int>(val), false))
-                  break;
-               else
-               {
-                  MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << boost::any_cast<int>
-                            (val) << "> for int parameter <" << str << ">.\n");
-                  return false;
-               }
+               MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << paramValueString <<
+                         "> for int parameter <" << paramName << ">.\n");
+               return false;
             }
-
-            break;
          }
       }
 
       return true;
    }
 
-   // check whether we have a Real parameter
-   if(str.substr(0, 4) == "real")
+   // check whether we have a real parameter
+   if(strncmp(paramTypeString, "real", 4) == 0)
    {
       for(int param = 0; ; param++)
       {
-         if(param >= REALPARAM_COUNT)
+         if(param >= SoPlexBase<R>::REALPARAM_COUNT)
          {
-            MSG_INFO1(spxout, spxout << "Error parsing setting string: unknown parameter name <" <<
-                      str << ">.\n");
+            MSG_INFO1(spxout, spxout << "Error parsing setting string: unknown parameter name <" << paramName <<
+                      ">.\n");
             return false;
          }
-         else if(str.substr(5) == SoPlexBase<R>::_currentSettings->realParam.name[param])
+         else if(strncmp(paramName, _currentSettings->realParam.name[param].c_str(), SET_MAX_LINE_LEN) == 0)
          {
-            auto value = boost::any_cast<Real>(val);
+            Real value;
+#ifdef WITH_LONG_DOUBLE
+            value = std::stold(paramValueString);
+#else
+#ifdef WITH_FLOAT
+            value = std::stof(paramValueString);
+#else
+            value = std::stod(paramValueString);
+#endif
+#endif
 
-            if(value != _currentSettings->realParam.defaultValue[param])
+            if(setRealParam((SoPlexBase<R>::RealParam)param, value))
+               break;
+            else
             {
-               if(setRealParam((SoPlexBase<R>::RealParam)param, value))
-                  break;
-               else
-               {
-                  MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << value <<
-                            "> for R parameter <" << str << ">.\n");
-                  return false;
-               }
+               MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << paramValueString <<
+                         "> for real parameter <" << paramName << ">.\n");
+               return false;
             }
-
-            break;
          }
       }
 
@@ -8739,30 +8970,28 @@ bool SoPlexBase<R>::parseSettingsString(const std::string str, boost::any val)
 #ifdef SOPLEX_WITH_RATIONALPARAM
 
    // check whether we have a rational parameter
-   // Note that so far SoPlex doesn't define any rational Params.
-   if(str.substr(0, 8) == "rational")
+   if(strncmp(paramTypeString, "rational", 8) == 0)
    {
       for(int param = 0; ; param++)
       {
-         if(param >= RATIONALPARAM_COUNT)
+         if(param >= SoPlexBase<R>::RATIONALPARAM_COUNT)
          {
-            MSG_INFO1(spxout, spxout << "Error parsing setting string: unknown parameter name <" << str <<
+            MSG_INFO1(spxout, spxout << "Error parsing setting string: unknown parameter name <" << paramName <<
                       ">.\n");
             return false;
          }
-         else if(str.substr(9) == rationalParam.name[param])
+         else if(strncmp(paramName, _currentSettings->rationalParam.name[param].c_str(),
+                         SET_MAX_LINE_LEN) == 0)
          {
             Rational value;
 
-            auto tmpStr = boost::any_cast<std::string>(val);
-            const char* paramValueString = tmpStr.c_str();
-
-            if(readStringRational(paramValueString, value) && setRationalParam((RationalParam)param, value))
+            if(readStringRational(paramValueString, value)
+                  && setRationalParam((SoPlexBase<R>::RationalParam)param, value))
                break;
             else
             {
-               MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << val <<
-                         "> for rational parameter <" << str << ">.\n");
+               MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << paramValueString <<
+                         "> for rational parameter <" << paramName << ">.\n");
                return false;
             }
          }
@@ -8773,9 +9002,37 @@ bool SoPlexBase<R>::parseSettingsString(const std::string str, boost::any val)
 
 #endif
 
+   // check whether we have the random seed
+   if(strncmp(paramTypeString, "uint", 4) == 0)
+   {
+      if(strncmp(paramName, "random_seed", 11) == 0)
+      {
+         unsigned int value;
+         unsigned long parseval;
+
+         parseval = std::stoul(paramValueString);
+
+         if(parseval > UINT_MAX)
+         {
+            value = UINT_MAX;
+            MSG_WARNING(spxout, spxout << "Converting number greater than UINT_MAX to uint.\n");
+         }
+         else
+            value = (unsigned int) parseval;
+
+         setRandomSeed(value);
+         return true;
+      }
+
+      MSG_INFO1(spxout, spxout << "Error parsing setting string for uint parameter <random_seed>.\n");
+      return false;
+   }
+
+   MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid parameter type <" <<
+             paramTypeString << "> for parameter <" << paramName << ">.\n");
+
    return false;
 }
-#endif
 
 /// writes settings file; returns true on success
 template <class R>
@@ -9424,7 +9681,7 @@ void SoPlexBase<R>::printSolutionStatistics(std::ostream& os)
    else if(_lastSolveMode == SOLVEMODE_RATIONAL)
    {
       os << "Solution (rational) : \n"
-         << "  Objective value   : " << rationalToString(objValueRational()) << "\n";
+         << "  Objective value   : " << objValueRational() << "\n";
       os << "Size (base 2/10)    : \n"
          << "  Total primal      : " << totalSizePrimalRational() << " / " << totalSizePrimalRational(
             10) << "\n"
@@ -9451,26 +9708,22 @@ void SoPlexBase<R>::printSolutionStatistics(std::ostream& os)
       os << "Violation (rational): \n";
 
       if(getBoundViolationRational(maxviol, sumviol))
-         os << "  Max/sum bound     : " << rationalToString(maxviol) << " / " << rationalToString(
-               sumviol) << "\n";
+         os << "  Max/sum bound     : " << maxviol.str() << " / " << sumviol.str() << "\n";
       else
          os << "  Max/sum bound     : - / -\n";
 
       if(getRowViolationRational(maxviol, sumviol))
-         os << "  Max/sum row       : " << rationalToString(maxviol) << " / " << rationalToString(
-               sumviol) << "\n";
+         os << "  Max/sum row       : " << maxviol.str() << " / " << sumviol.str() << "\n";
       else
          os << "  Max/sum row       : - / -\n";
 
       if(getRedCostViolationRational(maxviol, sumviol))
-         os << "  Max/sum redcost   : " << rationalToString(maxviol) << " / " << rationalToString(
-               sumviol) << "\n";
+         os << "  Max/sum redcost   : " << maxviol.str() << " / " << sumviol.str() << "\n";
       else
          os << "  Max/sum redcost   : - / -\n";
 
       if(getDualViolationRational(maxviol, sumviol))
-         os << "  Max/sum dual      : " << rationalToString(maxviol) << " / " << rationalToString(
-               sumviol) << "\n";
+         os << "  Max/sum dual      : " << maxviol.str() << " / " << sumviol.str() << "\n";
       else
          os << "  Max/sum dual      : - / -\n";
    }

@@ -3,13 +3,23 @@ next major Release
 
 features:
 
+- integrated PaPILO as new simplifier option
+- improved the buildsystem by adding a cmake-configurable `config.h.in` header in the same fashion as it is handled in SCIP
+- replaced SoPlex internal `Rational` class by the boost multiprecision library for rational numbers; this enables the possibility of performing a rational LP solve, even without linking GMP
+- restored classic command line interface to remove dependency on the Boost program options library
+- changed the command-line argument for running soplex with higher precision; formerly the multiprecision mode was triggered by setting `solvemode=3` (multiprecision), or `solvemode=4` (quadprecision); Now higher precision arithmetic has its own argument `arithmetic` (0 - double, 1 - quadprecision, 2 - multiprecision); This makes it possible to also use rational solving mode in combination with multiprecision
+
 interface & parameters:
 
-- added intterupt flag to optimize() (default NULL)
+- added interrupt flag to optimize() (default NULL)
+- added new simplifier enum SIMPLIFIER_PAPILO and SIMPLFIER_INTERNAL (replacing the deprecated SIMPLIFIER_AUTO)
+
 
 performance:
 
 code quality:
+- fixed deprecated copy compiler warnings that occur with newer compilers
+- added a ClassSet<T> class that functions in the same way as DataSet<T> for types that are not data-types
 
 fixed bugs:
 
