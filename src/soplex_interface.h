@@ -29,51 +29,51 @@ int SoPlex_getIntParam(void* soplex, int paramcode);
 
 /** adds a single (floating point) column **/
 void SoPlex_addColReal(
-    void* soplex,
-    double* colentries,
-    int colsize,
-    int nnonzeros,
-    double objval,
-    double lb,
-    double ub
+   void* soplex,
+   double* colentries,
+   int colsize,
+   int nnonzeros,
+   double objval,
+   double lb,
+   double ub
 );
 
 /** adds a single rational column **/
 void SoPlex_addColRational(
-    void* soplex,
-    long* colnums,
-    long* coldenoms,
-    int colsize,
-    int nnonzeros,
-    long objvalnum,
-    long objvaldenom,
-    long lbnum,
-    long lbdenom,
-    long ubnum,
-    long ubdenom
+   void* soplex,
+   long* colnums,
+   long* coldenoms,
+   int colsize,
+   int nnonzeros,
+   long objvalnum,
+   long objvaldenom,
+   long lbnum,
+   long lbdenom,
+   long ubnum,
+   long ubdenom
 );
 
 /** adds a single (floating point) column **/
 void SoPlex_addRowReal(
-    void* soplex,
-    double* rowentries,
-    int rowsize,
-    int nnonzeros,
-    double lb,
-    double ub
+   void* soplex,
+   double* rowentries,
+   int rowsize,
+   int nnonzeros,
+   double lb,
+   double ub
 );
 
 /** adds a single rational row **/
 void SoPlex_addRowRational(
-    void* soplex,
-    long* rownums,
-    long* rowdenoms,
-    int rowsize,
-    int nnonzeros,
-    long lbnum,
-    long lbdenom,
-    long ubnum,
-    long ubdenom
+   void* soplex,
+   long* rownums,
+   long* rowdenoms,
+   int rowsize,
+   int nnonzeros,
+   long lbnum,
+   long lbdenom,
+   long ubnum,
+   long ubdenom
 );
 
 /** gets primal solution **/
@@ -127,12 +127,12 @@ void SoPlex_changeVarBoundsReal(void* soplex, int colidx, double lb, double ub);
 
 /** changes rational bounds of a column to lbnum/lbdenom and ubnum/ubdenom **/
 void SoPlex_changeVarBoundsRational(
-    void* soplex,
-    int colidx,
-    long lbnum,
-    long lbdenom,
-    long ubnum,
-    long ubdenom
+   void* soplex,
+   int colidx,
+   long lbnum,
+   long lbdenom,
+   long ubnum,
+   long ubdenom
 );
 
 /** changes upper bound of column to ub **/
