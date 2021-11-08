@@ -1,3 +1,12 @@
+#
+# interface function for setting common library properties
+#
+function(setLibProperties targetname outputname)
+    set_target_properties(${targetname} PROPERTIES
+        OUTPUT_NAME ${outputname}
+        MACOSX_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+endfunction(setLibProperties)
+
 include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(sources
@@ -148,6 +157,7 @@ set_target_properties(libsoplexshared PROPERTIES
 add_dependencies(libsoplexshared soplex_update_githash libsoplex)
 if(MSVC)
     target_compile_options(libsoplexshared PUBLIC "/Zc:__cplusplus")
+    setLibProperties(libsoplexshared "libsoplexshared")
 endif()
 target_include_directories(libsoplexshared PUBLIC
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
