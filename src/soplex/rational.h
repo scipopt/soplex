@@ -167,7 +167,12 @@ inline Rational ratFromString(const char* desc)
 
       /* case 1: string is given in nom/den format */
       if(s.find('.') == std::string::npos)
-         res = Rational(desc);
+      {
+         if( s[0] == '+' )
+            res = Rational(desc+1);
+         else
+            res = Rational(desc);
+      }
       /* case 2: string is given as base-10 decimal number */
       else
       {
