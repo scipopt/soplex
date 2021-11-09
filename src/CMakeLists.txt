@@ -124,6 +124,10 @@ file(GLOB headers
     soplex/*.hpp
 )
 
+if(MSVC)
+   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
+
 # create soplex library with pic
 add_library(libsoplex-pic STATIC ${sources})
 set_target_properties(libsoplex-pic PROPERTIES
