@@ -147,6 +147,10 @@ set_target_properties(libsoplex PROPERTIES
     VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}.${SOPLEX_VERSION_SUB}
     SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
 add_dependencies(libsoplex soplex_update_githash)
+if(MSVC)
+    setLibProperties(libsoplex "libsoplex")
+    setLibProperties(libsoplex-pic "libsoplex-pic")
+endif()
 target_include_directories(libsoplex PUBLIC
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
