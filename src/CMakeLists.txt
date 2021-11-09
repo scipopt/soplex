@@ -130,6 +130,12 @@ endif()
 
 # create soplex library with pic
 add_library(libsoplex-pic STATIC ${sources})
+if(MSVC)
+    setLibProperties(libsoplex-pic "libsoplex-pic")
+else()
+   setLibProperties(libsoplex-pic "soplex-pic")
+endif()
+
 set_target_properties(libsoplex-pic PROPERTIES
     POSITION_INDEPENDENT_CODE on
     VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}.${SOPLEX_VERSION_SUB}
@@ -143,14 +149,16 @@ target_link_libraries(libsoplex-pic ${libs})
 
 # create soplex library without pic
 add_library(libsoplex STATIC ${sources})
+if(MSVC)
+    setLibProperties(libsoplex "libsoplex")
+else()
+   setLibProperties(libsoplex "soplex")
+endif()
+
 set_target_properties(libsoplex PROPERTIES
     VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}.${SOPLEX_VERSION_SUB}
     SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
 add_dependencies(libsoplex soplex_update_githash)
-if(MSVC)
-    setLibProperties(libsoplex "libsoplex")
-    setLibProperties(libsoplex-pic "libsoplex-pic")
-endif()
 target_include_directories(libsoplex PUBLIC
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
@@ -159,6 +167,12 @@ target_link_libraries(libsoplex ${libs})
 
 # create C shared library
 add_library(libsoplexshared SHARED soplex_interface.cpp ${sources})
+if(MSVC)
+    setLibProperties(libsoplexshared "libsoplexshared")
+else()
+   setLibProperties(libsoplex "soplexshared")
+endif()
+
 set_target_properties(libsoplexshared PROPERTIES
     VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}.${SOPLEX_VERSION_SUB}
     SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
@@ -188,17 +202,6 @@ target_link_libraries(example libsoplex)
 
 # set the install rpath to the installed destination
 set_target_properties(soplex PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-
-# on UNIX system the 'lib' prefix is automatically added
-set_target_properties(libsoplex PROPERTIES
-    OUTPUT_NAME "soplex"
-    MACOSX_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-set_target_properties(libsoplex-pic PROPERTIES
-    OUTPUT_NAME "soplex-pic"
-    MACOSX_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-set_target_properties(libsoplexshared PROPERTIES
-    OUTPUT_NAME "soplexc"
-    MACOSX_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 # install the header files of soplex
 install(FILES ${headers} ${PROJECT_BINARY_DIR}/soplex/config.h DESTINATION include/soplex)
