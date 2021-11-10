@@ -136,8 +136,8 @@ public:
 
    /// get optimal basis.
    virtual void getBasis(typename SPxSolverBase<R>::VarStatus rows[],
-                         typename SPxSolverBase<R>::VarStatus cols[], const int rowsSize = -1,
-                         const int colsSize = -1) const
+                         typename SPxSolverBase<R>::VarStatus cols[], const int rowsSize,
+                         const int colsSize) const
    {
       assert(false);
    }
@@ -194,6 +194,15 @@ private:
    R modifyRowsFac;             ///<
    DataArray<int> m_stat;       ///< preprocessing history.
    typename SPxLPBase<R>::SPxSense m_thesense;   ///< optimization sense.
+
+   bool enableSingletonCols;
+   bool enablePropagation;
+   bool enableParallelRows;
+   bool enableParallelCols;
+   bool enableSingletonStuffing;
+   bool enableDualFix;
+   bool enableFixContinuous;
+   bool enableDominatedCols;
 
    // TODO: the following parameters were ignored? Maybe I don't exactly know what they suppose to be
    bool m_keepbounds;           ///< keep some bounds (for boundflipping)
@@ -282,6 +291,54 @@ public:
    setModifyConsFrac(R value)
    {
       modifyRowsFac = value;
+   }
+
+   void
+   setEnableSingletonCols(bool value)
+   {
+      enableSingletonCols = value;
+   }
+
+   void
+   setEnablePropagation(bool value)
+   {
+      enablePropagation = value;
+   }
+
+   void
+   setEnableParallelRows(bool value)
+   {
+      enableParallelRows = value;
+   }
+
+   void
+   setEnableParallelCols(bool value)
+   {
+      enableParallelCols = value;
+   }
+
+   void
+   setEnableStuffing(bool value)
+   {
+      enableSingletonStuffing = value;
+   }
+
+   void
+   setEnableDualFix(bool value)
+   {
+      enableDualFix = value;
+   }
+
+   void
+   setEnableFixContinuous(bool value)
+   {
+      enableFixContinuous = value;
+   }
+
+   void
+   setEnableDomCols(bool value)
+   {
+      enableDominatedCols = value;
    }
 
    virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, R eps, R delta,
@@ -771,18 +828,31 @@ void Presol<R>::configurePapilo(papilo::Presolve<R>& presolve, R feasTolerance, 
    using uptr = std::unique_ptr<papilo::PresolveMethod<R>>;
 
    /* fast presolvers*/
-   presolve.addPresolveMethod(uptr(new papilo::SingletonCols<R>()));
-   presolve.addPresolveMethod(uptr(new papilo::ConstraintPropagation<R>()));
+   if(enableSingletonCols)
+      presolve.addPresolveMethod(uptr(new papilo::SingletonCols<R>()));
+
+   if(enablePropagation)
+      presolve.addPresolveMethod(uptr(new papilo::ConstraintPropagation<R>()));
 
    /* medium presolver */
-   presolve.addPresolveMethod(uptr(new papilo::ParallelRowDetection<R>()));
-   presolve.addPresolveMethod(uptr(new papilo::ParallelColDetection<R>()));
-   presolve.addPresolveMethod(uptr(new papilo::SingletonStuffing<R>()));
-   presolve.addPresolveMethod(uptr(new papilo::DualFix<R>()));
-   presolve.addPresolveMethod(uptr(new papilo::FixContinuous<R>()));
+   if(enableParallelRows)
+      presolve.addPresolveMethod(uptr(new papilo::ParallelRowDetection<R>()));
+
+   if(enableParallelCols)
+      presolve.addPresolveMethod(uptr(new papilo::ParallelColDetection<R>()));
+
+   if(enableSingletonStuffing)
+      presolve.addPresolveMethod(uptr(new papilo::SingletonStuffing<R>()));
+
+   if(enableDualFix)
+      presolve.addPresolveMethod(uptr(new papilo::DualFix<R>()));
+
+   if(enableFixContinuous)
+      presolve.addPresolveMethod(uptr(new papilo::FixContinuous<R>()));
 
    /* exhaustive presolvers*/
-   presolve.addPresolveMethod(uptr(new papilo::DominatedCols<R>()));
+   if(enableDominatedCols)
+      presolve.addPresolveMethod(uptr(new papilo::DominatedCols<R>()));
 
    /**
     * TODO: PaPILO doesn't support dualpostsolve for those presolvers

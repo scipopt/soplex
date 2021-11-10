@@ -145,6 +145,46 @@ SoPlexBase<R>::Settings::BoolParam::BoolParam()
    description[SoPlexBase<Real>::FORCEBASIC] =
       "try to enforce that the optimal solution is a basic solution";
    defaultValue[SoPlexBase<Real>::FORCEBASIC] = false;
+
+   name[SoPlexBase<R>::SIMPLIFIER_SINGLETONCOLS] = "simplifier_enable_singletoncols";
+   description[SoPlexBase<R>::SIMPLIFIER_SINGLETONCOLS] =
+      "enable presolver SingletonCols in PaPILO";
+   defaultValue[SoPlexBase<R>::SIMPLIFIER_SINGLETONCOLS] = true;
+
+   name[SoPlexBase<R>::SIMPLIFIER_CONSTRAINTPROPAGATION] = "simplifier_enable_propagation";
+   description[SoPlexBase<R>::SIMPLIFIER_CONSTRAINTPROPAGATION] =
+      "enable presolver ConstraintPropagation in PaPILO";
+   defaultValue[SoPlexBase<R>::SIMPLIFIER_CONSTRAINTPROPAGATION] = true;
+
+   name[SoPlexBase<R>::SIMPLIFIER_PARALLELROWDETECTION] = "simplifier_enable_parallelrows";
+   description[SoPlexBase<R>::SIMPLIFIER_PARALLELROWDETECTION] =
+      "enable presolver ParallelRowDetection in PaPILO";
+   defaultValue[SoPlexBase<R>::SIMPLIFIER_PARALLELROWDETECTION] = true;
+
+   name[SoPlexBase<R>::SIMPLIFIER_PARALLELCOLDETECTION] = "simplifier_enable_parallelcols";
+   description[SoPlexBase<R>::SIMPLIFIER_PARALLELCOLDETECTION] =
+      "enable presolver ParallelColDetection in PaPILO";
+   defaultValue[SoPlexBase<R>::SIMPLIFIER_PARALLELCOLDETECTION] = true;
+
+   name[SoPlexBase<R>::SIMPLIFIER_SINGLETONSTUFFING] = "simplifier_enable_stuffing";
+   description[SoPlexBase<R>::SIMPLIFIER_SINGLETONSTUFFING] =
+      "enable presolver SingletonStuffing in PaPILO";
+   defaultValue[SoPlexBase<R>::SIMPLIFIER_SINGLETONSTUFFING] = true;
+
+   name[SoPlexBase<R>::SIMPLIFIER_DUALFIX] = "simplifier_enable_dualfix";
+   description[SoPlexBase<R>::SIMPLIFIER_DUALFIX] =
+      "enable presolver DualFix in PaPILO";
+   defaultValue[SoPlexBase<R>::SIMPLIFIER_DUALFIX] = true;
+
+   name[SoPlexBase<R>::SIMPLIFIER_FIXCONTINUOUS] = "simplifier_enable_fixcontinuous";
+   description[SoPlexBase<R>::SIMPLIFIER_FIXCONTINUOUS] =
+      "enable presolver FixContinuous in PaPILO";
+   defaultValue[SoPlexBase<R>::SIMPLIFIER_FIXCONTINUOUS] = true;
+
+   name[SoPlexBase<R>::SIMPLIFIER_DOMINATEDCOLS] = "simplifier_enable_domcol";
+   description[SoPlexBase<R>::SIMPLIFIER_DOMINATEDCOLS] =
+      "enable presolver DominatedCols in PaPILO";
+   defaultValue[SoPlexBase<R>::SIMPLIFIER_DOMINATEDCOLS] = true;
 }
 
 template <class R>
@@ -588,6 +628,7 @@ SoPlexBase<R>::Settings::RealParam::RealParam()
    lower[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 0;
    upper[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 1;
    defaultValue[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 1.0;
+
 }
 
 template <class R>
@@ -5715,6 +5756,86 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
    case FORCEBASIC:
       break;
 
+   case SIMPLIFIER_SINGLETONCOLS:
+#ifdef SOPLEX_WITH_PAPILO
+      _simplifierPaPILO.setEnableSingletonCols(value);
+#else
+      MSG_INFO1(spxout, spxout <<
+                "Setting Parameter simplifier_enable_singleton_cols is only possible if SoPlex is build with PaPILO\n");
+      return false;
+#endif
+      break;
+
+   case SIMPLIFIER_CONSTRAINTPROPAGATION:
+#ifdef SOPLEX_WITH_PAPILO
+      _simplifierPaPILO.setEnablePropagation(value);
+#else
+      MSG_INFO1(spxout, spxout <<
+                "Setting Parameter simplifier_enable_propagation is only possible if SoPlex is build with PaPILO\n");
+      return false;
+#endif
+      break;
+
+   case SIMPLIFIER_PARALLELROWDETECTION:
+#ifdef SOPLEX_WITH_PAPILO
+      _simplifierPaPILO.setEnableParallelRows(value);
+#else
+      MSG_INFO1(spxout, spxout <<
+                "Setting Parameter simplifier_enable_parallelrows is only possible if SoPlex is build with PaPILO\n");
+      return false;
+#endif
+      break;
+
+   case SIMPLIFIER_PARALLELCOLDETECTION:
+#ifdef SOPLEX_WITH_PAPILO
+      _simplifierPaPILO.setEnableParallelCols(value);
+#else
+      MSG_INFO1(spxout, spxout <<
+                "Setting Parameter simplifier_enable_parallelcols is only possible if SoPlex is build with PaPILO\n");
+      return false;
+#endif
+      break;
+
+   case SIMPLIFIER_SINGLETONSTUFFING:
+#ifdef SOPLEX_WITH_PAPILO
+      _simplifierPaPILO.setEnableStuffing(value);
+#else
+      MSG_INFO1(spxout, spxout <<
+                "Setting Parameter simplifier_enable_stuffing is only possible if SoPlex is build with PaPILO\n");
+      return false;
+#endif
+      break;
+
+   case SIMPLIFIER_DUALFIX:
+#ifdef SOPLEX_WITH_PAPILO
+      _simplifierPaPILO.setEnableDualFix(value);
+#else
+      MSG_INFO1(spxout, spxout <<
+                "Setting Parameter simplifier_enable_dualfix is only possible if SoPlex is build with PaPILO\n");
+      return false;
+#endif
+      break;
+
+   case SIMPLIFIER_FIXCONTINUOUS:
+#ifdef SOPLEX_WITH_PAPILO
+      _simplifierPaPILO.setEnableFixContinuous(value);
+#else
+      MSG_INFO1(spxout, spxout <<
+                "Setting Parameter simplifier_enable_fixcontinuous is only possible if SoPlex is build with PaPILO\n");
+      return false;
+#endif
+      break;
+
+   case SIMPLIFIER_DOMINATEDCOLS:
+#ifdef SOPLEX_WITH_PAPILO
+      _simplifierPaPILO.setEnableDomCols(value);
+#else
+      MSG_INFO1(spxout, spxout <<
+                "Setting Parameter simplifier_enable_domcol is only possible if SoPlex is build with PaPILO\n");
+      return false;
+#endif
+      break;
+
    default:
       return false;
    }
@@ -6338,6 +6459,10 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
    case SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC:
 #ifdef SOPLEX_WITH_PAPILO
       _simplifierPaPILO.setModifyConsFrac(value);
+#else
+      MSG_INFO1(spxout, spxout <<
+                "Setting Parameter modifyrowfrac is only possible if SoPlex is build with PaPILO\n");
+      return false;
 #endif
       break;
 
