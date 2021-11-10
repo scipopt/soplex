@@ -704,6 +704,8 @@ Presol<R>::simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
 
    papilo::PresolveResult<R> res = presolve.apply(problem);
 
+   assert( res.postsolve.postsolveType == PostsolveType::kFull );
+
    switch(res.status)
    {
    case papilo::PresolveStatus::kInfeasible:
