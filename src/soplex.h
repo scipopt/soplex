@@ -982,11 +982,35 @@ public:
       /// re-optimize the original problem to get a proof (ray) of infeasibility/unboundedness?
       ENSURERAY = 15,
 
-      /// try to enforce that the optimal solution is a basic solutiong
+      /// try to enforce that the optimal solution is a basic solution
       FORCEBASIC = 16,
 
+      // enable presolver SingletonCols in PaPILO?
+      SIMPLIFIER_SINGLETONCOLS = 17,
+
+      // enable presolver ConstraintPropagation in PaPILO?
+      SIMPLIFIER_CONSTRAINTPROPAGATION = 18,
+
+      // enable presolver ParallelRowDetection in PaPILO?
+      SIMPLIFIER_PARALLELROWDETECTION = 19,
+
+      // enable presolver ParallelColDetection in PaPILO?
+      SIMPLIFIER_PARALLELCOLDETECTION = 20,
+
+      // enable presolver SingletonStuffing in PaPILO?
+      SIMPLIFIER_SINGLETONSTUFFING = 21,
+
+      // enable presolver DualFix in PaPILO?
+      SIMPLIFIER_DUALFIX = 22,
+
+      // enable presolver FixContinuous in PaPILO?
+      SIMPLIFIER_FIXCONTINUOUS = 23,
+
+      // enable presolver DominatedCols in PaPILO?
+      SIMPLIFIER_DOMINATEDCOLS = 24,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 17
+      BOOLPARAM_COUNT = 25
    } BoolParam;
 
    /// integer parameters
