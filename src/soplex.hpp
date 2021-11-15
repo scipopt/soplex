@@ -9058,10 +9058,6 @@ bool SoPlexBase<R>::saveSettingsFile(const char* filename, const bool onlyChange
 #endif
    file << "\n";
 
-   // Additional parameter solvemode is written
-   file << "\n# solving mode (0 - floating-point solve, 1 - auto, 2 - force iterative refinement, 3 - multi precision solve)\n";
-   file << "solvemode = " << solvemode << "\n";
-
    for(int i = 0; i < SoPlexBase<R>::BOOLPARAM_COUNT; i++)
    {
       if(onlyChanged
