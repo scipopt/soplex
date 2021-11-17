@@ -34,7 +34,7 @@ fi
 # Solve with the different settings
 for SETTINGS in ${SETTINGSLIST[@]}
 do
-    ./test.sh quick "${EXECUTABLE}" "${SETTINGS}" 60 "${OUTPUTDIR}"
+    ./test.sh quick "${EXECUTABLE}" "${SETTINGS}" 60 "${OUTPUTDIR}" 0
 done
 
 echo

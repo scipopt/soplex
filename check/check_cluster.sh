@@ -44,6 +44,7 @@ CLIENTTMPDIR="${11}"
 NOWAITCLUSTER="${12}"
 EXCLUSIVE="${13}"
 OUTPUTDIR="${14}"
+SEEDS="${15}"
 
 # check if all variables defined (by checking the last one)
 if test -z "${OUTPUTDIR}"
@@ -63,8 +64,12 @@ then
     echo "NOWAITCLUSTER = ${NOWAITCLUSTER}"
     echo "EXCLUSIVE     = ${EXCLUSIVE}"
     echo "OUTPUTDIR     = ${OUTPUTDIR}"
+    echo "SEEDS         = ${SEEDS}"
     exit 1
 fi
+
+echo "SEEDS         = ${SEEDS}"
+
 
 # call routines for creating the result directory, checking for existence
 # of passed settings, etc
@@ -105,63 +110,71 @@ do
     # check if problem instance exists
     if test -f "${SOPLEXPATH}/${i}"
     then
+        # run different random seeds
+        for (( s=0; s<=${SEEDS}; s++ ))
+        do
+          # the cluster queue has an upper bound of 2000 jobs; if this limit is
+          # reached the submitted jobs are dumped; to avoid that we check the total
+          # load of the cluster and wait until it is save (total load not more than
+          # 1900 jobs) to submit the next job.
+          if test "${NOWAITCLUSTER}" != "1"
+          then
+              if test  "${QUEUETYPE}" != "qsub"
+              then
+                  echo "waitcluster does not work on slurm cluster"
+              fi
+              ./waitcluster.sh 1600 "${QUEUE}" 200
+          fi
 
-        # the cluster queue has an upper bound of 2000 jobs; if this limit is
-        # reached the submitted jobs are dumped; to avoid that we check the total
-        # load of the cluster and wait until it is save (total load not more than
-        # 1900 jobs) to submit the next job.
-        if test "${NOWAITCLUSTER}" != "1"
-        then
-            if test  "${QUEUETYPE}" != "qsub"
-            then
-                echo "waitcluster does not work on slurm cluster"
-            fi
-            ./waitcluster.sh 1600 "${QUEUE}" 200
-        fi
+          SHORTFILENAME=$(basename "${i}" .gz)
+          SHORTFILENAME=$(basename "${SHORTFILENAME}" .mps)
+          SHORTFILENAME=$(basename "${SHORTFILENAME}" .lp)
+          SHORTFILENAME=$(basename "${SHORTFILENAME}" .opb)
 
-        SHORTFILENAME=$(basename "${i}" .gz)
-        SHORTFILENAME=$(basename "${SHORTFILENAME}" .mps)
-        SHORTFILENAME=$(basename "${SHORTFILENAME}" .lp)
-        SHORTFILENAME=$(basename "${SHORTFILENAME}" .opb)
+          FILENAME="${USER}.${TSTNAME}.${COUNT}_${SHORTFILENAME}.${BINID}.${QUEUE}.${SETTINGS}"
+          BASENAME="${SOPLEXPATH}/results/${FILENAME}"
 
-        FILENAME="${USER}.${TSTNAME}.${COUNT}_${SHORTFILENAME}.${BINID}.${QUEUE}.${SETTINGS}"
-        BASENAME="${SOPLEXPATH}/results/${FILENAME}"
+          if test "${SEEDS}" -gt 0
+          then
+              BASENAME="${BASENAME}-s${s}"
+          fi
 
-        TMPFILE="${BASENAME}.tmp"
-        SETFILE="${BASENAME}.set"
+          TMPFILE="${BASENAME}.tmp"
+          SETFILE="${BASENAME}.set"
 
-        echo "${BASENAME}" >> "${EVALFILE}"
+          echo "${BASENAME}" >> "${EVALFILE}"
 
-        # in case we want to continue we check if the job was already performed
-        if test "${CONTINUE}" != "false"
-        then
-            if test -e "results/${FILENAME}.out"
-            then
-                echo "skipping file ${i} due to existing output file ${FILENAME}.out"
-                continue
-            fi
-        fi
+          # in case we want to continue we check if the job was already performed
+          if test "${CONTINUE}" != "false"
+          then
+              if test -e "results/${FILENAME}.out"
+              then
+                  echo "skipping file ${i} due to existing output file ${FILENAME}.out"
+                  continue
+              fi
+          fi
 
-        # additional environment variables needed by runcluster.sh
-        export SOLVERPATH="${SOPLEXPATH}"
-        export EXECNAME="${EXECUTABLE}"
-        export BASENAME="${FILENAME}"
-        export FILENAME="${i}"
-        export TIMELIMIT="${TIMELIMIT}"
-        export SETTINGS="${SETTINGS}"
-        export INSTANCE="${SOPLEXPATH}/${i}"
-        export CLIENTTMPDIR="${CLIENTTMPDIR}"
+          # additional environment variables needed by runcluster.sh
+          export SOLVERPATH="${SOPLEXPATH}"
+          export EXECNAME="${EXECUTABLE}"
+          export BASENAME="${FILENAME}"
+          export FILENAME="${i}"
+          export TIMELIMIT="${TIMELIMIT}"
+          export SETTINGS="${SETTINGS}"
+          export INSTANCE="${SOPLEXPATH}/${i}"
+          export CLIENTTMPDIR="${CLIENTTMPDIR}"
 
-        # Create testset, without printing output
-        "${EXECNAME}" --loadset="${SETTINGSFILE}" -t"${TIMELIMIT}" --saveset="${SOLVERPATH}/results/${BASENAME}.set" > /dev/null
+          # Create testset, without printing output
+          "${EXECNAME}" --loadset="${SETTINGSFILE}" -t"${TIMELIMIT}" --saveset="${SOLVERPATH}/results/${BASENAME}.set" > /dev/null
 
-        if test  "${QUEUETYPE}" = "srun"
-        then
-            sbatch --job-name=SPX-"${SHORTFILENAME}" --mem="${HARDMEMLIMIT}" -p "${CLUSTERQUEUE}" -A "${ACCOUNT}" --time="${HARDTIMELIMIT}" ${NICE} ${EXCLUSIVE} --output=/dev/null runcluster.sh
-        else
-            # -V to copy all environment variables
-            qsub -l walltime="${HARDTIMELIMIT}" -l mem="${HARDMEMLIMIT}" -l nodes=1:ppn="${PPN}" -N SOPLEX"${SHORTFILENAME}" -V -q "${CLUSTERQUEUE}" -o /dev/null -e /dev/null runcluster.sh
-        fi
+          if test  "${QUEUETYPE}" = "srun"
+          then
+              sbatch --job-name=SPX-"${SHORTFILENAME}" --mem="${HARDMEMLIMIT}" -p "${CLUSTERQUEUE}" -A "${ACCOUNT}" --time="${HARDTIMELIMIT}" ${NICE} ${EXCLUSIVE} --output=/dev/null runcluster.sh
+          else
+              # -V to copy all environment variables
+              qsub -l walltime="${HARDTIMELIMIT}" -l mem="${HARDMEMLIMIT}" -l nodes=1:ppn="${PPN}" -N SOPLEX"${SHORTFILENAME}" -V -q "${CLUSTERQUEUE}" -o /dev/null -e /dev/null runcluster.sh
+          fi
+        done
     else
         echo "input file ${SOPLEXPATH}/${i} not found!"
     fi
