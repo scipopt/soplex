@@ -24,7 +24,16 @@ BINNAME="${BINNAME}.${HOST}"
 
 OUTPUTDIR=results/quick
 
-SETTINGSLIST=(default devex steep exact)
+SOPLEX_BOOST_SUPPORT="$(../${EXECUTABLE} --solvemode=2 |& grep 'without linking boost is not supported'|head -n 1)"
+echo SOPLEX_BOOST_SUPPORT ${SOPLEX_BOOST_SUPPORT}
+if [[ "${SOPLEX_BOOST_SUPPORT}" == "Using rational methods without linking boost is not supported" ]]
+then
+    echo "one"
+    SETTINGSLIST=(default devex steep)
+else
+    echo "two"
+    SETTINGSLIST=(default devex steep exact)
+fi
 
 if ! test -f ../settings/default.set
 then
