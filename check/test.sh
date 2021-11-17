@@ -66,7 +66,6 @@ do
   BASENAME=${OUTPUTDIR}/check.${TSTNAME}.${BINID}.${SETTINGS}
 
   if (( SEEDS > 0 )); then
-      echo ${s}
       BASENAME="${BASENAME}-s${s}"
   fi
 

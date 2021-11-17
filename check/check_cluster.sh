@@ -90,29 +90,35 @@ fi
 # defines the following environment variables: NICE, ACCOUNT, CLUSTERQUEUE, HARDTIMELIMIT
 . ./configuration_cluster.sh
 
-EVALFILE="${SOPLEXPATH}/results/check.${TSTNAME}.${BINID}.${QUEUE}.${SETTINGS}.eval"
-echo > "${EVALFILE}"
 
-# counter to define file names for a test set uniquely
-COUNT=0
-
-# iterate over instances in .test file
-for i in $(cat "${FULLTSTNAME}")
+# run different random seeds
+for (( s=0; s<=${SEEDS}; s++ ))
 do
-    if test "${i}" = "DONE"
-        then
-        break
-    fi
+  FILENAME="${SOPLEXPATH}/results/check.${TSTNAME}.${BINID}.${QUEUE}.${SETTINGS}"
+  if (( SEEDS > 0 )); then
+      FILENAME="${FILENAME}-s${s}"
+  fi
+  EVALFILE="${FILENAME}.eval"
+  echo > "${EVALFILE}"
 
-    # increase the index for the inctance tried to solve, even if the filename does not exist
-    COUNT=$((COUNT + 1))
+  # counter to define file names for a test set uniquely
+  COUNT=0
 
-    # check if problem instance exists
-    if test -f "${SOPLEXPATH}/${i}"
-    then
-        # run different random seeds
-        for (( s=0; s<=${SEEDS}; s++ ))
-        do
+  # iterate over instances in .test file
+  for i in $(cat "${FULLTSTNAME}")
+  do
+      if test "${i}" = "DONE"
+          then
+          break
+      fi
+
+      # increase the index for the inctance tried to solve, even if the filename does not exist
+      COUNT=$((COUNT + 1))
+
+      # check if problem instance exists
+      if test -f "${SOPLEXPATH}/${i}"
+      then
+
           # the cluster queue has an upper bound of 2000 jobs; if this limit is
           # reached the submitted jobs are dumped; to avoid that we check the total
           # load of the cluster and wait until it is save (total load not more than
@@ -133,11 +139,6 @@ do
 
           FILENAME="${USER}.${TSTNAME}.${COUNT}_${SHORTFILENAME}.${BINID}.${QUEUE}.${SETTINGS}"
           BASENAME="${SOPLEXPATH}/results/${FILENAME}"
-
-          if test "${SEEDS}" -gt 0
-          then
-              BASENAME="${BASENAME}-s${s}"
-          fi
 
           TMPFILE="${BASENAME}.tmp"
           SETFILE="${BASENAME}.set"
@@ -174,8 +175,8 @@ do
               # -V to copy all environment variables
               qsub -l walltime="${HARDTIMELIMIT}" -l mem="${HARDMEMLIMIT}" -l nodes=1:ppn="${PPN}" -N SOPLEX"${SHORTFILENAME}" -V -q "${CLUSTERQUEUE}" -o /dev/null -e /dev/null runcluster.sh
           fi
-        done
-    else
-        echo "input file ${SOPLEXPATH}/${i} not found!"
-    fi
+      else
+          echo "input file ${SOPLEXPATH}/${i} not found!"
+      fi
+  done
 done
