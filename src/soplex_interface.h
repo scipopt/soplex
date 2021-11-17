@@ -141,6 +141,43 @@ void SoPlex_changeVarUpperReal(void* soplex, int colidx, double ub);
 /** changes upper bound vector of columns to ub **/
 void SoPlex_getUpperReal(void* soplex, double* ub, int dim);
 
+/** get non-zero entries and indices of row i **/
+void SoPlex_getRowVectorReal(
+   void* soplex,
+   int i,
+   int* nnonzeros,
+   long* indices,
+   double* coefs
+);
+
+/** get non-zero entries and indices of rational row i **/
+void SoPlex_getRowVectorRational(
+   void* soplex,
+   int i,
+   int* nnonzeros,
+   long* indices,
+   long* coefsnum,
+   long* coefsdenom
+);
+
+/** get lower and upper bounds of row i **/
+void SoPlex_getRowBoundsReal(
+   void* soplex,
+   int i,
+   double* lb,
+   double* ub
+);
+
+/** get rational lower and upper bounds of row i **/
+void SoPlex_getRowBoundsRational(
+   void* soplex,
+   int i,
+   long* lbnum,
+   long* lbdenom,
+   long* ubnum,
+   long* ubdenom
+);
+
 #ifdef __cplusplus
 }
 #endif
