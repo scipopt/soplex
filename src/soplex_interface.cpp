@@ -418,3 +418,91 @@ void SoPlex_getUpperReal(void* soplex, double* ub, int dim)
    for(int i = 0; i < dim; ++i)
       ub[i] = ubvec[i];
 }
+
+/** get non-zero entries and indices of row i **/
+void SoPlex_getRowVectorReal(
+   void* soplex,
+   int i,
+   int* nnonzeros,
+   long* indices,
+   double* coefs
+)
+{
+   SoPlex* so = (SoPlex*)(soplex);
+   DSVector row;
+
+   so->getRowVectorReal(i, row);
+
+   *nnonzeros = row.size();
+
+   for(int j = 0; j < *nnonzeros; ++j)
+   {
+      coefs[j] = row.value(j);
+      indices[j] = row.index(j);
+   }
+}
+
+/** get non-zero entries and indices of rational row i **/
+void SoPlex_getRowVectorRational(
+   void* soplex,
+   int i,
+   int* nnonzeros,
+   long* indices,
+   long* coefsnum,
+   long* coefsdenom
+)
+{
+#ifndef SOPLEX_WITH_BOOST
+   throw SPxException("Rational functions cannot be used when built without Boost.");
+#endif
+   SoPlex* so = (SoPlex*)(soplex);
+   LPRowRational lprow;
+   SVectorRational row;
+
+   so->getRowRational(i, lprow);
+   row = lprow.rowVector();
+
+   *nnonzeros = row.size();
+
+   for(int j = 0; j < *nnonzeros; ++j)
+   {
+      coefsnum[j] = (long int) numerator(row.value(j));
+      coefsdenom[j] = (long int) denominator(row.value(j));
+      indices[j] = row.index(j);
+   }
+}
+
+/** get lower and upper bounds of row i **/
+void SoPlex_getRowBoundsReal(
+   void* soplex,
+   int i,
+   double* lb,
+   double* ub
+)
+{
+   SoPlex* so = (SoPlex*)(soplex);
+
+   *lb = so->lhsReal(i);
+   *ub = so->rhsReal(i);
+}
+
+/** get rational lower and upper bounds of row i **/
+void SoPlex_getRowBoundsRational(
+   void* soplex,
+   int i,
+   long* lbnum,
+   long* lbdenom,
+   long* ubnum,
+   long* ubdenom
+)
+{
+#ifndef SOPLEX_WITH_BOOST
+   throw SPxException("Rational functions cannot be used when built without Boost.");
+#endif
+   SoPlex* so = (SoPlex*)(soplex);
+
+   *lbnum = (long int) numerator(so->lhsRational(i));
+   *lbdenom = (long int) denominator(so->lhsRational(i));
+   *ubnum = (long int) numerator(so->rhsRational(i));
+   *ubdenom = (long int) denominator(so->rhsRational(i));
+}
