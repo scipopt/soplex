@@ -135,6 +135,9 @@ do
           SHORTFILENAME=$(basename "${SHORTFILENAME}" .opb)
 
           FILENAME="${USER}.${TSTNAME}.${COUNT}_${SHORTFILENAME}.${BINID}.${QUEUE}.${SETTINGS}"
+          if (( SEEDS > 0 )); then
+              FILENAME="${FILENAME}-s${s}"
+          fi
           BASENAME="${SOPLEXPATH}/results/${FILENAME}"
 
           TMPFILE="${BASENAME}.tmp"
