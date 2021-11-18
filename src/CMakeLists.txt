@@ -170,7 +170,7 @@ add_library(libsoplexshared SHARED soplex_interface.cpp ${sources})
 if(MSVC)
     setLibProperties(libsoplexshared "libsoplexshared")
 else()
-   setLibProperties(libsoplex "soplexshared")
+   setLibProperties(libsoplexshared "soplexshared")
 endif()
 
 set_target_properties(libsoplexshared PROPERTIES
