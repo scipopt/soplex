@@ -435,10 +435,10 @@ void SoPlex_getRowVectorReal(
 
    *nnonzeros = row.size();
 
-   for( int j = 0; j < *nnonzeros; ++j )
+   for(int j = 0; j < *nnonzeros; ++j)
    {
-       coefs[j] = row.value(j);
-       indices[j] = row.index(j);
+      coefs[j] = row.value(j);
+      indices[j] = row.index(j);
    }
 }
 
@@ -464,11 +464,11 @@ void SoPlex_getRowVectorRational(
 
    *nnonzeros = row.size();
 
-   for( int j = 0; j < *nnonzeros; ++j )
+   for(int j = 0; j < *nnonzeros; ++j)
    {
-       coefsnum[j] = (long int) numerator(row.value(j));
-       coefsdenom[j] = (long int) denominator(row.value(j));
-       indices[j] = row.index(j);
+      coefsnum[j] = (long int) numerator(row.value(j));
+      coefsdenom[j] = (long int) denominator(row.value(j));
+      indices[j] = row.index(j);
    }
 }
 
