@@ -41,13 +41,6 @@ then
     exit 1;
 fi
 
-echo "TSTNAME       = ${TSTNAME}"
-echo "EXECUTABLE    = ${EXECUTABLE}"
-echo "SETTINGS      = ${SETTINGS}"
-echo "TIME          = ${TIME}"
-echo "OUTPUTDIR     = ${OUTPUTDIR}"
-echo "SEEDS         = ${SEEDS}"
-
 # call routines for creating the result directory, checking for existence
 # of passed settings, etc
 # defines the following environment variables: SOPLEXPATH, FULLTSTNAME, SOLUFILE, SETTINGSFILE

@@ -68,9 +68,6 @@ then
     exit 1
 fi
 
-echo "SEEDS         = ${SEEDS}"
-
-
 # call routines for creating the result directory, checking for existence
 # of passed settings, etc
 # defines the following environment variables: SOPLEXPATH, EXECUTABLE, FULLTSTNAME, SOLUFILE, SETTINGSFILE
