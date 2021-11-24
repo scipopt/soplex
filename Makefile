@@ -58,6 +58,7 @@ LIMIT		=  #
 SETTINGS	=	default
 TIME		=	3600
 OUTPUTDIR	=	results
+SEEDS		=	0
 MAKESOFTLINKS	=	true
 SOFTLINKS	=
 LINKSINFO	=
@@ -416,7 +417,7 @@ doc:
 
 .PHONY: test
 test:		#$(BINFILE)
-		cd check; ./test.sh $(TEST) $(EXECUTABLE) $(SETTINGS) $(TIME) $(OUTPUTDIR)
+		cd check; ./test.sh $(TEST) $(EXECUTABLE) $(SETTINGS) $(TIME) $(OUTPUTDIR) $(SEEDS)
 
 .PHONY: check
 check:	#$(BINFILE)
