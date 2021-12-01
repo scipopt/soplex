@@ -187,8 +187,13 @@ if(BOOST)
            set(Boost_VERSION_MACRO ${Boost_VERSION})
         endif()
         if(${Boost_VERSION_MACRO} LESS "107000")
-            message(WARNING "Warning: ${Red} The multiprecision and quadprecision features are disabled with Boost versions older than 1.70.${ColourReset} \
-                            Found version is ${Boost_VERSION_STRING}")
+            if(NOT SOPLEX_WITH_GMP)
+               message(SEND_ERROR "ERROR: ${Red} If no GMP is linked, then the minimal Boost verion is 1.70. ${ColourReset} \
+                       Found Boost version is ${Boost_VERSION_STRING}. Either provide newer Boost, link GMP, or disable Boost by setting BOOST=off.")
+            else()
+               message(WARNING "Warning: ${Red} The multiprecision and quadprecision features are disabled with Boost versions older than 1.70.${ColourReset} \
+                       Found Boost version is ${Boost_VERSION_STRING}")
+            endif()
         endif()
     else()
         set(BOOST off)
