@@ -6460,8 +6460,13 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
 #ifdef SOPLEX_WITH_PAPILO
       _simplifierPaPILO.setModifyConsFrac(value);
 #else
-      MSG_INFO1(spxout, spxout <<
-                "Setting Parameter modifyrowfrac is only possible if SoPlex is build with PaPILO\n");
+
+      if(!init)
+      {
+         MSG_INFO1(spxout, spxout <<
+                   "Setting Parameter modifyrowfrac is only possible if SoPlex is build with PaPILO\n");
+      }
+
       return false;
 #endif
       break;
