@@ -80,7 +80,6 @@
 
 // An alias for boost multiprecision
 namespace mpf = boost::multiprecision;
-#include <boost/any.hpp>
 #endif
 
 #define DEFAULT_RANDOM_SEED   0   // used to suppress output when the seed was not changed
