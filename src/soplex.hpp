@@ -6620,8 +6620,11 @@ void SoPlexBase<R>::printVersion() const
 
 
 #ifdef SOPLEX_WITH_PAPILO
-   MSG_INFO1(spxout, spxout << " [PaPILO  " << PAPILO_VERSION_MAJOR << "." << PAPILO_VERSION_MINOR  <<
-             "." << PAPILO_VERSION_PATCH << " {" <<  PAPILO_GITHASH << "}]\n");
+   MSG_INFO1(spxout, spxout << " [PaPILO  " << PAPILO_VERSION_MAJOR << "." << PAPILO_VERSION_MINOR  << "." << PAPILO_VERSION_PATCH);
+#ifdef PAPILO_GITHASH_AVAILABLE
+   MSG_INFO1(spxout, spxout << " {" <<  PAPILO_GITHASH << "}");
+#endif
+   MSG_INFO1(spxout, spxout << "]\n");
 #else
    MSG_INFO1(spxout, spxout << " [PaPILO: not available]");
 #endif
