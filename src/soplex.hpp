@@ -1479,9 +1479,11 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
       _applyPolishing = rhs._applyPolishing;
 
       // rational constants do not need to be assigned
+#ifdef SOPLEX_WITH_BOOST
       _rationalPosone = 1;
       _rationalNegone = -1;
       _rationalZero = 0;
+#endif
    }
 
    assert(_isConsistent());
@@ -6241,6 +6243,7 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
 
    // infinity threshold
    case SoPlexBase<R>::INFTY:
+#ifdef SOPLEX_WITH_BOOST
       _rationalPosInfty = value;
       // boost is treating -value as an expression and not just a number<T> So
       // doing -val won't work since Rational doesn't have an operator= that
@@ -6250,6 +6253,7 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
       // A work around to avoid expression template
       _rationalNegInfty = value;
       _rationalNegInfty = -_rationalNegInfty;
+#endif
 
       if(intParam(SoPlexBase<R>::SYNCMODE) != SYNCMODE_ONLYREAL)
          _recomputeRangeTypesRational();
