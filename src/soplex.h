@@ -1156,13 +1156,13 @@ public:
       /// disabling presolving
       SIMPLIFIER_OFF = 0,
 
-      /// using internal presoling methods
+      /// using internal presolving methods
       SIMPLIFIER_INTERNAL = 3,
 
       /// using the presolve lib papilo
       SIMPLIFIER_PAPILO = 2,
 
-      /// @deprecated: only to provide backwards compatibility (use INTERNAL instead)
+      /// SoPlex chooses automatically (currently always "internal")
       SIMPLIFIER_AUTO = 1
    };
 
