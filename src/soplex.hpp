@@ -227,7 +227,7 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
 
    // type of simplifier
    name[SoPlexBase<R>::SIMPLIFIER] = "simplifier";
-   description[SoPlexBase<R>::SIMPLIFIER] = "simplifier (0 - off, 1 - default, 2 - PaPILO, 3 - internal)";
+   description[SoPlexBase<R>::SIMPLIFIER] = "simplifier (0 - off, 1 - auto, 2 - PaPILO, 3 - internal)";
    lower[SoPlexBase<R>::SIMPLIFIER] = 0;
    upper[SoPlexBase<R>::SIMPLIFIER] = 3;
    defaultValue[SoPlexBase<R>::SIMPLIFIER] = SoPlexBase<R>::SIMPLIFIER_INTERNAL;

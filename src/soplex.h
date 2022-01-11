@@ -1162,7 +1162,7 @@ public:
       /// using the presolve lib papilo
       SIMPLIFIER_PAPILO = 2,
 
-      /// use the default presolver (currently internal)
+      /// SoPlex chooses automatically (currently always "internal")
       SIMPLIFIER_AUTO = 1
    };
 
