@@ -495,7 +495,7 @@ void Presol<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
    for(int j = 0; j < (int)postsolveStorage.nColsOriginal; ++j)
    {
       m_prim[j] = originalSolution.primal[j];
-      m_redCost[j] = originalSolution.reducedCosts[j];
+      m_redCost[j] = switch_sign * originalSolution.reducedCosts[j];
       m_cBasisStat[j] = convertToSoplexStatus(originalSolution.varBasisStatus[j]);
    }
 
