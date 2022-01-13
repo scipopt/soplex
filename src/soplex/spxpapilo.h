@@ -479,7 +479,7 @@ void Presol<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
    papilo::Num<R> num {};
    num.setEpsilon(m_epsilon);
    num.setFeasTol(m_feastol);
-   /* since PaPILO verbosity is quiet it's irrelevant what's the messager */
+   /* since PaPILO verbosity is quiet it's irrelevant what the messenger is */
    papilo::Message msg{};
    msg.setVerbosityLevel(verbosityLevel);
 
