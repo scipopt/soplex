@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2021 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -172,7 +172,11 @@ class Presol : public SPxSimplifier<R>
 {
 private:
 
+#ifdef SOPLEX_DEBUG
+   const papilo::VerbosityLevel verbosityLevel = papilo::VerbosityLevel::kInfo;
+#else
    const papilo::VerbosityLevel verbosityLevel = papilo::VerbosityLevel::kQuiet;
+#endif
 
    VectorBase<R> m_prim;       ///< unsimplified primal solution VectorBase<R>.
    VectorBase<R> m_slack;      ///< unsimplified slack VectorBase<R>.
@@ -532,12 +536,10 @@ void Presol<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
    papilo::Num<R> num {};
    num.setEpsilon(m_epsilon);
    num.setFeasTol(m_feastol);
-   /* since PaPILO verbosity is quiet it's irrelevant what's the messager*/
+   /* since PaPILO verbosity is quiet it's irrelevant what the messenger is */
    papilo::Message msg{};
    msg.setVerbosityLevel(verbosityLevel);
-#ifdef SOPLEX_DEBUG
-   msg.setVerbosityLevel(papilo::VerbosityLevel::kInfo);
-#endif
+
    papilo::Postsolve<R> postsolve {msg, num};
    auto status = postsolve.undo(reducedSolution, originalSolution, postsolveStorage, isOptimal);
 
@@ -550,13 +552,13 @@ void Presol<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
    for(int j = 0; j < (int)postsolveStorage.nColsOriginal; ++j)
    {
       m_prim[j] = originalSolution.primal[j];
-      m_redCost[j] = originalSolution.reducedCosts[j];
+      m_redCost[j] = switch_sign * originalSolution.reducedCosts[j];
       m_cBasisStat[j] = convertToSoplexStatus(originalSolution.varBasisStatus[j]);
    }
 
    for(int i = 0; i < (int)postsolveStorage.nRowsOriginal; ++i)
    {
-      m_dual[i] = originalSolution.dual[i];
+      m_dual[i] = switch_sign * originalSolution.dual[i];
       m_slack[i] = originalSolution.slack[i];
       m_rBasisStat[i] = convertToSoplexStatus(originalSolution.rowBasisStatus[i]);
    }
@@ -634,6 +636,8 @@ papilo::Problem<R> buildProblem(SPxLPBase<R>& lp)
    /* set up columns */
    builder.setNumCols(ncols);
 
+   R switch_sign = lp.spxSense() == SPxLPBase<R>::MAXIMIZE ? -1 : 1;
+
    for(int i = 0; i < ncols; ++i)
    {
       R lowerbound = lp.lower(i);
@@ -645,7 +649,7 @@ papilo::Problem<R> buildProblem(SPxLPBase<R>& lp)
       builder.setColUbInf(i, upperbound >= R(infinity));
 
       builder.setColIntegral(i, false);
-      builder.setObj(i, objective);
+      builder.setObj(i, objective * switch_sign);
    }
 
    /* set up rows */
@@ -823,9 +827,7 @@ void Presol<R>::configurePapilo(papilo::Presolve<R>& presolve, R feasTolerance, 
    presolve.getPresolveOptions().calculate_basis_for_dual = true;
 
    presolve.setVerbosityLevel(verbosityLevel);
-#ifdef SOPLEX_DEBUG
-   presolve.setVerbosityLevel(papilo::VerbosityLevel::kInfo);
-#endif
+
    /* enable lp presolvers with dual postsolve*/
    using uptr = std::unique_ptr<papilo::PresolveMethod<R>>;
 
@@ -881,6 +883,8 @@ void Presol<R>::applyPresolveResultsToColumns(SPxLPBase <R>& lp, const papilo::P
    const papilo::Vec<R>& lowerBounds = problem.getLowerBounds();
    const papilo::Vec<papilo::ColFlags>& colFlags = problem.getColFlags();
 
+   R switch_sign = lp.spxSense() == SPxLPBase<R>::MAXIMIZE ? -1 : 1;
+
    for(int col = 0; col < problem.getNCols(); col++)
    {
       DSVectorBase<R> emptyVector{0};
@@ -894,7 +898,7 @@ void Presol<R>::applyPresolveResultsToColumns(SPxLPBase <R>& lp, const papilo::P
       if(colFlags[col].test(papilo::ColFlag::kUbInf))
          ub = R(infinity);
 
-      LPColBase<R> column(objective.coefficients[col], emptyVector, ub, lb);
+      LPColBase<R> column(objective.coefficients[col]* switch_sign, emptyVector, ub, lb);
       lp.addCol(column);
       assert(lp.lower(col) == lb);
       assert(lp.upper(col) == ub);

@@ -4,7 +4,7 @@
 #*                  This file is part of the class library                   *#
 #*       SoPlex --- the Sequential object-oriented simPlex.                  *#
 #*                                                                           *#
-#*    Copyright (C) 1996-2021 Konrad-Zuse-Zentrum                            *#
+#*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            *#
 #*                            fuer Informationstechnik Berlin                *#
 #*                                                                           *#
 #*  SoPlex is distributed under the terms of the ZIB Academic Licence.       *#
@@ -24,7 +24,7 @@ BINNAME="${BINNAME}.${HOST}"
 
 OUTPUTDIR=results/quick
 
-SOPLEX_BOOST_SUPPORT="$(../${EXECUTABLE} --solvemode=2 |& grep 'without linking boost is not supported'|head -n 1)"
+SOPLEX_BOOST_SUPPORT="$(../${EXECUTABLE} --solvemode=2 | grep 'without linking boost is not supported'|head -n 1)"
 if [[ "${SOPLEX_BOOST_SUPPORT}" == "Using rational methods without linking boost is not supported" ]]
 then
     SETTINGSLIST=(default devex steep)
