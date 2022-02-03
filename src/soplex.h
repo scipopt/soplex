@@ -2267,14 +2267,27 @@ private:
 
    /// corrects primal solution and aligns with basis
    void _correctPrimalSolution(
+      SolRational& sol,
       Rational& primalScale,
       int& primalSize,
-      SolRational& sol,
       const int& maxDimRational,
       VectorBase<R>& primalReal);
 
    /// updates or recomputes slacks depending on which looks faster
-   void _updateSlacks(int& primalSize, SolRational& sol);
+   void _updateSlacks(SolRational& sol, int& primalSize);
+
+   /// corrects dual solution and aligns with basis
+   void _correctDualSolution(
+      SolRational& sol,
+      const bool& maximizing,
+      VectorBase<R>& dualReal,
+      Rational& dualScale,
+      int& dualSize,
+      const int& maxDimRational);
+
+   /// updates or recomputes reduced cost values depending on which looks faster; adding one to the length of the
+   /// dual vector accounts for the objective function vector
+   void _updateReducedCosts(SolRational& sol, int& dualSize, const int& numCorrectedPrimals);
 
    /// solves current problem with iterative refinement and recovery mechanism
    void _performOptIRStable(SolRational& sol,
