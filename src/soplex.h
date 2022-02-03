@@ -2154,6 +2154,128 @@ private:
    //**@name Private solving methods implemented in solverational.hpp */
    ///@{
 
+   /// stores floating-point solution of original LP as current rational solution and ensure that solution vectors have right dimension; ensure that solution is aligned with basis
+   void _storeSolutionRational(
+      SolRational& sol,
+      VectorBase<R>& primalReal,
+      VectorBase<R>& dualReal,
+      int& dualSize);
+
+   /// computes violation of bounds during the refinement loop
+   void _computeBoundsViolation(SolRational& sol, Rational& boundsViolation);
+
+   /// computes violation of sides during the refinement loop
+   void _computeSidesViolation(SolRational& sol, Rational& sideViolation);
+
+   /// computes reduced cost violation during the refinement loop
+   void _computeReducedCostViolation(
+      SolRational& sol,
+      Rational& redCostViolation,
+      const bool& maximizing);
+   
+   /// computes dual violation
+   void _computeDualViolation(
+      SolRational& sol,
+      Rational& dualViolation,
+      const bool& maximizing);
+
+   /// check termination criteria for refinement loop
+   bool _isRefinementOver(
+      bool& primalFeasible,
+      bool& dualFeasible,
+      Rational& boundsViolation,
+      Rational& sideViolation,
+      Rational& redCostViolation,
+      Rational& dualViolation,
+      int minRounds,
+      bool& stoppedTime,
+      bool& stoppedIter,
+      int numFailedRefinements);
+                  
+   /// check refinement loop progress
+   void _checkRefinementProgress(
+      Rational& boundsViolation,
+      Rational& sideViolation,
+      Rational& redCostViolation,
+      Rational& dualViolation,
+      Rational& maxViolation,
+      Rational& bestViolation,
+      const Rational& violationImprovementFactor,
+      int& numFailedRefinements);
+
+   /// performs rational reconstruction and/or factorizationd
+   void _ratrecAndOrRatfac(
+      int& minRounds,
+      int lastStallRefinements,
+      bool& factorSolNewBasis,
+      int& nextRatrecRefinement,
+      const Rational& errorCorrectionFactor,
+      Rational& errorCorrection,
+      Rational& maxViolation,
+      SolRational& sol,
+      bool& primalFeasible,
+      bool& dualFeasible,
+      bool& stoppedTime,
+      bool& stoppedIter,
+      bool& error,
+      bool& breakAfter,
+      bool& continueAfter);
+
+   /// forces value of given nonbasic variable to bound
+   void _forceNonbasicToBound(
+      SolRational& sol,
+      int& c,
+      const int& maxDimRational,
+      bool toLower);
+
+   /// computes primal scaling factor; limit increase in scaling by tolerance used in floating point solve
+   void _computePrimalScalingFactor(
+      Rational& maxScale,
+      Rational& primalScale,
+      Rational& boundsViolation,
+      Rational& sideViolation,
+      Rational& redCostViolation);
+
+   /// computes dual scaling factor; limit increase in scaling by tolerance used in floating point solve
+   void _computeDualScalingFactor(
+      Rational& maxScale,
+      Rational& primalScale,
+      Rational& dualScale,
+      Rational& redCostViolation,
+      Rational& dualViolation);
+
+   /// applies scaled bounds
+   void _applyScaledBounds(Rational& primalScale);
+
+   /// applies scaled sides
+   void _applyScaledSides(Rational& primalScale);
+
+   /// applies scaled objective function
+   void _applyScaledObj(Rational& dualScale, SolRational& sol);
+
+   /// evaluates result of solve. Return true if the algorithm must to stopped, false otherwise.
+   bool _evaluateResult(
+      typename SPxSolverBase<R>::Status result,
+      bool usingRefinedLP,
+      SolRational& sol,
+      VectorBase<R>& dualReal,
+      bool& infeasible,
+      bool& unbounded,
+      bool& stoppedTime,
+      bool& stoppedIter,
+      bool& error);
+
+   /// corrects primal solution and aligns with basis
+   void _correctPrimalSolution(
+      Rational& primalScale,
+      int& primalSize,
+      SolRational& sol,
+      const int& maxDimRational,
+      VectorBase<R>& primalReal);
+
+   /// updates or recomputes slacks depending on which looks faster
+   void _updateSlacks(int& primalSize, SolRational& sol);
+
    /// solves current problem with iterative refinement and recovery mechanism
    void _performOptIRStable(SolRational& sol,
                             bool acceptUnbounded,
