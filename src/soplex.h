@@ -2155,7 +2155,7 @@ private:
    ///@{
 
    /// stores floating-point solution of original LP as current rational solution and ensure that solution vectors have right dimension; ensure that solution is aligned with basis
-   void _storeSolutionRational(
+   void _storeRealSolutionAsRational(
       SolRational& sol,
       VectorBase<R>& primalReal,
       VectorBase<R>& dualReal,
@@ -2167,19 +2167,19 @@ private:
    /// computes violation of sides during the refinement loop
    void _computeSidesViolation(SolRational& sol, Rational& sideViolation);
 
-   /// computes reduced cost violation during the refinement loop
+   /// computes violation of reduced costs during the refinement loop
    void _computeReducedCostViolation(
       SolRational& sol,
       Rational& redCostViolation,
       const bool& maximizing);
-   
-   /// computes dual violation
+
+   /// computes dual violation during the refinement loop
    void _computeDualViolation(
       SolRational& sol,
       Rational& dualViolation,
       const bool& maximizing);
 
-   /// check termination criteria for refinement loop
+   /// checks termination criteria for refinement loop
    bool _isRefinementOver(
       bool& primalFeasible,
       bool& dualFeasible,
@@ -2191,8 +2191,8 @@ private:
       bool& stoppedTime,
       bool& stoppedIter,
       int numFailedRefinements);
-                  
-   /// check refinement loop progress
+
+   /// checks refinement loop progress
    void _checkRefinementProgress(
       Rational& boundsViolation,
       Rational& sideViolation,

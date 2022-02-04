@@ -374,318 +374,9 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
 
 
 
-/// solves current problem with iterative refinement and recovery mechanism
-template <class R>
-void SoPlexBase<R>::_performOptIRStable(
-   SolRational& sol,
-   bool acceptUnbounded,
-   bool acceptInfeasible,
-   int minRounds,
-   bool& primalFeasible,
-   bool& dualFeasible,
-   bool& infeasible,
-   bool& unbounded,
-   bool& stoppedTime,
-   bool& stoppedIter,
-   bool& error)
-{
-   // start rational solving timing
-   _statistics->rationalTime->start();
-
-   primalFeasible = false;
-   dualFeasible = false;
-   infeasible = false;
-   unbounded = false;
-   stoppedTime = false;
-   stoppedIter = false;
-   error = false;
-
-   // set working tolerances in floating-point solver
-   _solver.setFeastol(realParam(SoPlexBase<R>::FPFEASTOL));
-   _solver.setOpttol(realParam(SoPlexBase<R>::FPOPTTOL));
-
-   // declare vectors and variables
-   typename SPxSolverBase<R>::Status result = SPxSolverBase<R>::UNKNOWN;
-
-   _modLower.reDim(numColsRational(), false);
-   _modUpper.reDim(numColsRational(), false);
-   _modLhs.reDim(numRowsRational(), false);
-   _modRhs.reDim(numRowsRational(), false);
-   _modObj.reDim(numColsRational(), false);
-
-   VectorBase<R> primalReal(numColsRational());
-   VectorBase<R> dualReal(numRowsRational());
-
-   Rational boundsViolation;
-   Rational sideViolation;
-   Rational redCostViolation;
-   Rational dualViolation;
-   Rational primalScale;
-   Rational dualScale;
-   Rational maxScale;
-
-   // solve original LP
-   MSG_INFO1(spxout, spxout << "Initial floating-point solve . . .\n");
-
-   if(_hasBasis)
-   {
-      assert(_basisStatusRows.size() == numRowsRational());
-      assert(_basisStatusCols.size() == numColsRational());
-      _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
-      _hasBasis = (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
-   }
-
-   for(int r = numRowsRational() - 1; r >= 0; r--)
-   {
-      assert(_solver.maxRowObj(r) == 0.0);
-   }
-
-   _statistics->rationalTime->stop();
-   result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows,
-                             _basisStatusCols);
-
-   // evalute result
-   if(_evaluateResult(result, false, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter, error))
-      return;
-
-   _statistics->rationalTime->start();
-
-   int dualSize = 0;
-
-   // stores floating-point solution of original LP as current rational solution
-   // ensure that solution vectors have right dimension; ensure that solution is aligned with basis
-   _storeSolutionRational(sol, primalReal, dualReal, dualSize);
-   
-   // initial scaling factors are one
-   primalScale = _rationalPosone;
-   dualScale = _rationalPosone;
-
-   // control progress
-   Rational maxViolation;
-   Rational bestViolation = _rationalPosInfty;
-   const Rational violationImprovementFactor = 16;
-   const Rational errorCorrectionFactor = 1.1;
-   Rational errorCorrection = 2;
-   int numFailedRefinements = 0;
-
-   // store basis status in case solving modified problem failed
-   DataArray< typename SPxSolverBase<R>::VarStatus > basisStatusRowsFirst;
-   DataArray< typename SPxSolverBase<R>::VarStatus > basisStatusColsFirst;
-
-   // refinement loop
-   const bool maximizing = (intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MAXIMIZE);
-   const int maxDimRational = numColsRational() > numRowsRational() ? numColsRational() :
-                              numRowsRational();
-   SolRational factorSol;
-   bool factorSolNewBasis = true;
-   int lastStallRefinements = 0;
-   int nextRatrecRefinement = 0;
-
-   // used in _ratrecAndOrRatfac to order a break or a continue outside of the function.
-   bool breakAfter;
-   bool continueAfter;
-
-   do
-   {
-      // decrement minRounds counter
-      minRounds--;
-
-      MSG_DEBUG(std::cout << "Computing primal violations.\n");
-
-      // computes violation of bounds
-      _computeBoundsViolation(sol, boundsViolation);
-
-      // computes violation of sides
-      _computeSidesViolation(sol, sideViolation);
-
-      MSG_DEBUG(std::cout << "Computing dual violations.\n");
-
-      // compute reduced cost violation
-      _computeReducedCostViolation(sol, redCostViolation, maximizing);
-
-      // compute dual violation
-      _computeDualViolation(sol, dualViolation, maximizing);
-
-      _modObj = sol._redCost;
-
-      // output violations; the reduced cost violations for artificially introduced slack columns are actually violations of the dual multipliers
-      MSG_INFO1(spxout, spxout
-                << "Max. bound violation = " << boundsViolation.str() << "\n"
-                << "Max. row violation = " << sideViolation.str() << "\n"
-                << "Max. reduced cost violation = " << redCostViolation.str() << "\n"
-                << "Max. dual violation = " << dualViolation.str() << "\n");
-
-      MSG_DEBUG(spxout
-                << std::fixed << std::setprecision(2) << std::setw(10)
-                << "Progress table: "
-                << std::setw(10) << _statistics->refinements << " & "
-                << std::setw(10) << _statistics->iterations << " & "
-                << std::setw(10) << _statistics->solvingTime->time() << " & "
-                << std::setw(10) << _statistics->rationalTime->time() << " & "
-                << std::setw(10) << boundsViolation > sideViolation ? boundsViolation :
-                sideViolation << " & "
-                << std::setw(10) << redCostViolation > dualViolation ? redCostViolation :
-                dualViolation << "\n");
-
-      // check termination criteria for refinement loop
-      if(_isRefinementOver(primalFeasible, dualFeasible, boundsViolation, sideViolation, redCostViolation, dualViolation,
-                           minRounds, stoppedTime, stoppedIter, numFailedRefinements))
-         break;
-
-      // check refinement progress
-      _checkRefinementProgress(boundsViolation, sideViolation, redCostViolation, dualViolation,
-                               maxViolation, bestViolation, violationImprovementFactor, numFailedRefinements);
-
-      // perform rational reconstruction and/or factorization
-      _ratrecAndOrRatfac(minRounds, lastStallRefinements, factorSolNewBasis, nextRatrecRefinement,
-                        errorCorrectionFactor, errorCorrection, maxViolation,
-                        sol, primalFeasible, dualFeasible,
-                        stoppedTime, stoppedIter, error, breakAfter, continueAfter);
-      if(breakAfter)
-         break;
-      else if(continueAfter)
-         continue;
-
-      // start refinement
-
-      // compute primal scaling factor; limit increase in scaling by tolerance used in floating point solve
-      _computePrimalScalingFactor(maxScale, primalScale, boundsViolation, sideViolation, redCostViolation);
-
-      // apply scaled bounds and scaled sides
-      _applyScaledBounds(primalScale);
-      _applyScaledSides(primalScale);
-
-      // compute dual scaling factor; limit increase in scaling by tolerance used in floating point solve
-      _computeDualScalingFactor(maxScale, primalScale, dualScale, redCostViolation, dualViolation);
-
-      // apply scaled objective function
-      _applyScaledObj(dualScale, sol);
-
-      MSG_INFO1(spxout, spxout << "Refined floating-point solve . . .\n");
-
-      // ensure that artificial slack columns are basic and inequality constraints are nonbasic; otherwise we may end
-      // up with dual violation on inequality constraints after removing the slack columns; do not change this in the
-      // floating-point solver, though, because the solver may require its original basis to detect optimality
-      if(_slackCols.num() > 0 && _hasBasis)
-      {
-         int numOrigCols = numColsRational() - _slackCols.num();
-         assert(_slackCols.num() <= 0 || boolParam(SoPlexBase<R>::EQTRANS));
-
-         for(int i = 0; i < _slackCols.num(); i++)
-         {
-            int row = _slackCols.colVector(i).index(0);
-            int col = numOrigCols + i;
-
-            assert(row >= 0);
-            assert(row < numRowsRational());
-
-            if(_basisStatusRows[row] == SPxSolverBase<R>::BASIC
-                  && _basisStatusCols[col] != SPxSolverBase<R>::BASIC)
-            {
-               _basisStatusRows[row] = _basisStatusCols[col];
-               _basisStatusCols[col] = SPxSolverBase<R>::BASIC;
-               _rationalLUSolver.clear();
-            }
-         }
-      }
-
-      // load basis
-      if(_hasBasis && _solver.basis().status() < SPxBasisBase<R>::REGULAR)
-      {
-         MSG_DEBUG(spxout << "basis (status = " << _solver.basis().status() << ") desc before set:\n";
-                   _solver.basis().desc().dump());
-         _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
-         MSG_DEBUG(spxout << "basis (status = " << _solver.basis().status() << ") desc after set:\n";
-                   _solver.basis().desc().dump());
-
-         _hasBasis = _solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM;
-         MSG_DEBUG(spxout << "setting basis in solver " << (_hasBasis ? "successful" : "failed") <<
-                   " (3)\n");
-      }
-
-      // solve modified problem
-      int prevIterations = _statistics->iterations;
-      _statistics->rationalTime->stop();
-      result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows,
-                                _basisStatusCols, primalScale > 1e20 || dualScale > 1e20);
-
-      // count refinements and remember whether we moved to a new basis
-      _statistics->refinements++;
-
-      if(_statistics->iterations <= prevIterations)
-      {
-         lastStallRefinements++;
-         _statistics->stallRefinements++;
-      }
-      else
-      {
-         factorSolNewBasis = true;
-         lastStallRefinements = 0;
-         _statistics->pivotRefinements = _statistics->refinements;
-      }
-
-      // evaluate result; if modified problem was not solved to optimality, stop refinement;
-      if(_evaluateResult(result, true, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter, error))
-         return;
-
-      _statistics->rationalTime->start();
-
-      int primalSize;
-
-      // correct primal solution and align with basis
-      _correctPrimalSolution(sol, primalScale, primalSize, maxDimRational, primalReal);
-
-      // update or recompute slacks depending on which looks faster
-      _updateSlacks(sol, primalSize);
-
-      const int numCorrectedPrimals = _primalDualDiff.size();
-
-      // correct dual solution and align with basis
-      _correctDualSolution(sol, maximizing, dualReal, dualScale, dualSize, maxDimRational);
-
-      // update or recompute reduced cost values depending on which looks faster
-      // adding one to the length of the dual vector accounts for the objective function vector
-      _updateReducedCosts(sol, dualSize, numCorrectedPrimals);
-   }
-   while(true);
-
-   // correct basis status for restricted inequalities
-   if(_hasBasis)
-   {
-      for(int r = numRowsRational() - 1; r >= 0; r--)
-      {
-         assert((lhsRational(r) == rhsRational(r)) == (_rowTypes[r] == RANGETYPE_FIXED));
-
-         if(_rowTypes[r] != RANGETYPE_FIXED && _basisStatusRows[r] == SPxSolverBase<R>::FIXED)
-            _basisStatusRows[r] = (maximizing == (sol._dual[r] < 0))
-                                  ? SPxSolverBase<R>::ON_LOWER
-                                  : SPxSolverBase<R>::ON_UPPER;
-      }
-   }
-
-   // compute objective function values
-   assert(sol._isPrimalFeasible == sol._isDualFeasible);
-
-   if(sol._isPrimalFeasible)
-   {
-      sol._objVal = sol._primal * _rationalLP->maxObj();
-
-      if(intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MINIMIZE)
-         sol._objVal *= -1;
-   }
-
-   // set objective coefficients for all rows to zero
-   _solver.clearRowObjs();
-
-   // stop rational solving time
-   _statistics->rationalTime->stop();
-}
-
-
-
 /// stores floating-point solution of original LP as current rational solution and ensure that solution vectors have right dimension; ensure that solution is aligned with basis
 template <class R>
-void SoPlexBase<R>::_storeSolutionRational(
+void SoPlexBase<R>::_storeRealSolutionAsRational(
    SolRational& sol,
    VectorBase<R>& primalReal,
    VectorBase<R>& dualReal,
@@ -894,10 +585,10 @@ void SoPlexBase<R>::_computeReducedCostViolation(
             && sol._redCost[c] < -redCostViolation)
       {
          MSG_DEBUG(std::cout << "basisStatusCol = " << basisStatusCol
-                     << ", lower tight = " << bool(sol._primal[c] <= lowerRational(c))
-                     << ", upper tight = " << bool(sol._primal[c] >= upperRational(c))
-                     << ", sol._redCost[c] = " << sol._redCost[c].str()
-                     << "\n");
+                   << ", lower tight = " << bool(sol._primal[c] <= lowerRational(c))
+                   << ", upper tight = " << bool(sol._primal[c] >= upperRational(c))
+                   << ", sol._redCost[c] = " << sol._redCost[c].str()
+                   << "\n");
          redCostViolation = -sol._redCost[c];
       }
 
@@ -906,10 +597,10 @@ void SoPlexBase<R>::_computeReducedCostViolation(
             && sol._redCost[c] > redCostViolation)
       {
          MSG_DEBUG(std::cout << "basisStatusCol = " << basisStatusCol
-                     << ", lower tight = " << bool(sol._primal[c] <= lowerRational(c))
-                     << ", upper tight = " << bool(sol._primal[c] >= upperRational(c))
-                     << ", sol._redCost[c] = " << sol._redCost[c].str()
-                     << "\n");
+                   << ", lower tight = " << bool(sol._primal[c] <= lowerRational(c))
+                   << ", upper tight = " << bool(sol._primal[c] >= upperRational(c))
+                   << ", sol._redCost[c] = " << sol._redCost[c].str()
+                   << "\n");
          redCostViolation = sol._redCost[c];
       }
    }
@@ -939,10 +630,10 @@ void SoPlexBase<R>::_computeDualViolation(
             && sol._dual[r] < -dualViolation)
       {
          MSG_DEBUG(std::cout << "basisStatusRow = " << basisStatusRow
-                     << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
-                     << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
-                     << ", sol._dual[r] = " << sol._dual[r].str()
-                     << "\n");
+                   << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
+                   << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
+                   << ", sol._dual[r] = " << sol._dual[r].str()
+                   << "\n");
          dualViolation = -sol._dual[r];
       }
 
@@ -951,10 +642,10 @@ void SoPlexBase<R>::_computeDualViolation(
             && sol._dual[r] > dualViolation)
       {
          MSG_DEBUG(std::cout << "basisStatusRow = " << basisStatusRow
-                     << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
-                     << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
-                     << ", sol._dual[r] = " << sol._dual[r].str()
-                     << "\n");
+                   << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
+                   << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
+                   << ", sol._dual[r] = " << sol._dual[r].str()
+                   << "\n");
          dualViolation = sol._dual[r];
       }
    }
@@ -962,7 +653,7 @@ void SoPlexBase<R>::_computeDualViolation(
 
 
 
-/// check termination criteria for refinement loop, return true if termination criteria is met, false otherwise
+/// checks termination criteria for refinement loop, return true if termination criteria is met, false otherwise
 template <class R>
 bool SoPlexBase<R>::_isRefinementOver(
    bool& primalFeasible,
@@ -990,7 +681,7 @@ bool SoPlexBase<R>::_isRefinementOver(
       else
       {
          MSG_INFO1(spxout, spxout <<
-                     "Tolerances reached but minRounds forcing additional refinement rounds.\n");
+                   "Tolerances reached but minRounds forcing additional refinement rounds.\n");
       }
    }
 
@@ -1003,7 +694,7 @@ bool SoPlexBase<R>::_isRefinementOver(
 
 
 
-/// check refinement loop progress
+/// checks refinement loop progress
 template <class R>
 void SoPlexBase<R>::_checkRefinementProgress(
    Rational& boundsViolation,
@@ -1098,7 +789,7 @@ void SoPlexBase<R>::_ratrecAndOrRatfac(
 
       nextRatrecRefinement = int(_statistics->refinements * realParam(SoPlexBase<R>::RATREC_FREQ)) + 1;
       MSG_DEBUG(spxout << "Next rational reconstruction after refinement " << nextRatrecRefinement <<
-               ".\n");
+                ".\n");
    }
 
    // solve basis systems exactly
@@ -1108,7 +799,7 @@ void SoPlexBase<R>::_ratrecAndOrRatfac(
 
       bool optimal;
       _factorizeColumnRational(sol, _basisStatusRows, _basisStatusCols, stoppedTime, stoppedIter, error,
-                              optimal);
+                               optimal);
       factorSolNewBasis = false;
 
       if(stoppedTime)
@@ -1191,7 +882,7 @@ void SoPlexBase<R>::_computePrimalScalingFactor(
       invert(primalScale);
 
       if(primalScale > maxScale)
-      primalScale = maxScale;
+         primalScale = maxScale;
    }
    else
       primalScale = maxScale;
@@ -1253,7 +944,7 @@ void SoPlexBase<R>::_applyScaledBounds(Rational& primalScale)
 {
    if(primalScale < 1)
       primalScale = 1;
-      
+
    if(primalScale > 1)
       MSG_INFO2(spxout, spxout << "Scaling primal by " << primalScale.str() << ".\n");
 
@@ -1299,7 +990,7 @@ void SoPlexBase<R>::_applyScaledSides(Rational& primalScale)
       {
          if(primalScale != 1)
             _modLhs[r] *= primalScale;
-         
+
          if(_modLhs[r] <= _rationalNegInfty)
             _solver.changeLhs(r, -realParam(SoPlexBase<R>::INFTY));
          else
@@ -1390,7 +1081,7 @@ bool SoPlexBase<R>::_evaluateResult(
       }
       else
          sol._hasDualFarkas = false;
-      
+
       if(usingRefinedLP)
          _solver.clearRowObjs();
 
@@ -1405,7 +1096,7 @@ bool SoPlexBase<R>::_evaluateResult(
 
       unbounded = true;
       return true;
-   
+
    case SPxSolverBase<R>::ABORT_TIME:
       stoppedTime = true;
       return true;
@@ -1420,7 +1111,7 @@ bool SoPlexBase<R>::_evaluateResult(
    default:
       if(usingRefinedLP)
          _solver.clearRowObjs();
-      
+
       error = true;
       return true;
    }
@@ -1580,11 +1271,11 @@ void SoPlexBase<R>::_correctDualSolution(
                && debugRedCost[c] < -debugRedCostViolation)
          {
             MSG_DEBUG(std::cout << "basisStatusCol = " << basisStatusCol
-                        << ", lower tight = " << bool(sol._primal[c] <= lowerRational(c))
-                        << ", upper tight = " << bool(sol._primal[c] >= upperRational(c))
-                        << ", obj[c] = " << _realLP->obj(c)
-                        << ", debugRedCost[c] = " << debugRedCost[c].str()
-                        << "\n");
+                      << ", lower tight = " << bool(sol._primal[c] <= lowerRational(c))
+                      << ", upper tight = " << bool(sol._primal[c] >= upperRational(c))
+                      << ", obj[c] = " << _realLP->obj(c)
+                      << ", debugRedCost[c] = " << debugRedCost[c].str()
+                      << "\n");
             debugRedCostViolation = -debugRedCost[c];
          }
 
@@ -1593,11 +1284,11 @@ void SoPlexBase<R>::_correctDualSolution(
                && debugRedCost[c] > debugRedCostViolation)
          {
             MSG_DEBUG(std::cout << "basisStatusCol = " << basisStatusCol
-                        << ", lower tight = " << bool(sol._primal[c] <= lowerRational(c))
-                        << ", upper tight = " << bool(sol._primal[c] >= upperRational(c))
-                        << ", obj[c] = " << _realLP->obj(c)
-                        << ", debugRedCost[c] = " << debugRedCost[c].str()
-                        << "\n");
+                      << ", lower tight = " << bool(sol._primal[c] <= lowerRational(c))
+                      << ", upper tight = " << bool(sol._primal[c] >= upperRational(c))
+                      << ", obj[c] = " << _realLP->obj(c)
+                      << ", debugRedCost[c] = " << debugRedCost[c].str()
+                      << "\n");
             debugRedCostViolation = debugRedCost[c];
          }
       }
@@ -1621,11 +1312,11 @@ void SoPlexBase<R>::_correctDualSolution(
                && val > debugDualViolation)
          {
             MSG_DEBUG(std::cout << "basisStatusRow = " << basisStatusRow
-                        << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
-                        << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
-                        << ", dualReal[r] = " << val.str()
-                        << ", dualReal[r] = " << dualReal[r]
-                        << "\n");
+                      << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
+                      << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
+                      << ", dualReal[r] = " << val.str()
+                      << ", dualReal[r] = " << dualReal[r]
+                      << "\n");
             debugDualViolation = val;
          }
 
@@ -1634,22 +1325,22 @@ void SoPlexBase<R>::_correctDualSolution(
                && val < -debugDualViolation)
          {
             MSG_DEBUG(std::cout << "basisStatusRow = " << basisStatusRow
-                        << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
-                        << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
-                        << ", dualReal[r] = " << val.str()
-                        << ", dualReal[r] = " << dualReal[r]
-                        << "\n");
+                      << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
+                      << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
+                      << ", dualReal[r] = " << val.str()
+                      << ", dualReal[r] = " << dualReal[r]
+                      << "\n");
             debugDualViolation = -val;
          }
 
          if(basisStatusRow == SPxSolverBase<R>::BASIC && spxAbs(val) > debugBasicDualViolation)
          {
             MSG_DEBUG(std::cout << "basisStatusRow = " << basisStatusRow
-                        << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
-                        << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
-                        << ", dualReal[r] = " << val.str()
-                        << ", dualReal[r] = " << dualReal[r]
-                        << "\n");
+                      << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
+                      << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
+                      << ", dualReal[r] = " << val.str()
+                      << ", dualReal[r] = " << dualReal[r]
+                      << "\n");
             debugBasicDualViolation = spxAbs(val);
          }
       }
@@ -1710,10 +1401,11 @@ void SoPlexBase<R>::_correctDualSolution(
 /// updates or recomputes reduced cost values depending on which looks faster; adding one to the length of the
 /// dual vector accounts for the objective function vector
 template <class R>
-void SoPlexBase<R>::_updateReducedCosts(SolRational& sol, int& dualSize, const int& numCorrectedPrimals)
+void SoPlexBase<R>::_updateReducedCosts(SolRational& sol, int& dualSize,
+                                        const int& numCorrectedPrimals)
 {
 
-if(_primalDualDiff.size() < dualSize + 1)
+   if(_primalDualDiff.size() < dualSize + 1)
    {
       _rationalLP->addDualActivity(_primalDualDiff, sol._redCost);
 #ifndef NDEBUG
@@ -1740,6 +1432,320 @@ if(_primalDualDiff.size() < dualSize + 1)
       MSG_INFO2(spxout, spxout << "Corrected " << numCorrectedPrimals << " primal variables and " <<
                 numCorrectedDuals << " dual values.\n");
    }
+}
+
+
+
+/// solves current problem with iterative refinement and recovery mechanism
+template <class R>
+void SoPlexBase<R>::_performOptIRStable(
+   SolRational& sol,
+   bool acceptUnbounded,
+   bool acceptInfeasible,
+   int minRounds,
+   bool& primalFeasible,
+   bool& dualFeasible,
+   bool& infeasible,
+   bool& unbounded,
+   bool& stoppedTime,
+   bool& stoppedIter,
+   bool& error)
+{
+   // start rational solving timing
+   _statistics->rationalTime->start();
+
+   primalFeasible = false;
+   dualFeasible = false;
+   infeasible = false;
+   unbounded = false;
+   stoppedTime = false;
+   stoppedIter = false;
+   error = false;
+
+   // set working tolerances in floating-point solver
+   _solver.setFeastol(realParam(SoPlexBase<R>::FPFEASTOL));
+   _solver.setOpttol(realParam(SoPlexBase<R>::FPOPTTOL));
+
+   // declare vectors and variables
+   typename SPxSolverBase<R>::Status result = SPxSolverBase<R>::UNKNOWN;
+
+   _modLower.reDim(numColsRational(), false);
+   _modUpper.reDim(numColsRational(), false);
+   _modLhs.reDim(numRowsRational(), false);
+   _modRhs.reDim(numRowsRational(), false);
+   _modObj.reDim(numColsRational(), false);
+
+   VectorBase<R> primalReal(numColsRational());
+   VectorBase<R> dualReal(numRowsRational());
+
+   Rational boundsViolation;
+   Rational sideViolation;
+   Rational redCostViolation;
+   Rational dualViolation;
+   Rational primalScale;
+   Rational dualScale;
+   Rational maxScale;
+
+   // solve original LP
+   MSG_INFO1(spxout, spxout << "Initial floating-point solve . . .\n");
+
+   if(_hasBasis)
+   {
+      assert(_basisStatusRows.size() == numRowsRational());
+      assert(_basisStatusCols.size() == numColsRational());
+      _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+      _hasBasis = (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
+   }
+
+   for(int r = numRowsRational() - 1; r >= 0; r--)
+   {
+      assert(_solver.maxRowObj(r) == 0.0);
+   }
+
+   _statistics->rationalTime->stop();
+   result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows,
+                             _basisStatusCols);
+
+   // evalute result
+   if(_evaluateResult(result, false, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
+                      error))
+      return;
+
+   _statistics->rationalTime->start();
+
+   int dualSize = 0;
+
+   // stores floating-point solution of original LP as current rational solution
+   // ensure that solution vectors have right dimension; ensure that solution is aligned with basis
+   _storeRealSolutionAsRational(sol, primalReal, dualReal, dualSize);
+
+   // initial scaling factors are one
+   primalScale = _rationalPosone;
+   dualScale = _rationalPosone;
+
+   // control progress
+   Rational maxViolation;
+   Rational bestViolation = _rationalPosInfty;
+   const Rational violationImprovementFactor = 16;
+   const Rational errorCorrectionFactor = 1.1;
+   Rational errorCorrection = 2;
+   int numFailedRefinements = 0;
+
+   // store basis status in case solving modified problem failed
+   DataArray< typename SPxSolverBase<R>::VarStatus > basisStatusRowsFirst;
+   DataArray< typename SPxSolverBase<R>::VarStatus > basisStatusColsFirst;
+
+   // refinement loop
+   const bool maximizing = (intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MAXIMIZE);
+   const int maxDimRational = numColsRational() > numRowsRational() ? numColsRational() :
+                              numRowsRational();
+   SolRational factorSol;
+   bool factorSolNewBasis = true;
+   int lastStallRefinements = 0;
+   int nextRatrecRefinement = 0;
+
+   // used in _ratrecAndOrRatfac to order a break or a continue outside of the function.
+   bool breakAfter;
+   bool continueAfter;
+
+   do
+   {
+      // decrement minRounds counter
+      minRounds--;
+
+      MSG_DEBUG(std::cout << "Computing primal violations.\n");
+
+      // computes violation of bounds
+      _computeBoundsViolation(sol, boundsViolation);
+
+      // computes violation of sides
+      _computeSidesViolation(sol, sideViolation);
+
+      MSG_DEBUG(std::cout << "Computing dual violations.\n");
+
+      // compute reduced cost violation
+      _computeReducedCostViolation(sol, redCostViolation, maximizing);
+
+      // compute dual violation
+      _computeDualViolation(sol, dualViolation, maximizing);
+
+      _modObj = sol._redCost;
+
+      // output violations; the reduced cost violations for artificially introduced slack columns are actually violations of the dual multipliers
+      MSG_INFO1(spxout, spxout
+                << "Max. bound violation = " << boundsViolation.str() << "\n"
+                << "Max. row violation = " << sideViolation.str() << "\n"
+                << "Max. reduced cost violation = " << redCostViolation.str() << "\n"
+                << "Max. dual violation = " << dualViolation.str() << "\n");
+
+      MSG_DEBUG(spxout
+                << std::fixed << std::setprecision(2) << std::setw(10)
+                << "Progress table: "
+                << std::setw(10) << _statistics->refinements << " & "
+                << std::setw(10) << _statistics->iterations << " & "
+                << std::setw(10) << _statistics->solvingTime->time() << " & "
+                << std::setw(10) << _statistics->rationalTime->time() << " & "
+                << std::setw(10) << boundsViolation > sideViolation ? boundsViolation :
+                sideViolation << " & "
+                << std::setw(10) << redCostViolation > dualViolation ? redCostViolation :
+                dualViolation << "\n");
+
+      // check termination criteria for refinement loop
+      if(_isRefinementOver(primalFeasible, dualFeasible, boundsViolation, sideViolation, redCostViolation,
+                           dualViolation,
+                           minRounds, stoppedTime, stoppedIter, numFailedRefinements))
+         break;
+
+      // check refinement progress
+      _checkRefinementProgress(boundsViolation, sideViolation, redCostViolation, dualViolation,
+                               maxViolation, bestViolation, violationImprovementFactor, numFailedRefinements);
+
+      // perform rational reconstruction and/or factorization
+      _ratrecAndOrRatfac(minRounds, lastStallRefinements, factorSolNewBasis, nextRatrecRefinement,
+                         errorCorrectionFactor, errorCorrection, maxViolation,
+                         sol, primalFeasible, dualFeasible,
+                         stoppedTime, stoppedIter, error, breakAfter, continueAfter);
+
+      if(breakAfter)
+         break;
+      else if(continueAfter)
+         continue;
+
+      // start refinement
+
+      // compute primal scaling factor; limit increase in scaling by tolerance used in floating point solve
+      _computePrimalScalingFactor(maxScale, primalScale, boundsViolation, sideViolation,
+                                  redCostViolation);
+
+      // apply scaled bounds and scaled sides
+      _applyScaledBounds(primalScale);
+      _applyScaledSides(primalScale);
+
+      // compute dual scaling factor; limit increase in scaling by tolerance used in floating point solve
+      _computeDualScalingFactor(maxScale, primalScale, dualScale, redCostViolation, dualViolation);
+
+      // apply scaled objective function
+      _applyScaledObj(dualScale, sol);
+
+      MSG_INFO1(spxout, spxout << "Refined floating-point solve . . .\n");
+
+      // ensure that artificial slack columns are basic and inequality constraints are nonbasic; otherwise we may end
+      // up with dual violation on inequality constraints after removing the slack columns; do not change this in the
+      // floating-point solver, though, because the solver may require its original basis to detect optimality
+      if(_slackCols.num() > 0 && _hasBasis)
+      {
+         int numOrigCols = numColsRational() - _slackCols.num();
+         assert(_slackCols.num() <= 0 || boolParam(SoPlexBase<R>::EQTRANS));
+
+         for(int i = 0; i < _slackCols.num(); i++)
+         {
+            int row = _slackCols.colVector(i).index(0);
+            int col = numOrigCols + i;
+
+            assert(row >= 0);
+            assert(row < numRowsRational());
+
+            if(_basisStatusRows[row] == SPxSolverBase<R>::BASIC
+                  && _basisStatusCols[col] != SPxSolverBase<R>::BASIC)
+            {
+               _basisStatusRows[row] = _basisStatusCols[col];
+               _basisStatusCols[col] = SPxSolverBase<R>::BASIC;
+               _rationalLUSolver.clear();
+            }
+         }
+      }
+
+      // load basis
+      if(_hasBasis && _solver.basis().status() < SPxBasisBase<R>::REGULAR)
+      {
+         MSG_DEBUG(spxout << "basis (status = " << _solver.basis().status() << ") desc before set:\n";
+                   _solver.basis().desc().dump());
+         _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+         MSG_DEBUG(spxout << "basis (status = " << _solver.basis().status() << ") desc after set:\n";
+                   _solver.basis().desc().dump());
+
+         _hasBasis = _solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM;
+         MSG_DEBUG(spxout << "setting basis in solver " << (_hasBasis ? "successful" : "failed") <<
+                   " (3)\n");
+      }
+
+      // solve modified problem
+      int prevIterations = _statistics->iterations;
+      _statistics->rationalTime->stop();
+      result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows,
+                                _basisStatusCols, primalScale > 1e20 || dualScale > 1e20);
+
+      // count refinements and remember whether we moved to a new basis
+      _statistics->refinements++;
+
+      if(_statistics->iterations <= prevIterations)
+      {
+         lastStallRefinements++;
+         _statistics->stallRefinements++;
+      }
+      else
+      {
+         factorSolNewBasis = true;
+         lastStallRefinements = 0;
+         _statistics->pivotRefinements = _statistics->refinements;
+      }
+
+      // evaluate result; if modified problem was not solved to optimality, stop refinement;
+      if(_evaluateResult(result, true, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
+                         error))
+         return;
+
+      _statistics->rationalTime->start();
+
+      int primalSize;
+
+      // correct primal solution and align with basis
+      _correctPrimalSolution(sol, primalScale, primalSize, maxDimRational, primalReal);
+
+      // update or recompute slacks depending on which looks faster
+      _updateSlacks(sol, primalSize);
+
+      const int numCorrectedPrimals = _primalDualDiff.size();
+
+      // correct dual solution and align with basis
+      _correctDualSolution(sol, maximizing, dualReal, dualScale, dualSize, maxDimRational);
+
+      // update or recompute reduced cost values depending on which looks faster
+      // adding one to the length of the dual vector accounts for the objective function vector
+      _updateReducedCosts(sol, dualSize, numCorrectedPrimals);
+   }
+   while(true);
+
+   // correct basis status for restricted inequalities
+   if(_hasBasis)
+   {
+      for(int r = numRowsRational() - 1; r >= 0; r--)
+      {
+         assert((lhsRational(r) == rhsRational(r)) == (_rowTypes[r] == RANGETYPE_FIXED));
+
+         if(_rowTypes[r] != RANGETYPE_FIXED && _basisStatusRows[r] == SPxSolverBase<R>::FIXED)
+            _basisStatusRows[r] = (maximizing == (sol._dual[r] < 0))
+                                  ? SPxSolverBase<R>::ON_LOWER
+                                  : SPxSolverBase<R>::ON_UPPER;
+      }
+   }
+
+   // compute objective function values
+   assert(sol._isPrimalFeasible == sol._isDualFeasible);
+
+   if(sol._isPrimalFeasible)
+   {
+      sol._objVal = sol._primal * _rationalLP->maxObj();
+
+      if(intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MINIMIZE)
+         sol._objVal *= -1;
+   }
+
+   // set objective coefficients for all rows to zero
+   _solver.clearRowObjs();
+
+   // stop rational solving time
+   _statistics->rationalTime->stop();
 }
 
 
