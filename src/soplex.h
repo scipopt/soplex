@@ -1703,6 +1703,15 @@ private:
    SPxScaler<R>* _scaler;
    SPxStarter<R>* _starter;
 
+   //----------------------------- BOOSTED SOLVER -----------------------------
+
+   using boostedPrecision = number<mpfr_float_backend<0>, et_off>;
+   // boostedPrecision.default_precision(<integer>) doesn't work in soplex.h
+
+   SPxSolverBase<boostedPrecision> _boostedSolver;
+
+   //--------------------------------------------------------------------------
+
    bool _isRealLPLoaded; // true indicates that the original LP is loaded in the _solver variable, hence all actions
    // are performed on the original LP.
    bool _isRealLPScaled;

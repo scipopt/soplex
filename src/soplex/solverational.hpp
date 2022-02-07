@@ -1590,6 +1590,14 @@ void SoPlexBase<R>::_performOptIRStable(
                 << std::setw(10) << redCostViolation > dualViolation ? redCostViolation :
                 dualViolation << "\n");
 
+      //-------------------------- SANDBOX ------------------------
+      /// @todo this is temporary, move the precision boosting after the result evaluation
+
+      // testing if the precision can be easily increased during run time
+      boostedPrecision::default_precision( boostedPrecision::default_precision() * 1.5 );
+
+      //-----------------------------------------------------------
+
       // check termination criteria for refinement loop
       if(_isRefinementOver(primalFeasible, dualFeasible, boundsViolation, sideViolation, redCostViolation,
                            dualViolation,
