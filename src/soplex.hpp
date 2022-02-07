@@ -6060,26 +6060,32 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       {
       case PRICER_AUTO:
          _solver.setPricer(&_pricerAuto);
+         _boostedSolver.setPricer(&_boostedPricerAuto);
          break;
 
       case PRICER_DANTZIG:
          _solver.setPricer(&_pricerDantzig);
+         _boostedSolver.setPricer(&_boostedPricerDantzig);
          break;
 
       case PRICER_PARMULT:
          _solver.setPricer(&_pricerParMult);
+         _boostedSolver.setPricer(&_boostedPricerParMult);
          break;
 
       case PRICER_DEVEX:
          _solver.setPricer(&_pricerDevex);
+         _boostedSolver.setPricer(&_boostedPricerDevex);
          break;
 
       case PRICER_QUICKSTEEP:
          _solver.setPricer(&_pricerQuickSteep);
+         _boostedSolver.setPricer(&_boostedPricerQuickSteep);
          break;
 
       case PRICER_STEEP:
          _solver.setPricer(&_pricerSteep);
+         _boostedSolver.setPricer(&_boostedPricerSteep);
          break;
 
       default:
@@ -6170,18 +6176,22 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       {
       case RATIOTESTER_TEXTBOOK:
          _solver.setTester(&_ratiotesterTextbook);
+         _boostedSolver.setTester(&_boostedRatiotesterTextbook);
          break;
 
       case RATIOTESTER_HARRIS:
          _solver.setTester(&_ratiotesterHarris);
+         _boostedSolver.setTester(&_boostedRatiotesterHarris);
          break;
 
       case RATIOTESTER_FAST:
          _solver.setTester(&_ratiotesterFast);
+         _boostedSolver.setTester(&_boostedRatiotesterFast);
          break;
 
       case RATIOTESTER_BOUNDFLIPPING:
          _solver.setTester(&_ratiotesterBoundFlipping);
+         _boostedSolver.setTester(&_boostedRatiotesterBoundFlipping);
          break;
 
       default:

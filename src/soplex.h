@@ -1710,6 +1710,18 @@ private:
 
    SPxSolverBase<boostedPrecision> _boostedSolver;
 
+   SPxAutoPR<boostedPrecision> _boostedPricerAuto;
+   SPxDantzigPR<boostedPrecision> _boostedPricerDantzig;
+   SPxParMultPR<boostedPrecision> _boostedPricerParMult;
+   SPxDevexPR<boostedPrecision> _boostedPricerDevex;
+   SPxSteepPR<boostedPrecision> _boostedPricerQuickSteep;
+   SPxSteepExPR<boostedPrecision> _boostedPricerSteep;
+
+   SPxDefaultRT<boostedPrecision> _boostedRatiotesterTextbook;
+   SPxHarrisRT<boostedPrecision> _boostedRatiotesterHarris;
+   SPxFastRT<boostedPrecision> _boostedRatiotesterFast;
+   SPxBoundFlippingRT<boostedPrecision> _boostedRatiotesterBoundFlipping;
+
    //--------------------------------------------------------------------------
 
    bool _isRealLPLoaded; // true indicates that the original LP is loaded in the _solver variable, hence all actions
