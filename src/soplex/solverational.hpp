@@ -1594,7 +1594,24 @@ void SoPlexBase<R>::_performOptIRStable(
       /// @todo this is temporary, move the precision boosting after the result evaluation
 
       // testing if the precision can be easily increased during run time
-      boostedPrecision::default_precision( boostedPrecision::default_precision() * 1.5 );
+      boostedPrecision::default_precision(boostedPrecision::default_precision() * 1.5);
+
+      /// load data from _rationalLP
+
+      /// just prints
+      _solver.printProblemStatistics(std::cout);
+      _boostedSolver.printProblemStatistics(std::cout);
+      _realLP->printProblemStatistics(std::cout);
+      _rationalLP->printProblemStatistics(std::cout);
+
+      /// load the data
+      _boostedSolver.loadLP(*_rationalLP);
+
+      /// just prints
+      _solver.printProblemStatistics(std::cout);
+      _boostedSolver.printProblemStatistics(std::cout);
+      _realLP->printProblemStatistics(std::cout);
+      _rationalLP->printProblemStatistics(std::cout);
 
       //-----------------------------------------------------------
 
