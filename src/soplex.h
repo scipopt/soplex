@@ -1710,6 +1710,8 @@ private:
 
    SPxSolverBase<boostedPrecision> _boostedSolver;
 
+   SLUFactor<boostedPrecision> _boostedSlufactor;
+
    SPxAutoPR<boostedPrecision> _boostedPricerAuto;
    SPxDantzigPR<boostedPrecision> _boostedPricerDantzig;
    SPxParMultPR<boostedPrecision> _boostedPricerParMult;
