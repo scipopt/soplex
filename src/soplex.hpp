@@ -5995,30 +5995,37 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       {
       case SCALER_OFF:
          _scaler = nullptr;
+         _boostedScaler = nullptr;
          break;
 
       case SCALER_UNIEQUI:
          _scaler = &_scalerUniequi;
+         _boostedScaler = &_boostedScalerUniequi;
          break;
 
       case SCALER_BIEQUI:
          _scaler = &_scalerBiequi;
+         _boostedScaler = &_boostedScalerBiequi;
          break;
 
       case SCALER_GEO1:
          _scaler = &_scalerGeo1;
+         _boostedScaler = &_boostedScalerGeo1;
          break;
 
       case SCALER_GEO8:
          _scaler = &_scalerGeo8;
+         _boostedScaler = &_boostedScalerGeo8;
          break;
 
       case SCALER_LEASTSQ:
          _scaler = &_scalerLeastsq;
+         _boostedScaler = &_boostedScalerLeastsq;
          break;
 
       case SCALER_GEOEQUI:
          _scaler = &_scalerGeoequi;
+         _boostedScaler = &_boostedScalerGeoequi;
          break;
 
       default:
@@ -7143,6 +7150,38 @@ void SoPlexBase<R>::_rangeToPerm(int start, int end, int* perm, int permSize) co
 
 /// checks consistency
 template <class R>
+bool SoPlexBase<R>::_isBoostedConsistent() const
+{
+   assert(_statistics != 0);
+   assert(_currentSettings != 0);
+
+   assert(_realLP != 0);
+   assert(_rationalLP != 0 || intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL);
+
+   assert(_realLP != &_solver || _isRealLPLoaded);
+   assert(_realLP == &_solver || !_isRealLPLoaded);
+
+   assert(_realLP != &_boostedSolver || _isRealLPLoaded);
+   assert(_realLP == &_boostedSolver || !_isRealLPLoaded);
+
+   assert(!_hasBasis || _isRealLPLoaded || _basisStatusRows.size() == numRows());
+   assert(!_hasBasis || _isRealLPLoaded || _basisStatusCols.size() == numCols());
+   assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED || _hasBasis);
+   assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED
+          || _rationalLUSolver.dim() == _rationalLUSolverBind.size());
+   assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED
+          || _rationalLUSolver.dim() == numRowsRational());
+
+   assert(_rationalLP == 0 || _colTypes.size() == numColsRational());
+   assert(_rationalLP == 0 || _rowTypes.size() == numRowsRational());
+
+   return true;
+}
+
+
+
+/// checks consistency
+template <class R>
 bool SoPlexBase<R>::_isConsistent() const
 {
    assert(_statistics != 0);
@@ -8092,6 +8131,138 @@ void SoPlexBase<R>::_ensureRealLPLoaded()
 
 /// call floating-point solver and update statistics on iterations etc.
 template <class R>
+void SoPlexBase<R>::_solveBoostedRealLPAndRecordStatistics(volatile bool* interrupt)
+{
+
+   ///@todo precision-boosting add arg SPxSolverBase<S> solver (idea for the future)
+
+   using boostedSolverRep = typename SPxSolverBase<BP>::Representation;
+   using boostedSolverType = typename SPxSolverBase<BP>::Type;
+
+   // set time and iteration limit
+   if(intParam(SoPlexBase<R>::ITERLIMIT) < realParam(SoPlexBase<R>::INFTY))
+      _boostedSolver.setTerminationIter(intParam(SoPlexBase<R>::ITERLIMIT) - _statistics->iterations);
+   else
+      _boostedSolver.setTerminationIter(-1);
+
+   if(realParam(SoPlexBase<R>::TIMELIMIT) < realParam(SoPlexBase<R>::INFTY))
+      _boostedSolver.setTerminationTime(Real(realParam(SoPlexBase<R>::TIMELIMIT)) -
+                                 _statistics->solvingTime->time());
+   else
+      _boostedSolver.setTerminationTime(Real(realParam(SoPlexBase<R>::INFTY)));
+
+   // ensure that tolerances are not too small
+   if(_boostedSolver.feastol() < 1e-12)
+      _boostedSolver.setFeastol(1e-12);
+
+   if(_boostedSolver.opttol() < 1e-12)
+      _boostedSolver.setOpttol(1e-12);
+
+   // set correct representation
+   if((intParam(SoPlexBase<R>::REPRESENTATION) == SoPlexBase<R>::REPRESENTATION_COLUMN
+         || (intParam(SoPlexBase<R>::REPRESENTATION) == SoPlexBase<R>::REPRESENTATION_AUTO
+             && (_boostedSolver.nCols() + 1) * realParam(SoPlexBase<R>::REPRESENTATION_SWITCH) >=
+             (_boostedSolver.nRows() + 1)))
+         && _boostedSolver.rep() != (boostedSolverRep)SPxSolverBase<R>::COLUMN)
+   {
+      _boostedSolver.setRep((boostedSolverRep)SPxSolverBase<R>::COLUMN);
+   }
+   else if((intParam(SoPlexBase<R>::REPRESENTATION) == SoPlexBase<R>::REPRESENTATION_ROW
+            || (intParam(SoPlexBase<R>::REPRESENTATION) == SoPlexBase<R>::REPRESENTATION_AUTO
+                && (_boostedSolver.nCols() + 1) * realParam(SoPlexBase<R>::REPRESENTATION_SWITCH) < (_boostedSolver.nRows() + 1)))
+           && _boostedSolver.rep() != (boostedSolverRep)SPxSolverBase<R>::ROW)
+   {
+      _boostedSolver.setRep((boostedSolverRep)SPxSolverBase<R>::ROW);
+   }
+
+   // set correct type
+   if(((intParam(ALGORITHM) == SoPlexBase<R>::ALGORITHM_PRIMAL
+         && _boostedSolver.rep() == (boostedSolverRep)SPxSolverBase<R>::COLUMN)
+         || (intParam(ALGORITHM) == SoPlexBase<R>::ALGORITHM_DUAL && _boostedSolver.rep() == (boostedSolverRep)SPxSolverBase<R>::ROW))
+         && _boostedSolver.type() != (boostedSolverType)SPxSolverBase<R>::ENTER)
+   {
+      _boostedSolver.setType((boostedSolverType)SPxSolverBase<R>::ENTER);
+   }
+   else if(((intParam(ALGORITHM) == SoPlexBase<R>::ALGORITHM_DUAL
+             && _boostedSolver.rep() == (boostedSolverRep)SPxSolverBase<R>::COLUMN)
+            || (intParam(ALGORITHM) == SoPlexBase<R>::ALGORITHM_PRIMAL
+                && _boostedSolver.rep() == (boostedSolverRep)SPxSolverBase<R>::ROW))
+           && _boostedSolver.type() != (boostedSolverType)SPxSolverBase<R>::LEAVE)
+   {
+      _boostedSolver.setType((boostedSolverType)SPxSolverBase<R>::LEAVE);
+   }
+
+   // set pricing modes
+   _boostedSolver.setSparsePricingFactor(realParam(SoPlexBase<R>::SPARSITY_THRESHOLD));
+
+   if((intParam(SoPlexBase<R>::HYPER_PRICING) == SoPlexBase<R>::HYPER_PRICING_ON)
+         || ((intParam(SoPlexBase<R>::HYPER_PRICING) == SoPlexBase<R>::HYPER_PRICING_AUTO)
+             && (_boostedSolver.nRows() + _boostedSolver.nCols() > HYPERPRICINGTHRESHOLD)))
+      _boostedSolver.hyperPricing(true);
+   else if(intParam(SoPlexBase<R>::HYPER_PRICING) == SoPlexBase<R>::HYPER_PRICING_OFF)
+      _boostedSolver.hyperPricing(false);
+
+   _boostedSolver.setNonzeroFactor(realParam(SoPlexBase<R>::REFAC_BASIS_NNZ));
+   _boostedSolver.setFillFactor(realParam(SoPlexBase<R>::REFAC_UPDATE_FILL));
+   _boostedSolver.setMemFactor(realParam(SoPlexBase<R>::REFAC_MEM_FACTOR));
+
+   // call floating-point solver and catch exceptions
+   _statistics->simplexTime->start();
+
+   try
+   {
+      _boostedSolver.solve(interrupt);
+   }
+   catch(const SPxException& E)
+   {
+      MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() << "> while solving Real LP.\n");
+      _status = SPxSolverBase<R>::ERROR;
+   }
+   catch(...)
+   {
+      MSG_INFO1(spxout, spxout << "Caught unknown exception while solving Real LP.\n");
+      _status = SPxSolverBase<R>::ERROR;
+   }
+
+   _statistics->simplexTime->stop();
+
+   // invalidate rational factorization of basis if pivots have been performed
+   if(_boostedSolver.iterations() > 0)
+      _rationalLUSolver.clear();
+
+   ///@todo precision-boosting currently no need to record statistics for the boosted solver
+#ifdef SOPLEX_DISABLE_CODE
+   // record statistics
+   _statistics->iterations += _solver.iterations();
+   _statistics->iterationsPrimal += _solver.primalIterations();
+   _statistics->iterationsFromBasis += _hadBasis ? _solver.iterations() : 0;
+   _statistics->iterationsPolish += _solver.polishIterations();
+   _statistics->boundflips += _solver.boundFlips();
+   _statistics->multTimeSparse += _solver.multTimeSparse->time();
+   _statistics->multTimeFull += _solver.multTimeFull->time();
+   _statistics->multTimeColwise += _solver.multTimeColwise->time();
+   _statistics->multTimeUnsetup += _solver.multTimeUnsetup->time();
+   _statistics->multSparseCalls += _solver.multSparseCalls;
+   _statistics->multFullCalls += _solver.multFullCalls;
+   _statistics->multColwiseCalls += _solver.multColwiseCalls;
+   _statistics->multUnsetupCalls += _solver.multUnsetupCalls;
+   _statistics->luFactorizationTimeReal += _slufactor.getFactorTime();
+   _statistics->luSolveTimeReal += _slufactor.getSolveTime();
+   _statistics->luFactorizationsReal += _slufactor.getFactorCount();
+   _statistics->luSolvesReal += _slufactor.getSolveCount();
+   _slufactor.resetCounters();
+
+   _statistics->degenPivotsPrimal += _solver.primalDegeneratePivots();
+   _statistics->degenPivotsDual += _solver.dualDegeneratePivots();
+   _statistics->sumDualDegen += _solver.sumDualDegeneracy();
+   _statistics->sumPrimalDegen += _solver.sumPrimalDegeneracy();
+#endif
+}
+
+
+
+/// call floating-point solver and update statistics on iterations etc.
+template <class R>
 void SoPlexBase<R>::_solveRealLPAndRecordStatistics(volatile bool* interrupt)
 {
    bool _hadBasis = _hasBasis;
@@ -8791,9 +8962,17 @@ SoPlexBase<R>::SoPlexBase()
    _scalerGeo8.setOutstream(spxout);
    _scalerGeoequi.setOutstream(spxout);
    _scalerLeastsq.setOutstream(spxout);
+   _boostedSolver.setOutstream(spxout);
+   _boostedScalerUniequi.setOutstream(spxout);
+   _boostedScalerBiequi.setOutstream(spxout);
+   _boostedScalerGeo1.setOutstream(spxout);
+   _boostedScalerGeo8.setOutstream(spxout);
+   _boostedScalerGeoequi.setOutstream(spxout);
+   _boostedScalerLeastsq.setOutstream(spxout);
 
    // give lu factorization to solver
    _solver.setBasisSolver(&_slufactor);
+   _boostedSolver.setBasisSolver(&_boostedSlufactor);
 
    // the R LP is initially stored in the solver; the rational LP is constructed, when the parameter SYNCMODE is
    // initialized in setSettings() below
@@ -8805,6 +8984,7 @@ SoPlexBase<R>::SoPlexBase()
    _unscaleCalls = 0;
    _realLP->setOutstream(spxout);
    _currentProb = DECOMP_ORIG;
+   _useBoostedSolver = false;
 
    // initialize statistics
    spx_alloc(_statistics);
