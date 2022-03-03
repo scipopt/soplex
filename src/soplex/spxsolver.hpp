@@ -1066,6 +1066,17 @@ void SPxSolverBase<R>::setType(Type tp)
    }
 
    template <class R>
+   void SPxSolverBase<R>::setEpsilon(R d)
+   {
+      if(d <= 0.0)
+         throw SPxInterfaceException("XSOLVE33 Cannot set epsilon less than or equal to zero.");
+
+      primVec.delta().setEpsilon(d);
+      dualVec.delta().setEpsilon(d);
+      addVec.delta().setEpsilon(d);
+   }
+
+   template <class R>
    void SPxSolverBase<R>::hyperPricing(bool h)
    {
       hyperPricingEnter = h;

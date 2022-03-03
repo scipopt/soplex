@@ -629,6 +629,12 @@ SoPlexBase<R>::Settings::RealParam::RealParam()
    upper[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 1;
    defaultValue[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 1.0;
 
+   // factor by which the precision of the floating-point solver is multiplied
+   name[SoPlexBase<R>::PRECISION_BOOSTING_FACTOR] = "precision_boosting_factor";
+   description[SoPlexBase<R>::PRECISION_BOOSTING_FACTOR] = "factor by which the precision of the floating-point solver is multiplied";
+   lower[SoPlexBase<R>::PRECISION_BOOSTING_FACTOR] = 1.0;
+   upper[SoPlexBase<R>::PRECISION_BOOSTING_FACTOR] = 10.0;
+   defaultValue[SoPlexBase<R>::PRECISION_BOOSTING_FACTOR] = 1.5;
 }
 
 template <class R>
@@ -5964,22 +5970,29 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       {
       case SIMPLIFIER_OFF:
          _simplifier = 0;
+         _boostedSimplifier = 0;
          break;
 
       case SIMPLIFIER_INTERNAL:
       case SIMPLIFIER_AUTO:
          _simplifier = &_simplifierMainSM;
+         _boostedSimplifier = &_boostedSimplifierMainSM;
          assert(_simplifier != 0);
+         assert(_boostedSimplifier != 0);
          break;
 
       case SIMPLIFIER_PAPILO:
 #ifdef SOPLEX_WITH_PAPILO
          _simplifier = &_simplifierPaPILO;
+         _boostedSimplifier = &_boostedSimplifierPaPILO;
          assert(_simplifier != 0);
+         assert(_boostedSimplifier != 0);
          break;
 #else
          _simplifier = &_simplifierMainSM;
+         _boostedSimplifier = &_boostedSimplifierMainSM;
          assert(_simplifier != 0);
+         assert(_boostedSimplifier != 0);
          return false;
 #endif
 
@@ -6490,6 +6503,11 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
 
       return false;
 #endif
+      break;
+
+   // factor by which the precision of the floating-point solver is multiplied
+   case SoPlexBase<R>::PRECISION_BOOSTING_FACTOR:
+      Param::setPrecisionBoostingFactor(Real(value));
       break;
 
    default:
@@ -7155,17 +7173,22 @@ bool SoPlexBase<R>::_isBoostedConsistent() const
    assert(_statistics != 0);
    assert(_currentSettings != 0);
 
-   assert(_realLP != 0);
    assert(_rationalLP != 0 || intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL);
 
-   assert(_realLP != &_solver || _isRealLPLoaded);
-   assert(_realLP == &_solver || !_isRealLPLoaded);
+   ///@todo precision-boosting _realLP not used in _boostedSolver
+#ifdef SOPLEX_DISABLED_CODE
+   assert(_realLP != 0);
 
    assert(_realLP != &_boostedSolver || _isRealLPLoaded);
    assert(_realLP == &_boostedSolver || !_isRealLPLoaded);
 
    assert(!_hasBasis || _isRealLPLoaded || _basisStatusRows.size() == numRows());
    assert(!_hasBasis || _isRealLPLoaded || _basisStatusCols.size() == numCols());
+#endif
+
+   assert(!_hasBasis || _basisStatusRows.size() == numRows());
+   assert(!_hasBasis || _basisStatusCols.size() == numCols());
+
    assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED || _hasBasis);
    assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED
           || _rationalLUSolver.dim() == _rationalLUSolverBind.size());
@@ -8010,23 +8033,32 @@ void SoPlexBase<R>::_enableSimplifierAndScaler()
    {
    case SIMPLIFIER_OFF:
       _simplifier = 0;
+      _boostedSimplifier = 0;
       break;
 
    case SIMPLIFIER_AUTO:
    case SIMPLIFIER_INTERNAL:
       _simplifier = &_simplifierMainSM;
+      _boostedSimplifier = &_boostedSimplifierMainSM;
       assert(_simplifier != 0);
+      assert(_boostedSimplifier != 0);
       _simplifier->setMinReduction(realParam(MINRED));
+      _boostedSimplifier->setMinReduction(realParam(MINRED));
       break;
 
    case SIMPLIFIER_PAPILO:
 #ifdef SOPLEX_WITH_PAPILO
       _simplifier = &_simplifierPaPILO;
+      _boostedSimplifier = &_boostedSimplifierPaPILO;
       assert(_simplifier != 0);
+      assert(_boostedSimplifier != 0);
 #else
       _simplifier = &_simplifierMainSM;
+      _boostedSimplifier = &_boostedSimplifierMainSM;
       assert(_simplifier != 0);
+      assert(_boostedSimplifier != 0);
       _simplifier->setMinReduction(realParam(MINRED));
+      _boostedSimplifier->setMinReduction(realParam(MINRED));
 #endif
       break;
 
@@ -8077,10 +8109,14 @@ template <class R>
 void SoPlexBase<R>::_disableSimplifierAndScaler()
 {
    _simplifier = 0;
+   _boostedSimplifier = 0;
 
    // preserve scaler when persistent scaling is used
    if(!_isRealLPScaled)
+   {
       _scaler = 0;
+      _boostedScaler = 0;
+   }
    else
       assert(boolParam(SoPlexBase<R>::PERSISTENTSCALING));
 }
@@ -8136,9 +8172,6 @@ void SoPlexBase<R>::_solveBoostedRealLPAndRecordStatistics(volatile bool* interr
 
    ///@todo precision-boosting add arg SPxSolverBase<S> solver (idea for the future)
 
-   using boostedSolverRep = typename SPxSolverBase<BP>::Representation;
-   using boostedSolverType = typename SPxSolverBase<BP>::Type;
-
    // set time and iteration limit
    if(intParam(SoPlexBase<R>::ITERLIMIT) < realParam(SoPlexBase<R>::INFTY))
       _boostedSolver.setTerminationIter(intParam(SoPlexBase<R>::ITERLIMIT) - _statistics->iterations);
@@ -8152,44 +8185,49 @@ void SoPlexBase<R>::_solveBoostedRealLPAndRecordStatistics(volatile bool* interr
       _boostedSolver.setTerminationTime(Real(realParam(SoPlexBase<R>::INFTY)));
 
    // ensure that tolerances are not too small
-   if(_boostedSolver.feastol() < 1e-12)
-      _boostedSolver.setFeastol(1e-12);
+   double tolerance = pow(10,-(int)(BP::default_precision()*_tolPrecisionRatio));
+   if(_boostedSolver.feastol() < tolerance)
+   {
+      _boostedSolver.setFeastol(tolerance);
+   }
 
-   if(_boostedSolver.opttol() < 1e-12)
-      _boostedSolver.setOpttol(1e-12);
+   if(_boostedSolver.opttol() < tolerance)
+   {
+      _boostedSolver.setOpttol(tolerance);
+   }
 
    // set correct representation
    if((intParam(SoPlexBase<R>::REPRESENTATION) == SoPlexBase<R>::REPRESENTATION_COLUMN
          || (intParam(SoPlexBase<R>::REPRESENTATION) == SoPlexBase<R>::REPRESENTATION_AUTO
              && (_boostedSolver.nCols() + 1) * realParam(SoPlexBase<R>::REPRESENTATION_SWITCH) >=
              (_boostedSolver.nRows() + 1)))
-         && _boostedSolver.rep() != (boostedSolverRep)SPxSolverBase<R>::COLUMN)
+         && _boostedSolver.rep() != SPxSolverBase<BP>::COLUMN)
    {
-      _boostedSolver.setRep((boostedSolverRep)SPxSolverBase<R>::COLUMN);
+      _boostedSolver.setRep(SPxSolverBase<BP>::COLUMN);
    }
    else if((intParam(SoPlexBase<R>::REPRESENTATION) == SoPlexBase<R>::REPRESENTATION_ROW
             || (intParam(SoPlexBase<R>::REPRESENTATION) == SoPlexBase<R>::REPRESENTATION_AUTO
                 && (_boostedSolver.nCols() + 1) * realParam(SoPlexBase<R>::REPRESENTATION_SWITCH) < (_boostedSolver.nRows() + 1)))
-           && _boostedSolver.rep() != (boostedSolverRep)SPxSolverBase<R>::ROW)
+           && _boostedSolver.rep() != SPxSolverBase<BP>::ROW)
    {
-      _boostedSolver.setRep((boostedSolverRep)SPxSolverBase<R>::ROW);
+      _boostedSolver.setRep(SPxSolverBase<BP>::ROW);
    }
 
    // set correct type
    if(((intParam(ALGORITHM) == SoPlexBase<R>::ALGORITHM_PRIMAL
-         && _boostedSolver.rep() == (boostedSolverRep)SPxSolverBase<R>::COLUMN)
-         || (intParam(ALGORITHM) == SoPlexBase<R>::ALGORITHM_DUAL && _boostedSolver.rep() == (boostedSolverRep)SPxSolverBase<R>::ROW))
-         && _boostedSolver.type() != (boostedSolverType)SPxSolverBase<R>::ENTER)
+         && _boostedSolver.rep() == SPxSolverBase<BP>::COLUMN)
+         || (intParam(ALGORITHM) == SoPlexBase<R>::ALGORITHM_DUAL && _boostedSolver.rep() == SPxSolverBase<BP>::ROW))
+         && _boostedSolver.type() != SPxSolverBase<BP>::ENTER)
    {
-      _boostedSolver.setType((boostedSolverType)SPxSolverBase<R>::ENTER);
+      _boostedSolver.setType(SPxSolverBase<BP>::ENTER);
    }
    else if(((intParam(ALGORITHM) == SoPlexBase<R>::ALGORITHM_DUAL
-             && _boostedSolver.rep() == (boostedSolverRep)SPxSolverBase<R>::COLUMN)
+             && _boostedSolver.rep() == SPxSolverBase<BP>::COLUMN)
             || (intParam(ALGORITHM) == SoPlexBase<R>::ALGORITHM_PRIMAL
-                && _boostedSolver.rep() == (boostedSolverRep)SPxSolverBase<R>::ROW))
-           && _boostedSolver.type() != (boostedSolverType)SPxSolverBase<R>::LEAVE)
+                && _boostedSolver.rep() == SPxSolverBase<BP>::ROW))
+           && _boostedSolver.type() != SPxSolverBase<BP>::LEAVE)
    {
-      _boostedSolver.setType((boostedSolverType)SPxSolverBase<R>::LEAVE);
+      _boostedSolver.setType(SPxSolverBase<BP>::LEAVE);
    }
 
    // set pricing modes
@@ -8984,7 +9022,6 @@ SoPlexBase<R>::SoPlexBase()
    _unscaleCalls = 0;
    _realLP->setOutstream(spxout);
    _currentProb = DECOMP_ORIG;
-   _useBoostedSolver = false;
 
    // initialize statistics
    spx_alloc(_statistics);

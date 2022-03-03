@@ -1438,8 +1438,11 @@ public:
       /// minimal modification threshold to apply presolve reductions
       SIMPLIFIER_MODIFYROWFAC = 25,
 
+      /// factor by which the precision of the floating-point solver is multiplied
+      PRECISION_BOOSTING_FACTOR = 26,
+
       /// number of real parameters
-      REALPARAM_COUNT = 26
+      REALPARAM_COUNT = 27
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
@@ -1705,11 +1708,16 @@ private:
 
    //----------------------------- BOOSTED SOLVER -----------------------------
 
+   // multiprecision type used for the boosted solver
    using BP = number<mpfr_float_backend<0>, et_off>;
 
+   // boosted solver object
    SPxSolverBase<BP> _boostedSolver;
 
-   bool _useBoostedSolver; // true if we switched to _boostedSolver instead of _solver
+   ///@todo precision-boosting maybe use a `using` or `define`
+   int _initialPrecision   = 50;
+   Real _tolPrecisionRatio = 0.7;
+   Real _epsPrecisionRatio = 0.8;
 
    SLUFactor<BP> _boostedSlufactor;
 
@@ -1725,6 +1733,9 @@ private:
    SPxFastRT<BP> _boostedRatiotesterFast;
    SPxBoundFlippingRT<BP> _boostedRatiotesterBoundFlipping;
 
+   SPxScaler<BP>* _boostedScaler;
+   SPxSimplifier<BP>* _boostedSimplifier;
+
    SPxEquiliSC<BP> _boostedScalerUniequi;
    SPxEquiliSC<BP> _boostedScalerBiequi;
    SPxGeometSC<BP> _boostedScalerGeo1;
@@ -1732,7 +1743,8 @@ private:
    SPxGeometSC<BP> _boostedScalerGeoequi;
    SPxLeastSqSC<BP> _boostedScalerLeastsq;
 
-   SPxScaler<BP>* _boostedScaler;
+   SPxMainSM<BP> _boostedSimplifierMainSM;
+   Presol<BP> _boostedSimplifierPaPILO;
 
    //--------------------------------------------------------------------------
 
@@ -1970,6 +1982,18 @@ private:
    DataArray<typename SPxSolverBase<R>::VarStatus > _basisStatusRows;
    DataArray<typename  SPxSolverBase<R>::VarStatus > _basisStatusCols;
 
+   // these vectors don't replace _basisStatusRows and _basisStatusCols
+   // they aim to overcome the issue of having the enum VarStatus inside SPxSolverBase.
+   // When calling setBasis or getBasis (from SPxSolverBase class), a specific conversion is needed.
+   // Function: SPxSolverBase<BP>::setBasis(...)
+   // Usage: copy _basisStatusRows(Cols) to _tmpBasisStatusRows(Cols) before calling
+   // mysolver.setBasis(_tmpBasisStatusRows, _tmpBasisStatusCols)
+   // Function: SPxSolverBase<BP>::getBasis(...)
+   // Usage: copy _tmpBasisStatusRows(Cols) to _basisStatusRows(Cols) after calling
+   // mysolver.getBasis(_tmpBasisStatusRows, _tmpBasisStatusCols, _basisStatusRows.size(), _basisStatusCols.size())
+   DataArray<typename SPxSolverBase<BP>::VarStatus > _tmpBasisStatusRows;
+   DataArray<typename  SPxSolverBase<BP>::VarStatus > _tmpBasisStatusCols;
+
    SolBase<R> _solReal;
    SolRational _solRational;
    SolRational _workSol;
@@ -2004,7 +2028,7 @@ private:
    /// creates a permutation for removing rows/columns from a range of indices
    void _rangeToPerm(int start, int end, int* perm, int permSize) const;
 
-   /// checks consistency
+   /// checks consistency for the boosted solver
    bool _isBoostedConsistent() const;
 
    /// checks consistency
@@ -2473,10 +2497,10 @@ private:
    void _computeInfeasBox(SolRational& sol, bool transformed);
 
    /// solves real LP during iterative refinement
-   void _solveBoostedRealForRational(bool fromscratch,
+   void _solveRealForRationalBoosted(bool fromscratch,
          VectorBase<BP>& primal, VectorBase<BP>& dual,
-         DataArray< typename SPxSolverBase<BP>::VarStatus >& basisStatusRows,
-         DataArray< typename SPxSolverBase<BP>::VarStatus >& basisStatusCols,
+         DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
+         DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
          typename SPxSolverBase<BP>::Status& boostedResult);
 
    /// solves real LP during iterative refinement
@@ -2486,12 +2510,12 @@ private:
          DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols);
 
    /// solves real LP with recovery mechanism
-   void _solveBoostedRealStable(bool acceptUnbounded, bool acceptInfeasible,
+   void _solveRealStableBoosted(bool acceptUnbounded, bool acceptInfeasible,
          VectorBase<BP>& primal, VectorBase<BP>& dual,
-         DataArray< typename SPxSolverBase<BP>::VarStatus >& basisStatusRows,
-         DataArray< typename SPxSolverBase<BP>::VarStatus >& basisStatusCols,
+         DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
+         DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
          typename SPxSolverBase<BP>::Status& boostedResult,
-         const bool forceNoSimplifier = false);
+         bool& fromScratch, const bool forceNoSimplifier = false);
 
    /// solves real LP with recovery mechanism
    typename SPxSolverBase<R>::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible,

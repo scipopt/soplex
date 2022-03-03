@@ -35,6 +35,9 @@ namespace soplex
 //   template <class R>
 // THREADLOCAL R Param::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
 
+//   template <class R>
+// THREADLOCAL R Param::s_prec_boost_factor     = DEFAULT_PREC_BOOST_FACTOR;
+
 
 /// returns \c true iff |a-b| <= eps
 template <class R, class S>
