@@ -2352,7 +2352,7 @@ void SoPlexBase<R>::_performOptIRStable(
 
       do
       {
-         MSG_INFO1(spxout, spxout << "New boosted iteration . . .\n");
+         MSG_INFO1(spxout, spxout << "\nNew boosted iteration . . .\n");
 
          nbBoostedIterations ++;
 
@@ -2422,12 +2422,6 @@ void SoPlexBase<R>::_performOptIRStable(
 
          // initialize boosted solver
          _boostedSolver.init();
-
-         ///@todo precision-boosting find a way to set the specific pricer et ratio tester
-         // set pricer
-         _boostedSolver.setPricer(&_boostedPricerAuto); // an example
-         // set ratio tester
-         _boostedSolver.setTester(&_boostedRatiotesterTextbook); // an example
 
          for(int r = numRowsRational() - 1; r >= 0; r--)
             assert(_boostedSolver.maxRowObj(r) == 0.0);
