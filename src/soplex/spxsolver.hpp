@@ -760,7 +760,7 @@ void SPxSolverBase<R>::setType(Type tp)
    template <class R>
    bool SPxSolverBase<R>::noViols(R tol) const
    {
-      assert(tol >= 0.0);
+      assert(tol >= R(0.0));
 
       if(type() == ENTER)
       {
@@ -1032,7 +1032,7 @@ void SPxSolverBase<R>::setType(Type tp)
    void SPxSolverBase<R>::setFeastol(R d)
    {
 
-      if(d <= 0.0)
+      if(d <= R(0.0))
          throw SPxInterfaceException("XSOLVE30 Cannot set feastol less than or equal to zero.");
 
       if(theRep == COLUMN)
@@ -1045,7 +1045,7 @@ void SPxSolverBase<R>::setType(Type tp)
    void SPxSolverBase<R>::setOpttol(R d)
    {
 
-      if(d <= 0.0)
+      if(d <= R(0.0))
          throw SPxInterfaceException("XSOLVE31 Cannot set opttol less than or equal to zero.");
 
       if(theRep == COLUMN)
@@ -1058,7 +1058,7 @@ void SPxSolverBase<R>::setType(Type tp)
    void SPxSolverBase<R>::setDelta(R d)
    {
 
-      if(d <= 0.0)
+      if(d <= R(0.0))
          throw SPxInterfaceException("XSOLVE32 Cannot set delta less than or equal to zero.");
 
       m_entertol = d;
@@ -1068,7 +1068,7 @@ void SPxSolverBase<R>::setType(Type tp)
    template <class R>
    void SPxSolverBase<R>::setEpsilon(R d)
    {
-      if(d <= 0.0)
+      if(d <= R(0.0))
          throw SPxInterfaceException("XSOLVE33 Cannot set epsilon less than or equal to zero.");
 
       primVec.delta().setEpsilon(d);
