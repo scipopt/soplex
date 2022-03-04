@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2021 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -80,7 +80,6 @@
 
 // An alias for boost multiprecision
 namespace mpf = boost::multiprecision;
-#include <boost/any.hpp>
 #endif
 
 #define DEFAULT_RANDOM_SEED   0   // used to suppress output when the seed was not changed
@@ -1157,13 +1156,13 @@ public:
       /// disabling presolving
       SIMPLIFIER_OFF = 0,
 
-      /// using internal presoling methods
+      /// using internal presolving methods
       SIMPLIFIER_INTERNAL = 3,
 
       /// using the presolve lib papilo
       SIMPLIFIER_PAPILO = 2,
 
-      /// @deprecated: only to provide backwards compatibility (use INTERNAL instead)
+      /// SoPlex chooses automatically (currently always "internal")
       SIMPLIFIER_AUTO = 1
    };
 

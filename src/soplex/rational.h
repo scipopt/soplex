@@ -228,9 +228,6 @@ using Integer = int;
 class Rational
 {
 
-private:
-   double val;
-
 public:
 
    ///@name Construction and destruction
@@ -245,80 +242,66 @@ public:
    /// default constructor
    inline Rational()
    {
-      rationalErrorMessage();
    };
    /// copy constructor
    inline Rational(const Rational& r)
    {
-      rationalErrorMessage();
    };
    /// constructor from long double
    inline Rational(const long double& r)
    {
-      rationalErrorMessage();
    };
    /// constructor from double
    inline Rational(const double& r)
    {
-      rationalErrorMessage();
    };
    ///constructor from int
    inline Rational(const int& i)
    {
-      rationalErrorMessage();
    };
    /// constructor from Integer
    inline Rational(const Integer& num, const Integer& den)
    {
-      rationalErrorMessage();
    };
    /// constructor from mpq_t (GMP only)
    inline Rational(const mpq_t& q)
    {
-      rationalErrorMessage();
    };
 #ifdef SOPLEX_WITH_BOOST
    // constructor from boost number
    inline template <typename T, boost::multiprecision::expression_template_option eto>
    Rational(const boost::multiprecision::number<T, eto>& q)
    {
-      rationalErrorMessage();
    };
 #endif
    /// destructor
    inline ~Rational()
    {
-      rationalErrorMessage();
    };
 
    /// assignment operator
    inline Rational& operator=(const Rational&)
    {
-      rationalErrorMessage();
       return *this;
    };
    /// assignment operator from long double
    inline Rational& operator=(const long double& r)
    {
-      rationalErrorMessage();
       return *this;
    };
    /// assignment operator from double
    inline Rational& operator=(const double& r)
    {
-      rationalErrorMessage();
       return *this;
    };
    /// assignment operator from int
    inline Rational& operator=(const int& i)
    {
-      rationalErrorMessage();
       return *this;
    };
    /// assignment operator from mpq_t
    inline Rational& operator=(const mpq_t& q)
    {
-      rationalErrorMessage();
       return *this;
    };
 
@@ -361,7 +344,7 @@ public:
    operator boost::multiprecision::number<T, eto>() const
    {
       rationalErrorMessage();
-      return val;
+      return 0;
    };
 #else
    // Operator to typecast Rational to one of the Boost Number types
@@ -370,7 +353,7 @@ public:
    const
    {
       rationalErrorMessage();
-      return val;
+      return 0;
    };
 #endif
 #endif

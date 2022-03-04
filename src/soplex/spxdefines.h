@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2021 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -80,10 +80,10 @@ namespace soplex
 // Overloaded EQ function
 bool EQ(int a, int b);
 
-#define SOPLEX_VERSION         600
+#define SOPLEX_VERSION         601
 #define SOPLEX_SUBVERSION        0
 #define SOPLEX_APIVERSION       13
-#define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2021 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)"
+#define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2022 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)"
 
 /*-----------------------------------------------------------------------------
  * Assertion Macros etc.

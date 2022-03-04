@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2021 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -227,9 +227,9 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
 
    // type of simplifier
    name[SoPlexBase<R>::SIMPLIFIER] = "simplifier";
-   description[SoPlexBase<R>::SIMPLIFIER] = "simplifier (0 - off, 1 - internal, 2 - PaPILO)";
+   description[SoPlexBase<R>::SIMPLIFIER] = "simplifier (0 - off, 1 - auto, 2 - PaPILO, 3 - internal)";
    lower[SoPlexBase<R>::SIMPLIFIER] = 0;
-   upper[SoPlexBase<R>::SIMPLIFIER] = 2;
+   upper[SoPlexBase<R>::SIMPLIFIER] = 3;
    defaultValue[SoPlexBase<R>::SIMPLIFIER] = SoPlexBase<R>::SIMPLIFIER_INTERNAL;
 
    // type of scaler
@@ -1479,9 +1479,11 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
       _applyPolishing = rhs._applyPolishing;
 
       // rational constants do not need to be assigned
+#ifdef SOPLEX_WITH_BOOST
       _rationalPosone = 1;
       _rationalNegone = -1;
       _rationalZero = 0;
+#endif
    }
 
    assert(_isConsistent());
@@ -6241,6 +6243,7 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
 
    // infinity threshold
    case SoPlexBase<R>::INFTY:
+#ifdef SOPLEX_WITH_BOOST
       _rationalPosInfty = value;
       // boost is treating -value as an expression and not just a number<T> So
       // doing -val won't work since Rational doesn't have an operator= that
@@ -6250,6 +6253,7 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
       // A work around to avoid expression template
       _rationalNegInfty = value;
       _rationalNegInfty = -_rationalNegInfty;
+#endif
 
       if(intParam(SoPlexBase<R>::SYNCMODE) != SYNCMODE_ONLYREAL)
          _recomputeRangeTypesRational();
@@ -6621,7 +6625,11 @@ void SoPlexBase<R>::printVersion() const
 
 #ifdef SOPLEX_WITH_PAPILO
    MSG_INFO1(spxout, spxout << " [PaPILO  " << PAPILO_VERSION_MAJOR << "." << PAPILO_VERSION_MINOR  <<
-             "." << PAPILO_VERSION_PATCH << " {" <<  PAPILO_GITHASH << "}]\n");
+             "." << PAPILO_VERSION_PATCH);
+#ifdef PAPILO_GITHASH_AVAILABLE
+   MSG_INFO1(spxout, spxout << " {" <<  PAPILO_GITHASH << "}");
+#endif
+   MSG_INFO1(spxout, spxout << "]\n");
 #else
    MSG_INFO1(spxout, spxout << " [PaPILO: not available]");
 #endif
