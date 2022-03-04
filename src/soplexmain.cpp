@@ -709,6 +709,17 @@ int runSoPlex(int argc, char* argv[])
             {
                continue;
             }
+            ///@todo precision-boosting make it so that we can read a several digits value like 1.2
+            // --precboostfac=<value> : choose precision boosting factor for boosted solver (0* - floating-point, 1 - rational)
+            else if(strncmp(option, "precboostfac=", 13) == 0)
+            {
+               if(!soplex->setRealParam(soplex->PRECISION_BOOSTING_FACTOR, atoi(&option[13])))
+               {
+                  printUsage(argv, optidx);
+                  returnValue = 1;
+                  goto TERMINATE_FREESTRINGS;
+               }
+            }
             // --<type>:<name>=<val> :  change parameter value using syntax of settings file entries
             else if(!soplex->parseSettingsString(option))
             {

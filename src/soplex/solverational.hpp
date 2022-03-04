@@ -2338,9 +2338,6 @@ void SoPlexBase<R>::_performOptIRStable(
       // set initial precision
       BP::default_precision(_initialPrecision);
 
-      // set precision boosting factor; default value is 1.5 (DEFAULT_PREC_BOOST_FACTOR)
-      Param::setPrecisionBoostingFactor(1.2);
-
       // get parameter value (true = from slack basis, false = hot start)
       bool fromScratch = _boostedFromSlack;
 
