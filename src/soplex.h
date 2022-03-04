@@ -1105,8 +1105,11 @@ public:
       /// type of timer for statistics
       STATTIMER = 29,
 
+      /// mode for boosted solver
+      BOOSTED_SOLVER = 30,
+
       /// number of integer parameters
-      INTPARAM_COUNT = 30
+      INTPARAM_COUNT = 31
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -1355,6 +1358,19 @@ public:
 
       /// minimize number of basic slack variables, i.e. more variables between bounds
       POLISHING_FRACTIONALITY = 2
+   };
+
+   /// values for parameter BOOSTED_SOLVER
+   enum
+   {
+      /// disable boosted solver
+      BOOSTED_SOLVER_OFF = 0,
+
+      /// boosted solver start solve from last basis encountered
+      BOOSTED_SOLVER_HOT_START = 1,
+
+      /// boosted solver start the solve from slack basis
+      BOOSTED_SOLVER_FROM_SLACK = 2
    };
 
    /// real parameters
@@ -1718,6 +1734,9 @@ private:
    int _initialPrecision   = 50;
    Real _tolPrecisionRatio = 0.7;
    Real _epsPrecisionRatio = 0.8;
+
+   bool _hasBoostedSolver;
+   bool _boostedFromSlack;
 
    SLUFactor<BP> _boostedSlufactor;
 

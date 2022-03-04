@@ -870,6 +870,17 @@ int runSoPlex(int argc, char* argv[])
             checkSol = true;
             break;
 
+         case 'b' :
+            // -b<value> : choose boosted solver (0 - off, 1 - hot start, 2 - from slack basis)
+            if(!soplex->setIntParam(soplex->BOOSTED_SOLVER, option[2] - '0'))
+            {
+               printUsage(argv, optidx);
+               returnValue = 1;
+               goto TERMINATE_FREESTRINGS;
+            }
+
+            break;
+
          case 'h' :
 
             // -h : display all parameters

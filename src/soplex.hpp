@@ -423,6 +423,13 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
    lower[SoPlexBase<R>::STATTIMER] = 0;
    upper[SoPlexBase<R>::STATTIMER] = 2;
    defaultValue[SoPlexBase<R>::STATTIMER] = 1;
+
+   // mode for boosted solver
+   name[SoPlexBase<R>::BOOSTED_SOLVER] = "boosted_solver";
+   description[SoPlexBase<R>::BOOSTED_SOLVER] = "mode of boosted solver (0 - off, 1 - hot start, 2 - from slack basis)";
+   lower[SoPlexBase<R>::BOOSTED_SOLVER] = 0;
+   upper[SoPlexBase<R>::BOOSTED_SOLVER] = 2;
+   defaultValue[SoPlexBase<R>::BOOSTED_SOLVER] = 1;
 }
 
 template <class R>
@@ -6080,32 +6087,38 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       {
       case PRICER_AUTO:
          _solver.setPricer(&_pricerAuto);
-         _boostedSolver.setPricer(&_boostedPricerAuto);
+         if(_hasBoostedSolver)
+            _boostedSolver.setPricer(&_boostedPricerAuto);
          break;
 
       case PRICER_DANTZIG:
          _solver.setPricer(&_pricerDantzig);
-         _boostedSolver.setPricer(&_boostedPricerDantzig);
+         if(_hasBoostedSolver)
+            _boostedSolver.setPricer(&_boostedPricerDantzig);
          break;
 
       case PRICER_PARMULT:
          _solver.setPricer(&_pricerParMult);
-         _boostedSolver.setPricer(&_boostedPricerParMult);
+         if(_hasBoostedSolver)
+            _boostedSolver.setPricer(&_boostedPricerParMult);
          break;
 
       case PRICER_DEVEX:
          _solver.setPricer(&_pricerDevex);
-         _boostedSolver.setPricer(&_boostedPricerDevex);
+         if(_hasBoostedSolver)
+            _boostedSolver.setPricer(&_boostedPricerDevex);
          break;
 
       case PRICER_QUICKSTEEP:
          _solver.setPricer(&_pricerQuickSteep);
-         _boostedSolver.setPricer(&_boostedPricerQuickSteep);
+         if(_hasBoostedSolver)
+            _boostedSolver.setPricer(&_boostedPricerQuickSteep);
          break;
 
       case PRICER_STEEP:
          _solver.setPricer(&_pricerSteep);
-         _boostedSolver.setPricer(&_boostedPricerSteep);
+         if(_hasBoostedSolver)
+            _boostedSolver.setPricer(&_boostedPricerSteep);
          break;
 
       default:
@@ -6196,22 +6209,26 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       {
       case RATIOTESTER_TEXTBOOK:
          _solver.setTester(&_ratiotesterTextbook);
-         _boostedSolver.setTester(&_boostedRatiotesterTextbook);
+         if(_hasBoostedSolver)
+            _boostedSolver.setTester(&_boostedRatiotesterTextbook);
          break;
 
       case RATIOTESTER_HARRIS:
          _solver.setTester(&_ratiotesterHarris);
-         _boostedSolver.setTester(&_boostedRatiotesterHarris);
+         if(_hasBoostedSolver)
+            _boostedSolver.setTester(&_boostedRatiotesterHarris);
          break;
 
       case RATIOTESTER_FAST:
          _solver.setTester(&_ratiotesterFast);
-         _boostedSolver.setTester(&_boostedRatiotesterFast);
+         if(_hasBoostedSolver)
+            _boostedSolver.setTester(&_boostedRatiotesterFast);
          break;
 
       case RATIOTESTER_BOUNDFLIPPING:
          _solver.setTester(&_ratiotesterBoundFlipping);
-         _boostedSolver.setTester(&_boostedRatiotesterBoundFlipping);
+         if(_hasBoostedSolver)
+            _boostedSolver.setTester(&_boostedRatiotesterBoundFlipping);
          break;
 
       default:
@@ -6310,6 +6327,30 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
 
    case STATTIMER:
       setTimings((Timer::TYPE) value);
+      break;
+
+   // mode for boosted solver
+   case SoPlexBase<R>::BOOSTED_SOLVER:
+      switch(value)
+      {
+      case BOOSTED_SOLVER_OFF:
+         _hasBoostedSolver = false;
+         break;
+
+      case BOOSTED_SOLVER_HOT_START:
+         _hasBoostedSolver = true;
+         _boostedFromSlack = false;
+         break;
+
+      case BOOSTED_SOLVER_FROM_SLACK:
+         _hasBoostedSolver = true;
+         _boostedFromSlack = true;
+         break;
+
+      default:
+         return false;
+      }
+
       break;
 
    default:

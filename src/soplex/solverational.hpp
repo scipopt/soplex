@@ -2329,7 +2329,9 @@ void SoPlexBase<R>::_performOptIRStable(
    }
    while(true);
 
-   if(!primalFeasible || !dualFeasible){
+   bool stop = primalFeasible && dualFeasible;
+
+   if(_hasBoostedSolver && !stop){
 
       MSG_INFO1(spxout, spxout << "\nInitialize boosted solver . . .\n");
 
@@ -2339,9 +2341,8 @@ void SoPlexBase<R>::_performOptIRStable(
       // set precision boosting factor; default value is 1.5 (DEFAULT_PREC_BOOST_FACTOR)
       Param::setPrecisionBoostingFactor(1.2);
 
-      ///@todo precision-boosting create a new parameter for this
-      // forcing the boosted solver to start from the slack basis
-      bool fromScratch = false;
+      // get parameter value (true = from slack basis, false = hot start)
+      bool fromScratch = _boostedFromSlack;
 
       int nbBoostedIterations = 0;
 
@@ -2670,7 +2671,8 @@ void SoPlexBase<R>::_performOptIRStable(
 
    // set objective coefficients for all rows to zero
    _solver.clearRowObjs();
-   _boostedSolver.clearRowObjs();
+   if(_hasBoostedSolver)
+      _boostedSolver.clearRowObjs();
 
    // stop rational solving time
    _statistics->rationalTime->stop();
