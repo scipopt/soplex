@@ -1105,11 +1105,16 @@ public:
       /// type of timer for statistics
       STATTIMER = 29,
 
+#ifndef SOPLEX_WITH_MPFR
+      /// number of integer parameters
+      INTPARAM_COUNT = 30
+#else
       /// mode for boosted solver
       BOOSTED_SOLVER = 30,
 
       /// number of integer parameters
       INTPARAM_COUNT = 31
+#endif
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -1360,6 +1365,7 @@ public:
       POLISHING_FRACTIONALITY = 2
    };
 
+#ifdef SOPLEX_WITH_MPFR
    /// values for parameter BOOSTED_SOLVER
    enum
    {
@@ -1372,6 +1378,7 @@ public:
       /// boosted solver start the solve from slack basis
       BOOSTED_SOLVER_FROM_SLACK = 2
    };
+#endif
 
    /// real parameters
    typedef enum
@@ -1454,11 +1461,16 @@ public:
       /// minimal modification threshold to apply presolve reductions
       SIMPLIFIER_MODIFYROWFAC = 25,
 
+#ifndef SOPLEX_WITH_MPFR
+      /// number of real parameters
+      REALPARAM_COUNT = 26
+#else
       /// factor by which the precision of the floating-point solver is multiplied
       PRECISION_BOOSTING_FACTOR = 26,
 
       /// number of real parameters
       REALPARAM_COUNT = 27
+#endif
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
@@ -1722,6 +1734,7 @@ private:
    SPxScaler<R>* _scaler;
    SPxStarter<R>* _starter;
 
+#ifdef SOPLEX_WITH_MPFR
    //----------------------------- BOOSTED SOLVER -----------------------------
 
    // multiprecision type used for the boosted solver
@@ -1766,6 +1779,7 @@ private:
    Presol<BP> _boostedSimplifierPaPILO;
 
    //--------------------------------------------------------------------------
+#endif
 
    bool _isRealLPLoaded; // true indicates that the original LP is loaded in the _solver variable, hence all actions
    // are performed on the original LP.
@@ -2001,6 +2015,7 @@ private:
    DataArray<typename SPxSolverBase<R>::VarStatus > _basisStatusRows;
    DataArray<typename  SPxSolverBase<R>::VarStatus > _basisStatusCols;
 
+#ifdef SOPLEX_WITH_MPFR
    // these vectors don't replace _basisStatusRows and _basisStatusCols
    // they aim to overcome the issue of having the enum VarStatus inside SPxSolverBase.
    // When calling setBasis or getBasis (from SPxSolverBase class), a specific conversion is needed.
@@ -2012,6 +2027,7 @@ private:
    // mysolver.getBasis(_tmpBasisStatusRows, _tmpBasisStatusCols, _basisStatusRows.size(), _basisStatusCols.size())
    DataArray<typename SPxSolverBase<BP>::VarStatus > _tmpBasisStatusRows;
    DataArray<typename  SPxSolverBase<BP>::VarStatus > _tmpBasisStatusCols;
+#endif
 
    SolBase<R> _solReal;
    SolRational _solRational;
@@ -2047,8 +2063,10 @@ private:
    /// creates a permutation for removing rows/columns from a range of indices
    void _rangeToPerm(int start, int end, int* perm, int permSize) const;
 
+#ifdef SOPLEX_WITH_MPFR
    /// checks consistency for the boosted solver
    bool _isBoostedConsistent() const;
+#endif
 
    /// checks consistency
    bool _isConsistent() const;
@@ -2187,8 +2205,10 @@ private:
    /// ensures that the real LP and the basis are loaded in the solver; performs no sync
    void _ensureRealLPLoaded();
 
+#ifdef SOPLEX_WITH_MPFR
    /// call floating-point solver and update statistics on iterations etc.
    void _solveBoostedRealLPAndRecordStatistics(volatile bool* interrupt = NULL);
+#endif
 
    /// call floating-point solver and update statistics on iterations etc.
    void _solveRealLPAndRecordStatistics(volatile bool* interrupt = NULL);
@@ -2235,13 +2255,6 @@ private:
 
    //**@name Private solving methods implemented in solverational.hpp */
    ///@{
-
-   /// stores floating-point solution of original LP as current rational solution and ensure that solution vectors have right dimension; ensure that solution is aligned with basis
-   void _storeRealSolutionAsRationalBoosted(
-      SolRational& sol,
-      VectorBase<BP>& primalReal,
-      VectorBase<BP>& dualReal,
-      int& dualSize);
 
    /// stores floating-point solution of original LP as current rational solution and ensure that solution vectors have right dimension; ensure that solution is aligned with basis
    void _storeRealSolutionAsRational(
@@ -2336,20 +2349,11 @@ private:
    /// applies scaled bounds
    void _applyScaledBounds(Rational& primalScale);
 
-   /// applies scaled bounds
-   void _applyScaledBoundsBoosted(Rational& primalScale);
-
    /// applies scaled sides
    void _applyScaledSides(Rational& primalScale);
 
-   /// applies scaled sides
-   void _applyScaledSidesBoosted(Rational& primalScale);
-
    /// applies scaled objective function
    void _applyScaledObj(Rational& dualScale, SolRational& sol);
-
-   /// applies scaled objective function
-   void _applyScaledObjBoosted(Rational& dualScale, SolRational& sol);
 
    /// evaluates result of solve. Return true if the algorithm must to stopped, false otherwise.
    bool _evaluateResult(
@@ -2362,6 +2366,47 @@ private:
       bool& stoppedTime,
       bool& stoppedIter,
       bool& error);
+
+   /// corrects primal solution and aligns with basis
+   void _correctPrimalSolution(
+      SolRational& sol,
+      Rational& primalScale,
+      int& primalSize,
+      const int& maxDimRational,
+      VectorBase<R>& primalReal);
+
+   /// updates or recomputes slacks depending on which looks faster
+   void _updateSlacks(SolRational& sol, int& primalSize);
+
+   /// corrects dual solution and aligns with basis
+   void _correctDualSolution(
+      SolRational& sol,
+      const bool& maximizing,
+      VectorBase<R>& dualReal,
+      Rational& dualScale,
+      int& dualSize,
+      const int& maxDimRational);
+
+   /// updates or recomputes reduced cost values depending on which looks faster; adding one to the length of the
+   /// dual vector accounts for the objective function vector
+   void _updateReducedCosts(SolRational& sol, int& dualSize, const int& numCorrectedPrimals);
+
+#ifdef SOPLEX_WITH_MPFR
+   /// stores floating-point solution of original LP as current rational solution and ensure that solution vectors have right dimension; ensure that solution is aligned with basis
+   void _storeRealSolutionAsRationalBoosted(
+      SolRational& sol,
+      VectorBase<BP>& primalReal,
+      VectorBase<BP>& dualReal,
+      int& dualSize);
+
+   /// applies scaled bounds
+   void _applyScaledBoundsBoosted(Rational& primalScale);
+
+   /// applies scaled sides
+   void _applyScaledSidesBoosted(Rational& primalScale);
+
+   /// applies scaled objective function
+   void _applyScaledObjBoosted(Rational& dualScale, SolRational& sol);
 
    /// evaluates result of solve. Return true if the algorithm must to stopped, false otherwise.
    bool _evaluateResultBoosted(
@@ -2383,17 +2428,6 @@ private:
       const int& maxDimRational,
       VectorBase<BP>& primalReal);
 
-   /// corrects primal solution and aligns with basis
-   void _correctPrimalSolution(
-      SolRational& sol,
-      Rational& primalScale,
-      int& primalSize,
-      const int& maxDimRational,
-      VectorBase<R>& primalReal);
-
-   /// updates or recomputes slacks depending on which looks faster
-   void _updateSlacks(SolRational& sol, int& primalSize);
-
    /// corrects dual solution and aligns with basis
    void _correctDualSolutionBoosted(
       SolRational& sol,
@@ -2403,28 +2437,18 @@ private:
       int& dualSize,
       const int& maxDimRational);
 
-   /// corrects dual solution and aligns with basis
-   void _correctDualSolution(
-      SolRational& sol,
-      const bool& maximizing,
-      VectorBase<R>& dualReal,
-      Rational& dualScale,
-      int& dualSize,
-      const int& maxDimRational);
-
-   /// updates or recomputes reduced cost values depending on which looks faster; adding one to the length of the
-   /// dual vector accounts for the objective function vector
-   void _updateReducedCosts(SolRational& sol, int& dualSize, const int& numCorrectedPrimals);
-
+   ///@todo precision-boosting move some place else
    /// converts the given DataArray of VarStatus to boostedPrecision
    void _convertDataArrayVarStatusToBoosted(
       DataArray< typename SPxSolverBase<R>::VarStatus >& base,
       DataArray< typename SPxSolverBase<BP>::VarStatus >& copy);
 
+   ///@todo precision-boosting move some place else
    /// converts the given DataArray of VarStatus to R precision
    void _convertDataArrayVarStatusToRPrecision(
       DataArray< typename SPxSolverBase<BP>::VarStatus >& base,
       DataArray< typename SPxSolverBase<R>::VarStatus >& copy);
+#endif
 
    /// solves current problem with iterative refinement and recovery mechanism
    void _performOptIRStable(SolRational& sol,
@@ -2516,17 +2540,25 @@ private:
    void _computeInfeasBox(SolRational& sol, bool transformed);
 
    /// solves real LP during iterative refinement
+   typename SPxSolverBase<R>::Status _solveRealForRational(bool fromscratch, VectorBase<R>& primal,
+         VectorBase<R>& dual,
+         DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
+         DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols);
+
+   /// solves real LP with recovery mechanism
+   typename SPxSolverBase<R>::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible,
+         VectorBase<R>& primal, VectorBase<R>& dual,
+         DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
+         DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
+         const bool forceNoSimplifier = false);
+
+#ifdef SOPLEX_WITH_MPFR
+   /// solves real LP during iterative refinement
    void _solveRealForRationalBoosted(bool fromscratch,
          VectorBase<BP>& primal, VectorBase<BP>& dual,
          DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
          DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
          typename SPxSolverBase<BP>::Status& boostedResult);
-
-   /// solves real LP during iterative refinement
-   typename SPxSolverBase<R>::Status _solveRealForRational(bool fromscratch, VectorBase<R>& primal,
-         VectorBase<R>& dual,
-         DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
-         DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols);
 
    /// solves real LP with recovery mechanism
    void _solveRealStableBoosted(bool acceptUnbounded, bool acceptInfeasible,
@@ -2535,13 +2567,7 @@ private:
          DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
          typename SPxSolverBase<BP>::Status& boostedResult,
          bool& fromScratch, const bool forceNoSimplifier = false);
-
-   /// solves real LP with recovery mechanism
-   typename SPxSolverBase<R>::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible,
-         VectorBase<R>& primal, VectorBase<R>& dual,
-         DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
-         DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
-         const bool forceNoSimplifier = false);
+#endif
 
    /// computes rational inverse of basis matrix as defined by _rationalLUSolverBind
    void _computeBasisInverseRational();
