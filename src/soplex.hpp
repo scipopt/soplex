@@ -6114,48 +6114,42 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       case PRICER_AUTO:
          _solver.setPricer(&_pricerAuto);
 #ifdef SOPLEX_WITH_MPFR
-         if(_hasBoostedSolver)
-            _boostedSolver.setPricer(&_boostedPricerAuto);
+         _boostedSolver.setPricer(&_boostedPricerAuto);
 #endif
          break;
 
       case PRICER_DANTZIG:
          _solver.setPricer(&_pricerDantzig);
 #ifdef SOPLEX_WITH_MPFR
-         if(_hasBoostedSolver)
-            _boostedSolver.setPricer(&_boostedPricerDantzig);
+         _boostedSolver.setPricer(&_boostedPricerDantzig);
 #endif
          break;
 
       case PRICER_PARMULT:
          _solver.setPricer(&_pricerParMult);
 #ifdef SOPLEX_WITH_MPFR
-         if(_hasBoostedSolver)
-            _boostedSolver.setPricer(&_boostedPricerParMult);
+         _boostedSolver.setPricer(&_boostedPricerParMult);
 #endif
          break;
 
       case PRICER_DEVEX:
          _solver.setPricer(&_pricerDevex);
 #ifdef SOPLEX_WITH_MPFR
-         if(_hasBoostedSolver)
-            _boostedSolver.setPricer(&_boostedPricerDevex);
+         _boostedSolver.setPricer(&_boostedPricerDevex);
 #endif
          break;
 
       case PRICER_QUICKSTEEP:
          _solver.setPricer(&_pricerQuickSteep);
 #ifdef SOPLEX_WITH_MPFR
-         if(_hasBoostedSolver)
-            _boostedSolver.setPricer(&_boostedPricerQuickSteep);
+         _boostedSolver.setPricer(&_boostedPricerQuickSteep);
 #endif
          break;
 
       case PRICER_STEEP:
          _solver.setPricer(&_pricerSteep);
 #ifdef SOPLEX_WITH_MPFR
-         if(_hasBoostedSolver)
-            _boostedSolver.setPricer(&_boostedPricerSteep);
+         _boostedSolver.setPricer(&_boostedPricerSteep);
 #endif
          break;
 
@@ -6248,32 +6242,28 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       case RATIOTESTER_TEXTBOOK:
          _solver.setTester(&_ratiotesterTextbook);
 #ifdef SOPLEX_WITH_MPFR
-         if(_hasBoostedSolver)
-            _boostedSolver.setTester(&_boostedRatiotesterTextbook);
+         _boostedSolver.setTester(&_boostedRatiotesterTextbook);
 #endif
          break;
 
       case RATIOTESTER_HARRIS:
          _solver.setTester(&_ratiotesterHarris);
 #ifdef SOPLEX_WITH_MPFR
-         if(_hasBoostedSolver)
-            _boostedSolver.setTester(&_boostedRatiotesterHarris);
+         _boostedSolver.setTester(&_boostedRatiotesterHarris);
 #endif
          break;
 
       case RATIOTESTER_FAST:
          _solver.setTester(&_ratiotesterFast);
 #ifdef SOPLEX_WITH_MPFR
-         if(_hasBoostedSolver)
-            _boostedSolver.setTester(&_boostedRatiotesterFast);
+         _boostedSolver.setTester(&_boostedRatiotesterFast);
 #endif
          break;
 
       case RATIOTESTER_BOUNDFLIPPING:
          _solver.setTester(&_ratiotesterBoundFlipping);
 #ifdef SOPLEX_WITH_MPFR
-         if(_hasBoostedSolver)
-            _boostedSolver.setTester(&_boostedRatiotesterBoundFlipping);
+         _boostedSolver.setTester(&_boostedRatiotesterBoundFlipping);
 #endif
          break;
 
