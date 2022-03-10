@@ -113,6 +113,15 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
       // solve problem with iterative refinement and recovery mechanism
       _performOptIRStable(_solRational, !unboundednessNotCertified, !infeasibilityNotCertified, 0,
                           primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
+#ifdef SOPLEX_WITH_MPFR
+      bool stop = primalFeasible && dualFeasible;
+      if(_hasBoostedSolver && !stop)
+      {
+         MSG_INFO1(spxout, spxout << "No success with current precision.\nIncreasing precision . . .\n");
+         _performOptIRStableBoosted(_solRational, !unboundednessNotCertified, !infeasibilityNotCertified, 0,
+                                    primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
+      }
+#endif
 
       // case: an unrecoverable error occured
       if(error)
@@ -2078,9 +2087,6 @@ void SoPlexBase<R>::_performOptIRStable(
    stoppedIter = false;
    error = false;
 
-   // save initial minRounds for boosted solve
-   int initialMinRounds = minRounds;
-
    // set working tolerances in floating-point solver
    _solver.setFeastol(realParam(SoPlexBase<R>::FPFEASTOL));
    _solver.setOpttol(realParam(SoPlexBase<R>::FPOPTTOL));
@@ -2131,6 +2137,10 @@ void SoPlexBase<R>::_performOptIRStable(
    // evalute result
    if(_evaluateResult(result, false, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                       error))
+      return;
+
+   // an error occured, stop solving right away
+   if(error)
       return;
 
    _statistics->rationalTime->start();
@@ -2327,6 +2337,10 @@ void SoPlexBase<R>::_performOptIRStable(
                          error))
          return;
 
+      // an error occured, stop solving right away
+      if(error)
+         return;
+
       _statistics->rationalTime->start();
 
       int primalSize;
@@ -2347,15 +2361,6 @@ void SoPlexBase<R>::_performOptIRStable(
       _updateReducedCosts(sol, dualSize, numCorrectedPrimals);
    }
    while(true);
-
-#ifdef SOPLEX_WITH_MPFR
-   bool stop = primalFeasible && dualFeasible;
-
-   if(_hasBoostedSolver && !stop)
-   {
-      _performOptIRStableBoosted(sol, acceptUnbounded, acceptInfeasible, initialMinRounds, primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
-   }
-#endif
 
    // correct basis status for restricted inequalities
    if(_hasBasis)
@@ -2384,10 +2389,6 @@ void SoPlexBase<R>::_performOptIRStable(
 
    // set objective coefficients for all rows to zero
    _solver.clearRowObjs();
-#ifdef SOPLEX_WITH_MPFR
-   if(_hasBoostedSolver)
-      _boostedSolver.clearRowObjs();
-#endif
 
    // stop rational solving time
    _statistics->rationalTime->stop();
@@ -2533,6 +2534,10 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
       if(_evaluateResultBoosted(boostedResult, false, sol, boostedDualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                      error))
       return;
+
+      // an error occured, stop solving right away
+      if(error)
+         return;
 
       _statistics->rationalTime->start();
 
@@ -2724,6 +2729,10 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
                            error))
             return;
 
+         // an error occured, stop solving right away
+         if(error)
+            return;
+
          _statistics->rationalTime->start();
 
          int primalSize;
@@ -2747,13 +2756,41 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
 
       if(primalFeasible && dualFeasible)
       {
-         MSG_INFO1(spxout, spxout << "Solved to optimality.\n");
-         _status = SPxSolverBase<R>::OPTIMAL;
+         // correct basis status for restricted inequalities
+         if(_hasBasis)
+         {
+            for(int r = numRowsRational() - 1; r >= 0; r--)
+            {
+               assert((lhsRational(r) == rhsRational(r)) == (_rowTypes[r] == RANGETYPE_FIXED));
+
+               if(_rowTypes[r] != RANGETYPE_FIXED && _basisStatusRows[r] == SPxSolverBase<R>::FIXED)
+                  _basisStatusRows[r] = (maximizing == (sol._dual[r] < 0))
+                                       ? SPxSolverBase<R>::ON_LOWER
+                                       : SPxSolverBase<R>::ON_UPPER;
+            }
+         }
+
+         // compute objective function values
+         assert(sol._isPrimalFeasible == sol._isDualFeasible);
+
+         if(sol._isPrimalFeasible)
+         {
+            sol._objVal = sol._primal * _rationalLP->maxObj();
+
+            if(intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MINIMIZE)
+               sol._objVal *= -1;
+         }
+
+         // set objective coefficients for all rows to zero
+         _boostedSolver.clearRowObjs();
+
+         // stop rational solving time
+         _statistics->rationalTime->stop();
          break;
       }
       else
       {
-         MSG_INFO1(spxout, spxout << "No success. Launch new boosted solve.\n");
+         MSG_INFO1(spxout, spxout << "\nNo success. Launch new boosted solve . . .\n");
       }
    }
    while(true);
@@ -2788,6 +2825,16 @@ void SoPlexBase<R>::_performUnboundedIRStable(
    // perform iterative refinement
    _performOptIRStable(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded,
                        stoppedTime, stoppedIter, error);
+
+#ifdef SOPLEX_WITH_MPFR
+   bool stop = primalFeasible && dualFeasible;
+   if(_hasBoostedSolver && !stop)
+   {
+      MSG_INFO1(spxout, spxout << "No success with current precision.\nIncreasing precision . . .\n");
+      _performOptIRStableBoosted(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded,
+                                 stoppedTime, stoppedIter, error);
+   }
+#endif
 
    // update unbounded refinement counter
    _statistics->unbdRefinements += _statistics->refinements - oldRefinements;
@@ -2868,6 +2915,16 @@ void SoPlexBase<R>::_performFeasIRStable(
       // perform iterative refinement
       _performOptIRStable(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded,
                           stoppedTime, stoppedIter, error);
+
+#ifdef SOPLEX_WITH_MPFR
+      bool stop = primalFeasible && dualFeasible;
+      if(_hasBoostedSolver && !stop)
+      {
+         MSG_INFO1(spxout, spxout << "No success with current precision.\nIncreasing precision . . .\n");
+         _performOptIRStableBoosted(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded,
+                                 stoppedTime, stoppedIter, error);
+      }
+#endif
 
       // update feasible refinement counter
       _statistics->feasRefinements += _statistics->refinements - oldRefinements;
