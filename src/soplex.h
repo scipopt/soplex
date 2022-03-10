@@ -2448,6 +2448,20 @@ private:
    void _convertDataArrayVarStatusToRPrecision(
       DataArray< typename SPxSolverBase<BP>::VarStatus >& base,
       DataArray< typename SPxSolverBase<R>::VarStatus >& copy);
+
+   /// solves current problem with iterative refinement and recovery mechanism using boosted solver
+   void _performOptIRStableBoosted(
+      SolRational& sol,
+      bool acceptUnbounded,
+      bool acceptInfeasible,
+      int minRounds,
+      bool& primalFeasible,
+      bool& dualFeasible,
+      bool& infeasible,
+      bool& unbounded,
+      bool& stoppedTime,
+      bool& stoppedIter,
+      bool& error);
 #endif
 
    /// solves current problem with iterative refinement and recovery mechanism
