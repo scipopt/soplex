@@ -2132,11 +2132,20 @@ void SoPlexBase<R>::_performOptIRStable(
    }
 
    _statistics->rationalTime->stop();
-#ifdef SOPLEX_DISABLED_CODE
+
+   // if boosted solver is available, double precision solver is only used once.
+   // otherwise use the expensive pipeline from _solveRealStable
+#ifdef SOPLEX_WITH_MPFR
+   if(_hasBoostedSolver)
+      result = _solveRealForRational(false, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
+   else
+      result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows,
+                             _basisStatusCols);
+#else
    result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows,
                              _basisStatusCols);
 #endif
-   result = _solveRealForRational(false, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
+   
 
    // evalute result
    if(_evaluateResult(result, false, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
@@ -2303,19 +2312,27 @@ void SoPlexBase<R>::_performOptIRStable(
       // solve modified problem
       int prevIterations = _statistics->iterations;
       _statistics->rationalTime->stop();
-#ifdef SOPLEX_DISABLED_CODE
+
+      // if boosted solver is available, double precision solver is only used once.
+      // otherwise use the expensive pipeline from _solveRealStable
+#ifdef SOPLEX_WITH_MPFR
+      if(_hasBoostedSolver)
+      {
+         // turn off simplifier if scaling factors are too high
+         int simplifier = intParam(SoPlexBase<R>::SIMPLIFIER);
+         if(primalScale > 1e20 || dualScale > 1e20)
+            setIntParam(SoPlexBase<R>::SIMPLIFIER, SoPlexBase<R>::SIMPLIFIER_OFF);
+         result = _solveRealForRational(false, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
+         // reset simplifier param to previous value
+         etIntParam(SoPlexBase<R>::SIMPLIFIER, simplifier);
+      }
+      else
+         result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows,
+                                _basisStatusCols, primalScale > 1e20 || dualScale > 1e20);
+#else
       result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows,
                                 _basisStatusCols, primalScale > 1e20 || dualScale > 1e20);
 #endif
-      // turn off simplifier if scaling factors are too high
-      int simplifier = intParam(SoPlexBase<R>::SIMPLIFIER);
-      if(primalScale > 1e20 || dualScale > 1e20)
-         setIntParam(SoPlexBase<R>::SIMPLIFIER, SoPlexBase<R>::SIMPLIFIER_OFF);
-
-      result = _solveRealForRational(false, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
-
-      // reset simplifier param to previous value
-      setIntParam(SoPlexBase<R>::SIMPLIFIER, simplifier);
 
       // count refinements and remember whether we moved to a new basis
       _statistics->refinements++;
@@ -2521,9 +2538,6 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
 
       // solve original LP with boosted solver
       _statistics->rationalTime->stop();
-#ifdef SOPLEX_DISABLED_CODE
-      _solveRealStableBoosted(acceptUnbounded, acceptInfeasible, boostedPrimalReal, boostedDualReal, _basisStatusRows, _basisStatusCols, boostedResult, fromScratch);
-#endif
       _solveRealForRationalBoosted(false, boostedPrimalReal, boostedDualReal, _basisStatusRows, _basisStatusCols, boostedResult);
 
       // evalute result
@@ -2688,9 +2702,6 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
          // solve modified problem
          int prevIterations = _statistics->iterations;
          _statistics->rationalTime->stop();
-#ifdef SOPLEX_DISABLED_CODE
-         _solveRealStableBoosted(acceptUnbounded, acceptInfeasible, boostedPrimalReal, boostedDualReal, _basisStatusRows, _basisStatusCols, boostedResult, fromScratch, primalScale > 1e20 || dualScale > 1e20);
-#endif
          // turn off simplifier if scaling factors are too high
          int simplifier = intParam(SoPlexBase<R>::SIMPLIFIER);
          if(primalScale > 1e20 || dualScale > 1e20)
