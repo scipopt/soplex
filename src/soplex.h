@@ -1750,6 +1750,7 @@ private:
 
    bool _hasBoostedSolver;
    bool _boostedFromSlack;
+   bool _disableFirstSolver;
 
    SLUFactor<BP> _boostedSlufactor;
 

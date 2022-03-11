@@ -111,13 +111,17 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
       stoppedIter = false;
 
       // solve problem with iterative refinement and recovery mechanism
-      _performOptIRStable(_solRational, !unboundednessNotCertified, !infeasibilityNotCertified, 0,
-                          primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
+      if(!_disableFirstSolver)
+         _performOptIRStable(_solRational, !unboundednessNotCertified, !infeasibilityNotCertified, 0,
+                             primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
 #ifdef SOPLEX_WITH_MPFR
-      bool stop = primalFeasible && dualFeasible;
-      if(_hasBoostedSolver && !stop)
+      if(_hasBoostedSolver && (!primalFeasible || !dualFeasible))
       {
-         MSG_INFO1(spxout, spxout << "No success with current precision.\nIncreasing precision . . .\n");
+         if(!_disableFirstSolver)
+         {
+            MSG_INFO1(spxout, spxout << "No success with double precision solver. Disabling it and switching to multiprecision . . .\n");
+            _disableFirstSolver = true;
+         }
          _performOptIRStableBoosted(_solRational, !unboundednessNotCertified, !infeasibilityNotCertified, 0,
                                     primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
       }
@@ -2139,10 +2143,6 @@ void SoPlexBase<R>::_performOptIRStable(
                       error))
       return;
 
-   // an error occured, stop solving right away
-   if(error)
-      return;
-
    _statistics->rationalTime->start();
 
    int dualSize = 0;
@@ -2337,10 +2337,6 @@ void SoPlexBase<R>::_performOptIRStable(
                          error))
          return;
 
-      // an error occured, stop solving right away
-      if(error)
-         return;
-
       _statistics->rationalTime->start();
 
       int primalSize;
@@ -2533,10 +2529,6 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
       // evalute result
       if(_evaluateResultBoosted(boostedResult, false, sol, boostedDualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                      error))
-      return;
-
-      // an error occured, stop solving right away
-      if(error)
          return;
 
       _statistics->rationalTime->start();
@@ -2729,10 +2721,6 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
                            error))
             return;
 
-         // an error occured, stop solving right away
-         if(error)
-            return;
-
          _statistics->rationalTime->start();
 
          int primalSize;
@@ -2823,14 +2811,18 @@ void SoPlexBase<R>::_performUnboundedIRStable(
    int oldRefinements = _statistics->refinements;
 
    // perform iterative refinement
-   _performOptIRStable(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded,
+   if(!_disableFirstSolver)
+      _performOptIRStable(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded,
                        stoppedTime, stoppedIter, error);
 
 #ifdef SOPLEX_WITH_MPFR
-   bool stop = primalFeasible && dualFeasible;
-   if(_hasBoostedSolver && !stop)
+   if(_hasBoostedSolver && (!primalFeasible || !dualFeasible || _disableFirstSolver))
    {
-      MSG_INFO1(spxout, spxout << "No success with current precision.\nIncreasing precision . . .\n");
+      if(!_disableFirstSolver)
+      {
+         MSG_INFO1(spxout, spxout << "No success with double precision solver. Disabling it and switching to multiprecision . . .\n");
+         _disableFirstSolver = true;
+      }
       _performOptIRStableBoosted(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded,
                                  stoppedTime, stoppedIter, error);
    }
@@ -2913,14 +2905,18 @@ void SoPlexBase<R>::_performFeasIRStable(
       int oldRefinements = _statistics->refinements;
 
       // perform iterative refinement
-      _performOptIRStable(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded,
+      if(!_disableFirstSolver)
+         _performOptIRStable(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded,
                           stoppedTime, stoppedIter, error);
 
 #ifdef SOPLEX_WITH_MPFR
-      bool stop = primalFeasible && dualFeasible;
-      if(_hasBoostedSolver && !stop)
+      if(_hasBoostedSolver && (!primalFeasible || !dualFeasible || _disableFirstSolver))
       {
-         MSG_INFO1(spxout, spxout << "No success with current precision.\nIncreasing precision . . .\n");
+         if(!_disableFirstSolver)
+         {
+            MSG_INFO1(spxout, spxout << "No success with double precision solver. Disabling it and switching to multiprecision . . .\n");
+            _disableFirstSolver = true;
+         }
          _performOptIRStableBoosted(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded,
                                  stoppedTime, stoppedIter, error);
       }
