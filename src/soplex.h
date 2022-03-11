@@ -2574,14 +2574,6 @@ private:
          DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
          DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
          typename SPxSolverBase<BP>::Status& boostedResult);
-
-   /// solves real LP with recovery mechanism
-   void _solveRealStableBoosted(bool acceptUnbounded, bool acceptInfeasible,
-         VectorBase<BP>& primal, VectorBase<BP>& dual,
-         DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
-         DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
-         typename SPxSolverBase<BP>::Status& boostedResult,
-         bool& fromScratch, const bool forceNoSimplifier = false);
 #endif
 
    /// computes rational inverse of basis matrix as defined by _rationalLUSolverBind
