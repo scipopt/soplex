@@ -2450,6 +2450,9 @@ private:
       DataArray< typename SPxSolverBase<BP>::VarStatus >& base,
       DataArray< typename SPxSolverBase<R>::VarStatus >& copy);
 
+   /// increase precision for the multiprecision solver
+   void _boostPrecision();
+
    /// solves current problem with iterative refinement and recovery mechanism using boosted solver
    void _performOptIRStableBoosted(
       SolRational& sol,
@@ -2462,8 +2465,24 @@ private:
       bool& unbounded,
       bool& stoppedTime,
       bool& stoppedIter,
-      bool& error);
+      bool& error,
+      bool& needNewBoostedIt);
 #endif
+
+   /// perform iterative refinement using the right precision
+   void _performOptIRWrapper(
+      SolRational& sol,
+      bool acceptUnbounded,
+      bool acceptInfeasible,
+      int minRounds,
+      bool& primalFeasible,
+      bool& dualFeasible,
+      bool& infeasible,
+      bool& unbounded,
+      bool& stoppedTime,
+      bool& stoppedIter,
+      bool& error
+   );
 
    /// solves current problem with iterative refinement and recovery mechanism
    void _performOptIRStable(SolRational& sol,

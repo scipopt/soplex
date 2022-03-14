@@ -9097,7 +9097,14 @@ SoPlexBase<R>::SoPlexBase()
    _scalerGeo8.setOutstream(spxout);
    _scalerGeoequi.setOutstream(spxout);
    _scalerLeastsq.setOutstream(spxout);
+
+   // give lu factorization to solver
+   _solver.setBasisSolver(&_slufactor);
+
 #ifdef SOPLEX_WITH_MPFR
+   // set initial precision
+   BP::default_precision(_initialPrecision);
+
    _boostedSolver.setOutstream(spxout);
    _boostedScalerUniequi.setOutstream(spxout);
    _boostedScalerBiequi.setOutstream(spxout);
@@ -9105,15 +9112,11 @@ SoPlexBase<R>::SoPlexBase()
    _boostedScalerGeo8.setOutstream(spxout);
    _boostedScalerGeoequi.setOutstream(spxout);
    _boostedScalerLeastsq.setOutstream(spxout);
-#endif
 
-   // give lu factorization to solver
-   _solver.setBasisSolver(&_slufactor);
-#ifdef SOPLEX_WITH_MPFR
    _boostedSolver.setBasisSolver(&_boostedSlufactor);
-#endif
 
    _disableFirstSolver = false;
+#endif
 
    // the R LP is initially stored in the solver; the rational LP is constructed, when the parameter SYNCMODE is
    // initialized in setSettings() below
