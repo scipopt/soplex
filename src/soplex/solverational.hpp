@@ -392,10 +392,10 @@ void SoPlexBase<R>::_performOptIRWrapper(
 {
 #ifdef SOPLEX_WITH_MPFR
    if(!_disableFirstSolver)
-      _performOptIRStable(_solRational, acceptUnbounded, acceptInfeasible, minRounds,
+      _performOptIRStable(sol, acceptUnbounded, acceptInfeasible, minRounds,
                            primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
 
-   if(_hasBoostedSolver && (!primalFeasible || !dualFeasible))
+   if(_hasBoostedSolver && (!primalFeasible || !dualFeasible) && !infeasible && !unbounded)
    {
       if(!_disableFirstSolver)
       {
@@ -407,7 +407,7 @@ void SoPlexBase<R>::_performOptIRWrapper(
          // solve problem with iterative refinement and recovery mechanism, using multiprecision
          // return false if a new boosted iteration is needed, true otherwise
          bool needNewBoostedIt;
-         _performOptIRStableBoosted(_solRational, acceptUnbounded, acceptInfeasible, minRounds,
+         _performOptIRStableBoosted(sol, acceptUnbounded, acceptInfeasible, minRounds,
                                     primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error, needNewBoostedIt);
          if(needNewBoostedIt)
             _boostPrecision();
@@ -417,8 +417,8 @@ void SoPlexBase<R>::_performOptIRWrapper(
    }
 #else
    // solve problem with iterative refinement and recovery mechanism
-   _performOptIRStable(_solRational, acceptUnbounded, acceptInfeasible, minRounds,
-                        primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
+   _performOptIRStable(sol, acceptUnbounded, acceptInfeasible, minRounds,
+                     primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
 #endif
 }
 
@@ -5158,8 +5158,9 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(bool fromscratch,
          // do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used
          bool keepbounds = intParam(SoPlexBase<R>::RATIOTESTER) == SoPlexBase<R>::RATIOTESTER_BOUNDFLIPPING;
          Real remainingTime = _boostedSolver.getMaxTime() - _boostedSolver.time();
+         BP tol = pow(10,-(int)(BP::default_precision()*_tolPrecisionRatio));
          simplificationStatus = _boostedSimplifier->simplify(_boostedSolver, realParam(SoPlexBase<R>::EPSILON_ZERO),
-                                realParam(SoPlexBase<R>::FPFEASTOL), realParam(SoPlexBase<R>::FPOPTTOL), remainingTime, keepbounds,
+                                tol, tol, remainingTime, keepbounds,
                                 _boostedSolver.random.getSeed());
       }
 
