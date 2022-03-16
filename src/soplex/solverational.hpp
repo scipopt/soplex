@@ -409,8 +409,10 @@ void SoPlexBase<R>::_performOptIRWrapper(
          bool needNewBoostedIt;
          _performOptIRStableBoosted(sol, acceptUnbounded, acceptInfeasible, minRounds,
                                     primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error, needNewBoostedIt);
+
+         // boost precision if no success
          if(needNewBoostedIt)
-            _boostPrecision();
+            BP::default_precision(BP::default_precision() * Param::precisionBoostingFactor());
          else
             break;
       } while (true);
@@ -2447,30 +2449,6 @@ void SoPlexBase<R>::_performOptIRStable(
 
 
 #ifdef SOPLEX_WITH_MPFR
-/// increase precision for the multiprecision solver
-template <class R>
-void SoPlexBase<R>::_boostPrecision()
-{
-   // increase precision
-   BP::default_precision(BP::default_precision() * Param::precisionBoostingFactor());
-
-   // decrease tolerances
-
-   // set tolerances of the boosted solver
-   _boostedSolver.setFeastol(pow(10,-(int)(BP::default_precision()*_tolPrecisionRatio)));
-   _boostedSolver.setOpttol( pow(10,-(int)(BP::default_precision()*_tolPrecisionRatio)));
-
-   // set epsilon for updateVectors primVec, dualVec, addVec
-   _boostedSolver.setEpsilon(pow(10,-(int)(BP::default_precision()*_epsPrecisionRatio)));
-   // set epsilons globally
-   Param::setEpsilon(             pow(10,-(int)(BP::default_precision()*_epsPrecisionRatio)));
-   Param::setEpsilonFactorization(pow(10,-(int)(BP::default_precision()*_epsPrecisionRatio)));
-   Param::setEpsilonUpdate(       pow(10,-(int)(BP::default_precision()*_epsPrecisionRatio)));
-   Param::setEpsilonPivot(        pow(10,-(int)(BP::default_precision()*_epsPrecisionRatio)));
-}
-
-
-
 /// solves current problem with iterative refinement and recovery mechanism using boosted solver
 /// return false if a new boosted iteration is necessary, true otherwise
 template <class R>
@@ -2516,6 +2494,27 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
    stoppedIter = false;
    error = false;
    needNewBoostedIt = false;
+
+   // set tolerances of the boosted solver
+   if(boolParam(SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION))
+   {
+      // decrease tolerances
+      _boostedSolver.setFeastol(pow(10,-(int)(BP::default_precision()*_tolPrecisionRatio)));
+      _boostedSolver.setOpttol( pow(10,-(int)(BP::default_precision()*_tolPrecisionRatio)));
+
+      // set epsilon for updateVectors primVec, dualVec, addVec
+      _boostedSolver.setEpsilon(pow(10,-(int)(BP::default_precision()*_epsPrecisionRatio)));
+      // set epsilons globally
+      Param::setEpsilon(             pow(10,-(int)(BP::default_precision()*_epsPrecisionRatio)));
+      Param::setEpsilonFactorization(pow(10,-(int)(BP::default_precision()*_epsPrecisionRatio)));
+      Param::setEpsilonUpdate(       pow(10,-(int)(BP::default_precision()*_epsPrecisionRatio)));
+      Param::setEpsilonPivot(        pow(10,-(int)(BP::default_precision()*_epsPrecisionRatio)));
+   }
+   else
+   {
+      _boostedSolver.setFeastol(realParam(SoPlexBase<R>::FPFEASTOL));
+      _boostedSolver.setOpttol(realParam(SoPlexBase<R>::FPFEASTOL));
+   }
 
    // declare real vectors after boosting precision
    VectorBase<BP> boostedPrimalReal(numColsRational());

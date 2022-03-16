@@ -1008,8 +1008,16 @@ public:
       // enable presolver DominatedCols in PaPILO?
       SIMPLIFIER_DOMINATEDCOLS = 24,
 
+#ifndef SOPLEX_WITH_MPFR
       /// number of boolean parameters
       BOOLPARAM_COUNT = 25
+#else
+      /// adapt tolerances to the multiprecision used
+      ADAPT_TOLS_TO_MULTIPRECISION = 25,
+
+      /// number of boolean parameters
+      BOOLPARAM_COUNT = 26
+#endif
    } BoolParam;
 
    /// integer parameters
@@ -2449,9 +2457,6 @@ private:
    void _convertDataArrayVarStatusToRPrecision(
       DataArray< typename SPxSolverBase<BP>::VarStatus >& base,
       DataArray< typename SPxSolverBase<R>::VarStatus >& copy);
-
-   /// increase precision for the multiprecision solver
-   void _boostPrecision();
 
    /// solves current problem with iterative refinement and recovery mechanism using boosted solver
    void _performOptIRStableBoosted(

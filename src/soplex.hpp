@@ -185,6 +185,14 @@ SoPlexBase<R>::Settings::BoolParam::BoolParam()
    description[SoPlexBase<R>::SIMPLIFIER_DOMINATEDCOLS] =
       "enable presolver DominatedCols in PaPILO";
    defaultValue[SoPlexBase<R>::SIMPLIFIER_DOMINATEDCOLS] = true;
+
+#ifdef SOPLEX_WITH_MPFR
+   // adapt tolerances to the multiprecision used
+   name[SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION] = "adapt_tols_to_multiprecision";
+   description[SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION] =
+      "adapt tolerances to the multiprecision used";
+   defaultValue[SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION] = false;
+#endif
 }
 
 template <class R>
@@ -5855,6 +5863,14 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
 #endif
       break;
 
+   case ADAPT_TOLS_TO_MULTIPRECISION:
+#ifndef SOPLEX_WITH_MPFR
+      MSG_INFO1(spxout, spxout <<
+                "Setting Parameter adapt_tols_to_multiprecision is only possible if SoPlex is build with MPFR\n");
+      return false;
+#endif
+      break;
+
    default:
       return false;
    }
@@ -8281,15 +8297,22 @@ void SoPlexBase<R>::_solveBoostedRealLPAndRecordStatistics(volatile bool* interr
       _boostedSolver.setTerminationTime(Real(realParam(SoPlexBase<R>::INFTY)));
 
    // ensure that tolerances are not too small
-   double tolerance = pow(10,-(int)(BP::default_precision()*_tolPrecisionRatio));
-   if(_boostedSolver.feastol() < tolerance)
+   if(boolParam(SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION))
    {
-      _boostedSolver.setFeastol(tolerance);
-   }
+      double tolerance = pow(10,-(int)(BP::default_precision()*_tolPrecisionRatio));
+      if(_boostedSolver.feastol() < tolerance)
+         _boostedSolver.setFeastol(tolerance);
 
-   if(_boostedSolver.opttol() < tolerance)
+      if(_boostedSolver.opttol() < tolerance)
+         _boostedSolver.setOpttol(tolerance);
+   }
+   else
    {
-      _boostedSolver.setOpttol(tolerance);
+      if(_boostedSolver.feastol() < 1e-12)
+         _boostedSolver.setFeastol(1e-12);
+
+      if(_boostedSolver.opttol() < 1e-12)
+         _boostedSolver.setOpttol(1e-12);
    }
 
    // set correct representation
