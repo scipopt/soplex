@@ -145,7 +145,18 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
          {
             MSG_INFO1(spxout, spxout << "Error while testing for unboundedness.\n");
             _status = SPxSolverBase<R>::ERROR;
+#ifdef SOPLEX_WITH_MPFR
+            if(!_hasBoostedSolver)
+               break;
+            else
+            {
+               _switchToBoosted();
+               _forceBoostedOneRestart = true;
+               continue;
+            }
+#else
             break;
+#endif
          }
 
          if(hasUnboundedRay)
@@ -183,7 +194,18 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
          {
             MSG_INFO1(spxout, spxout << "Error while testing for feasibility.\n");
             _status = SPxSolverBase<R>::ERROR;
+#ifdef SOPLEX_WITH_MPFR
+            if(!_hasBoostedSolver)
+               break;
+            else
+            {
+               _switchToBoosted();
+               _forceBoostedOneRestart = true;
+               continue;
+            }
+#else
             break;
+#endif
          }
          else if(stoppedTime)
          {
@@ -210,6 +232,16 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
          else
          {
             MSG_INFO1(spxout, spxout << "Primal feasible and bounded.\n");
+#ifdef SOPLEX_WITH_MPFR
+            if(_hasBoostedSolver)
+            {
+               _switchToBoosted();
+               // boost precision
+               BP::default_precision(BP::default_precision() * Param::precisionBoostingFactor());
+               // force restart from slack basis
+               _forceBoostedOneRestart = true;
+            }
+#endif
             continue;
          }
       }
@@ -225,7 +257,18 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             MSG_INFO1(spxout, spxout << "Error while testing for infeasibility.\n");
             _status = SPxSolverBase<R>::ERROR;
             _restoreBasis();
+#ifdef SOPLEX_WITH_MPFR
+            if(!_hasBoostedSolver)
+               break;
+            else
+            {
+               _switchToBoosted();
+               _forceBoostedOneRestart = true;
+               continue;
+            }
+#else
             break;
+#endif
          }
 
          infeasibilityNotCertified = !infeasible;
@@ -257,7 +300,18 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
                MSG_INFO1(spxout, spxout << "Error while testing for dual infeasibility.\n");
                _status = SPxSolverBase<R>::ERROR;
                _restoreBasis();
+#ifdef SOPLEX_WITH_MPFR
+            if(!_hasBoostedSolver)
                break;
+            else
+            {
+               _switchToBoosted();
+               _forceBoostedOneRestart = true;
+               continue;
+            }
+#else
+            break;
+#endif
             }
 
             if(hasUnboundedRay)
@@ -297,6 +351,15 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
          else
          {
             MSG_INFO1(spxout, spxout << "Primal feasible.  Optimizing again.\n");
+#ifdef SOPLEX_WITH_MPFR
+            if(_hasBoostedSolver)
+            {
+               // boost precision
+               BP::default_precision(BP::default_precision() * Param::precisionBoostingFactor());
+               // invalidate basis
+               _forceBoostedOneRestart = true;
+            }
+#endif
             continue;
          }
       }
@@ -308,8 +371,24 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
       }
       else
       {
+#ifdef SOPLEX_WITH_MPFR
+         if(!_hasBoostedSolver)
+         {
+            MSG_INFO1(spxout, spxout << "Terminating without success.\n");
+            break;
+         }
+         else
+         {
+            if(_switchedToBoosted) // if we are already using boosted solver, boost precision
+               BP::default_precision(BP::default_precision() * Param::precisionBoostingFactor());
+            _switchToBoosted();
+            _forceBoostedOneRestart = true;
+            continue;
+         }
+#else
          MSG_INFO1(spxout, spxout << "Terminating without success.\n");
          break;
+#endif
       }
    }
    while(!_isSolveStopped(stoppedTime, stoppedIter));
@@ -391,19 +470,18 @@ void SoPlexBase<R>::_performOptIRWrapper(
 )
 {
 #ifdef SOPLEX_WITH_MPFR
-   if(!_disableFirstSolver)
+   if(!_switchedToBoosted)
       _performOptIRStable(sol, acceptUnbounded, acceptInfeasible, minRounds,
                            primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
 
    if(_hasBoostedSolver && (!primalFeasible || !dualFeasible) && !infeasible && !unbounded)
    {
-      if(!_disableFirstSolver)
-      {
-         MSG_INFO1(spxout, spxout << "No success with double precision solver. Disabling it and switching to multiprecision.\n");
-         _disableFirstSolver = true;
-      }
       do
       {
+         // load basis correctly into boosted solver
+         _loadBasisBoosted();
+         // switch to boosted solver
+         _switchToBoosted();
          // solve problem with iterative refinement and recovery mechanism, using multiprecision
          // return false if a new boosted iteration is needed, true otherwise
          bool needNewBoostedIt;
@@ -2449,6 +2527,61 @@ void SoPlexBase<R>::_performOptIRStable(
 
 
 #ifdef SOPLEX_WITH_MPFR
+/// disable initial precision solver and switch to boosted solver
+template <class R>
+void SoPlexBase<R>::_switchToBoosted()
+{
+   assert(_hasBoostedSolver);
+
+   if(!_switchedToBoosted)
+   {
+      MSG_INFO1(spxout, spxout << "No success with initial precision solver. Disabling it and switching to multiprecision.\n");
+      _switchedToBoosted = true;
+      _hasBasis = (_boostedSolver.basis().status() > SPxBasisBase<BP>::NO_PROBLEM);
+   }
+}
+
+
+
+/// load basis correctly inside boosted solver
+template <class R>
+void SoPlexBase<R>::_loadBasisBoosted()
+{
+   bool fromScratch = _boostedFromSlack || _forceBoostedOneRestart;
+   _forceBoostedOneRestart = false;
+
+   if(!_switchedToBoosted && _hasBasis && !fromScratch)
+   {
+      // get basis from _solver
+      _basisStatusRows.reSize(_solver.nRows());
+      _basisStatusCols.reSize(_solver.nCols());
+      _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(),
+                           _basisStatusRows.size(), _basisStatusCols.size());
+
+      // load the data from the rationalLP
+      _boostedSolver.loadLP(*_rationalLP, false);
+
+      // load basis into _boostedSolver
+      _convertDataArrayVarStatusToBoosted(_basisStatusRows, _tmpBasisStatusRows);
+      _convertDataArrayVarStatusToBoosted(_basisStatusCols, _tmpBasisStatusCols);
+      _boostedSolver.setBasis(_tmpBasisStatusRows.get_const_ptr(), _tmpBasisStatusCols.get_const_ptr());
+   }
+   else if(!_hasBasis || fromScratch)
+   {
+      // start the solving from slack basis
+
+      // load the data from the rationalLP and init slack basis
+      _boostedSolver.loadLP(*_rationalLP, true);
+   }
+   else
+   {
+      // start from last basis of boosted solver; thus no need to do anything, the basis is already loaded
+      _boostedSolver.loadLP(*_rationalLP, false); // not sure this will work alone, the basis is kinda invalidated doing this
+   }
+}
+
+
+
 /// solves current problem with iterative refinement and recovery mechanism using boosted solver
 /// return false if a new boosted iteration is necessary, true otherwise
 template <class R>
@@ -2474,9 +2607,6 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
    _statistics->rationalTime->start();
 
    MSG_INFO1(spxout, spxout << "Current precision = 1e-" << BP::default_precision() << "\n");
-
-   // get parameter value (true = from slack basis, false = hot start)
-   bool fromScratch = _boostedFromSlack;
 
    typename SPxSolverBase<BP>::Status boostedResult = SPxSolverBase<BP>::UNKNOWN;
 
@@ -2530,41 +2660,6 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
 
    // solve original LP
    MSG_INFO1(spxout, spxout << "Initial floating-point boosted solve . . .\n");
-
-   // if _solver still have the last basis, load it onto _boostedSolver
-   if(!fromScratch && _hasBasis)
-   {
-      // get basis from _solver
-      _basisStatusRows.reSize(_solver.nRows());
-      _basisStatusCols.reSize(_solver.nCols());
-      _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(),
-                           _basisStatusRows.size(), _basisStatusCols.size());
-
-      // load the data from the rationalLP
-      _boostedSolver.loadLP(*_rationalLP, false);
-
-      // load basis into _boostedSolver
-      _convertDataArrayVarStatusToBoosted(_basisStatusRows, _tmpBasisStatusRows);
-      _convertDataArrayVarStatusToBoosted(_basisStatusCols, _tmpBasisStatusCols);
-      _boostedSolver.setBasis(_tmpBasisStatusRows.get_const_ptr(), _tmpBasisStatusCols.get_const_ptr());
-   }
-   else
-   {
-      // start the solving from slack basis
-
-      // load the data from the rationalLP and init slack basis
-      _boostedSolver.loadLP(*_rationalLP, true);
-
-      // load slack basis inside arrays _basisStatusRows and _basisStatusCols
-      _tmpBasisStatusRows.reSize(_boostedSolver.nRows());
-      _tmpBasisStatusCols.reSize(_boostedSolver.nCols());
-      _boostedSolver.getBasis(_tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr(),
-                           _tmpBasisStatusRows.size(), _tmpBasisStatusCols.size());
-      _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusRows, _basisStatusRows);
-      _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusCols, _basisStatusCols);
-   }
-
-   _hasBasis = (_boostedSolver.basis().status() > SPxBasisBase<BP>::NO_PROBLEM);
 
    // initialize boosted solver
    _boostedSolver.init();

@@ -1758,7 +1758,8 @@ private:
 
    bool _hasBoostedSolver;
    bool _boostedFromSlack;
-   bool _disableFirstSolver;
+   bool _forceBoostedOneRestart;
+   bool _switchedToBoosted;
 
    SLUFactor<BP> _boostedSlufactor;
 
@@ -2457,6 +2458,12 @@ private:
    void _convertDataArrayVarStatusToRPrecision(
       DataArray< typename SPxSolverBase<BP>::VarStatus >& base,
       DataArray< typename SPxSolverBase<R>::VarStatus >& copy);
+
+   /// disable initial precision solver and switch to boosted solver
+   void _switchToBoosted();
+
+   /// load basis correctly inside boosted solver
+   void _loadBasisBoosted();
 
    /// solves current problem with iterative refinement and recovery mechanism using boosted solver
    void _performOptIRStableBoosted(
