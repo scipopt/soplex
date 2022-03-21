@@ -8178,30 +8178,51 @@ void SoPlexBase<R>::_enableSimplifierAndScaler()
    {
    case SCALER_OFF:
       _scaler = 0;
+#ifdef SOPLEX_WITH_MPFR
+      _boostedScaler = 0;
+#endif
       break;
 
    case SCALER_UNIEQUI:
       _scaler = &_scalerUniequi;
+#ifdef SOPLEX_WITH_MPFR
+      _boostedScaler = &_boostedScalerUniequi;
+#endif
       break;
 
    case SCALER_BIEQUI:
       _scaler = &_scalerBiequi;
+#ifdef SOPLEX_WITH_MPFR
+      _boostedScaler = &_boostedScalerBiequi;
+#endif
       break;
 
    case SCALER_GEO1:
       _scaler = &_scalerGeo1;
+#ifdef SOPLEX_WITH_MPFR
+      _boostedScaler = &_boostedScalerGeo1;
+#endif
       break;
 
    case SCALER_GEO8:
       _scaler = &_scalerGeo8;
+#ifdef SOPLEX_WITH_MPFR
+      _boostedScaler = &_boostedScalerGeo8;
+#endif
       break;
 
    case SCALER_LEASTSQ:
       _scaler = &_scalerLeastsq;
+#ifdef SOPLEX_WITH_MPFR
+      _boostedScaler = &_boostedScalerLeastsq;
+#endif
       break;
 
    case SCALER_GEOEQUI:
       _scaler = &_scalerGeoequi;
+#ifdef SOPLEX_WITH_MPFR
+      _boostedScaler = &_boostedScalerGeoequi;
+#endif
       break;
 
    default:
