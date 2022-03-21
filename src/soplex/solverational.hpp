@@ -118,7 +118,17 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
       if(error)
       {
          _status = SPxSolverBase<R>::ERROR;
+#ifdef SOPLEX_WITH_MPFR
+         if(_hasBoostedSolver)
+         {
+            _setupBoostedSolverAfterRecovery();
+            continue;
+         }
+         else
+            break;
+#else
          break;
+#endif
       }
       // case: stopped due to some limit
       else if(stoppedTime)
@@ -146,14 +156,13 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             MSG_INFO1(spxout, spxout << "Error while testing for unboundedness.\n");
             _status = SPxSolverBase<R>::ERROR;
 #ifdef SOPLEX_WITH_MPFR
-            if(!_hasBoostedSolver)
-               break;
-            else
+            if(_hasBoostedSolver)
             {
-               _switchToBoosted();
-               _forceBoostedOneRestart = true;
+               _setupBoostedSolverAfterRecovery();
                continue;
             }
+            else
+               break;
 #else
             break;
 #endif
@@ -195,14 +204,13 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             MSG_INFO1(spxout, spxout << "Error while testing for feasibility.\n");
             _status = SPxSolverBase<R>::ERROR;
 #ifdef SOPLEX_WITH_MPFR
-            if(!_hasBoostedSolver)
-               break;
-            else
+            if(_hasBoostedSolver)
             {
-               _switchToBoosted();
-               _forceBoostedOneRestart = true;
+               _setupBoostedSolverAfterRecovery();
                continue;
             }
+            else
+               break;
 #else
             break;
 #endif
@@ -234,13 +242,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             MSG_INFO1(spxout, spxout << "Primal feasible and bounded.\n");
 #ifdef SOPLEX_WITH_MPFR
             if(_hasBoostedSolver)
-            {
-               _switchToBoosted();
-               // boost precision
-               BP::default_precision(BP::default_precision() * Param::precisionBoostingFactor());
-               // force restart from slack basis
-               _forceBoostedOneRestart = true;
-            }
+               _setupBoostedSolverAfterRecovery();
 #endif
             continue;
          }
@@ -258,14 +260,13 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             _status = SPxSolverBase<R>::ERROR;
             _restoreBasis();
 #ifdef SOPLEX_WITH_MPFR
-            if(!_hasBoostedSolver)
-               break;
-            else
+            if(_hasBoostedSolver)
             {
-               _switchToBoosted();
-               _forceBoostedOneRestart = true;
+               _setupBoostedSolverAfterRecovery();
                continue;
             }
+            else
+               break;
 #else
             break;
 #endif
@@ -301,16 +302,15 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
                _status = SPxSolverBase<R>::ERROR;
                _restoreBasis();
 #ifdef SOPLEX_WITH_MPFR
-            if(!_hasBoostedSolver)
-               break;
-            else
-            {
-               _switchToBoosted();
-               _forceBoostedOneRestart = true;
-               continue;
-            }
+               if(_hasBoostedSolver)
+               {
+                  _setupBoostedSolverAfterRecovery();
+                  continue;
+               }
+               else
+                  break;
 #else
-            break;
+               break;
 #endif
             }
 
@@ -353,12 +353,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             MSG_INFO1(spxout, spxout << "Primal feasible.  Optimizing again.\n");
 #ifdef SOPLEX_WITH_MPFR
             if(_hasBoostedSolver)
-            {
-               // boost precision
-               BP::default_precision(BP::default_precision() * Param::precisionBoostingFactor());
-               // invalidate basis
-               _forceBoostedOneRestart = true;
-            }
+               _setupBoostedSolverAfterRecovery();
 #endif
             continue;
          }
@@ -372,18 +367,15 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
       else
       {
 #ifdef SOPLEX_WITH_MPFR
-         if(!_hasBoostedSolver)
+         if(_hasBoostedSolver)
          {
-            MSG_INFO1(spxout, spxout << "Terminating without success.\n");
-            break;
+            _setupBoostedSolverAfterRecovery();
+            continue;
          }
          else
          {
-            if(_switchedToBoosted) // if we are already using boosted solver, boost precision
-               BP::default_precision(BP::default_precision() * Param::precisionBoostingFactor());
-            _switchToBoosted();
-            _forceBoostedOneRestart = true;
-            continue;
+            MSG_INFO1(spxout, spxout << "Terminating without success.\n");
+            break;
          }
 #else
          MSG_INFO1(spxout, spxout << "Terminating without success.\n");
@@ -470,18 +462,15 @@ void SoPlexBase<R>::_performOptIRWrapper(
 )
 {
 #ifdef SOPLEX_WITH_MPFR
-   if(!_switchedToBoosted)
+   if(!_hasBoostedSolver || !_switchedToBoosted)
       _performOptIRStable(sol, acceptUnbounded, acceptInfeasible, minRounds,
                            primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
-
-   if(_hasBoostedSolver && (!primalFeasible || !dualFeasible) && !infeasible && !unbounded)
+   else
    {
       do
       {
-         // load basis correctly into boosted solver
-         _loadBasisBoosted();
-         // switch to boosted solver
-         _switchToBoosted();
+         // setup boosted solver for the new iteration
+         _setupBoostedSolver();
          // solve problem with iterative refinement and recovery mechanism, using multiprecision
          // return false if a new boosted iteration is needed, true otherwise
          bool needNewBoostedIt;
@@ -490,7 +479,7 @@ void SoPlexBase<R>::_performOptIRWrapper(
 
          // boost precision if no success
          if(needNewBoostedIt)
-            BP::default_precision(BP::default_precision() * Param::precisionBoostingFactor());
+            _boostPrecision();
          else
             break;
       } while (true);
@@ -2543,14 +2532,13 @@ void SoPlexBase<R>::_switchToBoosted()
 
 
 
-/// load basis correctly inside boosted solver
+/// setup boosted solver before launching iteration
 template <class R>
-void SoPlexBase<R>::_loadBasisBoosted()
+void SoPlexBase<R>::_setupBoostedSolver()
 {
-   bool fromScratch = _boostedFromSlack || _forceBoostedOneRestart;
-   _forceBoostedOneRestart = false;
+   bool doubleHasBasis = _solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM;
 
-   if(!_switchedToBoosted && _hasBasis && !fromScratch)
+   if((!_switchedToBoosted || _boostedIterations == 0) && doubleHasBasis && !_isBoostedStartingFromSlack()) // double precision solver was last used and has a basis loaded
    {
       // get basis from _solver
       _basisStatusRows.reSize(_solver.nRows());
@@ -2566,7 +2554,7 @@ void SoPlexBase<R>::_loadBasisBoosted()
       _convertDataArrayVarStatusToBoosted(_basisStatusCols, _tmpBasisStatusCols);
       _boostedSolver.setBasis(_tmpBasisStatusRows.get_const_ptr(), _tmpBasisStatusCols.get_const_ptr());
    }
-   else if(!_hasBasis || fromScratch)
+   else if(!_hasBasis || _isBoostedStartingFromSlack())
    {
       // start the solving from slack basis
 
@@ -2576,8 +2564,53 @@ void SoPlexBase<R>::_loadBasisBoosted()
    else
    {
       // start from last basis of boosted solver; thus no need to do anything, the basis is already loaded
-      _boostedSolver.loadLP(*_rationalLP, false); // not sure this will work alone, the basis is kinda invalidated doing this
+      _boostedSolver.loadLP(*_rationalLP, false);
    }
+
+   _hasBasis = _boostedSolver.basis().status() > SPxBasisBase<BP>::NO_PROBLEM;
+
+   if(_hasBasis)
+   {
+      _tmpBasisStatusRows.reSize(_boostedSolver.nRows());
+      _tmpBasisStatusCols.reSize(_boostedSolver.nCols());
+
+      _boostedSolver.getBasis(_tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr(), _tmpBasisStatusRows.size(),
+                        _tmpBasisStatusCols.size());
+      _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusRows, _basisStatusRows);
+      _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusCols, _basisStatusCols);
+   }
+}
+
+
+
+/// increase the multiprecision
+template <class R>
+void SoPlexBase<R>::_boostPrecision()
+{
+   assert(_hasBoostedSolver);
+   assert(_switchedToBoosted);
+
+   if(_boostedIterations > 0)
+      BP::default_precision(BP::default_precision() * Param::precisionBoostingFactor());
+}
+
+
+
+/// setup recovery mecanism using multiprecision
+template <class R>
+void SoPlexBase<R>::_setupBoostedSolverAfterRecovery()
+{
+   _switchToBoosted();
+   _boostPrecision();
+}
+
+
+
+/// return true if slack basis has to be loaded for boosted solver
+template <class R>
+bool SoPlexBase<R>::_isBoostedStartingFromSlack(bool initialSolve)
+{
+   return (_boostedFromSlack && initialSolve);
 }
 
 
@@ -2664,12 +2697,15 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
    // initialize boosted solver
    _boostedSolver.init();
 
+   _boostedIterations ++;
+   MSG_INFO1(spxout, spxout << "Boosted iteration " << _boostedIterations << "\n");
+
    for(int r = numRowsRational() - 1; r >= 0; r--)
       assert(_boostedSolver.maxRowObj(r) == 0.0);
 
    // solve original LP with boosted solver
    _statistics->rationalTime->stop();
-   _solveRealForRationalBoosted(false, boostedPrimalReal, boostedDualReal, _basisStatusRows, _basisStatusCols, boostedResult);
+   _solveRealForRationalBoosted(boostedPrimalReal, boostedDualReal, _basisStatusRows, _basisStatusCols, boostedResult, true);
 
    // evalute result
    if(_evaluateResultBoosted(boostedResult, false, sol, boostedDualReal, infeasible, unbounded, stoppedTime, stoppedIter,
@@ -2838,7 +2874,7 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
       if(primalScale > 1e20 || dualScale > 1e20)
          setIntParam(SoPlexBase<R>::SIMPLIFIER, SoPlexBase<R>::SIMPLIFIER_OFF);
 
-      _solveRealForRationalBoosted(false, boostedPrimalReal, boostedDualReal, _basisStatusRows, _basisStatusCols, boostedResult);
+      _solveRealForRationalBoosted(boostedPrimalReal, boostedDualReal, _basisStatusRows, _basisStatusCols, boostedResult, false);
 
       // reset simplifier param to previous value
       setIntParam(SoPlexBase<R>::SIMPLIFIER, simplifier);
@@ -5187,18 +5223,18 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
 #ifdef SOPLEX_WITH_MPFR
 // General specializations
 /// solves real LP during iterative refinement
-///@param fromscratch in
+///@param initialSolve in
 ///@param primal out
 ///@param dual out
 ///@param basisStatusRows out
 ///@param basisStatusRows out
 ///@param boostedResult out
 template <class R>
-void SoPlexBase<R>::_solveRealForRationalBoosted(bool fromscratch,
+void SoPlexBase<R>::_solveRealForRationalBoosted(
       VectorBase<BP>& primal, VectorBase<BP>& dual,
       DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
       DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
-      typename SPxSolverBase<BP>::Status& boostedResult)
+      typename SPxSolverBase<BP>::Status& boostedResult, bool initialSolve)
 {
    assert(_isBoostedConsistent());
 
@@ -5209,7 +5245,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(bool fromscratch,
 
 #ifndef SOPLEX_MANUAL_ALT
 
-   if(fromscratch || !_hasBasis)
+   if(_isBoostedStartingFromSlack(initialSolve))
       _enableSimplifierAndScaler();
    else
       _disableSimplifierAndScaler();
@@ -5217,10 +5253,6 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(bool fromscratch,
 #else
    _disableSimplifierAndScaler();
 #endif
-
-   // reset basis to slack basis when solving from scratch
-   if(fromscratch)
-      _boostedSolver.reLoad();
 
    // start timing
    _statistics->syncTime->start();
@@ -5236,7 +5268,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(bool fromscratch,
 
    // with preprocessing or solving from scratch, the basis may change, hence invalidate the
    // rational basis factorization
-   if(_boostedSimplifier != nullptr || _boostedScaler != nullptr || fromscratch)
+   if(_boostedSimplifier != nullptr || _boostedScaler != nullptr)
       _rationalLUSolver.clear();
 
    // stop timing

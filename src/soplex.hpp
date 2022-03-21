@@ -9138,8 +9138,8 @@ SoPlexBase<R>::SoPlexBase()
 
    _boostedSolver.setBasisSolver(&_boostedSlufactor);
 
-   _forceBoostedOneRestart = false;
    _switchedToBoosted = false;
+   _boostedIterations = 0;
 #endif
 
    // the R LP is initially stored in the solver; the rational LP is constructed, when the parameter SYNCMODE is

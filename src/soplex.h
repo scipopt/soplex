@@ -1758,8 +1758,8 @@ private:
 
    bool _hasBoostedSolver;
    bool _boostedFromSlack;
-   bool _forceBoostedOneRestart;
    bool _switchedToBoosted;
+   int _boostedIterations;
 
    SLUFactor<BP> _boostedSlufactor;
 
@@ -2462,8 +2462,17 @@ private:
    /// disable initial precision solver and switch to boosted solver
    void _switchToBoosted();
 
-   /// load basis correctly inside boosted solver
-   void _loadBasisBoosted();
+   /// setup boosted solver before launching iteration
+   void _setupBoostedSolver();
+
+   /// increase the multiprecision
+   void _boostPrecision();
+
+   /// setup recovery mecanism using multiprecision
+   void _setupBoostedSolverAfterRecovery();
+
+   /// return true if slack basis has to be loaded for boosted solver
+   bool _isBoostedStartingFromSlack(bool initialSolve = true);
 
    /// solves current problem with iterative refinement and recovery mechanism using boosted solver
    void _performOptIRStableBoosted(
@@ -2600,11 +2609,11 @@ private:
 
 #ifdef SOPLEX_WITH_MPFR
    /// solves real LP during iterative refinement
-   void _solveRealForRationalBoosted(bool fromscratch,
+   void _solveRealForRationalBoosted(
          VectorBase<BP>& primal, VectorBase<BP>& dual,
          DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
          DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
-         typename SPxSolverBase<BP>::Status& boostedResult);
+         typename SPxSolverBase<BP>::Status& boostedResult, bool initialSolve);
 #endif
 
    /// computes rational inverse of basis matrix as defined by _rationalLUSolverBind
