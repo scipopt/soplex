@@ -119,7 +119,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
       {
          _status = SPxSolverBase<R>::ERROR;
 #ifdef SOPLEX_WITH_MPFR
-         if(_hasBoostedSolver)
+         if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
          {
             _setupBoostedSolverAfterRecovery();
             continue;
@@ -156,7 +156,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             MSG_INFO1(spxout, spxout << "Error while testing for unboundedness.\n");
             _status = SPxSolverBase<R>::ERROR;
 #ifdef SOPLEX_WITH_MPFR
-            if(_hasBoostedSolver)
+            if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
             {
                _setupBoostedSolverAfterRecovery();
                continue;
@@ -204,7 +204,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             MSG_INFO1(spxout, spxout << "Error while testing for feasibility.\n");
             _status = SPxSolverBase<R>::ERROR;
 #ifdef SOPLEX_WITH_MPFR
-            if(_hasBoostedSolver)
+            if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
             {
                _setupBoostedSolverAfterRecovery();
                continue;
@@ -241,7 +241,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
          {
             MSG_INFO1(spxout, spxout << "Primal feasible and bounded.\n");
 #ifdef SOPLEX_WITH_MPFR
-            if(_hasBoostedSolver)
+            if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
                _setupBoostedSolverAfterRecovery();
 #endif
             continue;
@@ -260,7 +260,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             _status = SPxSolverBase<R>::ERROR;
             _restoreBasis();
 #ifdef SOPLEX_WITH_MPFR
-            if(_hasBoostedSolver)
+            if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
             {
                _setupBoostedSolverAfterRecovery();
                continue;
@@ -302,7 +302,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
                _status = SPxSolverBase<R>::ERROR;
                _restoreBasis();
 #ifdef SOPLEX_WITH_MPFR
-               if(_hasBoostedSolver)
+               if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
                {
                   _setupBoostedSolverAfterRecovery();
                   continue;
@@ -352,7 +352,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
          {
             MSG_INFO1(spxout, spxout << "Primal feasible.  Optimizing again.\n");
 #ifdef SOPLEX_WITH_MPFR
-            if(_hasBoostedSolver)
+            if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
                _setupBoostedSolverAfterRecovery();
 #endif
             continue;
@@ -367,7 +367,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
       else
       {
 #ifdef SOPLEX_WITH_MPFR
-         if(_hasBoostedSolver)
+         if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
          {
             _setupBoostedSolverAfterRecovery();
             continue;
@@ -462,9 +462,9 @@ void SoPlexBase<R>::_performOptIRWrapper(
 )
 {
 #ifdef SOPLEX_WITH_MPFR
-   if(_iterativeRefinement)
+   if(boolParam(SoPlexBase<R>::ITERATIVE_REFINEMENT))
    {
-      if(!_hasBoostedSolver || !_switchedToBoosted)
+      if(!boolParam(SoPlexBase<R>::PRECISION_BOOSTING) || !_switchedToBoosted)
       {
          _performOptIRStable(sol, acceptUnbounded, acceptInfeasible, minRounds,
                            primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
@@ -491,7 +491,7 @@ void SoPlexBase<R>::_performOptIRWrapper(
    }
    else
    {
-      assert(_hasBoostedSolver); // at least one option between IR and precision boosting must be activated
+      assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING)); // at least one option between IR and precision boosting must be activated
 
       if(!_switchedToBoosted)
       {
@@ -2215,7 +2215,7 @@ void SoPlexBase<R>::_solveRealForRationalStable(
    bool& stoppedIter,
    bool& error)
 {
-   assert(!_iterativeRefinement);
+   assert(!boolParam(SoPlexBase<R>::ITERATIVE_REFINEMENT));
 
    // start rational solving timing
    _statistics->rationalTime->start();
@@ -2475,7 +2475,7 @@ void SoPlexBase<R>::_performOptIRStable(
    bool& stoppedIter,
    bool& error)
 {
-   assert(_iterativeRefinement);
+   assert(boolParam(SoPlexBase<R>::ITERATIVE_REFINEMENT));
 
    // start rational solving timing
    _statistics->rationalTime->start();
@@ -2533,7 +2533,7 @@ void SoPlexBase<R>::_performOptIRStable(
    // if boosted solver is available, double precision solver is only used once.
    // otherwise use the expensive pipeline from _solveRealStable
 #ifdef SOPLEX_WITH_MPFR
-   if(_hasBoostedSolver)
+   if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
       result = _solveRealForRational(false, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
    else
       result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows,
@@ -2713,7 +2713,7 @@ void SoPlexBase<R>::_performOptIRStable(
       // if boosted solver is available, double precision solver is only used once.
       // otherwise use the expensive pipeline from _solveRealStable
 #ifdef SOPLEX_WITH_MPFR
-      if(_hasBoostedSolver)
+      if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
       {
          // turn off simplifier if scaling factors are too high
          int simplifier = intParam(SoPlexBase<R>::SIMPLIFIER);
@@ -2811,7 +2811,7 @@ void SoPlexBase<R>::_performOptIRStable(
 template <class R>
 void SoPlexBase<R>::_switchToBoosted()
 {
-   assert(_hasBoostedSolver);
+   assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
 
    if(!_switchedToBoosted)
    {
@@ -2827,7 +2827,7 @@ void SoPlexBase<R>::_switchToBoosted()
 template <class R>
 void SoPlexBase<R>::_setupBoostedSolver()
 {
-   assert(_hasBoostedSolver);
+   assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
 
    bool doubleHasBasis = _solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM;
 
@@ -2880,7 +2880,7 @@ void SoPlexBase<R>::_setupBoostedSolver()
 template <class R>
 void SoPlexBase<R>::_boostPrecision()
 {
-   assert(_hasBoostedSolver);
+   assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
    assert(_switchedToBoosted);
 
    if(_boostedIterations > 0)
@@ -2893,7 +2893,7 @@ void SoPlexBase<R>::_boostPrecision()
 template <class R>
 void SoPlexBase<R>::_setupBoostedSolverAfterRecovery()
 {
-   assert(_hasBoostedSolver);
+   assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
 
    _switchToBoosted();
    _boostPrecision();
@@ -2905,7 +2905,7 @@ void SoPlexBase<R>::_setupBoostedSolverAfterRecovery()
 template <class R>
 bool SoPlexBase<R>::_isBoostedStartingFromSlack(bool initialSolve)
 {
-   return (_boostedFromSlack && initialSolve);
+   return (!boolParam(SoPlexBase<R>::BOOSTED_WARM_START) && initialSolve);
 }
 
 
@@ -2925,8 +2925,8 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
    bool& needNewBoostedIt
 )
 {
-   assert(_hasBoostedSolver);
-   assert(!_iterativeRefinement);
+   assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
+   assert(!boolParam(SoPlexBase<R>::ITERATIVE_REFINEMENT));
 
    // start rational solving timing
    _statistics->rationalTime->start();
@@ -3216,8 +3216,8 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
    bool& needNewBoostedIt
 )
 {
-   assert(_iterativeRefinement);
-   assert(_hasBoostedSolver);
+   assert(boolParam(SoPlexBase<R>::ITERATIVE_REFINEMENT));
+   assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
    assert(!primalFeasible || !dualFeasible);
 
    // start rational solving timing
@@ -5820,7 +5820,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
       DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
       typename SPxSolverBase<BP>::Status& boostedResult, bool initialSolve)
 {
-   assert(_hasBoostedSolver);
+   assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
    assert(_isBoostedConsistent());
 
    assert(_boostedSolver.nRows() == numRowsRational());

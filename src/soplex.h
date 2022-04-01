@@ -1008,15 +1008,24 @@ public:
       // enable presolver DominatedCols in PaPILO?
       SIMPLIFIER_DOMINATEDCOLS = 24,
 
+      // enable iterative refinement ?
+      ITERATIVE_REFINEMENT = 25,
+
 #ifndef SOPLEX_WITH_MPFR
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 25
+      BOOLPARAM_COUNT = 26
 #else
       /// adapt tolerances to the multiprecision used
-      ADAPT_TOLS_TO_MULTIPRECISION = 25,
+      ADAPT_TOLS_TO_MULTIPRECISION = 26,
+
+      /// enable precision boosting ?
+      PRECISION_BOOSTING = 27,
+
+      /// boosted solver start from last basis
+      BOOSTED_WARM_START = 28,
 
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 26
+      BOOLPARAM_COUNT = 29
 #endif
    } BoolParam;
 
@@ -1113,16 +1122,8 @@ public:
       /// type of timer for statistics
       STATTIMER = 29,
 
-#ifndef SOPLEX_WITH_MPFR
       /// number of integer parameters
       INTPARAM_COUNT = 30
-#else
-      /// mode for boosted solver
-      BOOSTED_SOLVER = 30,
-
-      /// number of integer parameters
-      INTPARAM_COUNT = 31
-#endif
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -1373,20 +1374,6 @@ public:
       POLISHING_FRACTIONALITY = 2
    };
 
-#ifdef SOPLEX_WITH_MPFR
-   /// values for parameter BOOSTED_SOLVER
-   enum
-   {
-      /// disable boosted solver
-      BOOSTED_SOLVER_OFF = 0,
-
-      /// boosted solver start solve from last basis encountered
-      BOOSTED_SOLVER_HOT_START = 1,
-
-      /// boosted solver start the solve from slack basis
-      BOOSTED_SOLVER_FROM_SLACK = 2
-   };
-#endif
 
    /// real parameters
    typedef enum
@@ -1742,8 +1729,6 @@ private:
    SPxScaler<R>* _scaler;
    SPxStarter<R>* _starter;
 
-   bool _iterativeRefinement;
-
 #ifdef SOPLEX_WITH_MPFR
    //----------------------------- BOOSTED SOLVER -----------------------------
 
@@ -1758,8 +1743,6 @@ private:
    Real _tolPrecisionRatio = 0.7;
    Real _epsPrecisionRatio = 0.8;
 
-   bool _hasBoostedSolver;
-   bool _boostedFromSlack;
    bool _switchedToBoosted;
    int _boostedIterations;
 

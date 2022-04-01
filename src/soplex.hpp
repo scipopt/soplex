@@ -186,12 +186,27 @@ SoPlexBase<R>::Settings::BoolParam::BoolParam()
       "enable presolver DominatedCols in PaPILO";
    defaultValue[SoPlexBase<R>::SIMPLIFIER_DOMINATEDCOLS] = true;
 
+   name[SoPlexBase<R>::ITERATIVE_REFINEMENT] = "iterative_refinement";
+   description[SoPlexBase<R>::ITERATIVE_REFINEMENT] =
+      "enable iterative refinement";
+   defaultValue[SoPlexBase<R>::ITERATIVE_REFINEMENT] = true;
+
 #ifdef SOPLEX_WITH_MPFR
    // adapt tolerances to the multiprecision used
    name[SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION] = "adapt_tols_to_multiprecision";
    description[SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION] =
       "adapt tolerances to the multiprecision used";
    defaultValue[SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION] = true;
+
+   name[SoPlexBase<R>::PRECISION_BOOSTING] = "precision_boosting";
+   description[SoPlexBase<R>::PRECISION_BOOSTING] =
+      "enable precision boosting";
+   defaultValue[SoPlexBase<R>::PRECISION_BOOSTING] = true;
+
+   name[SoPlexBase<R>::BOOSTED_WARM_START] = "boosted_warm_start";
+   description[SoPlexBase<R>::BOOSTED_WARM_START] =
+      "if true, boosted solver starts from last basis, otherwise from slack basis";
+   defaultValue[SoPlexBase<R>::BOOSTED_WARM_START] = true;
 #endif
 }
 
@@ -431,15 +446,6 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
    lower[SoPlexBase<R>::STATTIMER] = 0;
    upper[SoPlexBase<R>::STATTIMER] = 2;
    defaultValue[SoPlexBase<R>::STATTIMER] = 1;
-
-#ifdef SOPLEX_WITH_MPFR
-   // mode for boosted solver
-   name[SoPlexBase<R>::BOOSTED_SOLVER] = "boosted_solver";
-   description[SoPlexBase<R>::BOOSTED_SOLVER] = "mode of boosted solver (0 - off, 1 - hot start, 2 - from slack basis)";
-   lower[SoPlexBase<R>::BOOSTED_SOLVER] = 0;
-   upper[SoPlexBase<R>::BOOSTED_SOLVER] = 2;
-   defaultValue[SoPlexBase<R>::BOOSTED_SOLVER] = 1;
-#endif
 }
 
 template <class R>
@@ -5863,10 +5869,29 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
 #endif
       break;
 
+   case ITERATIVE_REFINEMENT:
+      break;
+
    case ADAPT_TOLS_TO_MULTIPRECISION:
 #ifndef SOPLEX_WITH_MPFR
       MSG_INFO1(spxout, spxout <<
                 "Setting Parameter adapt_tols_to_multiprecision is only possible if SoPlex is build with MPFR\n");
+      return false;
+#endif
+      break;
+
+   case PRECISION_BOOSTING:
+#ifndef SOPLEX_WITH_MPFR
+      MSG_INFO1(spxout, spxout <<
+                "Setting Parameter precision_boosting is only possible if SoPlex is build with MPFR\n");
+      return false;
+#endif
+      break;
+
+   case BOOSTED_WARM_START:
+#ifndef SOPLEX_WITH_MPFR
+      MSG_INFO1(spxout, spxout <<
+                "Setting Parameter boosted_warm_start is only possible if SoPlex is build with MPFR\n");
       return false;
 #endif
       break;
@@ -6380,32 +6405,6 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
    case STATTIMER:
       setTimings((Timer::TYPE) value);
       break;
-
-#ifdef SOPLEX_WITH_MPFR
-   // mode for boosted solver
-   case SoPlexBase<R>::BOOSTED_SOLVER:
-      switch(value)
-      {
-      case BOOSTED_SOLVER_OFF:
-         _hasBoostedSolver = false;
-         break;
-
-      case BOOSTED_SOLVER_HOT_START:
-         _hasBoostedSolver = true;
-         _boostedFromSlack = false;
-         break;
-
-      case BOOSTED_SOLVER_FROM_SLACK:
-         _hasBoostedSolver = true;
-         _boostedFromSlack = true;
-         break;
-
-      default:
-         return false;
-      }
-
-      break;
-#endif
 
    default:
       return false;
@@ -9144,8 +9143,6 @@ SoPlexBase<R>::SoPlexBase()
 
    // give lu factorization to solver
    _solver.setBasisSolver(&_slufactor);
-
-   _iterativeRefinement = true;
 
 #ifdef SOPLEX_WITH_MPFR
    // set initial precision

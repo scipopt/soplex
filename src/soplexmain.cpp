@@ -887,23 +887,6 @@ int runSoPlex(int argc, char* argv[])
             checkSol = true;
             break;
 
-         case 'b' :
-#ifdef SOPLEX_WITH_MPFR
-            // -b<value> : choose boosted solver (0 - off, 1 - hot start, 2 - from slack basis)
-            if(!soplex->setIntParam(soplex->BOOSTED_SOLVER, option[2] - '0'))
-            {
-               printUsage(argv, optidx);
-               returnValue = 1;
-               goto TERMINATE_FREESTRINGS;
-            }
-#else
-            MSG_ERROR(std::cerr << "ERROR: boosted solver without mpfr not defined!" << std::endl;)
-            returnValue = 1;
-            goto TERMINATE_FREESTRINGS;
-#endif
-
-            break;
-
          case 'h' :
 
             // -h : display all parameters
