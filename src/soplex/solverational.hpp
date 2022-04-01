@@ -3543,6 +3543,9 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
    {
       MSG_INFO1(spxout, spxout << "\nNo success. Launch new boosted solve . . .\n");
       needNewBoostedIt = true;
+
+      // stop rational solving time
+      _statistics->rationalTime->stop();
    }
 }
 #endif
