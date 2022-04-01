@@ -1356,7 +1356,7 @@ static R betterThreshold(R th)
 {
    assert(th < R(1.0));
 
-   if(LT(th, R(0.1)))
+   if(LT(th, R(0.0999)))
       th *= R(10.0);
    else if(LT(th, R(0.9)))
       th = (th + R(1.0)) / R(2.0);
