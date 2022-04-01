@@ -1742,6 +1742,8 @@ private:
    SPxScaler<R>* _scaler;
    SPxStarter<R>* _starter;
 
+   bool _iterativeRefinement;
+
 #ifdef SOPLEX_WITH_MPFR
    //----------------------------- BOOSTED SOLVER -----------------------------
 
@@ -2474,6 +2476,19 @@ private:
    /// return true if slack basis has to be loaded for boosted solver
    bool _isBoostedStartingFromSlack(bool initialSolve = true);
 
+   /// solves current problem using multiprecision floating-point solver
+   /// return false if a new boosted iteration is necessary, true otherwise
+   void _solveRealForRationalBoostedStable(
+      SolRational& sol,
+      bool& primalFeasible,
+      bool& dualFeasible,
+      bool& infeasible,
+      bool& unbounded,
+      bool& stoppedTime,
+      bool& stoppedIter,
+      bool& error,
+      bool& needNewBoostedIt);
+
    /// solves current problem with iterative refinement and recovery mechanism using boosted solver
    void _performOptIRStableBoosted(
       SolRational& sol,
@@ -2504,6 +2519,17 @@ private:
       bool& stoppedIter,
       bool& error
    );
+
+   /// solves current problem using double floating-point solver
+   void _solveRealForRationalStable(
+      SolRational& sol,
+      bool& primalFeasible,
+      bool& dualFeasible,
+      bool& infeasible,
+      bool& unbounded,
+      bool& stoppedTime,
+      bool& stoppedIter,
+      bool& error);
 
    /// solves current problem with iterative refinement and recovery mechanism
    void _performOptIRStable(SolRational& sol,

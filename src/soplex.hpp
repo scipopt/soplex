@@ -191,7 +191,7 @@ SoPlexBase<R>::Settings::BoolParam::BoolParam()
    name[SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION] = "adapt_tols_to_multiprecision";
    description[SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION] =
       "adapt tolerances to the multiprecision used";
-   defaultValue[SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION] = false;
+   defaultValue[SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION] = true;
 #endif
 }
 
@@ -9144,6 +9144,8 @@ SoPlexBase<R>::SoPlexBase()
 
    // give lu factorization to solver
    _solver.setBasisSolver(&_slufactor);
+
+   _iterativeRefinement = true;
 
 #ifdef SOPLEX_WITH_MPFR
    // set initial precision

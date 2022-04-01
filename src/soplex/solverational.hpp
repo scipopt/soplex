@@ -462,29 +462,63 @@ void SoPlexBase<R>::_performOptIRWrapper(
 )
 {
 #ifdef SOPLEX_WITH_MPFR
-   if(!_hasBoostedSolver || !_switchedToBoosted)
-      _performOptIRStable(sol, acceptUnbounded, acceptInfeasible, minRounds,
+   if(_iterativeRefinement)
+   {
+      if(!_hasBoostedSolver || !_switchedToBoosted)
+      {
+         _performOptIRStable(sol, acceptUnbounded, acceptInfeasible, minRounds,
                            primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
+      }
+      else
+      {
+         do
+         {
+            // setup boosted solver for the new iteration
+            _setupBoostedSolver();
+            // solve problem with iterative refinement and recovery mechanism, using multiprecision
+            // return false if a new boosted iteration is needed, true otherwise
+            bool needNewBoostedIt;
+            _performOptIRStableBoosted(sol, acceptUnbounded, acceptInfeasible, minRounds,
+                                       primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error, needNewBoostedIt);
+
+            // boost precision if no success
+            if(needNewBoostedIt)
+               _boostPrecision();
+            else
+               break;
+         } while (true);
+      }
+   }
    else
    {
-      do
-      {
-         // setup boosted solver for the new iteration
-         _setupBoostedSolver();
-         // solve problem with iterative refinement and recovery mechanism, using multiprecision
-         // return false if a new boosted iteration is needed, true otherwise
-         bool needNewBoostedIt;
-         _performOptIRStableBoosted(sol, acceptUnbounded, acceptInfeasible, minRounds,
-                                    primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error, needNewBoostedIt);
+      assert(_hasBoostedSolver); // at least one option between IR and precision boosting must be activated
 
-         // boost precision if no success
-         if(needNewBoostedIt)
-            _boostPrecision();
-         else
-            break;
-      } while (true);
+      if(!_switchedToBoosted)
+      {
+         _solveRealForRationalStable(sol, primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
+      }
+      else
+      {
+         do
+         {
+            // setup boosted solver for the new iteration
+            _setupBoostedSolver();
+            // solve problem with iterative refinement and recovery mechanism, using multiprecision
+            // return false if a new boosted iteration is needed, true otherwise
+            bool needNewBoostedIt;
+            _solveRealForRationalBoostedStable(sol, primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error, needNewBoostedIt);
+
+            // boost precision if no success
+            if(needNewBoostedIt)
+               _boostPrecision();
+            else
+               break;
+         } while (true);
+      }
    }
 #else
+   assert(_iterativeRefinement); // at least one option between IR and precision boosting must be activated
+
    // solve problem with iterative refinement and recovery mechanism
    _performOptIRStable(sol, acceptUnbounded, acceptInfeasible, minRounds,
                      primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
@@ -2171,6 +2205,263 @@ void SoPlexBase<R>::_convertDataArrayVarStatusToRPrecision(
 
 
 
+/// solves current problem with floating-point solver
+template <class R>
+void SoPlexBase<R>::_solveRealForRationalStable(
+   SolRational& sol,
+   bool& primalFeasible,
+   bool& dualFeasible,
+   bool& infeasible,
+   bool& unbounded,
+   bool& stoppedTime,
+   bool& stoppedIter,
+   bool& error)
+{
+   assert(!_iterativeRefinement);
+
+   // start rational solving timing
+   _statistics->rationalTime->start();
+
+   primalFeasible = false;
+   dualFeasible = false;
+   infeasible = false;
+   unbounded = false;
+   stoppedTime = false;
+   stoppedIter = false;
+   error = false;
+
+   // set working tolerances in floating-point solver
+   _solver.setFeastol(realParam(SoPlexBase<R>::FPFEASTOL));
+   _solver.setOpttol(realParam(SoPlexBase<R>::FPOPTTOL));
+
+   // declare vectors and variables
+   typename SPxSolverBase<R>::Status result = SPxSolverBase<R>::UNKNOWN;
+
+   _modLower.reDim(numColsRational(), false);
+   _modUpper.reDim(numColsRational(), false);
+   _modLhs.reDim(numRowsRational(), false);
+   _modRhs.reDim(numRowsRational(), false);
+   _modObj.reDim(numColsRational(), false);
+
+   VectorBase<R> primalReal(numColsRational());
+   VectorBase<R> dualReal(numRowsRational());
+
+   Rational boundsViolation;
+   Rational sideViolation;
+   Rational redCostViolation;
+   Rational dualViolation;
+
+   // solve original LP
+   MSG_INFO1(spxout, spxout << "Initial floating-point solve . . .\n");
+
+   if(_hasBasis)
+   {
+      assert(_basisStatusRows.size() == numRowsRational());
+      assert(_basisStatusCols.size() == numColsRational());
+      _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+      _hasBasis = (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
+   }
+
+   for(int r = numRowsRational() - 1; r >= 0; r--)
+   {
+      assert(_solver.maxRowObj(r) == 0.0);
+   }
+
+   _statistics->rationalTime->stop();
+
+   // if boosted solver is available, double precision solver is only used once.
+   // otherwise use the expensive pipeline from _solveRealStable
+   result = _solveRealForRational(false, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
+
+   // evalute result
+   if(_evaluateResult(result, false, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
+                      error))
+      return;
+
+   _statistics->rationalTime->start();
+
+   int dualSize = 0;
+
+   // stores floating-point solution of original LP as current rational solution
+   // ensure that solution vectors have right dimension; ensure that solution is aligned with basis
+   _storeRealSolutionAsRational(sol, primalReal, dualReal, dualSize);
+
+   // control progress
+   Rational maxViolation;
+   Rational bestViolation = _rationalPosInfty;
+   const Rational violationImprovementFactor = 16;
+   const Rational errorCorrectionFactor = 1.1;
+   Rational errorCorrection = 2;
+
+   // refinement loop
+   const bool maximizing = (intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MAXIMIZE);
+
+   do
+   {
+      MSG_DEBUG(std::cout << "Computing primal violations.\n");
+
+      // computes violation of bounds
+      _computeBoundsViolation(sol, boundsViolation);
+
+      // computes violation of sides
+      _computeSidesViolation(sol, sideViolation);
+
+      MSG_DEBUG(std::cout << "Computing dual violations.\n");
+
+      // compute reduced cost violation
+      _computeReducedCostViolation(sol, redCostViolation, maximizing);
+
+      // compute dual violation
+      _computeDualViolation(sol, dualViolation, maximizing);
+
+      _modObj = sol._redCost;
+
+      // output violations; the reduced cost violations for artificially introduced slack columns are actually violations of the dual multipliers
+      MSG_INFO1(spxout, spxout
+               << "Max. bound violation = " << boundsViolation.str() << ", ofm = 1e" << orderOfMagnitude(boundsViolation) << "\n"
+               << "Max. row violation = " << sideViolation.str() << ", ofm = 1e" << orderOfMagnitude(sideViolation) << "\n"
+               << "Max. reduced cost violation = " << redCostViolation.str() << ", ofm = 1e" << orderOfMagnitude(redCostViolation) << "\n"
+               << "Max. dual violation = " << dualViolation.str() << ", ofm = 1e" << orderOfMagnitude(dualViolation) << "\n");
+
+      MSG_DEBUG(spxout
+                  << std::fixed << std::setprecision(2) << std::setw(10)
+                  << "Progress table: "
+                  << std::setw(10) << _statistics->refinements << " & "
+                  << std::setw(10) << _statistics->iterations << " & "
+                  << std::setw(10) << _statistics->solvingTime->time() << " & "
+                  << std::setw(10) << _statistics->rationalTime->time() << " & "
+                  << std::setw(10) << boundsViolation > sideViolation ? boundsViolation :
+                  sideViolation << " & "
+                  << std::setw(10) << redCostViolation > dualViolation ? redCostViolation :
+                  dualViolation << "\n");
+
+      // terminate if tolerances are satisfied
+      primalFeasible = (boundsViolation <= _rationalFeastol && sideViolation <= _rationalFeastol);
+      dualFeasible = (redCostViolation <= _rationalOpttol && dualViolation <= _rationalOpttol);
+
+      if(primalFeasible && dualFeasible)
+      {
+         MSG_INFO1(spxout, spxout << "Tolerances reached.\n");
+         return;
+      }
+
+      // terminate if some limit is reached
+      if(_isSolveStopped(stoppedTime, stoppedIter))
+         return;
+
+      // compute maximal violation
+      maxViolation = boundsViolation;
+
+      if(sideViolation > maxViolation)
+         maxViolation = sideViolation;
+
+      if(redCostViolation > maxViolation)
+         maxViolation = redCostViolation;
+
+      if(dualViolation > maxViolation)
+         maxViolation = dualViolation;
+
+      // perform rational reconstruction and/or factorization is possible
+      bool forcebasic    = boolParam(SoPlexBase<R>::FORCEBASIC);
+      bool performRatfac = _hasBasis;
+      bool performRatrec = performRatfac;
+
+      // if we want to force the solution to be basic we need to turn rational factorization on
+      performRatfac = performRatfac || forcebasic;
+
+      // attempt rational reconstruction
+      errorCorrection *= errorCorrectionFactor;
+
+      if(performRatrec && maxViolation > 0)
+      {
+         MSG_INFO1(spxout, spxout << "Performing rational reconstruction . . .\n");
+
+         maxViolation *= errorCorrection; // only used for sign check later
+         invert(maxViolation);
+
+         if(_reconstructSolutionRational(sol, _basisStatusRows, _basisStatusCols, maxViolation))
+         {
+            MSG_INFO1(spxout, spxout << "Tolerances reached.\n");
+            primalFeasible = true;
+            dualFeasible = true;
+
+            if(_hasBasis || !forcebasic)
+            {
+               break;
+            }
+         }
+      }
+
+      // attempt rational factorization
+      // solve basis systems exactly
+      if((performRatfac && maxViolation > 0) || (!_hasBasis && forcebasic))
+      {
+         MSG_INFO1(spxout, spxout << "Performing rational factorization . . .\n");
+
+         bool optimal;
+         _factorizeColumnRational(sol, _basisStatusRows, _basisStatusCols, stoppedTime, stoppedIter, error, optimal);
+
+         if(stoppedTime)
+         {
+            MSG_INFO1(spxout, spxout << "Stopped rational factorization.\n");
+         }
+         else if(error)
+         {
+            // message was already printed; reset error flag and continue without factorization
+            error = false;
+         }
+         else if(optimal)
+         {
+            MSG_INFO1(spxout, spxout << "Tolerances reached.\n");
+            primalFeasible = true;
+            dualFeasible = true;
+            break;
+         }
+         else
+         {
+            // factorization didn't help to reach tolerances, no success.
+            break;
+         }
+      }
+
+      break; // when not using iterative refinement, we only try solving once
+
+   } while(true);
+
+   // correct basis status for restricted inequalities
+   if(_hasBasis)
+   {
+      for(int r = numRowsRational() - 1; r >= 0; r--)
+      {
+         assert((lhsRational(r) == rhsRational(r)) == (_rowTypes[r] == RANGETYPE_FIXED));
+
+         if(_rowTypes[r] != RANGETYPE_FIXED && _basisStatusRows[r] == SPxSolverBase<R>::FIXED)
+            _basisStatusRows[r] = (maximizing == (sol._dual[r] < 0))
+                                  ? SPxSolverBase<R>::ON_LOWER
+                                  : SPxSolverBase<R>::ON_UPPER;
+      }
+   }
+
+   // compute objective function values
+   assert(sol._isPrimalFeasible == sol._isDualFeasible);
+
+   if(sol._isPrimalFeasible)
+   {
+      sol._objVal = sol._primal * _rationalLP->maxObj();
+
+      if(intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MINIMIZE)
+         sol._objVal *= -1;
+   }
+
+   // set objective coefficients for all rows to zero
+   _solver.clearRowObjs();
+
+   // stop rational solving time
+   _statistics->rationalTime->stop();
+}
+
+
+
 /// solves current problem with iterative refinement and recovery mechanism
 template <class R>
 void SoPlexBase<R>::_performOptIRStable(
@@ -2615,6 +2906,294 @@ bool SoPlexBase<R>::_isBoostedStartingFromSlack(bool initialSolve)
 
 
 
+/// solves current problem using multiprecision floating-point solver
+/// return false if a new boosted iteration is necessary, true otherwise
+template <class R>
+void SoPlexBase<R>::_solveRealForRationalBoostedStable(
+   SolRational& sol,
+   bool& primalFeasible,
+   bool& dualFeasible,
+   bool& infeasible,
+   bool& unbounded,
+   bool& stoppedTime,
+   bool& stoppedIter,
+   bool& error,
+   bool& needNewBoostedIt
+)
+{
+   assert(_hasBoostedSolver);
+   assert(!_iterativeRefinement);
+
+   // start rational solving timing
+   _statistics->rationalTime->start();
+
+   MSG_INFO1(spxout, spxout << "Current precision = 1e-" << BP::default_precision() << "\n");
+
+   primalFeasible = false;
+   dualFeasible = false;
+   infeasible = false;
+   unbounded = false;
+   stoppedTime = false;
+   stoppedIter = false;
+   error = false;
+   needNewBoostedIt = false;
+
+   // initialize boosted solver
+   _boostedSolver.init();
+
+   // set tolerances of the boosted solver
+   if(boolParam(SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION))
+   {
+      // decrease tolerances
+      _boostedSolver.setFeastol(pow(10,-(int)(BP::default_precision()*_tolPrecisionRatio)));
+      _boostedSolver.setOpttol( pow(10,-(int)(BP::default_precision()*_tolPrecisionRatio)));
+
+      // set epsilon for updateVectors primVec, dualVec, addVec
+      _boostedSolver.setEpsilon(pow(10,-(int)(BP::default_precision()*_epsPrecisionRatio)));
+      // set epsilons globally
+      Param::setEpsilon(             pow(10,-(int)(BP::default_precision()*_epsPrecisionRatio)));
+      Param::setEpsilonFactorization(pow(10,-(int)(BP::default_precision()*_epsPrecisionRatio)));
+      Param::setEpsilonUpdate(       pow(10,-(int)(BP::default_precision()*_epsPrecisionRatio)));
+      Param::setEpsilonPivot(        pow(10,-(int)(BP::default_precision()*_epsPrecisionRatio)));
+   }
+   else
+   {
+      _boostedSolver.setFeastol(realParam(SoPlexBase<R>::FPFEASTOL));
+      _boostedSolver.setOpttol(realParam(SoPlexBase<R>::FPFEASTOL));
+   }
+
+   typename SPxSolverBase<BP>::Status boostedResult = SPxSolverBase<BP>::UNKNOWN;
+
+   _modLower.reDim(numColsRational(), false);
+   _modUpper.reDim(numColsRational(), false);
+   _modLhs.reDim(numRowsRational(), false);
+   _modRhs.reDim(numRowsRational(), false);
+   _modObj.reDim(numColsRational(), false);
+
+   // declare real vectors after boosting precision
+   VectorBase<BP> boostedPrimalReal(numColsRational());
+   VectorBase<BP> boostedDualReal(numRowsRational());
+
+   Rational boundsViolation;
+   Rational sideViolation;
+   Rational redCostViolation;
+   Rational dualViolation;
+
+   // solve original LP
+   MSG_INFO1(spxout, spxout << "Initial floating-point boosted solve . . .\n");
+
+   _boostedIterations ++;
+   MSG_INFO1(spxout, spxout << "Boosted iteration " << _boostedIterations << "\n");
+
+   for(int r = numRowsRational() - 1; r >= 0; r--)
+      assert(_boostedSolver.maxRowObj(r) == 0.0);
+
+   // solve original LP with boosted solver
+   _statistics->rationalTime->stop();
+   _solveRealForRationalBoosted(boostedPrimalReal, boostedDualReal, _basisStatusRows, _basisStatusCols, boostedResult, true);
+
+   // evalute result
+   if(_evaluateResultBoosted(boostedResult, false, sol, boostedDualReal, infeasible, unbounded, stoppedTime, stoppedIter,
+                  error))
+      return;
+
+   // stop rational solving time
+   _statistics->rationalTime->start();
+
+   int dualSize = 0;
+
+   // stores floating-point solution of original LP as current rational solution
+   // ensure that solution vectors have right dimension; ensure that solution is aligned with basis
+   _storeRealSolutionAsRationalBoosted(sol, boostedPrimalReal, boostedDualReal, dualSize);
+
+   // control progress
+   Rational maxViolation;
+   Rational bestViolation = _rationalPosInfty;
+   const Rational violationImprovementFactor = 16;
+   const Rational errorCorrectionFactor = 1.1;
+   Rational errorCorrection = 2;
+
+   const bool maximizing = (intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MAXIMIZE);
+
+   do
+   {
+      MSG_DEBUG(std::cout << "Computing primal violations.\n");
+
+      // computes violation of bounds
+      _computeBoundsViolation(sol, boundsViolation);
+
+      // computes violation of sides
+      _computeSidesViolation(sol, sideViolation);
+
+      MSG_DEBUG(std::cout << "Computing dual violations.\n");
+
+      // compute reduced cost violation
+      _computeReducedCostViolation(sol, redCostViolation, maximizing);
+
+      // compute dual violation
+      _computeDualViolation(sol, dualViolation, maximizing);
+
+      _modObj = sol._redCost;
+
+      // output violations; the reduced cost violations for artificially introduced slack columns are actually violations of the dual multipliers
+      MSG_INFO1(spxout, spxout
+            << "Max. bound violation = " << boundsViolation.str() << ", ofm = 1e" << orderOfMagnitude(boundsViolation) << "\n"
+            << "Max. row violation = " << sideViolation.str() << ", ofm = 1e" << orderOfMagnitude(sideViolation) << "\n"
+            << "Max. reduced cost violation = " << redCostViolation.str() << ", ofm = 1e" << orderOfMagnitude(redCostViolation) << "\n"
+            << "Max. dual violation = " << dualViolation.str() << ", ofm = 1e" << orderOfMagnitude(dualViolation) << "\n");
+
+      MSG_DEBUG(spxout
+            << std::fixed << std::setprecision(2) << std::setw(10)
+            << "Progress table: "
+            << std::setw(10) << _statistics->refinements << " & "
+            << std::setw(10) << _statistics->iterations << " & "
+            << std::setw(10) << _statistics->solvingTime->time() << " & "
+            << std::setw(10) << _statistics->rationalTime->time() << " & "
+            << std::setw(10) << boundsViolation > sideViolation ? boundsViolation :
+            sideViolation << " & "
+            << std::setw(10) << redCostViolation > dualViolation ? redCostViolation :
+            dualViolation << "\n");
+
+      // terminate if tolerances are satisfied
+      primalFeasible = (boundsViolation <= _rationalFeastol && sideViolation <= _rationalFeastol);
+      dualFeasible = (redCostViolation <= _rationalOpttol && dualViolation <= _rationalOpttol);
+
+      if(primalFeasible && dualFeasible)
+      {
+         MSG_INFO1(spxout, spxout << "Tolerances reached.\n");
+         return;
+      }
+
+      // terminate if some limit is reached
+      if(_isSolveStopped(stoppedTime, stoppedIter))
+         return;
+
+      // compute maximal violation
+      maxViolation = boundsViolation;
+
+      if(sideViolation > maxViolation)
+         maxViolation = sideViolation;
+
+      if(redCostViolation > maxViolation)
+         maxViolation = redCostViolation;
+
+      if(dualViolation > maxViolation)
+         maxViolation = dualViolation;
+
+      // perform rational reconstruction and/or factorization if possible
+      bool forcebasic    = boolParam(SoPlexBase<R>::FORCEBASIC);
+      bool performRatfac = _hasBasis;
+      bool performRatrec = performRatfac;
+
+      // if we want to force the solution to be basic we need to turn rational factorization on
+      performRatfac = performRatfac || forcebasic;
+
+      // attempt rational reconstruction
+      errorCorrection *= errorCorrectionFactor;
+
+      if(performRatrec && maxViolation > 0)
+      {
+         MSG_INFO1(spxout, spxout << "Performing rational reconstruction . . .\n");
+
+         maxViolation *= errorCorrection; // only used for sign check later
+         invert(maxViolation);
+
+         if(_reconstructSolutionRational(sol, _basisStatusRows, _basisStatusCols, maxViolation))
+         {
+            MSG_INFO1(spxout, spxout << "Tolerances reached.\n");
+            primalFeasible = true;
+            dualFeasible = true;
+
+            if(_hasBasis || !forcebasic)
+            {
+               break;
+            }
+         }
+      }
+
+      // attempt rational factorization
+      // solve basis systems exactly
+      if((performRatfac && maxViolation > 0) || (!_hasBasis && forcebasic))
+      {
+         MSG_INFO1(spxout, spxout << "Performing rational factorization . . .\n");
+
+         bool optimal;
+         _factorizeColumnRational(sol, _basisStatusRows, _basisStatusCols, stoppedTime, stoppedIter, error, optimal);
+
+         if(stoppedTime)
+         {
+            MSG_INFO1(spxout, spxout << "Stopped rational factorization.\n");
+         }
+         else if(error)
+         {
+            // message was already printed; reset error flag and continue without factorization
+            error = false;
+         }
+         else if(optimal)
+         {
+            MSG_INFO1(spxout, spxout << "Tolerances reached.\n");
+            primalFeasible = true;
+            dualFeasible = true;
+            break;
+         }
+         else
+         {
+            // factorization didn't help to reach tolerances, no success.
+            break;
+         }
+      }
+
+      break; // when not using iterative refinement, we only try solving once
+
+   } while (true);
+
+   if(primalFeasible && dualFeasible)
+   {
+      needNewBoostedIt = false;
+
+      // correct basis status for restricted inequalities
+      if(_hasBasis)
+      {
+         for(int r = numRowsRational() - 1; r >= 0; r--)
+         {
+            assert((lhsRational(r) == rhsRational(r)) == (_rowTypes[r] == RANGETYPE_FIXED));
+
+            if(_rowTypes[r] != RANGETYPE_FIXED && _basisStatusRows[r] == SPxSolverBase<R>::FIXED)
+               _basisStatusRows[r] = (maximizing == (sol._dual[r] < 0))
+                                    ? SPxSolverBase<R>::ON_LOWER
+                                    : SPxSolverBase<R>::ON_UPPER;
+         }
+      }
+
+      // compute objective function values
+      assert(sol._isPrimalFeasible == sol._isDualFeasible);
+
+      if(sol._isPrimalFeasible)
+      {
+         sol._objVal = sol._primal * _rationalLP->maxObj();
+
+         if(intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MINIMIZE)
+            sol._objVal *= -1;
+      }
+
+      // set objective coefficients for all rows to zero
+      _boostedSolver.clearRowObjs();
+
+      // stop rational solving time
+      _statistics->rationalTime->stop();
+   }
+   else
+   {
+      MSG_INFO1(spxout, spxout << "\nNo success. Launch new boosted solve . . .\n");
+      needNewBoostedIt = true;
+
+      // stop rational solving time
+      _statistics->rationalTime->stop();
+   }
+}
+
+
+
 /// solves current problem with iterative refinement and recovery mechanism using boosted solver
 /// return false if a new boosted iteration is necessary, true otherwise
 template <class R>
@@ -2658,6 +3237,9 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
    error = false;
    needNewBoostedIt = false;
 
+   // initialize boosted solver
+   _boostedSolver.init();
+
    // set tolerances of the boosted solver
    if(boolParam(SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION))
    {
@@ -2693,9 +3275,6 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
 
    // solve original LP
    MSG_INFO1(spxout, spxout << "Initial floating-point boosted solve . . .\n");
-
-   // initialize boosted solver
-   _boostedSolver.init();
 
    _boostedIterations ++;
    MSG_INFO1(spxout, spxout << "Boosted iteration " << _boostedIterations << "\n");
