@@ -517,8 +517,6 @@ void SoPlexBase<R>::_performOptIRWrapper(
       }
    }
 #else
-   assert(_iterativeRefinement); // at least one option between IR and precision boosting must be activated
-
    // solve problem with iterative refinement and recovery mechanism
    _performOptIRStable(sol, acceptUnbounded, acceptInfeasible, minRounds,
                      primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
@@ -2477,6 +2475,8 @@ void SoPlexBase<R>::_performOptIRStable(
    bool& stoppedIter,
    bool& error)
 {
+   assert(_iterativeRefinement);
+
    // start rational solving timing
    _statistics->rationalTime->start();
 
@@ -2827,6 +2827,8 @@ void SoPlexBase<R>::_switchToBoosted()
 template <class R>
 void SoPlexBase<R>::_setupBoostedSolver()
 {
+   assert(_hasBoostedSolver);
+
    bool doubleHasBasis = _solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM;
 
    if((!_switchedToBoosted || _boostedIterations == 0) && doubleHasBasis && !_isBoostedStartingFromSlack()) // double precision solver was last used and has a basis loaded
@@ -2891,6 +2893,8 @@ void SoPlexBase<R>::_boostPrecision()
 template <class R>
 void SoPlexBase<R>::_setupBoostedSolverAfterRecovery()
 {
+   assert(_hasBoostedSolver);
+
    _switchToBoosted();
    _boostPrecision();
 }
@@ -3212,6 +3216,7 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
    bool& needNewBoostedIt
 )
 {
+   assert(_iterativeRefinement);
    assert(_hasBoostedSolver);
    assert(!primalFeasible || !dualFeasible);
 
@@ -5815,6 +5820,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
       DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
       typename SPxSolverBase<BP>::Status& boostedResult, bool initialSolve)
 {
+   assert(_hasBoostedSolver);
    assert(_isBoostedConsistent());
 
    assert(_boostedSolver.nRows() == numRowsRational());
