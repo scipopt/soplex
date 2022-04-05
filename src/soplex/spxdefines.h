@@ -281,10 +281,8 @@ typedef double Real;
 #endif // !WITH_FLOAT
 #endif // !WITH_LONG_DOUBLE
 
-#ifdef SOPLEX_WITH_MPFR
 #ifndef DEFAULT_PREC_BOOST_FACTOR
 #define DEFAULT_PREC_BOOST_FACTOR 1.5
-#endif
 #endif
 
 #define MAXIMUM(x,y)        ((x)>(y) ? (x) : (y))
@@ -310,9 +308,7 @@ private:
    /// epsilon for pivot zero tolerance in factorization
    THREADLOCAL static Real s_epsilon_pivot;
    /// factor by which the precision of the floating-point solver is multiplied
-#ifdef SOPLEX_WITH_MPFR
    THREADLOCAL static Real s_prec_boost_factor;
-#endif
    ///@}
 
 public:
@@ -336,12 +332,10 @@ public:
    static Real epsilonPivot();
    ///
    static void setEpsilonPivot(Real eps);
-#ifdef SOPLEX_WITH_MPFR
    ///
    static Real precisionBoostingFactor();
    ///
    static void setPrecisionBoostingFactor(Real fac);
-#endif
    ///@}
 };
 

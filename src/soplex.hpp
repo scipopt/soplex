@@ -191,7 +191,6 @@ SoPlexBase<R>::Settings::BoolParam::BoolParam()
       "enable iterative refinement";
    defaultValue[SoPlexBase<R>::ITERATIVE_REFINEMENT] = true;
 
-#ifdef SOPLEX_WITH_MPFR
    // adapt tolerances to the multiprecision used
    name[SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION] = "adapt_tols_to_multiprecision";
    description[SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION] =
@@ -207,7 +206,6 @@ SoPlexBase<R>::Settings::BoolParam::BoolParam()
    description[SoPlexBase<R>::BOOSTED_WARM_START] =
       "if true, boosted solver starts from last basis, otherwise from slack basis";
    defaultValue[SoPlexBase<R>::BOOSTED_WARM_START] = true;
-#endif
 }
 
 template <class R>
@@ -652,14 +650,12 @@ SoPlexBase<R>::Settings::RealParam::RealParam()
    upper[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 1;
    defaultValue[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 1.0;
 
-#ifdef SOPLEX_WITH_MPFR
    // factor by which the precision of the floating-point solver is multiplied
    name[SoPlexBase<R>::PRECISION_BOOSTING_FACTOR] = "precision_boosting_factor";
    description[SoPlexBase<R>::PRECISION_BOOSTING_FACTOR] = "factor by which the precision of the floating-point solver is multiplied";
    lower[SoPlexBase<R>::PRECISION_BOOSTING_FACTOR] = 1.0;
    upper[SoPlexBase<R>::PRECISION_BOOSTING_FACTOR] = 10.0;
    defaultValue[SoPlexBase<R>::PRECISION_BOOSTING_FACTOR] = 1.5;
-#endif
 }
 
 template <class R>

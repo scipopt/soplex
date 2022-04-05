@@ -1011,10 +1011,6 @@ public:
       // enable iterative refinement ?
       ITERATIVE_REFINEMENT = 25,
 
-#ifndef SOPLEX_WITH_MPFR
-      /// number of boolean parameters
-      BOOLPARAM_COUNT = 26
-#else
       /// adapt tolerances to the multiprecision used
       ADAPT_TOLS_TO_MULTIPRECISION = 26,
 
@@ -1026,7 +1022,6 @@ public:
 
       /// number of boolean parameters
       BOOLPARAM_COUNT = 29
-#endif
    } BoolParam;
 
    /// integer parameters
@@ -1456,16 +1451,11 @@ public:
       /// minimal modification threshold to apply presolve reductions
       SIMPLIFIER_MODIFYROWFAC = 25,
 
-#ifndef SOPLEX_WITH_MPFR
-      /// number of real parameters
-      REALPARAM_COUNT = 26
-#else
       /// factor by which the precision of the floating-point solver is multiplied
       PRECISION_BOOSTING_FACTOR = 26,
 
       /// number of real parameters
       REALPARAM_COUNT = 27
-#endif
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
