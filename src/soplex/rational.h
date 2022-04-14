@@ -966,7 +966,8 @@ inline int sizeInBase(const Rational R, const int base)
    MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
    return 0;
 #else
-   if( R == Rational(0) )
+
+   if(R == Rational(0))
       return 3;
 
    Integer num = numerator(R);
@@ -977,16 +978,18 @@ inline int sizeInBase(const Rational R, const int base)
    densize = mpz_sizeinbase(den.backend().data(), base);
    numsize = mpz_sizeinbase(num.backend().data(), base);
 #else
-   if( base != 2 )
+
+   if(base != 2)
    {
-      densize = (size_t) (log2(den.convert_to<double>()) / log2(double(base))) + 1;
-      numsize = (size_t) (log2(num.convert_to<double>()) / log2(double(base))) + 1;
+      densize = (size_t)(log2(den.convert_to<double>()) / log2(double(base))) + 1;
+      numsize = (size_t)(log2(num.convert_to<double>()) / log2(double(base))) + 1;
    }
    else
    {
       densize = msb(den) + 1;
       numsize = msb(num) + 1;
    }
+
 #endif
 
    return (int)(densize + numsize);
@@ -1043,7 +1046,7 @@ inline int dmaxSizeRational(const Rational* vector, const int length, const int 
 
    for(int i = 0; i < length; i++)
    {
-      size_t dsize = sizeInBase(Rational(denominator(vector[i])),base) + 1;
+      size_t dsize = sizeInBase(Rational(denominator(vector[i])), base) + 1;
 
       if(dsize > dmax)
          dmax = dsize;
