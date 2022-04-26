@@ -124,6 +124,11 @@ public:
    int pivotRefinements; ///< number of refinement steps until final basis is reached
    int feasRefinements; ///< number of refinement steps during infeasibility test
    int unbdRefinements; ///< number of refinement steps during undboundedness test
+   int precBoosts; ///< number of precision boosts
+   int stallPrecBoosts; ///< number of precision boosts without pivots
+   int pivotPrecBoosts; ///< number of precision boosts until final basis is reached
+   int feasPrecBoosts; ///< number of precision boosts during infeasibility test
+   int unbdPrecBoosts; ///< number of precision boosts during undboundedness test
 
    // Improved dual simplex statistics
    int callsReducedProb;      ///< number of times the reduced problem is solved. This includes the initial solve.

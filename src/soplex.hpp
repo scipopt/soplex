@@ -451,7 +451,7 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
       "mode for updating tolerances (0 - fp-fp, 1 - multiprecision-fp, 2 - multiprecision-0)";
    lower[SoPlexBase<R>::UPDATETOLSMODE] = 0;
    upper[SoPlexBase<R>::UPDATETOLSMODE] = 2;
-   defaultValue[SoPlexBase<R>::UPDATETOLSMODE] = 0;
+   defaultValue[SoPlexBase<R>::UPDATETOLSMODE] = 2;
 }
 
 template <class R>
@@ -8328,6 +8328,8 @@ void SoPlexBase<R>::_solveBoostedRealLPAndRecordStatistics(volatile bool* interr
 
    ///@todo precision-boosting add arg SPxSolverBase<S> solver (idea for the future)
 
+   bool _hadBasis = _hasBasis;
+
    // set time and iteration limit
    if(intParam(SoPlexBase<R>::ITERLIMIT) < realParam(SoPlexBase<R>::INFTY))
       _boostedSolver.setTerminationIter(intParam(SoPlexBase<R>::ITERLIMIT) - _statistics->iterations);
@@ -8445,32 +8447,30 @@ void SoPlexBase<R>::_solveBoostedRealLPAndRecordStatistics(volatile bool* interr
       _rationalLUSolver.clear();
 
    ///@todo precision-boosting currently no need to record statistics for the boosted solver
-#ifdef SOPLEX_DISABLE_CODE
    // record statistics
-   _statistics->iterations += _solver.iterations();
-   _statistics->iterationsPrimal += _solver.primalIterations();
-   _statistics->iterationsFromBasis += _hadBasis ? _solver.iterations() : 0;
-   _statistics->iterationsPolish += _solver.polishIterations();
-   _statistics->boundflips += _solver.boundFlips();
-   _statistics->multTimeSparse += _solver.multTimeSparse->time();
-   _statistics->multTimeFull += _solver.multTimeFull->time();
-   _statistics->multTimeColwise += _solver.multTimeColwise->time();
-   _statistics->multTimeUnsetup += _solver.multTimeUnsetup->time();
-   _statistics->multSparseCalls += _solver.multSparseCalls;
-   _statistics->multFullCalls += _solver.multFullCalls;
-   _statistics->multColwiseCalls += _solver.multColwiseCalls;
-   _statistics->multUnsetupCalls += _solver.multUnsetupCalls;
+   _statistics->iterations += _boostedSolver.iterations();
+   _statistics->iterationsPrimal += _boostedSolver.primalIterations();
+   _statistics->iterationsFromBasis += _hadBasis ? _boostedSolver.iterations() : 0;
+   _statistics->iterationsPolish += _boostedSolver.polishIterations();
+   _statistics->boundflips += _boostedSolver.boundFlips();
+   _statistics->multTimeSparse += _boostedSolver.multTimeSparse->time();
+   _statistics->multTimeFull += _boostedSolver.multTimeFull->time();
+   _statistics->multTimeColwise += _boostedSolver.multTimeColwise->time();
+   _statistics->multTimeUnsetup += _boostedSolver.multTimeUnsetup->time();
+   _statistics->multSparseCalls += _boostedSolver.multSparseCalls;
+   _statistics->multFullCalls += _boostedSolver.multFullCalls;
+   _statistics->multColwiseCalls += _boostedSolver.multColwiseCalls;
+   _statistics->multUnsetupCalls += _boostedSolver.multUnsetupCalls;
    _statistics->luFactorizationTimeReal += _slufactor.getFactorTime();
    _statistics->luSolveTimeReal += _slufactor.getSolveTime();
    _statistics->luFactorizationsReal += _slufactor.getFactorCount();
    _statistics->luSolvesReal += _slufactor.getSolveCount();
    _slufactor.resetCounters();
 
-   _statistics->degenPivotsPrimal += _solver.primalDegeneratePivots();
-   _statistics->degenPivotsDual += _solver.dualDegeneratePivots();
-   _statistics->sumDualDegen += _solver.sumDualDegeneracy();
-   _statistics->sumPrimalDegen += _solver.sumPrimalDegeneracy();
-#endif
+   _statistics->degenPivotsPrimal += _boostedSolver.primalDegeneratePivots();
+   _statistics->degenPivotsDual += _boostedSolver.dualDegeneratePivots();
+   _statistics->sumDualDegen += R(_boostedSolver.sumDualDegeneracy());
+   _statistics->sumPrimalDegen += R(_boostedSolver.sumPrimalDegeneracy());
 }
 #endif
 

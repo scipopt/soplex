@@ -218,6 +218,12 @@ void SoPlexBase<R>::Statistics::print(std::ostream& os)
       << "  Feasibility       : " << feasRefinements << "\n"
       << "  Unboundedness     : " << unbdRefinements << "\n";
 
+   os << "Precision boosts    : " << precBoosts << "\n"
+      << "  Stalling          : " << stallPrecBoosts << "\n"
+      << "  Pivoting          : " << pivotPrecBoosts << "\n"
+      << "  Feasibility       : " << feasPrecBoosts << "\n"
+      << "  Unboundedness     : " << unbdPrecBoosts << "\n";
+
    os << "Iterations          : " << iterations << "\n"
       << "  From scratch      : " << iterations - iterationsFromBasis;
 
