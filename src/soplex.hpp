@@ -444,6 +444,14 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
    lower[SoPlexBase<R>::STATTIMER] = 0;
    upper[SoPlexBase<R>::STATTIMER] = 2;
    defaultValue[SoPlexBase<R>::STATTIMER] = 1;
+
+   // mode for updating tolerances
+   name[SoPlexBase<R>::UPDATETOLSMODE] = "updatetolsmode";
+   description[SoPlexBase<R>::UPDATETOLSMODE] =
+      "mode for updating tolerances (0 - fp-fp, 1 - multiprecision-fp, 2 - multiprecision-0)";
+   lower[SoPlexBase<R>::UPDATETOLSMODE] = 0;
+   upper[SoPlexBase<R>::UPDATETOLSMODE] = 2;
+   defaultValue[SoPlexBase<R>::UPDATETOLSMODE] = 0;
 }
 
 template <class R>
@@ -6402,6 +6410,26 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       setTimings((Timer::TYPE) value);
       break;
 
+   // mode for updating tolerances
+   case SoPlexBase<R>::UPDATETOLSMODE:
+      switch(value)
+      {
+      case 0:
+         _updateTolsMode = 0;
+         break;
+      case 1:
+         _updateTolsMode = 1;
+         break;
+      case 2:
+         _updateTolsMode = 2;
+         break;
+
+      default:
+         return false;
+      }
+
+      break;
+
    default:
       return false;
    }
@@ -8315,12 +8343,25 @@ void SoPlexBase<R>::_solveBoostedRealLPAndRecordStatistics(volatile bool* interr
    // ensure that tolerances are not too small
    if(boolParam(SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION))
    {
-      double tolerance = pow(10,-(int)(BP::default_precision()*_tolPrecisionRatio));
-      if(_boostedSolver.feastol() < tolerance)
-         _boostedSolver.setFeastol(tolerance);
 
-      if(_boostedSolver.opttol() < tolerance)
-         _boostedSolver.setOpttol(tolerance);
+      if (intParam(SoPlexBase<R>::UPDATETOLSMODE) == 0)
+      {
+         double tolerance = pow(10,-(int)(BP::default_precision()*_tolPrecisionRatio));
+
+         if(_boostedSolver.feastol() < tolerance)
+            _boostedSolver.setFeastol(tolerance);
+
+         if(_boostedSolver.opttol() < tolerance)
+            _boostedSolver.setOpttol(tolerance);
+      } else {
+         BP tolerance = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_tolPrecisionRatio));
+
+         if(_boostedSolver.feastol() < tolerance)
+            _boostedSolver.setFeastol(tolerance);
+
+         if(_boostedSolver.opttol() < tolerance)
+            _boostedSolver.setOpttol(tolerance);
+      }
    }
    else
    {

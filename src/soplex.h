@@ -1117,8 +1117,10 @@ public:
       /// type of timer for statistics
       STATTIMER = 29,
 
+      UPDATETOLSMODE = 30,
+
       /// number of integer parameters
-      INTPARAM_COUNT = 30
+      INTPARAM_COUNT = 31
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -1732,6 +1734,8 @@ private:
    int _initialPrecision   = 50;
    Real _tolPrecisionRatio = 0.7;
    Real _epsPrecisionRatio = 0.8;
+
+   bool _updateTolsMode;
 
    bool _switchedToBoosted;
    int _boostedIterations;
