@@ -1737,6 +1737,13 @@ private:
 
    bool _updateTolsMode;
 
+   // ideally these attributes would be local variables, however the precision boosting loop wraps the solve in a way that it is complicated to declare
+   // these variables locally.
+   int _lastStallPrecBoosts;
+   bool _factorSolNewBasisPrecBoost;
+   int _nextRatrecPrecBoost;
+   int _prevIterations;
+
    bool _switchedToBoosted;
    int _boostedIterations;
 
@@ -2297,9 +2304,10 @@ private:
    /// performs rational reconstruction and/or factorizationd
    void _ratrecAndOrRatfac(
       int& minRounds,
-      int lastStallRefinements,
+      int& lastStallIterations,
+      int& numberOfIterations,
       bool& factorSolNewBasis,
-      int& nextRatrecRefinement,
+      int& nextRatrec,
       const Rational& errorCorrectionFactor,
       Rational& errorCorrection,
       Rational& maxViolation,

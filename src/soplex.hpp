@@ -9195,6 +9195,11 @@ SoPlexBase<R>::SoPlexBase()
 
    _boostedSolver.setBasisSolver(&_boostedSlufactor);
 
+   _lastStallPrecBoosts = 0;
+   _factorSolNewBasisPrecBoost = true;
+   _nextRatrecPrecBoost = 0;
+   _prevIterations = 0;
+
    _switchedToBoosted = false;
    _boostedIterations = 0;
 #endif

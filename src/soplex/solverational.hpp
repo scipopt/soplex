@@ -896,7 +896,7 @@ void SoPlexBase<R>::_checkRefinementProgress(
 
 
 /// performs rational reconstruction and/or factorization
-///@param lastStallRefinements in
+///@param lastStallIterations in
 ///@param errorCorrectionFactor in
 ///@param dualFeasible out
 ///@param stoppedTime out
@@ -907,9 +907,10 @@ void SoPlexBase<R>::_checkRefinementProgress(
 template <class R>
 void SoPlexBase<R>::_ratrecAndOrRatfac(
    int& minRounds,
-   int lastStallRefinements,
+   int& lastStallIterations,
+   int& numberOfIterations,
    bool& factorSolNewBasis,
-   int& nextRatrecRefinement,
+   int& nextRatrec,
    const Rational& errorCorrectionFactor,
    Rational& errorCorrection,
    Rational& maxViolation,
@@ -922,16 +923,22 @@ void SoPlexBase<R>::_ratrecAndOrRatfac(
    bool& breakAfter,
    bool& continueAfter)
 {
+
+   ///@todo precision-boosting numberOfIterations is not the best name
+   // It is supposed to designate either the number of refinements (when we use iterative refinement) or
+   // the number of precision boosts (when not using iterative refinement)
+   // numberOfSpecificIterations maybe?
+
    breakAfter    = false;
    continueAfter = false;
 
    // decide whether to perform rational reconstruction and/or factorization
    bool forcebasic    = boolParam(SoPlexBase<R>::FORCEBASIC);
    bool performRatfac = boolParam(SoPlexBase<R>::RATFAC)
-                        && lastStallRefinements >= intParam(SoPlexBase<R>::RATFAC_MINSTALLS) && _hasBasis
+                        && lastStallIterations >= intParam(SoPlexBase<R>::RATFAC_MINSTALLS) && _hasBasis
                         && factorSolNewBasis;
    bool performRatrec = boolParam(SoPlexBase<R>::RATREC)
-                        && (_statistics->refinements >= nextRatrecRefinement || performRatfac);
+                        && (numberOfIterations >= nextRatrec || performRatfac);
 
    // if we want to force the solution to be basic we need to turn rational factorization on
    performRatfac = performRatfac || forcebasic;
@@ -959,9 +966,17 @@ void SoPlexBase<R>::_ratrecAndOrRatfac(
          }
       }
 
-      nextRatrecRefinement = int(_statistics->refinements * realParam(SoPlexBase<R>::RATREC_FREQ)) + 1;
-      MSG_DEBUG(spxout << "Next rational reconstruction after refinement " << nextRatrecRefinement <<
+      nextRatrec = int(numberOfIterations * realParam(SoPlexBase<R>::RATREC_FREQ)) + 1;
+      if (boolParam(SoPlexBase<R>::ITERATIVE_REFINEMENT))
+      {
+         MSG_DEBUG(spxout << "Next rational reconstruction after refinement " << nextRatrec <<
                 ".\n");
+      }
+      else {
+         assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
+         MSG_DEBUG(spxout << "Next rational reconstruction after precision boost " << nextRatrec <<
+                ".\n");
+      }
    }
 
    // solve basis systems exactly
@@ -2294,6 +2309,12 @@ void SoPlexBase<R>::_solveRealForRationalStable(
    // refinement loop
    const bool maximizing = (intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MAXIMIZE);
 
+   // used in _ratrecAndOrRatfac to order a break or a continue outside of the function.
+   bool breakAfter;
+   bool continueAfter;
+
+   int minRounds = 0;
+
    do
    {
       MSG_DEBUG(std::cout << "Computing primal violations.\n");
@@ -2359,70 +2380,15 @@ void SoPlexBase<R>::_solveRealForRationalStable(
       if(dualViolation > maxViolation)
          maxViolation = dualViolation;
 
-      // perform rational reconstruction and/or factorization is possible
-      bool forcebasic    = boolParam(SoPlexBase<R>::FORCEBASIC);
-      bool performRatfac = _hasBasis;
-      bool performRatrec = performRatfac;
 
-      // if we want to force the solution to be basic we need to turn rational factorization on
-      performRatfac = performRatfac || forcebasic;
+      // perform rational reconstruction and/or factorization
+      _ratrecAndOrRatfac(minRounds, _lastStallPrecBoosts, _statistics->precBoosts, _factorSolNewBasisPrecBoost, _nextRatrecPrecBoost,
+                         errorCorrectionFactor, errorCorrection, maxViolation,
+                         sol, primalFeasible, dualFeasible,
+                         stoppedTime, stoppedIter, error, breakAfter, continueAfter);
 
-      // attempt rational reconstruction
-      errorCorrection *= errorCorrectionFactor;
-
-      if(performRatrec && maxViolation > 0)
-      {
-         MSG_INFO1(spxout, spxout << "Performing rational reconstruction . . .\n");
-
-         maxViolation *= errorCorrection; // only used for sign check later
-         invert(maxViolation);
-
-         if(_reconstructSolutionRational(sol, _basisStatusRows, _basisStatusCols, maxViolation))
-         {
-            MSG_INFO1(spxout, spxout << "Tolerances reached.\n");
-            primalFeasible = true;
-            dualFeasible = true;
-
-            if(_hasBasis || !forcebasic)
-            {
-               break;
-            }
-         }
-      }
-
-      // attempt rational factorization
-      // solve basis systems exactly
-      if((performRatfac && maxViolation > 0) || (!_hasBasis && forcebasic))
-      {
-         MSG_INFO1(spxout, spxout << "Performing rational factorization . . .\n");
-
-         bool optimal;
-         _factorizeColumnRational(sol, _basisStatusRows, _basisStatusCols, stoppedTime, stoppedIter, error, optimal);
-
-         if(stoppedTime)
-         {
-            MSG_INFO1(spxout, spxout << "Stopped rational factorization.\n");
-         }
-         else if(error)
-         {
-            // message was already printed; reset error flag and continue without factorization
-            error = false;
-         }
-         else if(optimal)
-         {
-            MSG_INFO1(spxout, spxout << "Tolerances reached.\n");
-            primalFeasible = true;
-            dualFeasible = true;
-            break;
-         }
-         else
-         {
-            // factorization didn't help to reach tolerances, no success.
-            break;
-         }
-      }
-
-      break; // when not using iterative refinement, we only try solving once
+      if(!continueAfter)
+         break;
 
    } while(true);
 
@@ -2638,7 +2604,7 @@ void SoPlexBase<R>::_performOptIRStable(
                                maxViolation, bestViolation, violationImprovementFactor, numFailedRefinements);
 
       // perform rational reconstruction and/or factorization
-      _ratrecAndOrRatfac(minRounds, lastStallRefinements, factorSolNewBasis, nextRatrecRefinement,
+      _ratrecAndOrRatfac(minRounds, lastStallRefinements, _statistics->refinements, factorSolNewBasis, nextRatrecRefinement,
                          errorCorrectionFactor, errorCorrection, maxViolation,
                          sol, primalFeasible, dualFeasible,
                          stoppedTime, stoppedIter, error, breakAfter, continueAfter);
@@ -2883,8 +2849,27 @@ void SoPlexBase<R>::_boostPrecision()
    assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
    assert(_switchedToBoosted);
 
+   _statistics->precBoosts++;
+
    if(_boostedIterations > 0)
+   {
       BP::default_precision(BP::default_precision() * Param::precisionBoostingFactor());
+
+      if(_statistics->iterations <= _prevIterations)
+      {
+         _lastStallPrecBoosts++;
+         _statistics->stallPrecBoosts++;
+      }
+      else
+      {
+         _factorSolNewBasisPrecBoost = true;
+         _lastStallPrecBoosts = 0;
+         _statistics->pivotPrecBoosts = _statistics->precBoosts;
+      }
+   }
+
+   // remember the number of iterations for the next comparison
+   _prevIterations = _statistics->iterations;
 }
 
 
@@ -3047,6 +3032,12 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
 
    const bool maximizing = (intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MAXIMIZE);
 
+   // used in _ratrecAndOrRatfac to order a break or a continue outside of the function.
+   bool breakAfter;
+   bool continueAfter;
+
+   int minRounds = 0;
+
    do
    {
       MSG_DEBUG(std::cout << "Computing primal violations.\n");
@@ -3112,70 +3103,15 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
       if(dualViolation > maxViolation)
          maxViolation = dualViolation;
 
-      // perform rational reconstruction and/or factorization if possible
-      bool forcebasic    = boolParam(SoPlexBase<R>::FORCEBASIC);
-      bool performRatfac = _hasBasis;
-      bool performRatrec = performRatfac;
 
-      // if we want to force the solution to be basic we need to turn rational factorization on
-      performRatfac = performRatfac || forcebasic;
+      // perform rational reconstruction and/or factorization
+      _ratrecAndOrRatfac(minRounds, _lastStallPrecBoosts, _statistics->precBoosts, _factorSolNewBasisPrecBoost, _nextRatrecPrecBoost,
+                         errorCorrectionFactor, errorCorrection, maxViolation,
+                         sol, primalFeasible, dualFeasible,
+                         stoppedTime, stoppedIter, error, breakAfter, continueAfter);
 
-      // attempt rational reconstruction
-      errorCorrection *= errorCorrectionFactor;
-
-      if(performRatrec && maxViolation > 0)
-      {
-         MSG_INFO1(spxout, spxout << "Performing rational reconstruction . . .\n");
-
-         maxViolation *= errorCorrection; // only used for sign check later
-         invert(maxViolation);
-
-         if(_reconstructSolutionRational(sol, _basisStatusRows, _basisStatusCols, maxViolation))
-         {
-            MSG_INFO1(spxout, spxout << "Tolerances reached.\n");
-            primalFeasible = true;
-            dualFeasible = true;
-
-            if(_hasBasis || !forcebasic)
-            {
-               break;
-            }
-         }
-      }
-
-      // attempt rational factorization
-      // solve basis systems exactly
-      if((performRatfac && maxViolation > 0) || (!_hasBasis && forcebasic))
-      {
-         MSG_INFO1(spxout, spxout << "Performing rational factorization . . .\n");
-
-         bool optimal;
-         _factorizeColumnRational(sol, _basisStatusRows, _basisStatusCols, stoppedTime, stoppedIter, error, optimal);
-
-         if(stoppedTime)
-         {
-            MSG_INFO1(spxout, spxout << "Stopped rational factorization.\n");
-         }
-         else if(error)
-         {
-            // message was already printed; reset error flag and continue without factorization
-            error = false;
-         }
-         else if(optimal)
-         {
-            MSG_INFO1(spxout, spxout << "Tolerances reached.\n");
-            primalFeasible = true;
-            dualFeasible = true;
-            break;
-         }
-         else
-         {
-            // factorization didn't help to reach tolerances, no success.
-            break;
-         }
-      }
-
-      break; // when not using iterative refinement, we only try solving once
+      if(!continueAfter)
+         break;
 
    } while (true);
 
@@ -3436,7 +3372,7 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
                               maxViolation, bestViolation, violationImprovementFactor, numFailedRefinements);
 
       // perform rational reconstruction and/or factorization
-      _ratrecAndOrRatfac(minRounds, lastStallRefinements, factorSolNewBasis, nextRatrecRefinement,
+      _ratrecAndOrRatfac(minRounds, lastStallRefinements, _statistics->refinements, factorSolNewBasis, nextRatrecRefinement,
                         errorCorrectionFactor, errorCorrection, maxViolation,
                         sol, primalFeasible, dualFeasible,
                         stoppedTime, stoppedIter, error, breakAfter, continueAfter);
@@ -3628,15 +3564,17 @@ void SoPlexBase<R>::_performUnboundedIRStable(
    // invalidate solution
    sol.invalidate();
 
-   // remember current number of refinements
+   // remember current number of refinements and precision boosts
    int oldRefinements = _statistics->refinements;
+   int oldPrecBoosts = _statistics->precBoosts;
 
    // perform iterative refinement
    _performOptIRWrapper(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded,
                         stoppedTime, stoppedIter, error);
 
-   // update unbounded refinement counter
+   // update unbounded refinement counter and unbounded precision boosts
    _statistics->unbdRefinements += _statistics->refinements - oldRefinements;
+   _statistics->unbdPrecBoosts  += _statistics->precBoosts  - oldPrecBoosts;
 
    // stopped due to some limit
    if(stoppedTime || stoppedIter)
@@ -3708,15 +3646,17 @@ void SoPlexBase<R>::_performFeasIRStable(
 
    do
    {
-      // remember current number of refinements
+      // remember current number of refinements and precision boosts
       int oldRefinements = _statistics->refinements;
+      int oldPrecBoosts  = _statistics->precBoosts;
 
       // perform iterative refinement
       _performOptIRWrapper(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded,
                            stoppedTime, stoppedIter, error);
 
-      // update feasible refinement counter
+      // update feasible refinement counter and precision boosts counter
       _statistics->feasRefinements += _statistics->refinements - oldRefinements;
+      _statistics->feasPrecBoosts  += _statistics->precBoosts  - oldPrecBoosts;
 
       // stopped due to some limit
       if(stoppedTime || stoppedIter)
