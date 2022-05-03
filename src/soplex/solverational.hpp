@@ -2910,6 +2910,7 @@ bool SoPlexBase<R>::_isBoostedStartingFromSlack(bool initialSolve)
 
 
 
+// store last basis met for a potential iteration with increased precision
 template <class R>
 void SoPlexBase<R>::_storeBasisAsOldBasis(bool boosted)
 {
@@ -2980,6 +2981,7 @@ void SoPlexBase<R>::_storeBasisAsOldBasis(bool boosted)
 
 
 
+// load last basis if there is one available, else return false
 template <class R>
 bool SoPlexBase<R>::_loadBasisFromOldBasis(bool boosted)
 {
@@ -3041,36 +3043,42 @@ bool SoPlexBase<R>::_loadBasisFromOldBasis(bool boosted)
 
 
 
+// indicate we are solving the original LP
 template <class R>
 void SoPlexBase<R>::_switchToStandardMode()
 {
    _certificateMode = 0;
 }
 
+// indicate we are testing infeasibility
 template <class R>
 void SoPlexBase<R>::_switchToFeasMode()
 {
    _certificateMode = 1;
 }
 
+// indicate we are testing unboundedness
 template <class R>
 void SoPlexBase<R>::_switchToUnbdMode()
 {
    _certificateMode = 2;
 }
 
+// check we are solving the original LP
 template <class R>
 bool SoPlexBase<R>::_inStandardMode()
 {
    return _certificateMode == 0;
 }
 
+// check we are testing infeasibility
 template <class R>
 bool SoPlexBase<R>::_inFeasMode()
 {
    return _certificateMode == 1;
 }
 
+// check we are testing unboundedness
 template <class R>
 bool SoPlexBase<R>::_inUnbdMode()
 {
