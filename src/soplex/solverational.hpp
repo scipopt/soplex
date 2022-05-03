@@ -493,6 +493,9 @@ void SoPlexBase<R>::_performOptIRWrapper(
             _performOptIRStableBoosted(sol, acceptUnbounded, acceptInfeasible, minRounds,
                                        primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error, needNewBoostedIt);
 
+            // update statistics for precision boosting
+            _updateBoostingStatistics();
+
             // boost precision if no success
             if(needNewBoostedIt)
                _boostPrecision();
@@ -519,6 +522,9 @@ void SoPlexBase<R>::_performOptIRWrapper(
             // return false if a new boosted iteration is needed, true otherwise
             bool needNewBoostedIt;
             _solveRealForRationalBoostedStable(sol, primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error, needNewBoostedIt);
+
+            // update statistics for precision boosting
+            _updateBoostingStatistics();
 
             // boost precision if no success
             if(needNewBoostedIt)
@@ -2865,26 +2871,12 @@ void SoPlexBase<R>::_boostPrecision()
    assert(_switchedToBoosted);
 
    _statistics->precBoosts++;
-
-   if(_boostedIterations > 0)
-   {
-      BP::default_precision(BP::default_precision() * Param::precisionBoostingFactor());
-
-      if(_statistics->iterations <= _prevIterations)
-      {
-         _lastStallPrecBoosts++;
-         _statistics->stallPrecBoosts++;
-      }
-      else
-      {
-         _factorSolNewBasisPrecBoost = true;
-         _lastStallPrecBoosts = 0;
-         _statistics->pivotPrecBoosts = _statistics->precBoosts;
-      }
-   }
-
    // remember the number of iterations for the next comparison
    _prevIterations = _statistics->iterations;
+
+   // First iteration: precision is already 50; no need to increase precision
+   if(_statistics->precBoosts > 1)
+      BP::default_precision(BP::default_precision() * Param::precisionBoostingFactor());
 }
 
 
@@ -3039,6 +3031,31 @@ bool SoPlexBase<R>::_loadBasisFromOldBasis(bool boosted)
    }
 
    return true;
+}
+
+
+
+// update statistics for precision boosting
+template <class R>
+void SoPlexBase<R>::_updateBoostingStatistics()
+{
+   // update statistics
+   if(_statistics->iterations <= _prevIterations)
+   {
+      _lastStallPrecBoosts++;
+      _statistics->stallPrecBoosts++;
+   }
+   else
+   {
+      _factorSolNewBasisPrecBoost = true;
+      _lastStallPrecBoosts = 0;
+      _statistics->pivotPrecBoosts = _statistics->precBoosts;
+   }
+
+   if(_inFeasMode())
+      _statistics->feasPrecBoosts++;
+   else if(_inUnbdMode())
+      _statistics->unbdPrecBoosts++;
 }
 
 
@@ -3770,7 +3787,6 @@ void SoPlexBase<R>::_performUnboundedIRStable(
 
    // remember current number of refinements and precision boosts
    int oldRefinements = _statistics->refinements;
-   int oldPrecBoosts = _statistics->precBoosts;
 
    // perform iterative refinement
    _performOptIRWrapper(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded,
@@ -3778,7 +3794,6 @@ void SoPlexBase<R>::_performUnboundedIRStable(
 
    // update unbounded refinement counter and unbounded precision boosts
    _statistics->unbdRefinements += _statistics->refinements - oldRefinements;
-   _statistics->unbdPrecBoosts  += _statistics->precBoosts  - oldPrecBoosts;
 
    // stopped due to some limit
    if(stoppedTime || stoppedIter)
@@ -3852,7 +3867,6 @@ void SoPlexBase<R>::_performFeasIRStable(
    {
       // remember current number of refinements and precision boosts
       int oldRefinements = _statistics->refinements;
-      int oldPrecBoosts  = _statistics->precBoosts;
 
       // perform iterative refinement
       _performOptIRWrapper(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded,
@@ -3860,7 +3874,6 @@ void SoPlexBase<R>::_performFeasIRStable(
 
       // update feasible refinement counter and precision boosts counter
       _statistics->feasRefinements += _statistics->refinements - oldRefinements;
-      _statistics->feasPrecBoosts  += _statistics->precBoosts  - oldPrecBoosts;
 
       // stopped due to some limit
       if(stoppedTime || stoppedIter)

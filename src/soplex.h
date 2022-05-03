@@ -2497,6 +2497,9 @@ private:
    // load old basis in solver. The old basis loaded depends on the certificate mode (feasibility, unboundedness, or neither)
    bool _loadBasisFromOldBasis(bool boosted);
 
+   // update statistics for precision boosting
+   void _updateBoostingStatistics();
+
    /// solves current problem using multiprecision floating-point solver
    /// return false if a new boosted iteration is necessary, true otherwise
    void _solveRealForRationalBoostedStable(
