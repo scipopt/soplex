@@ -1737,6 +1737,9 @@ private:
 
    bool _updateTolsMode;
 
+   // this attribute remember wether we are testing feasibility (1), unboundedness (2) or neither (0)
+   int _certificateMode;
+
    // ideally these attributes would be local variables, however the precision boosting loop wraps the solve in a way that it is complicated to declare
    // these variables locally.
    int _lastStallPrecBoosts;
@@ -2012,6 +2015,23 @@ private:
    DataArray<typename  SPxSolverBase<R>::VarStatus > _basisStatusCols;
 
 #ifdef SOPLEX_WITH_MPFR
+   // indicates wether an old basis is currently stored for warm start
+   bool _hasOldBasis;
+   bool _hasOldFeasBasis; // basis for testing feasibility
+   bool _hasOldUnbdBasis; // basis for testing unboundedness
+
+   // these vectors store the last basis met in precision boosting when not testing feasibility or unboundedness.
+   DataArray<typename SPxSolverBase<R>::VarStatus > _oldBasisStatusRows;
+   DataArray<typename  SPxSolverBase<R>::VarStatus > _oldBasisStatusCols;
+
+   // these vectors store the last basis met when testing feasibility in precision boosting.
+   DataArray<typename SPxSolverBase<R>::VarStatus > _oldFeasBasisStatusRows;
+   DataArray<typename  SPxSolverBase<R>::VarStatus > _oldFeasBasisStatusCols;
+
+   // these vectors store the last basis met when testing unboundedness in precision boosting.
+   DataArray<typename SPxSolverBase<R>::VarStatus > _oldUnbdBasisStatusRows;
+   DataArray<typename  SPxSolverBase<R>::VarStatus > _oldUnbdBasisStatusCols;
+
    // these vectors don't replace _basisStatusRows and _basisStatusCols
    // they aim to overcome the issue of having the enum VarStatus inside SPxSolverBase.
    // When calling setBasis or getBasis (from SPxSolverBase class), a specific conversion is needed.
@@ -2460,6 +2480,22 @@ private:
 
    /// return true if slack basis has to be loaded for boosted solver
    bool _isBoostedStartingFromSlack(bool initialSolve = true);
+
+   /// indicate if we are testing feasibility, unboundedness or neither
+   void _switchToStandardMode();
+   void _switchToFeasMode();
+   void _switchToUnbdMode();
+
+   /// check if we are testing feasibility, unboundedness or neither
+   bool _inStandardMode();
+   bool _inFeasMode();
+   bool _inUnbdMode();
+
+   // stores given basis in old basis attributes: _oldBasisStatusRows, _oldFeasBasisStatusRows, _oldUnbdBasisStatusRows (and ...Cols)
+   void _storeBasisAsOldBasis(bool boosted);
+
+   // load old basis in solver. The old basis loaded depends on the certificate mode (feasibility, unboundedness, or neither)
+   bool _loadBasisFromOldBasis(bool boosted);
 
    /// solves current problem using multiprecision floating-point solver
    /// return false if a new boosted iteration is necessary, true otherwise

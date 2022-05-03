@@ -110,6 +110,9 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
       stoppedTime = false;
       stoppedIter = false;
 
+      // indicate we are solving the original LP
+      _switchToStandardMode();
+
       /// solve problem with iterative refinement and the right precision
       _performOptIRWrapper(_solRational, !unboundednessNotCertified, !infeasibilityNotCertified, 0,
                            primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
@@ -145,6 +148,9 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
       else if(unbounded && !unboundednessNotCertified)
       {
          SolRational solUnbounded;
+
+         // indicate we are testing unboundedness
+         _switchToUnbdMode();
 
          _performUnboundedIRStable(solUnbounded, hasUnboundedRay, stoppedTime, stoppedIter, error);
 
@@ -189,6 +195,9 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             _status = SPxSolverBase<R>::ABORT_ITER;
             break;
          }
+
+         // indicate we are testing feasibility
+         _switchToFeasMode();
 
          _performFeasIRStable(_solRational, infeasible, stoppedTime, stoppedIter, error);
 
@@ -251,6 +260,9 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
       else if(infeasible && !infeasibilityNotCertified)
       {
          _storeBasis();
+
+         // indicate we are testing feasibility
+         _switchToFeasMode();
 
          _performFeasIRStable(_solRational, infeasible, stoppedTime, stoppedIter, error);
 
@@ -2267,7 +2279,7 @@ void SoPlexBase<R>::_solveRealForRationalStable(
    // solve original LP
    MSG_INFO1(spxout, spxout << "Initial floating-point solve . . .\n");
 
-   if(_hasBasis)
+   if(!_loadBasisFromOldBasis(false) && _hasBasis)
    {
       assert(_basisStatusRows.size() == numRowsRational());
       assert(_basisStatusCols.size() == numColsRational());
@@ -2285,6 +2297,9 @@ void SoPlexBase<R>::_solveRealForRationalStable(
    // if boosted solver is available, double precision solver is only used once.
    // otherwise use the expensive pipeline from _solveRealStable
    result = _solveRealForRational(false, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
+
+   // store last basis met for a potential iteration with increased precision
+   _storeBasisAsOldBasis(false);
 
    // evalute result
    if(_evaluateResult(result, false, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
@@ -2513,7 +2528,11 @@ void SoPlexBase<R>::_performOptIRStable(
    // evalute result
    if(_evaluateResult(result, false, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                       error))
+   {
+      // store last basis met for a potential iteration with increased precision
+      _storeBasisAsOldBasis(false);
       return;
+   }
 
    _statistics->rationalTime->start();
 
@@ -2715,7 +2734,11 @@ void SoPlexBase<R>::_performOptIRStable(
       // evaluate result; if modified problem was not solved to optimality, stop refinement;
       if(_evaluateResult(result, true, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                          error))
+      {
+         // store last basis met for a potential iteration with increased precision
+         _storeBasisAsOldBasis(false);
          return;
+      }
 
       _statistics->rationalTime->start();
 
@@ -2763,6 +2786,9 @@ void SoPlexBase<R>::_performOptIRStable(
          sol._objVal *= -1;
    }
 
+   // store last basis met for a potential iteration with increased precision
+   _storeBasisAsOldBasis(false);
+
    // set objective coefficients for all rows to zero
    _solver.clearRowObjs();
 
@@ -2795,28 +2821,9 @@ void SoPlexBase<R>::_setupBoostedSolver()
 {
    assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
 
-   bool doubleHasBasis = _solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM;
-
-   if((!_switchedToBoosted || _boostedIterations == 0) && doubleHasBasis && !_isBoostedStartingFromSlack()) // double precision solver was last used and has a basis loaded
-   {
-      // get basis from _solver
-      _basisStatusRows.reSize(_solver.nRows());
-      _basisStatusCols.reSize(_solver.nCols());
-      _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(),
-                           _basisStatusRows.size(), _basisStatusCols.size());
-
-      // load the data from the rationalLP
-      _boostedSolver.loadLP(*_rationalLP, false);
-
-      // load basis into _boostedSolver
-      _convertDataArrayVarStatusToBoosted(_basisStatusRows, _tmpBasisStatusRows);
-      _convertDataArrayVarStatusToBoosted(_basisStatusCols, _tmpBasisStatusCols);
-      _boostedSolver.setBasis(_tmpBasisStatusRows.get_const_ptr(), _tmpBasisStatusCols.get_const_ptr());
-   }
-   else if(!_hasBasis || _isBoostedStartingFromSlack())
+   if(_isBoostedStartingFromSlack())
    {
       // start the solving from slack basis
-
       // load the data from the rationalLP and init slack basis
       _boostedSolver.loadLP(*_rationalLP, true);
    }
@@ -2824,6 +2831,14 @@ void SoPlexBase<R>::_setupBoostedSolver()
    {
       // start from last basis of boosted solver; thus no need to do anything, the basis is already loaded
       _boostedSolver.loadLP(*_rationalLP, false);
+
+      if(!_loadBasisFromOldBasis(true))
+      {
+         // load basis into _boostedSolver
+         _convertDataArrayVarStatusToBoosted(_basisStatusRows, _tmpBasisStatusRows);
+         _convertDataArrayVarStatusToBoosted(_basisStatusCols, _tmpBasisStatusCols);
+         _boostedSolver.setBasis(_tmpBasisStatusRows.get_const_ptr(), _tmpBasisStatusCols.get_const_ptr());
+      }
    }
 
    _hasBasis = _boostedSolver.basis().status() > SPxBasisBase<BP>::NO_PROBLEM;
@@ -2891,6 +2906,175 @@ template <class R>
 bool SoPlexBase<R>::_isBoostedStartingFromSlack(bool initialSolve)
 {
    return (!boolParam(SoPlexBase<R>::BOOSTED_WARM_START) && initialSolve);
+}
+
+
+
+template <class R>
+void SoPlexBase<R>::_storeBasisAsOldBasis(bool boosted)
+{
+   if(!boosted)
+   {
+      if(_inStandardMode())
+      {
+         MSG_INFO1(spxout, spxout << "Store basis as old basis (from solver)" << "\n");
+         _oldBasisStatusRows.reSize(_solver.nRows());
+         _oldBasisStatusCols.reSize(_solver.nCols());
+         _solver.getBasis(_oldBasisStatusRows.get_ptr(), _oldBasisStatusCols.get_ptr(), _oldBasisStatusRows.size(), _oldBasisStatusCols.size());
+         _hasOldBasis = true;
+      }
+      else if(_inFeasMode())
+      {
+         MSG_INFO1(spxout, spxout << "Store basis as old basis (from solver - testing feasibility)" << "\n");
+         _oldFeasBasisStatusRows.reSize(_solver.nRows());
+         _oldFeasBasisStatusCols.reSize(_solver.nCols());
+         _solver.getBasis(_oldFeasBasisStatusRows.get_ptr(), _oldFeasBasisStatusCols.get_ptr(), _oldFeasBasisStatusRows.size(), _oldFeasBasisStatusCols.size());
+         _hasOldFeasBasis = true;
+      }
+      else if(_inUnbdMode())
+      {
+         MSG_INFO1(spxout, spxout << "Store basis as old basis (from solver - testing unboundedness)" << "\n");
+         _oldUnbdBasisStatusRows.reSize(_solver.nRows());
+         _oldUnbdBasisStatusCols.reSize(_solver.nCols());
+         _solver.getBasis(_oldUnbdBasisStatusRows.get_ptr(), _oldUnbdBasisStatusCols.get_ptr(), _oldUnbdBasisStatusRows.size(), _oldUnbdBasisStatusCols.size());
+         _hasOldUnbdBasis = true;
+      }
+   }
+   else
+   {
+      if(_inStandardMode())
+      {
+         MSG_INFO1(spxout, spxout << "Store basis as old basis (from boosted solver)" << "\n");
+         _tmpBasisStatusRows.reSize(_boostedSolver.nRows());
+         _tmpBasisStatusCols.reSize(_boostedSolver.nCols());
+         _boostedSolver.getBasis(_tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr(), _tmpBasisStatusRows.size(),
+                                 _tmpBasisStatusCols.size());
+         _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusRows, _oldBasisStatusRows);
+         _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusCols, _oldBasisStatusCols);
+         _hasOldBasis = true;
+      }
+      else if(_inFeasMode())
+      {
+         MSG_INFO1(spxout, spxout << "Store basis as old basis (from boosted solver - testing feasibility)" << "\n");
+         _tmpBasisStatusRows.reSize(_boostedSolver.nRows());
+         _tmpBasisStatusCols.reSize(_boostedSolver.nCols());
+         _boostedSolver.getBasis(_tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr(), _tmpBasisStatusRows.size(),
+                                 _tmpBasisStatusCols.size());
+         _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusRows, _oldFeasBasisStatusRows);
+         _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusCols, _oldFeasBasisStatusCols);
+         _hasOldFeasBasis = true;
+      }
+      else if(_inUnbdMode())
+      {
+         MSG_INFO1(spxout, spxout << "Store basis as old basis (from boosted solver - testing unboundedness)" << "\n");
+         _tmpBasisStatusRows.reSize(_boostedSolver.nRows());
+         _tmpBasisStatusCols.reSize(_boostedSolver.nCols());
+         _boostedSolver.getBasis(_tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr(), _tmpBasisStatusRows.size(),
+                                 _tmpBasisStatusCols.size());
+         _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusRows, _oldUnbdBasisStatusRows);
+         _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusCols, _oldUnbdBasisStatusCols);
+         _hasOldUnbdBasis = true;
+      }
+   }
+}
+
+
+
+template <class R>
+bool SoPlexBase<R>::_loadBasisFromOldBasis(bool boosted)
+{
+   if(!boosted)
+   {
+      if(_inStandardMode() && _hasOldBasis)
+      {
+         MSG_INFO1(spxout, spxout << "Load basis from old basis (in solver)" << "\n");
+         _solver.setBasis(_oldBasisStatusRows.get_const_ptr(), _oldBasisStatusCols.get_const_ptr());
+      }
+      else if(_inFeasMode() && _hasOldFeasBasis)
+      {
+         MSG_INFO1(spxout, spxout << "Load basis from old basis (in solver - testing feasibility)" << "\n");
+         _solver.setBasis(_oldFeasBasisStatusRows.get_const_ptr(), _oldFeasBasisStatusCols.get_const_ptr());
+      }
+      else if(_inUnbdMode() && _hasOldUnbdBasis)
+      {
+         MSG_INFO1(spxout, spxout << "Load basis from old basis (in solver - testing unboundedness)" << "\n");
+         _solver.setBasis(_oldUnbdBasisStatusRows.get_const_ptr(), _oldUnbdBasisStatusCols.get_const_ptr());
+      }
+      else
+      {
+         MSG_INFO1(spxout, spxout << "No old basis available" << "\n");
+         return false;
+      }
+   }
+   else
+   {
+      if(_inStandardMode() && _hasOldBasis)
+      {
+         MSG_INFO1(spxout, spxout << "Load basis from old basis (in boosted solver)" << "\n");
+         _convertDataArrayVarStatusToBoosted(_oldBasisStatusRows, _tmpBasisStatusRows);
+         _convertDataArrayVarStatusToBoosted(_oldBasisStatusCols, _tmpBasisStatusCols);
+         _boostedSolver.setBasis(_tmpBasisStatusRows.get_const_ptr(), _tmpBasisStatusCols.get_const_ptr());
+      }
+      else if(_inFeasMode() && _hasOldFeasBasis)
+      {
+         MSG_INFO1(spxout, spxout << "Load basis from old basis (in boosted solver - testing feasibility)" << "\n");
+         _convertDataArrayVarStatusToBoosted(_oldFeasBasisStatusRows, _tmpBasisStatusRows);
+         _convertDataArrayVarStatusToBoosted(_oldFeasBasisStatusCols, _tmpBasisStatusCols);
+         _boostedSolver.setBasis(_tmpBasisStatusRows.get_const_ptr(), _tmpBasisStatusCols.get_const_ptr());
+      }
+      else if(_inUnbdMode() && _hasOldUnbdBasis)
+      {
+         MSG_INFO1(spxout, spxout << "Load basis from old basis (in boosted solver - testing unboundedness)" << "\n");
+         _convertDataArrayVarStatusToBoosted(_oldUnbdBasisStatusRows, _tmpBasisStatusRows);
+         _convertDataArrayVarStatusToBoosted(_oldUnbdBasisStatusCols, _tmpBasisStatusCols);
+         _boostedSolver.setBasis(_tmpBasisStatusRows.get_const_ptr(), _tmpBasisStatusCols.get_const_ptr());
+      }
+      else
+      {
+         MSG_INFO1(spxout, spxout << "No old basis available" << "\n");
+         return false;
+      }
+   }
+
+   return true;
+}
+
+
+
+template <class R>
+void SoPlexBase<R>::_switchToStandardMode()
+{
+   _certificateMode = 0;
+}
+
+template <class R>
+void SoPlexBase<R>::_switchToFeasMode()
+{
+   _certificateMode = 1;
+}
+
+template <class R>
+void SoPlexBase<R>::_switchToUnbdMode()
+{
+   _certificateMode = 2;
+}
+
+template <class R>
+bool SoPlexBase<R>::_inStandardMode()
+{
+   return _certificateMode == 0;
+}
+
+template <class R>
+bool SoPlexBase<R>::_inFeasMode()
+{
+   return _certificateMode == 1;
+}
+
+template <class R>
+bool SoPlexBase<R>::_inUnbdMode()
+{
+   return _certificateMode == 2;
 }
 
 
@@ -2999,8 +3183,7 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
    // solve original LP
    MSG_INFO1(spxout, spxout << "Initial floating-point boosted solve . . .\n");
 
-   _boostedIterations ++;
-   MSG_INFO1(spxout, spxout << "Boosted iteration " << _boostedIterations << "\n");
+   MSG_INFO1(spxout, spxout << "Boosted iteration " << _statistics->precBoosts << "\n");
 
    for(int r = numRowsRational() - 1; r >= 0; r--)
       assert(_boostedSolver.maxRowObj(r) == 0.0);
@@ -3008,6 +3191,9 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
    // solve original LP with boosted solver
    _statistics->rationalTime->stop();
    _solveRealForRationalBoosted(boostedPrimalReal, boostedDualReal, _basisStatusRows, _basisStatusCols, boostedResult, true);
+
+   // store last basis met for a potential future iteration with increased precision
+   _storeBasisAsOldBasis(true);
 
    // evalute result
    if(_evaluateResultBoosted(boostedResult, false, sol, boostedDualReal, infeasible, unbounded, stoppedTime, stoppedIter,
@@ -3273,8 +3459,7 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
    // solve original LP
    MSG_INFO1(spxout, spxout << "Initial floating-point boosted solve . . .\n");
 
-   _boostedIterations ++;
-   MSG_INFO1(spxout, spxout << "Boosted iteration " << _boostedIterations << "\n");
+   MSG_INFO1(spxout, spxout << "Boosted iteration " << _statistics->precBoosts << "\n");
 
    for(int r = numRowsRational() - 1; r >= 0; r--)
       assert(_boostedSolver.maxRowObj(r) == 0.0);
@@ -3286,7 +3471,11 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
    // evalute result
    if(_evaluateResultBoosted(boostedResult, false, sol, boostedDualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                   error))
+   {
+      // store last basis met for a potential iteration with increased precision
+      _storeBasisAsOldBasis(true);
       return;
+   }
 
    _statistics->rationalTime->start();
 
@@ -3473,7 +3662,11 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
       // evaluate result; if modified problem was not solved to optimality, stop refinement;
       if(_evaluateResultBoosted(boostedResult, true, sol, boostedDualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                         error))
+      {
+         // store last basis met for a potential iteration with increased precision
+         _storeBasisAsOldBasis(true);
          return;
+      }
 
       _statistics->rationalTime->start();
 
@@ -3535,6 +3728,9 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
    {
       MSG_INFO1(spxout, spxout << "\nNo success. Launch new boosted solve . . .\n");
       needNewBoostedIt = true;
+
+      // store last basis met for a potential iteration with increased precision
+      _storeBasisAsOldBasis(true);
 
       // stop rational solving time
       _statistics->rationalTime->stop();

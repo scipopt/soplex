@@ -9202,6 +9202,11 @@ SoPlexBase<R>::SoPlexBase()
 
    _switchedToBoosted = false;
    _boostedIterations = 0;
+
+   _certificateMode = 0;
+   _hasOldBasis     = false;
+   _hasOldFeasBasis = false;
+   _hasOldUnbdBasis = false;
 #endif
 
    // the R LP is initially stored in the solver; the rational LP is constructed, when the parameter SYNCMODE is
