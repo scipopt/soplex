@@ -24,11 +24,11 @@
 # of each computer. Of course, the value depends on the specific computer/queue.
 #
 # To get the result files call in directory check/
-# ./evalcheck_cluster.sh results/check.${TSTNAME}.${BINID}.${SETNAME}.eval
+# ./evalcheck_cluster.sh ${OUTPUTDIR}/check.${TSTNAME}.${BINID}.${SETNAME}.eval
 # This leads to result files
-#  - results/check.${TSTNAME}.${BINID}.${SETNAME}.out
-#  - results/check.${TSTNAME}.${BINID}.${SETNAME}.res
-#  - results/check.${TSTNAME}.${BINID}.${SETNAME}.err
+#  - ${OUTPUTDIR}/check.${TSTNAME}.${BINID}.${SETNAME}.out
+#  - ${OUTPUTDIR}/check.${TSTNAME}.${BINID}.${SETNAME}.res
+#  - ${OUTPUTDIR}/check.${TSTNAME}.${BINID}.${SETNAME}.err
 
 TSTNAME="${1}"
 EXECUTABLE="${2}"
@@ -85,7 +85,7 @@ fi
 # defines the following environment variables: NICE, ACCOUNT, CLUSTERQUEUE, HARDTIMELIMIT
 . ./configuration_cluster.sh
 
-EVALFILE="${SOPLEXPATH}/results/check.${TSTNAME}.${BINID}.${QUEUE}.${SETTINGS}.eval"
+EVALFILE="${SOPLEXPATH}/${OUTPUTDIR}/check.${TSTNAME}.${BINID}.${QUEUE}.${SETTINGS}.eval"
 echo > "${EVALFILE}"
 
 # counter to define file names for a test set uniquely
@@ -125,7 +125,7 @@ do
         SHORTFILENAME=$(basename "${SHORTFILENAME}" .opb)
 
         FILENAME="${USER}.${TSTNAME}.${COUNT}_${SHORTFILENAME}.${BINID}.${QUEUE}.${SETTINGS}"
-        BASENAME="${SOPLEXPATH}/results/${FILENAME}"
+        BASENAME="${SOPLEXPATH}/${OUTPUTDIR}/${FILENAME}"
 
         TMPFILE="${BASENAME}.tmp"
         SETFILE="${BASENAME}.set"
@@ -135,7 +135,7 @@ do
         # in case we want to continue we check if the job was already performed
         if test "${CONTINUE}" != "false"
         then
-            if test -e "results/${FILENAME}.out"
+            if test -e "${OUTPUTDIR}/${FILENAME}.out"
             then
                 echo "skipping file ${i} due to existing output file ${FILENAME}.out"
                 continue
@@ -145,15 +145,16 @@ do
         # additional environment variables needed by runcluster.sh
         export SOLVERPATH="${SOPLEXPATH}"
         export EXECNAME="${EXECUTABLE}"
-        export BASENAME="${FILENAME}"
-        export FILENAME="${i}"
+        export BASENAME="${FILENAME}" # careful, runcluster.sh uses BASENAME in a different sense
+        export FILENAME="${i}"        # careful, runcluster.sh uses FILENAME in a different sense
+        export OUTPUTDIR="${OUTPUTDIR}"
         export TIMELIMIT="${TIMELIMIT}"
         export SETTINGS="${SETTINGS}"
         export INSTANCE="${SOPLEXPATH}/${i}"
         export CLIENTTMPDIR="${CLIENTTMPDIR}"
 
         # Create testset, without printing output
-        "${EXECNAME}" --loadset="${SETTINGSFILE}" -t"${TIMELIMIT}" --saveset="${SOLVERPATH}/results/${BASENAME}.set" > /dev/null
+        "${EXECNAME}" --loadset="${SETTINGSFILE}" -t"${TIMELIMIT}" --saveset="${SOLVERPATH}/${OUTPUTDIR}/${BASENAME}.set" > /dev/null
 
         if test  "${QUEUETYPE}" = "srun"
         then

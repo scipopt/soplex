@@ -26,10 +26,23 @@ fi
 OUTFILE="${CLIENTTMPDIR}/${BASENAME}.out"
 ERRFILE="${CLIENTTMPDIR}/${BASENAME}.err"
 BASFILE="${CLIENTTMPDIR}/${BASENAME}.bas"
-TMPFILE="${SOLVERPATH}/results/${BASENAME}.tmp"
+TMPFILE="${SOLVERPATH}/${OUTPUTDIR}/${BASENAME}.tmp"
 
 uname -a                               > "${OUTFILE}"
 uname -a                               > "${ERRFILE}"
+
+# function to copy back the ${OUTPUTDIR} and delete temporary files
+function cleanup {
+    rm -f "${TMPFILE}"
+
+    mv "${OUTFILE}" "${SOLVERPATH}/${OUTPUTDIR}/${BASENAME}.out"
+    mv "${ERRFILE}" "${SOLVERPATH}/${OUTPUTDIR}/${BASENAME}.err"
+    mv "${BASFILE}" "${SOLVERPATH}/${OUTPUTDIR}/${BASENAME}.bas"
+}
+
+# ensure TMPFILE is deleted and ${OUTPUTDIR} are copied when exiting (normally or due to abort/interrupt)
+trap cleanup EXIT
+
 echo "@01 ${FILENAME}"                >> "${OUTFILE}"
 echo "@01 ${FILENAME}"                >> "${ERRFILE}"
 echo "-----------------------------"  >> "${OUTFILE}"
@@ -43,9 +56,5 @@ echo "-----------------------------"  >> "${OUTFILE}"
 date                                  >> "${OUTFILE}"
 echo "-----------------------------"  >> "${OUTFILE}"
 date                                  >> "${ERRFILE}"
-
-mv "${OUTFILE}" "${SOLVERPATH}/results/${BASENAME}.out"
-mv "${ERRFILE}" "${SOLVERPATH}/results/${BASENAME}.err"
-mv "${BASFILE}" "${SOLVERPATH}/results/${BASENAME}.bas"
 
 rm -f "${TMPFILE}"

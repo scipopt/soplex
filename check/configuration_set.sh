@@ -26,7 +26,7 @@
 #    SETTINGSFILE - absolute path to settings file
 
 # get current SOPLEX path
-SOPLEXPATH=$(pwd)
+SOPLEXPATH=$(pwd -P)
 
 EXECUTABLE="${SOPLEXPATH}/../${EXECUTABLE}"
 
