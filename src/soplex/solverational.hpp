@@ -2874,9 +2874,28 @@ void SoPlexBase<R>::_boostPrecision()
    // remember the number of iterations for the next comparison
    _prevIterations = _statistics->iterations;
 
-   // First iteration: precision is already 50; no need to increase precision
-   if(_statistics->precBoosts > 1)
+   if(_statistics->precBoosts == 1)
+   {
+      // 50 decimal digits are already allocated by default i.e. a mantissa stored with 167 bits
+      // we could set the precision to 38 to have a mantissa stored in 128 bits but this would not change the computation times
+      // and still would reduce the precision significantly.
+      // So we do nothing.
+   }
+   else if(_statistics->precBoosts == 2)
+   {
+      // special case. Normally we multiply the precision by 3/2 just like in QSopt_ex
+      // but the previous mantissa was stored in 167 bits and not 128 bits.
+      // so we hard set the number of bits for the mantissa to 192 bits
+      BP nbDecimalDigits = boost::multiprecision::floor(boost::multiprecision::log10(boost::multiprecision::pow(BP(2), 192)));
+      BP::default_precision((int)nbDecimalDigits);
+   }
+   else if(_statistics->precBoosts > 2)
+   {
+      // general case.
+      // to increase the bits for the mantissa by 3/2,
+      // we simply multiply the number of decimal digits also by 3/2
       BP::default_precision(BP::default_precision() * Param::precisionBoostingFactor());
+   }
 }
 
 
@@ -3125,7 +3144,8 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
    // start rational solving timing
    _statistics->rationalTime->start();
 
-   MSG_INFO1(spxout, spxout << "Current precision = 1e-" << BP::default_precision() << "\n");
+   MSG_INFO1(spxout, spxout << "Current precision = 1e-" << BP::default_precision() << ", ");
+   MSG_INFO1(spxout, spxout << "mantissa stored in " << (int)boost::multiprecision::floor(boost::multiprecision::log2(boost::multiprecision::pow(BP(10), (int)BP::default_precision()))) + 2 << " bits" << "\n");
 
    primalFeasible = false;
    dualFeasible = false;
@@ -3162,7 +3182,7 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
 
       } else {
          BP tolerance = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_tolPrecisionRatio));
-         BP epsilon   = pow(10,-(int)(BP::default_precision()*_epsPrecisionRatio));
+         BP epsilon   = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_epsPrecisionRatio));
          double global_epsilon = (double)epsilon;
 
          if(intParam(SoPlexBase<R>::UPDATETOLSMODE) == 2) {
@@ -3398,7 +3418,8 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
    // start rational solving timing
    _statistics->rationalTime->start();
 
-   MSG_INFO1(spxout, spxout << "Current precision = 1e-" << BP::default_precision() << "\n");
+   MSG_INFO1(spxout, spxout << "Current precision = 1e-" << BP::default_precision() << ", ");
+   MSG_INFO1(spxout, spxout << "mantissa stored in " << (int)boost::multiprecision::floor(boost::multiprecision::log2(boost::multiprecision::pow(BP(10), (int)BP::default_precision()))) + 2 << " bits" << "\n");
 
    typename SPxSolverBase<BP>::Status boostedResult = SPxSolverBase<BP>::UNKNOWN;
 
@@ -3443,7 +3464,7 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
 
       } else {
          BP tolerance = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_tolPrecisionRatio));
-         BP epsilon   = pow(10,-(int)(BP::default_precision()*_epsPrecisionRatio));
+         BP epsilon   = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_epsPrecisionRatio));
          double global_epsilon = (double)epsilon;
 
          if(intParam(SoPlexBase<R>::UPDATETOLSMODE) == 2) {
