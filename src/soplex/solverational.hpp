@@ -2539,8 +2539,11 @@ void SoPlexBase<R>::_performOptIRStable(
    if(_evaluateResult(result, false, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                       error))
    {
-      // store last basis met for a potential iteration with increased precision
-      _storeBasisAsOldBasis(false);
+      if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
+      {
+         // store last basis met for a potential iteration with increased precision
+         _storeBasisAsOldBasis(false);
+      }
       return;
    }
 
@@ -2745,8 +2748,11 @@ void SoPlexBase<R>::_performOptIRStable(
       if(_evaluateResult(result, true, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                          error))
       {
-         // store last basis met for a potential iteration with increased precision
-         _storeBasisAsOldBasis(false);
+         if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
+         {
+            // store last basis met for a potential iteration with increased precision
+            _storeBasisAsOldBasis(false);
+         }
          return;
       }
 
@@ -2796,8 +2802,11 @@ void SoPlexBase<R>::_performOptIRStable(
          sol._objVal *= -1;
    }
 
-   // store last basis met for a potential iteration with increased precision
-   _storeBasisAsOldBasis(false);
+   if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
+   {
+      // store last basis met for a potential iteration with increased precision
+      _storeBasisAsOldBasis(false);
+   }
 
    // set objective coefficients for all rows to zero
    _solver.clearRowObjs();
