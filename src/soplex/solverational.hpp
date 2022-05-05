@@ -2285,7 +2285,7 @@ void SoPlexBase<R>::_solveRealForRationalStable(
    // solve original LP
    MSG_INFO1(spxout, spxout << "Initial floating-point solve . . .\n");
 
-   if(!_loadBasisFromOldBasis(false) && _hasBasis)
+   if(_hasBasis)
    {
       assert(_basisStatusRows.size() == numRowsRational());
       assert(_basisStatusCols.size() == numColsRational());
@@ -2304,13 +2304,14 @@ void SoPlexBase<R>::_solveRealForRationalStable(
    // otherwise use the expensive pipeline from _solveRealStable
    result = _solveRealForRational(false, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
 
-   // store last basis met for a potential iteration with increased precision
-   _storeBasisAsOldBasis(false);
-
    // evalute result
    if(_evaluateResult(result, false, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                       error))
+   {
+       // store last basis met for a potential iteration with increased precision
+      _storeBasisAsOldBasis(false);
       return;
+   }
 
    _statistics->rationalTime->start();
 
@@ -2437,6 +2438,9 @@ void SoPlexBase<R>::_solveRealForRationalStable(
       if(intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MINIMIZE)
          sol._objVal *= -1;
    }
+
+   // store last basis met for a potential iteration with increased precision
+   _storeBasisAsOldBasis(false);
 
    // set objective coefficients for all rows to zero
    _solver.clearRowObjs();
@@ -2813,9 +2817,13 @@ void SoPlexBase<R>::_switchToBoosted()
 
    if(!_switchedToBoosted)
    {
-      MSG_INFO1(spxout, spxout << "No success with initial precision solver. Disabling it and switching to multiprecision.\n");
+      MSG_INFO1(spxout, spxout << "Numerical troubles with initial precision solver. Disabling it and switching to multiprecision.\n");
       _switchedToBoosted = true;
       _hasBasis = (_boostedSolver.basis().status() > SPxBasisBase<BP>::NO_PROBLEM);
+   }
+   else
+   {
+      MSG_INFO1(spxout, spxout << "Numerical troubles with multiprecision solver. Increase precision.\n");
    }
 }
 
@@ -3237,13 +3245,14 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
    _statistics->rationalTime->stop();
    _solveRealForRationalBoosted(boostedPrimalReal, boostedDualReal, _basisStatusRows, _basisStatusCols, boostedResult, true);
 
-   // store last basis met for a potential future iteration with increased precision
-   _storeBasisAsOldBasis(true);
-
    // evalute result
    if(_evaluateResultBoosted(boostedResult, false, sol, boostedDualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                   error))
+   {
+      // store last basis met for a potential future iteration with increased precision
+      _storeBasisAsOldBasis(true);
       return;
+   }
 
    // stop rational solving time
    _statistics->rationalTime->start();
@@ -3385,6 +3394,9 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
    {
       MSG_INFO1(spxout, spxout << "\nNo success. Launch new boosted solve . . .\n");
       needNewBoostedIt = true;
+
+      // store last basis met for a potential future iteration with increased precision
+      _storeBasisAsOldBasis(true);
 
       // stop rational solving time
       _statistics->rationalTime->stop();
