@@ -117,15 +117,28 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
       _performOptIRWrapper(_solRational, !unboundednessNotCertified, !infeasibilityNotCertified, 0,
                            primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
 
-      // case: an unrecoverable error occured
+#ifdef SOPLEX_WITH_MPFR
+      // case: an unrecoverable error occured, and precision boosting has reached its limit
+      if(error && _boostingLimitReached)
+      {
+         _status = SPxSolverBase<R>::ERROR;
+         break;
+      }
+      // case: an error occured, boost precision
+      else if(error)
+#else
+      // case: an unrecoverable error occured, boost precision
       if(error)
+#endif
       {
          _status = SPxSolverBase<R>::ERROR;
 #ifdef SOPLEX_WITH_MPFR
          if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
          {
-            _setupBoostedSolverAfterRecovery();
-            continue;
+            if(_setupBoostedSolverAfterRecovery())
+               continue;
+            else // precision boosting has reached its limit
+               break;
          }
          else
             break;
@@ -164,8 +177,10 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
 #ifdef SOPLEX_WITH_MPFR
             if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
             {
-               _setupBoostedSolverAfterRecovery();
-               continue;
+               if(_setupBoostedSolverAfterRecovery())
+                  continue;
+               else // precision boosting has reached its limit
+                  break;
             }
             else
                break;
@@ -215,8 +230,10 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
 #ifdef SOPLEX_WITH_MPFR
             if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
             {
-               _setupBoostedSolverAfterRecovery();
-               continue;
+               if(_setupBoostedSolverAfterRecovery())
+                  continue;
+               else // precision boosting has reached its limit
+                  break;
             }
             else
                break;
@@ -251,7 +268,12 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             MSG_INFO1(spxout, spxout << "Primal feasible and bounded.\n");
 #ifdef SOPLEX_WITH_MPFR
             if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
-               _setupBoostedSolverAfterRecovery();
+            {
+               if(_setupBoostedSolverAfterRecovery())
+                  continue;
+               else // precision boosting has reached its limit
+                  break;
+            }
 #endif
             continue;
          }
@@ -274,8 +296,10 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
 #ifdef SOPLEX_WITH_MPFR
             if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
             {
-               _setupBoostedSolverAfterRecovery();
-               continue;
+               if(_setupBoostedSolverAfterRecovery())
+                  continue;
+               else // precision boosting has reached its limit
+                  break;
             }
             else
                break;
@@ -316,8 +340,10 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
 #ifdef SOPLEX_WITH_MPFR
                if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
                {
-                  _setupBoostedSolverAfterRecovery();
-                  continue;
+                  if(_setupBoostedSolverAfterRecovery())
+                     continue;
+                  else // precision boosting has reached its limit
+                     break;
                }
                else
                   break;
@@ -365,7 +391,12 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             MSG_INFO1(spxout, spxout << "Primal feasible.  Optimizing again.\n");
 #ifdef SOPLEX_WITH_MPFR
             if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
-               _setupBoostedSolverAfterRecovery();
+            {
+               if(_setupBoostedSolverAfterRecovery())
+                  continue;
+               else // precision boosting has reached its limit
+                  break;
+            }
 #endif
             continue;
          }
@@ -381,8 +412,10 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
 #ifdef SOPLEX_WITH_MPFR
          if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
          {
-            _setupBoostedSolverAfterRecovery();
-            continue;
+            if(_setupBoostedSolverAfterRecovery())
+               continue;
+            else // precision boosting has reached its limit
+               break;
          }
          else
          {
@@ -498,7 +531,14 @@ void SoPlexBase<R>::_performOptIRWrapper(
 
             // boost precision if no success
             if(needNewBoostedIt)
-               _boostPrecision();
+            {
+               if(!_boostPrecision())
+               {
+                  // error message already displayed
+                  error = true;
+                  break;
+               }
+            }
             else
                break;
          } while (true);
@@ -528,7 +568,14 @@ void SoPlexBase<R>::_performOptIRWrapper(
 
             // boost precision if no success
             if(needNewBoostedIt)
-               _boostPrecision();
+            {
+               if(!_boostPrecision())
+               {
+                  // error message already displayed
+                  error = true;
+                  break;
+               }
+            }
             else
                break;
          } while (true);
@@ -2880,9 +2927,9 @@ void SoPlexBase<R>::_setupBoostedSolver()
 
 
 
-/// increase the multiprecision
+/// increase the multiprecision, return false if maximum precision is reached, true otherwise
 template <class R>
-void SoPlexBase<R>::_boostPrecision()
+bool SoPlexBase<R>::_boostPrecision()
 {
    assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
    assert(_switchedToBoosted);
@@ -2900,31 +2947,60 @@ void SoPlexBase<R>::_boostPrecision()
    }
    else if(_statistics->precBoosts == 2)
    {
-      // special case. Normally we multiply the precision by 3/2 just like in QSopt_ex
-      // but the previous mantissa was stored in 167 bits and not 128 bits.
-      // so we hard set the number of bits for the mantissa to 192 bits
-      BP nbDecimalDigits = boost::multiprecision::floor(boost::multiprecision::log10(boost::multiprecision::pow(BP(2), 192)));
-      BP::default_precision((int)nbDecimalDigits);
+      if(intParam(SoPlexBase<R>::MANTISSA_MAX_BITS) >= 192)
+      {
+         // special case. Normally we multiply the precision by 3/2 just like in QSopt_ex
+         // but the previous mantissa was stored in 167 bits and not 128 bits.
+         // so we hard set the number of bits for the mantissa to 192 bits
+         BP nbDecimalDigits = boost::multiprecision::floor(boost::multiprecision::log10(boost::multiprecision::pow(BP(2), 192)));
+         BP::default_precision((int)nbDecimalDigits);
+      }
+      else
+      {
+         MSG_INFO1(spxout, spxout << "Maximum number of bits for the mantissa reached.\n"
+                                 << "To increase this limit, modify the parameter mantissa_max_bits.\n"
+                                 << "Giving up.\n");
+         _boostingLimitReached = true;
+         return false;
+      }
    }
    else if(_statistics->precBoosts > 2)
    {
-      // general case.
-      // to increase the bits for the mantissa by 3/2,
-      // we simply multiply the number of decimal digits also by 3/2
-      BP::default_precision(BP::default_precision() * Param::precisionBoostingFactor());
+      int newNbDigits = (int)floor(BP::default_precision() * Param::precisionBoostingFactor());
+      int newMantissaBits = (int)boost::multiprecision::floor(boost::multiprecision::log2(boost::multiprecision::pow(BP(10), newNbDigits)));
+      if(intParam(SoPlexBase<R>::MANTISSA_MAX_BITS) >= newMantissaBits)
+      {
+         // general case.
+         // to increase the bits for the mantissa by 3/2,
+         // we simply multiply the number of decimal digits also by 3/2
+         BP::default_precision(BP::default_precision() * Param::precisionBoostingFactor());
+      }
+      else
+      {
+         MSG_INFO1(spxout, spxout << "Maximum number of bits for the mantissa reached.\n"
+                                 << "To increase this limit, modify the parameter mantissa_max_bits.\n"
+                                 << "Giving up.\n");
+         _boostingLimitReached = true;
+         return false;
+      }
    }
+
+   return true;
 }
 
 
 
-/// setup recovery mecanism using multiprecision
+/// setup recovery mecanism using multiprecision, return false if maximum precision reached, true otherwise
 template <class R>
-void SoPlexBase<R>::_setupBoostedSolverAfterRecovery()
+bool SoPlexBase<R>::_setupBoostedSolverAfterRecovery()
 {
    assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
 
    _switchToBoosted();
-   _boostPrecision();
+   if(!_boostPrecision())
+      return false;
+
+   return true;
 }
 
 

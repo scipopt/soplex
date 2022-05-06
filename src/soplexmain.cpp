@@ -721,6 +721,18 @@ int runSoPlex(int argc, char* argv[])
 
                break;
             }
+            // --mantissa_max_bits=<value> : maximum number of bits for the mantissa
+            else if(strncmp(option, "mantissa_max_bits=", 18) == 0)
+            {
+               if(!soplex->setIntParam(soplex->MANTISSA_MAX_BITS, option[18] - '0'))
+               {
+                  printUsage(argv, optidx);
+                  returnValue = 1;
+                  goto TERMINATE_FREESTRINGS;
+               }
+
+               break;
+            }
             ///@todo precision-boosting make it so that we can read a several digits value like 1.2
             // --precboostfac=<value> : choose precision boosting factor for boosted solver
             else if(strncmp(option, "precboostfac=", 13) == 0)

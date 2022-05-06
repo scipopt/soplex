@@ -1119,8 +1119,11 @@ public:
 
       UPDATETOLSMODE = 30,
 
+      // maximum number of bits for the mantissa when using multiprecision
+      MANTISSA_MAX_BITS = 31,
+
       /// number of integer parameters
-      INTPARAM_COUNT = 31
+      INTPARAM_COUNT = 32
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -1736,6 +1739,8 @@ private:
    Real _epsPrecisionRatio = 0.8;
 
    bool _updateTolsMode;
+
+   bool _boostingLimitReached;
 
    // this attribute remember wether we are testing feasibility (1), unboundedness (2) or neither (0)
    int _certificateMode;
@@ -2472,11 +2477,11 @@ private:
    /// setup boosted solver before launching iteration
    void _setupBoostedSolver();
 
-   /// increase the multiprecision
-   void _boostPrecision();
+   /// increase the multiprecision, return false if maximum precision is reached, true otherwise
+   bool _boostPrecision();
 
-   /// setup recovery mecanism using multiprecision
-   void _setupBoostedSolverAfterRecovery();
+   /// setup recovery mecanism using multiprecision, return false if maximum precision reached, true otherwise
+   bool _setupBoostedSolverAfterRecovery();
 
    /// return true if slack basis has to be loaded for boosted solver
    bool _isBoostedStartingFromSlack(bool initialSolve = true);

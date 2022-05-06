@@ -452,6 +452,14 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
    lower[SoPlexBase<R>::UPDATETOLSMODE] = 0;
    upper[SoPlexBase<R>::UPDATETOLSMODE] = 2;
    defaultValue[SoPlexBase<R>::UPDATETOLSMODE] = 2;
+
+   // maximum number of bits for the mantissa when using multiprecision
+   name[SoPlexBase<R>::MANTISSA_MAX_BITS] = "mantissa_max_bits";
+   description[SoPlexBase<R>::MANTISSA_MAX_BITS] =
+      "maximum number of bits for the mantissa when using multiprecision";
+   lower[SoPlexBase<R>::MANTISSA_MAX_BITS] = 168;
+   upper[SoPlexBase<R>::MANTISSA_MAX_BITS] = 1000000;
+   defaultValue[SoPlexBase<R>::MANTISSA_MAX_BITS] = 10000;
 }
 
 template <class R>
@@ -6430,6 +6438,10 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
 
       break;
 
+   // maximum number of bits for the mantissa when using multiprecision
+   case SoPlexBase<R>::MANTISSA_MAX_BITS:
+      break;
+
    default:
       return false;
    }
@@ -9207,6 +9219,8 @@ SoPlexBase<R>::SoPlexBase()
    _hasOldBasis     = false;
    _hasOldFeasBasis = false;
    _hasOldUnbdBasis = false;
+
+   _boostingLimitReached = false;
 #endif
 
    // the R LP is initially stored in the solver; the rational LP is constructed, when the parameter SYNCMODE is
