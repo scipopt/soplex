@@ -327,6 +327,10 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
          {
             SolRational solUnbounded;
 
+            // indicate we are testing unboundedness
+            // not sure about this.
+            _switchToUnbdMode();
+
             _performUnboundedIRStable(solUnbounded, hasUnboundedRay, stoppedTime, stoppedIter, error);
 
             assert(!hasUnboundedRay || solUnbounded.hasPrimalRay());
