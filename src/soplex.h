@@ -1020,8 +1020,11 @@ public:
       /// boosted solver start from last basis
       BOOSTED_WARM_START = 28,
 
+      /// try different settings when solve fails
+      RECOVERY_MECHANISM = 29,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 29
+      BOOLPARAM_COUNT = 30
    } BoolParam;
 
    /// integer parameters

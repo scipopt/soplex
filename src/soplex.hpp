@@ -206,6 +206,11 @@ SoPlexBase<R>::Settings::BoolParam::BoolParam()
    description[SoPlexBase<R>::BOOSTED_WARM_START] =
       "if true, boosted solver starts from last basis, otherwise from slack basis";
    defaultValue[SoPlexBase<R>::BOOSTED_WARM_START] = true;
+
+   name[SoPlexBase<R>::RECOVERY_MECHANISM] = "recovery_mechanism";
+   description[SoPlexBase<R>::RECOVERY_MECHANISM] =
+      "enable recovery mechanism for when the solve fails";
+   defaultValue[SoPlexBase<R>::RECOVERY_MECHANISM] = true;
 }
 
 template <class R>
@@ -5906,6 +5911,9 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
                 "Setting Parameter boosted_warm_start is only possible if SoPlex is build with MPFR\n");
       return false;
 #endif
+      break;
+
+   case RECOVERY_MECHANISM:
       break;
 
    default:

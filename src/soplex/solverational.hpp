@@ -2575,7 +2575,7 @@ void SoPlexBase<R>::_performOptIRStable(
    // if boosted solver is available, double precision solver is only used once.
    // otherwise use the expensive pipeline from _solveRealStable
 #ifdef SOPLEX_WITH_MPFR
-   if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
+   if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING) || !boolParam(SoPlexBase<R>::RECOVERY_MECHANISM))
       result = _solveRealForRational(false, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
    else
       result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows,
@@ -2762,7 +2762,7 @@ void SoPlexBase<R>::_performOptIRStable(
       // if boosted solver is available, double precision solver is only used once.
       // otherwise use the expensive pipeline from _solveRealStable
 #ifdef SOPLEX_WITH_MPFR
-      if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
+      if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING) || !boolParam(SoPlexBase<R>::RECOVERY_MECHANISM))
       {
          // turn off simplifier if scaling factors are too high
          int simplifier = intParam(SoPlexBase<R>::SIMPLIFIER);
