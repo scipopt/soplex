@@ -253,6 +253,9 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
    typename SPxSolverBase<R>::Type tightenedtype = type();
    bool tightened = false;
 
+   oldBasisStatusRows.reSize(this->nRows());
+   oldBasisStatusCols.reSize(this->nCols());
+
    while(!stop)
    {
       const typename SPxBasisBase<R>::Desc regulardesc = this->desc();
@@ -314,6 +317,9 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
             do
             {
                printDisplayLine();
+
+               if(store_basis_during_simplex_before && (iterations() % store_basis_simplex_freq == 0 || iterations() < store_basis_simplex_freq))
+                  getBasis(oldBasisStatusRows.get_ptr(), oldBasisStatusCols.get_ptr(), oldBasisStatusRows.size(), oldBasisStatusCols.size());
 
                enterId = thepricer->selectEnter();
 
@@ -529,6 +535,11 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                   assert(this->lastEntered().isValid());
                }
 
+               if(store_basis_during_simplex && iterations() % store_basis_simplex_freq == 0
+                     && this->lastIndex() >= 0 && this->lastEntered().isValid()
+                     && basis().status() > SPxBasisBase<R>::NO_PROBLEM && SPxBasisBase<R>::status() > SPxBasisBase<R>::SINGULAR)
+                  getBasis(oldBasisStatusRows.get_ptr(), oldBasisStatusCols.get_ptr(), oldBasisStatusRows.size(), oldBasisStatusCols.size());
+
                /* check every MAXSTALLS iterations whether shift and objective value have not changed */
                if((this->iteration() - stallRefIter) % MAXSTALLS == 0
                      && basis().status() != SPxBasisBase<R>::INFEASIBLE)
@@ -690,6 +701,9 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
             do
             {
                printDisplayLine();
+
+               if(store_basis_during_simplex_before && (iterations() % store_basis_simplex_freq == 0 || iterations() < store_basis_simplex_freq))
+                  getBasis(oldBasisStatusRows.get_ptr(), oldBasisStatusCols.get_ptr(), oldBasisStatusRows.size(), oldBasisStatusCols.size());
 
                leaveNum = thepricer->selectLeave();
 
@@ -855,6 +869,10 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                   leaveCount++;
                   assert(this->lastIndex() >= 0);
                }
+
+               if(store_basis_during_simplex && this->lastIndex() >= 0 && this->lastEntered().isValid()
+                     && basis().status() > SPxBasisBase<R>::NO_PROBLEM && SPxBasisBase<R>::status() > SPxBasisBase<R>::SINGULAR)
+                  getBasis(oldBasisStatusRows.get_ptr(), oldBasisStatusCols.get_ptr(), oldBasisStatusRows.size(), oldBasisStatusCols.size());
 
                /* check every MAXSTALLS iterations whether shift and objective value have not changed */
                if((this->iteration() - stallRefIter) % MAXSTALLS == 0

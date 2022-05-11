@@ -211,6 +211,16 @@ SoPlexBase<R>::Settings::BoolParam::BoolParam()
    description[SoPlexBase<R>::RECOVERY_MECHANISM] =
       "enable recovery mechanism for when the solve fails";
    defaultValue[SoPlexBase<R>::RECOVERY_MECHANISM] = true;
+
+   name[SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX] = "store_basis_during_simplex";
+   description[SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX] =
+      "store advanced and stable basis met during simplex algorithm, to better warm start";
+   defaultValue[SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX] = false;
+
+   name[SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE] = "store_basis_during_simplex_before";
+   description[SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE] =
+      "store advanced and stable basis met before each simplex iteration, to better warm start";
+   defaultValue[SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE] = false;
 }
 
 template <class R>
@@ -463,8 +473,16 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
    description[SoPlexBase<R>::MANTISSA_MAX_BITS] =
       "maximum number of bits for the mantissa when using multiprecision";
    lower[SoPlexBase<R>::MANTISSA_MAX_BITS] = 168;
-   upper[SoPlexBase<R>::MANTISSA_MAX_BITS] = 1000000;
+   upper[SoPlexBase<R>::MANTISSA_MAX_BITS] = INT_MAX;
    defaultValue[SoPlexBase<R>::MANTISSA_MAX_BITS] = 10000;
+
+   // after how many simplex pivots do we store the advanced and stable basis, 1 = every iterations
+   name[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] = "store_basis_simplex_freq";
+   description[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] =
+      "after how many simplex pivots do we store the advanced and stable basis, 1 = every iterations";
+   lower[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] = 1;
+   upper[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] = INT_MAX;
+   defaultValue[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] = 1;
 }
 
 template <class R>
@@ -5916,6 +5934,18 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
    case RECOVERY_MECHANISM:
       break;
 
+   case STORE_BASIS_DURING_SIMPLEX:
+      // attributes in solvers need to be updated
+      _solver.setStoreBasisDuringSimplex(value);
+      _boostedSolver.setStoreBasisDuringSimplex(value);
+      break;
+
+   case STORE_BASIS_DURING_SIMPLEX_BEFORE:
+      // attributes in solvers need to be updated
+      _solver.setStoreBasisDuringSimplexBefore(value);
+      _boostedSolver.setStoreBasisDuringSimplexBefore(value);
+      break;
+
    default:
       return false;
    }
@@ -6448,6 +6478,12 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
 
    // maximum number of bits for the mantissa when using multiprecision
    case SoPlexBase<R>::MANTISSA_MAX_BITS:
+      break;
+
+   case SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ:
+      // attributes in solvers need to be updated
+      _solver.setStoreBasisSimplexFreq(value);
+      _boostedSolver.setStoreBasisSimplexFreq(value);
       break;
 
    default:

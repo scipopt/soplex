@@ -332,6 +332,10 @@ private:
    int
    decompIterationLimit;   ///< the maximum number of iterations before the decomposition simplex is aborted.
 
+   bool store_basis_during_simplex; ///< do we store stable basis after a simplex pivot
+   bool store_basis_during_simplex_before; ///< do we store stable basis before simplex pivots
+   int store_basis_simplex_freq; ///< number of simplex pivots -1 to perform before storing stable basis
+
    bool
    fullPerturbation;       ///< whether to perturb the entire problem or just the bounds relevant for the current pivot
    int
@@ -485,6 +489,10 @@ public:
 
    DataArray<int>
    integerVariables;    ///< supplementary variable information, 0: continous variable, 1: integer variable
+
+   ///@todo precision-boosting make these private attributes
+   DataArray<VarStatus> oldBasisStatusRows; ///< stored stable basis met at the start of simplex pivots
+   DataArray<VarStatus> oldBasisStatusCols;
 
    //-----------------------------
    void setOutstream(SPxOut& newOutstream)
@@ -902,6 +910,60 @@ public:
    }
    /// enable or disable hyper sparse pricing
    void hyperPricing(bool h);
+
+   // set old basis status rows
+   void setOldBasisStatusRows(DataArray<VarStatus>& rows)
+   {
+      oldBasisStatusRows = rows;
+   }
+
+   // get old basis status rows
+   DataArray<VarStatus> getOldBasisStatusRows()
+   {
+      return oldBasisStatusRows;
+   }
+
+   // set old basis status cols
+   void setOldBasisStatusCols(DataArray<VarStatus>& cols)
+   {
+      oldBasisStatusCols = cols;
+   }
+
+   // get old basis status cols
+   DataArray<VarStatus> getOldBasisStatusCols()
+   {
+      return oldBasisStatusCols;
+   }
+
+   void setStoreBasisDuringSimplex(bool value)
+   {
+      store_basis_during_simplex = value;
+   }
+
+   bool getStoreBasisDuringSimplex()
+   {
+      return store_basis_during_simplex;
+   }
+
+   void setStoreBasisDuringSimplexBefore(bool value)
+   {
+      store_basis_during_simplex_before = value;
+   }
+
+   bool getStoreBasisDuringSimplexBefore()
+   {
+      return store_basis_during_simplex_before;
+   }
+
+   void setStoreBasisSimplexFreq(int freq)
+   {
+      store_basis_simplex_freq = freq;
+   }
+
+   bool getStoreBasisSimplexFreq()
+   {
+      return store_basis_simplex_freq;
+   }
 
    /** SPxSolverBase considers a Simplex step as degenerate if the
     *  steplength does not exceed #epsilon(). Cycling occurs if only

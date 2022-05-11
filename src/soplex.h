@@ -1023,8 +1023,15 @@ public:
       /// try different settings when solve fails
       RECOVERY_MECHANISM = 29,
 
+      ///@todo precision-boosting find better names for these two parameters
+      /// store advanced and stable basis met during simplex algorithm, to better warm start
+      STORE_BASIS_DURING_SIMPLEX = 30,
+
+      /// store advanced and stable basis met before each simplex iteration, to better warm start
+      STORE_BASIS_DURING_SIMPLEX_BEFORE = 31,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 30
+      BOOLPARAM_COUNT = 32
    } BoolParam;
 
    /// integer parameters
@@ -1125,8 +1132,12 @@ public:
       // maximum number of bits for the mantissa when using multiprecision
       MANTISSA_MAX_BITS = 31,
 
+      ///@todo precision-boosting find better parameter name
+      /// after how many simplex pivots do we store the advanced and stable basis, 1 = every iterations
+      STORE_BASIS_SIMPLEX_FREQ = 32,
+
       /// number of integer parameters
-      INTPARAM_COUNT = 32
+      INTPARAM_COUNT = 33
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -2489,6 +2500,9 @@ private:
    /// return true if slack basis has to be loaded for boosted solver
    bool _isBoostedStartingFromSlack(bool initialSolve = true);
 
+   /// return true if an advanced basis has been stored during the simplex method.
+   bool _basisWasStoredDuringSimplex();
+
    /// indicate if we are testing feasibility, unboundedness or neither
    void _switchToStandardMode();
    void _switchToFeasMode();
@@ -2500,7 +2514,16 @@ private:
    bool _inUnbdMode();
 
    // stores given basis in old basis attributes: _oldBasisStatusRows, _oldFeasBasisStatusRows, _oldUnbdBasisStatusRows (and ...Cols)
-   void _storeBasisAsOldBasis(bool boosted);
+   void _storeBasisAsOldBasis(DataArray< typename SPxSolverBase<R>::VarStatus >& rows, DataArray< typename SPxSolverBase<R>::VarStatus >& cols);
+
+   // stores given basis in old basis attributes: _oldBasisStatusRows, _oldFeasBasisStatusRows, _oldUnbdBasisStatusRows (and ...Cols)
+   void _storeBasisAsOldBasisBoosted(DataArray< typename SPxSolverBase<BP>::VarStatus >& rows, DataArray< typename SPxSolverBase<BP>::VarStatus >& cols);
+
+   // get the last advanced and stable basis stored by the initial solver and store it as old basis, unsimplify basis if simplifier activated
+   void _storeLastStableBasis(bool vanished);
+
+   // get the last advanced and stable basis stored by the boosted solver and store it as old basis, unsimplify basis if simplifier activated
+   void _storeLastStableBasisBoosted(bool vanished);
 
    // load old basis in solver. The old basis loaded depends on the certificate mode (feasibility, unboundedness, or neither)
    bool _loadBasisFromOldBasis(bool boosted);
