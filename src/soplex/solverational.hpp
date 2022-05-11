@@ -2908,7 +2908,7 @@ void SoPlexBase<R>::_setupBoostedSolver()
 
       if(!_loadBasisFromOldBasis(true))
       {
-         // no basis available. Load slack basis into _boostedSolver
+         // if no basis available. Load slack basis into _boostedSolver
          _boostedSolver.loadLP(*_rationalLP, true);
       }
    }
