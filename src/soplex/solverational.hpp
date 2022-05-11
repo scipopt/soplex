@@ -2358,11 +2358,7 @@ void SoPlexBase<R>::_solveRealForRationalStable(
    // evalute result
    if(_evaluateResult(result, false, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                       error))
-   {
-       // store last basis met for a potential iteration with increased precision
-      _storeBasisAsOldBasis(false);
       return;
-   }
 
    _statistics->rationalTime->start();
 
@@ -2490,9 +2486,6 @@ void SoPlexBase<R>::_solveRealForRationalStable(
          sol._objVal *= -1;
    }
 
-   // store last basis met for a potential iteration with increased precision
-   _storeBasisAsOldBasis(false);
-
    // set objective coefficients for all rows to zero
    _solver.clearRowObjs();
 
@@ -2589,14 +2582,7 @@ void SoPlexBase<R>::_performOptIRStable(
    // evalute result
    if(_evaluateResult(result, false, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                       error))
-   {
-      if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
-      {
-         // store last basis met for a potential iteration with increased precision
-         _storeBasisAsOldBasis(false);
-      }
       return;
-   }
 
    _statistics->rationalTime->start();
 
@@ -2798,14 +2784,7 @@ void SoPlexBase<R>::_performOptIRStable(
       // evaluate result; if modified problem was not solved to optimality, stop refinement;
       if(_evaluateResult(result, true, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                          error))
-      {
-         if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
-         {
-            // store last basis met for a potential iteration with increased precision
-            _storeBasisAsOldBasis(false);
-         }
          return;
-      }
 
       _statistics->rationalTime->start();
 
@@ -2851,12 +2830,6 @@ void SoPlexBase<R>::_performOptIRStable(
 
       if(intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MINIMIZE)
          sol._objVal *= -1;
-   }
-
-   if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
-   {
-      // store last basis met for a potential iteration with increased precision
-      _storeBasisAsOldBasis(false);
    }
 
    // set objective coefficients for all rows to zero
@@ -3016,72 +2989,59 @@ bool SoPlexBase<R>::_isBoostedStartingFromSlack(bool initialSolve)
 
 
 
-// store last basis met for a potential iteration with increased precision
+// store last basis met in double precision solver for a potential iteration with increased precision
 template <class R>
-void SoPlexBase<R>::_storeBasisAsOldBasis(bool boosted)
+void SoPlexBase<R>::_storeBasisAsOldBasis(DataArray< typename SPxSolverBase<R>::VarStatus >& rows, DataArray< typename SPxSolverBase<R>::VarStatus >& cols)
 {
-   if(!boosted)
+   if(_inStandardMode())
    {
-      if(_inStandardMode())
-      {
-         MSG_INFO1(spxout, spxout << "Store basis as old basis (from solver)" << "\n");
-         _oldBasisStatusRows.reSize(_solver.nRows());
-         _oldBasisStatusCols.reSize(_solver.nCols());
-         _solver.getBasis(_oldBasisStatusRows.get_ptr(), _oldBasisStatusCols.get_ptr(), _oldBasisStatusRows.size(), _oldBasisStatusCols.size());
-         _hasOldBasis = true;
-      }
-      else if(_inFeasMode())
-      {
-         MSG_INFO1(spxout, spxout << "Store basis as old basis (from solver - testing feasibility)" << "\n");
-         _oldFeasBasisStatusRows.reSize(_solver.nRows());
-         _oldFeasBasisStatusCols.reSize(_solver.nCols());
-         _solver.getBasis(_oldFeasBasisStatusRows.get_ptr(), _oldFeasBasisStatusCols.get_ptr(), _oldFeasBasisStatusRows.size(), _oldFeasBasisStatusCols.size());
-         _hasOldFeasBasis = true;
-      }
-      else if(_inUnbdMode())
-      {
-         MSG_INFO1(spxout, spxout << "Store basis as old basis (from solver - testing unboundedness)" << "\n");
-         _oldUnbdBasisStatusRows.reSize(_solver.nRows());
-         _oldUnbdBasisStatusCols.reSize(_solver.nCols());
-         _solver.getBasis(_oldUnbdBasisStatusRows.get_ptr(), _oldUnbdBasisStatusCols.get_ptr(), _oldUnbdBasisStatusRows.size(), _oldUnbdBasisStatusCols.size());
-         _hasOldUnbdBasis = true;
-      }
+      MSG_INFO1(spxout, spxout << "Store basis as old basis (from solver)" << "\n");
+      _oldBasisStatusRows = rows;
+      _oldBasisStatusCols = cols;
+      _hasOldBasis = true;
    }
-   else
+   else if(_inFeasMode())
    {
-      if(_inStandardMode())
-      {
-         MSG_INFO1(spxout, spxout << "Store basis as old basis (from boosted solver)" << "\n");
-         _tmpBasisStatusRows.reSize(_boostedSolver.nRows());
-         _tmpBasisStatusCols.reSize(_boostedSolver.nCols());
-         _boostedSolver.getBasis(_tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr(), _tmpBasisStatusRows.size(),
-                                 _tmpBasisStatusCols.size());
-         _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusRows, _oldBasisStatusRows);
-         _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusCols, _oldBasisStatusCols);
-         _hasOldBasis = true;
-      }
-      else if(_inFeasMode())
-      {
-         MSG_INFO1(spxout, spxout << "Store basis as old basis (from boosted solver - testing feasibility)" << "\n");
-         _tmpBasisStatusRows.reSize(_boostedSolver.nRows());
-         _tmpBasisStatusCols.reSize(_boostedSolver.nCols());
-         _boostedSolver.getBasis(_tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr(), _tmpBasisStatusRows.size(),
-                                 _tmpBasisStatusCols.size());
-         _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusRows, _oldFeasBasisStatusRows);
-         _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusCols, _oldFeasBasisStatusCols);
-         _hasOldFeasBasis = true;
-      }
-      else if(_inUnbdMode())
-      {
-         MSG_INFO1(spxout, spxout << "Store basis as old basis (from boosted solver - testing unboundedness)" << "\n");
-         _tmpBasisStatusRows.reSize(_boostedSolver.nRows());
-         _tmpBasisStatusCols.reSize(_boostedSolver.nCols());
-         _boostedSolver.getBasis(_tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr(), _tmpBasisStatusRows.size(),
-                                 _tmpBasisStatusCols.size());
-         _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusRows, _oldUnbdBasisStatusRows);
-         _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusCols, _oldUnbdBasisStatusCols);
-         _hasOldUnbdBasis = true;
-      }
+      MSG_INFO1(spxout, spxout << "Store basis as old basis (from solver - testing feasibility)" << "\n");
+      _oldFeasBasisStatusRows = rows;
+      _oldFeasBasisStatusCols = cols;
+      _hasOldFeasBasis = true;
+   }
+   else if(_inUnbdMode())
+   {
+      MSG_INFO1(spxout, spxout << "Store basis as old basis (from solver - testing unboundedness)" << "\n");
+      _oldUnbdBasisStatusRows = rows;
+      _oldUnbdBasisStatusCols = cols;
+      _hasOldUnbdBasis = true;
+   }
+}
+
+
+
+// store last basis met in boosted solver for a potential iteration with increased precision
+template <class R>
+void SoPlexBase<R>::_storeBasisAsOldBasisBoosted(DataArray< typename SPxSolverBase<BP>::VarStatus >& rows, DataArray< typename SPxSolverBase<BP>::VarStatus >& cols)
+{
+   if(_inStandardMode())
+   {
+      MSG_INFO1(spxout, spxout << "Store basis as old basis (from boosted solver)" << "\n");
+      _convertDataArrayVarStatusToRPrecision(rows, _oldBasisStatusRows);
+      _convertDataArrayVarStatusToRPrecision(cols, _oldBasisStatusCols);
+      _hasOldBasis = true;
+   }
+   else if(_inFeasMode())
+   {
+      MSG_INFO1(spxout, spxout << "Store basis as old basis (from boosted solver - testing feasibility)" << "\n");
+      _convertDataArrayVarStatusToRPrecision(rows, _oldFeasBasisStatusRows);
+      _convertDataArrayVarStatusToRPrecision(cols, _oldFeasBasisStatusCols);
+      _hasOldFeasBasis = true;
+   }
+   else if(_inUnbdMode())
+   {
+      MSG_INFO1(spxout, spxout << "Store basis as old basis (from boosted solver - testing unboundedness)" << "\n");
+      _convertDataArrayVarStatusToRPrecision(rows, _oldUnbdBasisStatusRows);
+      _convertDataArrayVarStatusToRPrecision(cols, _oldUnbdBasisStatusCols);
+      _hasOldUnbdBasis = true;
    }
 }
 
@@ -3335,11 +3295,7 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
    // evalute result
    if(_evaluateResultBoosted(boostedResult, false, sol, boostedDualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                   error))
-   {
-      // store last basis met for a potential future iteration with increased precision
-      _storeBasisAsOldBasis(true);
       return;
-   }
 
    // stop rational solving time
    _statistics->rationalTime->start();
@@ -3482,9 +3438,6 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
       MSG_INFO1(spxout, spxout << "\nNo success. Launch new boosted solve . . .\n");
       needNewBoostedIt = true;
 
-      // store last basis met for a potential future iteration with increased precision
-      _storeBasisAsOldBasis(true);
-
       // stop rational solving time
       _statistics->rationalTime->stop();
    }
@@ -3616,11 +3569,7 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
    // evalute result
    if(_evaluateResultBoosted(boostedResult, false, sol, boostedDualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                   error))
-   {
-      // store last basis met for a potential iteration with increased precision
-      _storeBasisAsOldBasis(true);
       return;
-   }
 
    _statistics->rationalTime->start();
 
@@ -3807,11 +3756,7 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
       // evaluate result; if modified problem was not solved to optimality, stop refinement;
       if(_evaluateResultBoosted(boostedResult, true, sol, boostedDualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                         error))
-      {
-         // store last basis met for a potential iteration with increased precision
-         _storeBasisAsOldBasis(true);
          return;
-      }
 
       _statistics->rationalTime->start();
 
@@ -3873,9 +3818,6 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
    {
       MSG_INFO1(spxout, spxout << "\nNo success. Launch new boosted solve . . .\n");
       needNewBoostedIt = true;
-
-      // store last basis met for a potential iteration with increased precision
-      _storeBasisAsOldBasis(true);
 
       // stop rational solving time
       _statistics->rationalTime->stop();
