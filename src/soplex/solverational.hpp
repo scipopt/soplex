@@ -2908,10 +2908,8 @@ void SoPlexBase<R>::_setupBoostedSolver()
 
       if(!_loadBasisFromOldBasis(true))
       {
-         // load basis into _boostedSolver
-         _convertDataArrayVarStatusToBoosted(_basisStatusRows, _tmpBasisStatusRows);
-         _convertDataArrayVarStatusToBoosted(_basisStatusCols, _tmpBasisStatusCols);
-         _boostedSolver.setBasis(_tmpBasisStatusRows.get_const_ptr(), _tmpBasisStatusCols.get_const_ptr());
+         // no basis available. Load slack basis into _boostedSolver
+         _boostedSolver.loadLP(*_rationalLP, true);
       }
    }
 
