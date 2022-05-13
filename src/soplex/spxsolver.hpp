@@ -1888,31 +1888,10 @@ void SPxSolverBase<R>::setType(Type tp)
          break;
 
       case ZERO :
-
          /* A 'free' row (i.e., infinite lower & upper bounds) does not really make sense. The user
           * might (think to) know better, e.g., when temporarily turning off a row. We therefore apply
           * the same adjustment as in the column case in varStatusToBasisStatusCol(). */
-         if(this->lhs(row) <= R(-infinity) && this->rhs(row) >= R(infinity))
-            rstat = SPxBasisBase<R>::Desc::P_FREE;
-         else
-         {
-            if(this->lhs(row) == this->rhs(row))
-            {
-               assert(this->rhs(row) < R(infinity));
-               rstat = SPxBasisBase<R>::Desc::P_FIXED;
-            }
-            else
-            {
-               if(this->lhs(row) > R(-infinity))
-                  rstat = SPxBasisBase<R>::Desc::P_ON_LOWER;
-               else
-               {
-                  assert(this->rhs(row) < R(infinity));
-                  rstat = SPxBasisBase<R>::Desc::P_ON_UPPER;
-               }
-            }
-         }
-
+         rstat = SPxBasisBase<R>::Desc::P_FREE;
          break;
 
       case BASIC :
@@ -1965,30 +1944,9 @@ void SPxSolverBase<R>::setType(Type tp)
 
          /* In this case the upper and lower bounds on the variable should be infinite. The bounds
           * might, however, have changed and we try to recover from this by changing the status to
-          * 'resonable' settings. A solve has to find the correct values afterwards. Note that the
-          * approach below is consistent with changesoplex.cpp (e.g., changeUpperStatus() and
-          * changeLowerStatus() ). */
-         if(this->lower(col) <= R(-infinity) && this->upper(col) >= R(infinity))
-            cstat = SPxBasisBase<R>::Desc::P_FREE;
-         else
-         {
-            if(this->lower(col) == this->upper(col))
-            {
-               assert(this->upper(col) < R(infinity));
-               cstat = SPxBasisBase<R>::Desc::P_FIXED;
-            }
-            else
-            {
-               if(this->lower(col) > R(-infinity))
-                  cstat = SPxBasisBase<R>::Desc::P_ON_LOWER;
-               else
-               {
-                  assert(this->upper(col) < R(infinity));
-                  cstat = SPxBasisBase<R>::Desc::P_ON_UPPER;
-               }
-            }
-         }
-
+          * 'resonable' settings. Since the status should be implicit free we still always set it
+          * to P_FREE to be consistent */
+         cstat = SPxBasisBase<R>::Desc::P_FREE;
          break;
 
       case BASIC :
