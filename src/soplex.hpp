@@ -476,13 +476,13 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
    upper[SoPlexBase<R>::MANTISSA_MAX_BITS] = INT_MAX;
    defaultValue[SoPlexBase<R>::MANTISSA_MAX_BITS] = 10000;
 
-   // after how many simplex pivots do we store the advanced and stable basis, 1 = every iterations
+   // at max, after how many simplex pivots do we store the advanced and stable basis, 1 = every iterations
    name[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] = "store_basis_simplex_freq";
    description[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] =
-      "after how many simplex pivots do we store the advanced and stable basis, 1 = every iterations";
+      "at max, after how many simplex pivots do we store the advanced and stable basis, 1 = every iterations";
    lower[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] = 1;
    upper[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] = INT_MAX;
-   defaultValue[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] = 1;
+   defaultValue[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] = 10000;
 }
 
 template <class R>

@@ -151,6 +151,11 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
    int   stallRefIter;
    int   stallNumRecovers;
 
+   int timesBasisWasStored = 0; /// number of times the current basis was stored in oldBasisStatusRows oldBasisStatusCols
+   /* storeBasisFreqLog : if true, store basis if iterations() == 2^timesBasisWasStored
+                          else, store basis if iterations() % store_basis_simplex_freq == 0 */
+   bool storeBasisFreqLog = true;
+
    if(dim() <= 0 && coDim() <= 0)  // no problem loaded
    {
       m_status = NO_PROBLEM;
@@ -318,8 +323,22 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
             {
                printDisplayLine();
 
-               if(store_basis_during_simplex_before && (iterations() % store_basis_simplex_freq == 0 || iterations() < store_basis_simplex_freq))
-                  getBasis(oldBasisStatusRows.get_ptr(), oldBasisStatusCols.get_ptr(), oldBasisStatusRows.size(), oldBasisStatusCols.size());
+               // if it is time to store the basis, store it
+               if(store_basis_during_simplex_before)
+               {
+                  if((storeBasisFreqLog && iterations() == pow(2, timesBasisWasStored))
+                     || (!storeBasisFreqLog && iterations() % store_basis_simplex_freq == 0))
+                  {
+                     // switch off storeBasisFreqLog if 2^timesBasisWasStored becomes too big
+                     // in order to avoid computing enormous powers of 2
+                     if(storeBasisFreqLog && pow(2, timesBasisWasStored) > store_basis_simplex_freq)
+                        storeBasisFreqLog = false;
+
+                     // store basis
+                     getBasis(oldBasisStatusRows.get_ptr(), oldBasisStatusCols.get_ptr(), oldBasisStatusRows.size(), oldBasisStatusCols.size());
+                     timesBasisWasStored ++;
+                  }
+               }
 
                enterId = thepricer->selectEnter();
 
@@ -702,8 +721,22 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
             {
                printDisplayLine();
 
-               if(store_basis_during_simplex_before && (iterations() % store_basis_simplex_freq == 0 || iterations() < store_basis_simplex_freq))
-                  getBasis(oldBasisStatusRows.get_ptr(), oldBasisStatusCols.get_ptr(), oldBasisStatusRows.size(), oldBasisStatusCols.size());
+               // if it is time to store the basis, store it
+               if(store_basis_during_simplex_before)
+               {
+                  if((storeBasisFreqLog && iterations() == pow(2, timesBasisWasStored))
+                     || (!storeBasisFreqLog && iterations() % store_basis_simplex_freq == 0))
+                  {
+                     // switch off storeBasisFreqLog if 2^timesBasisWasStored becomes too big
+                     // in order to avoid computing enormous powers of 2
+                     if(storeBasisFreqLog && pow(2, timesBasisWasStored) > store_basis_simplex_freq)
+                        storeBasisFreqLog = false;
+
+                     // store basis
+                     getBasis(oldBasisStatusRows.get_ptr(), oldBasisStatusCols.get_ptr(), oldBasisStatusRows.size(), oldBasisStatusCols.size());
+                     timesBasisWasStored ++;
+                  }
+               }
 
                leaveNum = thepricer->selectLeave();
 
