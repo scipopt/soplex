@@ -3474,7 +3474,6 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
 {
    assert(boolParam(SoPlexBase<R>::ITERATIVE_REFINEMENT));
    assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
-   assert(!primalFeasible || !dualFeasible);
 
    // start rational solving timing
    _statistics->rationalTime->start();

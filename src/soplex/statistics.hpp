@@ -91,6 +91,11 @@ typename SoPlexBase<R>::Statistics& SoPlexBase<R>::Statistics::operator=(const S
    pivotRefinements = rhs.pivotRefinements;
    feasRefinements = rhs.feasRefinements;
    unbdRefinements = rhs.unbdRefinements;
+   precBoosts = rhs.precBoosts;
+   stallPrecBoosts = rhs.stallPrecBoosts;
+   pivotPrecBoosts = rhs.pivotPrecBoosts;
+   feasPrecBoosts = rhs.feasPrecBoosts;
+   unbdPrecBoosts = rhs.unbdPrecBoosts;
 
    return *this;
 }
@@ -140,6 +145,11 @@ void SoPlexBase<R>::Statistics::clearSolvingData()
    pivotRefinements = 0;
    feasRefinements = 0;
    unbdRefinements = 0;
+   precBoosts = 0;
+   stallPrecBoosts = 0;
+   pivotPrecBoosts = 0;
+   feasPrecBoosts = 0;
+   unbdPrecBoosts = 0;
 
    callsReducedProb = 0;
    iterationsInit = 0;
