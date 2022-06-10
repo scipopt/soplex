@@ -465,7 +465,7 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
    description[SoPlexBase<R>::UPDATETOLSMODE] =
       "mode for updating tolerances (0 - fp-fp, 1 - multiprecision-fp, 2 - multiprecision-0)";
    lower[SoPlexBase<R>::UPDATETOLSMODE] = 0;
-   upper[SoPlexBase<R>::UPDATETOLSMODE] = 1;
+   upper[SoPlexBase<R>::UPDATETOLSMODE] = 2;
    defaultValue[SoPlexBase<R>::UPDATETOLSMODE] = 1;
 
    // maximum number of bits for the mantissa when using multiprecision
