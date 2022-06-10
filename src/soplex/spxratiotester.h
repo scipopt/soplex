@@ -88,10 +88,14 @@ public:
    /// set allowed bound violation
    virtual void setDelta(R newDelta)
    {
-      if(newDelta <= DEFAULT_EPS_ZERO)
+#ifdef SOPLEX_DISABLED_CODE
+      if(newDelta <= DEFAULT_EPS_ZERO) ///@todo precision-boosting remove the hard check
          delta = DEFAULT_EPS_ZERO;
       else
          delta = newDelta;
+#else
+      delta = newDelta;
+#endif
    }
 
    /// get allowed bound violation

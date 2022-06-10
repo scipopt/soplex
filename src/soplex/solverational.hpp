@@ -3230,7 +3230,7 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
       if (intParam(SoPlexBase<R>::UPDATETOLSMODE) == 0)
       {
          double tolerance = pow(10,-(int)(BP::default_precision()*_tolPrecisionRatio));
-         double epsilon   = pow(10,-(int)(BP::default_precision()*_epsPrecisionRatio));
+         double epsilon   = pow(10,-(int)(BP::default_precision()*_epsZeroPrecisionRatio));
          double global_epsilon = epsilon;
 
          // decrease tolerances
@@ -3247,11 +3247,23 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
 
       } else {
          BP tolerance = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_tolPrecisionRatio));
-         BP epsilon   = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_epsPrecisionRatio));
-         double global_epsilon = (double)epsilon;
 
-         if(intParam(SoPlexBase<R>::UPDATETOLSMODE) == 2) {
-            global_epsilon = 0;
+         BP epsilonZero   = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_epsZeroPrecisionRatio));
+         BP epsilonFactor = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_epsFactorPrecisionRatio));
+         BP epsilonUpdate = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_epsUpdatePrecisionRatio));
+         BP epsilonPivot  = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_epsPivotPrecisionRatio));
+
+         double dbEpsilonZero = (double)epsilonZero;
+         double dbEpsilonFactor = (double)epsilonFactor;
+         double dbEpsilonUpdate = (double)epsilonUpdate;
+         double dbEpsilonPivot = (double)epsilonPivot;
+
+         if(intParam(SoPlexBase<R>::UPDATETOLSMODE) == 2)
+         {
+            dbEpsilonZero = 0;
+            dbEpsilonFactor = 0;
+            dbEpsilonUpdate = 0;
+            dbEpsilonPivot = 0;
          }
 
          // decrease tolerances
@@ -3259,12 +3271,12 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
          _boostedSolver.setOpttol( tolerance);
 
          // set epsilon for updateVectors primVec, dualVec, addVec
-         _boostedSolver.setEpsilon(epsilon);
+         _boostedSolver.setEpsilon(epsilonUpdate);
          // set epsilons globally
-         Param::setEpsilon(             global_epsilon);
-         Param::setEpsilonFactorization(global_epsilon);
-         Param::setEpsilonUpdate(       global_epsilon);
-         Param::setEpsilonPivot(        global_epsilon);
+         Param::setEpsilon(             dbEpsilonZero);
+         Param::setEpsilonFactorization(dbEpsilonFactor);
+         Param::setEpsilonUpdate(       dbEpsilonUpdate);
+         Param::setEpsilonPivot(        dbEpsilonPivot);
       }
    }
    else
@@ -3513,7 +3525,7 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
       if (intParam(SoPlexBase<R>::UPDATETOLSMODE) == 0)
       {
          double tolerance = pow(10,-(int)(BP::default_precision()*_tolPrecisionRatio));
-         double epsilon   = pow(10,-(int)(BP::default_precision()*_epsPrecisionRatio));
+         double epsilon   = pow(10,-(int)(BP::default_precision()*_epsZeroPrecisionRatio));
          double global_epsilon = epsilon;
 
          // decrease tolerances
@@ -3530,11 +3542,23 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
 
       } else {
          BP tolerance = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_tolPrecisionRatio));
-         BP epsilon   = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_epsPrecisionRatio));
-         double global_epsilon = (double)epsilon;
 
-         if(intParam(SoPlexBase<R>::UPDATETOLSMODE) == 2) {
-            global_epsilon = 0;
+         BP epsilonZero   = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_epsZeroPrecisionRatio));
+         BP epsilonFactor = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_epsFactorPrecisionRatio));
+         BP epsilonUpdate = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_epsUpdatePrecisionRatio));
+         BP epsilonPivot  = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_epsPivotPrecisionRatio));
+
+         double dbEpsilonZero = (double)epsilonZero;
+         double dbEpsilonFactor = (double)epsilonFactor;
+         double dbEpsilonUpdate = (double)epsilonUpdate;
+         double dbEpsilonPivot = (double)epsilonPivot;
+
+         if(intParam(SoPlexBase<R>::UPDATETOLSMODE) == 2)
+         {
+            dbEpsilonZero = 0;
+            dbEpsilonFactor = 0;
+            dbEpsilonUpdate = 0;
+            dbEpsilonPivot = 0;
          }
 
          // decrease tolerances
@@ -3542,12 +3566,12 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
          _boostedSolver.setOpttol( tolerance);
 
          // set epsilon for updateVectors primVec, dualVec, addVec
-         _boostedSolver.setEpsilon(epsilon);
+         _boostedSolver.setEpsilon(epsilonUpdate);
          // set epsilons globally
-         Param::setEpsilon(             global_epsilon);
-         Param::setEpsilonFactorization(global_epsilon);
-         Param::setEpsilonUpdate(       global_epsilon);
-         Param::setEpsilonPivot(        global_epsilon);
+         Param::setEpsilon(             dbEpsilonZero);
+         Param::setEpsilonFactorization(dbEpsilonFactor);
+         Param::setEpsilonUpdate(       dbEpsilonUpdate);
+         Param::setEpsilonPivot(        dbEpsilonPivot);
       }
    }
    else

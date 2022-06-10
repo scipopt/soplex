@@ -1749,8 +1749,15 @@ private:
 
    ///@todo precision-boosting maybe use a `using` or `define`
    int _initialPrecision   = 50;
-   Real _tolPrecisionRatio = 0.7;
-   Real _epsPrecisionRatio = 0.8;
+
+   /// ratios for computing the tolerances for precision boosting
+   /// ratio denotes the proportion of precision used by the tolerance
+   /// e.g. ratio = 0.65, precision = 100 digits, new tol = 10^(0.65*100)
+   Real _tolPrecisionRatio = 0.65;
+   Real _epsZeroPrecisionRatio = 1.0;
+   Real _epsFactorPrecisionRatio = 1.25;
+   Real _epsUpdatePrecisionRatio = 1.0;
+   Real _epsPivotPrecisionRatio = 0.625;
 
    bool _updateTolsMode;
 
