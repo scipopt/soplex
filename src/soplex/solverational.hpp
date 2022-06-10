@@ -568,7 +568,8 @@ void SoPlexBase<R>::_performOptIRWrapper(
             _solveRealForRationalBoostedStable(sol, primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error, needNewBoostedIt);
 
             // update statistics for precision boosting
-            _updateBoostingStatistics();
+            if(_statistics->precBoosts > 1) // if == 1 statistics have already been updated in _solveRealForRationalBoostedStable
+               _updateBoostingStatistics();
 
             // boost precision if no success
             if(needNewBoostedIt)
@@ -3301,6 +3302,11 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
    _statistics->rationalTime->stop();
    _solveRealForRationalBoosted(boostedPrimalReal, boostedDualReal, _basisStatusRows, _basisStatusCols, boostedResult, true);
 
+   // special case on the first boosted iteration
+   // otherwise attributs such as _factorSolNewBasisPrecBoost are not updated correctly
+   if(_statistics->precBoosts == 1)
+      _updateBoostingStatistics();
+
    // evalute result
    if(_evaluateResultBoosted(boostedResult, false, sol, boostedDualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                   error))
@@ -5905,7 +5911,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                // get the last stable basis.
                if(_basisWasStoredDuringSimplex())
                   _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
-               
+
                break;
             }
 
