@@ -33,6 +33,8 @@ SoPlexBase<R>::Statistics::Statistics(Timer::TYPE ttype)
    syncTime = TimerFactory::createTimer(timerType);
    transformTime = TimerFactory::createTimer(timerType);
    rationalTime = TimerFactory::createTimer(timerType);
+   initialPrecisionTime = TimerFactory::createTimer(timerType);
+   extendedPrecisionTime = TimerFactory::createTimer(timerType);
    reconstructionTime = TimerFactory::createTimer(timerType);
    boostingStepTime = TimerFactory::createTimer(timerType);
    clearAllData();
@@ -50,6 +52,8 @@ SoPlexBase<R>::Statistics::Statistics(const Statistics& base)
    syncTime = TimerFactory::createTimer(timerType);
    transformTime = TimerFactory::createTimer(timerType);
    rationalTime = TimerFactory::createTimer(timerType);
+   initialPrecisionTime = TimerFactory::createTimer(timerType);
+   extendedPrecisionTime = TimerFactory::createTimer(timerType);
    reconstructionTime = TimerFactory::createTimer(timerType);
    boostingStepTime = TimerFactory::createTimer(timerType);
    clearAllData();
@@ -66,6 +70,8 @@ typename SoPlexBase<R>::Statistics& SoPlexBase<R>::Statistics::operator=(const S
    *syncTime = *(rhs.syncTime);
    *transformTime = *(rhs.transformTime);
    *rationalTime = *(rhs.rationalTime);
+   *initialPrecisionTime = *(rhs.initialPrecisionTime);
+   *extendedPrecisionTime = *(rhs.extendedPrecisionTime);
    *reconstructionTime = *(rhs.reconstructionTime);
    *boostingStepTime = *(rhs.boostingStepTime);
    timerType = rhs.timerType;
@@ -121,6 +127,8 @@ void SoPlexBase<R>::Statistics::clearSolvingData()
    syncTime->reset();
    transformTime->reset();
    rationalTime->reset();
+   initialPrecisionTime->reset();
+   extendedPrecisionTime->reset();
    reconstructionTime->reset();
    boostingStepTime->reset();
    multTimeSparse = 0.0;
@@ -220,6 +228,16 @@ void SoPlexBase<R>::Statistics::print(std::ostream& os)
 
    if(solTime > 0)
       os << " (" << 100 * rationalTime->time() / solTime << "% of solving time)";
+
+   os << "\n  InitialPrecision  : " << initialPrecisionTime->time();
+
+   if(solTime > 0)
+      os << " (" << 100 * initialPrecisionTime->time() / solTime << "% of solving time)";
+
+   os << "\n  ExtendedPrecision : " << extendedPrecisionTime->time();
+
+   if(solTime > 0)
+      os << " (" << 100 * extendedPrecisionTime->time() / solTime << "% of solving time)";
 
    os << "\n  BoostingStep      : " << boostingStepTime->time();
 

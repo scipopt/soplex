@@ -35,6 +35,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
    // start timing
    _statistics->solvingTime->start();
    _statistics->preprocessingTime->start();
+   _statistics->initialPrecisionTime->start();
 
    // remember that last solve was rational
    _lastSolveMode = SOLVEMODE_RATIONAL;
@@ -489,6 +490,8 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
    }
 
    // stop timing
+   _statistics->initialPrecisionTime->stop();
+   _statistics->extendedPrecisionTime->stop();
    _statistics->solvingTime->stop();
 }
 
@@ -2852,6 +2855,11 @@ void SoPlexBase<R>::_switchToBoosted()
    if(!_switchedToBoosted)
    {
       MSG_INFO1(spxout, spxout << "Numerical troubles with initial precision solver. Disabling it and switching to multiprecision.\n");
+
+      // switch timer
+      _statistics->initialPrecisionTime->stop();
+      _statistics->extendedPrecisionTime->start();
+
       _switchedToBoosted = true;
       _hasBasis = (_boostedSolver.basis().status() > SPxBasisBase<BP>::NO_PROBLEM);
    }
