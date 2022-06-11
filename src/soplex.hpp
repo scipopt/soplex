@@ -474,7 +474,9 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
       "maximum number of bits for the mantissa when using multiprecision";
    lower[SoPlexBase<R>::MANTISSA_MAX_BITS] = 168;
    upper[SoPlexBase<R>::MANTISSA_MAX_BITS] = INT_MAX;
-   defaultValue[SoPlexBase<R>::MANTISSA_MAX_BITS] = 10000;
+   defaultValue[SoPlexBase<R>::MANTISSA_MAX_BITS] = 1000; // if precision is too high, double tolerances are rounded to zero
+   // 1000 \approx log2(10^(300)), 300 being the greatest int k such that (double)1e-k != 0
+   // 1000 bits for the mantissa is equivalent to roughly 300 decimals
 
    // at max, after how many simplex pivots do we store the advanced and stable basis, 1 = every iterations
    name[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] = "store_basis_simplex_freq";
