@@ -34,6 +34,7 @@ SoPlexBase<R>::Statistics::Statistics(Timer::TYPE ttype)
    transformTime = TimerFactory::createTimer(timerType);
    rationalTime = TimerFactory::createTimer(timerType);
    reconstructionTime = TimerFactory::createTimer(timerType);
+   boostingStepTime = TimerFactory::createTimer(timerType);
    clearAllData();
 }
 
@@ -50,6 +51,7 @@ SoPlexBase<R>::Statistics::Statistics(const Statistics& base)
    transformTime = TimerFactory::createTimer(timerType);
    rationalTime = TimerFactory::createTimer(timerType);
    reconstructionTime = TimerFactory::createTimer(timerType);
+   boostingStepTime = TimerFactory::createTimer(timerType);
    clearAllData();
 }
 
@@ -65,6 +67,7 @@ typename SoPlexBase<R>::Statistics& SoPlexBase<R>::Statistics::operator=(const S
    *transformTime = *(rhs.transformTime);
    *rationalTime = *(rhs.rationalTime);
    *reconstructionTime = *(rhs.reconstructionTime);
+   *boostingStepTime = *(rhs.boostingStepTime);
    timerType = rhs.timerType;
    multTimeSparse = rhs.multTimeSparse;
    multTimeFull = rhs.multTimeFull;
@@ -119,6 +122,7 @@ void SoPlexBase<R>::Statistics::clearSolvingData()
    transformTime->reset();
    rationalTime->reset();
    reconstructionTime->reset();
+   boostingStepTime->reset();
    multTimeSparse = 0.0;
    multTimeFull = 0.0;
    multTimeColwise = 0.0;
@@ -216,6 +220,11 @@ void SoPlexBase<R>::Statistics::print(std::ostream& os)
 
    if(solTime > 0)
       os << " (" << 100 * rationalTime->time() / solTime << "% of solving time)";
+
+   os << "\n  BoostingStep      : " << boostingStepTime->time();
+
+   if(solTime > 0)
+      os << " (" << 100 * boostingStepTime->time() / solTime << "% of solving time)";
 
    os << "\n  Other             : " << otherTime;
 

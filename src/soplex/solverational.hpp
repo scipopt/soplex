@@ -2869,6 +2869,8 @@ void SoPlexBase<R>::_setupBoostedSolver()
 {
    assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
 
+   _statistics->boostingStepTime->start();
+
    if(_isBoostedStartingFromSlack())
    {
       // start the solving from slack basis
@@ -2899,6 +2901,8 @@ void SoPlexBase<R>::_setupBoostedSolver()
       _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusRows, _basisStatusRows);
       _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusCols, _basisStatusCols);
    }
+
+   _statistics->boostingStepTime->stop();
 }
 
 
@@ -2909,6 +2913,8 @@ bool SoPlexBase<R>::_boostPrecision()
 {
    assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
    assert(_switchedToBoosted);
+
+   _statistics->boostingStepTime->start();
 
    _statistics->precBoosts++;
    // remember the number of iterations for the next comparison
@@ -2937,7 +2943,6 @@ bool SoPlexBase<R>::_boostPrecision()
                                  << "To increase this limit, modify the parameter mantissa_max_bits.\n"
                                  << "Giving up.\n");
          _boostingLimitReached = true;
-         return false;
       }
    }
    else if(_statistics->precBoosts > 2)
@@ -2957,11 +2962,12 @@ bool SoPlexBase<R>::_boostPrecision()
                                  << "To increase this limit, modify the parameter mantissa_max_bits.\n"
                                  << "Giving up.\n");
          _boostingLimitReached = true;
-         return false;
       }
    }
 
-   return true;
+   _statistics->boostingStepTime->stop();
+
+   return !_boostingLimitReached;
 }
 
 
@@ -3224,6 +3230,8 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
    // initialize boosted solver
    _boostedSolver.init();
 
+   _statistics->boostingStepTime->start();
+
    // set tolerances of the boosted solver
    if(boolParam(SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION))
    {
@@ -3284,6 +3292,8 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
       _boostedSolver.setFeastol(realParam(SoPlexBase<R>::FPFEASTOL));
       _boostedSolver.setOpttol(realParam(SoPlexBase<R>::FPFEASTOL));
    }
+
+   _statistics->boostingStepTime->stop();
 
    typename SPxSolverBase<BP>::Status boostedResult = SPxSolverBase<BP>::UNKNOWN;
 
@@ -3519,6 +3529,8 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
    // initialize boosted solver
    _boostedSolver.init();
 
+   _statistics->boostingStepTime->start();
+
    // set tolerances of the boosted solver
    if(boolParam(SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION))
    {
@@ -3579,6 +3591,8 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
       _boostedSolver.setFeastol(realParam(SoPlexBase<R>::FPFEASTOL));
       _boostedSolver.setOpttol(realParam(SoPlexBase<R>::FPFEASTOL));
    }
+
+   _statistics->boostingStepTime->stop();
 
    // declare real vectors after boosting precision
    VectorBase<BP> boostedPrimalReal(numColsRational());

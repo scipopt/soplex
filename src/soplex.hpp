@@ -10281,6 +10281,7 @@ void SoPlexBase<R>::setTimings(const Timer::TYPE ttype)
    _statistics->rationalTime = TimerFactory::switchTimer(_statistics->rationalTime, ttype);
    _statistics->transformTime = TimerFactory::switchTimer(_statistics->transformTime, ttype);
    _statistics->reconstructionTime = TimerFactory::switchTimer(_statistics->reconstructionTime, ttype);
+   _statistics->boostingStepTime = TimerFactory::switchTimer(_statistics->boostingStepTime, ttype);
 }
 
 /// prints solution statistics

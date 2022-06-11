@@ -61,6 +61,7 @@ public:
       transformTime->~Timer();
       rationalTime->~Timer();
       reconstructionTime->~Timer();
+      boostingStepTime->~Timer();
       spx_free(readingTime);
       spx_free(solvingTime);
       spx_free(preprocessingTime);
@@ -69,6 +70,7 @@ public:
       spx_free(transformTime);
       spx_free(rationalTime);
       spx_free(reconstructionTime);
+      spx_free(boostingStepTime);
    }
 
    /// clears all statistics
@@ -95,6 +97,7 @@ public:
    Timer* transformTime; ///< time for transforming LPs (included in solving time)
    Timer* rationalTime; ///< time for rational LP solving (included in solving time)
    Timer* reconstructionTime; ///< time for rational reconstructions
+   Timer* boostingStepTime; ///< time for the precision boosting step (boost, load LP, load basis, decrease tols)
    Timer::TYPE timerType; ///< type of timer (user or wallclock)
 
    Real multTimeSparse; ///< time for computing A*x exploiting sparsity (setupPupdate(), PRICE step)
