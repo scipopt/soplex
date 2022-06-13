@@ -124,6 +124,11 @@ public:
    int iterationsFromBasis; ///< number of iterations from Basis
    int iterationsPolish; ///< number of iterations during solution polishing
    int boundflips; ///< number of dual bound flips
+   int boostedIterations; ///< number of iterations/pivots in extended precision
+   int boostedIterationsPrimal; ///< number of iterations with Primal
+   int boostedIterationsFromBasis; ///< number of iterations from Basis
+   int boostedIterationsPolish; ///< number of iterations during solution polishing
+   int boostedBoundflips; ///< number of dual bound flips
    int luFactorizationsReal; ///< number of basis matrix factorizations in real precision
    int luSolvesReal; ///< number of (forward and backward) solves with basis matrix in real precision
    int luFactorizationsRational; ///< number of basis matrix factorizations in rational precision

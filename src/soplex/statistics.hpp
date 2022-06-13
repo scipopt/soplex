@@ -90,7 +90,13 @@ typename SoPlexBase<R>::Statistics& SoPlexBase<R>::Statistics::operator=(const S
    iterations = rhs.iterations;
    iterationsPrimal = rhs.iterationsPrimal;
    iterationsFromBasis = rhs.iterationsFromBasis;
+   iterationsPolish = rhs.iterationsPolish;
    boundflips = rhs.boundflips;
+   boostedIterations = rhs.boostedIterations;
+   boostedIterationsPrimal = rhs.boostedIterationsPrimal;
+   boostedIterationsFromBasis = rhs.boostedIterationsFromBasis;
+   boostedIterationsPolish = rhs.boostedIterationsPolish;
+   boostedBoundflips = rhs.boostedBoundflips;
    luFactorizationsReal = rhs.luFactorizationsReal;
    luSolvesReal = rhs.luSolvesReal;
    luFactorizationsRational = rhs.luFactorizationsRational;
@@ -148,6 +154,11 @@ void SoPlexBase<R>::Statistics::clearSolvingData()
    iterationsFromBasis = 0;
    iterationsPolish = 0;
    boundflips = 0;
+   boostedIterations = 0;
+   boostedIterationsPrimal = 0;
+   boostedIterationsFromBasis = 0;
+   boostedIterationsPolish = 0;
+   boostedBoundflips = 0;
    luFactorizationsReal = 0;
    luSolvesReal = 0;
    luFactorizationsRational = 0;
@@ -284,6 +295,30 @@ void SoPlexBase<R>::Statistics::print(std::ostream& os)
 
    os << "\n  Bound flips       : " << boundflips;
    os << "\n  Sol. polishing    : " << iterationsPolish;
+
+   os << "\nIterationsBoosted   : " << boostedIterations << "\n"
+      << "  From scratch      : " << int(boostedIterations - boostedIterationsFromBasis);
+
+   if(boostedIterations > 0)
+      os << " (" << 100 * double((boostedIterations - boostedIterationsFromBasis)) / double(boostedIterations) << "%)";
+
+   os << "\n  From basis        : " << boostedIterationsFromBasis;
+
+   if(boostedIterations > 0)
+      os << " (" << 100 * double(boostedIterationsFromBasis) / double(boostedIterations) << "%)";
+
+   os << "\n  Primal            : " << boostedIterationsPrimal;
+
+   if(boostedIterations > 0)
+      os << " (" << 100 * double(boostedIterationsPrimal) / double(boostedIterations) << "%)";
+
+   os << "\n  Dual              : " << boostedIterations - boostedIterationsPrimal - boostedIterationsPolish;
+
+   if(boostedIterations > 0)
+      os << " (" << 100 * double((boostedIterations - boostedIterationsPrimal)) / double(boostedIterations) << "%)";
+
+   os << "\n  Bound flips       : " << boostedBoundflips;
+   os << "\n  Sol. polishing    : " << boostedIterationsPolish;
 
    os << "\nLU factorizations   : " << luFactorizationsReal << "\n"
       << "  Factor. frequency : ";

@@ -8511,6 +8511,11 @@ void SoPlexBase<R>::_solveBoostedRealLPAndRecordStatistics(volatile bool* interr
    _statistics->iterationsFromBasis += _hadBasis ? _boostedSolver.iterations() : 0;
    _statistics->iterationsPolish += _boostedSolver.polishIterations();
    _statistics->boundflips += _boostedSolver.boundFlips();
+   _statistics->boostedIterations += _boostedSolver.iterations();
+   _statistics->boostedIterationsPrimal += _boostedSolver.primalIterations();
+   _statistics->boostedIterationsFromBasis += _hadBasis ? _boostedSolver.iterations() : 0;
+   _statistics->boostedIterationsPolish += _boostedSolver.polishIterations();
+   _statistics->boostedBoundflips += _boostedSolver.boundFlips();
    _statistics->multTimeSparse += _boostedSolver.multTimeSparse->time();
    _statistics->multTimeFull += _boostedSolver.multTimeFull->time();
    _statistics->multTimeColwise += _boostedSolver.multTimeColwise->time();

@@ -2879,23 +2879,12 @@ void SoPlexBase<R>::_setupBoostedSolver()
 
    _statistics->boostingStepTime->start();
 
-   if(_isBoostedStartingFromSlack())
-   {
-      // start the solving from slack basis
-      // load the data from the rationalLP and init slack basis
-      _boostedSolver.loadLP(*_rationalLP, true);
-   }
-   else
-   {
-      // start from last basis of boosted solver; thus no need to do anything, the basis is already loaded
-      _boostedSolver.loadLP(*_rationalLP, false);
+   // load the data from the rationalLP
+   _boostedSolver.loadLP(*_rationalLP, false);
 
-      if(!_loadBasisFromOldBasis(true))
-      {
-         // if no basis available. Load slack basis into _boostedSolver
-         _boostedSolver.loadLP(*_rationalLP, true);
-      }
-   }
+   // if no warm-start, load available advanced basis
+   if(!_isBoostedStartingFromSlack())
+      _loadBasisFromOldBasis(true);
 
    _hasBasis = _boostedSolver.basis().status() > SPxBasisBase<BP>::NO_PROBLEM;
 
