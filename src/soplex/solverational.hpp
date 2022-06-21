@@ -5899,7 +5899,16 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
 
             // get the last stable basis. The hope is that precision boosting will get rid of cycling.
             if(_basisWasStoredDuringSimplex())
-               _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
+            {
+               try
+               {
+                  _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
+               }
+               catch
+               {
+                  MSG_INFO1(spxout, spxout << "Storage of last stable basis failed." << std::endl);
+               }
+            }
 
             break;
 
@@ -5931,7 +5940,16 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
 
             // get the last stable basis.
             if(_basisWasStoredDuringSimplex())
-               _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
+            {
+               try
+               {
+                  _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
+               }
+               catch
+               {
+                  MSG_INFO1(spxout, spxout << "Storage of last stable basis failed." << std::endl);
+               }
+            }
 
             break;
 
@@ -5945,7 +5963,16 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
 
                // get the last stable basis.
                if(_basisWasStoredDuringSimplex())
-                  _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
+               {
+                  try
+                  {
+                     _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
+                  }
+                  catch
+                  {
+                     MSG_INFO1(spxout, spxout << "Storage of last stable basis failed." << std::endl);
+                  }
+               }
 
                break;
             }
@@ -5966,7 +5993,16 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
 
             // if possible, get the last stable basis, otherwise store the infeasible basis.
             if(_basisWasStoredDuringSimplex())
-               _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
+            {
+               try
+               {
+                  _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
+               }
+               catch
+               {
+                  MSG_INFO1(spxout, spxout << "Storage of last stable basis failed." << std::endl);
+               }
+            }
             else
                _storeBasisAsOldBasis(basisStatusRows, basisStatusCols);
 
@@ -5980,7 +6016,16 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
 
             // get the last stable basis.
             if(_basisWasStoredDuringSimplex())
-               _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
+            {
+               try
+               {
+                  _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
+               }
+               catch
+               {
+                  MSG_INFO1(spxout, spxout << "Storage of last stable basis failed." << std::endl);
+               }
+            }
 
             break;
          }
