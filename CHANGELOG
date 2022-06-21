@@ -1,14 +1,6 @@
 upcoming Release 6.0.1
 =============================
 
-features:
-
-interface & parameters:
-
-performance:
-
-code quality:
-
 fixed bugs:
 - fix bug in varStatusToBasisStatusCol when setting Basis for implicitly free variables
 
