@@ -28,6 +28,10 @@ namespace soplex
 template <class R>
 void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
 {
+#ifndef SOPLEX_WITH_BOOST
+   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   return;
+#else
    bool hasUnboundedRay = false;
    bool infeasibilityNotCertified = false;
    bool unboundednessNotCertified = false;
@@ -370,6 +374,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
 
    // stop timing
    _statistics->solvingTime->stop();
+#endif
 }
 
 

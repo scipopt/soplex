@@ -6003,9 +6003,20 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
    case SoPlexBase<R>::READMODE:
       switch(value)
       {
+#ifndef SOPLEX_WITH_BOOST
+
+      case READMODE_REAL:
+         break;
+
+      case READMODE_RATIONAL:
+         MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+         return false;
+#else
+
       case READMODE_REAL:
       case READMODE_RATIONAL:
          break;
+#endif
 
       default:
          return false;
@@ -6017,10 +6028,23 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
    case SoPlexBase<R>::SOLVEMODE:
       switch(value)
       {
+#ifndef SOPLEX_WITH_BOOST
+
+      case SOLVEMODE_REAL:
+      case SOLVEMODE_AUTO:
+         break;
+
+      case SOLVEMODE_RATIONAL:
+         MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+         return false;
+#else
+
       case SOLVEMODE_REAL:
       case SOLVEMODE_AUTO:
       case SOLVEMODE_RATIONAL:
+
          break;
+#endif
 
       default:
          return false;
