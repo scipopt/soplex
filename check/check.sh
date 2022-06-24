@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
 #*                                                                           *#
 #*                  This file is part of the class library                   *#
@@ -24,8 +24,8 @@ BINNAME="${BINNAME}.${HOST}"
 
 OUTPUTDIR=results/quick
 
-SOPLEX_BOOST_SUPPORT="$(../${EXECUTABLE} --solvemode=2 | grep 'without linking boost is not supported'|head -n 1)"
-if [[ "${SOPLEX_BOOST_SUPPORT}" == "Using rational methods without linking boost is not supported" ]]
+SOPLEX_BOOST_SUPPORT="$(../${EXECUTABLE} --solvemode=2 check/instances/galenet.mps 2>&1 | grep 'rational solve without Boost not defined' )"
+if [[ "${SOPLEX_BOOST_SUPPORT}" =~ "rational solve without Boost not defined" ]]
 then
     SETTINGSLIST=(default devex steep)
 else
