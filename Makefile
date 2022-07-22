@@ -122,12 +122,10 @@ LIBOBJ = 	soplex/didxset.o \
 				soplex/idxset.o \
 				soplex/mpsinput.o \
 				soplex/nameset.o \
-				soplex/ratrecon.o \
 				soplex/spxdefines.o \
 				soplex/spxgithash.o \
 				soplex/spxid.o \
 				soplex/spxout.o \
-				soplex/spxscaler.o \
 				soplex/usertimer.o \
 				soplex/wallclocktimer.o
 
