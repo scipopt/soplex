@@ -200,7 +200,11 @@ SoPlexBase<R>::Settings::BoolParam::BoolParam()
    name[SoPlexBase<R>::PRECISION_BOOSTING] = "precision_boosting";
    description[SoPlexBase<R>::PRECISION_BOOSTING] =
       "enable precision boosting";
+#ifdef SOPLEX_WITH_MPFR
    defaultValue[SoPlexBase<R>::PRECISION_BOOSTING] = true;
+#else
+   defaultValue[SoPlexBase<R>::PRECISION_BOOSTING] = false;
+#endif
 
    name[SoPlexBase<R>::BOOSTED_WARM_START] = "boosted_warm_start";
    description[SoPlexBase<R>::BOOSTED_WARM_START] =
@@ -5910,11 +5914,6 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
       break;
 
    case ADAPT_TOLS_TO_MULTIPRECISION:
-#ifndef SOPLEX_WITH_MPFR
-      MSG_INFO1(spxout, spxout <<
-                "Setting Parameter adapt_tols_to_multiprecision is only possible if SoPlex is build with MPFR\n");
-      return false;
-#endif
       break;
 
    case PRECISION_BOOSTING:
@@ -5926,11 +5925,6 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
       break;
 
    case BOOSTED_WARM_START:
-#ifndef SOPLEX_WITH_MPFR
-      MSG_INFO1(spxout, spxout <<
-                "Setting Parameter boosted_warm_start is only possible if SoPlex is build with MPFR\n");
-      return false;
-#endif
       break;
 
    case RECOVERY_MECHANISM:
@@ -5947,7 +5941,6 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
       _solver.setStoreBasisDuringSimplexBefore(value);
       _boostedSolver.setStoreBasisDuringSimplexBefore(value);
       break;
-
    default:
       return false;
    }
@@ -6477,7 +6470,6 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       }
 
       break;
-
    // maximum number of bits for the mantissa when using multiprecision
    case SoPlexBase<R>::MANTISSA_MAX_BITS:
       break;
@@ -6487,7 +6479,6 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       _solver.setStoreBasisSimplexFreq(value);
       _boostedSolver.setStoreBasisSimplexFreq(value);
       break;
-
    default:
       return false;
    }
@@ -6681,12 +6672,10 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
 #endif
       break;
 
-#ifdef SOPLEX_WITH_MPFR
    // factor by which the precision of the floating-point solver is multiplied
    case SoPlexBase<R>::PRECISION_BOOSTING_FACTOR:
       Param::setPrecisionBoostingFactor(Real(value));
       break;
-#endif
 
    default:
       return false;
@@ -7343,8 +7332,6 @@ void SoPlexBase<R>::_rangeToPerm(int start, int end, int* perm, int permSize) co
 }
 
 
-
-#ifdef SOPLEX_WITH_MPFR
 /// checks consistency
 template <class R>
 bool SoPlexBase<R>::_isBoostedConsistent() const
@@ -7379,8 +7366,6 @@ bool SoPlexBase<R>::_isBoostedConsistent() const
 
    return true;
 }
-#endif
-
 
 
 /// checks consistency
@@ -8378,7 +8363,6 @@ void SoPlexBase<R>::_ensureRealLPLoaded()
 
 
 
-#ifdef SOPLEX_WITH_MPFR
 /// call floating-point solver and update statistics on iterations etc.
 template <class R>
 void SoPlexBase<R>::_solveBoostedRealLPAndRecordStatistics(volatile bool* interrupt)
@@ -8535,8 +8519,6 @@ void SoPlexBase<R>::_solveBoostedRealLPAndRecordStatistics(volatile bool* interr
    _statistics->sumDualDegen += R(_boostedSolver.sumDualDegeneracy());
    _statistics->sumPrimalDegen += R(_boostedSolver.sumPrimalDegeneracy());
 }
-#endif
-
 
 
 /// call floating-point solver and update statistics on iterations etc.
@@ -8913,6 +8895,8 @@ bool SoPlexBase<R>::_parseSettingsLine(char* line, const int lineNumber)
 {
    assert(line != 0);
 
+   bool success = true;
+
    // find the start of the parameter type
    while(*line == ' ' || *line == '\t' || *line == '\r')
       line++;
@@ -9048,7 +9032,7 @@ bool SoPlexBase<R>::_parseSettingsLine(char* line, const int lineNumber)
                   || strncasecmp(paramValueString, "T", 4) == 0
                   || strtol(paramValueString, NULL, 4) == 1)
             {
-               setBoolParam((SoPlexBase<R>::BoolParam)param, true);
+               success = setBoolParam((SoPlexBase<R>::BoolParam)param, true);
                break;
             }
             else if(strncasecmp(paramValueString, "false", 5) == 0
@@ -9057,7 +9041,7 @@ bool SoPlexBase<R>::_parseSettingsLine(char* line, const int lineNumber)
                     || strncasecmp(paramValueString, "F", 5) == 0
                     || strtol(paramValueString, NULL, 5) == 0)
             {
-               setBoolParam((SoPlexBase<R>::BoolParam)param, false);
+               success = setBoolParam((SoPlexBase<R>::BoolParam)param, false);
                break;
             }
             else
@@ -9069,7 +9053,7 @@ bool SoPlexBase<R>::_parseSettingsLine(char* line, const int lineNumber)
          }
       }
 
-      return true;
+      return success;
    }
 
    // check whether we have an integer parameter
@@ -9363,6 +9347,8 @@ bool SoPlexBase<R>::parseSettingsString(char* string)
 {
    assert(string != 0);
 
+   bool success = true;
+
    if(string == 0)
       return false;
 
@@ -9502,7 +9488,7 @@ bool SoPlexBase<R>::parseSettingsString(char* string)
                   || strncasecmp(paramValueString, "T", 4) == 0
                   || strtol(paramValueString, NULL, 4) == 1)
             {
-               setBoolParam((SoPlexBase<R>::BoolParam)param, true);
+               success = setBoolParam((SoPlexBase<R>::BoolParam)param, true);
                break;
             }
             else if(strncasecmp(paramValueString, "false", 5) == 0
@@ -9511,7 +9497,7 @@ bool SoPlexBase<R>::parseSettingsString(char* string)
                     || strncasecmp(paramValueString, "F", 5) == 0
                     || strtol(paramValueString, NULL, 5) == 0)
             {
-               setBoolParam((SoPlexBase<R>::BoolParam)param, false);
+               success = setBoolParam((SoPlexBase<R>::BoolParam)param, false);
                break;
             }
             else
@@ -9523,7 +9509,7 @@ bool SoPlexBase<R>::parseSettingsString(char* string)
          }
       }
 
-      return true;
+      return success;
    }
 
    // check whether we have an integer parameter
