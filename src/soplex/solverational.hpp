@@ -590,6 +590,12 @@ void SoPlexBase<R>::_performOptIRWrapper(
       }
    }
 #else
+   if( boolParam(SoPlexBase<R>::PRECISION_BOOSTING) )
+   {
+      MSG_ERROR(std::cerr << "ERROR: parameter precision_boosting is set to true but SoPlex was compiled without MPFR support " << std::endl;)
+      error = true;
+      return;
+   }
    // solve problem with iterative refinement and recovery mechanism
    _performOptIRStable(sol, acceptUnbounded, acceptInfeasible, minRounds,
                      primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
@@ -2845,7 +2851,6 @@ void SoPlexBase<R>::_performOptIRStable(
 
 
 
-#ifdef SOPLEX_WITH_MPFR
 /// disable initial precision solver and switch to boosted solver
 template <class R>
 void SoPlexBase<R>::_switchToBoosted()
@@ -3872,8 +3877,6 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
       _statistics->rationalTime->stop();
    }
 }
-#endif
-
 
 
 /// performs iterative refinement on the auxiliary problem for testing unboundedness
@@ -6268,7 +6271,6 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
 
 
 
-#ifdef SOPLEX_WITH_MPFR
 // General specializations
 /// solves real LP during iterative refinement
 ///@param initialSolve in
@@ -6595,7 +6597,6 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
       }
    }
 }
-#endif
 
 
 

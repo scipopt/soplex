@@ -1743,6 +1743,9 @@ private:
 
    // multiprecision type used for the boosted solver
    using BP = number<mpfr_float_backend<0>, et_off>;
+#else
+   using BP = number<gmp_float<50>, et_off>;
+#endif
 
    // boosted solver object
    SPxSolverBase<BP> _boostedSolver;
@@ -1804,7 +1807,6 @@ private:
    Presol<BP> _boostedSimplifierPaPILO;
 
    //--------------------------------------------------------------------------
-#endif
 
    bool _isRealLPLoaded; // true indicates that the original LP is loaded in the _solver variable, hence all actions
    // are performed on the original LP.
@@ -2040,7 +2042,6 @@ private:
    DataArray<typename SPxSolverBase<R>::VarStatus > _basisStatusRows;
    DataArray<typename  SPxSolverBase<R>::VarStatus > _basisStatusCols;
 
-#ifdef SOPLEX_WITH_MPFR
    // indicates wether an old basis is currently stored for warm start
    bool _hasOldBasis;
    bool _hasOldFeasBasis; // basis for testing feasibility
@@ -2069,7 +2070,6 @@ private:
    // mysolver.getBasis(_tmpBasisStatusRows, _tmpBasisStatusCols, _basisStatusRows.size(), _basisStatusCols.size())
    DataArray<typename SPxSolverBase<BP>::VarStatus > _tmpBasisStatusRows;
    DataArray<typename  SPxSolverBase<BP>::VarStatus > _tmpBasisStatusCols;
-#endif
 
    SolBase<R> _solReal;
    SolRational _solRational;
@@ -2105,10 +2105,8 @@ private:
    /// creates a permutation for removing rows/columns from a range of indices
    void _rangeToPerm(int start, int end, int* perm, int permSize) const;
 
-#ifdef SOPLEX_WITH_MPFR
    /// checks consistency for the boosted solver
    bool _isBoostedConsistent() const;
-#endif
 
    /// checks consistency
    bool _isConsistent() const;
@@ -2247,10 +2245,8 @@ private:
    /// ensures that the real LP and the basis are loaded in the solver; performs no sync
    void _ensureRealLPLoaded();
 
-#ifdef SOPLEX_WITH_MPFR
    /// call floating-point solver and update statistics on iterations etc.
    void _solveBoostedRealLPAndRecordStatistics(volatile bool* interrupt = NULL);
-#endif
 
    /// call floating-point solver and update statistics on iterations etc.
    void _solveRealLPAndRecordStatistics(volatile bool* interrupt = NULL);
@@ -2434,7 +2430,6 @@ private:
    /// dual vector accounts for the objective function vector
    void _updateReducedCosts(SolRational& sol, int& dualSize, const int& numCorrectedPrimals);
 
-#ifdef SOPLEX_WITH_MPFR
    /// stores floating-point solution of original LP as current rational solution and ensure that solution vectors have right dimension; ensure that solution is aligned with basis
    void _storeRealSolutionAsRationalBoosted(
       SolRational& sol,
@@ -2565,7 +2560,6 @@ private:
       bool& stoppedIter,
       bool& error,
       bool& needNewBoostedIt);
-#endif
 
    /// perform iterative refinement using the right precision
    void _performOptIRWrapper(
@@ -2695,14 +2689,12 @@ private:
          DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
          const bool forceNoSimplifier = false);
 
-#ifdef SOPLEX_WITH_MPFR
    /// solves real LP during iterative refinement
    void _solveRealForRationalBoosted(
          VectorBase<BP>& primal, VectorBase<BP>& dual,
          DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
          DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
          typename SPxSolverBase<BP>::Status& boostedResult, bool initialSolve);
-#endif
 
    /// computes rational inverse of basis matrix as defined by _rationalLUSolverBind
    void _computeBasisInverseRational();
