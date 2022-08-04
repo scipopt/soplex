@@ -5654,9 +5654,16 @@ void SoPlexBase<R>::_storeLastStableBasisBoosted(bool vanished)
       VectorBase<BP> tmpDual(vanished ? 0 : _boostedSolver.nRows());
       VectorBase<BP> tmpRedCost(vanished ? 0 : _boostedSolver.nCols());
 
-      ///@todo catch exception
-      _boostedSimplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost, _boostedSolver.oldBasisStatusRows.get_ptr(),
-                              _boostedSolver.oldBasisStatusCols.get_ptr());
+      try
+      {
+         _boostedSimplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost,
+                              _boostedSolver.oldBasisStatusRows.get_ptr(), _boostedSolver.oldBasisStatusCols.get_ptr());
+      }
+      catch(const SPxInternalCodeException& E)
+      {
+         // error message has already been printed
+         throw SPxInternalCodeException("Error storing the basis");
+      }
 
       // store basis for original problem
       _boostedSolver.oldBasisStatusRows.reSize(numRowsRational());
@@ -5683,9 +5690,16 @@ void SoPlexBase<R>::_storeLastStableBasis(bool vanished)
       VectorBase<R> tmpDual(vanished ? 0 : _solver.nRows());
       VectorBase<R> tmpRedCost(vanished ? 0 : _solver.nCols());
 
-      ///@todo catch exception
-      _simplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost, _solver.oldBasisStatusRows.get_ptr(),
-                              _solver.oldBasisStatusCols.get_ptr());
+      try
+      {
+         _simplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost,
+                              _solver.oldBasisStatusRows.get_ptr(), _solver.oldBasisStatusCols.get_ptr());
+      }
+      catch(const SPxInternalCodeException& E)
+      {
+         // error message has already been printed
+         throw SPxInternalCodeException("Error storing the basis");
+      }
 
       // store basis for original problem
       _solver.oldBasisStatusRows.reSize(numRowsRational());
@@ -5847,9 +5861,16 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                                    basisStatusCols.size());
                }
 
-               ///@todo catch exception
-               _simplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost, basisStatusRows.get_ptr(),
+               try
+               {
+                  _simplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost, basisStatusRows.get_ptr(),
                                        basisStatusCols.get_ptr());
+               }
+               catch(const SPxInternalCodeException& E)
+               {
+                  // error message has already been printed
+                  throw SPxInternalCodeException("Error storing the basis");
+               }
 
                // store basis for original problem
                basisStatusRows.reSize(numRowsRational());
@@ -5907,9 +5928,11 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                {
                   _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
                }
-               catch
+               catch(const SPxInternalCodeException& E)
                {
-                  MSG_INFO1(spxout, spxout << "Storage of last stable basis failed." << std::endl);
+                  MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
+                   "> while processing the result of the solve.\n");
+                  MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
                }
             }
 
@@ -5948,9 +5971,11 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                {
                   _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
                }
-               catch
+               catch(const SPxInternalCodeException& E)
                {
-                  MSG_INFO1(spxout, spxout << "Storage of last stable basis failed." << std::endl);
+                  MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
+                   "> while processing the result of the solve.\n");
+                  MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
                }
             }
 
@@ -5971,9 +5996,11 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                   {
                      _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
                   }
-                  catch
+                  catch(const SPxInternalCodeException& E)
                   {
-                     MSG_INFO1(spxout, spxout << "Storage of last stable basis failed." << std::endl);
+                     MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
+                     "> while processing the result of the solve.\n");
+                     MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
                   }
                }
 
@@ -6001,9 +6028,11 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                {
                   _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
                }
-               catch
+               catch(const SPxInternalCodeException& E)
                {
-                  MSG_INFO1(spxout, spxout << "Storage of last stable basis failed." << std::endl);
+                  MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
+                   "> while processing the result of the solve.\n");
+                  MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
                }
             }
             else
@@ -6024,9 +6053,11 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                {
                   _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
                }
-               catch
+               catch(const SPxInternalCodeException& E)
                {
-                  MSG_INFO1(spxout, spxout << "Storage of last stable basis failed." << std::endl);
+                  MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
+                   "> while processing the result of the solve.\n");
+                  MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
                }
             }
 
@@ -6418,11 +6449,18 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
                   _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusCols, basisStatusCols);
                }
 
-               ///@todo catch exception
                _convertDataArrayVarStatusToBoosted(basisStatusRows, _tmpBasisStatusRows);
                _convertDataArrayVarStatusToBoosted(basisStatusCols, _tmpBasisStatusCols);
-               _boostedSimplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost, _tmpBasisStatusRows.get_ptr(),
-                                       _tmpBasisStatusCols.get_ptr());
+               try
+               {
+                  _boostedSimplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost,
+                                       _tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr());
+               }
+               catch(const SPxInternalCodeException& E)
+               {
+                  // error message has already been printed
+                  throw SPxInternalCodeException("Error storing the basis");
+               }
 
                // store basis for original problem
                _tmpBasisStatusRows.reSize(numRowsRational());
