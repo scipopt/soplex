@@ -1337,11 +1337,13 @@ void SoPlexBase<R>::_applyScaledObj(SPxSolverBase<T>& solver, Rational& dualScal
 ///@param dualReal in
 ///@param ... out
 template <class R>
+template <typename T>
 bool SoPlexBase<R>::_evaluateResult(
-   typename SPxSolverBase<R>::Status result,
+   SPxSolverBase<T>& solver,
+   typename SPxSolverBase<T>::Status result,
    bool usingRefinedLP,
    SolRational& sol,
-   VectorBase<R>& dualReal,
+   VectorBase<T>& dualReal,
    bool& infeasible,
    bool& unbounded,
    bool& stoppedTime,
@@ -1369,7 +1371,7 @@ bool SoPlexBase<R>::_evaluateResult(
          sol._hasDualFarkas = false;
 
       if(usingRefinedLP)
-         _solver.clearRowObjs();
+         solver.clearRowObjs();
 
       infeasible = true;
       return true;
@@ -1378,7 +1380,7 @@ bool SoPlexBase<R>::_evaluateResult(
       MSG_INFO1(spxout, spxout << "Floating-point unbounded.\n");
 
       if(usingRefinedLP)
-         _solver.clearRowObjs();
+         solver.clearRowObjs();
 
       unbounded = true;
       return true;
@@ -1389,14 +1391,14 @@ bool SoPlexBase<R>::_evaluateResult(
 
    case SPxSolverBase<R>::ABORT_ITER:
       if(usingRefinedLP)
-         _solver.clearRowObjs();
+         solver.clearRowObjs();
 
       stoppedIter = true;
       return true;
 
    default:
       if(usingRefinedLP)
-         _solver.clearRowObjs();
+         solver.clearRowObjs();
 
       error = true;
       return true;
@@ -1734,80 +1736,6 @@ void SoPlexBase<R>::_updateReducedCosts(SolRational& sol, int& dualSize,
 
 
 #ifdef SOPLEX_WITH_MPFR
-/// evaluates result of solve. Return true if the algorithm needs to stop, false otherwise.
-///@param result in
-///@param usingRefinedLP in
-///@param dualReal in
-///@param ... out
-template <class R>
-bool SoPlexBase<R>::_evaluateResultBoosted(
-   typename SPxSolverBase<BP>::Status result,
-   bool usingRefinedLP,
-   SolRational& sol,
-   VectorBase<BP>& dualReal,
-   bool& infeasible,
-   bool& unbounded,
-   bool& stoppedTime,
-   bool& stoppedIter,
-   bool& error)
-{
-   switch(result)
-   {
-   case SPxSolverBase<R>::OPTIMAL:
-      MSG_INFO1(spxout, spxout << "Floating-point optimal.\n");
-      return false;
-
-   case SPxSolverBase<R>::INFEASIBLE:
-      MSG_INFO1(spxout, spxout << "Floating-point infeasible.\n");
-
-      // when not using refined LP
-      // the floating-point solve returns a Farkas ray if and only if the simplifier was not used, which is exactly
-      // the case when a basis could be returned
-      if(usingRefinedLP || _hasBasis)
-      {
-         sol._dualFarkas = dualReal;
-         sol._hasDualFarkas = true;
-      }
-      else
-         sol._hasDualFarkas = false;
-
-      if(usingRefinedLP)
-         _boostedSolver.clearRowObjs();
-
-      infeasible = true;
-      return true;
-
-   case SPxSolverBase<R>::UNBOUNDED:
-      MSG_INFO1(spxout, spxout << "Floating-point unbounded.\n");
-
-      if(usingRefinedLP)
-         _boostedSolver.clearRowObjs();
-
-      unbounded = true;
-      return true;
-
-   case SPxSolverBase<R>::ABORT_TIME:
-      stoppedTime = true;
-      return true;
-
-   case SPxSolverBase<R>::ABORT_ITER:
-      if(usingRefinedLP)
-         _boostedSolver.clearRowObjs();
-
-      stoppedIter = true;
-      return true;
-
-   default:
-      if(usingRefinedLP)
-         _boostedSolver.clearRowObjs();
-
-      error = true;
-      return true;
-   }
-}
-
-
-
 /// corrects primal solution and aligns with basis
 template <class R>
 void SoPlexBase<R>::_correctPrimalSolutionBoosted(
@@ -2181,7 +2109,7 @@ void SoPlexBase<R>::_solveRealForRationalStable(
    result = _solveRealForRational(false, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
 
    // evalute result
-   if(_evaluateResult(result, false, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
+   if(_evaluateResult<R>(_solver, result, false, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                       error))
       return;
 
@@ -2405,7 +2333,7 @@ void SoPlexBase<R>::_performOptIRStable(
 
 
    // evalute result
-   if(_evaluateResult(result, false, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
+   if(_evaluateResult<R>(_solver, result, false, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                       error))
       return;
 
@@ -2607,7 +2535,7 @@ void SoPlexBase<R>::_performOptIRStable(
       }
 
       // evaluate result; if modified problem was not solved to optimality, stop refinement;
-      if(_evaluateResult(result, true, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
+      if(_evaluateResult<R>(_solver, result, true, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                          error))
          return;
 
@@ -3147,7 +3075,7 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
       _updateBoostingStatistics();
 
    // evalute result
-   if(_evaluateResultBoosted(boostedResult, false, sol, boostedDualReal, infeasible, unbounded, stoppedTime, stoppedIter,
+   if(_evaluateResult<BP>(_boostedSolver, boostedResult, false, sol, boostedDualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                   error))
       return;
 
@@ -3436,7 +3364,7 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
    _solveRealForRationalBoosted(boostedPrimalReal, boostedDualReal, _basisStatusRows, _basisStatusCols, boostedResult, true);
 
    // evalute result
-   if(_evaluateResultBoosted(boostedResult, false, sol, boostedDualReal, infeasible, unbounded, stoppedTime, stoppedIter,
+   if(_evaluateResult<BP>(_boostedSolver, boostedResult, false, sol, boostedDualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                   error))
       return;
 
@@ -3623,7 +3551,7 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
       }
 
       // evaluate result; if modified problem was not solved to optimality, stop refinement;
-      if(_evaluateResultBoosted(boostedResult, true, sol, boostedDualReal, infeasible, unbounded, stoppedTime, stoppedIter,
+      if(_evaluateResult<BP>(_boostedSolver, boostedResult, true, sol, boostedDualReal, infeasible, unbounded, stoppedTime, stoppedIter,
                         error))
          return;
 

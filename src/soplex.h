@@ -2399,11 +2399,13 @@ private:
    void _applyScaledObj(SPxSolverBase<T>& solver, Rational& dualScale, SolRational& sol);
 
    /// evaluates result of solve. Return true if the algorithm must to stopped, false otherwise.
+   template <typename T>
    bool _evaluateResult(
-      typename SPxSolverBase<R>::Status result,
+      SPxSolverBase<T>& solver,
+      typename SPxSolverBase<T>::Status result,
       bool usingRefinedLP,
       SolRational& sol,
-      VectorBase<R>& dualReal,
+      VectorBase<T>& dualReal,
       bool& infeasible,
       bool& unbounded,
       bool& stoppedTime,
@@ -2433,18 +2435,6 @@ private:
    /// updates or recomputes reduced cost values depending on which looks faster; adding one to the length of the
    /// dual vector accounts for the objective function vector
    void _updateReducedCosts(SolRational& sol, int& dualSize, const int& numCorrectedPrimals);
-
-   /// evaluates result of solve. Return true if the algorithm must to stopped, false otherwise.
-   bool _evaluateResultBoosted(
-      typename SPxSolverBase<BP>::Status result,
-      bool usingRefinedLP,
-      SolRational& sol,
-      VectorBase<BP>& dualReal,
-      bool& infeasible,
-      bool& unbounded,
-      bool& stoppedTime,
-      bool& stoppedIter,
-      bool& error);
 
    /// corrects primal solution and aligns with basis
    void _correctPrimalSolutionBoosted(
