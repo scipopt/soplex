@@ -2387,13 +2387,16 @@ private:
       Rational& dualViolation);
 
    /// applies scaled bounds
-   void _applyScaledBounds(Rational& primalScale);
+   template <typename T>
+   void _applyScaledBounds(SPxSolverBase<T>& solver, Rational& primalScale);
 
    /// applies scaled sides
-   void _applyScaledSides(Rational& primalScale);
+   template <typename T>
+   void _applyScaledSides(SPxSolverBase<T>& solver, Rational& primalScale);
 
    /// applies scaled objective function
-   void _applyScaledObj(Rational& dualScale, SolRational& sol);
+   template <typename T>
+   void _applyScaledObj(SPxSolverBase<T>& solver, Rational& dualScale, SolRational& sol);
 
    /// evaluates result of solve. Return true if the algorithm must to stopped, false otherwise.
    bool _evaluateResult(
@@ -2430,15 +2433,6 @@ private:
    /// updates or recomputes reduced cost values depending on which looks faster; adding one to the length of the
    /// dual vector accounts for the objective function vector
    void _updateReducedCosts(SolRational& sol, int& dualSize, const int& numCorrectedPrimals);
-
-   /// applies scaled bounds
-   void _applyScaledBoundsBoosted(Rational& primalScale);
-
-   /// applies scaled sides
-   void _applyScaledSidesBoosted(Rational& primalScale);
-
-   /// applies scaled objective function
-   void _applyScaledObjBoosted(Rational& dualScale, SolRational& sol);
 
    /// evaluates result of solve. Return true if the algorithm must to stopped, false otherwise.
    bool _evaluateResultBoosted(

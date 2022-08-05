@@ -1216,7 +1216,8 @@ void SoPlexBase<R>::_computeDualScalingFactor(
 /// applies scaled bounds
 ///@param primalScale in & out
 template <class R>
-void SoPlexBase<R>::_applyScaledBounds(Rational& primalScale)
+template <typename T>
+void SoPlexBase<R>::_applyScaledBounds(SPxSolverBase<T>& solver, Rational& primalScale)
 {
    if(primalScale < 1)
       primalScale = 1;
@@ -1232,11 +1233,11 @@ void SoPlexBase<R>::_applyScaledBounds(Rational& primalScale)
             _modLower[c] *= primalScale;
 
          if(_modLower[c] <= _rationalNegInfty)
-            _solver.changeLower(c, -realParam(SoPlexBase<R>::INFTY));
+            solver.changeLower(c, -realParam(SoPlexBase<R>::INFTY));
          else if(primalScale > 1)
-            _solver.changeLower(c, R(_modLower[c]));
+            solver.changeLower(c, R(_modLower[c]));
          else
-            _solver.changeLower(c, static_cast<R>(_modLower[c]));
+            solver.changeLower(c, static_cast<R>(_modLower[c]));
       }
 
       if(_upperFinite(_colTypes[c]))
@@ -1245,9 +1246,9 @@ void SoPlexBase<R>::_applyScaledBounds(Rational& primalScale)
             _modUpper[c] *= primalScale;
 
          if(_modUpper[c] >= _rationalPosInfty)
-            _solver.changeUpper(c, realParam(SoPlexBase<R>::INFTY));
+            solver.changeUpper(c, realParam(SoPlexBase<R>::INFTY));
          else
-            _solver.changeUpper(c, R(_modUpper[c]));
+            solver.changeUpper(c, R(_modUpper[c]));
       }
    }
 }
@@ -1257,7 +1258,8 @@ void SoPlexBase<R>::_applyScaledBounds(Rational& primalScale)
 /// applies scaled sides, updates: _modLhs, _modRhs, Lhs (resp. Rhs) vector of _solver,
 ///@param primalScale in & out
 template <class R>
-void SoPlexBase<R>::_applyScaledSides(Rational& primalScale)
+template <typename T>
+void SoPlexBase<R>::_applyScaledSides(SPxSolverBase<T>& solver, Rational& primalScale)
 {
    assert(primalScale >= 1);
 
@@ -1269,9 +1271,9 @@ void SoPlexBase<R>::_applyScaledSides(Rational& primalScale)
             _modLhs[r] *= primalScale;
 
          if(_modLhs[r] <= _rationalNegInfty)
-            _solver.changeLhs(r, -realParam(SoPlexBase<R>::INFTY));
+            solver.changeLhs(r, -realParam(SoPlexBase<R>::INFTY));
          else
-            _solver.changeLhs(r, R(_modLhs[r]));
+            solver.changeLhs(r, R(_modLhs[r]));
       }
 
       if(_upperFinite(_rowTypes[r]))
@@ -1280,9 +1282,9 @@ void SoPlexBase<R>::_applyScaledSides(Rational& primalScale)
             _modRhs[r] *= primalScale;
 
          if(_modRhs[r] >= _rationalPosInfty)
-            _solver.changeRhs(r, realParam(SoPlexBase<R>::INFTY));
+            solver.changeRhs(r, realParam(SoPlexBase<R>::INFTY));
          else
-            _solver.changeRhs(r, R(_modRhs[r]));
+            solver.changeRhs(r, R(_modRhs[r]));
       }
    }
 }
@@ -1293,16 +1295,17 @@ void SoPlexBase<R>::_applyScaledSides(Rational& primalScale)
 ///@param dualScale in
 ///@param sol in
 template <class R>
-void SoPlexBase<R>::_applyScaledObj(Rational& dualScale, SolRational& sol)
+template <typename T>
+void SoPlexBase<R>::_applyScaledObj(SPxSolverBase<T>& solver, Rational& dualScale, SolRational& sol)
 {
    for(int c = numColsRational() - 1; c >= 0; c--)
    {
       if(_modObj[c] >= _rationalPosInfty)
-         _solver.changeObj(c, realParam(SoPlexBase<R>::INFTY));
+         solver.changeObj(c, realParam(SoPlexBase<R>::INFTY));
       else if(_modObj[c] <= _rationalNegInfty)
-         _solver.changeObj(c, -realParam(SoPlexBase<R>::INFTY));
+         solver.changeObj(c, -realParam(SoPlexBase<R>::INFTY));
       else
-         _solver.changeObj(c, R(_modObj[c]));
+         solver.changeObj(c, R(_modObj[c]));
    }
 
    for(int r = numRowsRational() - 1; r >= 0; r--)
@@ -1310,18 +1313,18 @@ void SoPlexBase<R>::_applyScaledObj(Rational& dualScale, SolRational& sol)
       Rational newRowObj;
 
       if(_rowTypes[r] == RANGETYPE_FIXED)
-         _solver.changeRowObj(r, R(0.0));
+         solver.changeRowObj(r, R(0.0));
       else
       {
          newRowObj = sol._dual[r];
          newRowObj *= dualScale;
 
          if(newRowObj >= _rationalPosInfty)
-            _solver.changeRowObj(r, -realParam(SoPlexBase<R>::INFTY));
+            solver.changeRowObj(r, -realParam(SoPlexBase<R>::INFTY));
          else if(newRowObj <= _rationalNegInfty)
-            _solver.changeRowObj(r, realParam(SoPlexBase<R>::INFTY));
+            solver.changeRowObj(r, realParam(SoPlexBase<R>::INFTY));
          else
-            _solver.changeRowObj(r, -R(newRowObj));
+            solver.changeRowObj(r, -R(newRowObj));
       }
    }
 }
@@ -1731,121 +1734,6 @@ void SoPlexBase<R>::_updateReducedCosts(SolRational& sol, int& dualSize,
 
 
 #ifdef SOPLEX_WITH_MPFR
-/// applies scaled bounds
-///@param primalScale in & out
-template <class R>
-void SoPlexBase<R>::_applyScaledBoundsBoosted(Rational& primalScale)
-{
-   if(primalScale < 1)
-      primalScale = 1;
-
-   if(primalScale > 1)
-      MSG_INFO2(spxout, spxout << "Scaling primal by " << primalScale.str() << ".\n");
-
-   for(int c = numColsRational() - 1; c >= 0; c--)
-   {
-      if(_lowerFinite(_colTypes[c]))
-      {
-         if(primalScale > 1)
-            _modLower[c] *= primalScale;
-
-         if(_modLower[c] <= _rationalNegInfty)
-            _boostedSolver.changeLower(c, -realParam(SoPlexBase<R>::INFTY));
-         else if(primalScale > 1)
-            _boostedSolver.changeLower(c, BP(_modLower[c]));
-         else
-            _boostedSolver.changeLower(c, static_cast<BP>(_modLower[c]));
-      }
-
-      if(_upperFinite(_colTypes[c]))
-      {
-         if(primalScale > 1)
-            _modUpper[c] *= primalScale;
-
-         if(_modUpper[c] >= _rationalPosInfty)
-            _boostedSolver.changeUpper(c, realParam(SoPlexBase<R>::INFTY));
-         else
-            _boostedSolver.changeUpper(c, BP(_modUpper[c]));
-      }
-   }
-}
-
-
-
-/// applies scaled sides
-///@param primalScale in & out
-template <class R>
-void SoPlexBase<R>::_applyScaledSidesBoosted(Rational& primalScale)
-{
-   assert(primalScale >= 1);
-
-   for(int r = numRowsRational() - 1; r >= 0; r--)
-   {
-      if(_lowerFinite(_rowTypes[r]))
-      {
-         if(primalScale != 1)
-            _modLhs[r] *= primalScale;
-
-         if(_modLhs[r] <= _rationalNegInfty)
-            _boostedSolver.changeLhs(r, -realParam(SoPlexBase<R>::INFTY));
-         else
-            _boostedSolver.changeLhs(r, BP(_modLhs[r]));
-      }
-
-      if(_upperFinite(_rowTypes[r]))
-      {
-         if(primalScale != 1)
-            _modRhs[r] *= primalScale;
-
-         if(_modRhs[r] >= _rationalPosInfty)
-            _boostedSolver.changeRhs(r, realParam(SoPlexBase<R>::INFTY));
-         else
-            _boostedSolver.changeRhs(r, BP(_modRhs[r]));
-      }
-   }
-}
-
-
-
-/// applies scaled objective function
-///@param dualScale in
-///@param sol in
-template <class R>
-void SoPlexBase<R>::_applyScaledObjBoosted(Rational& dualScale, SolRational& sol)
-{
-   for(int c = numColsRational() - 1; c >= 0; c--)
-   {
-      if(_modObj[c] >= _rationalPosInfty)
-         _boostedSolver.changeObj(c, realParam(SoPlexBase<R>::INFTY));
-      else if(_modObj[c] <= _rationalNegInfty)
-         _boostedSolver.changeObj(c, -realParam(SoPlexBase<R>::INFTY));
-      else
-         _boostedSolver.changeObj(c, BP(_modObj[c]));
-   }
-
-   for(int r = numRowsRational() - 1; r >= 0; r--)
-   {
-      Rational newRowObj;
-
-      if(_rowTypes[r] == RANGETYPE_FIXED)
-         _boostedSolver.changeRowObj(r, BP(0.0));
-      else
-      {
-         newRowObj = sol._dual[r];
-         newRowObj *= dualScale;
-
-         if(newRowObj >= _rationalPosInfty)
-            _boostedSolver.changeRowObj(r, -realParam(SoPlexBase<R>::INFTY));
-         else if(newRowObj <= _rationalNegInfty)
-            _boostedSolver.changeRowObj(r, realParam(SoPlexBase<R>::INFTY));
-         else
-            _boostedSolver.changeRowObj(r, -BP(newRowObj));
-      }
-   }
-}
-
-
-
 /// evaluates result of solve. Return true if the algorithm needs to stop, false otherwise.
 ///@param result in
 ///@param usingRefinedLP in
@@ -2627,14 +2515,14 @@ void SoPlexBase<R>::_performOptIRStable(
                                   redCostViolation);
 
       // apply scaled bounds and scaled sides
-      _applyScaledBounds(primalScale);
-      _applyScaledSides(primalScale);
+      _applyScaledBounds<R>(_solver, primalScale);
+      _applyScaledSides<R>(_solver, primalScale);
 
       // compute dual scaling factor; limit increase in scaling by tolerance used in floating point solve
       _computeDualScalingFactor(maxScale, primalScale, dualScale, redCostViolation, dualViolation);
 
       // apply scaled objective function
-      _applyScaledObj(dualScale, sol);
+      _applyScaledObj<R>(_solver, dualScale, sol);
 
       MSG_INFO1(spxout, spxout << "Refined floating-point solve . . .\n");
 
@@ -3653,14 +3541,14 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
                                  redCostViolation);
 
       // apply scaled bounds and scaled sides
-      _applyScaledBoundsBoosted(primalScale);
-      _applyScaledSidesBoosted(primalScale);
+      _applyScaledBounds<BP>(_boostedSolver, primalScale);
+      _applyScaledSides<BP>(_boostedSolver, primalScale);
 
       // compute dual scaling factor; limit increase in scaling by tolerance used in floating point solve
       _computeDualScalingFactor(maxScale, primalScale, dualScale, redCostViolation, dualViolation);
 
       // apply scaled objective function
-      _applyScaledObjBoosted(dualScale, sol);
+      _applyScaledObj<BP>(_boostedSolver, dualScale, sol);
 
       MSG_INFO1(spxout, spxout << "Refined floating-point solve . . .\n");
 
