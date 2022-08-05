@@ -6006,7 +6006,18 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
 
             // get the last stable basis. The hope is that precision boosting will get rid of cycling.
             if(_basisWasStoredDuringSimplex())
-               _storeLastStableBasisBoosted(simplificationStatus == SPxSimplifier<BP>::VANISHED);
+            {
+               try
+               {
+                  _storeLastStableBasisBoosted(simplificationStatus == SPxSimplifier<BP>::VANISHED);
+               }
+               catch(const SPxInternalCodeException& E)
+               {
+                  MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
+                   "> while processing the result of the solve.\n");
+                  MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
+               }
+            }
 
             break;
 
@@ -6040,7 +6051,18 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
 
             // get the last stable basis.
             if(_basisWasStoredDuringSimplex())
-               _storeLastStableBasisBoosted(simplificationStatus == SPxSimplifier<BP>::VANISHED);
+            {
+               try
+               {
+                  _storeLastStableBasisBoosted(simplificationStatus == SPxSimplifier<BP>::VANISHED);
+               }
+               catch(const SPxInternalCodeException& E)
+               {
+                  MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
+                   "> while processing the result of the solve.\n");
+                  MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
+               }
+            }
 
             break;
 
@@ -6054,7 +6076,18 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
 
                // get the last stable basis.
                if(_basisWasStoredDuringSimplex())
-                  _storeLastStableBasisBoosted(simplificationStatus == SPxSimplifier<BP>::VANISHED);
+               {
+                  try
+                  {
+                     _storeLastStableBasisBoosted(simplificationStatus == SPxSimplifier<BP>::VANISHED);
+                  }
+                  catch(const SPxInternalCodeException& E)
+                  {
+                     MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
+                     "> while processing the result of the solve.\n");
+                     MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
+                  }
+               }
 
                break;
             }
@@ -6077,7 +6110,18 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
 
             // if possible, get the last stable basis, otherwise store the infeasible basis.
             if(_basisWasStoredDuringSimplex())
-               _storeLastStableBasisBoosted(simplificationStatus == SPxSimplifier<BP>::VANISHED);
+            {
+               try
+               {
+                  _storeLastStableBasisBoosted(simplificationStatus == SPxSimplifier<BP>::VANISHED);
+               }
+               catch(const SPxInternalCodeException& E)
+               {
+                  MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
+                   "> while processing the result of the solve.\n");
+                  MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
+               }
+            }
             else
                _storeBasisAsOldBasisBoosted(_tmpBasisStatusRows, _tmpBasisStatusCols);
 
@@ -6091,7 +6135,19 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
 
             // get the last stable basis.
             if(_basisWasStoredDuringSimplex())
-               _storeLastStableBasisBoosted(simplificationStatus == SPxSimplifier<BP>::VANISHED);
+            {
+               try
+               {
+                  _storeLastStableBasisBoosted(simplificationStatus == SPxSimplifier<BP>::VANISHED);
+               }
+               catch(const SPxInternalCodeException& E)
+               {
+                  MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
+                   "> while processing the result of the solve.\n");
+                  MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
+               }
+            }
+
 
             break;
          }
