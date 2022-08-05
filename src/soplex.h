@@ -2413,21 +2413,24 @@ private:
       bool& error);
 
    /// corrects primal solution and aligns with basis
+   template <typename T>
    void _correctPrimalSolution(
       SolRational& sol,
       Rational& primalScale,
       int& primalSize,
       const int& maxDimRational,
-      VectorBase<R>& primalReal);
+      VectorBase<T>& primalReal);
 
    /// updates or recomputes slacks depending on which looks faster
    void _updateSlacks(SolRational& sol, int& primalSize);
 
    /// corrects dual solution and aligns with basis
+   template <typename T>
    void _correctDualSolution(
+      SPxSolverBase<T>& solver,
       SolRational& sol,
       const bool& maximizing,
-      VectorBase<R>& dualReal,
+      VectorBase<T>& dualReal,
       Rational& dualScale,
       int& dualSize,
       const int& maxDimRational);
@@ -2435,23 +2438,6 @@ private:
    /// updates or recomputes reduced cost values depending on which looks faster; adding one to the length of the
    /// dual vector accounts for the objective function vector
    void _updateReducedCosts(SolRational& sol, int& dualSize, const int& numCorrectedPrimals);
-
-   /// corrects primal solution and aligns with basis
-   void _correctPrimalSolutionBoosted(
-      SolRational& sol,
-      Rational& primalScale,
-      int& primalSize,
-      const int& maxDimRational,
-      VectorBase<BP>& primalReal);
-
-   /// corrects dual solution and aligns with basis
-   void _correctDualSolutionBoosted(
-      SolRational& sol,
-      const bool& maximizing,
-      VectorBase<BP>& dualReal,
-      Rational& dualScale,
-      int& dualSize,
-      const int& maxDimRational);
 
    ///@todo precision-boosting move some place else
    /// converts the given DataArray of VarStatus to boostedPrecision

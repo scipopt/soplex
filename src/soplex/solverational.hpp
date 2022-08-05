@@ -1412,12 +1412,13 @@ bool SoPlexBase<R>::_evaluateResult(
 ///@param primalSize out
 ///@param ... in
 template <class R>
+template <typename T>
 void SoPlexBase<R>::_correctPrimalSolution(
    SolRational& sol,
    Rational& primalScale,
    int& primalSize,
    const int& maxDimRational,
-   VectorBase<R>& primalReal)
+   VectorBase<T>& primalReal)
 {
    MSG_DEBUG(std::cout << "Correcting primal solution.\n");
 
@@ -1535,10 +1536,12 @@ void SoPlexBase<R>::_updateSlacks(SolRational& sol, int& primalSize)
 ///@param dualSize out
 ///@param ... in
 template <class R>
+template <typename T>
 void SoPlexBase<R>::_correctDualSolution(
+   SPxSolverBase<T>& solver,
    SolRational& sol,
    const bool& maximizing,
-   VectorBase<R>& dualReal,
+   VectorBase<T>& dualReal,
    Rational& dualScale,
    int& dualSize,
    const int& maxDimRational)
@@ -1642,7 +1645,7 @@ void SoPlexBase<R>::_correctDualSolution(
          }
       }
 
-      if(R(debugRedCostViolation) > _solver.opttol() || R(debugDualViolation) > _solver.opttol()
+      if(R(debugRedCostViolation) > solver.opttol() || R(debugDualViolation) > solver.opttol()
             || debugBasicDualViolation > 1e-9)
       {
          MSG_WARNING(spxout, spxout << "Warning: floating-point dual solution with violation "
@@ -1736,265 +1739,6 @@ void SoPlexBase<R>::_updateReducedCosts(SolRational& sol, int& dualSize,
 
 
 #ifdef SOPLEX_WITH_MPFR
-/// corrects primal solution and aligns with basis
-template <class R>
-void SoPlexBase<R>::_correctPrimalSolutionBoosted(
-   SolRational& sol,
-   Rational& primalScale,
-   int& primalSize,
-   const int& maxDimRational,
-   VectorBase<BP>& primalReal)
-{
-   MSG_DEBUG(std::cout << "Correcting primal solution.\n");
-
-   primalSize = 0;
-   Rational primalScaleInverse = primalScale;
-   invert(primalScaleInverse);
-   _primalDualDiff.clear();
-
-   for(int c = numColsRational() - 1; c >= 0; c--)
-   {
-      // force values of nonbasic variables to bounds
-      typename SPxSolverBase<R>::VarStatus& basisStatusCol = _basisStatusCols[c];
-
-      if(basisStatusCol == SPxSolverBase<R>::ON_LOWER)
-      {
-         if(sol._primal[c] != lowerRational(c))
-         {
-            _forceNonbasicToBound(sol, c, maxDimRational, true);
-         }
-      }
-      else if(basisStatusCol == SPxSolverBase<R>::ON_UPPER)
-      {
-         if(sol._primal[c] != upperRational(c))
-         {
-            _forceNonbasicToBound(sol, c, maxDimRational, false);
-         }
-      }
-      else if(basisStatusCol == SPxSolverBase<R>::FIXED)
-      {
-         // it may happen that lower and upper are only equal in the Real LP but different in the rational LP; we
-         // do not check this to avoid rational comparisons, but simply switch the basis status to the lower
-         // bound; this is necessary, because for fixed variables any reduced cost is feasible
-         basisStatusCol = SPxSolverBase<R>::ON_LOWER;
-
-         if(sol._primal[c] != lowerRational(c))
-         {
-            _forceNonbasicToBound(sol, c, maxDimRational, true);
-         }
-      }
-      else if(basisStatusCol == SPxSolverBase<R>::ZERO)
-      {
-         if(sol._primal[c] != 0)
-         {
-            int i = _primalDualDiff.size();
-            _ensureDSVectorRationalMemory(_primalDualDiff, maxDimRational);
-            _primalDualDiff.add(c);
-
-            _primalDualDiff.value(i) = sol._primal[c];
-            _primalDualDiff.value(i) *= -1;
-            sol._primal[c] = 0;
-         }
-      }
-      else
-      {
-         if(primalReal[c] == 1.0)
-         {
-            int i = _primalDualDiff.size();
-            _ensureDSVectorRationalMemory(_primalDualDiff, maxDimRational);
-            _primalDualDiff.add(c);
-            _primalDualDiff.value(i) = primalScaleInverse;
-            sol._primal[c] += _primalDualDiff.value(i);
-         }
-         else if(primalReal[c] == -1.0)
-         {
-            int i = _primalDualDiff.size();
-            _ensureDSVectorRationalMemory(_primalDualDiff, maxDimRational);
-            _primalDualDiff.add(c);
-            _primalDualDiff.value(i) = primalScaleInverse;
-            _primalDualDiff.value(i) *= -1;
-            sol._primal[c] += _primalDualDiff.value(i);
-         }
-         else if(primalReal[c] != 0.0)
-         {
-            int i = _primalDualDiff.size();
-            _ensureDSVectorRationalMemory(_primalDualDiff, maxDimRational);
-            _primalDualDiff.add(c);
-            _primalDualDiff.value(i).assign(primalReal[c]);
-            _primalDualDiff.value(i) *= primalScaleInverse;
-            sol._primal[c] += _primalDualDiff.value(i);
-         }
-      }
-
-      if(sol._primal[c] != 0)
-         primalSize++;
-   }
-}
-
-
-
-/// corrects dual solution and aligns with basis
-template <class R>
-void SoPlexBase<R>::_correctDualSolutionBoosted(
-   SolRational& sol,
-   const bool& maximizing,
-   VectorBase<BP>& dualReal,
-   Rational& dualScale,
-   int& dualSize,
-   const int& maxDimRational)
-{
-   MSG_DEBUG(std::cout << "Correcting dual solution.\n");
-
-#ifndef NDEBUG
-   {
-      // compute reduced cost violation
-      VectorRational debugRedCost(numColsRational());
-      debugRedCost = VectorRational(_realLP->maxObj());
-      debugRedCost *= -1;
-      _rationalLP->subDualActivity(VectorRational(dualReal), debugRedCost);
-
-      Rational debugRedCostViolation = 0;
-
-      for(int c = numColsRational() - 1; c >= 0; c--)
-      {
-         if(_colTypes[c] == RANGETYPE_FIXED)
-            continue;
-
-         const typename SPxSolverBase<R>::VarStatus& basisStatusCol = _basisStatusCols[c];
-         assert(basisStatusCol != SPxSolverBase<R>::FIXED);
-
-         if(((maximizing && basisStatusCol != SPxSolverBase<R>::ON_LOWER) || (!maximizing
-               && basisStatusCol != SPxSolverBase<R>::ON_UPPER))
-               && debugRedCost[c] < -debugRedCostViolation)
-         {
-            MSG_DEBUG(std::cout << "basisStatusCol = " << basisStatusCol
-                      << ", lower tight = " << bool(sol._primal[c] <= lowerRational(c))
-                      << ", upper tight = " << bool(sol._primal[c] >= upperRational(c))
-                      << ", obj[c] = " << _realLP->obj(c)
-                      << ", debugRedCost[c] = " << debugRedCost[c].str()
-                      << "\n");
-            debugRedCostViolation = -debugRedCost[c];
-         }
-
-         if(((maximizing && basisStatusCol != SPxSolverBase<R>::ON_UPPER) || (!maximizing
-               && basisStatusCol != SPxSolverBase<R>::ON_LOWER))
-               && debugRedCost[c] > debugRedCostViolation)
-         {
-            MSG_DEBUG(std::cout << "basisStatusCol = " << basisStatusCol
-                      << ", lower tight = " << bool(sol._primal[c] <= lowerRational(c))
-                      << ", upper tight = " << bool(sol._primal[c] >= upperRational(c))
-                      << ", obj[c] = " << _realLP->obj(c)
-                      << ", debugRedCost[c] = " << debugRedCost[c].str()
-                      << "\n");
-            debugRedCostViolation = debugRedCost[c];
-         }
-      }
-
-      // compute dual violation
-      Rational debugDualViolation = 0;
-      Rational debugBasicDualViolation = 0;
-
-      for(int r = numRowsRational() - 1; r >= 0; r--)
-      {
-         if(_rowTypes[r] == RANGETYPE_FIXED)
-            continue;
-
-         const typename SPxSolverBase<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
-         assert(basisStatusRow != SPxSolverBase<R>::FIXED);
-
-         Rational val = (-dualScale * sol._dual[r]) - Rational(dualReal[r]);
-
-         if(((maximizing && basisStatusRow != SPxSolverBase<R>::ON_LOWER) || (!maximizing
-               && basisStatusRow != SPxSolverBase<R>::ON_UPPER))
-               && val > debugDualViolation)
-         {
-            MSG_DEBUG(std::cout << "basisStatusRow = " << basisStatusRow
-                      << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
-                      << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
-                      << ", dualReal[r] = " << val.str()
-                      << ", dualReal[r] = " << dualReal[r]
-                      << "\n");
-            debugDualViolation = val;
-         }
-
-         if(((maximizing && basisStatusRow != SPxSolverBase<R>::ON_UPPER) || (!maximizing
-               && basisStatusRow != SPxSolverBase<R>::ON_LOWER))
-               && val < -debugDualViolation)
-         {
-            MSG_DEBUG(std::cout << "basisStatusRow = " << basisStatusRow
-                      << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
-                      << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
-                      << ", dualReal[r] = " << val.str()
-                      << ", dualReal[r] = " << dualReal[r]
-                      << "\n");
-            debugDualViolation = -val;
-         }
-
-         if(basisStatusRow == SPxSolverBase<R>::BASIC && spxAbs(val) > debugBasicDualViolation)
-         {
-            MSG_DEBUG(std::cout << "basisStatusRow = " << basisStatusRow
-                      << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
-                      << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
-                      << ", dualReal[r] = " << val.str()
-                      << ", dualReal[r] = " << dualReal[r]
-                      << "\n");
-            debugBasicDualViolation = spxAbs(val);
-         }
-      }
-
-      if(BP(debugRedCostViolation) > _boostedSolver.opttol() || BP(debugDualViolation) > _boostedSolver.opttol()
-            || debugBasicDualViolation > 1e-9)
-      {
-         MSG_WARNING(spxout, spxout << "Warning: floating-point dual solution with violation "
-                     << debugRedCostViolation.str() << " / "
-                     << debugDualViolation.str() << " / "
-                     << debugBasicDualViolation.str()
-                     << " (red. cost, dual, basic).\n");
-      }
-   }
-#endif
-
-   Rational dualScaleInverseNeg = dualScale;
-   invert(dualScaleInverseNeg);
-   dualScaleInverseNeg *= -1;
-   _primalDualDiff.clear();
-   dualSize = 0;
-
-   for(int r = numRowsRational() - 1; r >= 0; r--)
-   {
-      typename SPxSolverBase<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
-
-      // it may happen that left-hand and right-hand side are different in the rational, but equal in the Real LP,
-      // leading to a fixed basis status; this is critical because rows with fixed basis status are ignored in the
-      // computation of the dual violation; to avoid rational comparisons we do not check this but simply switch
-      // to the left-hand side status
-      if(basisStatusRow == SPxSolverBase<R>::FIXED)
-         basisStatusRow = SPxSolverBase<R>::ON_LOWER;
-
-      {
-         if(dualReal[r] != 0)
-         {
-            int i = _primalDualDiff.size();
-            _ensureDSVectorRationalMemory(_primalDualDiff, maxDimRational);
-            _primalDualDiff.add(r);
-            _primalDualDiff.value(i).assign(dualReal[r]);
-            _primalDualDiff.value(i) *= dualScaleInverseNeg;
-            sol._dual[r] -= _primalDualDiff.value(i);
-
-            dualSize++;
-         }
-         else
-         {
-            // we do not check whether the dual value is nonzero, because it probably is; this gives us an
-            // overestimation of the number of nonzeros in the dual solution
-            dualSize++;
-         }
-      }
-   }
-}
-
-
-
 ///@todo precision-boosting move in a different file ?
 /// converts the given DataArray of VarStatus to boostedPrecision
 template <class R>
@@ -2544,7 +2288,7 @@ void SoPlexBase<R>::_performOptIRStable(
       int primalSize;
 
       // correct primal solution and align with basis
-      _correctPrimalSolution(sol, primalScale, primalSize, maxDimRational, primalReal);
+      _correctPrimalSolution<R>(sol, primalScale, primalSize, maxDimRational, primalReal);
 
       // update or recompute slacks depending on which looks faster
       _updateSlacks(sol, primalSize);
@@ -2552,7 +2296,7 @@ void SoPlexBase<R>::_performOptIRStable(
       const int numCorrectedPrimals = _primalDualDiff.size();
 
       // correct dual solution and align with basis
-      _correctDualSolution(sol, maximizing, dualReal, dualScale, dualSize, maxDimRational);
+      _correctDualSolution<R>(_solver, sol, maximizing, dualReal, dualScale, dualSize, maxDimRational);
 
       // update or recompute reduced cost values depending on which looks faster
       // adding one to the length of the dual vector accounts for the objective function vector
@@ -3560,7 +3304,7 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
       int primalSize;
 
       // correct primal solution and align with basis
-      _correctPrimalSolutionBoosted(sol, primalScale, primalSize, maxDimRational, boostedPrimalReal);
+      _correctPrimalSolution<BP>(sol, primalScale, primalSize, maxDimRational, boostedPrimalReal);
 
       // update or recompute slacks depending on which looks faster
       _updateSlacks(sol, primalSize);
@@ -3568,7 +3312,7 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
       const int numCorrectedPrimals = _primalDualDiff.size();
 
       // correct dual solution and align with basis
-      _correctDualSolutionBoosted(sol, maximizing, boostedDualReal, dualScale, dualSize, maxDimRational);
+      _correctDualSolution<BP>(_boostedSolver, sol, maximizing, boostedDualReal, dualScale, dualSize, maxDimRational);
 
       // update or recompute reduced cost values depending on which looks faster
       // adding one to the length of the dual vector accounts for the objective function vector
