@@ -611,10 +611,11 @@ void SoPlexBase<R>::_performOptIRWrapper(
 ///@param dualReal in
 ///@param dualSize in & out
 template <class R>
+template <typename T> // to support both _solver and _boostedSolver
 void SoPlexBase<R>::_storeRealSolutionAsRational(
    SolRational& sol,
-   VectorBase<R>& primalReal,
-   VectorBase<R>& dualReal,
+   VectorBase<T>& primalReal,
+   VectorBase<T>& dualReal,
    int& dualSize)
 {
    sol._primal.reDim(numColsRational(), false);
@@ -1730,80 +1731,6 @@ void SoPlexBase<R>::_updateReducedCosts(SolRational& sol, int& dualSize,
 
 
 #ifdef SOPLEX_WITH_MPFR
-/// stores floating-point solution of original LP as current rational solution and ensure that solution vectors have right dimension; ensure that solution is aligned with basis
-/// - updates _rationalLP
-///@param sol out
-///@param primalReal in
-///@param dualReal in
-///@param dualSize in & out
-template <class R>
-void SoPlexBase<R>::_storeRealSolutionAsRationalBoosted(
-   SolRational& sol,
-   VectorBase<BP>& primalReal,
-   VectorBase<BP>& dualReal,
-   int& dualSize)
-{
-   sol._primal.reDim(numColsRational(), false);
-   sol._slacks.reDim(numRowsRational(), false);
-   sol._dual.reDim(numRowsRational(), false);
-   sol._redCost.reDim(numColsRational(), false);
-   sol._isPrimalFeasible = true;
-   sol._isDualFeasible = true;
-
-   for(int c = numColsRational() - 1; c >= 0; c--)
-   {
-      typename SPxSolverBase<R>::VarStatus& basisStatusCol = _basisStatusCols[c];
-
-      if(basisStatusCol == SPxSolverBase<R>::ON_LOWER)
-         sol._primal[c] = lowerRational(c);
-      else if(basisStatusCol == SPxSolverBase<R>::ON_UPPER)
-         sol._primal[c] = upperRational(c);
-      else if(basisStatusCol == SPxSolverBase<R>::FIXED)
-      {
-         // it may happen that lower and upper are only equal in the Real LP but different in the rational LP; we do
-         // not check this to avoid rational comparisons, but simply switch the basis status to the lower bound; this
-         // is necessary, because for fixed variables any reduced cost is feasible
-         sol._primal[c] = lowerRational(c);
-         basisStatusCol = SPxSolverBase<R>::ON_LOWER;
-      }
-      else if(basisStatusCol == SPxSolverBase<R>::ZERO)
-         sol._primal[c] = 0;
-      else
-         sol._primal[c].assign(primalReal[c]);
-   }
-
-   _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
-
-   assert(dualSize == 0);
-
-   for(int r = numRowsRational() - 1; r >= 0; r--)
-   {
-      typename SPxSolverBase<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
-
-      // it may happen that left-hand and right-hand side are different in the rational, but equal in the Real LP,
-      // leading to a fixed basis status; this is critical because rows with fixed basis status are ignored in the
-      // computation of the dual violation; to avoid rational comparisons we do not check this but simply switch to
-      // the left-hand side status
-      if(basisStatusRow == SPxSolverBase<R>::FIXED)
-         basisStatusRow = SPxSolverBase<R>::ON_LOWER;
-
-      {
-         sol._dual[r].assign(dualReal[r]);
-
-         if(dualReal[r] != 0.0)
-            dualSize++;
-      }
-   }
-
-   // we assume that the objective function vector has less nonzeros than the reduced cost vector, and so multiplying
-   // with -1 first and subtracting the dual activity should be faster than adding the dual activity and negating
-   // afterwards
-   _rationalLP->getObj(sol._redCost);
-   _rationalLP->subDualActivity(sol._dual, sol._redCost);
-}
-
-
-
 /// applies scaled bounds
 ///@param primalScale in & out
 template <class R>
@@ -2376,7 +2303,7 @@ void SoPlexBase<R>::_solveRealForRationalStable(
 
    // stores floating-point solution of original LP as current rational solution
    // ensure that solution vectors have right dimension; ensure that solution is aligned with basis
-   _storeRealSolutionAsRational(sol, primalReal, dualReal, dualSize);
+   _storeRealSolutionAsRational<R>(sol, primalReal, dualReal, dualSize);
 
    // control progress
    Rational maxViolation;
@@ -2600,7 +2527,7 @@ void SoPlexBase<R>::_performOptIRStable(
 
    // stores floating-point solution of original LP as current rational solution
    // ensure that solution vectors have right dimension; ensure that solution is aligned with basis
-   _storeRealSolutionAsRational(sol, primalReal, dualReal, dualSize);
+   _storeRealSolutionAsRational<R>(sol, primalReal, dualReal, dualSize);
 
    // initial scaling factors are one
    primalScale = _rationalPosone;
@@ -3343,7 +3270,7 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
 
    // stores floating-point solution of original LP as current rational solution
    // ensure that solution vectors have right dimension; ensure that solution is aligned with basis
-   _storeRealSolutionAsRationalBoosted(sol, boostedPrimalReal, boostedDualReal, dualSize);
+   _storeRealSolutionAsRational<BP>(sol, boostedPrimalReal, boostedDualReal, dualSize);
 
    // control progress
    Rational maxViolation;
@@ -3631,7 +3558,7 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
 
    // stores floating-point solution of original LP as current rational solution
    // ensure that solution vectors have right dimension; ensure that solution is aligned with basis
-   _storeRealSolutionAsRationalBoosted(sol, boostedPrimalReal, boostedDualReal, dualSize);
+   _storeRealSolutionAsRational<BP>(sol, boostedPrimalReal, boostedDualReal, dualSize);
 
    // initial scaling factors are one
    primalScale = _rationalPosone;

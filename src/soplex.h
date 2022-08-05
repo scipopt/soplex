@@ -2295,10 +2295,11 @@ private:
    ///@{
 
    /// stores floating-point solution of original LP as current rational solution and ensure that solution vectors have right dimension; ensure that solution is aligned with basis
+   template <typename T>
    void _storeRealSolutionAsRational(
       SolRational& sol,
-      VectorBase<R>& primalReal,
-      VectorBase<R>& dualReal,
+      VectorBase<T>& primalReal,
+      VectorBase<T>& dualReal,
       int& dualSize);
 
    /// computes violation of bounds during the refinement loop
@@ -2429,13 +2430,6 @@ private:
    /// updates or recomputes reduced cost values depending on which looks faster; adding one to the length of the
    /// dual vector accounts for the objective function vector
    void _updateReducedCosts(SolRational& sol, int& dualSize, const int& numCorrectedPrimals);
-
-   /// stores floating-point solution of original LP as current rational solution and ensure that solution vectors have right dimension; ensure that solution is aligned with basis
-   void _storeRealSolutionAsRationalBoosted(
-      SolRational& sol,
-      VectorBase<BP>& primalReal,
-      VectorBase<BP>& dualReal,
-      int& dualSize);
 
    /// applies scaled bounds
    void _applyScaledBoundsBoosted(Rational& primalScale);
