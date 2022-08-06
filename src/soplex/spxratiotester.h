@@ -89,7 +89,10 @@ public:
    virtual void setDelta(R newDelta)
    {
 #ifdef SOPLEX_DISABLED_CODE
-      if(newDelta <= DEFAULT_EPS_ZERO) ///@todo precision-boosting remove the hard check
+      // this old code block didn't allow setting values below the smallest positive double value
+      // with the implementation of precision boosting, template type R can be a multiprecision type
+      // therefore newDelta can very much be smaller than DEFAULT_EPS_ZERO
+      if(newDelta <= DEFAULT_EPS_ZERO)
          delta = DEFAULT_EPS_ZERO;
       else
          delta = newDelta;
