@@ -6674,7 +6674,6 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
 
    // factor by which the precision of the floating-point solver is multiplied
    case SoPlexBase<R>::PRECISION_BOOSTING_FACTOR:
-      Param::setPrecisionBoostingFactor(Real(value));
       break;
 
    default:

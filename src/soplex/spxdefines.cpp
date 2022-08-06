@@ -39,8 +39,6 @@ THREADLOCAL Real Param::s_epsilon_update        = DEFAULT_EPS_UPDATE;
 
 THREADLOCAL Real Param::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
 
-THREADLOCAL Real Param::s_prec_boost_factor     = DEFAULT_PREC_BOOST_FACTOR;
-
 bool msginconsistent(const char* name, const char* file, int line)
 {
    assert(name != 0);
@@ -94,16 +92,6 @@ Real Param::epsilonPivot()
 void Param::setEpsilonPivot(Real eps)
 {
    s_epsilon_pivot = eps;
-}
-
-Real Param::precisionBoostingFactor()
-{
-   return s_prec_boost_factor;
-}
-
-void Param::setPrecisionBoostingFactor(Real fac)
-{
-   s_prec_boost_factor = fac;
 }
 
 } // namespace soplex

@@ -281,10 +281,6 @@ typedef double Real;
 #endif // !WITH_FLOAT
 #endif // !WITH_LONG_DOUBLE
 
-#ifndef DEFAULT_PREC_BOOST_FACTOR
-#define DEFAULT_PREC_BOOST_FACTOR 1.5
-#endif
-
 #define MAXIMUM(x,y)        ((x)>(y) ? (x) : (y))
 #define MINIMUM(x,y)        ((x)<(y) ? (x) : (y))
 
@@ -307,8 +303,6 @@ private:
    THREADLOCAL static Real s_epsilon_update;
    /// epsilon for pivot zero tolerance in factorization
    THREADLOCAL static Real s_epsilon_pivot;
-   /// factor by which the precision of the floating-point solver is multiplied
-   THREADLOCAL static Real s_prec_boost_factor;
    ///@}
 
 public:
@@ -332,10 +326,6 @@ public:
    static Real epsilonPivot();
    ///
    static void setEpsilonPivot(Real eps);
-   ///
-   static Real precisionBoostingFactor();
-   ///
-   static void setPrecisionBoostingFactor(Real fac);
    ///@}
 };
 

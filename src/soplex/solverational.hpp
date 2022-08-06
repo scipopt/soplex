@@ -2436,14 +2436,14 @@ bool SoPlexBase<R>::_boostPrecision()
    }
    else if(_statistics->precBoosts > 2)
    {
-      int newNbDigits = (int)floor(BP::default_precision() * Param::precisionBoostingFactor());
+      int newNbDigits = (int)floor(BP::default_precision() * realParam(SoPlexBase<R>::PRECISION_BOOSTING_FACTOR));
       int newMantissaBits = (int)boost::multiprecision::floor(boost::multiprecision::log2(boost::multiprecision::pow(BP(10), newNbDigits)));
       if(intParam(SoPlexBase<R>::MANTISSA_MAX_BITS) >= newMantissaBits)
       {
          // general case.
          // to increase the bits for the mantissa by 3/2,
          // we simply multiply the number of decimal digits also by 3/2
-         BP::default_precision(BP::default_precision() * Param::precisionBoostingFactor());
+         BP::default_precision(BP::default_precision() * realParam(SoPlexBase<R>::PRECISION_BOOSTING_FACTOR));
       }
       else
       {
