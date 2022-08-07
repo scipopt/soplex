@@ -2354,6 +2354,9 @@ void SoPlexBase<R>::_switchToBoosted()
 
       _switchedToBoosted = true;
       _hasBasis = (_boostedSolver.basis().status() > SPxBasisBase<BP>::NO_PROBLEM);
+
+      // invalidate rational basis factorization
+      _rationalLUSolver.clear();
    }
    else
    {
