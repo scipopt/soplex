@@ -216,11 +216,6 @@ SoPlexBase<R>::Settings::BoolParam::BoolParam()
       "enable recovery mechanism for when the solve fails";
    defaultValue[SoPlexBase<R>::RECOVERY_MECHANISM] = true;
 
-   name[SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX] = "store_basis_during_simplex";
-   description[SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX] =
-      "store advanced and stable basis met during simplex algorithm, to better warm start";
-   defaultValue[SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX] = false;
-
    name[SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE] = "store_basis_during_simplex_before";
    description[SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE] =
       "store advanced and stable basis met before each simplex iteration, to better warm start";
@@ -5928,12 +5923,6 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
       break;
 
    case RECOVERY_MECHANISM:
-      break;
-
-   case STORE_BASIS_DURING_SIMPLEX:
-      // attributes in solvers need to be updated
-      _solver.setStoreBasisDuringSimplex(value);
-      _boostedSolver.setStoreBasisDuringSimplex(value);
       break;
 
    case STORE_BASIS_DURING_SIMPLEX_BEFORE:

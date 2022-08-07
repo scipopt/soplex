@@ -1023,10 +1023,7 @@ public:
       /// try different settings when solve fails
       RECOVERY_MECHANISM = 29,
 
-      ///@todo precision-boosting find better names for these two parameters
-      /// store advanced and stable basis met during simplex algorithm, to better warm start
-      STORE_BASIS_DURING_SIMPLEX = 30,
-
+      ///@todo precision-boosting find better name for this parameter
       /// store advanced and stable basis met before each simplex iteration, to better warm start
       STORE_BASIS_DURING_SIMPLEX_BEFORE = 31,
 
@@ -2465,9 +2462,6 @@ private:
 
    /// return true if slack basis has to be loaded for boosted solver
    bool _isBoostedStartingFromSlack(bool initialSolve = true);
-
-   /// return true if an advanced basis has been stored during the simplex method.
-   bool _basisWasStoredDuringSimplex();
 
    /// indicate if we are testing feasibility, unboundedness or neither
    void _switchToStandardMode();

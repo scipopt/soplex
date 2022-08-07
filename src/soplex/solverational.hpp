@@ -2488,15 +2488,6 @@ bool SoPlexBase<R>::_isBoostedStartingFromSlack(bool initialSolve)
 
 
 
-/// test if a basis has been stored during the simplex pivots, even if the solve failed.
-template <class R>
-bool SoPlexBase<R>::_basisWasStoredDuringSimplex()
-{
-   return (boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX) || boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE));
-}
-
-
-
 // store last basis met in double precision solver for a potential iteration with increased precision
 template <class R>
 void SoPlexBase<R>::_storeBasisAsOldBasis(DataArray< typename SPxSolverBase<R>::VarStatus >& rows, DataArray< typename SPxSolverBase<R>::VarStatus >& cols)
@@ -5412,7 +5403,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             }
 
             // get the last stable basis. The hope is that precision boosting will get rid of cycling.
-            if(_basisWasStoredDuringSimplex())
+            if(boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE))
             {
                try
                {
@@ -5444,9 +5435,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(),
                                 basisStatusCols.size());
 
-               // get the last stable basis.
-               if(!boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX))
-                  _storeBasisAsOldBasis(basisStatusRows, basisStatusCols);
+               _storeBasisAsOldBasis(basisStatusRows, basisStatusCols);
             }
             else
             {
@@ -5455,7 +5444,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             }
 
             // get the last stable basis.
-            if(_basisWasStoredDuringSimplex())
+            if(boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE))
             {
                try
                {
@@ -5480,7 +5469,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                _rationalLUSolver.clear();
 
                // get the last stable basis.
-               if(_basisWasStoredDuringSimplex())
+               if(boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE))
                {
                   try
                   {
@@ -5512,7 +5501,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             _hasBasis = true;
 
             // if possible, get the last stable basis, otherwise store the infeasible basis.
-            if(_basisWasStoredDuringSimplex())
+            if(boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE))
             {
                try
                {
@@ -5537,7 +5526,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             _rationalLUSolver.clear();
 
             // get the last stable basis.
-            if(_basisWasStoredDuringSimplex())
+            if(boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE))
             {
                try
                {
@@ -6008,7 +5997,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
             }
 
             // get the last stable basis. The hope is that precision boosting will get rid of cycling.
-            if(_basisWasStoredDuringSimplex())
+            if(boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE))
             {
                try
                {
@@ -6042,9 +6031,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
                _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusRows, basisStatusRows);
                _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusCols, basisStatusCols);
 
-               // get the last stable basis.
-               if(!boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX))
-                  _storeBasisAsOldBasisBoosted(_tmpBasisStatusRows, _tmpBasisStatusCols);
+               _storeBasisAsOldBasisBoosted(_tmpBasisStatusRows, _tmpBasisStatusCols);
             }
             else
             {
@@ -6053,7 +6040,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
             }
 
             // get the last stable basis.
-            if(_basisWasStoredDuringSimplex())
+            if(boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE))
             {
                try
                {
@@ -6078,7 +6065,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
                _rationalLUSolver.clear();
 
                // get the last stable basis.
-               if(_basisWasStoredDuringSimplex())
+               if(boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE))
                {
                   try
                   {
@@ -6112,7 +6099,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
             _hasBasis = true;
 
             // if possible, get the last stable basis, otherwise store the infeasible basis.
-            if(_basisWasStoredDuringSimplex())
+            if(boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE))
             {
                try
                {
@@ -6137,7 +6124,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
             _rationalLUSolver.clear();
 
             // get the last stable basis.
-            if(_basisWasStoredDuringSimplex())
+            if(boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE))
             {
                try
                {

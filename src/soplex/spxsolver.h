@@ -332,7 +332,6 @@ private:
    int
    decompIterationLimit;   ///< the maximum number of iterations before the decomposition simplex is aborted.
 
-   bool store_basis_during_simplex; ///< do we store stable basis after a simplex pivot
    bool store_basis_during_simplex_before; ///< do we store stable basis before simplex pivots
    int store_basis_simplex_freq; ///< number of simplex pivots -1 to perform before storing stable basis
 
@@ -933,16 +932,6 @@ public:
    DataArray<VarStatus> getOldBasisStatusCols()
    {
       return oldBasisStatusCols;
-   }
-
-   void setStoreBasisDuringSimplex(bool value)
-   {
-      store_basis_during_simplex = value;
-   }
-
-   bool getStoreBasisDuringSimplex()
-   {
-      return store_basis_during_simplex;
    }
 
    void setStoreBasisDuringSimplexBefore(bool value)
