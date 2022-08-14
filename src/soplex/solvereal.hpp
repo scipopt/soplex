@@ -272,7 +272,7 @@ void SoPlexBase<R>::_preprocessAndSolveReal(bool applySimplifier, volatile bool*
          assert(_basisStatusCols.size() == this->numCols());
 
          _solver.loadLP(*_realLP, false);
-         _solver.template setBasis<R>(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+         _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
       }
       // load real LP and set up slack basis
       else
@@ -616,7 +616,7 @@ void SoPlexBase<R>::_storeSolutionReal(bool verify)
       // reset basis status
       _solver.setBasisStatus(simplifiedBasisStatus);
 
-      _solver.template setBasis<R>(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+      _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
       // load unsimplified basis into solver
       assert(_basisStatusRows.size() == numRows());
       assert(_basisStatusCols.size() == this->numCols());

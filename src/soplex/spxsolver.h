@@ -2132,8 +2132,7 @@ public:
    bool isBasisValid(DataArray<VarStatus> rows, DataArray<VarStatus> cols);
 
    /// set the lp solver's basis.
-   template <typename T>
-   void setBasis(const typename SPxSolverBase<T>::VarStatus p_rows[], const typename SPxSolverBase<T>::VarStatus p_cols[]);
+   void setBasis(const VarStatus rows[], const VarStatus cols[]);
 
    /// set the lp solver's basis status.
    void setBasisStatus(typename SPxBasisBase<R>::SPxStatus stat)

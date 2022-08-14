@@ -5580,7 +5580,7 @@ void SoPlexBase<R>::setBasis(const typename SPxSolverBase<R>::VarStatus rows[],
       assert(numRows() == _solver.nRows());
       assert(numCols() == _solver.nCols());
 
-      _solver.template setBasis<R>(rows, cols);
+      _solver.setBasis(rows, cols);
       _hasBasis = (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
    }
    else
@@ -8315,7 +8315,7 @@ void SoPlexBase<R>::_ensureRealLPLoaded()
          ///      entries); fix either in SPxSolverBase or in SPxBasisBase
          assert(_basisStatusRows.size() == numRows());
          assert(_basisStatusCols.size() == numCols());
-         _solver.template setBasis<R>(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+         _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
          _hasBasis = (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
       }
    }

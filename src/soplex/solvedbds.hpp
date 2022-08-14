@@ -570,7 +570,7 @@ void SoPlexBase<R>::_solveDecompositionDualSimplex()
          // Need to add commands to multiply the objective solution values by -1
       }
 
-      //_solver.template setBasis<R>(basisStatusRows.get_const_ptr(), basisStatusCols.get_const_ptr());
+      //_solver.setBasis(basisStatusRows.get_const_ptr(), basisStatusCols.get_const_ptr());
       _preprocessAndSolveReal(true);
    }
    else
@@ -962,7 +962,7 @@ void SoPlexBase<R>::_decompSimplifyAndSolve(SPxSolverBase<R>& solver, SLUFactor<
 
          ///@todo this should not fail even if the basis is invalid (wrong dimension or wrong number of basic
          ///      entries); fix either in SPxSolverBase or in SPxBasisBase
-         solver.template setBasis<R>(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+         solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
       }
 
       // if there is no preprocessing, then the original and the transformed problem are identical and it is more

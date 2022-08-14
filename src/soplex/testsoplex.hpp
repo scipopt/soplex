@@ -194,7 +194,7 @@ void SoPlexBase<R>::_checkBasisScaling()
       MSG_INFO1(spxout, spxout << "DEBUG: unscaling LP\n";)
       //         _solver.setRep(SPxSolverBase<R>::COLUMN);
       _solver.unscaleLPandReloadBasis();
-      //         _solver.template setBasis<R>(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
+      //         _solver.setBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
       //         _solver.solve();
 
       VectorBase<R>** binvcol2 = 0;
