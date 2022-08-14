@@ -1745,8 +1745,33 @@ private:
    // boosted solver object
    SPxSolverBase<BP> _boostedSolver;
 
-   ///@todo precision-boosting maybe use a `using` or `define`
-   int _initialPrecision   = 50;
+   // ------------- Main attributes for precision boosting
+
+   int _initialPrecision   = 50; // initial number of digits for multiprecision
+   bool _boostingLimitReached; // true if BP::default_precision() > max authorized number of digits
+   bool _switchedToBoosted; // true if _boostedSolver is used instead of _solver to cope with the numerical failure of _solver
+   // this attribute remembers wether we are testing feasibility (1), unboundedness (2) or neither (0)
+   // it is used when storing/loading the right basis in precision boosting.
+   // example: if _certificateMode == 1, it is the basis for the feasibility LP that should be stored/loaded.
+   int _certificateMode;
+
+   ///@todo precision-boosting remove because depreciated
+   int _boostedIterations;
+   ///@todo precision-boosting remove because depreciated
+   bool _updateTolsMode;
+
+   // ------------- Buffers for statistics of precision boosting
+
+   // ideally these four attributes would be local variables, however the precision boosting loop
+   // wraps the solve in a way that it is complicated to declare these variables locally.
+   int _lastStallPrecBoosts; // number of previous stalling precision boosts
+   bool _factorSolNewBasisPrecBoost; // false if the current basis has already been factorized (no new iterations have been done)
+   int _nextRatrecPrecBoost; // the iteration during or after which rational reconstruction can be performed
+   // buffer storing the number of iterations before a given precision boost
+   // used to detect stalling (_prevIterations < _statistics->iterations)
+   int _prevIterations;
+
+   // ------------- Tolerances Ratios
 
    /// ratios for computing the tolerances for precision boosting
    /// ratio denotes the proportion of precision used by the tolerance
@@ -1757,22 +1782,7 @@ private:
    Real _epsUpdatePrecisionRatio = 1.0;
    Real _epsPivotPrecisionRatio = 0.625;
 
-   bool _updateTolsMode;
-
-   bool _boostingLimitReached;
-
-   // this attribute remember wether we are testing feasibility (1), unboundedness (2) or neither (0)
-   int _certificateMode;
-
-   // ideally these attributes would be local variables, however the precision boosting loop wraps the solve in a way that it is complicated to declare
-   // these variables locally.
-   int _lastStallPrecBoosts;
-   bool _factorSolNewBasisPrecBoost;
-   int _nextRatrecPrecBoost;
-   int _prevIterations;
-
-   bool _switchedToBoosted;
-   int _boostedIterations;
+   // ------------- [Boosted] SLUFactor, Pricers, RatioTesters, Scalers, Simplifiers
 
    SLUFactor<BP> _boostedSlufactor;
 

@@ -1065,6 +1065,7 @@ void SPxSolverBase<R>::setType(Type tp)
       m_leavetol = d;
    }
 
+   // set parameter \p epsilon for semi-sparse primal, dual and pricing vectors
    template <class R>
    void SPxSolverBase<R>::setEpsilon(R d)
    {
