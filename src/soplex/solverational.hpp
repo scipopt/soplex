@@ -465,7 +465,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
    if(_hasBasis)
    {
       assert(_isRealLPLoaded);
-      _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+      _solver.template setBasis<R>(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
       _hasBasis = (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
 
       // since setBasis always sets the basis status to regular, we need to set it manually here
@@ -1837,7 +1837,7 @@ void SoPlexBase<R>::_solveRealForRationalStable(
    {
       assert(_basisStatusRows.size() == numRowsRational());
       assert(_basisStatusCols.size() == numColsRational());
-      _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+      _solver.template setBasis<R>(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
       _hasBasis = (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
    }
 
@@ -2051,7 +2051,7 @@ void SoPlexBase<R>::_performOptIRStable(
    {
       assert(_basisStatusRows.size() == numRowsRational());
       assert(_basisStatusCols.size() == numColsRational());
-      _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+      _solver.template setBasis<R>(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
       _hasBasis = (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
    }
 
@@ -2229,7 +2229,7 @@ void SoPlexBase<R>::_performOptIRStable(
       {
          MSG_DEBUG(spxout << "basis (status = " << _solver.basis().status() << ") desc before set:\n";
                    _solver.basis().desc().dump());
-         _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+         _solver.template setBasis<R>(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
          MSG_DEBUG(spxout << "basis (status = " << _solver.basis().status() << ") desc after set:\n";
                    _solver.basis().desc().dump());
 
@@ -2553,17 +2553,17 @@ bool SoPlexBase<R>::_loadBasisFromOldBasis(bool boosted)
       if(_inStandardMode() && _hasOldBasis)
       {
          MSG_INFO1(spxout, spxout << "Load basis from old basis (in solver)" << "\n");
-         _solver.setBasis(_oldBasisStatusRows.get_const_ptr(), _oldBasisStatusCols.get_const_ptr());
+         _solver.template setBasis<R>(_oldBasisStatusRows.get_const_ptr(), _oldBasisStatusCols.get_const_ptr());
       }
       else if(_inFeasMode() && _hasOldFeasBasis)
       {
          MSG_INFO1(spxout, spxout << "Load basis from old basis (in solver - testing feasibility)" << "\n");
-         _solver.setBasis(_oldFeasBasisStatusRows.get_const_ptr(), _oldFeasBasisStatusCols.get_const_ptr());
+         _solver.template setBasis<R>(_oldFeasBasisStatusRows.get_const_ptr(), _oldFeasBasisStatusCols.get_const_ptr());
       }
       else if(_inUnbdMode() && _hasOldUnbdBasis)
       {
          MSG_INFO1(spxout, spxout << "Load basis from old basis (in solver - testing unboundedness)" << "\n");
-         _solver.setBasis(_oldUnbdBasisStatusRows.get_const_ptr(), _oldUnbdBasisStatusCols.get_const_ptr());
+         _solver.template setBasis<R>(_oldUnbdBasisStatusRows.get_const_ptr(), _oldUnbdBasisStatusCols.get_const_ptr());
       }
       else
       {
@@ -2576,23 +2576,17 @@ bool SoPlexBase<R>::_loadBasisFromOldBasis(bool boosted)
       if(_inStandardMode() && _hasOldBasis)
       {
          MSG_INFO1(spxout, spxout << "Load basis from old basis (in boosted solver)" << "\n");
-         _convertDataArrayVarStatusToBoosted(_oldBasisStatusRows, _tmpBasisStatusRows);
-         _convertDataArrayVarStatusToBoosted(_oldBasisStatusCols, _tmpBasisStatusCols);
-         _boostedSolver.setBasis(_tmpBasisStatusRows.get_const_ptr(), _tmpBasisStatusCols.get_const_ptr());
+         _boostedSolver.template setBasis<R>(_oldBasisStatusRows.get_const_ptr(), _oldBasisStatusCols.get_const_ptr());
       }
       else if(_inFeasMode() && _hasOldFeasBasis)
       {
          MSG_INFO1(spxout, spxout << "Load basis from old basis (in boosted solver - testing feasibility)" << "\n");
-         _convertDataArrayVarStatusToBoosted(_oldFeasBasisStatusRows, _tmpBasisStatusRows);
-         _convertDataArrayVarStatusToBoosted(_oldFeasBasisStatusCols, _tmpBasisStatusCols);
-         _boostedSolver.setBasis(_tmpBasisStatusRows.get_const_ptr(), _tmpBasisStatusCols.get_const_ptr());
+         _boostedSolver.template setBasis<R>(_oldFeasBasisStatusRows.get_const_ptr(), _oldFeasBasisStatusCols.get_const_ptr());
       }
       else if(_inUnbdMode() && _hasOldUnbdBasis)
       {
          MSG_INFO1(spxout, spxout << "Load basis from old basis (in boosted solver - testing unboundedness)" << "\n");
-         _convertDataArrayVarStatusToBoosted(_oldUnbdBasisStatusRows, _tmpBasisStatusRows);
-         _convertDataArrayVarStatusToBoosted(_oldUnbdBasisStatusCols, _tmpBasisStatusCols);
-         _boostedSolver.setBasis(_tmpBasisStatusRows.get_const_ptr(), _tmpBasisStatusCols.get_const_ptr());
+         _boostedSolver.template setBasis<R>(_oldUnbdBasisStatusRows.get_const_ptr(), _oldUnbdBasisStatusCols.get_const_ptr());
       }
       else
       {
@@ -3189,9 +3183,7 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
       {
          MSG_DEBUG(spxout << "basis (status = " << _boostedSolver.basis().status() << ") desc before set:\n";
                _boostedSolver.basis().desc().dump());
-         _convertDataArrayVarStatusToBoosted(_basisStatusRows, _tmpBasisStatusRows);
-         _convertDataArrayVarStatusToBoosted(_basisStatusCols, _tmpBasisStatusCols);
-         _boostedSolver.setBasis(_tmpBasisStatusRows.get_const_ptr(), _tmpBasisStatusCols.get_const_ptr());
+         _boostedSolver.template setBasis<R>(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
          MSG_DEBUG(spxout << "basis (status = " << _boostedSolver.basis().status() << ") desc after set:\n";
                _boostedSolver.basis().desc().dump());
 
@@ -3816,7 +3808,7 @@ void SoPlexBase<R>::_restoreLPReal()
             }
          }
 
-         _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+         _solver.template setBasis<R>(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
          _hasBasis = (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
       }
    }
@@ -5502,7 +5494,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
       spx_free(rationalLP);
 
       if(_hasBasis)
-         _solver.setBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
+         _solver.template setBasis<R>(basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
    }
 
    return result;
@@ -6102,9 +6094,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
 
       if(_hasBasis)
       {
-         _convertDataArrayVarStatusToBoosted(basisStatusRows, _tmpBasisStatusRows);
-         _convertDataArrayVarStatusToBoosted(basisStatusCols, _tmpBasisStatusCols);
-         _boostedSolver.setBasis(_tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr());
+         _boostedSolver.template setBasis<R>(basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
       }
    }
 }

@@ -2055,7 +2055,8 @@ void SPxSolverBase<R>::setType(Type tp)
    }
 
    template <class R>
-   void SPxSolverBase<R>::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
+   template <typename T>
+   void SPxSolverBase<R>::setBasis(const typename SPxSolverBase<T>::VarStatus p_rows[], const typename SPxSolverBase<T>::VarStatus p_cols[])
    {
       if(SPxBasisBase<R>::status() == SPxBasisBase<R>::NO_PROBLEM)
          SPxBasisBase<R>::load(this, false);
@@ -2064,10 +2065,10 @@ void SPxSolverBase<R>::setType(Type tp)
       int i;
 
       for(i = 0; i < this->nRows(); i++)
-         ds.rowStatus(i) = varStatusToBasisStatusRow(i, p_rows[i]);
+         ds.rowStatus(i) = varStatusToBasisStatusRow(i, (VarStatus)p_rows[i]);
 
       for(i = 0; i < this->nCols(); i++)
-         ds.colStatus(i) = varStatusToBasisStatusCol(i, p_cols[i]);
+         ds.colStatus(i) = varStatusToBasisStatusCol(i, (VarStatus)p_cols[i]);
 
       loadBasis(ds);
       forceRecompNonbasicValue();
