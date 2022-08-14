@@ -332,7 +332,7 @@ private:
    int
    decompIterationLimit;   ///< the maximum number of iterations before the decomposition simplex is aborted.
 
-   bool store_basis_during_simplex_before; ///< do we store stable basis before simplex pivots
+   bool store_basis_before_simplex_pivot; ///< do we store stable basis before simplex pivots
    int store_basis_simplex_freq; ///< number of simplex pivots -1 to perform before storing stable basis
 
    bool
@@ -936,12 +936,12 @@ public:
 
    void setStoreBasisDuringSimplexBefore(bool value)
    {
-      store_basis_during_simplex_before = value;
+      store_basis_before_simplex_pivot = value;
    }
 
    bool getStoreBasisDuringSimplexBefore()
    {
-      return store_basis_during_simplex_before;
+      return store_basis_before_simplex_pivot;
    }
 
    void setStoreBasisSimplexFreq(int freq)

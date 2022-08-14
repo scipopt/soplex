@@ -5403,7 +5403,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             }
 
             // get the last stable basis. The hope is that precision boosting will get rid of cycling.
-            if(boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE))
+            if(boolParam(SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT))
             {
                try
                {
@@ -5444,7 +5444,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             }
 
             // get the last stable basis.
-            if(boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE))
+            if(boolParam(SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT))
             {
                try
                {
@@ -5469,7 +5469,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                _rationalLUSolver.clear();
 
                // get the last stable basis.
-               if(boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE))
+               if(boolParam(SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT))
                {
                   try
                   {
@@ -5501,7 +5501,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             _hasBasis = true;
 
             // if possible, get the last stable basis, otherwise store the infeasible basis.
-            if(boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE))
+            if(boolParam(SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT))
             {
                try
                {
@@ -5526,7 +5526,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             _rationalLUSolver.clear();
 
             // get the last stable basis.
-            if(boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE))
+            if(boolParam(SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT))
             {
                try
                {
@@ -5997,7 +5997,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
             }
 
             // get the last stable basis. The hope is that precision boosting will get rid of cycling.
-            if(boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE))
+            if(boolParam(SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT))
             {
                try
                {
@@ -6040,7 +6040,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
             }
 
             // get the last stable basis.
-            if(boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE))
+            if(boolParam(SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT))
             {
                try
                {
@@ -6065,7 +6065,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
                _rationalLUSolver.clear();
 
                // get the last stable basis.
-               if(boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE))
+               if(boolParam(SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT))
                {
                   try
                   {
@@ -6099,7 +6099,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
             _hasBasis = true;
 
             // if possible, get the last stable basis, otherwise store the infeasible basis.
-            if(boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE))
+            if(boolParam(SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT))
             {
                try
                {
@@ -6124,7 +6124,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
             _rationalLUSolver.clear();
 
             // get the last stable basis.
-            if(boolParam(SoPlexBase<R>::STORE_BASIS_DURING_SIMPLEX_BEFORE))
+            if(boolParam(SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT))
             {
                try
                {

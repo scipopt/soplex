@@ -324,7 +324,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                printDisplayLine();
 
                // if it is time to store the basis, store it
-               if(store_basis_during_simplex_before)
+               if(store_basis_before_simplex_pivot)
                {
                   if((storeBasisFreqLog && iterations() == pow(2, timesBasisWasStored))
                      || (!storeBasisFreqLog && iterations() % store_basis_simplex_freq == 0))
@@ -717,7 +717,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                printDisplayLine();
 
                // if it is time to store the basis, store it
-               if(store_basis_during_simplex_before)
+               if(store_basis_before_simplex_pivot)
                {
                   if((storeBasisFreqLog && iterations() == pow(2, timesBasisWasStored))
                      || (!storeBasisFreqLog && iterations() % store_basis_simplex_freq == 0))

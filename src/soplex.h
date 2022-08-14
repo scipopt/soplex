@@ -1023,9 +1023,8 @@ public:
       /// try different settings when solve fails
       RECOVERY_MECHANISM = 29,
 
-      ///@todo precision-boosting find better name for this parameter
       /// store advanced and stable basis met before each simplex iteration, to better warm start
-      STORE_BASIS_DURING_SIMPLEX_BEFORE = 31,
+      STORE_BASIS_BEFORE_SIMPLEX_PIVOT = 31,
 
       /// number of boolean parameters
       BOOLPARAM_COUNT = 32
@@ -1384,7 +1383,6 @@ public:
       /// minimize number of basic slack variables, i.e. more variables between bounds
       POLISHING_FRACTIONALITY = 2
    };
-
 
    /// real parameters
    typedef enum
