@@ -459,15 +459,14 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
    upper[SoPlexBase<R>::STATTIMER] = 2;
    defaultValue[SoPlexBase<R>::STATTIMER] = 1;
 
-   // maximum number of bits for the mantissa when using multiprecision
-   name[SoPlexBase<R>::MANTISSA_MAX_BITS] = "mantissa_max_bits";
-   description[SoPlexBase<R>::MANTISSA_MAX_BITS] =
-      "maximum number of bits for the mantissa when using multiprecision";
-   lower[SoPlexBase<R>::MANTISSA_MAX_BITS] = 168;
-   upper[SoPlexBase<R>::MANTISSA_MAX_BITS] = INT_MAX;
-   defaultValue[SoPlexBase<R>::MANTISSA_MAX_BITS] = 1000; // if precision is too high, double tolerances are rounded to zero
-   // 1000 \approx log2(10^(300)), 300 being the greatest int k such that (double)1e-k != 0
-   // 1000 bits for the mantissa is equivalent to roughly 300 decimals
+   // maximum number of digits for the multiprecision type
+   name[SoPlexBase<R>::MULTIPRECISION_LIMIT] = "multiprecision_limit";
+   description[SoPlexBase<R>::MULTIPRECISION_LIMIT] =
+      "maximum number of digits for the multiprecision type";
+   lower[SoPlexBase<R>::MULTIPRECISION_LIMIT] = 50;
+   upper[SoPlexBase<R>::MULTIPRECISION_LIMIT] = INT_MAX;
+   defaultValue[SoPlexBase<R>::MULTIPRECISION_LIMIT] = 300; // if precision is too high, double tolerances are rounded to zero
+   // 300 is very close to the greatest int k such that (double)1e-k != 0
 
    // at max, after how many simplex pivots do we store the advanced and stable basis, 1 = every iterations
    name[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] = "store_basis_simplex_freq";
@@ -6432,8 +6431,8 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       setTimings((Timer::TYPE) value);
       break;
 
-   // maximum number of bits for the mantissa when using multiprecision
-   case SoPlexBase<R>::MANTISSA_MAX_BITS:
+   // maximum number of digits for the multiprecision type
+   case SoPlexBase<R>::MULTIPRECISION_LIMIT:
       break;
 
    case SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ:

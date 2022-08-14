@@ -2414,44 +2414,42 @@ bool SoPlexBase<R>::_boostPrecision()
 
    if(_statistics->precBoosts == 1)
    {
-      // 50 decimal digits are already allocated by default i.e. a mantissa stored with 167 bits
-      // we could set the precision to 38 to have a mantissa stored in 128 bits but this would not change the computation times
-      // and still would reduce the precision significantly.
+      // 50 decimal digits are already allocated by default
+      // we could set the precision to a lower number of digits but this would not improve the computation times
       // So we do nothing.
    }
    else if(_statistics->precBoosts == 2)
    {
-      if(intParam(SoPlexBase<R>::MANTISSA_MAX_BITS) >= 192)
+      // special case for the second boost. Normally we multiply the precision by 3/2 just like in QSopt_ex
+      // but the previous multiprecision type was stored in 167 bits and not 128 bits.
+      // so we hard set the number of bits for the multiprecision type to 192 bits
+      BP nbDigitsSecondBoost = boost::multiprecision::floor(boost::multiprecision::log10(boost::multiprecision::pow(BP(2), 192)));
+
+      if(intParam(SoPlexBase<R>::MULTIPRECISION_LIMIT) >= nbDigitsSecondBoost)
       {
-         // special case. Normally we multiply the precision by 3/2 just like in QSopt_ex
-         // but the previous mantissa was stored in 167 bits and not 128 bits.
-         // so we hard set the number of bits for the mantissa to 192 bits
-         BP nbDecimalDigits = boost::multiprecision::floor(boost::multiprecision::log10(boost::multiprecision::pow(BP(2), 192)));
-         BP::default_precision((int)nbDecimalDigits);
+         BP::default_precision((int)nbDigitsSecondBoost);
       }
       else
       {
-         MSG_INFO1(spxout, spxout << "Maximum number of bits for the mantissa reached.\n"
-                                 << "To increase this limit, modify the parameter mantissa_max_bits.\n"
+         MSG_INFO1(spxout, spxout << "Maximum number of digits for the multiprecision type reached.\n"
+                                 << "To increase this limit, modify the parameter multiprecision_limit.\n"
                                  << "Giving up.\n");
          _boostingLimitReached = true;
       }
    }
    else if(_statistics->precBoosts > 2)
    {
+      // general case: increase the number of decimal digits by 3/2,
       int newNbDigits = (int)floor(BP::default_precision() * realParam(SoPlexBase<R>::PRECISION_BOOSTING_FACTOR));
-      int newMantissaBits = (int)boost::multiprecision::floor(boost::multiprecision::log2(boost::multiprecision::pow(BP(10), newNbDigits)));
-      if(intParam(SoPlexBase<R>::MANTISSA_MAX_BITS) >= newMantissaBits)
+
+      if(intParam(SoPlexBase<R>::MULTIPRECISION_LIMIT) >= newNbDigits)
       {
-         // general case.
-         // to increase the bits for the mantissa by 3/2,
-         // we simply multiply the number of decimal digits also by 3/2
-         BP::default_precision(BP::default_precision() * realParam(SoPlexBase<R>::PRECISION_BOOSTING_FACTOR));
+         BP::default_precision(newNbDigits);
       }
       else
       {
-         MSG_INFO1(spxout, spxout << "Maximum number of bits for the mantissa reached.\n"
-                                 << "To increase this limit, modify the parameter mantissa_max_bits.\n"
+         MSG_INFO1(spxout, spxout << "Maximum number of digits for the multiprecision type reached.\n"
+                                 << "To increase this limit, modify the parameter multiprecision_limit.\n"
                                  << "Giving up.\n");
          _boostingLimitReached = true;
       }
@@ -2699,7 +2697,6 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
    _statistics->rationalTime->start();
 
    MSG_INFO1(spxout, spxout << "Current precision = 1e-" << BP::default_precision() << ", ");
-   MSG_INFO1(spxout, spxout << "mantissa stored in " << (int)boost::multiprecision::floor(boost::multiprecision::log2(boost::multiprecision::pow(BP(10), (int)BP::default_precision()))) + 2 << " bits" << "\n");
 
    primalFeasible = false;
    dualFeasible = false;
@@ -2962,7 +2959,6 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
    _statistics->rationalTime->start();
 
    MSG_INFO1(spxout, spxout << "Current precision = 1e-" << BP::default_precision() << ", ");
-   MSG_INFO1(spxout, spxout << "mantissa stored in " << (int)boost::multiprecision::floor(boost::multiprecision::log2(boost::multiprecision::pow(BP(10), (int)BP::default_precision()))) + 2 << " bits" << "\n");
 
    typename SPxSolverBase<BP>::Status boostedResult = SPxSolverBase<BP>::UNKNOWN;
 

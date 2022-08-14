@@ -709,18 +709,6 @@ int runSoPlex(int argc, char* argv[])
             {
                continue;
             }
-            // --mantissa_max_bits=<value> : maximum number of bits for the mantissa
-            else if(strncmp(option, "mantissa_max_bits=", 18) == 0)
-            {
-               if(!soplex->setIntParam(soplex->MANTISSA_MAX_BITS, option[18] - '0'))
-               {
-                  printUsage(argv, optidx);
-                  returnValue = 1;
-                  goto TERMINATE_FREESTRINGS;
-               }
-
-               break;
-            }
             // --<type>:<name>=<val> :  change parameter value using syntax of settings file entries
             else if(!soplex->parseSettingsString(option))
             {

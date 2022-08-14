@@ -1123,8 +1123,8 @@ public:
       /// type of timer for statistics
       STATTIMER = 29,
 
-      // maximum number of bits for the mantissa when using multiprecision
-      MANTISSA_MAX_BITS = 30,
+      // maximum number of digits for the multiprecision type
+      MULTIPRECISION_LIMIT = 30,
 
       ///@todo precision-boosting find better parameter name
       /// after how many simplex pivots do we store the advanced and stable basis, 1 = every iterations
