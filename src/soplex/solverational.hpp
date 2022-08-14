@@ -5138,7 +5138,7 @@ void SoPlexBase<R>::_storeLastStableBasisBoosted(bool vanished)
       try
       {
          _boostedSimplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost,
-                              _boostedSolver.oldBasisStatusRows.get_ptr(), _boostedSolver.oldBasisStatusCols.get_ptr());
+                              _boostedSolver.getOldBasisStatusRows().get_ptr(), _boostedSolver.getOldBasisStatusCols().get_ptr());
       }
       catch(const SPxInternalCodeException& E)
       {
@@ -5147,14 +5147,14 @@ void SoPlexBase<R>::_storeLastStableBasisBoosted(bool vanished)
       }
 
       // store basis for original problem
-      _boostedSolver.oldBasisStatusRows.reSize(numRowsRational());
-      _boostedSolver.oldBasisStatusCols.reSize(numColsRational());
-      _boostedSimplifier->getBasis(_boostedSolver.oldBasisStatusRows.get_ptr(), _boostedSolver.oldBasisStatusCols.get_ptr(), _boostedSolver.oldBasisStatusRows.size(),
-                              _boostedSolver.oldBasisStatusCols.size());
+      _boostedSolver.getOldBasisStatusRows().reSize(numRowsRational());
+      _boostedSolver.getOldBasisStatusCols().reSize(numColsRational());
+      _boostedSimplifier->getBasis(_boostedSolver.getOldBasisStatusRows().get_ptr(), _boostedSolver.getOldBasisStatusCols().get_ptr(),
+                                   _boostedSolver.getOldBasisStatusRows().size(),    _boostedSolver.getOldBasisStatusCols().size());
    }
 
    // store last basis as old basis
-   _storeBasisAsOldBasisBoosted(_boostedSolver.oldBasisStatusRows, _boostedSolver.oldBasisStatusCols);
+   _storeBasisAsOldBasisBoosted(_boostedSolver.getOldBasisStatusRows(), _boostedSolver.getOldBasisStatusCols());
 }
 
 
@@ -5174,7 +5174,7 @@ void SoPlexBase<R>::_storeLastStableBasis(bool vanished)
       try
       {
          _simplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost,
-                              _solver.oldBasisStatusRows.get_ptr(), _solver.oldBasisStatusCols.get_ptr());
+                              _solver.getOldBasisStatusRows().get_ptr(), _solver.getOldBasisStatusCols().get_ptr());
       }
       catch(const SPxInternalCodeException& E)
       {
@@ -5183,14 +5183,14 @@ void SoPlexBase<R>::_storeLastStableBasis(bool vanished)
       }
 
       // store basis for original problem
-      _solver.oldBasisStatusRows.reSize(numRowsRational());
-      _solver.oldBasisStatusCols.reSize(numColsRational());
-      _simplifier->getBasis(_solver.oldBasisStatusRows.get_ptr(), _solver.oldBasisStatusCols.get_ptr(), _solver.oldBasisStatusRows.size(),
-                              _solver.oldBasisStatusCols.size());
+      _solver.getOldBasisStatusRows().reSize(numRowsRational());
+      _solver.getOldBasisStatusCols().reSize(numColsRational());
+      _simplifier->getBasis(_solver.getOldBasisStatusRows().get_ptr(), _solver.getOldBasisStatusCols().get_ptr(),
+                            _solver.getOldBasisStatusRows().size(),    _solver.getOldBasisStatusCols().size());
    }
 
    // store last basis as old basis
-   _storeBasisAsOldBasis(_solver.oldBasisStatusRows, _solver.oldBasisStatusCols);
+   _storeBasisAsOldBasis(_solver.getOldBasisStatusRows(), _solver.getOldBasisStatusCols());
 }
 
 

@@ -332,6 +332,9 @@ private:
    int
    decompIterationLimit;   ///< the maximum number of iterations before the decomposition simplex is aborted.
 
+   DataArray<VarStatus> oldBasisStatusRows; ///< stored stable basis met before a simplex pivot (used to warm start the solver)
+   DataArray<VarStatus> oldBasisStatusCols; // They don't have setters because only the internal simplex method is meant to fill them
+
    bool store_basis_before_simplex_pivot; ///< do we store stable basis before simplex pivots
    int store_basis_simplex_freq; ///< number of simplex pivots -1 to perform before storing stable basis
 
@@ -488,10 +491,6 @@ public:
 
    DataArray<int>
    integerVariables;    ///< supplementary variable information, 0: continous variable, 1: integer variable
-
-   ///@todo precision-boosting make these private attributes
-   DataArray<VarStatus> oldBasisStatusRows; ///< stored stable basis met at the start of simplex pivots
-   DataArray<VarStatus> oldBasisStatusCols;
 
    //-----------------------------
    void setOutstream(SPxOut& newOutstream)
@@ -910,26 +909,14 @@ public:
    /// enable or disable hyper sparse pricing
    void hyperPricing(bool h);
 
-   // set old basis status rows
-   void setOldBasisStatusRows(DataArray<VarStatus>& rows)
-   {
-      oldBasisStatusRows = rows;
-   }
-
    // get old basis status rows
-   DataArray<VarStatus> getOldBasisStatusRows()
+   DataArray<VarStatus>& getOldBasisStatusRows()
    {
       return oldBasisStatusRows;
    }
 
-   // set old basis status cols
-   void setOldBasisStatusCols(DataArray<VarStatus>& cols)
-   {
-      oldBasisStatusCols = cols;
-   }
-
    // get old basis status cols
-   DataArray<VarStatus> getOldBasisStatusCols()
+   DataArray<VarStatus>& getOldBasisStatusCols()
    {
       return oldBasisStatusCols;
    }
