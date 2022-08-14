@@ -1756,8 +1756,6 @@ private:
    int _certificateMode;
 
    ///@todo precision-boosting remove because depreciated
-   int _boostedIterations;
-   ///@todo precision-boosting remove because depreciated
    bool _updateTolsMode;
 
    // ------------- Buffers for statistics of precision boosting

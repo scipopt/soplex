@@ -9236,7 +9236,6 @@ SoPlexBase<R>::SoPlexBase()
    _prevIterations = 0;
 
    _switchedToBoosted = false;
-   _boostedIterations = 0;
 
    _certificateMode = 0;
    _hasOldBasis     = false;
