@@ -1123,17 +1123,15 @@ public:
       /// type of timer for statistics
       STATTIMER = 29,
 
-      UPDATETOLSMODE = 30,
-
       // maximum number of bits for the mantissa when using multiprecision
-      MANTISSA_MAX_BITS = 31,
+      MANTISSA_MAX_BITS = 30,
 
       ///@todo precision-boosting find better parameter name
       /// after how many simplex pivots do we store the advanced and stable basis, 1 = every iterations
-      STORE_BASIS_SIMPLEX_FREQ = 32,
+      STORE_BASIS_SIMPLEX_FREQ = 31,
 
       /// number of integer parameters
-      INTPARAM_COUNT = 33
+      INTPARAM_COUNT = 32
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -1754,9 +1752,6 @@ private:
    // it is used when storing/loading the right basis in precision boosting.
    // example: if _certificateMode == 1, it is the basis for the feasibility LP that should be stored/loaded.
    int _certificateMode;
-
-   ///@todo precision-boosting remove because depreciated
-   bool _updateTolsMode;
 
    // ------------- Buffers for statistics of precision boosting
 

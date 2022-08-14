@@ -709,18 +709,6 @@ int runSoPlex(int argc, char* argv[])
             {
                continue;
             }
-            // --updatetolsmode=<value> : (temporary) different ways to update tolerances
-            else if(strncmp(option, "updatetolsmode=", 15) == 0)
-            {
-               if(!soplex->setIntParam(soplex->UPDATETOLSMODE, option[15] - '0'))
-               {
-                  printUsage(argv, optidx);
-                  returnValue = 1;
-                  goto TERMINATE_FREESTRINGS;
-               }
-
-               break;
-            }
             // --mantissa_max_bits=<value> : maximum number of bits for the mantissa
             else if(strncmp(option, "mantissa_max_bits=", 18) == 0)
             {
