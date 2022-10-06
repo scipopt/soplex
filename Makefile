@@ -42,7 +42,7 @@ include make/make.detecthost
 # default settings
 #-----------------------------------------------------------------------------
 
-VERSION		:=	6.0.1.3
+VERSION		:=	6.0.2.4
 SPXGITHASH	=
 
 VERBOSE		=	false
@@ -123,12 +123,10 @@ LIBOBJ = 	soplex/didxset.o \
 				soplex/idxset.o \
 				soplex/mpsinput.o \
 				soplex/nameset.o \
-				soplex/ratrecon.o \
 				soplex/spxdefines.o \
 				soplex/spxgithash.o \
 				soplex/spxid.o \
 				soplex/spxout.o \
-				soplex/spxscaler.o \
 				soplex/usertimer.o \
 				soplex/wallclocktimer.o
 
