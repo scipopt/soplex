@@ -5325,7 +5325,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                _hasBasis = true;
             }
 
-            if(oldIterations > _statistics->iterations) // store optimal basis as old basis
+            if(oldIterations < _statistics->iterations) // store optimal basis as old basis
                _storeBasisAsOldBasis(basisStatusRows, basisStatusCols);
 
             break;
@@ -5349,7 +5349,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             {
                try
                {
-                  if(oldIterations > _statistics->iterations)
+                  if(oldIterations < _statistics->iterations)
                      _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
                }
                catch(const SPxInternalCodeException& E)
@@ -5378,7 +5378,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(),
                                 basisStatusCols.size());
 
-               if(oldIterations > _statistics->iterations)
+               if(oldIterations < _statistics->iterations)
                   _storeBasisAsOldBasis(basisStatusRows, basisStatusCols);
             }
             else
@@ -5392,7 +5392,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             {
                try
                {
-                  if(oldIterations > _statistics->iterations)
+                  if(oldIterations < _statistics->iterations)
                      _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
                }
                catch(const SPxInternalCodeException& E)
@@ -5418,7 +5418,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                {
                   try
                   {
-                     if(oldIterations > _statistics->iterations)
+                     if(oldIterations < _statistics->iterations)
                         _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
                   }
                   catch(const SPxInternalCodeException& E)
@@ -5451,7 +5451,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             {
                try
                {
-                  if(oldIterations > _statistics->iterations)
+                  if(oldIterations < _statistics->iterations)
                      _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
                }
                catch(const SPxInternalCodeException& E)
@@ -5463,7 +5463,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             }
             else
             {
-               if(oldIterations > _statistics->iterations)
+               if(oldIterations < _statistics->iterations)
                   _storeBasisAsOldBasis(basisStatusRows, basisStatusCols);
             }
 
@@ -5480,7 +5480,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             {
                try
                {
-                  if(oldIterations > _statistics->iterations)
+                  if(oldIterations < _statistics->iterations)
                      _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
                }
                catch(const SPxInternalCodeException& E)
@@ -5930,7 +5930,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
                _hasBasis = true;
             }
 
-            if(oldIterations > _statistics->iterations) // store optimal basis as old basis
+            if(oldIterations < _statistics->iterations) // store optimal basis as old basis
                _storeBasisAsOldBasisBoosted(_tmpBasisStatusRows, _tmpBasisStatusCols);
 
             break;
@@ -5954,7 +5954,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
             {
                try
                {
-                  if(oldIterations > _statistics->iterations)
+                  if(oldIterations < _statistics->iterations)
                      _storeLastStableBasisBoosted(simplificationStatus == SPxSimplifier<BP>::VANISHED);
                }
                catch(const SPxInternalCodeException& E)
@@ -5985,7 +5985,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
                _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusRows, basisStatusRows);
                _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusCols, basisStatusCols);
 
-               if(oldIterations > _statistics->iterations)
+               if(oldIterations < _statistics->iterations)
                   _storeBasisAsOldBasisBoosted(_tmpBasisStatusRows, _tmpBasisStatusCols);
             }
             else
@@ -5999,7 +5999,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
             {
                try
                {
-                  if(oldIterations > _statistics->iterations)
+                  if(oldIterations < _statistics->iterations)
                      _storeLastStableBasisBoosted(simplificationStatus == SPxSimplifier<BP>::VANISHED);
                }
                catch(const SPxInternalCodeException& E)
@@ -6025,7 +6025,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
                {
                   try
                   {
-                     if(oldIterations > _statistics->iterations)
+                     if(oldIterations < _statistics->iterations)
                         _storeLastStableBasisBoosted(simplificationStatus == SPxSimplifier<BP>::VANISHED);
                   }
                   catch(const SPxInternalCodeException& E)
@@ -6060,7 +6060,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
             {
                try
                {
-                  if(oldIterations > _statistics->iterations)
+                  if(oldIterations < _statistics->iterations)
                      _storeLastStableBasisBoosted(simplificationStatus == SPxSimplifier<BP>::VANISHED);
                }
                catch(const SPxInternalCodeException& E)
@@ -6072,7 +6072,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
             }
             else
             {
-               if(oldIterations > _statistics->iterations)
+               if(oldIterations < _statistics->iterations)
                   _storeBasisAsOldBasisBoosted(_tmpBasisStatusRows, _tmpBasisStatusCols);
             }
 
@@ -6089,7 +6089,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
             {
                try
                {
-                  if(oldIterations > _statistics->iterations)
+                  if(oldIterations < _statistics->iterations)
                      _storeLastStableBasisBoosted(simplificationStatus == SPxSimplifier<BP>::VANISHED);
                }
                catch(const SPxInternalCodeException& E)
