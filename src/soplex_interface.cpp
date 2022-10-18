@@ -419,6 +419,35 @@ void SoPlex_getUpperReal(void* soplex, double* ub, int dim)
       ub[i] = ubvec[i];
 }
 
+/** returns status of row
+ *  0 -> row is set to its upper bound
+ *  1 -> row is set to its lower bound
+ *  2 -> row is fixed to its identical bounds
+ *  4 -> row is basic
+ *  5 -> nothing known about basis status
+ **/
+int SoPlex_basisRowStatus(void* soplex, int rowidx)
+{
+   SoPlex* so = (SoPlex*)(soplex);
+
+   return so->basisRowStatus(rowidx);
+}
+
+/** returns status of column
+ *  0 -> column is set to its upper bound
+ *  1 -> column is set to its lower bound
+ *  2 -> column is fixed to its identical bounds
+ *  3 -> column is free and fixed to zero
+ *  4 -> column is basic
+ *  5 -> nothing known about basis status
+ **/
+int SoPlex_basisColStatus(void* soplex, int colidx)
+{
+   SoPlex* so = (SoPlex*)(soplex);
+
+   return so->basisColStatus(colidx);
+}
+
 /** get non-zero entries and indices of row i **/
 void SoPlex_getRowVectorReal(
    void* soplex,
