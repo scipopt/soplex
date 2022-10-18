@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2021 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -145,6 +145,46 @@ SoPlexBase<R>::Settings::BoolParam::BoolParam()
    description[SoPlexBase<Real>::FORCEBASIC] =
       "try to enforce that the optimal solution is a basic solution";
    defaultValue[SoPlexBase<Real>::FORCEBASIC] = false;
+
+   name[SoPlexBase<R>::SIMPLIFIER_SINGLETONCOLS] = "simplifier_enable_singletoncols";
+   description[SoPlexBase<R>::SIMPLIFIER_SINGLETONCOLS] =
+      "enable presolver SingletonCols in PaPILO";
+   defaultValue[SoPlexBase<R>::SIMPLIFIER_SINGLETONCOLS] = true;
+
+   name[SoPlexBase<R>::SIMPLIFIER_CONSTRAINTPROPAGATION] = "simplifier_enable_propagation";
+   description[SoPlexBase<R>::SIMPLIFIER_CONSTRAINTPROPAGATION] =
+      "enable presolver ConstraintPropagation in PaPILO";
+   defaultValue[SoPlexBase<R>::SIMPLIFIER_CONSTRAINTPROPAGATION] = true;
+
+   name[SoPlexBase<R>::SIMPLIFIER_PARALLELROWDETECTION] = "simplifier_enable_parallelrows";
+   description[SoPlexBase<R>::SIMPLIFIER_PARALLELROWDETECTION] =
+      "enable presolver ParallelRowDetection in PaPILO";
+   defaultValue[SoPlexBase<R>::SIMPLIFIER_PARALLELROWDETECTION] = true;
+
+   name[SoPlexBase<R>::SIMPLIFIER_PARALLELCOLDETECTION] = "simplifier_enable_parallelcols";
+   description[SoPlexBase<R>::SIMPLIFIER_PARALLELCOLDETECTION] =
+      "enable presolver ParallelColDetection in PaPILO";
+   defaultValue[SoPlexBase<R>::SIMPLIFIER_PARALLELCOLDETECTION] = true;
+
+   name[SoPlexBase<R>::SIMPLIFIER_SINGLETONSTUFFING] = "simplifier_enable_stuffing";
+   description[SoPlexBase<R>::SIMPLIFIER_SINGLETONSTUFFING] =
+      "enable presolver SingletonStuffing in PaPILO";
+   defaultValue[SoPlexBase<R>::SIMPLIFIER_SINGLETONSTUFFING] = true;
+
+   name[SoPlexBase<R>::SIMPLIFIER_DUALFIX] = "simplifier_enable_dualfix";
+   description[SoPlexBase<R>::SIMPLIFIER_DUALFIX] =
+      "enable presolver DualFix in PaPILO";
+   defaultValue[SoPlexBase<R>::SIMPLIFIER_DUALFIX] = true;
+
+   name[SoPlexBase<R>::SIMPLIFIER_FIXCONTINUOUS] = "simplifier_enable_fixcontinuous";
+   description[SoPlexBase<R>::SIMPLIFIER_FIXCONTINUOUS] =
+      "enable presolver FixContinuous in PaPILO";
+   defaultValue[SoPlexBase<R>::SIMPLIFIER_FIXCONTINUOUS] = true;
+
+   name[SoPlexBase<R>::SIMPLIFIER_DOMINATEDCOLS] = "simplifier_enable_domcol";
+   description[SoPlexBase<R>::SIMPLIFIER_DOMINATEDCOLS] =
+      "enable presolver DominatedCols in PaPILO";
+   defaultValue[SoPlexBase<R>::SIMPLIFIER_DOMINATEDCOLS] = true;
 }
 
 template <class R>
@@ -227,9 +267,9 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
 
    // type of simplifier
    name[SoPlexBase<R>::SIMPLIFIER] = "simplifier";
-   description[SoPlexBase<R>::SIMPLIFIER] = "simplifier (0 - off, 1 - internal, 2 - PaPILO)";
+   description[SoPlexBase<R>::SIMPLIFIER] = "simplifier (0 - off, 1 - auto, 2 - PaPILO, 3 - internal)";
    lower[SoPlexBase<R>::SIMPLIFIER] = 0;
-   upper[SoPlexBase<R>::SIMPLIFIER] = 2;
+   upper[SoPlexBase<R>::SIMPLIFIER] = 3;
    defaultValue[SoPlexBase<R>::SIMPLIFIER] = SoPlexBase<R>::SIMPLIFIER_INTERNAL;
 
    // type of scaler
@@ -588,6 +628,7 @@ SoPlexBase<R>::Settings::RealParam::RealParam()
    lower[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 0;
    upper[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 1;
    defaultValue[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 1.0;
+
 }
 
 template <class R>
@@ -1479,9 +1520,11 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
       _applyPolishing = rhs._applyPolishing;
 
       // rational constants do not need to be assigned
+#ifdef SOPLEX_WITH_BOOST
       _rationalPosone = 1;
       _rationalNegone = -1;
       _rationalZero = 0;
+#endif
    }
 
    assert(_isConsistent());
@@ -5715,6 +5758,86 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
    case FORCEBASIC:
       break;
 
+   case SIMPLIFIER_SINGLETONCOLS:
+#ifdef SOPLEX_WITH_PAPILO
+      _simplifierPaPILO.setEnableSingletonCols(value);
+#else
+      MSG_INFO1(spxout, spxout <<
+                "Setting Parameter simplifier_enable_singleton_cols is only possible if SoPlex is build with PaPILO\n");
+      return false;
+#endif
+      break;
+
+   case SIMPLIFIER_CONSTRAINTPROPAGATION:
+#ifdef SOPLEX_WITH_PAPILO
+      _simplifierPaPILO.setEnablePropagation(value);
+#else
+      MSG_INFO1(spxout, spxout <<
+                "Setting Parameter simplifier_enable_propagation is only possible if SoPlex is build with PaPILO\n");
+      return false;
+#endif
+      break;
+
+   case SIMPLIFIER_PARALLELROWDETECTION:
+#ifdef SOPLEX_WITH_PAPILO
+      _simplifierPaPILO.setEnableParallelRows(value);
+#else
+      MSG_INFO1(spxout, spxout <<
+                "Setting Parameter simplifier_enable_parallelrows is only possible if SoPlex is build with PaPILO\n");
+      return false;
+#endif
+      break;
+
+   case SIMPLIFIER_PARALLELCOLDETECTION:
+#ifdef SOPLEX_WITH_PAPILO
+      _simplifierPaPILO.setEnableParallelCols(value);
+#else
+      MSG_INFO1(spxout, spxout <<
+                "Setting Parameter simplifier_enable_parallelcols is only possible if SoPlex is build with PaPILO\n");
+      return false;
+#endif
+      break;
+
+   case SIMPLIFIER_SINGLETONSTUFFING:
+#ifdef SOPLEX_WITH_PAPILO
+      _simplifierPaPILO.setEnableStuffing(value);
+#else
+      MSG_INFO1(spxout, spxout <<
+                "Setting Parameter simplifier_enable_stuffing is only possible if SoPlex is build with PaPILO\n");
+      return false;
+#endif
+      break;
+
+   case SIMPLIFIER_DUALFIX:
+#ifdef SOPLEX_WITH_PAPILO
+      _simplifierPaPILO.setEnableDualFix(value);
+#else
+      MSG_INFO1(spxout, spxout <<
+                "Setting Parameter simplifier_enable_dualfix is only possible if SoPlex is build with PaPILO\n");
+      return false;
+#endif
+      break;
+
+   case SIMPLIFIER_FIXCONTINUOUS:
+#ifdef SOPLEX_WITH_PAPILO
+      _simplifierPaPILO.setEnableFixContinuous(value);
+#else
+      MSG_INFO1(spxout, spxout <<
+                "Setting Parameter simplifier_enable_fixcontinuous is only possible if SoPlex is build with PaPILO\n");
+      return false;
+#endif
+      break;
+
+   case SIMPLIFIER_DOMINATEDCOLS:
+#ifdef SOPLEX_WITH_PAPILO
+      _simplifierPaPILO.setEnableDomCols(value);
+#else
+      MSG_INFO1(spxout, spxout <<
+                "Setting Parameter simplifier_enable_domcol is only possible if SoPlex is build with PaPILO\n");
+      return false;
+#endif
+      break;
+
    default:
       return false;
    }
@@ -6001,9 +6124,20 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
    case SoPlexBase<R>::READMODE:
       switch(value)
       {
+#ifndef SOPLEX_WITH_BOOST
+
+      case READMODE_REAL:
+         break;
+
+      case READMODE_RATIONAL:
+         MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+         return false;
+#else
+
       case READMODE_REAL:
       case READMODE_RATIONAL:
          break;
+#endif
 
       default:
          return false;
@@ -6015,10 +6149,23 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
    case SoPlexBase<R>::SOLVEMODE:
       switch(value)
       {
+#ifndef SOPLEX_WITH_BOOST
+
+      case SOLVEMODE_REAL:
+      case SOLVEMODE_AUTO:
+         break;
+
+      case SOLVEMODE_RATIONAL:
+         MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+         return false;
+#else
+
       case SOLVEMODE_REAL:
       case SOLVEMODE_AUTO:
       case SOLVEMODE_RATIONAL:
+
          break;
+#endif
 
       default:
          return false;
@@ -6241,6 +6388,7 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
 
    // infinity threshold
    case SoPlexBase<R>::INFTY:
+#ifdef SOPLEX_WITH_BOOST
       _rationalPosInfty = value;
       // boost is treating -value as an expression and not just a number<T> So
       // doing -val won't work since Rational doesn't have an operator= that
@@ -6250,6 +6398,7 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
       // A work around to avoid expression template
       _rationalNegInfty = value;
       _rationalNegInfty = -_rationalNegInfty;
+#endif
 
       if(intParam(SoPlexBase<R>::SYNCMODE) != SYNCMODE_ONLYREAL)
          _recomputeRangeTypesRational();
@@ -6338,6 +6487,15 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
    case SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC:
 #ifdef SOPLEX_WITH_PAPILO
       _simplifierPaPILO.setModifyConsFrac(value);
+#else
+
+      if(!init)
+      {
+         MSG_INFO1(spxout, spxout <<
+                   "Setting Parameter modifyrowfrac is only possible if SoPlex is build with PaPILO\n");
+      }
+
+      return false;
 #endif
       break;
 
@@ -6621,7 +6779,11 @@ void SoPlexBase<R>::printVersion() const
 
 #ifdef SOPLEX_WITH_PAPILO
    MSG_INFO1(spxout, spxout << " [PaPILO  " << PAPILO_VERSION_MAJOR << "." << PAPILO_VERSION_MINOR  <<
-             "." << PAPILO_VERSION_PATCH << " {" <<  PAPILO_GITHASH << "}]\n");
+             "." << PAPILO_VERSION_PATCH);
+#ifdef PAPILO_GITHASH_AVAILABLE
+   MSG_INFO1(spxout, spxout << " {" <<  PAPILO_GITHASH << "}");
+#endif
+   MSG_INFO1(spxout, spxout << "]\n");
 #else
    MSG_INFO1(spxout, spxout << " [PaPILO: not available]");
 #endif
@@ -9057,10 +9219,6 @@ bool SoPlexBase<R>::saveSettingsFile(const char* filename, const bool onlyChange
    file << "." << SOPLEX_SUBVERSION;
 #endif
    file << "\n";
-
-   // Additional parameter solvemode is written
-   file << "\n# solving mode (0 - floating-point solve, 1 - auto, 2 - force iterative refinement, 3 - multi precision solve)\n";
-   file << "solvemode = " << solvemode << "\n";
 
    for(int i = 0; i < SoPlexBase<R>::BOOLPARAM_COUNT; i++)
    {

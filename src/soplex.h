@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2021 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -80,7 +80,6 @@
 
 // An alias for boost multiprecision
 namespace mpf = boost::multiprecision;
-#include <boost/any.hpp>
 #endif
 
 #define DEFAULT_RANDOM_SEED   0   // used to suppress output when the seed was not changed
@@ -982,11 +981,35 @@ public:
       /// re-optimize the original problem to get a proof (ray) of infeasibility/unboundedness?
       ENSURERAY = 15,
 
-      /// try to enforce that the optimal solution is a basic solutiong
+      /// try to enforce that the optimal solution is a basic solution
       FORCEBASIC = 16,
 
+      // enable presolver SingletonCols in PaPILO?
+      SIMPLIFIER_SINGLETONCOLS = 17,
+
+      // enable presolver ConstraintPropagation in PaPILO?
+      SIMPLIFIER_CONSTRAINTPROPAGATION = 18,
+
+      // enable presolver ParallelRowDetection in PaPILO?
+      SIMPLIFIER_PARALLELROWDETECTION = 19,
+
+      // enable presolver ParallelColDetection in PaPILO?
+      SIMPLIFIER_PARALLELCOLDETECTION = 20,
+
+      // enable presolver SingletonStuffing in PaPILO?
+      SIMPLIFIER_SINGLETONSTUFFING = 21,
+
+      // enable presolver DualFix in PaPILO?
+      SIMPLIFIER_DUALFIX = 22,
+
+      // enable presolver FixContinuous in PaPILO?
+      SIMPLIFIER_FIXCONTINUOUS = 23,
+
+      // enable presolver DominatedCols in PaPILO?
+      SIMPLIFIER_DOMINATEDCOLS = 24,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 17
+      BOOLPARAM_COUNT = 25
    } BoolParam;
 
    /// integer parameters
@@ -1157,13 +1180,13 @@ public:
       /// disabling presolving
       SIMPLIFIER_OFF = 0,
 
-      /// using internal presoling methods
+      /// using internal presolving methods
       SIMPLIFIER_INTERNAL = 3,
 
       /// using the presolve lib papilo
       SIMPLIFIER_PAPILO = 2,
 
-      /// @deprecated: only to provide backwards compatibility (use INTERNAL instead)
+      /// SoPlex chooses automatically (currently always "internal")
       SIMPLIFIER_AUTO = 1
    };
 
@@ -2130,6 +2153,141 @@ private:
 
    //**@name Private solving methods implemented in solverational.hpp */
    ///@{
+
+   /// stores floating-point solution of original LP as current rational solution and ensure that solution vectors have right dimension; ensure that solution is aligned with basis
+   void _storeRealSolutionAsRational(
+      SolRational& sol,
+      VectorBase<R>& primalReal,
+      VectorBase<R>& dualReal,
+      int& dualSize);
+
+   /// computes violation of bounds during the refinement loop
+   void _computeBoundsViolation(SolRational& sol, Rational& boundsViolation);
+
+   /// computes violation of sides during the refinement loop
+   void _computeSidesViolation(SolRational& sol, Rational& sideViolation);
+
+   /// computes violation of reduced costs during the refinement loop
+   void _computeReducedCostViolation(
+      SolRational& sol,
+      Rational& redCostViolation,
+      const bool& maximizing);
+
+   /// computes dual violation during the refinement loop
+   void _computeDualViolation(
+      SolRational& sol,
+      Rational& dualViolation,
+      const bool& maximizing);
+
+   /// checks termination criteria for refinement loop
+   bool _isRefinementOver(
+      bool& primalFeasible,
+      bool& dualFeasible,
+      Rational& boundsViolation,
+      Rational& sideViolation,
+      Rational& redCostViolation,
+      Rational& dualViolation,
+      int minRounds,
+      bool& stoppedTime,
+      bool& stoppedIter,
+      int numFailedRefinements);
+
+   /// checks refinement loop progress
+   void _checkRefinementProgress(
+      Rational& boundsViolation,
+      Rational& sideViolation,
+      Rational& redCostViolation,
+      Rational& dualViolation,
+      Rational& maxViolation,
+      Rational& bestViolation,
+      const Rational& violationImprovementFactor,
+      int& numFailedRefinements);
+
+   /// performs rational reconstruction and/or factorizationd
+   void _ratrecAndOrRatfac(
+      int& minRounds,
+      int lastStallRefinements,
+      bool& factorSolNewBasis,
+      int& nextRatrecRefinement,
+      const Rational& errorCorrectionFactor,
+      Rational& errorCorrection,
+      Rational& maxViolation,
+      SolRational& sol,
+      bool& primalFeasible,
+      bool& dualFeasible,
+      bool& stoppedTime,
+      bool& stoppedIter,
+      bool& error,
+      bool& breakAfter,
+      bool& continueAfter);
+
+   /// forces value of given nonbasic variable to bound
+   void _forceNonbasicToBound(
+      SolRational& sol,
+      int& c,
+      const int& maxDimRational,
+      bool toLower);
+
+   /// computes primal scaling factor; limit increase in scaling by tolerance used in floating point solve
+   void _computePrimalScalingFactor(
+      Rational& maxScale,
+      Rational& primalScale,
+      Rational& boundsViolation,
+      Rational& sideViolation,
+      Rational& redCostViolation);
+
+   /// computes dual scaling factor; limit increase in scaling by tolerance used in floating point solve
+   void _computeDualScalingFactor(
+      Rational& maxScale,
+      Rational& primalScale,
+      Rational& dualScale,
+      Rational& redCostViolation,
+      Rational& dualViolation);
+
+   /// applies scaled bounds
+   void _applyScaledBounds(Rational& primalScale);
+
+   /// applies scaled sides
+   void _applyScaledSides(Rational& primalScale);
+
+   /// applies scaled objective function
+   void _applyScaledObj(Rational& dualScale, SolRational& sol);
+
+   /// evaluates result of solve. Return true if the algorithm must to stopped, false otherwise.
+   bool _evaluateResult(
+      typename SPxSolverBase<R>::Status result,
+      bool usingRefinedLP,
+      SolRational& sol,
+      VectorBase<R>& dualReal,
+      bool& infeasible,
+      bool& unbounded,
+      bool& stoppedTime,
+      bool& stoppedIter,
+      bool& error);
+
+   /// corrects primal solution and aligns with basis
+   void _correctPrimalSolution(
+      SolRational& sol,
+      Rational& primalScale,
+      int& primalSize,
+      const int& maxDimRational,
+      VectorBase<R>& primalReal);
+
+   /// updates or recomputes slacks depending on which looks faster
+   void _updateSlacks(SolRational& sol, int& primalSize);
+
+   /// corrects dual solution and aligns with basis
+   void _correctDualSolution(
+      SolRational& sol,
+      const bool& maximizing,
+      VectorBase<R>& dualReal,
+      Rational& dualScale,
+      int& dualSize,
+      const int& maxDimRational);
+
+   /// updates or recomputes reduced cost values depending on which looks faster; adding one to the length of the
+   /// dual vector accounts for the objective function vector
+   void _updateReducedCosts(SolRational& sol, int& dualSize, const int& numCorrectedPrimals);
 
    /// solves current problem with iterative refinement and recovery mechanism
    void _performOptIRStable(SolRational& sol,

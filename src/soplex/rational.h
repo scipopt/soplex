@@ -167,7 +167,12 @@ inline Rational ratFromString(const char* desc)
 
       /* case 1: string is given in nom/den format */
       if(s.find('.') == std::string::npos)
-         res = Rational(desc);
+      {
+         if(s[0] == '+')
+            res = Rational(desc + 1);
+         else
+            res = Rational(desc);
+      }
       /* case 2: string is given as base-10 decimal number */
       else
       {
@@ -223,9 +228,6 @@ using Integer = int;
 class Rational
 {
 
-private:
-   double val;
-
 public:
 
    ///@name Construction and destruction
@@ -240,80 +242,66 @@ public:
    /// default constructor
    inline Rational()
    {
-      rationalErrorMessage();
    };
    /// copy constructor
    inline Rational(const Rational& r)
    {
-      rationalErrorMessage();
    };
    /// constructor from long double
    inline Rational(const long double& r)
    {
-      rationalErrorMessage();
    };
    /// constructor from double
    inline Rational(const double& r)
    {
-      rationalErrorMessage();
    };
    ///constructor from int
    inline Rational(const int& i)
    {
-      rationalErrorMessage();
    };
    /// constructor from Integer
    inline Rational(const Integer& num, const Integer& den)
    {
-      rationalErrorMessage();
    };
    /// constructor from mpq_t (GMP only)
    inline Rational(const mpq_t& q)
    {
-      rationalErrorMessage();
    };
 #ifdef SOPLEX_WITH_BOOST
    // constructor from boost number
    inline template <typename T, boost::multiprecision::expression_template_option eto>
    Rational(const boost::multiprecision::number<T, eto>& q)
    {
-      rationalErrorMessage();
    };
 #endif
    /// destructor
    inline ~Rational()
    {
-      rationalErrorMessage();
    };
 
    /// assignment operator
    inline Rational& operator=(const Rational&)
    {
-      rationalErrorMessage();
       return *this;
    };
    /// assignment operator from long double
    inline Rational& operator=(const long double& r)
    {
-      rationalErrorMessage();
       return *this;
    };
    /// assignment operator from double
    inline Rational& operator=(const double& r)
    {
-      rationalErrorMessage();
       return *this;
    };
    /// assignment operator from int
    inline Rational& operator=(const int& i)
    {
-      rationalErrorMessage();
       return *this;
    };
    /// assignment operator from mpq_t
    inline Rational& operator=(const mpq_t& q)
    {
-      rationalErrorMessage();
       return *this;
    };
 
@@ -356,7 +344,7 @@ public:
    operator boost::multiprecision::number<T, eto>() const
    {
       rationalErrorMessage();
-      return val;
+      return 0;
    };
 #else
    // Operator to typecast Rational to one of the Boost Number types
@@ -365,7 +353,7 @@ public:
    const
    {
       rationalErrorMessage();
-      return val;
+      return 0;
    };
 #endif
 #endif
@@ -974,14 +962,35 @@ namespace soplex
 /// Size in specified base (bit size for base 2)
 inline int sizeInBase(const Rational R, const int base)
 {
-   assert(base == 2);
-
 #ifndef SOPLEX_WITH_BOOST
    MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
    return 0;
 #else
-   size_t densize = msb(denominator(R)) + 1;
-   size_t numsize = msb(numerator(R)) + 1;
+
+   if(R == Rational(0))
+      return 3;
+
+   Integer num = numerator(R);
+   Integer den = denominator(R);
+   size_t numsize, densize;
+
+#ifdef SOPLEX_WITH_GMP
+   densize = mpz_sizeinbase(den.backend().data(), base);
+   numsize = mpz_sizeinbase(num.backend().data(), base);
+#else
+
+   if(base != 2)
+   {
+      densize = (size_t)(log2(den.convert_to<double>()) / log2(double(base))) + 1;
+      numsize = (size_t)(log2(num.convert_to<double>()) / log2(double(base))) + 1;
+   }
+   else
+   {
+      densize = msb(den) + 1;
+      numsize = msb(num) + 1;
+   }
+
+#endif
 
    return (int)(densize + numsize);
 #endif
@@ -1006,19 +1015,18 @@ inline int dlcmSizeRational(const Rational* vector, const int length, const int 
 {
    assert(vector != 0);
    assert(length >= 0);
-   assert(base == 2);
 
 #ifndef SOPLEX_WITH_BOOST
    MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
    return 0;
 #else
 
-   Integer lcm;
+   Integer lcm = 1;
 
    for(int i = 0; i < length; i++)
       SpxLcm(lcm, lcm, denominator(vector[i]));
 
-   int size = msb(lcm) + 1;
+   int size = sizeInBase(Rational(lcm), base) + 1;
 
    return size;
 #endif
@@ -1029,7 +1037,6 @@ inline int dmaxSizeRational(const Rational* vector, const int length, const int 
 {
    assert(vector != 0);
    assert(length >= 0);
-   assert(base == 2);
 #ifndef SOPLEX_WITH_BOOST
    MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
    return 0;
@@ -1039,7 +1046,7 @@ inline int dmaxSizeRational(const Rational* vector, const int length, const int 
 
    for(int i = 0; i < length; i++)
    {
-      size_t dsize = msb(denominator(vector[i])) + 1;
+      size_t dsize = sizeInBase(Rational(denominator(vector[i])), base) + 1;
 
       if(dsize > dmax)
          dmax = dsize;

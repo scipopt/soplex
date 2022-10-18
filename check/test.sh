@@ -4,7 +4,7 @@
 #*                  This file is part of the class library                   *#
 #*       SoPlex --- the Sequential object-oriented simPlex.                  *#
 #*                                                                           *#
-#*    Copyright (C) 1996-2021 Konrad-Zuse-Zentrum                            *#
+#*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            *#
 #*                            fuer Informationstechnik Berlin                *#
 #*                                                                           *#
 #*  SoPlex is distributed under the terms of the ZIB Academic Licence.       *#
@@ -25,6 +25,7 @@ EXECUTABLE="${2}" # path to soplex executable
 SETTINGS="${3}"   # name of settings (has to be in settings)
 TIME="${4}"       # time limit
 OUTPUTDIR="${5}"  # results directory
+SEEDS="${6}"      # the number of random seeds - 0 only default seeds
 
 
 # check if all variables defined (by checking the last one)
@@ -36,6 +37,7 @@ then
     echo "SETTINGS      = ${SETTINGS}"
     echo "TIME          = ${TIME}"
     echo "OUTPUTDIR     = ${OUTPUTDIR}"
+    echo "SEEDS         = ${SEEDS}"
     exit 1;
 fi
 
@@ -44,60 +46,73 @@ fi
 # defines the following environment variables: SOPLEXPATH, FULLTSTNAME, SOLUFILE, SETTINGSFILE
 . ./configuration_set.sh
 
-BINNAME=$(basename "${EXECUTABLE}")
-# get host name
-HOST=$(uname -n | sed 's/\(.zib.de\)//g')
-BINID="${BINNAME}.${HOST}"
 
-OUTFILE="${OUTPUTDIR}/check.${TSTNAME}.${BINID}.${SETTINGS}.out"
-ERRFILE="${OUTPUTDIR}/check.${TSTNAME}.${BINID}.${SETTINGS}.err"
-RESFILE="${OUTPUTDIR}/check.${TSTNAME}.${BINID}.${SETTINGS}.res"
-SETFILE="${OUTPUTDIR}/check.${TSTNAME}.${BINID}.${SETTINGS}.set"
-
-# create results directory
-mkdir -p "${OUTPUTDIR}"
-
-if ! test -f "${EXECUTABLE}"
-then
-    echo "SoPlex executable not found: ${EXECUTABLE}"
-    exit 1
-fi
-
-date >"${OUTFILE}"
-date >"${ERRFILE}"
-
-# Avoid problems with foreign locales (two separate commands for SunOS)
-LANG=C
-export LANG
-
-# Determine awk program to use.
-AWK=awk
-OSTYPE=$(uname -s | tr '[:upper:]' '[:lower:]' | sed -e s/cygwin.*/cygwin/ -e s/irix../irix/)
-
-case "${OSTYPE}" in
-    osf1)  AWK=gawk ;;
-    sunos)  AWK=gawk ;;
-    aix)  AWK=gawk ;;
-esac
-
-# Create testset
-"${EXECUTABLE}" --loadset="${SETTINGSFILE}" -t"${TIME}" --saveset="${SETFILE}"
-
-# Solve the instances of the testset
-for instance in $(cat "${FULLTSTNAME}")
+# run different random seeds
+for (( s=0; s<=${SEEDS}; s++ ))
 do
-    echo "@01 ${instance}"
-    echo "@01 ${instance}" >> "${ERRFILE}"
-    ${EXECUTABLE} --loadset="${SETFILE}" -v4 --int:displayfreq=10000 -c -q -t"${TIME}" "${instance}" 2>> "${ERRFILE}"
-    echo "=ready="
-done | tee -a "${OUTFILE}"
-date >> "${OUTFILE}"
-date >> "${ERRFILE}"
+  BINNAME=$(basename "${EXECUTABLE}")
+  # get host name
+  HOST=$(uname -n | sed 's/\(.zib.de\)//g')
+  BINID="${BINNAME}.${HOST}"
 
-# check whether python is available
-if command -v python >/dev/null 2>&1
-then
-    python evaluation.py "${OUTFILE}" | tee "${RESFILE}"
-else
-    ./evaluation.sh "${OUTFILE}" | tee "${RESFILE}"
-fi
+
+  BASENAME=${OUTPUTDIR}/check.${TSTNAME}.${BINID}.${SETTINGS}
+
+  if (( SEEDS > 0 )); then
+      BASENAME="${BASENAME}-s${s}"
+  fi
+
+  OUTFILE="${BASENAME}.out"
+  ERRFILE="${BASENAME}.err"
+  RESFILE="${BASENAME}.res"
+  SETFILE="${BASENAME}.set"
+
+  echo ${OUTFILE}
+  # create results directory
+  mkdir -p "${OUTPUTDIR}"
+
+  if ! test -f "${EXECUTABLE}"
+  then
+      echo "SoPlex executable not found: ${EXECUTABLE}"
+      exit 1
+  fi
+
+  date >"${OUTFILE}"
+  date >"${ERRFILE}"
+
+  # Avoid problems with foreign locales (two separate commands for SunOS)
+  LANG=C
+  export LANG
+
+  # Determine awk program to use.
+  AWK=awk
+  OSTYPE=$(uname -s | tr '[:upper:]' '[:lower:]' | sed -e s/cygwin.*/cygwin/ -e s/irix../irix/)
+
+  case "${OSTYPE}" in
+      osf1)  AWK=gawk ;;
+      sunos)  AWK=gawk ;;
+      aix)  AWK=gawk ;;
+  esac
+
+  # Create testset
+  "${EXECUTABLE}" --loadset="${SETTINGSFILE}" -t"${TIME}" --saveset="${SETFILE}"
+
+   Solve the instances of the testset
+  for instance in $(cat "${FULLTSTNAME}")
+  do
+      echo "@01 ${instance}"
+      echo "@01 ${instance}" >> "${ERRFILE}"
+      ${EXECUTABLE} --loadset="${SETFILE}" -v4 --int:displayfreq=10000 -c -q -t"${TIME}" "${instance}" 2>> "${ERRFILE}"
+      echo "=ready="
+  done | tee -a "${OUTFILE}"
+  date >> "${OUTFILE}"
+  date >> "${ERRFILE}"
+
+  # check whether python is available
+  if command -v python >/dev/null 2>&1
+  then
+      python evaluation.py "${OUTFILE}" | tee "${RESFILE}"
+  else
+      ./evaluation.sh "${OUTFILE}" | tee "${RESFILE}"
+  fi
+done

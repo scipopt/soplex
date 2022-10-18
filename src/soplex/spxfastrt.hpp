@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2021 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -41,7 +41,7 @@ namespace soplex
 #define MINSTAB         1e-5
 #define LOWSTAB         1e-10
 #define TRIES           2
-#define SHORT           1e-5
+#define SHORTVAL           1e-5
 #define DELTA_SHIFT     1e-5
 #define EPSILON         1e-10
 
@@ -833,13 +833,13 @@ bool SPxFastRT<R>::maxShortLeave(R& sel, int leave, R maxabs)
 
    sel = this->thesolver->fVec().delta()[leave];
 
-   if(sel > maxabs * SHORT)
+   if(sel > maxabs * SHORTVAL)
    {
       sel = (this->thesolver->ubBound()[leave] - this->thesolver->fVec()[leave]) / sel;
       return true;
    }
 
-   if(sel < -maxabs * SHORT)
+   if(sel < -maxabs * SHORTVAL)
    {
       sel = (this->thesolver->lbBound()[leave] - this->thesolver->fVec()[leave]) / sel;
       return true;
@@ -856,13 +856,13 @@ bool SPxFastRT<R>::minShortLeave(R& sel, int leave, R maxabs)
 
    sel = this->thesolver->fVec().delta()[leave];
 
-   if(sel > maxabs * SHORT)
+   if(sel > maxabs * SHORTVAL)
    {
       sel = (this->thesolver->lbBound()[leave] - this->thesolver->fVec()[leave]) / sel;
       return true;
    }
 
-   if(sel < -maxabs * SHORT)
+   if(sel < -maxabs * SHORTVAL)
    {
       sel = (this->thesolver->ubBound()[leave] - this->thesolver->fVec()[leave]) / sel;
       return true;
@@ -1360,7 +1360,7 @@ bool SPxFastRT<R>::shortEnter(
       {
          R x = this->thesolver->coPvec().delta()[nr];
 
-         if(x < maxabs * SHORT && -x < maxabs * SHORT)
+         if(x < maxabs * SHORTVAL && -x < maxabs * SHORTVAL)
             return false;
       }
 
@@ -1372,7 +1372,7 @@ bool SPxFastRT<R>::shortEnter(
       {
          R x = this->thesolver->pVec().delta()[nr];
 
-         if(x < maxabs * SHORT && -x < maxabs * SHORT)
+         if(x < maxabs * SHORTVAL && -x < maxabs * SHORTVAL)
             return false;
       }
 

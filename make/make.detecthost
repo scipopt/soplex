@@ -4,7 +4,7 @@
 #*       SoPlex --- the Sequential object-oriented simPlex.                  *#
 #*                                                                           *#
 #*    Copyright (C) 1996      Roland Wunderling                              *#
-#*                  1996-2021 Konrad-Zuse-Zentrum                            *#
+#*                  1996-2022 Konrad-Zuse-Zentrum                            *#
 #*                            fuer Informationstechnik Berlin                *#
 #*                                                                           *#
 #*  SoPlex is distributed under the terms of the ZIB Academic Licence.       *#
@@ -30,7 +30,8 @@ ARCH		:=	$(shell uname -m | \
 			-e 's/9000..../hppa/' \
 			-e 's/Power\ Macintosh/ppc/' \
 			-e 's/00........../pwr4/'\
-			-e 's/arm.*/arm/')
+			-e 's/arm.*/arm/' \
+			-e 's/aarch64/arm/')
 OSTYPE		:=	$(shell uname -s | tr '[:upper:]' '[:lower:]' | \
 			sed \
 			-e 's/cygwin.*/cygwin/' \

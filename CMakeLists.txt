@@ -16,8 +16,8 @@ endif()
 
 set(SOPLEX_VERSION_MAJOR 6)
 set(SOPLEX_VERSION_MINOR 0)
-set(SOPLEX_VERSION_PATCH 0)
-set(SOPLEX_VERSION_SUB 1)
+set(SOPLEX_VERSION_PATCH 2)
+set(SOPLEX_VERSION_SUB 4)
 set(SOPLEX_VERSION_API 11)
 
 
@@ -57,7 +57,7 @@ if(NOT WIN32)
 endif()
 
 # path to e.g. findGMP module
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
 # make 'Release' the default build type
 if(NOT CMAKE_BUILD_TYPE)
@@ -168,7 +168,7 @@ endif()
 if(PAPILO)
     set(PAPILO_MIN_VERSION 2.0.0.0)
     message(STATUS "Finding PAPILO")
-    find_package(PAPILO CONFIG ${PAPILO_MIN_VERSION} REQUIRED)
+    find_package(PAPILO CONFIG ${PAPILO_MIN_VERSION} REQUIRED HINTS ${PAPILO_DIR})
     set(libs ${libs} ${PAPILO_IMPORTED_TARGETS})
     message(STATUS "Finding PAPILO - found")
     set(SOPLEX_WITH_PAPILO on)
@@ -187,8 +187,13 @@ if(BOOST)
            set(Boost_VERSION_MACRO ${Boost_VERSION})
         endif()
         if(${Boost_VERSION_MACRO} LESS "107000")
-            message(WARNING "Warning: ${Red} The multiprecision and quadprecision features are disabled with Boost versions older than 1.70.${ColourReset} \
-                            Found version is ${Boost_VERSION_STRING}")
+            if(NOT SOPLEX_WITH_GMP)
+               message(SEND_ERROR "ERROR: ${Red} If no GMP is linked, then the minimal Boost verion is 1.70. ${ColourReset} \
+                       Found Boost version is ${Boost_VERSION_STRING}. Either provide newer Boost, link GMP, or disable Boost by setting BOOST=off.")
+            else()
+               message(WARNING "Warning: ${Red} The multiprecision and quadprecision features are disabled with Boost versions older than 1.70.${ColourReset} \
+                       Found Boost version is ${Boost_VERSION_STRING}")
+            endif()
         endif()
     else()
         set(BOOST off)

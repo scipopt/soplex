@@ -1,38 +1,63 @@
-next major Release
+Next major release
 ==================
 
 features:
 
-- integrated PaPILO as new simplifier option
-- improved the buildsystem by adding a cmake-configurable `config.h.in` header in the same fashion as it is handled in SCIP
-- replaced SoPlex internal `Rational` class by the boost multiprecision library for rational numbers; this enables the possibility of performing a rational LP solve, even without linking GMP
-- restored classic command line interface to remove dependency on the Boost program options library
-- changed the command-line argument for running soplex with higher precision; formerly the multiprecision mode was triggered by setting `solvemode=3` (multiprecision), or `solvemode=4` (quadprecision); Now higher precision arithmetic has its own argument `arithmetic` (0 - double, 1 - quadprecision, 2 - multiprecision); This makes it possible to also use rational solving mode in combination with multiprecision
+interface & parameters:
+
+performance:
+
+code quality:
+
+fixed bugs:
+
+upcoming Release 6.0.3
+=============================
+
+fixed bugs:
 
 interface & parameters:
 
+performance:
+
+code quality:
+
+October 2022 - Release 6.0.2
+=============================
+
+- version bump
+
+June 2022 - Release 6.0.1
+=============================
+
+fixed bugs:
+- fix bug in varStatusToBasisStatusCol when setting Basis for implicitly free variables
+
+January 2022 - Release 6.0.0
+=============================
+
+features:
+- integrated PaPILO as new simplifier option
+- improved the buildsystem by adding a cmake-configurable `config.h.in` header in the same fashion
+  as it is handled in SCIP
+- replaced SoPlex internal `Rational` class by the boost multiprecision library for rational numbers;
+  this enables the possibility of performing a rational LP solve, even without linking GMP
+- restored classic command line interface to remove dependency on the Boost program options library
+- changed the command-line argument for running soplex with higher precision;
+  formerly the multiprecision mode was triggered by setting `solvemode=3` (multiprecision),
+  or `solvemode=4` (quadprecision); Now higher precision arithmetic has its own
+  argument `arithmetic` (0 - double, 1 - quadprecision, 2 - multiprecision);
+  This makes it possible to also use rational solving mode in combination with multiprecision
+
+interface & parameters:
 - added interrupt flag to optimize() (default NULL)
 - added new simplifier enum SIMPLIFIER_PAPILO and SIMPLFIER_INTERNAL (replacing the deprecated SIMPLIFIER_AUTO)
-
 
 performance:
 
 code quality:
 - fixed deprecated copy compiler warnings that occur with newer compilers
 - added a ClassSet<T> class that functions in the same way as DataSet<T> for types that are not data-types
-
-fixed bugs:
-
-next minor Release 5.0.3
-========================
-
-features:
-
-interface & parameters:
-
-performance:
-
-code quality:
 
 fixed bugs:
 
@@ -58,7 +83,8 @@ fixed bugs:
 fixed bugs:
 - add missing case of `scale = true` in spxlpbase.h change functions
 - corrected feasibility checks for rational solution in debug mode
-- Makefiles: fix a typo in SANITIZERFLAGS, if SHARED=true, add SANITZERFLAGS also to LIBBUILDFLAGS and always add SANITZERFLAGS to LDFLAGS
+- Makefiles: fix a typo in SANITIZERFLAGS, if SHARED=true, add SANITZERFLAGS also to LIBBUILDFLAGS
+  and always add SANITZERFLAGS to LDFLAGS
 - Makefiles: fix BOOST=false SHARED=true case
 - CMake: add minimum gcc requirement
 - CMake: fix for older cmake versions and for building without boost

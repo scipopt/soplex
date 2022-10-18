@@ -1,10 +1,10 @@
-#!/bin/bash -ex
+#!/bin/bash
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
 #*                                                                           *#
 #*                  This file is part of the class library                   *#
 #*       SoPlex --- the Sequential object-oriented simPlex.                  *#
 #*                                                                           *#
-#*    Copyright (C) 1996-2021 Konrad-Zuse-Zentrum                            *#
+#*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            *#
 #*                            fuer Informationstechnik Berlin                *#
 #*                                                                           *#
 #*  SoPlex is distributed under the terms of the ZIB Academic Licence.       *#
@@ -24,7 +24,13 @@ BINNAME="${BINNAME}.${HOST}"
 
 OUTPUTDIR=results/quick
 
-SETTINGSLIST=(default devex steep exact)
+SOPLEX_BOOST_SUPPORT="$(../${EXECUTABLE} --solvemode=2 check/instances/galenet.mps 2>&1 | grep 'rational solve without Boost not defined' )"
+if [[ "${SOPLEX_BOOST_SUPPORT}" =~ "rational solve without Boost not defined" ]]
+then
+    SETTINGSLIST=(default devex steep)
+else
+    SETTINGSLIST=(default devex steep exact)
+fi
 
 if ! test -f ../settings/default.set
 then
@@ -34,7 +40,7 @@ fi
 # Solve with the different settings
 for SETTINGS in ${SETTINGSLIST[@]}
 do
-    ./test.sh quick "${EXECUTABLE}" "${SETTINGS}" 60 "${OUTPUTDIR}"
+    ./test.sh quick "${EXECUTABLE}" "${SETTINGS}" 60 "${OUTPUTDIR}" 0
 done
 
 echo

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2021 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -136,8 +136,8 @@ public:
 
    /// get optimal basis.
    virtual void getBasis(typename SPxSolverBase<R>::VarStatus rows[],
-                         typename SPxSolverBase<R>::VarStatus cols[], const int rowsSize = -1,
-                         const int colsSize = -1) const
+                         typename SPxSolverBase<R>::VarStatus cols[], const int rowsSize,
+                         const int colsSize) const
    {
       assert(false);
    }
@@ -172,7 +172,11 @@ class Presol : public SPxSimplifier<R>
 {
 private:
 
+#ifdef SOPLEX_DEBUG
+   const papilo::VerbosityLevel verbosityLevel = papilo::VerbosityLevel::kInfo;
+#else
    const papilo::VerbosityLevel verbosityLevel = papilo::VerbosityLevel::kQuiet;
+#endif
 
    VectorBase<R> m_prim;       ///< unsimplified primal solution VectorBase<R>.
    VectorBase<R> m_slack;      ///< unsimplified slack VectorBase<R>.
@@ -194,6 +198,15 @@ private:
    R modifyRowsFac;             ///<
    DataArray<int> m_stat;       ///< preprocessing history.
    typename SPxLPBase<R>::SPxSense m_thesense;   ///< optimization sense.
+
+   bool enableSingletonCols;
+   bool enablePropagation;
+   bool enableParallelRows;
+   bool enableParallelCols;
+   bool enableSingletonStuffing;
+   bool enableDualFix;
+   bool enableFixContinuous;
+   bool enableDominatedCols;
 
    // TODO: the following parameters were ignored? Maybe I don't exactly know what they suppose to be
    bool m_keepbounds;           ///< keep some bounds (for boundflipping)
@@ -282,6 +295,54 @@ public:
    setModifyConsFrac(R value)
    {
       modifyRowsFac = value;
+   }
+
+   void
+   setEnableSingletonCols(bool value)
+   {
+      enableSingletonCols = value;
+   }
+
+   void
+   setEnablePropagation(bool value)
+   {
+      enablePropagation = value;
+   }
+
+   void
+   setEnableParallelRows(bool value)
+   {
+      enableParallelRows = value;
+   }
+
+   void
+   setEnableParallelCols(bool value)
+   {
+      enableParallelCols = value;
+   }
+
+   void
+   setEnableStuffing(bool value)
+   {
+      enableSingletonStuffing = value;
+   }
+
+   void
+   setEnableDualFix(bool value)
+   {
+      enableDualFix = value;
+   }
+
+   void
+   setEnableFixContinuous(bool value)
+   {
+      enableFixContinuous = value;
+   }
+
+   void
+   setEnableDomCols(bool value)
+   {
+      enableDominatedCols = value;
    }
 
    virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, R eps, R delta,
@@ -475,12 +536,10 @@ void Presol<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
    papilo::Num<R> num {};
    num.setEpsilon(m_epsilon);
    num.setFeasTol(m_feastol);
-   /* since PaPILO verbosity is quiet it's irrelevant what's the messager*/
+   /* since PaPILO verbosity is quiet it's irrelevant what the messenger is */
    papilo::Message msg{};
    msg.setVerbosityLevel(verbosityLevel);
-#ifdef SOPLEX_DEBUG
-   msg.setVerbosityLevel(papilo::VerbosityLevel::kInfo;);
-#endif
+
    papilo::Postsolve<R> postsolve {msg, num};
    auto status = postsolve.undo(reducedSolution, originalSolution, postsolveStorage, isOptimal);
 
@@ -493,13 +552,13 @@ void Presol<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
    for(int j = 0; j < (int)postsolveStorage.nColsOriginal; ++j)
    {
       m_prim[j] = originalSolution.primal[j];
-      m_redCost[j] = originalSolution.reducedCosts[j];
+      m_redCost[j] = switch_sign * originalSolution.reducedCosts[j];
       m_cBasisStat[j] = convertToSoplexStatus(originalSolution.varBasisStatus[j]);
    }
 
    for(int i = 0; i < (int)postsolveStorage.nRowsOriginal; ++i)
    {
-      m_dual[i] = originalSolution.dual[i];
+      m_dual[i] = switch_sign * originalSolution.dual[i];
       m_slack[i] = originalSolution.slack[i];
       m_rBasisStat[i] = convertToSoplexStatus(originalSolution.rowBasisStatus[i]);
    }
@@ -577,6 +636,8 @@ papilo::Problem<R> buildProblem(SPxLPBase<R>& lp)
    /* set up columns */
    builder.setNumCols(ncols);
 
+   R switch_sign = lp.spxSense() == SPxLPBase<R>::MAXIMIZE ? -1 : 1;
+
    for(int i = 0; i < ncols; ++i)
    {
       R lowerbound = lp.lower(i);
@@ -588,7 +649,7 @@ papilo::Problem<R> buildProblem(SPxLPBase<R>& lp)
       builder.setColUbInf(i, upperbound >= R(infinity));
 
       builder.setColIntegral(i, false);
-      builder.setObj(i, objective);
+      builder.setObj(i, objective * switch_sign);
    }
 
    /* set up rows */
@@ -646,6 +707,8 @@ Presol<R>::simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
             )
 
    papilo::PresolveResult<R> res = presolve.apply(problem);
+
+   assert(res.postsolve.postsolveType == PostsolveType::kFull);
 
    switch(res.status)
    {
@@ -764,25 +827,36 @@ void Presol<R>::configurePapilo(papilo::Presolve<R>& presolve, R feasTolerance, 
    presolve.getPresolveOptions().calculate_basis_for_dual = true;
 
    presolve.setVerbosityLevel(verbosityLevel);
-#ifdef SOPLEX_DEBUG
-   presolve.setVerbosityLevel(papilo::VerbosityLevel::kInfo;);
-#endif
+
    /* enable lp presolvers with dual postsolve*/
    using uptr = std::unique_ptr<papilo::PresolveMethod<R>>;
 
    /* fast presolvers*/
-   presolve.addPresolveMethod(uptr(new papilo::SingletonCols<R>()));
-   presolve.addPresolveMethod(uptr(new papilo::ConstraintPropagation<R>()));
+   if(enableSingletonCols)
+      presolve.addPresolveMethod(uptr(new papilo::SingletonCols<R>()));
+
+   if(enablePropagation)
+      presolve.addPresolveMethod(uptr(new papilo::ConstraintPropagation<R>()));
 
    /* medium presolver */
-   presolve.addPresolveMethod(uptr(new papilo::ParallelRowDetection<R>()));
-   presolve.addPresolveMethod(uptr(new papilo::ParallelColDetection<R>()));
-   presolve.addPresolveMethod(uptr(new papilo::SingletonStuffing<R>()));
-   presolve.addPresolveMethod(uptr(new papilo::DualFix<R>()));
-   presolve.addPresolveMethod(uptr(new papilo::FixContinuous<R>()));
+   if(enableParallelRows)
+      presolve.addPresolveMethod(uptr(new papilo::ParallelRowDetection<R>()));
+
+   if(enableParallelCols)
+      presolve.addPresolveMethod(uptr(new papilo::ParallelColDetection<R>()));
+
+   if(enableSingletonStuffing)
+      presolve.addPresolveMethod(uptr(new papilo::SingletonStuffing<R>()));
+
+   if(enableDualFix)
+      presolve.addPresolveMethod(uptr(new papilo::DualFix<R>()));
+
+   if(enableFixContinuous)
+      presolve.addPresolveMethod(uptr(new papilo::FixContinuous<R>()));
 
    /* exhaustive presolvers*/
-   presolve.addPresolveMethod(uptr(new papilo::DominatedCols<R>()));
+   if(enableDominatedCols)
+      presolve.addPresolveMethod(uptr(new papilo::DominatedCols<R>()));
 
    /**
     * TODO: PaPILO doesn't support dualpostsolve for those presolvers
@@ -809,6 +883,8 @@ void Presol<R>::applyPresolveResultsToColumns(SPxLPBase <R>& lp, const papilo::P
    const papilo::Vec<R>& lowerBounds = problem.getLowerBounds();
    const papilo::Vec<papilo::ColFlags>& colFlags = problem.getColFlags();
 
+   R switch_sign = lp.spxSense() == SPxLPBase<R>::MAXIMIZE ? -1 : 1;
+
    for(int col = 0; col < problem.getNCols(); col++)
    {
       DSVectorBase<R> emptyVector{0};
@@ -822,7 +898,7 @@ void Presol<R>::applyPresolveResultsToColumns(SPxLPBase <R>& lp, const papilo::P
       if(colFlags[col].test(papilo::ColFlag::kUbInf))
          ub = R(infinity);
 
-      LPColBase<R> column(objective.coefficients[col], emptyVector, ub, lb);
+      LPColBase<R> column(objective.coefficients[col]* switch_sign, emptyVector, ub, lb);
       lp.addCol(column);
       assert(lp.lower(col) == lb);
       assert(lp.upper(col) == ub);
