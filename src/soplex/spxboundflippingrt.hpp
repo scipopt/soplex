@@ -15,7 +15,6 @@
 
 #include <assert.h>
 #include "soplex/spxdefines.h"
-#include "soplex/spxboundflippingrt.h"
 #include "soplex/sorter.h"
 #include "soplex/spxsolver.h"
 #include "soplex/spxout.h"
