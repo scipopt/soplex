@@ -15,7 +15,6 @@
 
 #include <iostream>
 
-#include "soplex/spxmainsm.h"
 #include "soplex/array.h"
 #include "soplex/dataarray.h"
 #include "soplex/sorter.h"

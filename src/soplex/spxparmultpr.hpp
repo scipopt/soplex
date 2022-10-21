@@ -17,7 +17,6 @@
 #include <iostream>
 
 #include "soplex/spxdefines.h"
-#include "soplex/spxparmultpr.h"
 
 namespace soplex
 {

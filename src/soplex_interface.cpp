@@ -217,6 +217,7 @@ char* SoPlex_getPrimalRationalString(void* soplex, int dim)
    VectorRational primal(dim);
    std::string primalstring;
    char* rawstring;
+   long unsigned int lengthstring;
 
    so->getPrimalRational(primal);
 
@@ -225,9 +226,9 @@ char* SoPlex_getPrimalRationalString(void* soplex, int dim)
       primalstring.append(primal[i].str());
       primalstring.append(" ");
    }
-
-   rawstring = new char[strlen(primalstring.c_str()) + 1];
-   strcpy(rawstring, primalstring.c_str());
+   lengthstring = strlen(primalstring.c_str()) + 1;
+   rawstring = new char[lengthstring];
+   strncpy(rawstring, primalstring.c_str(), lengthstring);
    return rawstring;
 }
 
@@ -351,12 +352,15 @@ char* SoPlex_objValueRationalString(void* soplex)
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
 #endif
+   long unsigned int lengthstring;
    char* value;
    std::string objstring;
    SoPlex* so = (SoPlex*)(soplex);
+   
+   lengthstring = strlen(objstring.c_str()) + 1;
    objstring = so->objValueRational().str();
-   value = new char[strlen(objstring.c_str()) + 1];
-   strcpy(value, objstring.c_str());
+   value = new char[lengthstring];
+   strncpy(value, objstring.c_str(), lengthstring);
    return value;
 }
 
