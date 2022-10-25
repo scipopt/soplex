@@ -45,6 +45,7 @@ void SoPlex_setRational(void* soplex)
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
 #endif
+   /* coverity[unreachable] */
    SoPlex* so = (SoPlex*)(soplex);
    so->setIntParam(SoPlex::READMODE, SoPlex::READMODE_RATIONAL);
    so->setIntParam(SoPlex::SOLVEMODE, SoPlex::SOLVEMODE_RATIONAL);
@@ -110,6 +111,7 @@ void SoPlex_addColRational(
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
 #endif
+   /* coverity[unreachable] */
    SoPlex* so = (SoPlex*)(soplex);
    DSVectorRational col(nnonzeros);
 
@@ -175,6 +177,7 @@ void SoPlex_addRowRational(
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
 #endif
+   /* coverity[unreachable] */
    SoPlex* so = (SoPlex*)(soplex);
    DSVectorRational row(nnonzeros);
 
@@ -213,6 +216,7 @@ char* SoPlex_getPrimalRationalString(void* soplex, int dim)
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
 #endif
+   /* coverity[unreachable] */
    SoPlex* so = (SoPlex*)(soplex);
    VectorRational primal(dim);
    std::string primalstring;
@@ -260,6 +264,7 @@ void SoPlex_changeObjRational(void* soplex, long* objnums, long* objdenoms, int 
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
 #endif
+   /* coverity[unreachable] */
    SoPlex* so = (SoPlex*)(soplex);
    Rational* objrational = new Rational [dim];
 
@@ -288,6 +293,7 @@ void SoPlex_changeLhsRational(void* soplex, long* lhsnums, long* lhsdenoms, int 
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
 #endif
+   /* coverity[unreachable] */
    SoPlex* so = (SoPlex*)(soplex);
    Rational* lhsrational = new Rational [dim];
 
@@ -316,6 +322,7 @@ void SoPlex_changeRhsRational(void* soplex, long* rhsnums, long* rhsdenoms, int 
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
 #endif
+   /* coverity[unreachable] */
    SoPlex* so = (SoPlex*)(soplex);
    Rational* rhsrational = new Rational [dim];
 
@@ -352,6 +359,7 @@ char* SoPlex_objValueRationalString(void* soplex)
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
 #endif
+   /* coverity[unreachable] */
    long unsigned int stringlength;
    char* value;
    std::string objstring;
@@ -393,6 +401,7 @@ void SoPlex_changeVarBoundsRational(
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
 #endif
+   /* coverity[unreachable] */
    SoPlex* so = (SoPlex*)(soplex);
 
    /* get rational lower bound */
