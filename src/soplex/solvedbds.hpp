@@ -3429,6 +3429,7 @@ void SoPlexBase<R>::_evaluateSolutionDecomp(SPxSolverBase<R>& solver, SLUFactor<
       _status = solverStat;
 
    // process result
+   // coverity[switch_selector_expr_is_constant]
    switch(solverStat)
    {
    case SPxSolverBase<R>::OPTIMAL:

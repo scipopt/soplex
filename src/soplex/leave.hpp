@@ -423,6 +423,7 @@ void SPxSolverBase<R>::getLeaveVals2(
       int idx = this->number(SPxRowId(enterId));
       typename SPxBasisBase<R>::Desc::Status enterStat = ds.rowStatus(idx);
 
+      // coverity[switch_selector_expr_is_constant]
       switch(enterStat)
       {
       case SPxBasisBase<R>::Desc::D_FREE :
@@ -542,6 +543,7 @@ void SPxSolverBase<R>::getLeaveVals2(
       int idx = this->number(SPxColId(enterId));
       typename SPxBasisBase<R>::Desc::Status enterStat = ds.colStatus(idx);
 
+      // coverity[switch_selector_expr_is_constant]
       switch(enterStat)
       {
       case SPxBasisBase<R>::Desc::D_ON_UPPER :
