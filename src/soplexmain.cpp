@@ -1259,7 +1259,7 @@ int main(int argc, char* argv[])
 #endif
       break;
 #endif
-
+   // coverity[dead_error_begin]
    default:
       std::cerr << "Wrong value for the arithmetic mode\n";
       return 0;
