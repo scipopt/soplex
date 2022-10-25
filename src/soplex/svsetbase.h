@@ -87,8 +87,8 @@ private:
       /**@name Data */
       ///@{
 
-      DLPSV* thenext; ///< next SVectorBase
-      DLPSV* theprev; ///< previous SVectorBase
+      DLPSV* thenext = nullptr; ///< next SVectorBase
+      DLPSV* theprev = nullptr; ///< previous SVectorBase
 
       ///@}
 
