@@ -41,6 +41,7 @@
 #include <iostream>
 
 #include <cstdlib>
+#include <memory>
 
 /*
  * include build configuration flags
