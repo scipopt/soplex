@@ -131,7 +131,8 @@ public:
 
       Name& operator=(const Name& old)
       {
-         name = old.name;
+         if(this != &old)
+            name = old.name;
          return *this;
       }
       ///@}

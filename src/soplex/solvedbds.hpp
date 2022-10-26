@@ -1806,6 +1806,7 @@ void SoPlexBase<R>::_getCompatibleColumns(VectorBase<R> feasVector, int* nonposi
       if(y.isSetup())
       {
          for(int j = 0; j < y.size(); j++)
+            // coverity[var_deref_model]
             newRowVector.add(y.index(j), y.value(j));
       }
       else
@@ -1957,14 +1958,15 @@ void SoPlexBase<R>::_getCompatibleBoundCons(LPRowSetBase<R>& boundcons, int* com
 #endif
 
    bool compatible;
-   SSVectorBase<R>  y(numCols());
+   int ncols = numCols();
+   SSVectorBase<R>  y(ncols);
    y.unSetup();
 
    _decompReducedProbColRowIDs.reSize(numCols());
 
 
    // identifying the compatible bound constraints
-   for(int i = 0; i < numCols(); i++)
+   for(int i = 0; i < ncols; i++)
    {
       _decompReducedProbColRowIDs[i].inValidate();
 
@@ -2011,7 +2013,7 @@ void SoPlexBase<R>::_getCompatibleBoundCons(LPRowSetBase<R>& boundcons, int* com
       }
       else
       {
-         for(int j = 0; j < numCols(); j++)
+         for(int j = 0; j < ncols; j++)
          {
             if(!isZero(y[j], feastol))
             {

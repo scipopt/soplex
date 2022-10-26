@@ -115,8 +115,12 @@ private:
       DLPSV& operator=(DLPSV&& rhs)
       {
          SVectorBase<R>::operator=(std::move(rhs));
-         this->thenext = rhs.thenext;
-         this->theprev = rhs.theprev;
+
+         if (this !=&rhs)
+         {
+            this->thenext = rhs.thenext;
+            this->theprev = rhs.theprev;
+         }
          return *this;
       }
       ///@}
