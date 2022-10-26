@@ -84,6 +84,19 @@ public:
       assert(isConsistent());
    }
 
+   /// Assignment operator.
+   LPColBase<R>& operator=(const LPColBase<R>& old)
+   {
+      if (this != &old)
+      {
+         up = old.up;
+         low = old.low;
+         object = old.object;
+         vec = old.vec;
+      }
+      assert(isConsistent());
+   }
+
    /// Copy constructor.
    LPColBase<R>(const LPColBase<R>& old)
       : up(old.up), low(old.low), object(old.object), vec(old.vec)

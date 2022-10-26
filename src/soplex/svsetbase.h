@@ -87,8 +87,8 @@ private:
       /**@name Data */
       ///@{
 
-      DLPSV* thenext = nullptr; ///< next SVectorBase
-      DLPSV* theprev = nullptr; ///< previous SVectorBase
+      DLPSV* thenext; ///< next SVectorBase
+      DLPSV* theprev; ///< previous SVectorBase
 
       ///@}
 
@@ -116,7 +116,7 @@ private:
       {
          SVectorBase<R>::operator=(std::move(rhs));
 
-         if (this !=&rhs)
+         if (this !=& rhs)
          {
             this->thenext = rhs.thenext;
             this->theprev = rhs.theprev;
