@@ -87,13 +87,14 @@ public:
    /// Assignment operator.
    LPColBase<R>& operator=(const LPColBase<R>& old)
    {
-      if (this != &old)
+      if(this != &old)
       {
          up = old.up;
          low = old.low;
          object = old.object;
          vec = old.vec;
       }
+
       assert(isConsistent());
    }
 

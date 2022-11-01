@@ -133,6 +133,7 @@ public:
       {
          if(this != &old)
             name = old.name;
+
          return *this;
       }
       ///@}

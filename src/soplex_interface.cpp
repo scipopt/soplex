@@ -230,6 +230,7 @@ char* SoPlex_getPrimalRationalString(void* soplex, int dim)
       primalstring.append(primal[i].str());
       primalstring.append(" ");
    }
+
    stringlength = strlen(primalstring.c_str()) + 1;
    rawstring = new char[stringlength];
    strncpy(rawstring, primalstring.c_str(), stringlength);
