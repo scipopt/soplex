@@ -466,6 +466,10 @@ public:
       assert(isConsistent());
    }
 
+   /// Assignment operator and copy constructor should be deleted to avoid memory problems
+   IsList<T> (const IsList<T>&) = delete;
+   IsList<T>& operator=(const IsList<T>& old) = delete;
+
    /// destructor
    ~IsList()
    {
