@@ -16,7 +16,6 @@
 #include <iostream>
 #include <assert.h>
 
-#include "soplex/statistics.h"
 #include "soplex/timerfactory.h"
 
 namespace soplex

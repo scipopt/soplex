@@ -59,6 +59,7 @@ void SPxSolverBase<R>::computeFrhs()
 
             if(!isBasic(stat))
             {
+               // coverity[switch_selector_expr_is_constant]
                switch(stat)
                {
                // columnwise cases:
@@ -165,6 +166,7 @@ void SPxSolverBase<R>::computeFrhsXtra()
       {
          R x;
 
+         // coverity[switch_selector_expr_is_constant]
          switch(stat)
          {
          // columnwise cases:
@@ -220,6 +222,7 @@ void SPxSolverBase<R>::computeFrhs1(
       {
          R x;
 
+         // coverity[switch_selector_expr_is_constant]
          switch(stat)
          {
          case SPxBasisBase<R>::Desc::D_FREE :
@@ -280,6 +283,7 @@ void SPxSolverBase<R>::computeFrhs2(
       {
          R x;
 
+         // coverity[switch_selector_expr_is_constant]
          switch(stat)
          {
          case SPxBasisBase<R>::Desc::D_FREE :

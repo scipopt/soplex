@@ -42,7 +42,8 @@ SPxOut::~SPxOut()
 
 SPxOut& SPxOut::operator=(const SPxOut& base)
 {
-   m_verbosity = base.m_verbosity;
+   if(this != &base)
+      m_verbosity = base.m_verbosity;
 
    for(int i = DEBUG; i <= INFO3; ++i)
       m_streams[ i ] = base.m_streams[ i ];

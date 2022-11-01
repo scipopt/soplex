@@ -81,6 +81,7 @@ public:
    UnitVectorBase<R>(int i = 0)
       : SVectorBase<R>(1, &themem)
    {
+      // coverity[callee_ptr_arith]
       SVectorBase<R>::add(i, 1.0);
 
       assert(isConsistent());

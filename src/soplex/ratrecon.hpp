@@ -17,7 +17,6 @@
 #include <assert.h>
 
 #include "soplex/spxdefines.h"
-#include "soplex/ratrecon.h"
 #include "soplex/rational.h"
 
 namespace soplex

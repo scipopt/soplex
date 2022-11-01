@@ -1239,13 +1239,16 @@ void SPxSolverBase<R>::performSolutionPolishing()
       instableEnter = false;
       theratiotester->setType(type());
 
+      int nrows = this->nRows();
+      int ncols = this->nCols();
+
       if(polishObj == POLISH_INTEGRALITY)
       {
-         DIdxSet slackcandidates(this->nRows());
-         DIdxSet continuousvars(this->nCols());
+         DIdxSet slackcandidates(nrows);
+         DIdxSet continuousvars(ncols);
 
          // collect nonbasic slack variables that could be made basic
-         for(int i = 0; i < this->nRows(); ++i)
+         for(int i = 0; i < nrows; ++i)
          {
             // only check nonbasic rows, skip equations
             if(rowstatus[i] ==  SPxBasisBase<R>::Desc::P_ON_LOWER
@@ -1258,9 +1261,9 @@ void SPxSolverBase<R>::performSolutionPolishing()
          }
 
          // collect continuous variables that could be made basic
-         if(integerVariables.size() == this->nCols())
+         if(integerVariables.size() == ncols)
          {
-            for(int i = 0; i < this->nCols(); ++i)
+            for(int i = 0; i < ncols; ++i)
             {
                // skip fixed variables
                if(colstatus[i] == SPxBasisBase<R>::Desc::P_ON_LOWER
@@ -1407,8 +1410,9 @@ void SPxSolverBase<R>::performSolutionPolishing()
       instableLeave = false;
       theratiotester->setType(type());
       bool useIntegrality = false;
+      int ncols = this->nCols();
 
-      if(integerVariables.size() == this->nCols())
+      if(integerVariables.size() == ncols)
          useIntegrality = true;
 
       // in ROW rep: pivot slack out of the basis

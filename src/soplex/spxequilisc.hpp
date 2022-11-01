@@ -18,7 +18,6 @@
  */
 #include <assert.h>
 
-#include "soplex/spxequilisc.h"
 #include "soplex/spxout.h"
 #include "soplex/spxlpbase.h"
 #include "soplex/spxlp.h"

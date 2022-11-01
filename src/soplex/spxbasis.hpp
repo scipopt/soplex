@@ -1113,7 +1113,7 @@ R SPxBasisBase<R>::condition(int maxiters, R tolerance)
    R norm2;
 
    // catch corner case of empty matrix
-   if(dimension == 0)
+   if(dimension <= 0)
       return 1.0;
 
    SSVectorBase<R> x(dimension);

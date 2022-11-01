@@ -17,8 +17,6 @@
  * @brief Validation object for soplex solutions
  */
 
-#include "soplex/validation.h"
-
 namespace soplex
 {
 

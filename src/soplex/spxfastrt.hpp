@@ -17,8 +17,6 @@
 #include <stdio.h>
 
 #include "soplex/spxdefines.h"
-#include "soplex/spxfastrt.h"
-
 
 /*
   Here comes our implementation of the Harris procedure improved by shifting

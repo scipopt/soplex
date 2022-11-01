@@ -16,7 +16,6 @@
 #include <iostream>
 
 #include "soplex/spxdefines.h"
-#include "soplex/spxbasis.h"
 #include "soplex/spxsolver.h"
 
 namespace soplex

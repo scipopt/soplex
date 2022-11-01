@@ -15,7 +15,6 @@
 
 #include <assert.h>
 #include "soplex/spxdefines.h"
-#include "soplex/spxboundflippingrt.h"
 #include "soplex/sorter.h"
 #include "soplex/spxsolver.h"
 #include "soplex/spxout.h"
@@ -675,11 +674,13 @@ SPxId SPxBoundFlippingRT<R>::selectEnter(
    if(max > 0)
    {
       collectBreakpointsMax(nBp, minIdx, pidx, pupdnnz, pupd, pvec, upb, lpb, PVEC);
+      // coverity[negative_returns]
       collectBreakpointsMax(nBp, minIdx, cidx, cupdnnz, cupd, cvec, ucb, lcb, COPVEC);
    }
    else
    {
       collectBreakpointsMin(nBp, minIdx, pidx, pupdnnz, pupd, pvec, upb, lpb, PVEC);
+      // coverity[negative_returns]
       collectBreakpointsMin(nBp, minIdx, cidx, cupdnnz, cupd, cvec, ucb, lcb, COPVEC);
    }
 

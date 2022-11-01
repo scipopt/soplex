@@ -18,7 +18,6 @@
 #include <iostream>
 
 #include "soplex/spxdefines.h"
-#include "soplex/spxweightst.h"
 #include "soplex/svset.h"
 #include "soplex/sorter.h"
 

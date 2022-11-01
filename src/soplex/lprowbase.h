@@ -90,6 +90,20 @@ public:
       assert(isConsistent());
    }
 
+   /// Assignment operator.
+   LPRowBase<R>& operator=(const LPRowBase<R>& row)
+   {
+      if(this != &row)
+      {
+         left = row.left;
+         right = row.right;
+         object = row.object;
+         vec = row.vec;
+      }
+
+      assert(isConsistent());
+   }
+
    /// Copy constructor.
    LPRowBase<R>(const LPRowBase<R>& row)
       : left(row.left), right(row.right), object(row.object), vec(row.vec)
