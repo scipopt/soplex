@@ -260,18 +260,18 @@ static void read_latte(
 int main(int argc, char **argv)
 {
    const char* banner =
-   "************************************************************************\n"
-   "*                                                                      *\n"
-   "*       LPConv --- Convert LPF to MPS format.                          *\n"
-   "*                  Release 1.0.2                                       *\n"
-   "*    Copyright (C) 2007-2020 Konrad-Zuse-Zentrum                       *\n"
-   "*                            fuer Informationstechnik Berlin           *\n"
-   "*                                                                      *\n"
-   "*  LPConv is distributed under the terms of the ZIB Academic Licence.  *\n"
-   "*  You should have received a copy of the ZIB Academic License         *\n"
-   "*  along with SoPlex; If not email to soplex@zib.de.                   *\n"
-   "*                                                                      *\n"
-   "************************************************************************\n"
+   "****************************************************************************\n"
+   "*                                                                          *\n"
+   "*       LPConv --- Convert LPF to MPS format.                              *\n"
+   "*                  Release 1.0.2                                           *\n"
+   "*    Copyright (C) 2007-2020 Konrad-Zuse-Zentrum                           *\n"
+   "*                            fuer Informationstechnik Berlin               *\n"
+   "*                                                                          *\n"
+   "*  LPConv is distributed under the terms of the Apache 2.0 Licence.        *\n"
+   "*  You should have received a copy of the Apache-2.0 license               *\n"
+   "*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de. *\n"
+   "*                                                                          *\n"
+   "****************************************************************************\n"
    ;
 
    const char* usage =

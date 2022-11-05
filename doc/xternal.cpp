@@ -65,8 +65,8 @@
  * <a href="http://soplex.zib.de">SoPlex</a> web page.  It is also distributed
  * as part of the <a href="http://scipopt.org/">SCIP Optimization Suite</a>.
  *
- * SoPlex is distributed under the terms of the \ref LICENSE "ZIB Academic Licence"
- * and can be freely used for academic research.  See the <a
+ * SoPlex is distributed under the terms of the \ref LICENSE "Apache 2.0"
+ * See the <a
  * href="http://soplex.zib.de">SoPlex</a> web page or contact us for more
  * information.
  *
@@ -164,7 +164,7 @@
 
 /**@page LICENSE License
  *
- * \verbinclude COPYING
+ * \verbinclude LICENSE
  */
 
 
