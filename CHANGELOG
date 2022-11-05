@@ -9,6 +9,9 @@ performance:
 
 code quality:
 
+miscellaneous:
+- changed license to Apache 2.0, see https://www.apache.org/licenses/LICENSE-2.0.
+
 October 2022 - Release 6.0.2
 =============================
 
