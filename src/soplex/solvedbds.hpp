@@ -1,14 +1,24 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /*                                                                           */
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -1806,6 +1816,7 @@ void SoPlexBase<R>::_getCompatibleColumns(VectorBase<R> feasVector, int* nonposi
       if(y.isSetup())
       {
          for(int j = 0; j < y.size(); j++)
+            // coverity[var_deref_model]
             newRowVector.add(y.index(j), y.value(j));
       }
       else
@@ -1957,14 +1968,15 @@ void SoPlexBase<R>::_getCompatibleBoundCons(LPRowSetBase<R>& boundcons, int* com
 #endif
 
    bool compatible;
-   SSVectorBase<R>  y(numCols());
+   int ncols = numCols();
+   SSVectorBase<R>  y(ncols);
    y.unSetup();
 
    _decompReducedProbColRowIDs.reSize(numCols());
 
 
    // identifying the compatible bound constraints
-   for(int i = 0; i < numCols(); i++)
+   for(int i = 0; i < ncols; i++)
    {
       _decompReducedProbColRowIDs[i].inValidate();
 
@@ -2011,7 +2023,7 @@ void SoPlexBase<R>::_getCompatibleBoundCons(LPRowSetBase<R>& boundcons, int* com
       }
       else
       {
-         for(int j = 0; j < numCols(); j++)
+         for(int j = 0; j < ncols; j++)
          {
             if(!isZero(y[j], feastol))
             {
@@ -3429,6 +3441,7 @@ void SoPlexBase<R>::_evaluateSolutionDecomp(SPxSolverBase<R>& solver, SLUFactor<
       _status = solverStat;
 
    // process result
+   // coverity[switch_selector_expr_is_constant]
    switch(solverStat)
    {
    case SPxSolverBase<R>::OPTIMAL:

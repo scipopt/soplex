@@ -3,13 +3,22 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -1239,13 +1248,16 @@ void SPxSolverBase<R>::performSolutionPolishing()
       instableEnter = false;
       theratiotester->setType(type());
 
+      int nrows = this->nRows();
+      int ncols = this->nCols();
+
       if(polishObj == POLISH_INTEGRALITY)
       {
-         DIdxSet slackcandidates(this->nRows());
-         DIdxSet continuousvars(this->nCols());
+         DIdxSet slackcandidates(nrows);
+         DIdxSet continuousvars(ncols);
 
          // collect nonbasic slack variables that could be made basic
-         for(int i = 0; i < this->nRows(); ++i)
+         for(int i = 0; i < nrows; ++i)
          {
             // only check nonbasic rows, skip equations
             if(rowstatus[i] ==  SPxBasisBase<R>::Desc::P_ON_LOWER
@@ -1258,9 +1270,9 @@ void SPxSolverBase<R>::performSolutionPolishing()
          }
 
          // collect continuous variables that could be made basic
-         if(integerVariables.size() == this->nCols())
+         if(integerVariables.size() == ncols)
          {
-            for(int i = 0; i < this->nCols(); ++i)
+            for(int i = 0; i < ncols; ++i)
             {
                // skip fixed variables
                if(colstatus[i] == SPxBasisBase<R>::Desc::P_ON_LOWER
@@ -1407,8 +1419,9 @@ void SPxSolverBase<R>::performSolutionPolishing()
       instableLeave = false;
       theratiotester->setType(type());
       bool useIntegrality = false;
+      int ncols = this->nCols();
 
-      if(integerVariables.size() == this->nCols())
+      if(integerVariables.size() == ncols)
          useIntegrality = true;
 
       // in ROW rep: pivot slack out of the basis
