@@ -97,8 +97,7 @@ SECTION:Frequently asked questions about SoPlex
         as a subroutine and do some kind of Branch-and-Bound. For
         instance, you can use  SCIP (Solving Constraint Integer Programs)
         together with SoPlex to solve IPs.  SCIP can be obtained at
-        <a href="http://scipopt.org/">here</a> and is
-        distributed under the ZIB academic license, like SoPlex.
+        <a href="http://scipopt.org/">here</a>.
     </p>
 
 
@@ -203,8 +202,8 @@ SECTION:Frequently asked questions about SoPlex
     LABEL:lpgeneration
     ANSWER:
     <p>
-        You can use <a href="http://zimpl.zib.de/">ZIMPL</a>, available at
-        under the ZIB academic license. It takes a (human readable) file
+        You can use <a href="http://zimpl.zib.de/">ZIMPL</a>, for example.
+        It takes a (human readable) file
         describing the linear program together with a data file as input and
         generates LPs or MIPs in LP- or MPS-format.
     </p>
