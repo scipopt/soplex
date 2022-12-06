@@ -1,13 +1,5 @@
-upcoming Release 6.0.3
+December 2022 Release 6.0.3
 =============================
-
-fixed bugs:
-
-interface & parameters:
-
-performance:
-
-code quality:
 
 miscellaneous:
 - changed license to Apache 2.0, see https://www.apache.org/licenses/LICENSE-2.0.
