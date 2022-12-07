@@ -229,6 +229,8 @@ endif()
 # export compilation settings to header file
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/soplex/config.h.in ${PROJECT_BINARY_DIR}/soplex/config.h @ONLY)
 
+configure_file(${PROJECT_SOURCE_DIR}/soplex-config.cmake.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/soplex-config.cmake" @ONLY)
+
 add_subdirectory(src)
 add_subdirectory(tests/c_interface)
 add_subdirectory(check)
