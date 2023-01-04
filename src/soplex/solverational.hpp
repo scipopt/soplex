@@ -435,6 +435,8 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
    }
    while(!_isSolveStopped(stoppedTime, stoppedIter));
 
+   _switchedToBoosted = false;
+
    ///@todo set status to ABORT_VALUE if optimal solution exceeds objective limit
 
    if(_status == SPxSolverBase<R>::OPTIMAL || _status == SPxSolverBase<R>::INFEASIBLE
@@ -5075,29 +5077,35 @@ void SoPlexBase<R>::_storeLastStableBasisBoosted(bool vanished)
       VectorBase<BP> tmpDual(vanished ? 0 : _boostedSolver.nRows());
       VectorBase<BP> tmpRedCost(vanished ? 0 : _boostedSolver.nCols());
 
-      try
+      if(!vanished)
       {
-         _boostedSimplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost,
-                              _boostedSolver.getOldBasisStatusRows().get_ptr(), _boostedSolver.getOldBasisStatusCols().get_ptr());
-      }
-      catch(const SPxInternalCodeException& E)
-      {
-         // error message has already been printed
-         throw SPxInternalCodeException("Error storing the basis");
-      }
+         _boostedSolver.getPrimalSol(tmpPrimal);
+         _boostedSolver.getSlacks(tmpSlacks);
+         _boostedSolver.getDualSol(tmpDual);
+         _boostedSolver.getRedCostSol(tmpRedCost);
 
-      // store basis for original problem
-      _boostedSolver.getOldBasisStatusRows().reSize(numRowsRational());
-      _boostedSolver.getOldBasisStatusCols().reSize(numColsRational());
-      _boostedSimplifier->getBasis(_boostedSolver.getOldBasisStatusRows().get_ptr(), _boostedSolver.getOldBasisStatusCols().get_ptr(),
-                                   _boostedSolver.getOldBasisStatusRows().size(),    _boostedSolver.getOldBasisStatusCols().size());
+         try
+         {
+            _boostedSimplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost,
+                                           _boostedSolver.getOldBasisStatusRows().get_ptr(), _boostedSolver.getOldBasisStatusCols().get_ptr());
+         }
+         catch(const SPxInternalCodeException& E)
+         {
+            // error message has already been printed
+            throw SPxInternalCodeException("Error storing the basis");
+         }
+
+         // store basis for original problem
+         _boostedSolver.getOldBasisStatusRows().reSize(numRowsRational());
+         _boostedSolver.getOldBasisStatusCols().reSize(numColsRational());
+         _boostedSimplifier->getBasis(_boostedSolver.getOldBasisStatusRows().get_ptr(), _boostedSolver.getOldBasisStatusCols().get_ptr(),
+                                      _boostedSolver.getOldBasisStatusRows().size(),    _boostedSolver.getOldBasisStatusCols().size());
+      }
    }
 
    // store last basis as old basis
    _storeBasisAsOldBasisBoosted(_boostedSolver.getOldBasisStatusRows(), _boostedSolver.getOldBasisStatusCols());
 }
-
-
 
 // get the last stable basis from the initial solver and store it as old basis, unsimplify basis if simplifier activated
 template <class R>
@@ -5111,22 +5119,41 @@ void SoPlexBase<R>::_storeLastStableBasis(bool vanished)
       VectorBase<R> tmpDual(vanished ? 0 : _solver.nRows());
       VectorBase<R> tmpRedCost(vanished ? 0 : _solver.nCols());
 
-      try
+      if(!vanished)
       {
-         _simplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost,
-                              _solver.getOldBasisStatusRows().get_ptr(), _solver.getOldBasisStatusCols().get_ptr());
-      }
-      catch(const SPxInternalCodeException& E)
-      {
-         // error message has already been printed
-         throw SPxInternalCodeException("Error storing the basis");
-      }
+         _solver.getPrimalSol(tmpPrimal);
+         _solver.getSlacks(tmpSlacks);
+         _solver.getDualSol(tmpDual);
+         _solver.getRedCostSol(tmpRedCost);
 
-      // store basis for original problem
-      _solver.getOldBasisStatusRows().reSize(numRowsRational());
-      _solver.getOldBasisStatusCols().reSize(numColsRational());
-      _simplifier->getBasis(_solver.getOldBasisStatusRows().get_ptr(), _solver.getOldBasisStatusCols().get_ptr(),
-                            _solver.getOldBasisStatusRows().size(),    _solver.getOldBasisStatusCols().size());
+         // unscale vectors
+         if(_scaler && _solver.isScaled())
+         {
+            _scaler->unscalePrimal(_solver, tmpPrimal);
+            _scaler->unscaleSlacks(_solver, tmpSlacks);
+            _scaler->unscaleDual(_solver, tmpDual);
+            _scaler->unscaleRedCost(_solver, tmpRedCost);
+         }
+
+         _solver.getBasis(_solver.getOldBasisStatusRows().get_ptr(), _solver.getOldBasisStatusCols().get_ptr(), _solver.getOldBasisStatusRows().size(), _solver.getOldBasisStatusCols().size());
+
+         try
+         {
+            _simplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost,
+                                    _solver.getOldBasisStatusRows().get_ptr(), _solver.getOldBasisStatusCols().get_ptr());
+         }
+         catch(const SPxInternalCodeException& E)
+         {
+            // error message has already been printed
+            throw SPxInternalCodeException("Error storing the basis");
+         }
+
+         // store basis for original problem
+         _solver.getOldBasisStatusRows().reSize(numRowsRational());
+         _solver.getOldBasisStatusCols().reSize(numColsRational());
+         _simplifier->getBasis(_solver.getOldBasisStatusRows().get_ptr(), _solver.getOldBasisStatusCols().get_ptr(),
+                               _solver.getOldBasisStatusRows().size(),    _solver.getOldBasisStatusCols().size());
+      }
    }
 
    // store last basis as old basis
@@ -5325,7 +5352,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                _hasBasis = true;
             }
 
-            if(oldIterations < _statistics->iterations) // store optimal basis as old basis
+            if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size() || _oldBasisStatusCols.size() != basisStatusCols.size())
                _storeBasisAsOldBasis(basisStatusRows, basisStatusCols);
 
             break;
@@ -5349,7 +5376,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             {
                try
                {
-                  if(oldIterations < _statistics->iterations)
+                  if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size() || _oldBasisStatusCols.size() != basisStatusCols.size())
                      _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
                }
                catch(const SPxInternalCodeException& E)
@@ -5378,8 +5405,8 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(),
                                 basisStatusCols.size());
 
-               if(oldIterations < _statistics->iterations)
-                  _storeBasisAsOldBasis(basisStatusRows, basisStatusCols);
+            if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size() || _oldBasisStatusCols.size() != basisStatusCols.size())
+               _storeBasisAsOldBasis(basisStatusRows, basisStatusCols);
             }
             else
             {
@@ -5392,7 +5419,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             {
                try
                {
-                  if(oldIterations < _statistics->iterations)
+                  if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size() || _oldBasisStatusCols.size() != basisStatusCols.size())
                      _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
                }
                catch(const SPxInternalCodeException& E)
@@ -5418,7 +5445,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                {
                   try
                   {
-                     if(oldIterations < _statistics->iterations)
+                     if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size() || _oldBasisStatusCols.size() != basisStatusCols.size())
                         _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
                   }
                   catch(const SPxInternalCodeException& E)
@@ -5451,7 +5478,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             {
                try
                {
-                  if(oldIterations < _statistics->iterations)
+                  if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size() || _oldBasisStatusCols.size() != basisStatusCols.size())
                      _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
                }
                catch(const SPxInternalCodeException& E)
@@ -5463,8 +5490,8 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             }
             else
             {
-               if(oldIterations < _statistics->iterations)
-                  _storeBasisAsOldBasis(basisStatusRows, basisStatusCols);
+            if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size() || _oldBasisStatusCols.size() != basisStatusCols.size())
+               _storeBasisAsOldBasis(basisStatusRows, basisStatusCols);
             }
 
             break;
@@ -5480,7 +5507,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             {
                try
                {
-                  if(oldIterations < _statistics->iterations)
+                  if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size() || _oldBasisStatusCols.size() != basisStatusCols.size())
                      _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
                }
                catch(const SPxInternalCodeException& E)
