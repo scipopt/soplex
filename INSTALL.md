@@ -116,6 +116,25 @@ and link with the GMP callable library.
 Note for building SCIP with SoPlex:  If SoPlex was built with GMP, then SCIP
 also needs to be built with GMP (default).
 
+### Webdemo
+
+SoPlex can be compiled into a single HTML file and used in a browser. This
+requires `emscripten` to be installed from their website (unfortunately, e.g.
+`sudo apt install emscripten` in Ubuntu Linux is broken):
+
+    https://emscripten.org/docs/getting_started/downloads.html
+
+Then, run
+
+    sh build_webdemo.sh
+
+This will create the file `build_webdemo/bin/soplex.html`. For fast edit
+iterations run
+
+    find src | entr -rs 'make -C build_webdemo soplex; echo'
+
+This will rebuild `soplex.html` every time a source file is modified (e.g.
+from Visual Studio Code).
 
 Using the Library
 =================
