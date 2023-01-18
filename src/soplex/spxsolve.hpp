@@ -639,7 +639,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                      if(boundrange == 0.0 || siderange == 0.0 || objrange == 0.0)
                         calculateProblemRanges();
 
-                     if(MAXIMUM(MAXIMUM(boundrange, siderange), objrange) >= 1e9)
+                     if(MAXIMUM(MAXIMUM(boundrange, siderange), objrange) >= 1e9 && false)
                      {
                         SPxOut::setScientific(spxout->getCurrentStream(), 0);
                         MSG_INFO1((*this->spxout), (*this->spxout) <<
@@ -1010,7 +1010,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                      if(boundrange == 0.0 || siderange == 0.0 || objrange == 0.0)
                         calculateProblemRanges();
 
-                     if(MAXIMUM(MAXIMUM(boundrange, siderange), objrange) >= 1e9)
+                     if(MAXIMUM(MAXIMUM(boundrange, siderange), objrange) >= 1e9 && false)
                      {
                         SPxOut::setScientific(spxout->getCurrentStream(), 0);
                         MSG_INFO1((*this->spxout), (*this->spxout) <<
