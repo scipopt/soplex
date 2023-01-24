@@ -30,6 +30,7 @@ include(CPack)
 
 option(ZLIB "Use ZLIB" ON)
 option(GMP "Use GMP" ON)
+option(EMSCRIPTEN_HTML "Emscripten HTML output" OFF)
 option(STATIC_GMP "Prefer static GMP lib" OFF)
 option(BOOST "Use Boost (required to build the binary). Disable if you only want to build libsoplex." ON)
 option(QUADMATH "should quadmath library be used" OFF)

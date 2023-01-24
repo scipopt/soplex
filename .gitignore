@@ -38,3 +38,5 @@ doc/html/
 doc/latex/
 faqdata.php
 faq.inc
+# webdemo
+build_webdemo
