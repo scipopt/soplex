@@ -231,8 +231,8 @@ public:
    ///
    virtual void setDelta(R newDelta)
    {
-      if(newDelta <= DEFAULT_EPS_ZERO)
-         newDelta = DEFAULT_EPS_ZERO;
+      if(newDelta <= Param::epsilon())
+         newDelta = Param::epsilon();
 
       this->delta = newDelta;
       fastDelta = newDelta;

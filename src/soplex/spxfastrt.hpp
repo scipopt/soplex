@@ -38,20 +38,14 @@
 namespace soplex
 {
 
-#define MINSTAB         1e-5
-#define LOWSTAB         1e-10
 #define TRIES           2
-#define SHORTVAL           1e-5
-#define DELTA_SHIFT     1e-5
-#define EPSILON         1e-10
-
 
 
 template <class R>
 void SPxFastRT<R>::resetTols()
 {
    // epsilon = thesolver->epsilon();
-   epsilon = EPSILON;
+   epsilon = this->thesolver->epsilon() * 1e6;
    /*
      if(thesolver->basis().stability() < 1e-4)
      epsilon *= 1e-4 / thesolver->basis().stability();
@@ -61,20 +55,17 @@ void SPxFastRT<R>::resetTols()
 template <class R>
 void SPxFastRT<R>::tighten()
 {
-   /*
-     if((delta > 1.99 * DELTA_SHIFT  &&  thesolver->theShift < 1e-4) ||
-     (delta > 1e-4   &&  thesolver->theShift > 1e-4))
-   */
-   // if(delta > 1.99 * DELTA_SHIFT)
-   if(fastDelta >= this->delta + DELTA_SHIFT)
+   R delta_shift = this->thesolver->feastol() * 1e4;
+
+   if(fastDelta >= this->delta + delta_shift)
    {
-      fastDelta -= DELTA_SHIFT;
+      fastDelta -= delta_shift;
 
       if(fastDelta > 1e-4)
-         fastDelta -= 2 * DELTA_SHIFT;
+         fastDelta -= 2 * delta_shift;
    }
 
-   if(minStab < MINSTAB)
+   if(minStab < this->thesolver->feastol() * 1e4)
    {
       minStab /= 0.90;
 
@@ -86,9 +77,9 @@ void SPxFastRT<R>::tighten()
 template <class R>
 void SPxFastRT<R>::relax()
 {
+   R delta_shift = this->thesolver->feastol() * 1e4;
    minStab *= 0.95;
-   fastDelta += 3 * DELTA_SHIFT;
-   // delta   += 2 * (thesolver->theShift > delta) * DELTA_SHIFT;
+   fastDelta += 3 * delta_shift;
 }
 
 template <class R>
@@ -831,15 +822,17 @@ bool SPxFastRT<R>::maxShortLeave(R& sel, int leave, R maxabs)
    assert(leave >= 0);
    assert(maxabs >= 0);
 
+   R shortval = this->thesolver->feastol() * 1e4;
+
    sel = this->thesolver->fVec().delta()[leave];
 
-   if(sel > maxabs * SHORTVAL)
+   if(sel > maxabs * shortval)
    {
       sel = (this->thesolver->ubBound()[leave] - this->thesolver->fVec()[leave]) / sel;
       return true;
    }
 
-   if(sel < -maxabs * SHORTVAL)
+   if(sel < -maxabs * shortval)
    {
       sel = (this->thesolver->lbBound()[leave] - this->thesolver->fVec()[leave]) / sel;
       return true;
@@ -854,15 +847,17 @@ bool SPxFastRT<R>::minShortLeave(R& sel, int leave, R maxabs)
    assert(leave >= 0);
    assert(maxabs >= 0);
 
+   R shortval = this->thesolver->feastol() * 1e4;
+
    sel = this->thesolver->fVec().delta()[leave];
 
-   if(sel > maxabs * SHORTVAL)
+   if(sel > maxabs * shortval)
    {
       sel = (this->thesolver->lbBound()[leave] - this->thesolver->fVec()[leave]) / sel;
       return true;
    }
 
-   if(sel < -maxabs * SHORTVAL)
+   if(sel < -maxabs * shortval)
    {
       sel = (this->thesolver->ubBound()[leave] - this->thesolver->fVec()[leave]) / sel;
       return true;
@@ -963,6 +958,7 @@ template <class R>
 int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
 {
    R maxabs, max, sel;
+   R delta_shift = this->thesolver->feastol() * 1e4;
    int leave = -1;
    int cnt = 0;
 
@@ -970,7 +966,7 @@ int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
 
    // force instable pivot iff true (see explanation in enter.cpp and spxsolve.hpp)
    bool instable = this->solver()->instableEnter;
-   R lowstab = LOWSTAB;
+   R lowstab = this->thesolver->feastol() * 1e-1;
    assert(!instable || this->solver()->instableEnterId.isValid());
 
    resetTols();
@@ -1007,7 +1003,7 @@ int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
             else
                leave = maxSelect(sel, stab, bestDelta, max);
 
-            if(bestDelta < DELTA_SHIFT * TRIES)
+            if(bestDelta < delta_shift * TRIES)
                cnt++;
             else
                cnt += TRIES;
@@ -1055,7 +1051,7 @@ int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
                    || this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(
                             leave)))) != SPxBasisBase<R>::Desc::P_FIXED);
 
-            if(bestDelta < DELTA_SHIFT * TRIES)
+            if(bestDelta < delta_shift * TRIES)
                cnt++;
             else
                cnt += TRIES;
@@ -1354,13 +1350,15 @@ bool SPxFastRT<R>::shortEnter(
    R max,
    R maxabs) const
 {
+   R shortval = this->thesolver->feastol() * 1e4;
+
    if(this->thesolver->isCoId(enterId))
    {
       if(max != 0.0)
       {
          R x = this->thesolver->coPvec().delta()[nr];
 
-         if(x < maxabs * SHORTVAL && -x < maxabs * SHORTVAL)
+         if(x < maxabs * shortval && -x < maxabs * shortval)
             return false;
       }
 
@@ -1372,7 +1370,7 @@ bool SPxFastRT<R>::shortEnter(
       {
          R x = this->thesolver->pVec().delta()[nr];
 
-         if(x < maxabs * SHORTVAL && -x < maxabs * SHORTVAL)
+         if(x < maxabs * shortval && -x < maxabs * shortval)
             return false;
       }
 
@@ -1388,6 +1386,7 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
    SPxId enterId;
    R max, sel;
    R maxabs = 0.0;
+   R delta_shift = this->thesolver->feastol() * 1e4;
    int nr;
    int cnt = 0;
 
@@ -1395,7 +1394,7 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
 
    // force instable pivot iff true (see explanation in leave.hpp and spxsolve.hpp)
    bool instable = this->solver()->instableLeave;
-   R lowstab = LOWSTAB;
+   R lowstab = this->thesolver->feastol() * 1e-1;
    assert(!instable || this->solver()->instableLeaveNum >= 0);
 
    resetTols();
@@ -1432,7 +1431,7 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
                enterId = maxSelect(nr, sel, stab, bestDelta, max);
             }
 
-            if(bestDelta < DELTA_SHIFT * TRIES)
+            if(bestDelta < delta_shift * TRIES)
                cnt++;
             else
                cnt += TRIES;
@@ -1475,7 +1474,7 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
                enterId = minSelect(nr, sel, stab, bestDelta, max);
             }
 
-            if(bestDelta < DELTA_SHIFT * TRIES)
+            if(bestDelta < delta_shift * TRIES)
                cnt++;
             else
                cnt += TRIES;
@@ -1563,7 +1562,7 @@ void SPxFastRT<R>::setType(typename SPxSolverBase<R>::Type type)
 {
    this->m_type = type;
 
-   minStab = MINSTAB;
+   minStab = this->thesolver->feastol() * 1e4;
    fastDelta = this->delta;
 }
 } // namespace soplex

@@ -214,7 +214,7 @@ SoPlexBase<R>::Settings::BoolParam::BoolParam()
    name[SoPlexBase<R>::RECOVERY_MECHANISM] = "recovery_mechanism";
    description[SoPlexBase<R>::RECOVERY_MECHANISM] =
       "enable recovery mechanism for when the solve fails";
-   defaultValue[SoPlexBase<R>::RECOVERY_MECHANISM] = true;
+   defaultValue[SoPlexBase<R>::RECOVERY_MECHANISM] = false;
 
    name[SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT] = "store_basis_before_simplex_pivot";
    description[SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT] =
@@ -559,7 +559,7 @@ SoPlexBase<R>::Settings::RealParam::RealParam()
    name[SoPlexBase<R>::FPFEASTOL] = "fpfeastol";
    description[SoPlexBase<R>::FPFEASTOL] =
       "working tolerance for feasibility in floating-point solver during iterative refinement";
-   lower[SoPlexBase<R>::FPFEASTOL] = 1e-12;
+   lower[SoPlexBase<R>::FPFEASTOL] = 0;
    upper[SoPlexBase<R>::FPFEASTOL] = 1.0;
    defaultValue[SoPlexBase<R>::FPFEASTOL] = 1e-9;
 
@@ -567,7 +567,7 @@ SoPlexBase<R>::Settings::RealParam::RealParam()
    name[SoPlexBase<R>::FPOPTTOL] = "fpopttol";
    description[SoPlexBase<R>::FPOPTTOL] =
       "working tolerance for optimality in floating-point solver during iterative refinement";
-   lower[SoPlexBase<R>::FPOPTTOL] = 1e-12;
+   lower[SoPlexBase<R>::FPOPTTOL] = 0;
    upper[SoPlexBase<R>::FPOPTTOL] = 1.0;
    defaultValue[SoPlexBase<R>::FPOPTTOL] = 1e-9;
 
@@ -8330,6 +8330,8 @@ void SoPlexBase<R>::_solveBoostedRealLPAndRecordStatistics(volatile bool* interr
 
    ///@todo precision-boosting add arg SPxSolverBase<S> solver (idea for the future)
 
+   _solver.setEpsilon(Param::epsilon());
+
    bool _hadBasis = _hasBasis;
 
    // set time and iteration limit
@@ -8357,11 +8359,13 @@ void SoPlexBase<R>::_solveBoostedRealLPAndRecordStatistics(volatile bool* interr
    }
    else
    {
-      if(_boostedSolver.feastol() < 1e-12)
-         _boostedSolver.setFeastol(1e-12);
+      R minfeastol = 0.001 * realParam(SoPlexBase<R>::FPFEASTOL);
+      R minopttol = 0.001 * realParam(SoPlexBase<R>::FPOPTTOL);
+      if(_boostedSolver.feastol() < minfeastol )
+         _boostedSolver.setFeastol(minfeastol);
 
-      if(_boostedSolver.opttol() < 1e-12)
-         _boostedSolver.setOpttol(1e-12);
+      if(_boostedSolver.opttol() < minopttol )
+         _boostedSolver.setOpttol(minopttol);
    }
 
    // set correct representation
@@ -8475,6 +8479,8 @@ void SoPlexBase<R>::_solveRealLPAndRecordStatistics(volatile bool* interrupt)
 {
    bool _hadBasis = _hasBasis;
 
+   _solver.setEpsilon(Param::epsilon());
+
    // set time and iteration limit
    if(intParam(SoPlexBase<R>::ITERLIMIT) < realParam(SoPlexBase<R>::INFTY))
       _solver.setTerminationIter(intParam(SoPlexBase<R>::ITERLIMIT) - _statistics->iterations);
@@ -8488,11 +8494,13 @@ void SoPlexBase<R>::_solveRealLPAndRecordStatistics(volatile bool* interrupt)
       _solver.setTerminationTime(Real(realParam(SoPlexBase<R>::INFTY)));
 
    // ensure that tolerances are not too small
-   if(_solver.feastol() < 1e-12)
-      _solver.setFeastol(1e-12);
+   R minfeastol = 0.001 * realParam(SoPlexBase<R>::FPFEASTOL);
+   R minopttol = 0.001 * realParam(SoPlexBase<R>::FPOPTTOL);
+   if(_solver.feastol() < minfeastol )
+      _solver.setFeastol(minfeastol);
 
-   if(_solver.opttol() < 1e-12)
-      _solver.setOpttol(1e-12);
+   if(_solver.opttol() < minopttol )
+      _solver.setOpttol(minopttol);
 
    // set correct representation
    if((intParam(SoPlexBase<R>::REPRESENTATION) == SoPlexBase<R>::REPRESENTATION_COLUMN
