@@ -90,19 +90,23 @@ private:
       int nCols;
       /// number of rows
       int nRows;
+      /// 0-epsilon of this poststep
+      R m_eps;
 
    public:
       /// constructor.
-      PostStep(const char* p_name, int nR = 0, int nC = 0)
+      PostStep(const char* p_name, int nR = 0, int nC = 0, R ftol = 1e-6)
          : m_name(p_name)
          , nCols(nC)
          , nRows(nR)
+         , m_eps(ftol)
       {}
       /// copy constructor.
       PostStep(const PostStep& old)
          : m_name(old.m_name)
          , nCols(old.nCols)
          , nRows(old.nRows)
+         , m_eps(old.m_eps)
       {}
       /// assignment operator
       PostStep& operator=(const PostStep& /*rhs*/)
@@ -135,9 +139,9 @@ private:
       virtual bool checkBasisDim(DataArray<typename SPxSolverBase<R>::VarStatus> rows,
                                  DataArray<typename SPxSolverBase<R>::VarStatus> cols) const;
 
-      static R eps()
+      virtual R eps() const
       {
-         return 1e-6;
+         return m_eps;
       }
    };
 
@@ -152,8 +156,8 @@ private:
 
    public:
       ///
-      RowObjPS(const SPxLPBase<R>& lp, int _i, int _j)
-         : PostStep("RowObj", lp.nRows(), lp.nCols())
+      RowObjPS(R m_epsilon, const SPxLPBase<R>& lp, int _i, int _j)
+         : PostStep("RowObj", lp.nRows(), lp.nCols(), m_epsilon)
          , m_i(_i)
          , m_j(_j)
       {}
@@ -198,8 +202,8 @@ private:
 
    public:
       ///
-      FreeConstraintPS(const SPxLPBase<R>& lp, int _i)
-         : PostStep("FreeConstraint", lp.nRows(), lp.nCols())
+      FreeConstraintPS(R m_epsilon, const SPxLPBase<R>& lp, int _i)
+         : PostStep("FreeConstraint", lp.nRows(), lp.nCols(), m_epsilon)
          , m_i(_i)
          , m_old_i(lp.nRows() - 1)
          , m_row(lp.rowVector(_i))
@@ -249,8 +253,8 @@ private:
 
    public:
       ///
-      EmptyConstraintPS(const SPxLPBase<R>& lp, int _i)
-         : PostStep("EmptyConstraint", lp.nRows(), lp.nCols())
+      EmptyConstraintPS(R m_epsilon, const SPxLPBase<R>& lp, int _i)
+         : PostStep("EmptyConstraint", lp.nRows(), lp.nCols(), m_epsilon)
          , m_i(_i)
          , m_old_i(lp.nRows() - 1)
          , m_row_obj(lp.rowObj(_i))
@@ -309,9 +313,9 @@ private:
 
    public:
       ///
-      RowSingletonPS(const SPxLPBase<R>& lp, int _i, int _j, bool strictLo, bool strictUp,
+      RowSingletonPS(R m_epsilon, const SPxLPBase<R>& lp, int _i, int _j, bool strictLo, bool strictUp,
                      R newLo, R newUp, R oldLo, R oldUp)
-         : PostStep("RowSingleton", lp.nRows(), lp.nCols())
+         : PostStep("RowSingleton", lp.nRows(), lp.nCols(), m_epsilon)
          , m_i(_i)
          , m_old_i(lp.nRows() - 1)
          , m_j(_j)
@@ -392,9 +396,9 @@ private:
 
    public:
       ///
-      ForceConstraintPS(const SPxLPBase<R>& lp, int _i, bool lhsFixed, DataArray<bool>& fixCols,
+      ForceConstraintPS(R m_epsilon, const SPxLPBase<R>& lp, int _i, bool lhsFixed, DataArray<bool>& fixCols,
                         Array<R>& lo, Array<R>& up)
-         : PostStep("ForceConstraint", lp.nRows(), lp.nCols())
+         : PostStep("ForceConstraint", lp.nRows(), lp.nCols(), m_epsilon)
          , m_i(_i)
          , m_old_i(lp.nRows() - 1)
          , m_lRhs(lhsFixed ? lp.lhs(_i) : lp.rhs(_i))
@@ -479,9 +483,9 @@ private:
 
    public:
       ///
-      FixVariablePS(const SPxLPBase<R>& lp, SPxMainSM& simplifier, int _j, const R val,
+      FixVariablePS(R m_epsilon, const SPxLPBase<R>& lp, SPxMainSM& simplifier, int _j, const R val,
                     bool correctIdx = true)
-         : PostStep("FixVariable", lp.nRows(), lp.nCols())
+         : PostStep("FixVariable", lp.nRows(), lp.nCols(), m_epsilon)
          , m_j(_j)
          , m_old_j(lp.nCols() - 1)
          , m_val(val)
@@ -538,8 +542,8 @@ private:
 
    public:
       ///
-      FixBoundsPS(const SPxLPBase<R>& lp, int j, R val)
-         : PostStep("FixBounds", lp.nRows(), lp.nCols())
+      FixBoundsPS(R m_epsilon, const SPxLPBase<R>& lp, int j, R val)
+         : PostStep("FixBounds", lp.nRows(), lp.nCols(), m_epsilon)
          , m_j(j)
       {
          if(EQrel(lp.lower(j), lp.upper(j), this->eps()))
@@ -604,8 +608,8 @@ private:
 
    public:
       ///
-      FreeZeroObjVariablePS(const SPxLPBase<R>& lp, int _j, bool loFree, DSVectorBase<R> col_idx_sorted)
-         : PostStep("FreeZeroObjVariable", lp.nRows(), lp.nCols())
+      FreeZeroObjVariablePS(R m_epsilon, const SPxLPBase<R>& lp, int _j, bool loFree, DSVectorBase<R> col_idx_sorted)
+         : PostStep("FreeZeroObjVariable", lp.nRows(), lp.nCols(), m_epsilon)
          , m_j(_j)
          , m_old_j(lp.nCols() - 1)
          , m_old_i(lp.nRows() - 1)
@@ -687,8 +691,8 @@ private:
 
    public:
       ///
-      ZeroObjColSingletonPS(const SPxLPBase<R>& lp, const SPxMainSM&, int _j, int _i)
-         : PostStep("ZeroObjColSingleton", lp.nRows(), lp.nCols())
+      ZeroObjColSingletonPS(R m_epsilon, const SPxLPBase<R>& lp, const SPxMainSM&, int _j, int _i)
+         : PostStep("ZeroObjColSingleton", lp.nRows(), lp.nCols(), m_epsilon)
          , m_j(_j)
          , m_i(_i)
          , m_old_j(lp.nCols() - 1)
@@ -752,8 +756,8 @@ private:
 
    public:
       ///
-      FreeColSingletonPS(const SPxLPBase<R>& lp, SPxMainSM& simplifier, int _j, int _i, R slackVal)
-         : PostStep("FreeColSingleton", lp.nRows(), lp.nCols())
+      FreeColSingletonPS(R m_epsilon, const SPxLPBase<R>& lp, SPxMainSM& simplifier, int _j, int _i, R slackVal)
+         : PostStep("FreeColSingleton", lp.nRows(), lp.nCols(), m_epsilon)
          , m_j(_j)
          , m_i(_i)
          , m_old_j(lp.nCols() - 1)
@@ -832,8 +836,8 @@ private:
 
    public:
       ///
-      DoubletonEquationPS(const SPxLPBase<R>& lp, int _j, int _k, int _i, R oldLo, R oldUp)
-         : PostStep("DoubletonEquation", lp.nRows(), lp.nCols())
+      DoubletonEquationPS(R m_epsilon, const SPxLPBase<R>& lp, int _j, int _k, int _i, R oldLo, R oldUp)
+         : PostStep("DoubletonEquation", lp.nRows(), lp.nCols(), m_epsilon)
          , m_j(_j)
          , m_k(_k)
          , m_i(_i)
@@ -923,11 +927,11 @@ private:
       DataArray<bool> m_isLhsEqualRhs;
 
    public:
-      DuplicateRowsPS(const SPxLPBase<R>& lp, int _i,
+      DuplicateRowsPS(R m_epsilon, const SPxLPBase<R>& lp, int _i,
                       int maxLhsIdx, int minRhsIdx, const DSVectorBase<R>& dupRows,
                       const Array<R> scale, const DataArray<int> perm, const DataArray<bool> isLhsEqualRhs,
                       bool isTheLast, bool isFixedRow, bool isFirst = false)
-         : PostStep("DuplicateRows", lp.nRows(), lp.nCols())
+         : PostStep("DuplicateRows", lp.nRows(), lp.nCols(), m_epsilon)
          , m_i(_i)
          , m_i_rowObj(lp.rowObj(_i))
          , m_maxLhsIdx((maxLhsIdx == -1) ? -1 : maxLhsIdx)
@@ -1015,9 +1019,9 @@ private:
       DataArray<int>       m_perm;
 
    public:
-      DuplicateColsPS(const SPxLPBase<R>& lp, int _j, int _k, R scale, DataArray<int>  perm,
+      DuplicateColsPS(R m_epsilon, const SPxLPBase<R>& lp, int _j, int _k, R scale, DataArray<int>  perm,
                       bool isFirst = false, bool isTheLast = false)
-         : PostStep("DuplicateCols", lp.nRows(), lp.nCols())
+         : PostStep("DuplicateCols", lp.nRows(), lp.nCols(), m_epsilon)
          , m_j(_j)
          , m_k(_k)
          , m_loJ(lp.lower(_j))
@@ -1086,8 +1090,8 @@ private:
 
    public:
       ///
-      AggregationPS(const SPxLPBase<R>& lp, int _i, int _j, R rhs, R oldupper, R oldlower)
-         : PostStep("Aggregation", lp.nRows(), lp.nCols())
+      AggregationPS(R m_epsilon, const SPxLPBase<R>& lp, int _i, int _j, R rhs, R oldupper, R oldlower)
+         : PostStep("Aggregation", lp.nRows(), lp.nCols(), m_epsilon)
          , m_j(_j)
          , m_i(_i)
          , m_old_j(lp.nCols() - 1)
@@ -1165,8 +1169,8 @@ private:
 
    public:
       ///
-      MultiAggregationPS(const SPxLPBase<R>& lp, SPxMainSM& simplifier, int _i, int _j, R constant)
-         : PostStep("MultiAggregation", lp.nRows(), lp.nCols())
+      MultiAggregationPS(R m_epsilon, const SPxLPBase<R>& lp, SPxMainSM& simplifier, int _i, int _j, R constant)
+         : PostStep("MultiAggregation", lp.nRows(), lp.nCols(), m_epsilon)
          , m_j(_j)
          , m_i(_i)
          , m_old_j(lp.nCols() - 1)
@@ -1236,8 +1240,8 @@ private:
 
    public:
       ///
-      TightenBoundsPS(const SPxLPBase<R>& lp, int j, R origupper, R origlower)
-         : PostStep("TightenBounds", lp.nRows(), lp.nCols())
+      TightenBoundsPS(R m_epsilon, const SPxLPBase<R>& lp, int j, R origupper, R origlower)
+         : PostStep("TightenBounds", lp.nRows(), lp.nCols(), m_epsilon)
          , m_j(j)
          , m_origupper(origupper)
          , m_origlower(origlower)
