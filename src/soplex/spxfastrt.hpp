@@ -62,7 +62,7 @@ void SPxFastRT<R>::resetTols()
 template <class R>
 void SPxFastRT<R>::tighten()
 {
-   R delta_shift = this->thesolver->feastol() * 1e4;
+   R delta_shift = this->thesolver->feastol() * 1e1;
 
    if(fastDelta >= this->delta + delta_shift)
    {
@@ -72,7 +72,7 @@ void SPxFastRT<R>::tighten()
          fastDelta -= 2 * delta_shift;
    }
 
-   if(minStab < this->thesolver->feastol() * 1e4)
+   if(minStab < this->thesolver->feastol() * 1e1)
    {
       minStab /= 0.90;
 
@@ -84,7 +84,7 @@ void SPxFastRT<R>::tighten()
 template <class R>
 void SPxFastRT<R>::relax()
 {
-   R delta_shift = this->thesolver->feastol() * 1e4;
+   R delta_shift = this->thesolver->feastol() * 1e1;
    minStab *= 0.95;
    fastDelta += 3 * delta_shift;
 }
@@ -829,7 +829,7 @@ bool SPxFastRT<R>::maxShortLeave(R& sel, int leave, R maxabs)
    assert(leave >= 0);
    assert(maxabs >= 0);
 
-   R shortval = this->thesolver->feastol() * 1e4;
+   R shortval = this->thesolver->feastol() * 1e1;
 
    sel = this->thesolver->fVec().delta()[leave];
 
@@ -854,7 +854,7 @@ bool SPxFastRT<R>::minShortLeave(R& sel, int leave, R maxabs)
    assert(leave >= 0);
    assert(maxabs >= 0);
 
-   R shortval = this->thesolver->feastol() * 1e4;
+   R shortval = this->thesolver->feastol() * 1e1;
 
    sel = this->thesolver->fVec().delta()[leave];
 
@@ -965,7 +965,7 @@ template <class R>
 int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
 {
    R maxabs, max, sel;
-   R delta_shift = this->thesolver->feastol() * 1e4;
+   R delta_shift = this->thesolver->feastol() * 1e1;
    int leave = -1;
    int cnt = 0;
 
@@ -973,7 +973,7 @@ int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
 
    // force instable pivot iff true (see explanation in enter.cpp and spxsolve.hpp)
    bool instable = this->solver()->instableEnter;
-   R lowstab = this->thesolver->feastol() * 1e-1;
+   R lowstab = this->thesolver->feastol() * 1e-4;
    assert(!instable || this->solver()->instableEnterId.isValid());
 
    resetTols();
@@ -1357,7 +1357,7 @@ bool SPxFastRT<R>::shortEnter(
    R max,
    R maxabs) const
 {
-   R shortval = this->thesolver->feastol() * 1e4;
+   R shortval = this->thesolver->feastol() * 1e1;
 
    if(this->thesolver->isCoId(enterId))
    {
@@ -1393,7 +1393,7 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
    SPxId enterId;
    R max, sel;
    R maxabs = 0.0;
-   R delta_shift = this->thesolver->feastol() * 1e4;
+   R delta_shift = this->thesolver->feastol() * 1e1;
    int nr;
    int cnt = 0;
 
@@ -1401,7 +1401,7 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
 
    // force instable pivot iff true (see explanation in leave.hpp and spxsolve.hpp)
    bool instable = this->solver()->instableLeave;
-   R lowstab = this->thesolver->feastol() * 1e-1;
+   R lowstab = this->thesolver->feastol() * 1e-4;
    assert(!instable || this->solver()->instableLeaveNum >= 0);
 
    resetTols();
@@ -1569,7 +1569,7 @@ void SPxFastRT<R>::setType(typename SPxSolverBase<R>::Type type)
 {
    this->m_type = type;
 
-   minStab = this->thesolver->feastol() * 1e4;
+   minStab = this->thesolver->feastol() * 1e1;
    fastDelta = this->delta;
 }
 } // namespace soplex
