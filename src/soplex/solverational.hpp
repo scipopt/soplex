@@ -96,7 +96,8 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
 
    // force ratio test (avoid bound flipping)
    int oldRatiotester = intParam(SoPlexBase<R>::RATIOTESTER);
-   if( oldRatiotester == SoPlexBase<R>::RATIOTESTER_BOUNDFLIPPING )
+
+   if(oldRatiotester == SoPlexBase<R>::RATIOTESTER_BOUNDFLIPPING)
       setIntParam(SoPlexBase<R>::RATIOTESTER, SoPlexBase<R>::RATIOTESTER_FAST);
 
    ///@todo implement handling of row objectives in Cplex interface

@@ -1074,6 +1074,18 @@ void SPxSolverBase<R>::setType(Type tp)
       m_leavetol = d;
    }
 
+   // set parameter \p epsilon for semi-sparse primal, dual and pricing vectors
+   template <class R>
+   void SPxSolverBase<R>::setEpsilon(R d)
+   {
+      if(d <= R(0.0))
+         throw SPxInterfaceException("XSOLVE33 Cannot set epsilon less than or equal to zero.");
+
+      primVec.delta().setEpsilon(d);
+      dualVec.delta().setEpsilon(d);
+      addVec.delta().setEpsilon(d);
+   }
+
    template <class R>
    void SPxSolverBase<R>::hyperPricing(bool h)
    {

@@ -862,6 +862,8 @@ public:
    void setOpttol(R d);
    /// set parameter \p delta, i.e., set \p feastol and \p opttol to same value.
    void setDelta(R d);
+   /// set parameter \p epsilon for semi-sparse primal, dual and pricing vectors
+   void setEpsilon(R d);
    /// set timing type
    void setTiming(Timer::TYPE ttype)
    {
