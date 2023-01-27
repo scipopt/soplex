@@ -8136,10 +8136,11 @@ void SoPlexBase<R>::_solveRealLPAndRecordStatistics(volatile bool* interrupt)
    // ensure that tolerances are not too small
    R minfeastol = 0.001 * realParam(SoPlexBase<R>::FPFEASTOL);
    R minopttol = 0.001 * realParam(SoPlexBase<R>::FPOPTTOL);
-   if(_solver.feastol() < minfeastol )
+
+   if(_solver.feastol() < minfeastol)
       _solver.setFeastol(minfeastol);
 
-   if(_solver.opttol() < minopttol )
+   if(_solver.opttol() < minopttol)
       _solver.setOpttol(minopttol);
 
    // set correct representation
