@@ -396,7 +396,8 @@ private:
 
    public:
       ///
-      ForceConstraintPS(R m_epsilon, const SPxLPBase<R>& lp, int _i, bool lhsFixed, DataArray<bool>& fixCols,
+      ForceConstraintPS(R m_epsilon, const SPxLPBase<R>& lp, int _i, bool lhsFixed,
+                        DataArray<bool>& fixCols,
                         Array<R>& lo, Array<R>& up)
          : PostStep("ForceConstraint", lp.nRows(), lp.nCols(), m_epsilon)
          , m_i(_i)
@@ -608,7 +609,8 @@ private:
 
    public:
       ///
-      FreeZeroObjVariablePS(R m_epsilon, const SPxLPBase<R>& lp, int _j, bool loFree, DSVectorBase<R> col_idx_sorted)
+      FreeZeroObjVariablePS(R m_epsilon, const SPxLPBase<R>& lp, int _j, bool loFree,
+                            DSVectorBase<R> col_idx_sorted)
          : PostStep("FreeZeroObjVariable", lp.nRows(), lp.nCols(), m_epsilon)
          , m_j(_j)
          , m_old_j(lp.nCols() - 1)
@@ -756,7 +758,8 @@ private:
 
    public:
       ///
-      FreeColSingletonPS(R m_epsilon, const SPxLPBase<R>& lp, SPxMainSM& simplifier, int _j, int _i, R slackVal)
+      FreeColSingletonPS(R m_epsilon, const SPxLPBase<R>& lp, SPxMainSM& simplifier, int _j, int _i,
+                         R slackVal)
          : PostStep("FreeColSingleton", lp.nRows(), lp.nCols(), m_epsilon)
          , m_j(_j)
          , m_i(_i)
@@ -1169,7 +1172,8 @@ private:
 
    public:
       ///
-      MultiAggregationPS(R m_epsilon, const SPxLPBase<R>& lp, SPxMainSM& simplifier, int _i, int _j, R constant)
+      MultiAggregationPS(R m_epsilon, const SPxLPBase<R>& lp, SPxMainSM& simplifier, int _i, int _j,
+                         R constant)
          : PostStep("MultiAggregation", lp.nRows(), lp.nCols(), m_epsilon)
          , m_j(_j)
          , m_i(_i)

@@ -2354,7 +2354,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::removeRowSingleton(SPxLPBase<R>&
       stricterLo = true;
    }
 
-   std::shared_ptr<PostStep> ptr(new RowSingletonPS(m_feastol, lp, i, j, stricterLo, stricterUp, lp.lower(j),
+   std::shared_ptr<PostStep> ptr(new RowSingletonPS(m_feastol, lp, i, j, stricterLo, stricterUp,
+                                 lp.lower(j),
                                  lp.upper(j), oldLo, oldUp));
    m_hist.append(ptr);
 
@@ -3089,7 +3090,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                lp.changeUpper(j, lp.lower(j));
          }
 
-         std::shared_ptr<PostStep> ptr(new ForceConstraintPS(m_feastol, lp, i, true, fixedCol, lowers, uppers));
+         std::shared_ptr<PostStep> ptr(new ForceConstraintPS(m_feastol, lp, i, true, fixedCol, lowers,
+                                       uppers));
          m_hist.append(ptr);
 
          ++remRows;
@@ -3132,7 +3134,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                lp.changeLower(j, lp.upper(j));
          }
 
-         std::shared_ptr<PostStep> ptr(new ForceConstraintPS(m_feastol, lp, i, false, fixedCol, lowers, uppers));
+         std::shared_ptr<PostStep> ptr(new ForceConstraintPS(m_feastol, lp, i, false, fixedCol, lowers,
+                                       uppers));
          m_hist.append(ptr);
 
          ++remRows;
@@ -4142,7 +4145,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::multiaggregation(SPxLPBase<R>& l
                << " Coefficient of aggregated col=" << aggAij << std::endl;
             )
 
-            std::shared_ptr<PostStep> ptr(new MultiAggregationPS(m_feastol, lp, *this, bestpos, j, aggConstant));
+            std::shared_ptr<PostStep> ptr(new MultiAggregationPS(m_feastol, lp, *this, bestpos, j,
+                                          aggConstant));
             m_hist.append(ptr);
 
             for(int k = 0; k < col.size(); ++k)
