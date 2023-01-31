@@ -105,3 +105,5 @@ do
       fi
     fi
 done
+
+sed -i 's!2002-'$LASTYEAR'!2002-'$NEWYEAR'!g' LICENSE

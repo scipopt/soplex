@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -264,7 +264,7 @@ int main(int argc, char **argv)
    "*                                                                          *\n"
    "*       LPConv --- Convert LPF to MPS format.                              *\n"
    "*                  Release 1.0.2                                           *\n"
-   "*    Copyright (C) 2007-2020 Konrad-Zuse-Zentrum                           *\n"
+   "*    Copyright (c) 2007-2020 Zuse Institute Berlin (ZIB)                   *\n"
    "*                            fuer Informationstechnik Berlin               *\n"
    "*                                                                          *\n"
    "*  LPConv is distributed under the terms of the Apache 2.0 Licence.        *\n"
