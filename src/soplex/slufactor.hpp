@@ -38,6 +38,8 @@
 
 namespace soplex
 {
+/// note: we keep this constant since it is just a tradeoff between sparsity and stability and does
+/// not need to be changed when precisions are decreased
 #define MINSTABILITY    R(4e-2)
 
 template <class R>
