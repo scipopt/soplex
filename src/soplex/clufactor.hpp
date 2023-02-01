@@ -3475,8 +3475,8 @@ void CLUFactor<R>::solveLright2(R* vec1, R* vec2)
          idx = &(lidx[k]);
          val = &(lval[k]);
 
-         StableSum<Real> tmp1(-vec1[lrow[i]]);
-         StableSum<Real> tmp2(-vec2[lrow[i]]);
+         StableSum<R> tmp1(-vec1[lrow[i]]);
+         StableSum<R> tmp2(-vec2[lrow[i]]);
 
          for(j = lbeg[i + 1]; j > k; --j)
          {
