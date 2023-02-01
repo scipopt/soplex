@@ -1663,7 +1663,7 @@ void SPxMainSM<R>::handleRowObjectives(SPxLPBase<R>& lp)
    {
       if(lp.maxRowObj(i) != 0.0)
       {
-         std::shared_ptr<PostStep> ptr(new RowObjPS(m_feastol, lp, i, lp.nCols()));
+         std::shared_ptr<PostStep> ptr(new RowObjPS(lp, i, lp.nCols(), m_feastol));
          m_hist.append(ptr);
          lp.addCol(lp.rowObj(i), -lp.rhs(i), UnitVectorBase<R>(i), -lp.lhs(i));
          lp.changeRange(i, R(0.0), R(0.0));
@@ -1733,7 +1733,7 @@ void SPxMainSM<R>::handleExtremes(SPxLPBase<R>& lp)
 
       if(lp.lhs(i) <= R(-infinity) && lp.rhs(i) >= R(infinity))
       {
-         std::shared_ptr<PostStep> ptr(new FreeConstraintPS(m_feastol, lp, i));
+         std::shared_ptr<PostStep> ptr(new FreeConstraintPS(lp, i, m_feastol));
          m_hist.append(ptr);
 
          removeRow(lp, i);
@@ -2157,7 +2157,7 @@ void SPxMainSM<R>::propagatePseudoobj(SPxLPBase<R>& lp)
 
             if(LT(newbound, lp.upper(j)))
             {
-               std::shared_ptr<PostStep> ptr(new TightenBoundsPS(m_feastol, lp, j, lp.upper(j), lp.lower(j)));
+               std::shared_ptr<PostStep> ptr(new TightenBoundsPS(lp, j, lp.upper(j), lp.lower(j), m_feastol));
                m_hist.append(ptr);
                lp.changeUpper(j, newbound);
             }
@@ -2168,7 +2168,7 @@ void SPxMainSM<R>::propagatePseudoobj(SPxLPBase<R>& lp)
 
             if(GT(newbound, lp.lower(j)))
             {
-               std::shared_ptr<PostStep> ptr(new TightenBoundsPS(m_feastol, lp, j, lp.upper(j), lp.lower(j)));
+               std::shared_ptr<PostStep> ptr(new TightenBoundsPS(lp, j, lp.upper(j), lp.lower(j), m_feastol));
                m_hist.append(ptr);
                lp.changeLower(j, newbound);
             }
@@ -2206,7 +2206,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::removeEmpty(SPxLPBase<R>& lp)
 
          MSG_DEBUG((*this->spxout) << " removed" << std::endl;)
 
-         std::shared_ptr<PostStep> ptr(new EmptyConstraintPS(m_feastol, lp, i));
+         std::shared_ptr<PostStep> ptr(new EmptyConstraintPS(lp, i, m_feastol));
          m_hist.append(ptr);
 
          ++remRows;
@@ -2264,8 +2264,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::removeEmpty(SPxLPBase<R>& lp)
 
          MSG_DEBUG((*this->spxout) << " removed" << std::endl;)
 
-         std::shared_ptr<PostStep> ptr1(new FixBoundsPS(m_feastol, lp, j, val));
-         std::shared_ptr<PostStep> ptr2(new FixVariablePS(m_feastol, lp, *this, j, val));
+         std::shared_ptr<PostStep> ptr1(new FixBoundsPS(lp, j, val, m_feastol));
+         std::shared_ptr<PostStep> ptr2(new FixVariablePS(lp, *this, j, val, m_feastol));
          m_hist.append(ptr1);
          m_hist.append(ptr2);
 
@@ -2354,9 +2354,9 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::removeRowSingleton(SPxLPBase<R>&
       stricterLo = true;
    }
 
-   std::shared_ptr<PostStep> ptr(new RowSingletonPS(m_feastol, lp, i, j, stricterLo, stricterUp,
+   std::shared_ptr<PostStep> ptr(new RowSingletonPS(lp, i, j, stricterLo, stricterUp,
                                  lp.lower(j),
-                                 lp.upper(j), oldLo, oldUp));
+                                 lp.upper(j), oldLo, oldUp, m_feastol));
    m_hist.append(ptr);
 
    removeRow(lp, i);
@@ -2586,7 +2586,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::aggregateVars(SPxLPBase<R>& lp,
       this->m_chgBnds++;
    }
 
-   std::shared_ptr<PostStep> ptr(new AggregationPS(m_feastol, lp, i, j, rhs, oldupper_k, oldlower_k));
+   std::shared_ptr<PostStep> ptr(new AggregationPS(lp, i, j, rhs, oldupper_k, oldlower_k, m_feastol));
    m_hist.append(ptr);
 
    removeRow(lp, i);
@@ -2990,7 +2990,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
          MSG_DEBUG((*this->spxout) << "IMAISM20 row " << i
                    << ": unconstrained -> removed" << std::endl;)
 
-         std::shared_ptr<PostStep> ptr(new FreeConstraintPS(m_feastol, lp, i));
+         std::shared_ptr<PostStep> ptr(new FreeConstraintPS(lp, i, m_feastol));
          m_hist.append(ptr);
 
          ++remRows;
@@ -3021,7 +3021,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
          MSG_DEBUG((*this->spxout) << " removed" << std::endl;)
 
-         std::shared_ptr<PostStep> ptr(new EmptyConstraintPS(m_feastol, lp, i));
+         std::shared_ptr<PostStep> ptr(new EmptyConstraintPS(lp, i, m_feastol));
          m_hist.append(ptr);
 
          ++remRows;
@@ -3090,8 +3090,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                lp.changeUpper(j, lp.lower(j));
          }
 
-         std::shared_ptr<PostStep> ptr(new ForceConstraintPS(m_feastol, lp, i, true, fixedCol, lowers,
-                                       uppers));
+         std::shared_ptr<PostStep> ptr(new ForceConstraintPS(lp, i, true, fixedCol, lowers,
+                                       uppers, m_feastol));
          m_hist.append(ptr);
 
          ++remRows;
@@ -3134,8 +3134,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                lp.changeLower(j, lp.upper(j));
          }
 
-         std::shared_ptr<PostStep> ptr(new ForceConstraintPS(m_feastol, lp, i, false, fixedCol, lowers,
-                                       uppers));
+         std::shared_ptr<PostStep> ptr(new ForceConstraintPS(lp, i, false, fixedCol, lowers,
+                                       uppers, m_feastol));
          m_hist.append(ptr);
 
          ++remRows;
@@ -3262,8 +3262,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
 
          MSG_DEBUG((*this->spxout) << " removed" << std::endl;)
 
-         std::shared_ptr<PostStep> ptr1(new FixBoundsPS(m_feastol, lp, j, val));
-         std::shared_ptr<PostStep> ptr2(new FixVariablePS(m_feastol, lp, *this, j, val));
+         std::shared_ptr<PostStep> ptr1(new FixBoundsPS(lp, j, val, m_feastol));
+         std::shared_ptr<PostStep> ptr2(new FixVariablePS(lp, *this, j, val, m_feastol));
          m_hist.append(ptr1);
          m_hist.append(ptr2);
 
@@ -3330,7 +3330,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
 
             MSG_DEBUG((*this->spxout) << " fixed at upper=" << lp.upper(j) << std::endl;)
 
-            std::shared_ptr<PostStep> ptr(new FixBoundsPS(m_feastol, lp, j, lp.upper(j)));
+            std::shared_ptr<PostStep> ptr(new FixBoundsPS(lp, j, lp.upper(j), m_feastol));
             m_hist.append(ptr);
             lp.changeLower(j, lp.upper(j));
          }
@@ -3351,7 +3351,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
 
             MSG_DEBUG((*this->spxout) << " fixed at lower=" << lp.lower(j) << std::endl;)
 
-            std::shared_ptr<PostStep> ptr(new FixBoundsPS(m_feastol, lp, j, lp.lower(j)));
+            std::shared_ptr<PostStep> ptr(new FixBoundsPS(lp, j, lp.lower(j), m_feastol));
             m_hist.append(ptr);
             lp.changeUpper(j, lp.lower(j));
 #endif
@@ -3377,8 +3377,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
                IdxCompare compare;
                SPxQuicksort(col_idx_sorted.mem(), col_idx_sorted.size(), compare);
 
-               std::shared_ptr<PostStep> ptr(new FreeZeroObjVariablePS(m_feastol, lp, j, unconstrained_below,
-                                             col_idx_sorted));
+               std::shared_ptr<PostStep> ptr(new FreeZeroObjVariablePS(lp, j, unconstrained_below,
+                                             col_idx_sorted, m_feastol));
                m_hist.append(ptr);
 
                // we have to remove the rows with larger idx first, because otherwise the rows are reorder and indices
@@ -3482,7 +3482,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
                       << " (" << lp.rhs(i)
                       << ")" << std::endl;)
 
-            std::shared_ptr<PostStep> ptr(new ZeroObjColSingletonPS(m_feastol, lp, *this, j, i));
+            std::shared_ptr<PostStep> ptr(new ZeroObjColSingletonPS(lp, *this, j, i, m_feastol));
             m_hist.append(ptr);
 
             lp.changeRange(i, lhs, rhs);
@@ -3495,7 +3495,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
 
             if(lp.lhs(i) <= R(-infinity) && lp.rhs(i) >= R(infinity))
             {
-               std::shared_ptr<PostStep> ptr2(new FreeConstraintPS(m_feastol, lp, i));
+               std::shared_ptr<PostStep> ptr2(new FreeConstraintPS(lp, i, m_feastol));
                m_hist.append(ptr2);
 
                ++remRows;
@@ -3596,7 +3596,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
                return this->INFEASIBLE;
             }
 
-            std::shared_ptr<PostStep> ptr(new DoubletonEquationPS(m_feastol, lp, j, k, i, oldLower, oldUpper));
+            std::shared_ptr<PostStep> ptr(new DoubletonEquationPS(lp, j, k, i, oldLower, oldUpper, m_feastol));
             m_hist.append(ptr);
 
             if(lp.lower(j) > R(-infinity) && lp.upper(j) < R(infinity))
@@ -3665,7 +3665,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
                }
             }
 
-            std::shared_ptr<PostStep> ptr(new FreeColSingletonPS(m_feastol, lp, *this, j, i, slackVal));
+            std::shared_ptr<PostStep> ptr(new FreeColSingletonPS(lp, *this, j, i, slackVal, m_feastol));
             m_hist.append(ptr);
 
             MSG_DEBUG((*this->spxout) << "IMAISM41 col " << j
@@ -3752,7 +3752,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLPBase<R>& lp, b
          MSG_DEBUG((*this->spxout) << "IMAISM43 row " << i
                    << ": unconstrained" << std::endl;)
 
-         std::shared_ptr<PostStep> ptr(new FreeConstraintPS(m_feastol, lp, i));
+         std::shared_ptr<PostStep> ptr(new FreeConstraintPS(lp, i, m_feastol));
          m_hist.append(ptr);
 
          ++remRows;
@@ -3878,7 +3878,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLPBase<R>& lp, b
 
          MSG_DEBUG((*this->spxout) << " fixed at upper=" << lp.upper(j) << std::endl;)
 
-         std::shared_ptr<PostStep> ptr(new FixBoundsPS(m_feastol, lp, j, lp.upper(j)));
+         std::shared_ptr<PostStep> ptr(new FixBoundsPS(lp, j, lp.upper(j), m_feastol));
          m_hist.append(ptr);
          lp.changeLower(j, lp.upper(j));
 
@@ -3900,7 +3900,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLPBase<R>& lp, b
 
          MSG_DEBUG((*this->spxout) << " fixed at lower=" << lp.lower(j) << std::endl;)
 
-         std::shared_ptr<PostStep> ptr(new FixBoundsPS(m_feastol, lp, j, lp.lower(j)));
+         std::shared_ptr<PostStep> ptr(new FixBoundsPS(lp, j, lp.lower(j), m_feastol));
          m_hist.append(ptr);
          lp.changeUpper(j, lp.lower(j));
 
@@ -3916,7 +3916,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLPBase<R>& lp, b
                    << ": weakly dominated -> maxObj=" << obj
                    << " dual rhs bound=" << dualConsUp[j] << std::endl;)
 
-         std::shared_ptr<PostStep> ptr(new FixBoundsPS(m_feastol, lp, j, lp.upper(j)));
+         std::shared_ptr<PostStep> ptr(new FixBoundsPS(lp, j, lp.upper(j), m_feastol));
          m_hist.append(ptr);
          lp.changeLower(j, lp.upper(j));
 
@@ -3930,7 +3930,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLPBase<R>& lp, b
                    << ": weakly dominated -> maxObj=" << obj
                    << " dual lhs bound=" << dualConsLo[j] << std::endl;)
 
-         std::shared_ptr<PostStep> ptr(new FixBoundsPS(m_feastol, lp, j, lp.lower(j)));
+         std::shared_ptr<PostStep> ptr(new FixBoundsPS(lp, j, lp.lower(j), m_feastol));
          m_hist.append(ptr);
          lp.changeUpper(j, lp.lower(j));
 
@@ -4145,8 +4145,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::multiaggregation(SPxLPBase<R>& l
                << " Coefficient of aggregated col=" << aggAij << std::endl;
             )
 
-            std::shared_ptr<PostStep> ptr(new MultiAggregationPS(m_feastol, lp, *this, bestpos, j,
-                                          aggConstant));
+            std::shared_ptr<PostStep> ptr(new MultiAggregationPS(lp, *this, bestpos, j,
+                                          aggConstant, m_feastol));
             m_hist.append(ptr);
 
             for(int k = 0; k < col.size(); ++k)
@@ -4503,17 +4503,17 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLPBase<R>& lp, 
                   da_perm[j] = perm_tmp[j];
                }
 
-               std::shared_ptr<PostStep> ptr(new DuplicateRowsPS(m_feastol, lp, rowIdx, maxLhsIdx, minRhsIdx,
+               std::shared_ptr<PostStep> ptr(new DuplicateRowsPS(lp, rowIdx, maxLhsIdx, minRhsIdx,
                                              m_dupRows[k], scale, da_perm, isLhsEqualRhs, true,
-                                             EQrel(newLhs, newRhs), k == idxFirstDupRows));
+                                             EQrel(newLhs, newRhs), m_feastol, k == idxFirstDupRows));
                m_hist.append(ptr);
             }
             else
             {
                DataArray<int> da_perm_empty(0);
-               std::shared_ptr<PostStep> ptr(new DuplicateRowsPS(m_feastol, lp, rowIdx, maxLhsIdx, minRhsIdx,
+               std::shared_ptr<PostStep> ptr(new DuplicateRowsPS(lp, rowIdx, maxLhsIdx, minRhsIdx,
                                              m_dupRows[k], scale, da_perm_empty, isLhsEqualRhs, false, EQrel(newLhs, newRhs),
-                                             k == idxFirstDupRows));
+                                             m_feastol, k == idxFirstDupRows));
                m_hist.append(ptr);
             }
 
@@ -4732,7 +4732,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
 
          if(!hasDuplicateCol)
          {
-            std::shared_ptr<PostStep> ptr(new DuplicateColsPS(m_feastol, lp, 0, 0, 1.0, m_perm_empty, true));
+            std::shared_ptr<PostStep> ptr(new DuplicateColsPS(lp, 0, 0, 1.0, m_perm_empty, m_feastol, true));
             m_hist.append(ptr);
             hasDuplicateCol = true;
          }
@@ -4764,7 +4764,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
                      if(LErel(lp.lower(j1), R(0.0)) && GErel(lp.upper(j1), R(0.0))
                            && LErel(lp.lower(j2), R(0.0)) && GErel(lp.upper(j2), R(0.0)))
                      {
-                        std::shared_ptr<PostStep> ptr(new DuplicateColsPS(m_feastol, lp, j1, j2, factor, m_perm_empty));
+                        std::shared_ptr<PostStep> ptr(new DuplicateColsPS(lp, j1, j2, factor, m_perm_empty, m_feastol));
                         // variable substitution xj2' := xj2 + factor * xj1 <=> xj2 = -factor * xj1 + xj2'
                         m_hist.append(ptr);
 
@@ -4828,7 +4828,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
                                      << ", " << j2
                                      << " first one fixed at upper bound=" << lp.upper(j1) << std::endl;)
 
-                           std::shared_ptr<PostStep> ptr(new FixBoundsPS(m_feastol, lp, j1, lp.upper(j1)));
+                           std::shared_ptr<PostStep> ptr(new FixBoundsPS(lp, j1, lp.upper(j1), m_feastol));
                            m_hist.append(ptr);
                            lp.changeLower(j1, lp.upper(j1));
                         }
@@ -4845,7 +4845,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
                                      << ", " << j2
                                      << " first one fixed at lower bound=" << lp.lower(j1) << std::endl;)
 
-                           std::shared_ptr<PostStep> ptr(new FixBoundsPS(m_feastol, lp, j1, lp.lower(j1)));
+                           std::shared_ptr<PostStep> ptr(new FixBoundsPS(lp, j1, lp.lower(j1), m_feastol));
                            m_hist.append(ptr);
                            lp.changeUpper(j1, lp.lower(j1));
                         }
@@ -4866,7 +4866,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
                                      << ", " << j2
                                      << " first one fixed at upper bound=" << lp.upper(j1) << std::endl;)
 
-                           std::shared_ptr<PostStep> ptr(new FixBoundsPS(m_feastol, lp, j1, lp.upper(j1)));
+                           std::shared_ptr<PostStep> ptr(new FixBoundsPS(lp, j1, lp.upper(j1), m_feastol));
                            m_hist.append(ptr);
                            lp.changeLower(j1, lp.upper(j1));
                         }
@@ -4885,7 +4885,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
                                      << ", " << j2
                                      << " first one fixed at lower bound=" << lp.lower(j1) << std::endl;)
 
-                           std::shared_ptr<PostStep> ptr(new FixBoundsPS(m_feastol, lp, j1, lp.lower(j1)));
+                           std::shared_ptr<PostStep> ptr(new FixBoundsPS(lp, j1, lp.lower(j1), m_feastol));
                            m_hist.append(ptr);
                            lp.changeUpper(j1, lp.lower(j1));
                         }
@@ -4950,7 +4950,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
 
    if(hasDuplicateCol)
    {
-      std::shared_ptr<PostStep> ptr(new DuplicateColsPS(m_feastol, lp, 0, 0, 1.0, da_perm, false, true));
+      std::shared_ptr<PostStep> ptr(new DuplicateColsPS(lp, 0, 0, 1.0, da_perm, m_feastol, false, true));
       m_hist.append(ptr);
    }
 
@@ -5057,7 +5057,7 @@ void SPxMainSM<R>::fixColumn(SPxLPBase<R>& lp, int j, bool correctIdx)
       }
    }
 
-   std::shared_ptr<PostStep> ptr(new FixVariablePS(m_feastol, lp, *this, j, lp.lower(j), correctIdx));
+   std::shared_ptr<PostStep> ptr(new FixVariablePS(lp, *this, j, lp.lower(j), m_feastol, correctIdx));
    m_hist.append(ptr);
 }
 
