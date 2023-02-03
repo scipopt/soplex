@@ -975,14 +975,7 @@ void SPxBasisBase<R>::factorize()
       minStab = factor->stability();
 
       // This seems always to be about 1e-7
-      if(minStab > 1e-4)
-         minStab *= 0.001;
-
-      if(minStab > 1e-5)
-         minStab *= 0.01;
-
-      if(minStab > 1e-6)
-         minStab *= 0.1;
+      minStab = std::min(minStab, R(this->theLP->epsilon() * 1e9));
 
       break;
 
