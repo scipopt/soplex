@@ -8134,14 +8134,13 @@ void SoPlexBase<R>::_solveRealLPAndRecordStatistics(volatile bool* interrupt)
       _solver.setTerminationTime(Real(realParam(SoPlexBase<R>::INFTY)));
 
    // ensure that tolerances are not too small
-   R minfeastol = 0.001 * realParam(SoPlexBase<R>::FPFEASTOL);
-   R minopttol = 0.001 * realParam(SoPlexBase<R>::FPOPTTOL);
+   R mintol = 1e4 * _solver.epsilon();
 
-   if(_solver.feastol() < minfeastol)
-      _solver.setFeastol(minfeastol);
+   if(_solver.feastol() < mintol)
+      _solver.setFeastol(mintol);
 
-   if(_solver.opttol() < minopttol)
-      _solver.setOpttol(minopttol);
+   if(_solver.opttol() < mintol)
+      _solver.setOpttol(mintol);
 
    // set correct representation
    if((intParam(SoPlexBase<R>::REPRESENTATION) == SoPlexBase<R>::REPRESENTATION_COLUMN
