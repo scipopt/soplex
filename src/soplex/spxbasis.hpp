@@ -1391,7 +1391,7 @@ SPxBasisBase<R>::SPxBasisBase(const SPxBasisBase<R>& old)
 }
 
 template <class R>
-SPxBasisBase<R>::~SPxBasisBase<R>()
+SPxBasisBase<R>::~SPxBasisBase()
 {
 
    assert(!freeSlinSolver || factor != 0);

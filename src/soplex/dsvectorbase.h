@@ -103,7 +103,7 @@ public:
    /** Creates a DSVectorBase ready to hold \p n nonzeros. However, the memory is automatically enlarged, if more
     *  nonzeros are added to the DSVectorBase.
     */
-   explicit DSVectorBase<R>(int n = 8)
+   explicit DSVectorBase(int n = 8)
       : theelem(0)
    {
       allocMem((n < 1) ? 2 : n);
@@ -113,7 +113,7 @@ public:
 
    /// Copy constructor.
    template < class S >
-   explicit DSVectorBase<R>(const SVectorBase<S>& old)
+   explicit DSVectorBase(const SVectorBase<S>& old)
       : theelem(0)
    {
       allocMem(old.size());
@@ -126,7 +126,7 @@ public:
    /** The redundancy with the copy constructor below is necessary since otherwise the compiler doesn't realize that it
     *  could use the more general one with S = R and generates a shallow copy constructor.
     */
-   DSVectorBase<R>(const DSVectorBase<R>& old)
+   DSVectorBase(const DSVectorBase<R>& old)
       : SVectorBase<R>()
       , theelem(0)
    {
@@ -138,7 +138,7 @@ public:
 
    /// Copy constructor.
    template < class S >
-   DSVectorBase<R>(const DSVectorBase<S>& old)
+   DSVectorBase(const DSVectorBase<S>& old)
       : SVectorBase<R>()
       , theelem(0)
    {
@@ -150,11 +150,11 @@ public:
 
    /// Copy constructor.
    template < class S >
-   explicit DSVectorBase<R>(const VectorBase<S>& vec);
+   explicit DSVectorBase(const VectorBase<S>& vec);
 
    /// Copy constructor.
    template < class S >
-   explicit DSVectorBase<R>(const SSVectorBase<S>& old);
+   explicit DSVectorBase(const SSVectorBase<S>& old);
 
    /// Assignment operator.
    template < class S >
@@ -206,7 +206,7 @@ public:
    DSVectorBase<R>& operator=(const SSVectorBase<S>& vec);
 
    /// Destructor.
-   virtual ~DSVectorBase<R>()
+   virtual ~DSVectorBase()
    {
       if(theelem)
       {

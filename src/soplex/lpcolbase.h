@@ -77,7 +77,7 @@ public:
    /// Default constructor.
    /** Construct LPColBase with a column vector ready for taking \p defDim nonzeros.
     */
-   explicit LPColBase<R>(int defDim = 0)
+   explicit LPColBase(int defDim = 0)
       : up(R(infinity)), low(0), object(0), vec(defDim)
    {
       assert(isConsistent());
@@ -87,7 +87,7 @@ public:
    /*  Construct LPColBase with the given objective value \p obj, a column %vector \p vec, upper bound \p upper and
     *  lower bound \p lower.
     */
-   LPColBase<R>(const R& p_obj, const SVectorBase<R>& p_vector, const R& p_upper, const R& p_lower)
+   LPColBase(const R& p_obj, const SVectorBase<R>& p_vector, const R& p_upper, const R& p_lower)
       : up(p_upper), low(p_lower), object(p_obj), vec(p_vector)
    {
       assert(isConsistent());
@@ -108,7 +108,7 @@ public:
    }
 
    /// Copy constructor.
-   LPColBase<R>(const LPColBase<R>& old)
+   LPColBase(const LPColBase<R>& old)
       : up(old.up), low(old.low), object(old.object), vec(old.vec)
    {
       assert(isConsistent());
@@ -116,7 +116,7 @@ public:
 
    /// Copy constructor.
    template < class S >
-   LPColBase<R>(const LPColBase<S>& old)
+   LPColBase(const LPColBase<S>& old)
       : up(old.up), low(old.low), object(old.object), vec(old.vec)
    {
       assert(isConsistent());

@@ -1355,7 +1355,7 @@ void SLUFactor<R>::freeAll()
 }
 
 template <class R>
-SLUFactor<R>::~SLUFactor<R>()
+SLUFactor<R>::~SLUFactor()
 {
    freeAll();
 }

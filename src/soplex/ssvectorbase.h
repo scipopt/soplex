@@ -668,7 +668,7 @@ public:
    ///@{
 
    /// Default constructor.
-   explicit SSVectorBase<R>(int p_dim, R p_eps = Param::epsilon())
+   explicit SSVectorBase(int p_dim, R p_eps = Param::epsilon())
       : VectorBase<R>(p_dim)
       , IdxSet()
       , setupStatus(true)
@@ -683,7 +683,7 @@ public:
 
    /// Copy constructor.
    template < class S >
-   SSVectorBase<R>(const SSVectorBase<S>& vec)
+   SSVectorBase(const SSVectorBase<S>& vec)
       : VectorBase<R>(vec)
       , IdxSet()
       , setupStatus(vec.setupStatus)
@@ -700,7 +700,7 @@ public:
    /** The redundancy with the copy constructor below is necessary since otherwise the compiler doesn't realize that it
     *  could use the more general one with S = R and generates a shallow copy constructor.
     */
-   SSVectorBase<R>(const SSVectorBase<R>& vec)
+   SSVectorBase(const SSVectorBase<R>& vec)
       : VectorBase<R>(vec)
       , IdxSet()
       , setupStatus(vec.setupStatus)
@@ -715,7 +715,7 @@ public:
 
    /// Constructs nonsetup copy of \p vec.
    template < class S >
-   explicit SSVectorBase<R>(const VectorBase<S>& vec, R eps = Param::epsilon())
+   explicit SSVectorBase(const VectorBase<S>& vec, R eps = Param::epsilon())
       : VectorBase<R>(vec)
       , IdxSet()
       , setupStatus(false)
@@ -890,7 +890,7 @@ public:
    }
 
    /// destructor
-   ~SSVectorBase<R>()
+   ~SSVectorBase()
    {
       if(idx)
          spx_free(idx);

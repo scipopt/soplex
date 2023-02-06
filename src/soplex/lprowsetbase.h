@@ -690,7 +690,7 @@ public:
     *  rows to the LPRowSetBase, which may result in automated memory realllocation.
     */
    explicit
-   LPRowSetBase<R>(int pmax = -1, int pmemmax = -1)
+   LPRowSetBase(int pmax = -1, int pmemmax = -1)
       : SVSetBase<R>(pmax, pmemmax), left(0), right(0), object(0), scaleExp(0)
    {
       assert(isConsistent());
@@ -732,7 +732,7 @@ public:
    }
 
    /// Copy constructor.
-   LPRowSetBase<R>(const LPRowSetBase<R>& rs)
+   LPRowSetBase(const LPRowSetBase<R>& rs)
       : SVSetBase<R>(rs)
       , left(rs.left)
       , right(rs.right)
@@ -744,7 +744,7 @@ public:
 
    /// Copy constructor.
    template < class S >
-   LPRowSetBase<R>(const LPRowSetBase<S>& rs)
+   LPRowSetBase(const LPRowSetBase<S>& rs)
       : SVSetBase<R>(rs)
       , left(rs.left)
       , right(rs.right)
@@ -755,7 +755,7 @@ public:
    }
 
    /// Destructor.
-   virtual ~LPRowSetBase<R>()
+   virtual ~LPRowSetBase()
    {}
 
    ///@}

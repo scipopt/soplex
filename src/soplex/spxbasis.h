@@ -967,13 +967,13 @@ public:
    /**@name Constructors / Destructors */
    ///@{
    /// default constructor.
-   SPxBasisBase<R>(Timer::TYPE ttype = Timer::USER_TIME);
+   SPxBasisBase(Timer::TYPE ttype = Timer::USER_TIME);
    /// copy constructor
-   SPxBasisBase<R>(const SPxBasisBase<R>& old);
+   SPxBasisBase(const SPxBasisBase<R>& old);
    /// assignment operator
    SPxBasisBase<R>& operator=(const SPxBasisBase<R>& rhs);
    /// destructor.
-   virtual ~SPxBasisBase<R>();
+   virtual ~SPxBasisBase();
    ///@}
 
 

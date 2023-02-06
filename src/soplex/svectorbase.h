@@ -60,13 +60,13 @@ public:
    }
 
    template < class S >
-   Nonzero<R>(const Nonzero<S>& vec)
+   Nonzero(const Nonzero<S>& vec)
       : val(vec.val)
       , idx(vec.idx)
    {
    }
 
-   Nonzero<R>()
+   Nonzero()
       : val()
       , idx(0)
    {
@@ -622,12 +622,12 @@ public:
     *  beginning of the memory block. Once this memory has been passed, it shall not be modified until the SVectorBase
     *  is no longer used.
     */
-   explicit SVectorBase<R>(int n = 0, Nonzero<R>* p_mem = 0)
+   explicit SVectorBase(int n = 0, Nonzero<R>* p_mem = 0)
    {
       setMem(n, p_mem);
    }
 
-   SVectorBase<R>(const SVectorBase<R>& sv) = default;
+   SVectorBase(const SVectorBase<R>& sv) = default;
 
    /// Assignment operator.
    template < class S >
