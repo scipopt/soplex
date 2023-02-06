@@ -77,7 +77,7 @@ public:
    ///@{
    /// default constructor.
    explicit
-   UpdateVector<R>(int p_dim /*=0*/, R p_eps /*=1e-16*/)
+   UpdateVector(int p_dim /*=0*/, R p_eps /*=1e-16*/)
       : VectorBase<R> (p_dim)
       , theval(0)
       , thedelta(p_dim, p_eps)
@@ -85,10 +85,10 @@ public:
       assert(isConsistent());
    }
    ///
-   ~UpdateVector<R>()
+   ~UpdateVector()
    {}
    /// copy constructor
-   UpdateVector<R>(const UpdateVector<R>&);
+   UpdateVector(const UpdateVector<R>&);
    /// assignment from VectorBase<R>
    UpdateVector<R>& operator=(const VectorBase<R>& rhs)
    {
