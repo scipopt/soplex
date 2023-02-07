@@ -1903,7 +1903,7 @@ void SPxMainSM<R>::computeMinMaxResidualActivity(SPxLPBase<R>& lp, int rowNumber
          }
          else if(LT(row.value(l), R(0.0), this->_tolerances->epsilon()))
          {
-            if(lp.upper(row.index(l) >= R(infinity)))
+            if(lp.upper(row.index(l)) >= R(infinity))
                minNegInfinite = true;
             else
                minAct += row.value(l) * lp.upper(row.index(l));
