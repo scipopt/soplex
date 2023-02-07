@@ -403,7 +403,7 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
          {
             x = v[j] + xx * vec.value(i);
 
-            if(isNotZero(x, epsilon))
+            if(isNotZero(x, this->tolerances()->epsilon()))
                v[j] = x;
             else
             {
@@ -415,7 +415,7 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
          {
             x = xx * vec.value(i);
 
-            if(isNotZero(x, epsilon))
+            if(isNotZero(x, this->tolerances()->epsilon()))
             {
                v[j] = x;
                addIdx(j);
@@ -433,7 +433,7 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
          {
             x = v[*iptr];
 
-            if(isNotZero(x, epsilon))
+            if(isNotZero(x, this->tolerances()->epsilon()))
                *iiptr++ = *iptr;
             else
                v[*iptr] = 0;
@@ -528,7 +528,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product(const SSVectorBase<S>& x, const
    {
       y = A[i] * x;
 
-      if(isNotZero(y, epsilon))
+      if(isNotZero(y, this->tolerances()->epsilon()))
       {
          VectorBase<R>::val[i] = y;
          IdxSet::addIdx(i);
@@ -619,7 +619,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product1(const SVSetBase<S>& A, const S
    const SVectorBase<S>& Ai = A[nzidx];
 
    // compute A[nzidx] * nzval:
-   if(isZero(nzval, epsilon) || Ai.size() == 0)
+   if(isZero(nzval, this->tolerances()->epsilon()) || Ai.size() == 0)
       clear();    // this := zero vector
    else
    {
@@ -665,7 +665,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A,
 
    num = A0.size();
 
-   if(isZero(x0, epsilon) || num == 0)
+   if(isZero(x0, this->tolerances()->epsilon()) || num == 0)
    {
       // A[0] == 0 or x[0] == 0 => this := zero vector
       clear();
@@ -697,7 +697,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A,
       // If A[i] == 0 or x[i] == 0, do nothing.
       Aisize = Ai.size();
 
-      if(isNotZero(xi, epsilon) || Aisize == 0)
+      if(isNotZero(xi, this->tolerances()->epsilon()) || Aisize == 0)
       {
          // Compute x[i] * A[i] and add it to the existing vector.
          for(int j = 0; j < Aisize; ++j)
@@ -736,7 +736,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A,
    {
       curidx = idx[i];
 
-      if(isZero(VectorBase<R>::val[curidx], epsilon))
+      if(isZero(VectorBase<R>::val[curidx], this->tolerances()->epsilon()))
          VectorBase<R>::val[curidx] = 0;
       else
       {
@@ -827,7 +827,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, 
          {
             // If x[i] is really nonzero, compute A[i] * x[i] and adapt x.idx,
             // otherwise set x[i] to 0.
-            if(isNotZero(xval, epsilon))
+            if(isNotZero(xval, this->tolerances()->epsilon()))
             {
                const SVectorBase<S>& Ai = A[i];
                x.idx[ nzcount++ ] = i;
@@ -872,7 +872,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign(const SVectorBase<S>& rhs)
       int k = rhs.index(i);
       S v = rhs.value(i);
 
-      if(isZero(v, epsilon))
+      if(isZero(v, this->tolerances()->epsilon()))
          VectorBase<R>::val[k] = 0;
       else
       {

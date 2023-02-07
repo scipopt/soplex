@@ -42,7 +42,6 @@ template <class R>
 bool SPxDevexPR<R>::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-
    if(this->thesolver != 0)
       if(this->thesolver->weights.dim() != this->thesolver->coDim()
             || this->thesolver->coWeights.dim() != this->thesolver->dim())

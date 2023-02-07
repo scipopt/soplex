@@ -503,13 +503,22 @@ public:
    }
 
    /// set the _tolerances member variable
-   void setTolerances(std::shared_ptr<Tolerances> newTolerances)
+   virtual void setTolerances(std::shared_ptr<Tolerances> newTolerances)
    {
       this->_tolerances = newTolerances;
+      // set tolerances for all the UpdateVectors
+      this->primVec.setTolerances(newTolerances);
+      this->dualVec.setTolerances(newTolerances);
+      this->addVec.setTolerances(newTolerances);
+      this->theFvec->setTolerances(newTolerances);
+      this->theCoPvec->setTolerances(newTolerances);
+      this->thePvec->setTolerances(newTolerances);
+      this->theRPvec->setTolerances(newTolerances);
+      this->theCPvec->setTolerances(newTolerances);
    }
 
    /// returns current tolerances
-   std::shared_ptr<Tolerances>& tolerances()
+   const std::shared_ptr<Tolerances>& tolerances() const
    {
       return this->_tolerances;
    }

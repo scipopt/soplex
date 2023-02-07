@@ -267,7 +267,7 @@ public:
    }
 
    /// set the _tolerances member variable
-   void setTolerances(std::shared_ptr<Tolerances> newTolerances)
+   virtual void setTolerances(std::shared_ptr<Tolerances> newTolerances)
    {
       this->_tolerances = newTolerances;
    }

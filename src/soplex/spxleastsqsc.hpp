@@ -279,32 +279,32 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    SVSetBase<R> facncols(ncols, ncols, 1.1, 1.2);
 
    /* column scaling factor vectors */
-   SSVectorBase<R> colscale1(ncols, R(this->_tolerances->epsilon()));
-   SSVectorBase<R> colscale2(ncols, R(this->_tolerances->epsilon()));
+   SSVectorBase<R> colscale1(ncols, this->_tolerances);
+   SSVectorBase<R> colscale2(ncols, this->_tolerances);
 
    /* row scaling factor vectors */
-   SSVectorBase<R> rowscale1(nrows, R(this->_tolerances->epsilon()));
-   SSVectorBase<R> rowscale2(nrows, R(this->_tolerances->epsilon()));
+   SSVectorBase<R> rowscale1(nrows, this->_tolerances);
+   SSVectorBase<R> rowscale2(nrows, this->_tolerances);
 
    /* residual vectors */
-   SSVectorBase<R> resnrows(nrows, R(this->_tolerances->epsilon()));
-   SSVectorBase<R> resncols(ncols, R(this->_tolerances->epsilon()));
+   SSVectorBase<R> resnrows(nrows, this->_tolerances);
+   SSVectorBase<R> resncols(ncols, this->_tolerances);
 
    /* vectors to store temporary values */
-   SSVectorBase<R> tmprows(nrows, R(this->_tolerances->epsilon()));
-   SSVectorBase<R> tmpcols(ncols, R(this->_tolerances->epsilon()));
+   SSVectorBase<R> tmprows(nrows, this->_tolerances);
+   SSVectorBase<R> tmpcols(ncols, this->_tolerances);
 
    /* vectors storing the row and column sums (respectively) of logarithms of
     *(absolute values of) non-zero elements of left hand matrix of LP
     */
-   SSVectorBase<R> rowlogs(nrows, R(this->_tolerances->epsilon()));
-   SSVectorBase<R> collogs(ncols, R(this->_tolerances->epsilon()));
+   SSVectorBase<R> rowlogs(nrows, this->_tolerances);
+   SSVectorBase<R> collogs(ncols, this->_tolerances);
 
    /* vectors storing the inverted number of non-zeros in each row and column
     *(respectively) of left hand matrix of LP
     */
-   SSVectorBase<R> rownnzinv(nrows, R(this->_tolerances->epsilon()));
-   SSVectorBase<R> colnnzinv(ncols, R(this->_tolerances->epsilon()));
+   SSVectorBase<R> rownnzinv(nrows, this->_tolerances);
+   SSVectorBase<R> colnnzinv(ncols, this->_tolerances);
 
    /* VectorBase<R> pointers */
    SSVectorBase<R>* csccurr = &colscale1;

@@ -3016,6 +3016,9 @@ bool CLUFactor<R>::isConsistent() const
    if(this->stat)
       return true;
 
+   if(this->_tolerances == nullptr)
+      return false;
+
    /*  Test column ring list consistency.
     */
    i = 0;

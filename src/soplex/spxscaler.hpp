@@ -76,7 +76,6 @@ SPxScaler<R>::SPxScaler(
    , m_doBoth(doBoth)
    , spxout(outstream)
 {
-   assert(SPxScaler<R>::isConsistent());
 }
 
 template <class R>
@@ -88,7 +87,6 @@ SPxScaler<R>::SPxScaler(const SPxScaler<R>& old)
    , m_doBoth(old.m_doBoth)
    , spxout(old.spxout)
 {
-   assert(SPxScaler<R>::isConsistent());
 }
 
 template <class R>

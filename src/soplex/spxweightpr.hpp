@@ -406,6 +406,9 @@ bool SPxWeightPR<R>::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
+   if(this->_tolerances == nullptr)
+      return MSGinconsistent("SPxWeightPR");
+
    if(this->solver() != 0)
    {
       if(rPenalty.dim() != this->solver()->nRows())

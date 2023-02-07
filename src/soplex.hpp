@@ -1526,6 +1526,8 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
          _rationalLP = 0;
          spx_alloc(_rationalLP);
          _rationalLP = new(_rationalLP) SPxLPRational(*rhs._rationalLP);
+         _rationalLP->setTolerances(rhs._rationalLP->tolerances());
+
       }
 
       // copy rational factorization
@@ -8101,6 +8103,7 @@ void SoPlexBase<R>::_ensureRationalLP()
       spx_alloc(_rationalLP);
       _rationalLP = new(_rationalLP) SPxLPRational();
       _rationalLP->setOutstream(spxout);
+      _rationalLP->setTolerances(this->tolerances());
    }
 }
 

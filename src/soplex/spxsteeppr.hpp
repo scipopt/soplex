@@ -61,7 +61,7 @@ void SPxSteepPR<R>::load(SPxSolverBase<R>* base)
 template <class R>
 void SPxSteepPR<R>::setType(typename SPxSolverBase<R>::Type type)
 {
-   workRhs.setEpsilon(this->_tolerances->epsilon());
+   workRhs.setTolerances(this->_tolerances);
 
    setupWeights(type);
    workVec.clear();
@@ -157,7 +157,7 @@ void SPxSteepPR<R>::setupWeights(typename SPxSolverBase<R>::Type type)
       {
          assert(type == SPxSolverBase<R>::LEAVE);
          coWeights.reDim(this->thesolver->dim(), false);
-         SSVectorBase<R>  tmp(this->thesolver->dim(), this->thesolver->epsilon());
+         SSVectorBase<R>  tmp(this->thesolver->dim(), this->thesolver->tolerances());
 
          for(i = this->thesolver->dim() - 1; i >= endDim && !this->thesolver->isTimeLimitReached(); --i)
          {
@@ -1113,7 +1113,7 @@ bool SPxSteepPR<R>::isConsistent() const
    if(this->thesolver != 0 && this->thesolver->type() == SPxSolverBase<R>::LEAVE && setup == EXACT)
    {
       int i;
-      SSVectorBase<R>  tmp(this->thesolver->dim(), this->thesolver->epsilon());
+      SSVectorBase<R>  tmp(this->thesolver->dim(), this->thesolver->tolerances());
       R x;
 
       for(i = this->thesolver->dim() - 1; i >= 0; --i)

@@ -202,8 +202,8 @@ public:
       , flipPotential(1)
       , relax_count(0)
       , breakpoints(10)
-      , updPrimRhs(0, DEFAULT_EPS_ZERO)
-      , updPrimVec(0, DEFAULT_EPS_ZERO)
+      , updPrimRhs(0)
+      , updPrimVec(0)
    {}
    /// copy constructor
    SPxBoundFlippingRT(const SPxBoundFlippingRT& old)
@@ -213,8 +213,8 @@ public:
       , flipPotential(1)
       , relax_count(0)
       , breakpoints(10)
-      , updPrimRhs(0, DEFAULT_EPS_ZERO)
-      , updPrimVec(0, DEFAULT_EPS_ZERO)
+      , updPrimRhs(0)
+      , updPrimVec(0)
    {}
    /// assignment operator
    SPxBoundFlippingRT& operator=(const SPxBoundFlippingRT& rhs)
@@ -264,6 +264,14 @@ public:
    void useBoundFlipsRow(bool bf)
    {
       enableRowBoundFlips = bf;
+   }
+
+   /// set tolerances
+   void setTolerances(std::shared_ptr<Tolerances> tolerances)
+   {
+      this->_tolerances = tolerances;
+      this->updPrimRhs.setTolerances(tolerances);
+      this->updPrimVec.setTolerances(tolerances);
    }
    ///@}
 };

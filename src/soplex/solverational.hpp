@@ -3312,7 +3312,7 @@ void SoPlexBase<R>::_computeInfeasBox(SolRational& sol, bool transformed)
 
    // prepare ytransA and ytransb; since we want exact arithmetic, we set the zero threshold of the semi-sparse
    // vector to zero
-   ytransA.setEpsilon(0);
+   ytransA.setTolerances(0);
    ytransA.clear();
    ytransb = 0;
 

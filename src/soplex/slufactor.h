@@ -303,9 +303,12 @@ public:
    bool isConsistent() const;
 
    /// set tolerances
-   void setTolerances(std::shared_ptr<Tolerances> tolerances)
+   virtual void setTolerances(std::shared_ptr<Tolerances> tolerances)
    {
       this->_tolerances = tolerances;
+      this->eta.setTolerances(tolerances);
+      this->forest.setTolerances(tolerances);
+      this->ssvec.setTolerances(tolerances);
    }
 
    std::shared_ptr<Tolerances> tolerances()

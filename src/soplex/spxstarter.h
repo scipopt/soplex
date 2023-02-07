@@ -111,7 +111,7 @@ public:
    ///@}
 
    /// set the tolerances to be used by the starter
-   void setTolerances(std::shared_ptr<Tolerances>& tolerances)
+   virtual void setTolerances(const std::shared_ptr<Tolerances>& tolerances)
    {
       _tolerances = tolerances;
    }

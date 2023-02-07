@@ -1634,13 +1634,13 @@ void SPxSolverBase<R>::setType(Type tp)
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
-      if(epsilon() < 0)
+      if(epsilon() < 0 || tolerances() == nullptr)
          return MSGinconsistent("SPxSolverBase");
 
-      if(primVec.delta().getEpsilon() != dualVec.delta().getEpsilon())
+      if(primVec.delta().tolerances() != dualVec.delta().tolerances())
          return MSGinconsistent("SPxSolverBase");
 
-      if(dualVec.delta().getEpsilon() != addVec.delta().getEpsilon())
+      if(dualVec.delta().tolerances() != addVec.delta().tolerances())
          return MSGinconsistent("SPxSolverBase");
 
       if(unitVecs.size() < SPxLPBase<R>::nCols() || unitVecs.size() < SPxLPBase<R>::nRows())
@@ -1693,7 +1693,7 @@ void SPxSolverBase<R>::setType(Type tp)
          if(thecovectors !=
                reinterpret_cast<const SVSetBase<R> *>(static_cast<const LPRowSetBase<R>*>(this))
                || thevectors !=
-               reinterpret_cast<const SVSetBase<R> *>(static_cast<const LPColSet*>(this))
+               reinterpret_cast<const SVSetBase<R> *>(static_cast<const LPColSetBase<R>*>(this))
                || theFrhs != &primRhs ||
                theFvec != &primVec ||
                theCoPrhs != &dualRhs ||
@@ -1710,7 +1710,7 @@ void SPxSolverBase<R>::setType(Type tp)
       else
       {
          if(thecovectors
-               != reinterpret_cast<const SVSetBase<R> *>(static_cast<const LPColSet*>(this))
+               != reinterpret_cast<const SVSetBase<R> *>(static_cast<const LPColSetBase<R>*>(this))
                || thevectors
                != reinterpret_cast<const SVSetBase<R> *>(static_cast<const LPRowSetBase<R>*>(this))
                || theFrhs != &dualRhs ||

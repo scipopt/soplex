@@ -169,6 +169,12 @@ public:
       return _tolerances;
    }
 
+   /// set tolerances
+   virtual void setTolerances(std::shared_ptr<Tolerances> tolerances)
+   {
+      this->_tolerances = tolerances;
+   }
+
    /// Returns true if and only if the LP is scaled
    bool isScaled() const
    {
@@ -2022,6 +2028,8 @@ public:
    /// Consistency check.
    bool isConsistent() const
    {
+      if(this->_tolerances == nullptr && nCols() != 0)
+         return MSGinconsistent("SPxLPBase");
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
       for(int i = nCols() - 1; i >= 0; --i)
@@ -2835,6 +2843,7 @@ public:
       , lp_scaler(old.lp_scaler)
       , spxout(old.spxout)
    {
+      _tolerances = old._tolerances;
       assert(isConsistent());
    }
 
@@ -2849,6 +2858,7 @@ public:
       , spxout(old.spxout)
    {
       lp_scaler = nullptr;
+      _tolerances = old._tolerances;
       assert(isConsistent());
    }
 
@@ -2864,6 +2874,7 @@ public:
          _isScaled = old._isScaled;
          lp_scaler = old.lp_scaler;
          spxout = old.spxout;
+         _tolerances = old._tolerances;
 
          assert(isConsistent());
       }
@@ -2887,6 +2898,7 @@ public:
                     SPxLPBase<R>::MAXIMIZE;
          offset = R(old.offset);
          _isScaled = old._isScaled;
+         _tolerances = old._tolerances;
 
          // this may have un-intended consequences in the future
          lp_scaler = nullptr;
