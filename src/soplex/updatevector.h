@@ -170,7 +170,7 @@ public:
       thedelta.reDim(newdim);
    }
 
-      /// set tolerances
+   /// set tolerances
    virtual void setTolerances(std::shared_ptr<Tolerances>& tolerances)
    {
       thedelta.setTolerances(tolerances);

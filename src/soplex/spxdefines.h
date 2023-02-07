@@ -313,6 +313,10 @@ private:
    Real s_epsilon_update;
    /// epsilon for pivot zero tolerance in factorization
    Real s_epsilon_pivot;
+   /// feasibility tolerance
+   Real s_feastol;
+   /// optimality tolerance
+   Real s_opttol;
    ///@}
 
 public:
@@ -342,6 +346,14 @@ public:
    Real epsilonPivot();
    ///
    void setEpsilonPivot(Real eps);
+   ///
+   Real feastol();
+   ///
+   void setFeastol(Real ftol);
+   ///
+   Real opttol();
+   ///
+   void setOpttol(Real otol);
    ///@}
 };
 

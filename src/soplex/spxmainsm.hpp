@@ -454,7 +454,8 @@ void SPxMainSM<R>::ForceConstraintPS::execute(VectorBase<R>& x, VectorBase<R>& y
             cStatus[cIdx] = EQrel(oldLo, x[cIdx],
                                   this->feastol()) ? SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ON_UPPER;
 
-            if(violation > maxViolation && ((EQrel(oldLo, x[cIdx], this->feastol()) && r[cIdx] < -this->feastol())
+            if(violation > maxViolation && ((EQrel(oldLo, x[cIdx], this->feastol())
+                                             && r[cIdx] < -this->feastol())
                                             || (EQrel(oldUp, x[cIdx], this->feastol()) && r[cIdx] > this->feastol())))
             {
                maxViolation = violation;
@@ -565,7 +566,8 @@ void SPxMainSM<R>::FixVariablePS::execute(VectorBase<R>& x, VectorBase<R>& y, Ve
    }
    else
    {
-      assert(EQrel(m_val, m_lower, this->epsilon()) || EQrel(m_val, m_upper, this->epsilon()) || m_val == 0.0);
+      assert(EQrel(m_val, m_lower, this->epsilon()) || EQrel(m_val, m_upper, this->epsilon())
+             || m_val == 0.0);
 
       cStatus[m_j] = EQrel(m_val, m_lower, this->epsilon()) ? SPxSolverBase<R>::ON_LOWER : (EQrel(m_val,
                      m_upper, this->epsilon()) ? SPxSolverBase<R>::ON_UPPER : SPxSolverBase<R>::ZERO);
@@ -1031,7 +1033,8 @@ void SPxMainSM<R>::DoubletonEquationPS::execute(VectorBase<R>& x, VectorBase<R>&
          cStatus[m_j] = SPxSolverBase<R>::FIXED;
       else
       {
-         if(GT(r[m_j], (R) 0, this->epsilon()) || (isZero(r[m_j], this->epsilon()) && EQ(x[m_j], m_Lo_j, this->epsilon())))
+         if(GT(r[m_j], (R) 0, this->epsilon()) || (isZero(r[m_j], this->epsilon())
+               && EQ(x[m_j], m_Lo_j, this->epsilon())))
             cStatus[m_j] = SPxSolverBase<R>::ON_LOWER;
          else
             cStatus[m_j] = SPxSolverBase<R>::ON_UPPER;
@@ -2009,7 +2012,8 @@ void SPxMainSM<R>::trivialHeuristic(SPxLPBase<R>& lp)
 
          ASSERT_WARN("WMAISM45", isNotZero(aij, R(1.0 / R(infinity))));
 
-         if(GT(lp.lhs(col.index(k)), R(-infinity), this->_tolerances->epsilon()) && LT(lp.rhs(col.index(k)), R(infinity), this->_tolerances->epsilon()))
+         if(GT(lp.lhs(col.index(k)), R(-infinity), this->_tolerances->epsilon())
+               && LT(lp.rhs(col.index(k)), R(infinity), this->_tolerances->epsilon()))
          {
             upLocks[j]++;
             downLocks[j]++;
@@ -2139,7 +2143,8 @@ void SPxMainSM<R>::propagatePseudoobj(SPxLPBase<R>& lp)
       }
    }
 
-   if(GT(m_cutoffbound, R(-infinity), this->_tolerances->epsilon()) && LT(m_cutoffbound, R(infinity), this->_tolerances->epsilon()))
+   if(GT(m_cutoffbound, R(-infinity), this->_tolerances->epsilon())
+         && LT(m_cutoffbound, R(infinity), this->_tolerances->epsilon()))
    {
       if(pseudoObj > m_pseudoobj)
          m_pseudoobj = pseudoObj;
@@ -2157,7 +2162,8 @@ void SPxMainSM<R>::propagatePseudoobj(SPxLPBase<R>& lp)
 
             if(LT(newbound, lp.upper(j), this->_tolerances->epsilon()))
             {
-               std::shared_ptr<PostStep> ptr(new TightenBoundsPS(lp, j, lp.upper(j), lp.lower(j), this->_tolerances));
+               std::shared_ptr<PostStep> ptr(new TightenBoundsPS(lp, j, lp.upper(j), lp.lower(j),
+                                             this->_tolerances));
                m_hist.append(ptr);
                lp.changeUpper(j, newbound);
             }
@@ -2168,7 +2174,8 @@ void SPxMainSM<R>::propagatePseudoobj(SPxLPBase<R>& lp)
 
             if(GT(newbound, lp.lower(j), this->_tolerances->epsilon()))
             {
-               std::shared_ptr<PostStep> ptr(new TightenBoundsPS(lp, j, lp.upper(j), lp.lower(j), this->_tolerances));
+               std::shared_ptr<PostStep> ptr(new TightenBoundsPS(lp, j, lp.upper(j), lp.lower(j),
+                                             this->_tolerances));
                m_hist.append(ptr);
                lp.changeLower(j, newbound);
             }
@@ -2434,9 +2441,11 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::aggregateVars(SPxLPBase<R>& lp,
       // no bound tightening on x_k when x_j is aggregated
       flip_jk = false;
    }
-   else if(LE(new_lo_j, lower_j, this->_tolerances->epsilon()) && GE(new_up_j, upper_j, this->_tolerances->epsilon()))
+   else if(LE(new_lo_j, lower_j, this->_tolerances->epsilon())
+           && GE(new_up_j, upper_j, this->_tolerances->epsilon()))
    {
-      if(LE(new_lo_k, lower_k, this->_tolerances->epsilon()) && GE(new_up_k, upper_k, this->_tolerances->epsilon()))
+      if(LE(new_lo_k, lower_k, this->_tolerances->epsilon())
+            && GE(new_up_k, upper_k, this->_tolerances->epsilon()))
       {
          // both variables' bounds are not affected by aggregation; choose the better aggregation coeff (aik/aij)
          if(spxAbs(aij) > spxAbs(aik))
@@ -2447,7 +2456,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::aggregateVars(SPxLPBase<R>& lp,
       else
          flip_jk = false;
    }
-   else if(LE(new_lo_k, lower_k, this->_tolerances->epsilon()) && GE(new_up_k, upper_k, this->_tolerances->epsilon()))
+   else if(LE(new_lo_k, lower_k, this->_tolerances->epsilon())
+           && GE(new_up_k, upper_k, this->_tolerances->epsilon()))
    {
       flip_jk = true;
    }
@@ -2586,7 +2596,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::aggregateVars(SPxLPBase<R>& lp,
       this->m_chgBnds++;
    }
 
-   std::shared_ptr<PostStep> ptr(new AggregationPS(lp, i, j, rhs, oldupper_k, oldlower_k, this->_tolerances));
+   std::shared_ptr<PostStep> ptr(new AggregationPS(lp, i, j, rhs, oldupper_k, oldlower_k,
+                                 this->_tolerances));
    m_hist.append(ptr);
 
    removeRow(lp, i);
@@ -3596,7 +3607,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
                return this->INFEASIBLE;
             }
 
-            std::shared_ptr<PostStep> ptr(new DoubletonEquationPS(lp, j, k, i, oldLower, oldUpper, this->_tolerances));
+            std::shared_ptr<PostStep> ptr(new DoubletonEquationPS(lp, j, k, i, oldLower, oldUpper,
+                                          this->_tolerances));
             m_hist.append(ptr);
 
             if(lp.lower(j) > R(-infinity) && lp.upper(j) < R(infinity))
@@ -4512,7 +4524,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLPBase<R>& lp, 
             {
                DataArray<int> da_perm_empty(0);
                std::shared_ptr<PostStep> ptr(new DuplicateRowsPS(lp, rowIdx, maxLhsIdx, minRhsIdx,
-                                             m_dupRows[k], scale, da_perm_empty, isLhsEqualRhs, false, EQrel(newLhs, newRhs, this->_tolerances->epsilon()),
+                                             m_dupRows[k], scale, da_perm_empty, isLhsEqualRhs, false, EQrel(newLhs, newRhs,
+                                                   this->_tolerances->epsilon()),
                                              this->_tolerances, k == idxFirstDupRows));
                m_hist.append(ptr);
             }
@@ -4732,7 +4745,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
 
          if(!hasDuplicateCol)
          {
-            std::shared_ptr<PostStep> ptr(new DuplicateColsPS(lp, 0, 0, 1.0, m_perm_empty, this->_tolerances, true));
+            std::shared_ptr<PostStep> ptr(new DuplicateColsPS(lp, 0, 0, 1.0, m_perm_empty, this->_tolerances,
+                                          true));
             m_hist.append(ptr);
             hasDuplicateCol = true;
          }
@@ -4761,10 +4775,13 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
 
                      // if 0 is not within the column bounds, we are not able to postsolve if the aggregated column has
                      // status ZERO, hence we skip this case
-                     if(LErel(lp.lower(j1), R(0.0), this->_tolerances->epsilon()) && GErel(lp.upper(j1), R(0.0), this->_tolerances->epsilon())
-                           && LErel(lp.lower(j2), R(0.0), this->_tolerances->epsilon()) && GErel(lp.upper(j2), R(0.0), this->_tolerances->epsilon()))
+                     if(LErel(lp.lower(j1), R(0.0), this->_tolerances->epsilon())
+                           && GErel(lp.upper(j1), R(0.0), this->_tolerances->epsilon())
+                           && LErel(lp.lower(j2), R(0.0), this->_tolerances->epsilon())
+                           && GErel(lp.upper(j2), R(0.0), this->_tolerances->epsilon()))
                      {
-                        std::shared_ptr<PostStep> ptr(new DuplicateColsPS(lp, j1, j2, factor, m_perm_empty, this->_tolerances));
+                        std::shared_ptr<PostStep> ptr(new DuplicateColsPS(lp, j1, j2, factor, m_perm_empty,
+                                                      this->_tolerances));
                         // variable substitution xj2' := xj2 + factor * xj1 <=> xj2 = -factor * xj1 + xj2'
                         m_hist.append(ptr);
 
@@ -4950,7 +4967,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
 
    if(hasDuplicateCol)
    {
-      std::shared_ptr<PostStep> ptr(new DuplicateColsPS(lp, 0, 0, 1.0, da_perm, this->_tolerances, false, true));
+      std::shared_ptr<PostStep> ptr(new DuplicateColsPS(lp, 0, 0, 1.0, da_perm, this->_tolerances, false,
+                                    true));
       m_hist.append(ptr);
    }
 
@@ -5057,7 +5075,8 @@ void SPxMainSM<R>::fixColumn(SPxLPBase<R>& lp, int j, bool correctIdx)
       }
    }
 
-   std::shared_ptr<PostStep> ptr(new FixVariablePS(lp, *this, j, lp.lower(j), this->_tolerances, correctIdx));
+   std::shared_ptr<PostStep> ptr(new FixVariablePS(lp, *this, j, lp.lower(j), this->_tolerances,
+                                 correctIdx));
    m_hist.append(ptr);
 }
 

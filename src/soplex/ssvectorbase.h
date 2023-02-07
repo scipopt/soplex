@@ -110,7 +110,7 @@ public:
       return VectorBase<R>::get_ptr();
    }
 
-    /// set the _tolerances member variable
+   /// set the _tolerances member variable
    virtual void setTolerances(std::shared_ptr<Tolerances> newTolerances)
    {
       this->_tolerances = newTolerances;
@@ -631,6 +631,7 @@ public:
    bool isConsistent() const
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
+
       if(VectorBase<R>::dim() > IdxSet::max())
          return MSGinconsistent("SSVectorBase");
 

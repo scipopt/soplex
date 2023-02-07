@@ -2030,6 +2030,7 @@ public:
    {
       if(this->_tolerances == nullptr && nCols() != 0)
          return MSGinconsistent("SPxLPBase");
+
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
       for(int i = nCols() - 1; i >= 0; --i)

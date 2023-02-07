@@ -700,7 +700,8 @@ private:
 
    public:
       ///
-      ZeroObjColSingletonPS(const SPxLPBase<R>& lp, const SPxMainSM&, int _j, int _i, std::shared_ptr<Tolerances> tols)
+      ZeroObjColSingletonPS(const SPxLPBase<R>& lp, const SPxMainSM&, int _j, int _i,
+                            std::shared_ptr<Tolerances> tols)
          : PostStep("ZeroObjColSingleton", tols, lp.nRows(), lp.nCols())
          , m_j(_j)
          , m_i(_i)
@@ -846,7 +847,8 @@ private:
 
    public:
       ///
-      DoubletonEquationPS(const SPxLPBase<R>& lp, int _j, int _k, int _i, R oldLo, R oldUp, std::shared_ptr<Tolerances> tols)
+      DoubletonEquationPS(const SPxLPBase<R>& lp, int _j, int _k, int _i, R oldLo, R oldUp,
+                          std::shared_ptr<Tolerances> tols)
          : PostStep("DoubletonEquation", tols, lp.nRows(), lp.nCols())
          , m_j(_j)
          , m_k(_k)
@@ -1100,7 +1102,8 @@ private:
 
    public:
       ///
-      AggregationPS(const SPxLPBase<R>& lp, int _i, int _j, R rhs, R oldupper, R oldlower, std::shared_ptr<Tolerances> tols)
+      AggregationPS(const SPxLPBase<R>& lp, int _i, int _j, R rhs, R oldupper, R oldlower,
+                    std::shared_ptr<Tolerances> tols)
          : PostStep("Aggregation", tols, lp.nRows(), lp.nCols())
          , m_j(_j)
          , m_i(_i)
@@ -1251,7 +1254,8 @@ private:
 
    public:
       ///
-      TightenBoundsPS(const SPxLPBase<R>& lp, int j, R origupper, R origlower, std::shared_ptr<Tolerances> tols)
+      TightenBoundsPS(const SPxLPBase<R>& lp, int j, R origupper, R origlower,
+                      std::shared_ptr<Tolerances> tols)
          : PostStep("TightenBounds", tols, lp.nRows(), lp.nCols())
          , m_j(j)
          , m_origupper(origupper)
@@ -1641,7 +1645,10 @@ private:
    public:
       R epsilon;
 
-      ElementCompare(R epsilon) { this->epsilon = epsilon; }
+      ElementCompare(R epsilon)
+      {
+         this->epsilon = epsilon;
+      }
 
       int operator()(const typename SVectorBase<R>::Element& e1,
                      const typename SVectorBase<R>::Element& e2) const

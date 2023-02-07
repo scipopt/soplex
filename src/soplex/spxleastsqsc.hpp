@@ -366,7 +366,8 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
       {
          // not in first iteration?
          if(k != 0)   // true, then update row scaling factor vector
-            updateScale(rownnzinv, resnrows, tmprows, rsccurr, rscprev, qcurr, qprev, eprev[1], eprev[2], R(this->_tolerances->epsilon()));
+            updateScale(rownnzinv, resnrows, tmprows, rsccurr, rscprev, qcurr, qprev, eprev[1], eprev[2],
+                        R(this->_tolerances->epsilon()));
 
          updateRes(facncols, resncols, resnrows, tmprows, eprev[0], qcurr, R(this->_tolerances->epsilon()));
          scurr = resnrows * tmprows.assignPWproduct4setup(resnrows, rownnzinv);
@@ -374,7 +375,8 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
       else // k is odd
       {
          // update column scaling factor vector
-         updateScale(colnnzinv, resncols, tmpcols, csccurr, cscprev, qcurr, qprev, eprev[1], eprev[2], R(this->_tolerances->epsilon()));
+         updateScale(colnnzinv, resncols, tmpcols, csccurr, cscprev, qcurr, qprev, eprev[1], eprev[2],
+                     R(this->_tolerances->epsilon()));
 
          updateRes(facnrows, resnrows, resncols, tmpcols, eprev[0], qcurr, R(this->_tolerances->epsilon()));
          scurr = resncols * tmpcols.assignPWproduct4setup(resncols, colnnzinv);
@@ -396,12 +398,14 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    if(k > 0 && (k % 2) == 0)
    {
       // update column scaling factor vector
-      updateScaleFinal(colnnzinv, resncols, tmpcols, csccurr, cscprev, qprev, eprev[1], eprev[2], R(this->_tolerances->epsilon()));
+      updateScaleFinal(colnnzinv, resncols, tmpcols, csccurr, cscprev, qprev, eprev[1], eprev[2],
+                       R(this->_tolerances->epsilon()));
    }
    else if(k > 0)
    {
       // update row scaling factor vector
-      updateScaleFinal(rownnzinv, resnrows, tmprows, rsccurr, rscprev, qprev, eprev[1], eprev[2], R(this->_tolerances->epsilon()));
+      updateScaleFinal(rownnzinv, resnrows, tmprows, rsccurr, rscprev, qprev, eprev[1], eprev[2],
+                       R(this->_tolerances->epsilon()));
    }
 
    /* compute actual scaling factors */

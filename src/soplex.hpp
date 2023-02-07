@@ -6015,8 +6015,10 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       default:
          return false;
       }
+
       if(_simplifier != nullptr)
          _simplifier->setTolerances(this->_tolerances);
+
       break;
 
    // type of scaler
@@ -6054,8 +6056,10 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       default:
          return false;
       }
+
       if(_scaler != nullptr)
          _scaler->setTolerances(this->_tolerances);
+
       break;
 
    // type of starter used to create crash basis
@@ -6081,8 +6085,10 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       default:
          return false;
       }
+
       if(_starter != nullptr)
          _starter->setTolerances(this->_tolerances);
+
       _solver.setStarter(_starter, false);
       break;
 
@@ -6953,7 +6959,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
          for(int i = 0; i < _realLP->rhs().dim(); i++)
          {
             if(((_realLP->rhs()[i] >= R(realParam(SoPlexBase<R>::INFTY)))
-               != (_rationalLP->rhs()[i] >= _rationalPosInfty))
+                  != (_rationalLP->rhs()[i] >= _rationalPosInfty))
                   || (_realLP->rhs()[i] < R(realParam(SoPlexBase<R>::INFTY))
                       && _rationalLP->rhs()[i] < _rationalPosInfty
                       && !isAdjacentTo(_rationalLP->rhs()[i], (double)_realLP->rhs()[i])))
@@ -6981,7 +6987,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
          for(int i = 0; i < _realLP->lhs().dim(); i++)
          {
             if(((_realLP->lhs()[i] <= R(-realParam(SoPlexBase<R>::INFTY)))
-                != (_rationalLP->lhs()[i] <= _rationalNegInfty))
+                  != (_rationalLP->lhs()[i] <= _rationalNegInfty))
                   || (_realLP->lhs()[i] > R(-realParam(SoPlexBase<R>::INFTY))
                       && _rationalLP->lhs()[i] > _rationalNegInfty
                       && !isAdjacentTo(_rationalLP->lhs()[i], (double)_realLP->lhs()[i])))

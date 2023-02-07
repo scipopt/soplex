@@ -473,6 +473,7 @@ void SPxSolverBase<R>::changeUpperStatus(int i, R newUpper, R oldUpper)
                objChange = -this->maxObj(i) * currLower;
          }
       }
+
       {
          stat = SPxBasisBase<R>::Desc::P_ON_LOWER;
 

@@ -33,6 +33,7 @@ template <class R>
 bool SPxHybridPR<R>::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
+
    if(this->_tolerances == nullptr)
       return MSGinconsistent("SPxHybridPR");
 

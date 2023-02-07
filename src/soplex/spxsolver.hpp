@@ -192,7 +192,8 @@ void SPxSolverBase<R>::setStarter(SPxStarter<R>* x, const bool destroy)
    }
 
    thestarter = x;
-   if( thestarter != nullptr )
+
+   if(thestarter != nullptr)
       thestarter->setTolerances(this->tolerances());
 
    freeStarter = destroy;
