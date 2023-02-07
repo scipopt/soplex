@@ -140,7 +140,6 @@ private:
    bool _isScaled;                   ///< true, if scaling has been performed
    SPxScaler<R>*
    lp_scaler;             ///< points to the scaler if the lp has been scaled, to nullptr otherwise
-   std::shared_ptr<Tolerances> _tolerances;
 
    ///@}
 
@@ -2068,6 +2067,8 @@ public:
    ///@}
 
 protected:
+
+   std::shared_ptr<Tolerances> _tolerances;
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Protected write access */

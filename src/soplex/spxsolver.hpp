@@ -147,7 +147,7 @@ void SPxSolverBase<R>::setPricer(SPxPricer<R>* x, const bool destroy)
       thepricer->clear();
 
    thepricer = x;
-   thepricer->setTolerances(_tolerances);
+   thepricer->setTolerances(this->tolerances());
 
    freePricer = destroy;
 }
@@ -174,7 +174,7 @@ void SPxSolverBase<R>::setTester(SPxRatioTester<R>* x, const bool destroy)
          theratiotester->clear();
    }
 
-   theratiotester->setTolerances(_tolerances);
+   theratiotester->setTolerances(this->tolerances());
 
    freeRatioTester = destroy;
 }
@@ -193,7 +193,7 @@ void SPxSolverBase<R>::setStarter(SPxStarter<R>* x, const bool destroy)
 
    thestarter = x;
    if( thestarter != nullptr )
-      thestarter->setTolerances(_tolerances);
+      thestarter->setTolerances(this->tolerances());
 
    freeStarter = destroy;
 }
@@ -1083,7 +1083,7 @@ void SPxSolverBase<R>::setType(Type tp)
    template <class R>
    void SPxSolverBase<R>::setEpsilonUpdateVectors()
    {
-      R d = this->_tolerances->epsilon();
+      R d = this->tolerances()->epsilon();
       primVec.delta().setEpsilon(d);
       dualVec.delta().setEpsilon(d);
       addVec.delta().setEpsilon(d);

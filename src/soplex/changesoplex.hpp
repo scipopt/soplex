@@ -297,7 +297,7 @@ void SPxSolverBase<R>::changeLowerStatus(int i, R newLower, R oldLower)
                objChange = (theUCbound[i] * currUpper) - (theLCbound[i] * oldLower);
          }
       }
-      else if(EQ(newLower, currUpper, R(this->_tolerances->epsilon())))
+      else if(EQ(newLower, currUpper, R(this->tolerances()->epsilon())))
       {
          stat = SPxBasisBase<R>::Desc::P_FIXED;
 

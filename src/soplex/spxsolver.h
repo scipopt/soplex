@@ -258,7 +258,6 @@ private:
    //-----------------------------
    /**@name Private data */
    ///@{
-   std::shared_ptr<Tolerances> _tolerances; ///< tolerances used by the solver
    Type           theType;     ///< entering or leaving algortihm.
    Pricing        thePricing;  ///< full or partial pricing.
    Representation theRep;      ///< row or column representation.
@@ -507,6 +506,12 @@ public:
    void setTolerances(std::shared_ptr<Tolerances> newTolerances)
    {
       this->_tolerances = newTolerances;
+   }
+
+   /// returns current tolerances
+   std::shared_ptr<Tolerances>& tolerances()
+   {
+      return this->_tolerances;
    }
 
    /// set refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
@@ -823,7 +828,7 @@ public:
     */
    R epsilon() const
    {
-      return _tolerances->epsilon();
+      return this->_tolerances->epsilon();
    }
    /// feasibility tolerance maintained by ratio test during ENTER algorithm.
    R entertol() const
