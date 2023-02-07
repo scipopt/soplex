@@ -147,6 +147,7 @@ void SPxSolverBase<R>::setPricer(SPxPricer<R>* x, const bool destroy)
       thepricer->clear();
 
    thepricer = x;
+   thepricer->setTolerances(_tolerances);
 
    freePricer = destroy;
 }
@@ -173,6 +174,8 @@ void SPxSolverBase<R>::setTester(SPxRatioTester<R>* x, const bool destroy)
          theratiotester->clear();
    }
 
+   theratiotester->setTolerances(_tolerances);
+
    freeRatioTester = destroy;
 }
 
@@ -185,10 +188,12 @@ void SPxSolverBase<R>::setStarter(SPxStarter<R>* x, const bool destroy)
    if(freeStarter)
    {
       delete thestarter;
-      thestarter = 0;
+      thestarter = nullptr;
    }
 
    thestarter = x;
+   if( thestarter != nullptr )
+      thestarter->setTolerances(_tolerances);
 
    freeStarter = destroy;
 }
@@ -842,7 +847,7 @@ void SPxSolverBase<R>::setType(Type tp)
                   break;
 
                case SPxBasisBase<R>::Desc::P_FIXED :
-                  assert(EQ(SPxLPBase<R>::lower(i), SPxLPBase<R>::upper(i)));
+                  assert(EQ(SPxLPBase<R>::lower(i), SPxLPBase<R>::upper(i), this->epsilon()));
                   val += this->maxObj(i) * SPxLPBase<R>::lower(i);
                   break;
 
@@ -864,7 +869,7 @@ void SPxSolverBase<R>::setType(Type tp)
                   break;
 
                case SPxBasisBase<R>::Desc::P_FIXED :
-                  assert(EQ(SPxLPBase<R>::lhs(i), SPxLPBase<R>::rhs(i)));
+                  assert(EQ(SPxLPBase<R>::lhs(i), SPxLPBase<R>::rhs(i), this->epsilon()));
                   val += this->maxRowObj(i) * SPxLPBase<R>::lhs(i);
                   break;
 
@@ -890,7 +895,7 @@ void SPxSolverBase<R>::setType(Type tp)
                   break;
 
                case SPxBasisBase<R>::Desc::P_FIXED :
-                  assert(EQ(theLCbound[i], theUCbound[i]));
+                  assert(EQ(theLCbound[i], theUCbound[i], this->epsilon()));
                   val += this->maxObj(i) * theLCbound[i];
                   break;
 
@@ -912,7 +917,7 @@ void SPxSolverBase<R>::setType(Type tp)
                   break;
 
                case SPxBasisBase<R>::Desc::P_FIXED :
-                  assert(EQ(theLRbound[i], theURbound[i]));
+                  assert(EQ(theLRbound[i], theURbound[i], this->epsilon()));
                   val += this->maxRowObj(i) * theURbound[i];
                   break;
 
@@ -1076,11 +1081,9 @@ void SPxSolverBase<R>::setType(Type tp)
 
    // set parameter \p epsilon for semi-sparse primal, dual and pricing vectors
    template <class R>
-   void SPxSolverBase<R>::setEpsilon(R d)
+   void SPxSolverBase<R>::setEpsilonUpdateVectors()
    {
-      if(d <= R(0.0))
-         throw SPxInterfaceException("XSOLVE33 Cannot set epsilon less than or equal to zero.");
-
+      R d = this->_tolerances->epsilon();
       primVec.delta().setEpsilon(d);
       dualVec.delta().setEpsilon(d);
       addVec.delta().setEpsilon(d);
@@ -1144,9 +1147,9 @@ void SPxSolverBase<R>::setType(Type tp)
       , fullPerturbation(false)
       , printBasisMetric(0)
       , unitVecs(0)
-      , primVec(0, Param::epsilon())
-      , dualVec(0, Param::epsilon())
-      , addVec(0, Param::epsilon())
+      , primVec(0)
+      , dualVec(0)
+      , addVec(0)
       , thepricer(0)
       , theratiotester(0)
       , thestarter(0)

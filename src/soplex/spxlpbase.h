@@ -140,6 +140,7 @@ private:
    bool _isScaled;                   ///< true, if scaling has been performed
    SPxScaler<R>*
    lp_scaler;             ///< points to the scaler if the lp has been scaled, to nullptr otherwise
+   std::shared_ptr<Tolerances> _tolerances;
 
    ///@}
 
@@ -162,6 +163,12 @@ public:
 
    /**@name Inquiry */
    ///@{
+
+   /// returns current tolerances
+   const std::shared_ptr<Tolerances> tolerances() const
+   {
+      return _tolerances;
+   }
 
    /// Returns true if and only if the LP is scaled
    bool isScaled() const
@@ -1319,7 +1326,7 @@ public:
 
          if(hasRhs && hasLhs)
          {
-            if(EQ(lhs(i), rhs(i)))
+            if(EQ(lhs(i), rhs(i), this->_tolerances->epsilon()))
                countEqual++;
             else
                countRanged++;
@@ -1832,7 +1839,7 @@ public:
       SVectorBase<R>& row = rowVector_w(i);
       SVectorBase<R>& col = colVector_w(j);
 
-      if(isNotZero(val))
+      if(isNotZero(val, this->_tolerances->epsilon()))
       {
          R newVal;
 

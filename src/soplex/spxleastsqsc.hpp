@@ -49,7 +49,8 @@ static void updateScale(
    R qcurr,
    R qprev,
    R eprev1,
-   R eprev2)
+   R eprev2,
+   R epsilon)
 {
    assert(psccurr != NULL);
    assert(pscprev != NULL);
@@ -61,7 +62,7 @@ static void updateScale(
 
    *pscprev -= *psccurr;
 
-   if(isZero(fac))
+   if(isZero(fac, epsilon))
       (*pscprev).clear();
    else
       *pscprev *= fac;
@@ -87,7 +88,8 @@ static void updateScaleFinal(
    SSVectorBase<R>*& pscprev,
    R q,
    R eprev1,
-   R eprev2)
+   R eprev2,
+   R epsilon)
 {
    assert(q != 0);
    assert(psccurr != NULL);
@@ -97,7 +99,7 @@ static void updateScaleFinal(
 
    *pscprev -= *psccurr;
 
-   if(isZero(fac))
+   if(isZero(fac, epsilon))
       (*pscprev).clear();
    else
       *pscprev *= fac;
@@ -117,11 +119,12 @@ static inline void updateRes(
    SSVectorBase<R>& resvec,
    SSVectorBase<R>& tmpvec,
    R eprev,
-   R qcurr)
+   R qcurr,
+   R epsilon)
 {
    assert(qcurr != 0.0);
 
-   if(isZero(eprev))
+   if(isZero(eprev, epsilon))
       resvec.clear();
    else
       resvec *= eprev;
@@ -143,7 +146,8 @@ static void initConstVecs(
    const SVSetBase<R>* vecset,
    SVSetBase<R>& facset,
    SSVectorBase<R>& veclogs,
-   SSVectorBase<R>& vecnnzinv)
+   SSVectorBase<R>& vecnnzinv,
+   R epsilon)
 {
    assert(vecset != NULL);
 
@@ -161,7 +165,7 @@ static void initConstVecs(
       {
          const R a = lpvec.value(i);
 
-         if(!isZero(a))
+         if(!isZero(a, epsilon))
          {
             logsum += log2(double(spxAbs(a))); // todo spxLog2?
             nnz++;
@@ -189,7 +193,7 @@ static void initConstVecs(
 
       for(int i = 0; i < size; ++i)
       {
-         if(!isZero(lpvec.value(i)))
+         if(!isZero(lpvec.value(i), epsilon))
             vecnew.add(lpvec.index(i), nnzinv);
       }
 
@@ -275,32 +279,32 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    SVSetBase<R> facncols(ncols, ncols, 1.1, 1.2);
 
    /* column scaling factor vectors */
-   SSVectorBase<R> colscale1(ncols);
-   SSVectorBase<R> colscale2(ncols);
+   SSVectorBase<R> colscale1(ncols, R(this->_tolerances->epsilon()));
+   SSVectorBase<R> colscale2(ncols, R(this->_tolerances->epsilon()));
 
    /* row scaling factor vectors */
-   SSVectorBase<R> rowscale1(nrows);
-   SSVectorBase<R> rowscale2(nrows);
+   SSVectorBase<R> rowscale1(nrows, R(this->_tolerances->epsilon()));
+   SSVectorBase<R> rowscale2(nrows, R(this->_tolerances->epsilon()));
 
    /* residual vectors */
-   SSVectorBase<R> resnrows(nrows);
-   SSVectorBase<R> resncols(ncols);
+   SSVectorBase<R> resnrows(nrows, R(this->_tolerances->epsilon()));
+   SSVectorBase<R> resncols(ncols, R(this->_tolerances->epsilon()));
 
    /* vectors to store temporary values */
-   SSVectorBase<R> tmprows(nrows);
-   SSVectorBase<R> tmpcols(ncols);
+   SSVectorBase<R> tmprows(nrows, R(this->_tolerances->epsilon()));
+   SSVectorBase<R> tmpcols(ncols, R(this->_tolerances->epsilon()));
 
    /* vectors storing the row and column sums (respectively) of logarithms of
     *(absolute values of) non-zero elements of left hand matrix of LP
     */
-   SSVectorBase<R> rowlogs(nrows);
-   SSVectorBase<R> collogs(ncols);
+   SSVectorBase<R> rowlogs(nrows, R(this->_tolerances->epsilon()));
+   SSVectorBase<R> collogs(ncols, R(this->_tolerances->epsilon()));
 
    /* vectors storing the inverted number of non-zeros in each row and column
     *(respectively) of left hand matrix of LP
     */
-   SSVectorBase<R> rownnzinv(nrows);
-   SSVectorBase<R> colnnzinv(ncols);
+   SSVectorBase<R> rownnzinv(nrows, R(this->_tolerances->epsilon()));
+   SSVectorBase<R> colnnzinv(ncols, R(this->_tolerances->epsilon()));
 
    /* VectorBase<R> pointers */
    SSVectorBase<R>* csccurr = &colscale1;
@@ -326,8 +330,8 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    std::array<R, 3> eprev;
    eprev.fill(0.0);
 
-   initConstVecs(lp.rowSet(), facnrows, rowlogs, rownnzinv);
-   initConstVecs(lp.colSet(), facncols, collogs, colnnzinv);
+   initConstVecs(lp.rowSet(), facnrows, rowlogs, rownnzinv, R(this->_tolerances->epsilon()));
+   initConstVecs(lp.colSet(), facncols, collogs, colnnzinv, R(this->_tolerances->epsilon()));
 
    assert(tmprows.isSetup() && tmpcols.isSetup());
    assert(rowscale1.isSetup() && rowscale2.isSetup());
@@ -362,17 +366,17 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
       {
          // not in first iteration?
          if(k != 0)   // true, then update row scaling factor vector
-            updateScale(rownnzinv, resnrows, tmprows, rsccurr, rscprev, qcurr, qprev, eprev[1], eprev[2]);
+            updateScale(rownnzinv, resnrows, tmprows, rsccurr, rscprev, qcurr, qprev, eprev[1], eprev[2], R(this->_tolerances->epsilon()));
 
-         updateRes(facncols, resncols, resnrows, tmprows, eprev[0], qcurr);
+         updateRes(facncols, resncols, resnrows, tmprows, eprev[0], qcurr, R(this->_tolerances->epsilon()));
          scurr = resnrows * tmprows.assignPWproduct4setup(resnrows, rownnzinv);
       }
       else // k is odd
       {
          // update column scaling factor vector
-         updateScale(colnnzinv, resncols, tmpcols, csccurr, cscprev, qcurr, qprev, eprev[1], eprev[2]);
+         updateScale(colnnzinv, resncols, tmpcols, csccurr, cscprev, qcurr, qprev, eprev[1], eprev[2], R(this->_tolerances->epsilon()));
 
-         updateRes(facnrows, resnrows, resncols, tmpcols, eprev[0], qcurr);
+         updateRes(facnrows, resnrows, resncols, tmpcols, eprev[0], qcurr, R(this->_tolerances->epsilon()));
          scurr = resncols * tmpcols.assignPWproduct4setup(resncols, colnnzinv);
       }
 
@@ -380,7 +384,7 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
       for(unsigned l = 2; l > 0; --l)
          eprev[l] = eprev[l - 1];
 
-      assert(isNotZero(sprev));
+      assert(isNotZero(sprev, R(this->_tolerances->epsilon())));
 
       eprev[0] = (qcurr * scurr) / sprev;
 
@@ -392,12 +396,12 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    if(k > 0 && (k % 2) == 0)
    {
       // update column scaling factor vector
-      updateScaleFinal(colnnzinv, resncols, tmpcols, csccurr, cscprev, qprev, eprev[1], eprev[2]);
+      updateScaleFinal(colnnzinv, resncols, tmpcols, csccurr, cscprev, qprev, eprev[1], eprev[2], R(this->_tolerances->epsilon()));
    }
    else if(k > 0)
    {
       // update row scaling factor vector
-      updateScaleFinal(rownnzinv, resnrows, tmprows, rsccurr, rscprev, qprev, eprev[1], eprev[2]);
+      updateScaleFinal(rownnzinv, resnrows, tmprows, rsccurr, rscprev, qprev, eprev[1], eprev[2], R(this->_tolerances->epsilon()));
    }
 
    /* compute actual scaling factors */

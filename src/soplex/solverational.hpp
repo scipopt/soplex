@@ -3839,7 +3839,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
 
    while(true)
    {
-      assert(!increasedMarkowitz || GE(_slufactor.markowitz(), R(0.9)));
+      assert(!increasedMarkowitz || GE(_slufactor.markowitz(), R(0.9), this->tolerances()->epsilon()));
 
       result = _solveRealForRational(fromScratch, primal, dual, basisStatusRows, basisStatusCols);
 

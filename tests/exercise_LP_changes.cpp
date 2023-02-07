@@ -110,10 +110,10 @@ public:
       setDelta( delta  );
       setTerminationTime( timelimit );
 
-      Param::setEpsilon( epsilon );
-      Param::setEpsilonFactorization( epsilon_factor );
-      Param::setEpsilonUpdate( epsilon_update );
-      Param::setVerbose( verbose );
+      _tolerances->setEpsilon( epsilon );
+      _tolerances->setEpsilonFactorization( epsilon_factor );
+      _tolerances->setEpsilonUpdate( epsilon_update );
+      _tolerances->setVerbose( verbose );
 
       setPricer( &_pricer );
       setTester( &_ratiotester );

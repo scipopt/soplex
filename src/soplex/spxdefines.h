@@ -174,7 +174,7 @@ extern bool msginconsistent(const char* name, const char* file, int line);
 #define MSGinconsistent(name) msginconsistent(name, __FILE__, __LINE__)
 
 #if defined(SOPLEX_DEBUG)
-// print output in any case, regardless of Param::verbose():
+// print output in any case, regardless of _tolerances->verbose():
 #define MSG_DEBUG(x) { x; }
 #else
 #define MSG_DEBUG(x) /**/
@@ -298,7 +298,7 @@ typedef double Real;
 
 THREADLOCAL extern const Real infinity;
 
-class Param
+class Tolerances
 {
 private:
 
@@ -306,36 +306,42 @@ private:
    /**@name Data */
    ///@{
    /// default allowed additive zero: 1.0 + EPS_ZERO == 1.0
-   THREADLOCAL static Real s_epsilon;
+   Real s_epsilon;
    /// epsilon for factorization
-   THREADLOCAL static Real s_epsilon_factorization;
+   Real s_epsilon_factorization;
    /// epsilon for factorization update
-   THREADLOCAL static Real s_epsilon_update;
+   Real s_epsilon_update;
    /// epsilon for pivot zero tolerance in factorization
-   THREADLOCAL static Real s_epsilon_pivot;
+   Real s_epsilon_pivot;
    ///@}
 
 public:
+
+   // default constructor
+   explicit Tolerances()
+      : s_epsilon(DEFAULT_EPS_ZERO), s_epsilon_factorization(DEFAULT_EPS_FACTOR),
+        s_epsilon_update(DEFAULT_EPS_UPDATE), s_epsilon_pivot(DEFAULT_EPS_PIVOT)
+   {}
 
    //------------------------------------
    /**@name Access / modification */
    ///@{
    ///
-   static Real epsilon();
+   Real epsilon();
    ///
-   static void setEpsilon(Real eps);
+   void setEpsilon(Real eps);
    ///
-   static Real epsilonFactorization();
+   Real epsilonFactorization();
    ///
-   static void setEpsilonFactorization(Real eps);
+   void setEpsilonFactorization(Real eps);
    ///
-   static Real epsilonUpdate();
+   Real epsilonUpdate();
    ///
-   static void setEpsilonUpdate(Real eps);
+   void setEpsilonUpdate(Real eps);
    ///
-   static Real epsilonPivot();
+   Real epsilonPivot();
    ///
-   static void setEpsilonPivot(Real eps);
+   void setEpsilonPivot(Real eps);
    ///@}
 };
 

@@ -202,8 +202,8 @@ public:
       , flipPotential(1)
       , relax_count(0)
       , breakpoints(10)
-      , updPrimRhs(0)
-      , updPrimVec(0)
+      , updPrimRhs(0, DEFAULT_EPS_ZERO)
+      , updPrimVec(0, DEFAULT_EPS_ZERO)
    {}
    /// copy constructor
    SPxBoundFlippingRT(const SPxBoundFlippingRT& old)
@@ -213,8 +213,8 @@ public:
       , flipPotential(1)
       , relax_count(0)
       , breakpoints(10)
-      , updPrimRhs(0)
-      , updPrimVec(0)
+      , updPrimRhs(0, DEFAULT_EPS_ZERO)
+      , updPrimVec(0, DEFAULT_EPS_ZERO)
    {}
    /// assignment operator
    SPxBoundFlippingRT& operator=(const SPxBoundFlippingRT& rhs)

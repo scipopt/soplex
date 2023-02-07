@@ -77,7 +77,7 @@ public:
    ///@{
    /// default constructor.
    explicit
-   UpdateVector<R>(int p_dim /*=0*/, R p_eps /*=1e-16*/)
+   UpdateVector<R>(int p_dim /*=0*/, R p_eps = 1e-16)
       : VectorBase<R> (p_dim)
       , theval(0)
       , thedelta(p_dim, p_eps)

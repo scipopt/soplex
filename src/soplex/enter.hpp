@@ -512,7 +512,7 @@ void SPxSolverBase<R>::getEnterVals
 
          if(enterLB <= R(-infinity))
             ds.colStatus(enterIdx) = SPxBasisBase<R>::Desc::D_ON_LOWER;
-         else if(EQ(enterLB, enterUB))
+         else if(EQ(enterLB, enterUB, this->epsilon()))
             ds.colStatus(enterIdx) = SPxBasisBase<R>::Desc::D_FREE;
          else
             ds.colStatus(enterIdx) = SPxBasisBase<R>::Desc::D_ON_BOTH;
@@ -531,7 +531,7 @@ void SPxSolverBase<R>::getEnterVals
 
          if(enterUB >= R(infinity))
             ds.colStatus(enterIdx) = SPxBasisBase<R>::Desc::D_ON_UPPER;
-         else if(EQ(enterLB, enterUB))
+         else if(EQ(enterLB, enterUB, this->epsilon()))
             ds.colStatus(enterIdx) = SPxBasisBase<R>::Desc::D_FREE;
          else
             ds.colStatus(enterIdx) = SPxBasisBase<R>::Desc::D_ON_BOTH;
@@ -667,7 +667,7 @@ void SPxSolverBase<R>::getEnterVals
 
          if(enterUB >= R(infinity))
             ds.rowStatus(enterIdx) = SPxBasisBase<R>::Desc::D_ON_LOWER;
-         else if(EQ(enterLB, enterUB))
+         else if(EQ(enterLB, enterUB, this->epsilon()))
             ds.rowStatus(enterIdx) = SPxBasisBase<R>::Desc::D_FREE;
          else
             ds.rowStatus(enterIdx) = SPxBasisBase<R>::Desc::D_ON_BOTH;
@@ -686,7 +686,7 @@ void SPxSolverBase<R>::getEnterVals
 
          if(enterLB <= R(-infinity))
             ds.rowStatus(enterIdx) = SPxBasisBase<R>::Desc::D_ON_UPPER;
-         else if(EQ(enterLB, enterUB))
+         else if(EQ(enterLB, enterUB, this->epsilon()))
             ds.rowStatus(enterIdx) = SPxBasisBase<R>::Desc::D_FREE;
          else
             ds.rowStatus(enterIdx) = SPxBasisBase<R>::Desc::D_ON_BOTH;
@@ -1328,7 +1328,7 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
    {
       if(spxAbs(leaveVal) < entertol())
       {
-         if(NE(theUBbound[leaveIdx], theLBbound[leaveIdx])
+         if(NE(theUBbound[leaveIdx], theLBbound[leaveIdx], this->_tolerances->epsilon())
                && enterStat != SPxBasisBase<R>::Desc::P_FREE && enterStat != SPxBasisBase<R>::Desc::D_FREE)
          {
             m_numCycle++;
@@ -1452,7 +1452,7 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
    }
    /*  No leaving vector could be found that would yield a stable pivot step.
     */
-   else if(NE(leaveVal, -enterMax))
+   else if(NE(leaveVal, -enterMax, this->_tolerances->epsilon()))
    {
       /* In the ENTER algorithm, when for a selected entering variable we find only
          an instable leaving variable, then the basis change is not conducted.
@@ -1497,7 +1497,7 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
    else if(!polish && leaveVal < R(infinity) && leaveVal > R(-infinity))
    {
       assert(rep() == COLUMN);
-      assert(EQ(leaveVal, -enterMax));
+      assert(EQ(leaveVal, -enterMax, this->epsilon()));
 
       this->change(-1, enterId, enterVec);
 

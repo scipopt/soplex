@@ -61,7 +61,7 @@ void SPxSteepPR<R>::load(SPxSolverBase<R>* base)
 template <class R>
 void SPxSteepPR<R>::setType(typename SPxSolverBase<R>::Type type)
 {
-   workRhs.setEpsilon(this->thesolver->epsilon());
+   workRhs.setEpsilon(this->_tolerances->epsilon());
 
    setupWeights(type);
    workVec.clear();

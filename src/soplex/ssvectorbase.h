@@ -668,7 +668,7 @@ public:
    ///@{
 
    /// Default constructor.
-   explicit SSVectorBase<R>(int p_dim, R p_eps = Param::epsilon())
+   explicit SSVectorBase<R>(int p_dim, R p_eps)
       : VectorBase<R>(p_dim)
       , IdxSet()
       , setupStatus(true)
@@ -715,7 +715,7 @@ public:
 
    /// Constructs nonsetup copy of \p vec.
    template < class S >
-   explicit SSVectorBase<R>(const VectorBase<S>& vec, R eps = Param::epsilon())
+   explicit SSVectorBase<R>(const VectorBase<S>& vec, R eps)
       : VectorBase<R>(vec)
       , IdxSet()
       , setupStatus(false)

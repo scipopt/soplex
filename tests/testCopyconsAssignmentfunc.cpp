@@ -100,8 +100,6 @@ int main(int argc, const char* const argv[])
     exit(0);
   }
 
-  Param::setVerbose ( 0 );
-
   int times = 0;
   int succ_times = 0;
   const int num_rows_output = 6;
@@ -144,6 +142,7 @@ int main(int argc, const char* const argv[])
 
 
         SoPlex lp_ori(SPxSolver::LEAVE, SPxSolver::COLUMN);
+        lp_ori.tolerances()->setVerbose(0);
         set_s_g_c_p_t(lp_ori, 1, 1, 0, 4, 2);
 
 

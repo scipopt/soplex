@@ -1264,7 +1264,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
                   || rowstatus[i] == SPxBasisBase<R>::Desc::P_ON_UPPER)
             {
                // only consider rows with zero dual multiplier to preserve optimality
-               if(EQrel((*theCoPvec)[i], (R) 0))
+               if(EQrel((*theCoPvec)[i], (R) 0, this->epsilon()))
                   slackcandidates.addIdx(i);
             }
          }
@@ -1279,7 +1279,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
                      || colstatus[i] ==  SPxBasisBase<R>::Desc::P_ON_UPPER)
                {
                   // only consider continuous variables with zero dual multiplier to preserve optimality
-                  if(EQrel(this->maxObj(i) - (*thePvec)[i], (R) 0) && integerVariables[i] == 0)
+                  if(EQrel(this->maxObj(i) - (*thePvec)[i], (R) 0, this->epsilon()) && integerVariables[i] == 0)
                      continuousvars.addIdx(i);
                }
             }
@@ -1362,7 +1362,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
                   || colstatus[i] == SPxBasisBase<R>::Desc::P_ON_UPPER)
             {
                // only consider variables with zero reduced costs to preserve optimality
-               if(EQrel(this->maxObj(i) - (*thePvec)[i], (R) 0))
+               if(EQrel(this->maxObj(i) - (*thePvec)[i], (R) 0, this->epsilon()))
                   candidates.addIdx(i);
             }
          }
@@ -1447,7 +1447,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
 
             if(stat == SPxBasisBase<R>::Desc::P_ON_LOWER || stat ==  SPxBasisBase<R>::Desc::P_ON_UPPER)
             {
-               if(EQrel((*theFvec)[i], (R) 0))
+               if(EQrel((*theFvec)[i], (R) 0, this->epsilon()))
                   basiccandidates.addIdx(i);
             }
          }
@@ -1512,7 +1512,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
 
             if(stat == SPxBasisBase<R>::Desc::P_ON_LOWER || stat ==  SPxBasisBase<R>::Desc::P_ON_UPPER)
             {
-               if(EQrel((*theFvec)[i], (R) 0))
+               if(EQrel((*theFvec)[i], (R) 0, this->epsilon()))
                   basiccandidates.addIdx(i);
             }
          }

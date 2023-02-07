@@ -771,7 +771,6 @@ void SLUFactor<R>::clear()
    this->l.firstUnused = 0;
    this->thedim        = 0;
 
-   epsilon       = Param::epsilonFactorization();
    usetup        = false;
    this->maxabs        = 1;
    this->initMaxabs    = 1;
@@ -858,7 +857,6 @@ void SLUFactor<R>::assign(const SLUFactor<R>& old)
    uptype        = old.uptype;
    minThreshold  = old.minThreshold;
    minStability  = old.minStability;
-   epsilon       = old.epsilon;
    lastThreshold = old.lastThreshold;
 
    // clufactor
@@ -1092,11 +1090,11 @@ SLUFactor<R>& SLUFactor<R>::operator=(const SLUFactor<R>& old)
 template <class R>
 SLUFactor<R>::SLUFactor()
    : vec(1)
-   , ssvec(1)
+   , ssvec(1, 0)
    , usetup(false)
    , uptype(FOREST_TOMLIN)
-   , eta(1)
-   , forest(1)
+   , eta(1, 0)
+   , forest(1, 0)
    , minThreshold(0.01)
    , timerType(Timer::USER_TIME)
 {
@@ -1222,10 +1220,10 @@ template <class R>
 SLUFactor<R>::SLUFactor(const SLUFactor<R>& old)
    : SLinSolver<R>(old)
    , vec(1)     // we don't need to copy it, because they are temporary vectors
-   , ssvec(1)   // we don't need to copy it, because they are temporary vectors
+   , ssvec(1, this->tolerances()->epsilon())   // we don't need to copy it, because they are temporary vectors
    , usetup(old.usetup)
-   , eta(old.eta)
-   , forest(old.forest)
+   , eta(old.eta, this->tolerances()->epsilon())
+   , forest(old.forest, this->tolerances()->epsilon())
    , timerType(old.timerType)
 {
    this->row.perm    = 0;
@@ -1367,11 +1365,11 @@ static R betterThreshold(R th)
 {
    assert(th < R(1.0));
 
-   if(LT(th, R(0.1)))
+   if(th < R(0.1))
       th *= R(10.0);
-   else if(LT(th, R(0.9)))
+   else if(th < R(0.9))
       th = (th + R(1.0)) / R(2.0);
-   else if(LT(th, R(0.999)))
+   else if(th < R(0.999))
       th = R(0.99999);
 
    assert(th < R(1.0));
@@ -1465,7 +1463,7 @@ typename SLUFactor<R>::Status SLUFactor<R>::load(const SVectorBase<R>* matrix[],
       ///an empty column) and singularity due to numerics, that could be avoided by changing minStability and
       ///lastThreshold; in the first case, we want to abort, otherwise change the numerics
       this->stat = this->OK;
-      this->factor(matrix, lastThreshold, epsilon);
+      this->factor(matrix, lastThreshold, this->tolerances()->epsilon());
 
       // finish if the factorization is stable
       if(stability() >= minStability)
@@ -1476,7 +1474,7 @@ typename SLUFactor<R>::Status SLUFactor<R>::load(const SVectorBase<R>* matrix[],
       lastThreshold = betterThreshold(lastThreshold);
 
       // until it doesn't change anymore at its maximum value
-      if(EQ(x, lastThreshold))
+      if(EQ(x, lastThreshold, this->tolerances()->epsilon()))
          break;
 
       // we relax the stability requirement

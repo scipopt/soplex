@@ -47,16 +47,16 @@ class SPxEquiliSC : public SPxScaler<R>
 public:
    /// compute equilibrium scaling vector rounded to power of two
    static void computeEquiExpVec(const SVSetBase<R>* vecset, const DataArray<int>& coScaleExp,
-                                 DataArray<int>& scaleExp);
+                                 DataArray<int>& scaleExp, R epsilon);
 
    /// compute equilibrium scaling vector rounded to power of two
    static void computeEquiExpVec(const SVSetBase<R>* vecset, const std::vector<R>& coScaleVal,
-                                 DataArray<int>& scaleExp);
+                                 DataArray<int>& scaleExp, R epsilon);
 
    /// compute equilibrium scaling rounded to power of 2 for existing R scaling factors (preRowscale, preColscale)
    static void computePostequiExpVecs(const SPxLPBase<R>& lp, const std::vector<R>& preRowscale,
                                       const std::vector<R>& preColscale,
-                                      DataArray<int>& rowscaleExp, DataArray<int>& colscaleExp);
+                                      DataArray<int>& rowscaleExp, DataArray<int>& colscaleExp, R epsilon);
    //-------------------------------------
    /**@name Construction / destruction */
    ///@{

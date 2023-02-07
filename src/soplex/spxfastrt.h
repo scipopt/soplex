@@ -240,8 +240,8 @@ public:
    ///
    virtual void setDelta(R newDelta)
    {
-      if(newDelta <= Param::epsilon())
-         newDelta = Param::epsilon();
+      if(newDelta <= this->_tolerances->epsilon())
+         newDelta = this->_tolerances->epsilon();
 
       this->delta = newDelta;
       fastDelta = newDelta;

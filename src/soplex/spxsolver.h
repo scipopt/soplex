@@ -258,6 +258,7 @@ private:
    //-----------------------------
    /**@name Private data */
    ///@{
+   std::shared_ptr<Tolerances> _tolerances; ///< tolerances used by the solver
    Type           theType;     ///< entering or leaving algortihm.
    Pricing        thePricing;  ///< full or partial pricing.
    Representation theRep;      ///< row or column representation.
@@ -500,6 +501,12 @@ public:
    {
       spxout = &newOutstream;
       SPxLPBase<R>::spxout = &newOutstream;
+   }
+
+   /// set the _tolerances member variable
+   void setTolerances(std::shared_ptr<Tolerances> newTolerances)
+   {
+      this->_tolerances = newTolerances;
    }
 
    /// set refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
@@ -812,11 +819,11 @@ public:
    ///@{
    /// values \f$|x| < \epsilon\f$ are considered to be 0.
    /** if you want another value for epsilon, use
-    * \ref soplex::Param::setEpsilon() "Param::setEpsilon()".
+    * \ref soplex::Tolerances::setEpsilon() "Tolerances::setEpsilon()".
     */
    R epsilon() const
    {
-      return primVec.delta().getEpsilon();
+      return _tolerances->epsilon();
    }
    /// feasibility tolerance maintained by ratio test during ENTER algorithm.
    R entertol() const
@@ -862,8 +869,8 @@ public:
    void setOpttol(R d);
    /// set parameter \p delta, i.e., set \p feastol and \p opttol to same value.
    void setDelta(R d);
-   /// set parameter \p epsilon for semi-sparse primal, dual and pricing vectors
-   void setEpsilon(R d);
+   /// update the epsilon of the update vectors
+   void setEpsilonUpdateVectors();
    /// set timing type
    void setTiming(Timer::TYPE ttype)
    {

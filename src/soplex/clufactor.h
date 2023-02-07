@@ -50,6 +50,12 @@ class CLUFactor
 {
 public:
 
+   /// set tolerances
+   void setTolerances(std::shared_ptr<Tolerances> tolerances)
+   {
+      this->_tolerances = tolerances;
+   }
+
    //----------------------------------------
    /**@name Public types */
    ///@{
@@ -79,11 +85,11 @@ public:
          idx = -1;
          pos = -1;
       }
-
    private:
       Pring(const Pring&);             ///< blocked copy constructor
       Pring& operator= (const Pring&); ///< blocked assignment operator
    };
+
    ///@}
 
 protected:
@@ -216,6 +222,7 @@ protected:
    Timer*  factorTime;        ///< Time spent in factorizations
    int     factorCount;       ///< Number of factorizations
    int     hugeValues;        ///< number of times huge values occurred during solve (only used in debug mode)
+   std::shared_ptr<Tolerances> _tolerances; ///< Tolerances for the factorization
    ///@}
 
 private:

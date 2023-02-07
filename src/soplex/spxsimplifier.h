@@ -51,7 +51,6 @@ template <class R>
 class SPxSimplifier
 {
 protected:
-
    //-------------------------------------
    /**@name Protected Data */
    ///@{
@@ -80,6 +79,8 @@ protected:
    R        m_minReduction;
    /// message handler
    SPxOut*     spxout;
+   ///< tolerances used by the solver
+   std::shared_ptr<Tolerances> _tolerances;
    ///@}
 
 public:
@@ -263,6 +264,12 @@ public:
    void setOutstream(SPxOut& newOutstream)
    {
       spxout = &newOutstream;
+   }
+
+   /// set the _tolerances member variable
+   void setTolerances(std::shared_ptr<Tolerances> newTolerances)
+   {
+      this->_tolerances = newTolerances;
    }
 
 };

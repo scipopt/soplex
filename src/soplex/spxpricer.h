@@ -68,6 +68,8 @@ protected:
    thesolver; //@todo The template type should be identified? Do I have to defined two of them?
    /// violation bound
    R        theeps;
+   /// tolerances used by the solver
+   std::shared_ptr<Tolerances> _tolerances;
    ///@}
 
 
@@ -153,6 +155,12 @@ public:
       assert(eps >= 0.0);
 
       theeps = eps;
+   }
+
+   /// set the _tolerances member variable
+   void setTolerances(std::shared_ptr<Tolerances> newTolerances)
+   {
+      this->_tolerances = newTolerances;
    }
 
    /// sets pricing type.

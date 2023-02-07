@@ -286,11 +286,11 @@ public:
    SLUFactorRational()
       : CLUFactorRational()
       , vec(1)
-      , ssvec(1)
+      , ssvec(1, 0)
       , usetup(false)
       , uptype(FOREST_TOMLIN)
-      , eta(1)
-      , forest(1)
+      , eta(1, 0)
+      , forest(1, 0)
       , minThreshold(0.01)
       , timerType(Timer::USER_TIME)
    {
@@ -445,10 +445,10 @@ public:
       : SLinSolverRational(old)
       , CLUFactorRational()
       , vec(1)     // we don't need to copy it, because they are temporary vectors
-      , ssvec(1)   // we don't need to copy it, because they are temporary vectors
+      , ssvec(1, 0)   // we don't need to copy it, because they are temporary vectors
       , usetup(old.usetup)
-      , eta(old.eta)
-      , forest(old.forest)
+      , eta(old.eta, 0)
+      , forest(old.forest, 0)
       , timerType(old.timerType)
    {
       row.perm    = 0;

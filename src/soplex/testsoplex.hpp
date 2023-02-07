@@ -44,8 +44,8 @@ void SoPlexBase<R>::_checkScaling(SPxLPBase<R>* origLP) const
 
    for(int i = 0; i < origLP->nRows(); ++i)
    {
-      assert(EQ(origLP->lhs(i), _realLP->lhsUnscaled(i)));
-      assert(EQ(origLP->rhs(i), _realLP->rhsUnscaled(i)));
+      assert(EQ(origLP->lhs(i), _realLP->lhsUnscaled(i), this->thesolver.epsilon()));
+      assert(EQ(origLP->rhs(i), _realLP->rhsUnscaled(i), this->thesolver.epsilon()));
 
       DSVectorBase<R> row;
       _realLP->getRowVectorUnscaled(i, row);
@@ -68,9 +68,9 @@ void SoPlexBase<R>::_checkScaling(SPxLPBase<R>* origLP) const
 
    for(int i = 0; i < origLP->nCols(); ++i)
    {
-      assert(EQ(origLP->lower(i), _realLP->lowerUnscaled(i)));
-      assert(EQ(origLP->upper(i), _realLP->upperUnscaled(i)));
-      assert(EQ(origLP->obj(i), _realLP->objUnscaled(i)));
+      assert(EQ(origLP->lower(i), _realLP->lowerUnscaled(i), this->thesolver.epsilon()));
+      assert(EQ(origLP->upper(i), _realLP->upperUnscaled(i), this->thesolver.epsilon()));
+      assert(EQ(origLP->obj(i), _realLP->objUnscaled(i), this->thesolver.epsilon()));
 
       DSVectorBase<R> col;
       _realLP->getColVectorUnscaled(i, col);
