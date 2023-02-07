@@ -5021,7 +5021,7 @@ bool SoPlexBase<R>::getBasisInverseTimesVecReal(R* rhs, R* sol, bool unscale)
 
             for(int i = 0; i < v.dim(); ++i)
             {
-               if(isNotZero(v[i]))
+               if(isNotZero(v[i], this->tolerances()->epsilon()))
                {
                   scaleExp = _scaler->getRowScaleExp(i);
                   v[i] = spxLdexp(v[i], scaleExp);
@@ -5032,7 +5032,7 @@ bool SoPlexBase<R>::getBasisInverseTimesVecReal(R* rhs, R* sol, bool unscale)
 
             for(int i = 0; i < x.dim(); i++)
             {
-               if(isNotZero(x[i]))
+               if(isNotZero(x[i], this->tolerances()->epsilon()))
                {
                   idx = _solver.number(_solver.basis().baseId(i));
 
@@ -5187,7 +5187,7 @@ bool SoPlexBase<R>::multBasis(R* vec, bool unscale)
 
          for(int i = 0; i < basisdim; ++i)
          {
-            if(isNotZero(vec[i]))
+            if(isNotZero(vec[i], this->tolerances()->epsilon()))
             {
                if(_solver.basis().baseId(i).isSPxColId())
                   scaleExp = - _scaler->getColScaleExp(_solver.number(_solver.basis().baseId(i)));
@@ -5239,7 +5239,7 @@ bool SoPlexBase<R>::multBasis(R* vec, bool unscale)
       // temporarily create the column basis and multiply every column with x
       for(int i = 0; i < colbasisdim; ++i)
       {
-         if(isNotZero(x[i]))
+         if(isNotZero(x[i], this->tolerances()->epsilon()))
          {
             // get vector corresponding to requested index i
             index = bind[i];
@@ -5310,7 +5310,7 @@ bool SoPlexBase<R>::multBasisTranspose(R* vec, bool unscale)
 
          for(int i = 0; i < basisdim; ++i)
          {
-            if(isNotZero(vec[i]))
+            if(isNotZero(vec[i], this->tolerances()->epsilon()))
             {
                scaleExp = - _scaler->getRowScaleExp(i);
                vec[i] = spxLdexp(vec[i], scaleExp);
@@ -5324,7 +5324,7 @@ bool SoPlexBase<R>::multBasisTranspose(R* vec, bool unscale)
 
          for(int i = 0; i < basisdim; ++i)
          {
-            if(isNotZero(vec[i]))
+            if(isNotZero(vec[i], this->tolerances()->epsilon()))
             {
                if(_solver.basis().baseId(i).isSPxColId())
                   scaleExp = - _scaler->getColScaleExp(_solver.number(_solver.basis().baseId(i)));
