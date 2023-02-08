@@ -684,8 +684,8 @@ bool SoPlexBase<R>::_isRefinementOver(
    int numFailedRefinements)
 {
    // terminate if tolerances are satisfied
-   primalFeasible = (boundsViolation <= _rationalFeastol && sideViolation <= _rationalFeastol);
-   dualFeasible = (redCostViolation <= _rationalOpttol && dualViolation <= _rationalOpttol);
+   primalFeasible = (boundsViolation <= this->tolerances()->feastolRational() && sideViolation <= this->tolerances()->feastolRational());
+   dualFeasible = (redCostViolation <= this->tolerances()->opttolRational() && dualViolation <= this->tolerances()->opttolRational());
 
    if(primalFeasible && dualFeasible)
    {
@@ -1478,10 +1478,6 @@ void SoPlexBase<R>::_performOptIRStable(
    stoppedIter = false;
    error = false;
 
-   // set working tolerances in floating-point solver
-   _solver.setFeastol(realParam(SoPlexBase<R>::FPFEASTOL));
-   _solver.setOpttol(realParam(SoPlexBase<R>::FPOPTTOL));
-
    // declare vectors and variables
    typename SPxSolverBase<R>::Status result = SPxSolverBase<R>::UNKNOWN;
 
@@ -1821,7 +1817,7 @@ void SoPlexBase<R>::_performUnboundedIRStable(
 
       // because the right-hand side and all bounds (but tau's upper bound) are zero, tau should be approximately
       // zero if basic; otherwise at its upper bound 1
-      error = !(tau >= _rationalPosone || tau <= _rationalFeastol);
+      error = !(tau >= _rationalPosone || tau <= this->tolerances()->feastolRational());
       assert(!error);
 
       hasUnboundedRay = (tau >= 1);
@@ -1900,7 +1896,7 @@ void SoPlexBase<R>::_performFeasIRStable(
          assert(tau >= -realParam(SoPlexBase<R>::FEASTOL));
          assert(tau <= 1.0 + realParam(SoPlexBase<R>::FEASTOL));
 
-         error = (tau < -_rationalFeastol || tau > _rationalPosone + _rationalFeastol);
+         error = (tau < -this->tolerances()->feastolRational() || tau > _rationalPosone + this->tolerances()->feastolRational());
          withDualFarkas = (tau < _rationalPosone);
 
          if(withDualFarkas)
@@ -2159,7 +2155,7 @@ void SoPlexBase<R>::_project(SolRational& sol)
 
    for(int i = _beforeLiftCols; i < numColsRational() && sol._isDualFeasible; i++)
    {
-      if(spxAbs(Rational(maxValue * sol._redCost[i])) > _rationalOpttol)
+      if(spxAbs(Rational(maxValue * sol._redCost[i])) > this->tolerances()->opttolRational())
       {
          MSG_INFO1(spxout, spxout << "Warning: lost dual solution during project phase.\n");
          sol._isDualFeasible = false;
@@ -2670,12 +2666,12 @@ void SoPlexBase<R>::_untransformUnbounded(SolRational& sol, bool unbounded)
       _basisStatusCols.reSize(numOrigCols);
       _basisStatusRows.reSize(numOrigRows);
    }
-   else if(boolParam(SoPlexBase<R>::TESTDUALINF) && tau < _rationalFeastol)
+   else if(boolParam(SoPlexBase<R>::TESTDUALINF) && tau < this->tolerances()->feastolRational())
    {
       const Rational& alpha = sol._dual[numOrigRows];
 
       assert(sol._isDualFeasible);
-      assert(alpha <= _rationalFeastol - _rationalPosone);
+      assert(alpha <= this->tolerances()->feastolRational() - _rationalPosone);
 
       sol._isPrimalFeasible = false;
       sol._hasPrimalRay = false;
@@ -3942,8 +3938,16 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
          MSG_INFO1(spxout, spxout << "Relaxing tolerances." << std::endl);
 
          setIntParam(SoPlexBase<R>::ALGORITHM, SoPlexBase<R>::ALGORITHM_PRIMAL);
-         _solver.setDelta((_solver.feastol() * 1e3 > 1e-3) ? 1e-3 : (_solver.feastol() * 1e3));
-         relaxedTolerances = _solver.feastol() >= 1e-3;
+         // scale tols by up 1e3 but so that they do not exceed 1e-3
+         if( _solver.entertol() > 1e-6 )
+            _solver.scaleEntertol(1e-3 / _solver.entertol());
+         else
+            _solver.scaleEntertol(1e3);
+         if( _solver.leavetol() > 1e-6 )
+            _solver.scaleLeavetol(1e-3 / _solver.leavetol());
+         else
+            _solver.scaleLeavetol(1e3);
+         relaxedTolerances = _solver.entertol() >= 1e-3;
          solvedFromScratch = false;
          continue;
       }
@@ -3953,8 +3957,12 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
          MSG_INFO1(spxout, spxout << "Tightening tolerances." << std::endl);
 
          setIntParam(SoPlexBase<R>::ALGORITHM, SoPlexBase<R>::ALGORITHM_DUAL);
-         _solver.setDelta(_solver.feastol() * 1e-3 < 1e-9 ? 1e-9 : _solver.feastol() * 1e-3);
-         tightenedTolerances = _solver.feastol() <= 1e-9;
+         // scale tols by up 1e-3 but so that they are not smaller than 1e-9
+         if( _solver.entertol() < 1e-6 )
+            _solver.scaleEntertol(1e-9 / _solver.entertol());
+         else
+            _solver.scaleEntertol(1e-3);
+         tightenedTolerances = _solver.entertol() <= 1e-9;
          solvedFromScratch = false;
          continue;
       }
@@ -4000,8 +4008,6 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
       break;
    }
 
-   _solver.setFeastol(realParam(SoPlexBase<R>::FPFEASTOL));
-   _solver.setOpttol(realParam(SoPlexBase<R>::FPOPTTOL));
    _slufactor.setMarkowitz(markowitz);
 
    setIntParam(SoPlexBase<R>::RATIOTESTER, ratiotester);

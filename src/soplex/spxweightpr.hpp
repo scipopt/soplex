@@ -132,7 +132,7 @@ int SPxWeightPR<R>::selectLeave()
    {
       x = test[i];
 
-      if(x < -this->theeps)
+      if(x < -this->thetolerance)
       {
          x *= leavePenalty[i];
 
@@ -165,7 +165,7 @@ SPxId SPxWeightPR<R>::selectEnter()
    {
       x = rTest[i];
 
-      if(x < -this->theeps)
+      if(x < -this->thetolerance)
       {
          x *= -x;
 
@@ -211,7 +211,7 @@ SPxId SPxWeightPR<R>::selectEnter()
    {
       x = cTest[i];
 
-      if(x < -this->theeps)
+      if(x < -this->thetolerance)
       {
          x *= -x;
 

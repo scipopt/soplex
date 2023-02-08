@@ -317,6 +317,10 @@ private:
    Real s_feastol;
    /// optimality tolerance
    Real s_opttol;
+   /// rational feasibility tolerance
+   Real s_feastol_rational;
+   /// rational optimality tolerance
+   Real s_opttol_rational;
    ///@}
 
 public:
@@ -354,6 +358,14 @@ public:
    Real opttol();
    ///
    void setOpttol(Real otol);
+   ///
+   Real feastolRational();
+   ///
+   void setFeastolRational(Real ftol);
+   ///
+   Real opttolRational();
+   ///
+   void setOpttolRational(Real otol);
    ///@}
 };
 

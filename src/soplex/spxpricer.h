@@ -67,7 +67,7 @@ protected:
    SPxSolverBase<R>*
    thesolver; //@todo The template type should be identified? Do I have to defined two of them?
    /// violation bound
-   R        theeps;
+   R        thetolerance;
    /// tolerances used by the solver
    std::shared_ptr<Tolerances> _tolerances;
    ///@}
@@ -141,21 +141,21 @@ public:
       return thesolver;
    }
 
-   /// returns violation bound \ref soplex::SPxPricer::theeps "theeps".
-   virtual R epsilon() const
-   {
-      return theeps;
-   }
-
-   /// sets violation bound.
-   /** Inequality violations are accepted, if their size is less than \p eps.
+   /// sets pricing tolerance.
+   /** Inequality violations are accepted, if their size is less than \p tol.
     */
-   virtual void setEpsilon(R eps)
+   virtual void setPricingTolerance(R tol)
    {
-      assert(eps >= 0.0);
+      assert(tol >= 0.0);
 
-      theeps = eps;
+      thetolerance = tol;
    }
+   /// returns the pricing tolerance
+   virtual R pricingTolerance() const
+   {
+      return thetolerance;
+   }
+
 
    /// set the _tolerances member variable
    virtual void setTolerances(std::shared_ptr<Tolerances> newTolerances)
@@ -188,7 +188,7 @@ public:
    /// returns selected index to leave basis.
    /** Selects the index of a vector to leave the basis. The selected index
        i, say, must be in the range 0 <= i < solver()->dim() and its
-       tested value must fullfill solver()->test()[i] < -#epsilon().
+       tested value must fullfill solver()->test()[i] < -#tolerance().
    */
    virtual int selectLeave() = 0;
 
@@ -209,7 +209,7 @@ public:
    /** Selects the SPxId of a vector to enter the basis. The selected
        id, must not represent a basic index (i.e. solver()->isBasic(id) must
        be false). However, the corresponding test value needs not to be less
-       than -#epsilon(). If not, SoPlex will discard the pivot.
+       than -#tolerance(). If not, SoPlex will discard the pivot.
 
        Note:
        When method #selectEnter() is called by the loaded SoPlex
@@ -284,14 +284,14 @@ public:
    explicit SPxPricer(const char* p_name)
       : m_name(p_name)
       , thesolver(0)
-      , theeps(0.0)
+      , thetolerance(0.0)
    {}
 
    /// copy constructor
    SPxPricer(const SPxPricer& old)
       : m_name(old.m_name)
       , thesolver(old.thesolver)
-      , theeps(old.theeps)
+      , thetolerance(old.thetolerance)
    {}
 
    /// assignment operator
@@ -301,7 +301,7 @@ public:
       {
          m_name = rhs.m_name;
          thesolver = rhs.thesolver;
-         theeps = rhs.theeps;
+         thetolerance = rhs.thetolerance;
          assert(isConsistent());
       }
 

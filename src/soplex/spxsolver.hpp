@@ -233,10 +233,6 @@ void SPxSolverBase<R>::setType(Type tp)
    template <class R>
    void SPxSolverBase<R>::initRep(Representation p_rep)
    {
-
-      R tmpfeastol = feastol();
-      R tmpopttol = opttol();
-
       theRep = p_rep;
 
       if(theRep == COLUMN)
@@ -278,9 +274,6 @@ void SPxSolverBase<R>::setType(Type tp)
       reDim();
 
       forceRecompNonbasicValue();
-
-      setFeastol(tmpfeastol);
-      setOpttol(tmpopttol);
 
       SPxBasisBase<R>::setRep();
 
@@ -1041,45 +1034,6 @@ void SPxSolverBase<R>::setType(Type tp)
       return m_nonbasicValueUpToDate;
    }
 
-
-
-   template <class R>
-   void SPxSolverBase<R>::setFeastol(R d)
-   {
-
-      if(d <= 0.0)
-         throw SPxInterfaceException("XSOLVE30 Cannot set feastol less than or equal to zero.");
-
-      if(theRep == COLUMN)
-         m_entertol = d;
-      else
-         m_leavetol = d;
-   }
-
-   template <class R>
-   void SPxSolverBase<R>::setOpttol(R d)
-   {
-
-      if(d <= 0.0)
-         throw SPxInterfaceException("XSOLVE31 Cannot set opttol less than or equal to zero.");
-
-      if(theRep == COLUMN)
-         m_leavetol = d;
-      else
-         m_entertol = d;
-   }
-
-   template <class R>
-   void SPxSolverBase<R>::setDelta(R d)
-   {
-
-      if(d <= 0.0)
-         throw SPxInterfaceException("XSOLVE32 Cannot set delta less than or equal to zero.");
-
-      m_entertol = d;
-      m_leavetol = d;
-   }
-
    // set parameter \p epsilon for semi-sparse primal, dual and pricing vectors
    template <class R>
    void SPxSolverBase<R>::setEpsilonUpdateVectors()
@@ -1128,6 +1082,8 @@ void SPxSolverBase<R>::setType(Type tp)
       , m_pricingViolCo(0.0)
       , m_pricingViolCoUpToDate(false)
       , m_numViol(0)
+      , entertolscale(1.0)
+      , leavetolscale(1.0)
       , theShift(0)
       , m_maxCycle(100)
       , m_numCycle(0)
@@ -1184,8 +1140,6 @@ void SPxSolverBase<R>::setType(Type tp)
       multTimeFull = TimerFactory::createTimer(timerType);
       multTimeColwise = TimerFactory::createTimer(timerType);
       multTimeUnsetup = TimerFactory::createTimer(timerType);
-
-      setDelta(DEFAULT_BND_VIOL);
 
       this->theLP = this;
       initRep(p_rep);
@@ -1261,8 +1215,8 @@ void SPxSolverBase<R>::setType(Type tp)
          m_pricingViolCo = base.m_pricingViolCo;
          m_pricingViolCoUpToDate = base.m_pricingViolCoUpToDate;
          m_numViol = base.m_numViol;
-         m_entertol = base.m_entertol;
-         m_leavetol = base.m_leavetol;
+         entertolscale = base.entertolscale;
+         leavetolscale = base.leavetolscale;
          theShift = base.theShift;
          lastShift = base.lastShift;
          m_maxCycle = base.m_maxCycle;
@@ -1464,8 +1418,8 @@ void SPxSolverBase<R>::setType(Type tp)
       , m_pricingViolCo(base.m_pricingViolCo)
       , m_pricingViolCoUpToDate(base.m_pricingViolCoUpToDate)
       , m_numViol(base.m_numViol)
-      , m_entertol(base.m_entertol)
-      , m_leavetol(base.m_leavetol)
+      , entertolscale(base.entertolscale)
+      , leavetolscale(base.leavetolscale)
       , theShift(base.theShift)
       , lastShift(base.lastShift)
       , m_maxCycle(base.m_maxCycle)

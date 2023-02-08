@@ -192,22 +192,22 @@ int SPxDevexPR<R>::selectLeave()
       if(bestPrices.size() < 2 || this->thesolver->basis().lastUpdate() == 0)
       {
          // call init method to build up price-vector and return index of largest price
-         retid = buildBestPriceVectorLeave(this->theeps);
+         retid = buildBestPriceVectorLeave(this->thetolerance);
       }
       else
-         retid = selectLeaveHyper(this->theeps);
+         retid = selectLeaveHyper(this->thetolerance);
    }
    else if(this->thesolver->sparsePricingLeave)
-      retid = selectLeaveSparse(this->theeps);
+      retid = selectLeaveSparse(this->thetolerance);
    else
-      retid = selectLeaveX(this->theeps);
+      retid = selectLeaveX(this->thetolerance);
 
    if(retid < 0 && !refined)
    {
       refined = true;
       MSG_INFO3((*this->thesolver->spxout),
                 (*this->thesolver->spxout) << "WDEVEX02 trying refinement step..\n";)
-      retid = selectLeaveX(this->theeps / DEVEX_REFINETOL);
+      retid = selectLeaveX(this->thetolerance / DEVEX_REFINETOL);
    }
 
    assert(retid < this->thesolver->dim());
@@ -372,10 +372,10 @@ void SPxDevexPR<R>::left4(int n, SPxId id)
 
 #ifndef NDEBUG
 
-      if(spxAbs(rhoVec[n]) < this->theeps)
+      if(spxAbs(rhoVec[n]) < this->thetolerance)
       {
          MSG_INFO3((*this->thesolver->spxout), (*this->thesolver->spxout) << "WDEVEX01: rhoVec = "
-                   << rhoVec[n] << " with smaller absolute value than this->theeps = " << this->theeps << std::endl;)
+                   << rhoVec[n] << " with smaller absolute value than this->thetolerance = " << this->thetolerance << std::endl;)
       }
 
 #endif  // NDEBUG
@@ -511,7 +511,7 @@ SPxId SPxDevexPR<R>::selectEnter()
 
    SPxId enterId;
 
-   enterId = selectEnterX(this->theeps);
+   enterId = selectEnterX(this->thetolerance);
 
    if(enterId.isSPxColId() && this->thesolver->isBasic(SPxColId(enterId)))
       enterId.info = 0;
@@ -524,7 +524,7 @@ SPxId SPxDevexPR<R>::selectEnter()
       refined = true;
       MSG_INFO3((*this->thesolver->spxout),
                 (*this->thesolver->spxout) << "WDEVEX02 trying refinement step..\n";)
-      enterId = selectEnterX(this->theeps / DEVEX_REFINETOL);
+      enterId = selectEnterX(this->thetolerance / DEVEX_REFINETOL);
 
       if(enterId.isSPxColId() && this->thesolver->isBasic(SPxColId(enterId)))
          enterId.info = 0;

@@ -95,4 +95,44 @@ void Tolerances::setEpsilonPivot(Real eps)
    s_epsilon_pivot = eps;
 }
 
-} // namespace soplex
+Real Tolerances::feastol()
+{
+   return s_feastol;
+}
+
+void Tolerances::setFeastol(Real ftol)
+{
+   s_feastol = ftol;
+}
+
+Real Tolerances::opttol()
+{
+   return s_opttol;
+}
+
+void Tolerances::setOpttol(Real otol)
+{
+   s_opttol = otol;
+}
+
+Real Tolerances::feastolRational()
+{
+   return s_feastol_rational;
+}
+
+void Tolerances::setFeastolRational(Real ftol)
+{
+   s_feastol_rational = ftol;
+}
+
+Real Tolerances::opttolRational()
+{
+   return s_opttol_rational;
+}
+
+void Tolerances::setOpttolRational(Real otol)
+{
+   s_opttol_rational = otol;
+}
+// namespace soplex
+}

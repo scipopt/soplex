@@ -71,11 +71,11 @@ void SPxHybridPR<R>::clear()
 }
 
 template <class R>
-void SPxHybridPR<R>::setEpsilon(R eps)
+void SPxHybridPR<R>::setPricingTolerance(R tol)
 {
-   steep.setEpsilon(eps);
-   devex.setEpsilon(eps);
-   parmult.setEpsilon(eps);
+   steep.setPricingTolerance(tol);
+   devex.setPricingTolerance(tol);
+   parmult.setPricingTolerance(tol);
 }
 
 template <class R>

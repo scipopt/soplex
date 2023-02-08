@@ -62,10 +62,10 @@ bool SPxSolverBase<R>::precisionReached(R& newpricertol) const
 
    if(!reached)
    {
-      newpricertol = thepricer->epsilon() / 10.0;
+      newpricertol = thepricer->pricingTolerance() / 10.0;
 
       MSG_INFO3((*this->spxout), (*this->spxout) << "Precision not reached: Pricer tolerance = "
-                << thepricer->epsilon()
+                << thepricer->pricingTolerance()
                 << " new tolerance = " << newpricertol
                 << std::endl
                 << " maxViolRedCost= " << maxViolRedCost
@@ -299,7 +299,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
             R maxpricertol = leavetol();
             R minpricertol = 0.01 * maxpricertol;
 
-            thepricer->setEpsilon(maxpricertol);
+            thepricer->setPricingTolerance(maxpricertol);
             priced = false;
 
             // to avoid shifts we restrict tolerances in the ratio test
@@ -437,7 +437,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
 
                      // is the solution good enough ?
                      // max three times reduced
-                     if((thepricer->epsilon() > minpricertol) && !precisionReached(newpricertol))
+                     if((thepricer->pricingTolerance() > minpricertol) && !precisionReached(newpricertol))
                      {
                         // no!
                         // we reduce the pricer tolerance. Note that if the pricer does not find a candiate
@@ -445,10 +445,10 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                         if(newpricertol < minpricertol)
                            newpricertol = minpricertol;
 
-                        thepricer->setEpsilon(newpricertol);
+                        thepricer->setPricingTolerance(newpricertol);
 
                         MSG_INFO2((*this->spxout), (*this->spxout) << " --- setting pricer tolerance to "
-                                  << thepricer->epsilon()
+                                  << thepricer->pricingTolerance()
                                   << std::endl;)
                      }
                   }
@@ -675,7 +675,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
             R maxpricertol = entertol();
             R minpricertol = 0.01 * maxpricertol;
 
-            thepricer->setEpsilon(maxpricertol);
+            thepricer->setPricingTolerance(maxpricertol);
             priced = false;
 
             // to avoid shifts we restrict tolerances in the ratio test
@@ -764,7 +764,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
 
                      // is the solution good enough ?
                      // max three times reduced
-                     if((thepricer->epsilon() > minpricertol) && !precisionReached(newpricertol))
+                     if((thepricer->pricingTolerance() > minpricertol) && !precisionReached(newpricertol))
                      {
                         // no
                         // we reduce the pricer tolerance. Note that if the pricer does not find a candiate
@@ -772,10 +772,10 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                         if(newpricertol < minpricertol)
                            newpricertol = minpricertol;
 
-                        thepricer->setEpsilon(newpricertol);
+                        thepricer->setPricingTolerance(newpricertol);
 
                         MSG_INFO2((*this->spxout), (*this->spxout) << " --- setting pricer tolerance to "
-                                  << thepricer->epsilon()
+                                  << thepricer->pricingTolerance()
                                   << std::endl;);
                      }
                   }
@@ -1020,18 +1020,18 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
 
             if(tightenedtype == ENTER)
             {
-               m_entertol = 0.01 * m_entertol;
+               this->scaleEntertol(0.01);
 
                MSG_INFO2((*this->spxout), (*this->spxout) <<
-                         " --- basis singular: reloading basis and solving with tighter ratio test tolerance " << m_entertol
+                         " --- basis singular: reloading basis and solving with tighter ratio test tolerance " << this->entertol()
                          << std::endl;)
             }
             else
             {
-               m_leavetol = 0.01 * m_leavetol;
+               this->scaleLeavetol(0.01);
 
                MSG_INFO2((*this->spxout), (*this->spxout) <<
-                         " --- basis singular: reloading basis and solving with tighter ratio test tolerance " << m_leavetol
+                         " --- basis singular: reloading basis and solving with tighter ratio test tolerance " << this->leavetol()
                          << std::endl;)
             }
 
@@ -1054,9 +1054,9 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                          " --- reloaded basis singular, resetting original tolerances" << std::endl;)
 
                if(tightenedtype == ENTER)
-                  m_entertol = 100.0 * m_entertol;
+                  this->scaleEntertol(1);
                else
-                  m_leavetol = 100.0 * m_leavetol;
+                  this->scaleLeavetol(1);
 
                theratiotester->setType(type());
 
@@ -1078,9 +1078,9 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
          else if(tightened)
          {
             if(tightenedtype == ENTER)
-               m_entertol = 100.0 * m_entertol;
+               this->scaleEntertol(1);
             else
-               m_leavetol = 100.0 * m_leavetol;
+               this->scaleLeavetol(1);
 
             theratiotester->setType(type());
 
@@ -1096,9 +1096,9 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
    if(tightened)
    {
       if(tightenedtype == ENTER)
-         m_entertol = 100.0 * m_entertol;
+         this->scaleEntertol(1);
       else
-         m_leavetol = 100.0 * m_leavetol;
+         this->scaleLeavetol(1);
 
       theratiotester->setType(type());
    }

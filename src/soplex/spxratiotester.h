@@ -99,8 +99,8 @@ public:
    /// set allowed bound violation
    virtual void setDelta(R newDelta)
    {
-      if(newDelta <= DEFAULT_EPS_ZERO)
-         delta = DEFAULT_EPS_ZERO;
+      if(newDelta <= this->_tolerances->epsilon())
+         delta = this->_tolerances->epsilon();
       else
          delta = newDelta;
    }

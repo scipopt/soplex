@@ -73,7 +73,7 @@ public:
    /**@name Access / modification */
    ///@{
    /// sets the epsilon
-   virtual void setEpsilon(R eps);
+   virtual void setPricingTolerance(R tol);
    /// sets the solver
    virtual void load(SPxSolverBase<R>* solver);
    /// clears all pricers and unselects the current pricer

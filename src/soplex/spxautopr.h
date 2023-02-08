@@ -125,7 +125,7 @@ public:
    /// clear the data
    void clear();
    /// set epsilon of internal pricers
-   void setEpsilon(R eps);
+   void setPricingTolerance(R tol);
    /// set the solver
    virtual void load(SPxSolverBase<R>* base);
    /// set entering/leaving algorithm

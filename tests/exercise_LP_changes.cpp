@@ -107,7 +107,6 @@ public:
       : SPxSolver( type_,
                    representation_ )
    {
-      setDelta( delta  );
       setTerminationTime( timelimit );
 
       _tolerances->setEpsilon( epsilon );
