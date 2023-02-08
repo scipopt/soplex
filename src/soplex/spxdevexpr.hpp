@@ -375,7 +375,8 @@ void SPxDevexPR<R>::left4(int n, SPxId id)
       if(spxAbs(rhoVec[n]) < this->thetolerance)
       {
          MSG_INFO3((*this->thesolver->spxout), (*this->thesolver->spxout) << "WDEVEX01: rhoVec = "
-                   << rhoVec[n] << " with smaller absolute value than this->thetolerance = " << this->thetolerance << std::endl;)
+                   << rhoVec[n] << " with smaller absolute value than this->thetolerance = " << this->thetolerance <<
+                   std::endl;)
       }
 
 #endif  // NDEBUG

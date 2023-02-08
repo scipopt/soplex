@@ -684,8 +684,10 @@ bool SoPlexBase<R>::_isRefinementOver(
    int numFailedRefinements)
 {
    // terminate if tolerances are satisfied
-   primalFeasible = (boundsViolation <= this->tolerances()->feastolRational() && sideViolation <= this->tolerances()->feastolRational());
-   dualFeasible = (redCostViolation <= this->tolerances()->opttolRational() && dualViolation <= this->tolerances()->opttolRational());
+   primalFeasible = (boundsViolation <= this->tolerances()->feastolRational()
+                     && sideViolation <= this->tolerances()->feastolRational());
+   dualFeasible = (redCostViolation <= this->tolerances()->opttolRational()
+                   && dualViolation <= this->tolerances()->opttolRational());
 
    if(primalFeasible && dualFeasible)
    {
@@ -1896,7 +1898,8 @@ void SoPlexBase<R>::_performFeasIRStable(
          assert(tau >= -realParam(SoPlexBase<R>::FEASTOL));
          assert(tau <= 1.0 + realParam(SoPlexBase<R>::FEASTOL));
 
-         error = (tau < -this->tolerances()->feastolRational() || tau > _rationalPosone + this->tolerances()->feastolRational());
+         error = (tau < -this->tolerances()->feastolRational()
+                  || tau > _rationalPosone + this->tolerances()->feastolRational());
          withDualFarkas = (tau < _rationalPosone);
 
          if(withDualFarkas)
@@ -3938,15 +3941,18 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
          MSG_INFO1(spxout, spxout << "Relaxing tolerances." << std::endl);
 
          setIntParam(SoPlexBase<R>::ALGORITHM, SoPlexBase<R>::ALGORITHM_PRIMAL);
+
          // scale tols by up 1e3 but so that they do not exceed 1e-3
-         if( _solver.entertol() > 1e-6 )
+         if(_solver.entertol() > 1e-6)
             _solver.scaleEntertol(1e-3 / _solver.entertol());
          else
             _solver.scaleEntertol(1e3);
-         if( _solver.leavetol() > 1e-6 )
+
+         if(_solver.leavetol() > 1e-6)
             _solver.scaleLeavetol(1e-3 / _solver.leavetol());
          else
             _solver.scaleLeavetol(1e3);
+
          relaxedTolerances = _solver.entertol() >= 1e-3;
          solvedFromScratch = false;
          continue;
@@ -3957,11 +3963,13 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
          MSG_INFO1(spxout, spxout << "Tightening tolerances." << std::endl);
 
          setIntParam(SoPlexBase<R>::ALGORITHM, SoPlexBase<R>::ALGORITHM_DUAL);
+
          // scale tols by up 1e-3 but so that they are not smaller than 1e-9
-         if( _solver.entertol() < 1e-6 )
+         if(_solver.entertol() < 1e-6)
             _solver.scaleEntertol(1e-9 / _solver.entertol());
          else
             _solver.scaleEntertol(1e-3);
+
          tightenedTolerances = _solver.entertol() <= 1e-9;
          solvedFromScratch = false;
          continue;

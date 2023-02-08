@@ -775,8 +775,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                         thepricer->setPricingTolerance(newpricertol);
 
                         MSG_INFO2((*this->spxout), (*this->spxout) << " --- setting pricer tolerance to "
-                                  << thepricer->pricingTolerance()
-                                  << std::endl;);
+                                  << thepricer->pricingTolerance() << std::endl;);
                      }
                   }
 
@@ -1023,16 +1022,16 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                this->scaleEntertol(0.01);
 
                MSG_INFO2((*this->spxout), (*this->spxout) <<
-                         " --- basis singular: reloading basis and solving with tighter ratio test tolerance " << this->entertol()
-                         << std::endl;)
+                         " --- basis singular: reloading basis and solving with tighter ratio test tolerance " <<
+                         this->entertol() << std::endl;)
             }
             else
             {
                this->scaleLeavetol(0.01);
 
                MSG_INFO2((*this->spxout), (*this->spxout) <<
-                         " --- basis singular: reloading basis and solving with tighter ratio test tolerance " << this->leavetol()
-                         << std::endl;)
+                         " --- basis singular: reloading basis and solving with tighter ratio test tolerance " <<
+                         this->leavetol() << std::endl;)
             }
 
             // load original basis

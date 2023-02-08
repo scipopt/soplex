@@ -203,8 +203,8 @@ void SPxSteepPR<R>::left4(int n, SPxId id)
       if(spxAbs(rhoVec[n]) < this->thetolerance * 0.5)
       {
          MSG_INFO3((*this->thesolver->spxout), (*this->thesolver->spxout) << "WSTEEP04: rhoVec = "
-                   << rhoVec[n] << " with smaller absolute value than 0.5*thetolerance = " << 0.5 * this->thetolerance <<
-                   std::endl;)
+                   << rhoVec[n] << " with smaller absolute value than 0.5*thetolerance = " << 0.5 * this->thetolerance
+                   << std::endl;)
       }
 
 #endif
