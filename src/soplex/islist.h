@@ -476,7 +476,7 @@ public:
    }
 
    /// Assignment operator and copy constructor should be deleted to avoid memory problems
-   IsList (const IsList<T>&) = delete;
+   IsList(const IsList<T>&) = delete;
    IsList<T>& operator=(const IsList<T>& old) = delete;
 
    /// destructor
