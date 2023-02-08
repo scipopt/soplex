@@ -600,7 +600,7 @@ public:
     *  number of columns to the LPColSetBase, which may result in automated memory realllocation.
    */
    explicit
-   LPColSetBase<R>(int pmax = -1, int pmemmax = -1)
+   LPColSetBase(int pmax = -1, int pmemmax = -1)
       : SVSetBase<R>(pmax, pmemmax), low(0), up(0), object(0), scaleExp(0)
    {
       assert(isConsistent());
@@ -642,7 +642,7 @@ public:
    }
 
    /// Copy constructor.
-   LPColSetBase<R>(const LPColSetBase<R>& rs)
+   LPColSetBase(const LPColSetBase<R>& rs)
       : SVSetBase<R>(rs)
       , low(rs.low)
       , up(rs.up)
@@ -654,7 +654,7 @@ public:
 
    /// Copy constructor.
    template < class S >
-   LPColSetBase<R>(const LPColSetBase<S>& rs)
+   LPColSetBase(const LPColSetBase<S>& rs)
       : SVSetBase<R>(rs)
       , low(rs.low)
       , up(rs.up)
@@ -665,7 +665,7 @@ public:
    }
 
    /// Destructor.
-   virtual ~LPColSetBase<R>()
+   virtual ~LPColSetBase()
    {}
 
    ///@}

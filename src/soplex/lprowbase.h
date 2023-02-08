@@ -93,7 +93,7 @@ public:
    ///@{
 
    /// Constructs LPRowBase with a vector ready to hold \p defDim nonzeros.
-   explicit LPRowBase<R>(int defDim = 0)
+   explicit LPRowBase(int defDim = 0)
       : left(0), right(R(infinity)), object(0), vec(defDim)
    {
       assert(isConsistent());
@@ -114,7 +114,7 @@ public:
    }
 
    /// Copy constructor.
-   LPRowBase<R>(const LPRowBase<R>& row)
+   LPRowBase(const LPRowBase<R>& row)
       : left(row.left), right(row.right), object(row.object), vec(row.vec)
    {
       assert(isConsistent());
@@ -122,21 +122,21 @@ public:
 
    /// Copy constructor.
    template < class S >
-   LPRowBase<R>(const LPRowBase<S>& row)
+   LPRowBase(const LPRowBase<S>& row)
       : left(row.left), right(row.right), object(row.object), vec(row.vec)
    {
       assert(isConsistent());
    }
 
    /// Constructs LPRowBase with the given left-hand side, right-hand side and rowVector.
-   LPRowBase<R>(const R& p_lhs, const SVectorBase<R>& p_rowVector, const R& p_rhs, const R& p_obj = 0)
+   LPRowBase(const R& p_lhs, const SVectorBase<R>& p_rowVector, const R& p_rhs, const R& p_obj = 0)
       : left(p_lhs), right(p_rhs), object(p_obj), vec(p_rowVector)
    {
       assert(isConsistent());
    }
 
    /// Constructs LPRowBase from passed \p rowVector, \p type and \p value.
-   LPRowBase<R>(const SVectorBase<R>& p_rowVector, Type p_type, const R& p_value, const R& p_obj = 0)
+   LPRowBase(const SVectorBase<R>& p_rowVector, Type p_type, const R& p_value, const R& p_obj = 0)
       : object(p_obj), vec(p_rowVector)
    {
       switch(p_type)
