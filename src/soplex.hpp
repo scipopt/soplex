@@ -6405,7 +6405,7 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
          MSG_WARNING(spxout, spxout << "Cannot set optimality tolerance to small value " << value <<
                      " without GMP - using " << DEFAULT_EPS_PIVOT << ".\n");
          this->_tolerances->setOpttol(DEFAULT_EPS_PIVOT);
-         this->_tolerances->setRationalOpttol(DEFAULT_EPS_PIVOT);
+         this->_tolerances->setOpttolRational(DEFAULT_EPS_PIVOT);
          break;
       }
 
