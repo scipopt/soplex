@@ -124,7 +124,7 @@ public:
    void setSwitchIters(int iters);
    /// clear the data
    void clear();
-   /// set epsilon of internal pricers
+   /// set tolerances of internal pricers
    void setPricingTolerance(R tol);
    /// set the solver
    virtual void load(SPxSolverBase<R>* base);

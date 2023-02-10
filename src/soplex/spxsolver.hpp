@@ -1034,16 +1034,6 @@ void SPxSolverBase<R>::setType(Type tp)
       return m_nonbasicValueUpToDate;
    }
 
-   // set parameter \p epsilon for semi-sparse primal, dual and pricing vectors
-   template <class R>
-   void SPxSolverBase<R>::setEpsilonUpdateVectors()
-   {
-      R d = this->tolerances()->epsilon();
-      primVec.delta().setEpsilon(d);
-      dualVec.delta().setEpsilon(d);
-      addVec.delta().setEpsilon(d);
-   }
-
    template <class R>
    void SPxSolverBase<R>::hyperPricing(bool h)
    {

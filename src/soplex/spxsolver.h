@@ -890,8 +890,6 @@ public:
       return std::max(this->tolerances()->feastol(), this->tolerances()->opttol());
    }
 
-   /// update the epsilon of the update vectors
-   void setEpsilonUpdateVectors();
    /// set timing type
    void setTiming(Timer::TYPE ttype)
    {

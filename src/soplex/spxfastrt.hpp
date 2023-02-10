@@ -47,18 +47,6 @@ namespace soplex
 
 #define TRIES           2
 
-
-template <class R>
-void SPxFastRT<R>::resetTols()
-{
-   // epsilon = thesolver->epsilon();
-   epsilon = this->thesolver->epsilon() * 1e6;
-   /*
-     if(thesolver->basis().stability() < 1e-4)
-     epsilon *= 1e-4 / thesolver->basis().stability();
-   */
-}
-
 template <class R>
 void SPxFastRT<R>::tighten()
 {
@@ -152,7 +140,7 @@ int SPxFastRT<R>::maxDelta(
 
          x = upd[i];
 
-         if(x > epsilon)
+         if(x > epsilonZero())
          {
             // @todo check wether mabs should be computed only over bounded vars, i.e., in the if block below
             mabs = (x > mabs) ? x : mabs;
@@ -174,7 +162,7 @@ int SPxFastRT<R>::maxDelta(
                }
             }
          }
-         else if(x < -epsilon)
+         else if(x < -epsilonZero())
          {
             // @todo check wether mabs should be computed only over bounded vars, i.e., in the if block below
             mabs = (-x > mabs) ? -x : mabs;
@@ -212,7 +200,7 @@ int SPxFastRT<R>::maxDelta(
 
          if(x != 0.0)
          {
-            if(x >= -epsilon && x <= epsilon)
+            if(x >= -epsilonZero() && x <= epsilonZero())
             {
                *uval = 0.0;
                continue;
@@ -230,7 +218,7 @@ int SPxFastRT<R>::maxDelta(
                   == SPxBasisBase<R>::Desc::P_FIXED)
                continue;
 
-            if(x > epsilon)
+            if(x > epsilonZero())
             {
                mabs = (x > mabs) ? x : mabs;
                u = up[i];
@@ -251,7 +239,7 @@ int SPxFastRT<R>::maxDelta(
                   }
                }
             }
-            else if(x < -epsilon)
+            else if(x < -epsilonZero())
             {
                mabs = (-x > mabs) ? -x : mabs;
                l = low[i];
@@ -331,7 +319,7 @@ int SPxFastRT<R>::minDelta(
                == SPxBasisBase<R>::Desc::P_FIXED)
             continue;
 
-         if(x > epsilon)
+         if(x > epsilonZero())
          {
             // @todo check wether mabs should be computed only over bounded vars, i.e., in the if block below
             mabs = (x > mabs) ? x : mabs;
@@ -353,7 +341,7 @@ int SPxFastRT<R>::minDelta(
                }
             }
          }
-         else if(x < -epsilon)
+         else if(x < -epsilonZero())
          {
             // @todo check wether mabs should be computed only over bounded vars, i.e., in the if block below
             mabs = (-x > mabs) ? -x : mabs;
@@ -391,7 +379,7 @@ int SPxFastRT<R>::minDelta(
 
          if(x != 0.0)
          {
-            if(x >= -epsilon && x <= epsilon)
+            if(x >= -epsilonZero() && x <= epsilonZero())
             {
                *uval = 0.0;
                continue;
@@ -410,7 +398,7 @@ int SPxFastRT<R>::minDelta(
                continue;
 
 
-            if(x > epsilon)
+            if(x > epsilonZero())
             {
                mabs = (x > mabs) ? x : mabs;
                l = low[i];
@@ -431,7 +419,7 @@ int SPxFastRT<R>::minDelta(
                   }
                }
             }
-            else if(x < -epsilon)
+            else if(x < -epsilonZero())
             {
                mabs = (-x > mabs) ? -x : mabs;
                u = up[i];
@@ -976,9 +964,7 @@ int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
    R lowstab = this->thesolver->feastol() * 1e-4;
    assert(!instable || this->solver()->instableEnterId.isValid());
 
-   resetTols();
-
-   if(val > epsilon)
+   if(val > epsilonZero())
    {
       do
       {
@@ -1023,7 +1009,7 @@ int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
       }
       while(cnt < TRIES);
    }
-   else if(val < -epsilon)
+   else if(val < -epsilonZero())
    {
       do
       {
@@ -1404,10 +1390,9 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
    R lowstab = this->thesolver->feastol() * 1e-4;
    assert(!instable || this->solver()->instableLeaveNum >= 0);
 
-   resetTols();
    sel = 0.0;
 
-   if(val > epsilon)
+   if(val > epsilonZero())
    {
       do
       {
@@ -1451,7 +1436,7 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
       }
       while(cnt < TRIES);
    }
-   else if(val < -epsilon)
+   else if(val < -epsilonZero())
    {
       do
       {
@@ -1544,7 +1529,7 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
       }
 
 
-   if(enterId.isValid() || minStab > 2 * epsilon)
+   if(enterId.isValid() || minStab > 2 * epsilonZero())
    {
       val = sel;
 

@@ -56,8 +56,6 @@ protected:
    ///@{
    /// parameter for computing minimum stability requirement
    R minStab;
-   /// |value| < epsilon is considered 0.
-   R epsilon;
    /// currently allowed infeasibility.
    R fastDelta;
    /// flag used in methods minSelect/maxSelect to retrieve correct basis status
@@ -67,8 +65,10 @@ protected:
    //-------------------------------------
    /**@name Private helpers */
    ///@{
-   /// resets tolerances (epsilon).
-   void resetTols();
+   const R epsilonZero() const
+   {
+      return this->thesolver->epsilon() * 1e6;
+   }
    /// relaxes stability requirements.
    void relax();
    /// tightens stability requirements.
@@ -182,7 +182,6 @@ public:
    SPxFastRT()
       : SPxRatioTester<R>("Fast")
       , minStab(DEFAULT_BND_VIOL)
-      , epsilon(DEFAULT_EPS_ZERO)
       , fastDelta(DEFAULT_BND_VIOL)
       , iscoid(false)
    {}
@@ -190,7 +189,6 @@ public:
    SPxFastRT(const SPxFastRT& old)
       : SPxRatioTester<R>(old)
       , minStab(old.minStab)
-      , epsilon(old.epsilon)
       , fastDelta(old.fastDelta)
       , iscoid(false)
    {}
@@ -201,7 +199,6 @@ public:
       {
          SPxRatioTester<R>::operator=(rhs);
          minStab = rhs.minStab;
-         epsilon = rhs.epsilon;
          fastDelta = rhs.fastDelta;
          iscoid = false;
       }
@@ -212,7 +209,6 @@ public:
    SPxFastRT(const char* name)
       : SPxRatioTester<R>(name)
       , minStab(DEFAULT_BND_VIOL)
-      , epsilon(DEFAULT_EPS_ZERO)
       , fastDelta(DEFAULT_BND_VIOL)
       , iscoid(false)
    {}
