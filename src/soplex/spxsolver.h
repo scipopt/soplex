@@ -837,7 +837,7 @@ public:
     */
    R epsilon() const
    {
-      return this->_tolerances->epsilon();
+      return this->tolerances()->epsilon();
    }
    /// feasibility tolerance maintained by ratio test during ENTER algorithm.
    R entertol() const

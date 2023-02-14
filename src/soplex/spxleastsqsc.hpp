@@ -330,8 +330,8 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    std::array<R, 3> eprev;
    eprev.fill(0.0);
 
-   initConstVecs(lp.rowSet(), facnrows, rowlogs, rownnzinv, R(this->_tolerances->epsilon()));
-   initConstVecs(lp.colSet(), facncols, collogs, colnnzinv, R(this->_tolerances->epsilon()));
+   initConstVecs(lp.rowSet(), facnrows, rowlogs, rownnzinv, R(this->tolerances()->epsilon()));
+   initConstVecs(lp.colSet(), facncols, collogs, colnnzinv, R(this->tolerances()->epsilon()));
 
    assert(tmprows.isSetup() && tmpcols.isSetup());
    assert(rowscale1.isSetup() && rowscale2.isSetup());
@@ -367,18 +367,18 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
          // not in first iteration?
          if(k != 0)   // true, then update row scaling factor vector
             updateScale(rownnzinv, resnrows, tmprows, rsccurr, rscprev, qcurr, qprev, eprev[1], eprev[2],
-                        R(this->_tolerances->epsilon()));
+                        R(this->tolerances()->epsilon()));
 
-         updateRes(facncols, resncols, resnrows, tmprows, eprev[0], qcurr, R(this->_tolerances->epsilon()));
+         updateRes(facncols, resncols, resnrows, tmprows, eprev[0], qcurr, R(this->tolerances()->epsilon()));
          scurr = resnrows * tmprows.assignPWproduct4setup(resnrows, rownnzinv);
       }
       else // k is odd
       {
          // update column scaling factor vector
          updateScale(colnnzinv, resncols, tmpcols, csccurr, cscprev, qcurr, qprev, eprev[1], eprev[2],
-                     R(this->_tolerances->epsilon()));
+                     R(this->tolerances()->epsilon()));
 
-         updateRes(facnrows, resnrows, resncols, tmpcols, eprev[0], qcurr, R(this->_tolerances->epsilon()));
+         updateRes(facnrows, resnrows, resncols, tmpcols, eprev[0], qcurr, R(this->tolerances()->epsilon()));
          scurr = resncols * tmpcols.assignPWproduct4setup(resncols, colnnzinv);
       }
 
@@ -386,7 +386,7 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
       for(unsigned l = 2; l > 0; --l)
          eprev[l] = eprev[l - 1];
 
-      assert(isNotZero(sprev, R(this->_tolerances->epsilon())));
+      assert(isNotZero(sprev, R(this->tolerances()->epsilon())));
 
       eprev[0] = (qcurr * scurr) / sprev;
 
@@ -399,13 +399,13 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    {
       // update column scaling factor vector
       updateScaleFinal(colnnzinv, resncols, tmpcols, csccurr, cscprev, qprev, eprev[1], eprev[2],
-                       R(this->_tolerances->epsilon()));
+                       R(this->tolerances()->epsilon()));
    }
    else if(k > 0)
    {
       // update row scaling factor vector
       updateScaleFinal(rownnzinv, resnrows, tmprows, rsccurr, rscprev, qprev, eprev[1], eprev[2],
-                       R(this->_tolerances->epsilon()));
+                       R(this->tolerances()->epsilon()));
    }
 
    /* compute actual scaling factors */

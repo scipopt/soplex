@@ -3037,7 +3037,7 @@ void SoPlexBase<R>::_removeComplementaryDualFixedPrimalVars(int* currFixedVars)
                    _compSolver.number(SPxColId(_decompVarBoundDualIDs[i * 2])) >= 0);
             int varcount = 0;
 
-            if(GT(_realLP->lower(i), R(-infinity), this->_tolerances->epsilon()))
+            if(GT(_realLP->lower(i), R(-infinity), this->tolerances()->epsilon()))
             {
                colsforremoval[ncolsforremoval] = _compSolver.number(SPxColId(_decompVarBoundDualIDs[i * 2 +
                                                  varcount]));

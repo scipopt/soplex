@@ -310,7 +310,7 @@ void SPxSolverBase<R>::changeLowerStatus(int i, R newLower, R oldLower)
       break;
 
    case SPxBasisBase<R>::Desc::P_ON_UPPER:
-      if(EQ(newLower, currUpper, this->_tolerances->epsilon()))
+      if(EQ(newLower, currUpper, this->tolerances()->epsilon()))
          stat = SPxBasisBase<R>::Desc::P_FIXED;
 
       break;
@@ -327,7 +327,7 @@ void SPxSolverBase<R>::changeLowerStatus(int i, R newLower, R oldLower)
       break;
 
    case SPxBasisBase<R>::Desc::P_FIXED:
-      if(NE(newLower, currUpper, this->_tolerances->epsilon()))
+      if(NE(newLower, currUpper, this->tolerances()->epsilon()))
       {
          stat = SPxBasisBase<R>::Desc::P_ON_UPPER;
 
@@ -432,7 +432,7 @@ void SPxSolverBase<R>::changeUpperStatus(int i, R newUpper, R oldUpper)
                objChange = (theLCbound[i] * currLower) - (theUCbound[i] * oldUpper);
          }
       }
-      else if(EQ(newUpper, currLower, this->_tolerances->epsilon()))
+      else if(EQ(newUpper, currLower, this->tolerances()->epsilon()))
       {
          stat = SPxBasisBase<R>::Desc::P_FIXED;
 
@@ -456,24 +456,7 @@ void SPxSolverBase<R>::changeUpperStatus(int i, R newUpper, R oldUpper)
       break;
 
    case SPxBasisBase<R>::Desc::P_FIXED:
-      if(NE(newUpper, currLower, this->_tolerances->epsilon()))
-      {
-         if(newUpper < R(infinity))
-         {
-            stat = SPxBasisBase<R>::Desc::P_ON_UPPER;
-
-            if(m_nonbasicValueUpToDate && rep() == COLUMN)
-               objChange = this->maxObj(i) * (newUpper - currLower);
-         }
-         else
-         {
-            stat = SPxBasisBase<R>::Desc::P_FREE;
-
-            if(m_nonbasicValueUpToDate && rep() == COLUMN)
-               objChange = -this->maxObj(i) * currLower;
-         }
-      }
-
+      if(NE(newUpper, currLower, this->tolerances()->epsilon()))
       {
          stat = SPxBasisBase<R>::Desc::P_ON_LOWER;
 
@@ -553,7 +536,7 @@ void SPxSolverBase<R>::changeBounds(int i, const R& newLower, const R& newUpper,
 {
    changeLower(i, newLower, scale);
 
-   if(EQ(newLower, newUpper, this->_tolerances->epsilon()))
+   if(EQ(newLower, newUpper, this->tolerances()->epsilon()))
       changeUpper(i, newLower, scale);
    else
       changeUpper(i, newUpper, scale);
@@ -590,7 +573,7 @@ void SPxSolverBase<R>::changeLhsStatus(int i, R newLhs, R oldLhs)
                objChange = (theLRbound[i] * currRhs) - (theURbound[i] * oldLhs);
          }
       }
-      else if(EQ(newLhs, currRhs, this->_tolerances->epsilon()))
+      else if(EQ(newLhs, currRhs, this->tolerances()->epsilon()))
       {
          stat = SPxBasisBase<R>::Desc::P_FIXED;
 
@@ -603,7 +586,7 @@ void SPxSolverBase<R>::changeLhsStatus(int i, R newLhs, R oldLhs)
       break;
 
    case SPxBasisBase<R>::Desc::P_ON_UPPER:
-      if(EQ(newLhs, currRhs, this->_tolerances->epsilon()))
+      if(EQ(newLhs, currRhs, this->tolerances()->epsilon()))
          stat = SPxBasisBase<R>::Desc::P_FIXED;
 
       break;
@@ -620,7 +603,7 @@ void SPxSolverBase<R>::changeLhsStatus(int i, R newLhs, R oldLhs)
       break;
 
    case SPxBasisBase<R>::Desc::P_FIXED:
-      if(NE(newLhs, currRhs, this->_tolerances->epsilon()))
+      if(NE(newLhs, currRhs, this->tolerances()->epsilon()))
       {
          stat = SPxBasisBase<R>::Desc::P_ON_UPPER;
 
@@ -717,7 +700,7 @@ void SPxSolverBase<R>::changeRhsStatus(int i, R newRhs, R oldRhs)
                objChange = (theURbound[i] * currLhs) - (theLRbound[i] * oldRhs);
          }
       }
-      else if(EQ(newRhs, currLhs, this->_tolerances->epsilon()))
+      else if(EQ(newRhs, currLhs, this->tolerances()->epsilon()))
       {
          stat = SPxBasisBase<R>::Desc::P_FIXED;
 
@@ -730,7 +713,7 @@ void SPxSolverBase<R>::changeRhsStatus(int i, R newRhs, R oldRhs)
       break;
 
    case SPxBasisBase<R>::Desc::P_ON_LOWER:
-      if(EQ(newRhs, currLhs, this->_tolerances->epsilon()))
+      if(EQ(newRhs, currLhs, this->tolerances()->epsilon()))
          stat = SPxBasisBase<R>::Desc::P_FIXED;
 
       break;
@@ -747,7 +730,7 @@ void SPxSolverBase<R>::changeRhsStatus(int i, R newRhs, R oldRhs)
       break;
 
    case SPxBasisBase<R>::Desc::P_FIXED:
-      if(NE(newRhs, currLhs, this->_tolerances->epsilon()))
+      if(NE(newRhs, currLhs, this->tolerances()->epsilon()))
       {
          stat = SPxBasisBase<R>::Desc::P_ON_LOWER;
 
@@ -845,7 +828,7 @@ void SPxSolverBase<R>::changeRange(int i, const R& newLhs, const R& newRhs, bool
 
    SPxLPBase<R>::changeLhs(i, newLhs, scale);
 
-   if(EQ(newLhs, newRhs, this->_tolerances->epsilon()))
+   if(EQ(newLhs, newRhs, this->tolerances()->epsilon()))
       SPxLPBase<R>::changeRhs(i, newLhs, scale);
    else
       SPxLPBase<R>::changeRhs(i, newRhs, scale);

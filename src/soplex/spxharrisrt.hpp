@@ -58,7 +58,7 @@ int SPxHarrisRT<R>::maxDelta(
    R themax;
    int sel;
    int i;
-   R epsilon = this->_tolerances->epsilon();
+   R epsilon = this->tolerances()->epsilon();
 
    assert(*val >= 0);
 
@@ -115,7 +115,7 @@ int SPxHarrisRT<R>::minDelta(
    R themax;
    int sel;
    int i;
-   R epsilon = this->_tolerances->epsilon();
+   R epsilon = this->tolerances()->epsilon();
 
    assert(*val < 0);
 

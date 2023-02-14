@@ -137,7 +137,7 @@ void SPxGeometSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
     */
    const R colratio = this->maxColRatio(lp);
    const R rowratio = this->maxRowRatio(lp);
-   R epsilon = this->_tolerances->epsilon();
+   R epsilon = this->tolerances()->epsilon();
 
    const bool colFirst = colratio < rowratio;
 

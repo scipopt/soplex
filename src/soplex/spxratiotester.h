@@ -99,8 +99,8 @@ public:
    /// set allowed bound violation
    virtual void setDelta(R newDelta)
    {
-      if(newDelta <= this->_tolerances->epsilon())
-         delta = this->_tolerances->epsilon();
+      if(newDelta <= this->tolerances()->epsilon())
+         delta = this->tolerances()->epsilon();
       else
          delta = newDelta;
    }
@@ -115,6 +115,11 @@ public:
    virtual void setTolerances(std::shared_ptr<Tolerances> newTolerances)
    {
       this->_tolerances = newTolerances;
+   }
+   /// get the _tolerances member variable
+   const std::shared_ptr<Tolerances> tolerances() const
+   {
+      return _tolerances;
    }
    ///@}
 

@@ -1787,7 +1787,7 @@ void SPxMainSM<R>::handleExtremes(SPxLPBase<R>& lp)
       }
 
       // fixed columns will be eliminated later
-      if(NE(lo, up, this->_tolerances->epsilon()))
+      if(NE(lo, up, this->tolerances()->epsilon()))
       {
          lo = spxAbs(lo);
          up = spxAbs(up);
@@ -1894,14 +1894,14 @@ void SPxMainSM<R>::computeMinMaxResidualActivity(SPxLPBase<R>& lp, int rowNumber
       if(colNumber < 0 || row.index(l) != colNumber)
       {
          // computing the minimum activity of the aggregated variables
-         if(GT(row.value(l), R(0.0), this->_tolerances->epsilon()))
+         if(GT(row.value(l), R(0.0), this->tolerances()->epsilon()))
          {
             if(lp.lower(row.index(l)) <= R(-infinity))
                minNegInfinite = true;
             else
                minAct += row.value(l) * lp.lower(row.index(l));
          }
-         else if(LT(row.value(l), R(0.0), this->_tolerances->epsilon()))
+         else if(LT(row.value(l), R(0.0), this->tolerances()->epsilon()))
          {
             if(lp.upper(row.index(l)) >= R(infinity))
                minNegInfinite = true;
@@ -1910,14 +1910,14 @@ void SPxMainSM<R>::computeMinMaxResidualActivity(SPxLPBase<R>& lp, int rowNumber
          }
 
          // computing the maximum activity of the aggregated variables
-         if(GT(row.value(l), R(0.0), this->_tolerances->epsilon()))
+         if(GT(row.value(l), R(0.0), this->tolerances()->epsilon()))
          {
             if(lp.upper(row.index(l)) >= R(infinity))
                maxInfinite = true;
             else
                maxAct += row.value(l) * lp.upper(row.index(l));
          }
-         else if(LT(row.value(l), R(0.0), this->_tolerances->epsilon()))
+         else if(LT(row.value(l), R(0.0), this->tolerances()->epsilon()))
          {
             if(lp.lower(row.index(l)) <= R(-infinity))
                maxInfinite = true;
@@ -1945,7 +1945,7 @@ void SPxMainSM<R>::computeMinMaxValues(SPxLPBase<R>& lp, R side, R val, R minRes
    minVal = 0;
    maxVal = 0;
 
-   if(LT(val, R(0.0), this->_tolerances->epsilon()))
+   if(LT(val, R(0.0), this->tolerances()->epsilon()))
    {
       if(minRes <= R(-infinity))
          minVal = R(-infinity);
@@ -1957,7 +1957,7 @@ void SPxMainSM<R>::computeMinMaxValues(SPxLPBase<R>& lp, R side, R val, R minRes
       else
          maxVal = (side - maxRes) / val;
    }
-   else if(GT(val, R(0.0), this->_tolerances->epsilon()))
+   else if(GT(val, R(0.0), this->tolerances()->epsilon()))
    {
       if(maxRes >= R(infinity))
          minVal = R(-infinity);
@@ -1993,7 +1993,7 @@ void SPxMainSM<R>::trivialHeuristic(SPxLPBase<R>& lp)
 
    R largeValue = R(infinity);
 
-   if(LT(R(1.0 / feastol()), R(infinity), this->_tolerances->epsilon()))
+   if(LT(R(1.0 / feastol()), R(infinity), this->tolerances()->epsilon()))
       largeValue = 1.0 / feastol();
 
 
@@ -2012,20 +2012,20 @@ void SPxMainSM<R>::trivialHeuristic(SPxLPBase<R>& lp)
 
          ASSERT_WARN("WMAISM45", isNotZero(aij, R(1.0 / R(infinity))));
 
-         if(GT(lp.lhs(col.index(k)), R(-infinity), this->_tolerances->epsilon())
-               && LT(lp.rhs(col.index(k)), R(infinity), this->_tolerances->epsilon()))
+         if(GT(lp.lhs(col.index(k)), R(-infinity), this->tolerances()->epsilon())
+               && LT(lp.rhs(col.index(k)), R(infinity), this->tolerances()->epsilon()))
          {
             upLocks[j]++;
             downLocks[j]++;
          }
-         else if(GT(lp.lhs(col.index(k)), R(-infinity), this->_tolerances->epsilon()))
+         else if(GT(lp.lhs(col.index(k)), R(-infinity), this->tolerances()->epsilon()))
          {
             if(aij > 0)
                downLocks[j]++;
             else if(aij < 0)
                upLocks[j]++;
          }
-         else if(LT(lp.rhs(col.index(k)), R(infinity), this->_tolerances->epsilon()))
+         else if(LT(lp.rhs(col.index(k)), R(infinity), this->tolerances()->epsilon()))
          {
             if(aij > 0)
                upLocks[j]++;
@@ -2037,10 +2037,10 @@ void SPxMainSM<R>::trivialHeuristic(SPxLPBase<R>& lp)
       R lower = lp.lower(j);
       R upper = lp.upper(j);
 
-      if(LE(lower, R(-infinity), this->_tolerances->epsilon()))
+      if(LE(lower, R(-infinity), this->tolerances()->epsilon()))
          lower = MINIMUM(-largeValue, upper);
 
-      if(GE(upper, R(infinity), this->_tolerances->epsilon()))
+      if(GE(upper, R(infinity), this->tolerances()->epsilon()))
          upper = MAXIMUM(lp.lower(j), largeValue);
 
       if(zerovalid)
@@ -2143,8 +2143,8 @@ void SPxMainSM<R>::propagatePseudoobj(SPxLPBase<R>& lp)
       }
    }
 
-   if(GT(m_cutoffbound, R(-infinity), this->_tolerances->epsilon())
-         && LT(m_cutoffbound, R(infinity), this->_tolerances->epsilon()))
+   if(GT(m_cutoffbound, R(-infinity), this->tolerances()->epsilon())
+         && LT(m_cutoffbound, R(infinity), this->tolerances()->epsilon()))
    {
       if(pseudoObj > m_pseudoobj)
          m_pseudoobj = pseudoObj;
@@ -2153,14 +2153,14 @@ void SPxMainSM<R>::propagatePseudoobj(SPxLPBase<R>& lp)
       {
          R objval = lp.maxObj(j);
 
-         if(EQ(objval, R(0.0), this->_tolerances->epsilon()))
+         if(EQ(objval, R(0.0), this->tolerances()->epsilon()))
             continue;
 
          if(objval < 0.0)
          {
             R newbound = lp.lower(j) + (m_cutoffbound - m_pseudoobj) / objval;
 
-            if(LT(newbound, lp.upper(j), this->_tolerances->epsilon()))
+            if(LT(newbound, lp.upper(j), this->tolerances()->epsilon()))
             {
                std::shared_ptr<PostStep> ptr(new TightenBoundsPS(lp, j, lp.upper(j), lp.lower(j),
                                              this->_tolerances));
@@ -2172,7 +2172,7 @@ void SPxMainSM<R>::propagatePseudoobj(SPxLPBase<R>& lp)
          {
             R newbound = lp.upper(j) + (m_cutoffbound - m_pseudoobj) / objval;
 
-            if(GT(newbound, lp.lower(j), this->_tolerances->epsilon()))
+            if(GT(newbound, lp.lower(j), this->tolerances()->epsilon()))
             {
                std::shared_ptr<PostStep> ptr(new TightenBoundsPS(lp, j, lp.upper(j), lp.lower(j),
                                              this->_tolerances));
@@ -2441,11 +2441,11 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::aggregateVars(SPxLPBase<R>& lp,
       // no bound tightening on x_k when x_j is aggregated
       flip_jk = false;
    }
-   else if(LE(new_lo_j, lower_j, this->_tolerances->epsilon())
-           && GE(new_up_j, upper_j, this->_tolerances->epsilon()))
+   else if(LE(new_lo_j, lower_j, this->tolerances()->epsilon())
+           && GE(new_up_j, upper_j, this->tolerances()->epsilon()))
    {
-      if(LE(new_lo_k, lower_k, this->_tolerances->epsilon())
-            && GE(new_up_k, upper_k, this->_tolerances->epsilon()))
+      if(LE(new_lo_k, lower_k, this->tolerances()->epsilon())
+            && GE(new_up_k, upper_k, this->tolerances()->epsilon()))
       {
          // both variables' bounds are not affected by aggregation; choose the better aggregation coeff (aik/aij)
          if(spxAbs(aij) > spxAbs(aik))
@@ -2456,8 +2456,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::aggregateVars(SPxLPBase<R>& lp,
       else
          flip_jk = false;
    }
-   else if(LE(new_lo_k, lower_k, this->_tolerances->epsilon())
-           && GE(new_up_k, upper_k, this->_tolerances->epsilon()))
+   else if(LE(new_lo_k, lower_k, this->tolerances()->epsilon())
+           && GE(new_up_k, upper_k, this->tolerances()->epsilon()))
    {
       flip_jk = true;
    }
@@ -2710,7 +2710,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                if(lp.lhs(i) > R(-infinity) && lp.lower(j) > R(-infinity) && rhsCnt <= 1
                      && NErel(lp.lhs(i), rhsBnd, feastol())
                      // do not perform if strongly different orders of magnitude occur
-                     && spxAbs(lp.lhs(i) / maxAbs(rhsBnd, R(1.0))) > this->_tolerances->epsilon())
+                     && spxAbs(lp.lhs(i) / maxAbs(rhsBnd, R(1.0))) > this->tolerances()->epsilon())
                {
                   R lo    = R(-infinity);
                   R scale = maxAbs(lp.lhs(i), rhsBnd);
@@ -2749,7 +2749,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                if(lp.rhs(i) < R(infinity) && lp.upper(j) < R(infinity) && lhsCnt <= 1
                      && NErel(lp.rhs(i), lhsBnd, feastol())
                      // do not perform if strongly different orders of magnitude occur
-                     && spxAbs(lp.rhs(i) / maxAbs(lhsBnd, R(1.0))) > this->_tolerances->epsilon())
+                     && spxAbs(lp.rhs(i) / maxAbs(lhsBnd, R(1.0))) > this->tolerances()->epsilon())
                {
                   R up    = R(infinity);
                   R scale = maxAbs(lp.rhs(i), lhsBnd);
@@ -2819,7 +2819,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                if(lp.lhs(i) > R(-infinity) && lp.upper(j) < R(infinity) && rhsCnt <= 1
                      && NErel(lp.lhs(i), rhsBnd, feastol())
                      // do not perform if strongly different orders of magnitude occur
-                     && spxAbs(lp.lhs(i) / maxAbs(rhsBnd, R(1.0))) > this->_tolerances->epsilon())
+                     && spxAbs(lp.lhs(i) / maxAbs(rhsBnd, R(1.0))) > this->tolerances()->epsilon())
                {
                   R up    = R(infinity);
                   R scale = maxAbs(lp.lhs(i), rhsBnd);
@@ -2857,7 +2857,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                if(lp.rhs(i) < R(infinity) && lp.lower(j) > R(-infinity) && lhsCnt <= 1
                      && NErel(lp.rhs(i), lhsBnd, feastol())
                      // do not perform if strongly different orders of magnitude occur
-                     && spxAbs(lp.rhs(i) / maxAbs(lhsBnd, R(1.0))) > this->_tolerances->epsilon())
+                     && spxAbs(lp.rhs(i) / maxAbs(lhsBnd, R(1.0))) > this->tolerances()->epsilon())
                {
                   R lo    = R(-infinity);
                   R scale = maxAbs(lp.rhs(i), lhsBnd);
@@ -2880,7 +2880,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                   if(isZero(lo, this->epsZero()))
                      lo = 0.0;
 
-                  if(GErel(lo, lp.lower(j), this->_tolerances->epsilon()))
+                  if(GErel(lo, lp.lower(j), this->tolerances()->epsilon()))
                   {
                      MSG_DEBUG((*this->spxout) << "IMAISM16 row " << i
                                << ": redundant lower bound on x" << j
@@ -4106,7 +4106,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::multiaggregation(SPxLPBase<R>& l
                   // computing the values of the upper and lower bounds for the aggregated variables
                   computeMinMaxValues(lp, lhs, val, minRes, maxRes, minVal, maxVal);
 
-                  assert(LE(minVal, maxVal, this->_tolerances->epsilon()));
+                  assert(LE(minVal, maxVal, this->tolerances()->epsilon()));
 
                   // if the bounds of the aggregation and the original variable are equivalent, then we can reduce
                   if((minVal > R(-infinity) && GT(minVal, lower, feastol()))
@@ -4127,7 +4127,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::multiaggregation(SPxLPBase<R>& l
                   // computing the values of the upper and lower bounds for the aggregated variables
                   computeMinMaxValues(lp, rhs, val, minRes, maxRes, minVal, maxVal);
 
-                  assert(LE(minVal, maxVal, this->_tolerances->epsilon()));
+                  assert(LE(minVal, maxVal, this->tolerances()->epsilon()));
 
                   if((minVal > R(-infinity) && GT(minVal, lower, feastol()))
                         && (maxVal < R(infinity) && LT(maxVal, upper, feastol())))
@@ -4192,7 +4192,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::multiaggregation(SPxLPBase<R>& l
                   if(lp.lhs(rowNumber) > R(-infinity))
                      lp.changeLhs(rowNumber, updateLhs - updateRow[j]*aggConstant / aggAij);
 
-                  assert(LE(lp.lhs(rowNumber), lp.rhs(rowNumber), this->_tolerances->epsilon()));
+                  assert(LE(lp.lhs(rowNumber), lp.rhs(rowNumber), this->tolerances()->epsilon()));
                }
             }
 
@@ -4347,7 +4347,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLPBase<R>& lp, 
          if(m_classSetRows[k].size() > 0)
          {
             // sort classSet[k] w.r.t. scaled column values
-            ElementCompare compare(this->_tolerances->epsilon());
+            ElementCompare compare(this->tolerances()->epsilon());
 
             if(m_classSetRows[k].size() > 1)
                SPxQuicksort(m_classSetRows[k].mem(), m_classSetRows[k].size(), compare);
@@ -4517,7 +4517,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLPBase<R>& lp, 
 
                std::shared_ptr<PostStep> ptr(new DuplicateRowsPS(lp, rowIdx, maxLhsIdx, minRhsIdx,
                                              m_dupRows[k], scale, da_perm, isLhsEqualRhs, true,
-                                             EQrel(newLhs, newRhs, this->_tolerances->epsilon()), this->_tolerances, k == idxFirstDupRows));
+                                             EQrel(newLhs, newRhs, this->tolerances()->epsilon()), this->_tolerances, k == idxFirstDupRows));
                m_hist.append(ptr);
             }
             else
@@ -4525,7 +4525,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLPBase<R>& lp, 
                DataArray<int> da_perm_empty(0);
                std::shared_ptr<PostStep> ptr(new DuplicateRowsPS(lp, rowIdx, maxLhsIdx, minRhsIdx,
                                              m_dupRows[k], scale, da_perm_empty, isLhsEqualRhs, false, EQrel(newLhs, newRhs,
-                                                   this->_tolerances->epsilon()),
+                                                   this->tolerances()->epsilon()),
                                              this->_tolerances, k == idxFirstDupRows));
                m_hist.append(ptr);
             }
@@ -4689,7 +4689,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
          if(m_classSetCols[k].size() > 0)
          {
             // sort classSet[k] w.r.t. scaled row values
-            ElementCompare compare(this->_tolerances->epsilon());
+            ElementCompare compare(this->tolerances()->epsilon());
 
             if(m_classSetCols[k].size() > 1)
                SPxQuicksort(m_classSetCols[k].mem(), m_classSetCols[k].size(), compare);
@@ -4775,10 +4775,10 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
 
                      // if 0 is not within the column bounds, we are not able to postsolve if the aggregated column has
                      // status ZERO, hence we skip this case
-                     if(LErel(lp.lower(j1), R(0.0), this->_tolerances->epsilon())
-                           && GErel(lp.upper(j1), R(0.0), this->_tolerances->epsilon())
-                           && LErel(lp.lower(j2), R(0.0), this->_tolerances->epsilon())
-                           && GErel(lp.upper(j2), R(0.0), this->_tolerances->epsilon()))
+                     if(LErel(lp.lower(j1), R(0.0), this->tolerances()->epsilon())
+                           && GErel(lp.upper(j1), R(0.0), this->tolerances()->epsilon())
+                           && LErel(lp.lower(j2), R(0.0), this->tolerances()->epsilon())
+                           && GErel(lp.upper(j2), R(0.0), this->tolerances()->epsilon()))
                      {
                         std::shared_ptr<PostStep> ptr(new DuplicateColsPS(lp, j1, j2, factor, m_perm_empty,
                                                       this->_tolerances));
@@ -5005,7 +5005,7 @@ void SPxMainSM<R>::fixColumn(SPxLPBase<R>& lp, int j, bool correctIdx)
    R mid           = lo;
 
    // use the center value between slightly different bounds to improve numerics
-   if(NE(lo, up, this->_tolerances->epsilon()))
+   if(NE(lo, up, this->tolerances()->epsilon()))
       mid = (up + lo) / 2.0;
 
    assert(lo < R(infinity) && lo > R(-infinity));
@@ -5140,7 +5140,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLPBase<R>& lp, R eps
 {
    if(lp.lhs(i) > R(-infinity) && lp.rhs(i) < R(infinity))
       {
-         if(EQ(lp.lhs(i), lp.rhs(i), this->_tolerances->epsilon()))
+         if(EQ(lp.lhs(i), lp.rhs(i), this->tolerances()->epsilon()))
             ++numEqualities;
          else
             ++numRangedRows;
@@ -5293,7 +5293,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLPBase<R>& lp, R eps
    {
       if(lp.lhs(i) > R(-infinity) && lp.rhs(i) < R(infinity))
          {
-            if(EQ(lp.lhs(i), lp.rhs(i), this->_tolerances->epsilon()))
+            if(EQ(lp.lhs(i), lp.rhs(i), this->tolerances()->epsilon()))
                ++numEqualities;
             else
                ++numRangedRows;

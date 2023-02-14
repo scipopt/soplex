@@ -85,11 +85,11 @@ public:
          idx = -1;
          pos = -1;
       }
+
    private:
       Pring(const Pring&);             ///< blocked copy constructor
       Pring& operator= (const Pring&); ///< blocked assignment operator
    };
-
    ///@}
 
 protected:

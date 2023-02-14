@@ -804,7 +804,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
    R oldShift = theShift;
    SPxId enterId = theratiotester->selectEnter(enterVal, leaveIdx, polish);
 
-   if(NE(theShift, oldShift, this->_tolerances->epsilon()))
+   if(NE(theShift, oldShift, this->tolerances()->epsilon()))
    {
       MSG_DEBUG(std::cout << "DLEAVE71 trigger recomputation of nonbasic value due to shifts in ratiotest"
                 << std::endl;)
@@ -832,7 +832,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
       if(polish)
          return false;
 
-      if(NE(enterVal, leaveMax, this->_tolerances->epsilon()))
+      if(NE(enterVal, leaveMax, this->tolerances()->epsilon()))
       {
          MSG_DEBUG(std::cout << "DLEAVE61 rejecting leave A (leaveIdx=" << leaveIdx
                    << ", theCoTest=" << theCoTest[leaveIdx] << ")"

@@ -161,6 +161,11 @@ public:
    {
       _tolerances = tolerances;
    }
+   /// get the _tolerances member variable
+   const std::shared_ptr<Tolerances> tolerances() const
+   {
+      return _tolerances;
+   }
    ///@}
 
    //-------------------------------------

@@ -1331,7 +1331,7 @@ public:
 
          if(hasRhs && hasLhs)
          {
-            if(EQ(lhs(i), rhs(i), this->_tolerances->epsilon()))
+            if(EQ(lhs(i), rhs(i), this->tolerances()->epsilon()))
                countEqual++;
             else
                countRanged++;
@@ -1844,7 +1844,7 @@ public:
       SVectorBase<R>& row = rowVector_w(i);
       SVectorBase<R>& col = colVector_w(j);
 
-      if(isNotZero(val, this->_tolerances->epsilon()))
+      if(isNotZero(val, this->tolerances()->epsilon()))
       {
          R newVal;
 

@@ -236,8 +236,8 @@ public:
    ///
    virtual void setDelta(R newDelta)
    {
-      if(newDelta <= this->_tolerances->epsilon())
-         newDelta = this->_tolerances->epsilon();
+      if(newDelta <= this->tolerances()->epsilon())
+         newDelta = this->tolerances()->epsilon();
 
       this->delta = newDelta;
       fastDelta = newDelta;

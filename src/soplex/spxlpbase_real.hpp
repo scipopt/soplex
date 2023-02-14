@@ -1056,10 +1056,10 @@ bool SPxLPBase<R>::readLPF(
                 */
                if(have_value)
                {
-                  if(NE(spxAbs(val), R(1.0), this->_tolerances->epsilon()))
+                  if(NE(spxAbs(val), R(1.0), this->tolerances()->epsilon()))
                      goto syntax_error;
 
-                  if(EQ(val, R(-1.0), this->_tolerances->epsilon()))
+                  if(EQ(val, R(-1.0), this->tolerances()->epsilon()))
                      pre_sign = val;
                }
 
@@ -1092,10 +1092,10 @@ bool SPxLPBase<R>::readLPF(
                 */
                if(have_value)
                {
-                  if(NE(spxAbs(val), R(1.0), this->_tolerances->epsilon()))
+                  if(NE(spxAbs(val), R(1.0), this->tolerances()->epsilon()))
                      goto syntax_error;
 
-                  if(EQ(val, R(-1.0), this->_tolerances->epsilon()))
+                  if(EQ(val, R(-1.0), this->tolerances()->epsilon()))
                      pre_sign = val;
                }
 
@@ -2566,7 +2566,7 @@ void SPxLPBase<R>::writeMPS(
             MPSwriteRecord(p_output, 0, getColName(*this, i, p_cnames, name),
                            MPSgetRowName(*this, col.index(k), p_rnames, name1), col.value(k));
 
-         if(isNotZero(maxObj(i), this->_tolerances->epsilon()))
+         if(isNotZero(maxObj(i), this->tolerances()->epsilon()))
             MPSwriteRecord(p_output, 0, getColName(*this, i, p_cnames, name), "MINIMIZE", -maxObj(i));
       }
 
@@ -2628,7 +2628,7 @@ void SPxLPBase<R>::writeMPS(
       // skip variables that do not appear in the objective function or any constraint
       const SVectorBase<R>& col = colVector(i);
 
-      if(col.size() == 0 && isZero(maxObj(i), this->_tolerances->epsilon()))
+      if(col.size() == 0 && isZero(maxObj(i), this->tolerances()->epsilon()))
          continue;
 
       if(lower(i) == upper(i))
@@ -2756,7 +2756,7 @@ void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[
       }
       else if(lower(i) <= R(-infinity))   // no lower bound is set, indicating a <= 0 variable
       {
-         if(isZero(upper(i), this->_tolerances->epsilon()))   // standard bound variable
+         if(isZero(upper(i), this->tolerances()->epsilon()))   // standard bound variable
          {
             if(spxSense() == MINIMIZE)
                dualrows.create(0, obj(i), R(infinity));
@@ -2787,7 +2787,7 @@ void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[
       }
       else if(upper(i) >= R(infinity))   // no upper bound set, indicating a >= 0 variable
       {
-         if(isZero(lower(i), this->_tolerances->epsilon()))   // standard bound variable
+         if(isZero(lower(i), this->tolerances()->epsilon()))   // standard bound variable
          {
             if(spxSense() == MINIMIZE)
                dualrows.create(0, R(-infinity), obj(i));
@@ -2816,9 +2816,9 @@ void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[
 
          numAddedRows++;
       }
-      else if(NE(lower(i), upper(i), this->_tolerances->epsilon()))   // a boxed variable
+      else if(NE(lower(i), upper(i), this->tolerances()->epsilon()))   // a boxed variable
       {
-         if(isZero(lower(i), this->_tolerances->epsilon()))   // variable bounded between 0 and upper(i)
+         if(isZero(lower(i), this->tolerances()->epsilon()))   // variable bounded between 0 and upper(i)
          {
             col.add(numAddedRows, 1.0);
 
@@ -2837,7 +2837,7 @@ void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[
 
             numVarBoundCols++;
          }
-         else if(isZero(upper(i), this->_tolerances->epsilon()))   // variable bounded between lower(i) and 0
+         else if(isZero(upper(i), this->tolerances()->epsilon()))   // variable bounded between lower(i) and 0
          {
             col.add(numAddedRows, 1.0);
 
@@ -2965,7 +2965,7 @@ void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[
          break;
 
       case LPRowBase<R>::EQUAL: // Equality constraint
-         assert(EQ(lhs(i), rhs(i), this->_tolerances->epsilon()));
+         assert(EQ(lhs(i), rhs(i), this->tolerances()->epsilon()));
          primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
          primalrowsidx++;
          dualcols.add(rhs(i), R(-infinity), rowVector(i), R(infinity));

@@ -219,7 +219,7 @@ void SPxEquiliSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
     */
    R colratio = this->maxColRatio(lp);
    R rowratio = this->maxRowRatio(lp);
-   R epsilon = this->_tolerances->epsilon();
+   R epsilon = this->tolerances()->epsilon();
 
    bool colFirst = colratio < rowratio;
 
