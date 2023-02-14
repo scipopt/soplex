@@ -2837,7 +2837,8 @@ void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[
 
             numVarBoundCols++;
          }
-         else if(isZero(upper(i), this->tolerances()->epsilon()))   // variable bounded between lower(i) and 0
+         else if(isZero(upper(i),
+                        this->tolerances()->epsilon()))   // variable bounded between lower(i) and 0
          {
             col.add(numAddedRows, 1.0);
 
