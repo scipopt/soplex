@@ -2823,7 +2823,7 @@ public:
    ///@{
 
    /// Default constructor.
-   SPxLPBase<R>()
+   SPxLPBase()
    {
       SPxLPBase<R>::clear(); // clear is virtual.
 
@@ -2831,11 +2831,11 @@ public:
    }
 
    /// Destructor.
-   virtual ~SPxLPBase<R>()
+   virtual ~SPxLPBase()
    {}
 
    /// Copy constructor.
-   SPxLPBase<R>(const SPxLPBase<R>& old)
+   SPxLPBase(const SPxLPBase<R>& old)
       : LPRowSetBase<R>(old)
       , LPColSetBase<R>(old)
       , thesense(old.thesense)
@@ -2850,7 +2850,7 @@ public:
 
    /// Copy constructor.
    template < class S >
-   SPxLPBase<R>(const SPxLPBase<S>& old)
+   SPxLPBase(const SPxLPBase<S>& old)
       : LPRowSetBase<R>(old)
       , LPColSetBase<R>(old)
       , thesense(old.thesense == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE)

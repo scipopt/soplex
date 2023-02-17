@@ -321,13 +321,13 @@ public:
    /**@name Constructors / Destructors */
    ///@{
    /// default constructor.
-   SLUFactor<R>();
+   SLUFactor();
    /// assignment operator.
    SLUFactor<R>& operator=(const SLUFactor<R>& old);
    /// copy constructor.
-   SLUFactor<R>(const SLUFactor<R>& old);
+   SLUFactor(const SLUFactor<R>& old);
    /// destructor.
-   virtual ~SLUFactor<R>();
+   virtual ~SLUFactor();
    /// clone function for polymorphism
    inline virtual SLinSolver<R>* clone() const
    {

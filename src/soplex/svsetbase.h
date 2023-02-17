@@ -996,7 +996,7 @@ public:
 
    /// Default constructor.
    explicit
-   SVSetBase<R>(int pmax = -1, int pmemmax = -1, double pfac = 1.1, double pmemFac = 1.2)
+   SVSetBase(int pmax = -1, int pmemmax = -1, double pfac = 1.1, double pmemFac = 1.2)
       : SVSetBaseArray(0, (pmemmax > 0) ? pmemmax : 8 * ((pmax > 0) ? pmax : 8), pmemFac)
       , set((pmax > 0) ? pmax : 8)
       , unusedMem(0)
@@ -1007,7 +1007,7 @@ public:
    }
 
    /// Destructor
-   virtual ~SVSetBase<R>()
+   virtual ~SVSetBase()
    {}
 
    /// Assignment operator.
@@ -1063,7 +1063,7 @@ public:
    }
 
    /// Copy constructor.
-   SVSetBase<R>(const SVSetBase<R>& old)
+   SVSetBase(const SVSetBase<R>& old)
       : SVSetBaseArray()
       , unusedMem(old.unusedMem)
       , numUnusedMemUpdates(old.numUnusedMemUpdates)
@@ -1076,7 +1076,7 @@ public:
 
    /// Copy constructor.
    template < class S >
-   SVSetBase<R>(const SVSetBase<S>& old)
+   SVSetBase(const SVSetBase<S>& old)
       : SVSetBaseArray()
       , unusedMem(old.unusedMem)
       , numUnusedMemUpdates(old.numUnusedMemUpdates)

@@ -85,10 +85,10 @@ public:
       assert(isConsistent());
    }
    ///
-   ~UpdateVector<R>()
+   ~UpdateVector()
    {}
    /// copy constructor
-   UpdateVector<R>(const UpdateVector<R>&);
+   UpdateVector(const UpdateVector<R>&);
    /// assignment from VectorBase<R>
    UpdateVector<R>& operator=(const VectorBase<R>& rhs)
    {

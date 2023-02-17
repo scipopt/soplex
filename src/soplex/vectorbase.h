@@ -114,20 +114,20 @@ public:
     */
 
    // Default constructor
-   VectorBase<R>()
+   VectorBase()
    {
       // Default constructor
       ;
    }
 
    // Construct from pointer, copies the values into the VectorBase
-   VectorBase<R>(int dimen, R* p_val)
+   VectorBase(int dimen, R* p_val)
    {
       val.assign(p_val, p_val + dimen);
    }
 
    // do not convert int to empty vectorbase
-   explicit VectorBase<R>(int p_dimen)
+   explicit VectorBase(int p_dimen)
    {
       val.resize(p_dimen);
    }
@@ -135,18 +135,18 @@ public:
    // Constructing an element (usually involving casting Real to Rational and
    // vice versa.)
    template <typename S>
-   VectorBase<R>(const VectorBase<S>& vec)
+   VectorBase(const VectorBase<S>& vec)
    {
       this->operator=(vec);
    }
 
    // The move constructor
-   VectorBase<R>(const VectorBase<R>&& vec)noexcept: val(std::move(vec.val))
+   VectorBase(const VectorBase<R>&& vec)noexcept: val(std::move(vec.val))
    {
    }
 
    // Copy constructor
-   VectorBase<R>(const VectorBase<R>& vec): val(vec.val)
+   VectorBase(const VectorBase<R>& vec): val(vec.val)
    {
    }
 

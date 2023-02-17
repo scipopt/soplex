@@ -241,7 +241,7 @@ private:
    unsigned int _hasDualFarkas: 1;
 
    /// default constructor only for friends
-   SolBase<R>()
+   SolBase()
       : _objVal(0)
    {
       invalidate();
