@@ -311,10 +311,6 @@ public:
       this->ssvec.setTolerances(tolerances);
    }
 
-   std::shared_ptr<Tolerances> tolerances()
-   {
-      return this->_tolerances;
-   }
    ///@}
 
    //------------------------------------
