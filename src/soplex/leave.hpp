@@ -36,7 +36,7 @@
 
 namespace soplex
 {
-   static const Real default_reject_leave_tol = 1e-10; // = DEFAULT_LOWSTAB as defined in spxfastrt.hpp
+static const Real default_reject_leave_tol = 1e-10; // = DEFAULT_LOWSTAB as defined in spxfastrt.hpp
 
 /*
   VectorBase<R> |fTest| gives the feasibility test of all basic variables. For its
@@ -995,6 +995,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
 #endif  // ENABLE_ADDITIONAL_CHECKS
 
          R reject_treshold = this->tolerances()->scaleAccordingToEpsilon(default_reject_leave_tol);
+
          if(spxAbs(theFvec->delta()[leaveIdx]) < reject_treshold)
          {
             if(instable)
