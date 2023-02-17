@@ -45,12 +45,18 @@
 namespace soplex
 {
 
-#define TRIES           2
+
+#define DEFAULT_MINSTAB         1e-5
+#define DEFAULT_LOWSTAB         1e-10
+#define TRIES                   2
+#define DEFAULT_SHORTVAL        1e-5
+#define DEFAULT_DELTA_SHIFT     1e-5
+#define DEFAULT_EPSILON         1e-10
 
 template <class R>
 void SPxFastRT<R>::tighten()
 {
-   R delta_shift = this->thesolver->tolerances()->floatingPointFeastol() * 1e1;
+   R delta_shift = this->tolerances()->scaleWithMachineTolerance(DEFAULT_DELTA_SHIFT);
 
    if(fastDelta >= this->delta + delta_shift)
    {
@@ -60,7 +66,7 @@ void SPxFastRT<R>::tighten()
          fastDelta -= 2 * delta_shift;
    }
 
-   if(minStab < this->thesolver->tolerances()->floatingPointFeastol() * 1e1)
+   if(minStab < this->tolerances()->scaleWithMachineTolerance(DEFAULT_MINSTAB))
    {
       minStab /= 0.90;
 
@@ -72,7 +78,7 @@ void SPxFastRT<R>::tighten()
 template <class R>
 void SPxFastRT<R>::relax()
 {
-   R delta_shift = this->thesolver->tolerances()->floatingPointFeastol() * 1e1;
+   R delta_shift = this->tolerances()->scaleWithMachineTolerance(DEFAULT_DELTA_SHIFT);
    minStab *= 0.95;
    fastDelta += 3 * delta_shift;
 }
@@ -817,7 +823,7 @@ bool SPxFastRT<R>::maxShortLeave(R& sel, int leave, R maxabs)
    assert(leave >= 0);
    assert(maxabs >= 0);
 
-   R shortval = this->thesolver->tolerances()->floatingPointFeastol() * 1e1;
+   R shortval = this->tolerances()->scaleWithMachineTolerance(DEFAULT_SHORTVAL);
 
    sel = this->thesolver->fVec().delta()[leave];
 
@@ -842,7 +848,7 @@ bool SPxFastRT<R>::minShortLeave(R& sel, int leave, R maxabs)
    assert(leave >= 0);
    assert(maxabs >= 0);
 
-   R shortval = this->thesolver->tolerances()->floatingPointFeastol() * 1e1;
+   R shortval = this->tolerances()->scaleWithMachineTolerance(DEFAULT_SHORTVAL);
 
    sel = this->thesolver->fVec().delta()[leave];
 
@@ -953,7 +959,7 @@ template <class R>
 int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
 {
    R maxabs, max, sel;
-   R delta_shift = this->thesolver->tolerances()->floatingPointFeastol() * 1e1;
+   R delta_shift = this->tolerances()->scaleWithMachineTolerance(DEFAULT_DELTA_SHIFT);
    int leave = -1;
    int cnt = 0;
 
@@ -961,7 +967,7 @@ int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
 
    // force instable pivot iff true (see explanation in enter.cpp and spxsolve.hpp)
    bool instable = this->solver()->instableEnter;
-   R lowstab = this->thesolver->tolerances()->floatingPointFeastol() * 1e-4;
+   R lowstab = this->tolerances()->scaleWithMachineTolerance(DEFAULT_LOWSTAB);
    assert(!instable || this->solver()->instableEnterId.isValid());
 
    if(val > epsilonZero())
@@ -1343,7 +1349,7 @@ bool SPxFastRT<R>::shortEnter(
    R max,
    R maxabs) const
 {
-   R shortval = this->thesolver->tolerances()->floatingPointFeastol() * 1e1;
+   R shortval = this->tolerances()->scaleWithMachineTolerance(DEFAULT_SHORTVAL);
 
    if(this->thesolver->isCoId(enterId))
    {
@@ -1379,7 +1385,7 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
    SPxId enterId;
    R max, sel;
    R maxabs = 0.0;
-   R delta_shift = this->thesolver->tolerances()->floatingPointFeastol() * 1e1;
+   R delta_shift = this->tolerances()->scaleWithMachineTolerance(DEFAULT_DELTA_SHIFT);
    int nr;
    int cnt = 0;
 
@@ -1387,7 +1393,7 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
 
    // force instable pivot iff true (see explanation in leave.hpp and spxsolve.hpp)
    bool instable = this->solver()->instableLeave;
-   R lowstab = this->thesolver->tolerances()->floatingPointFeastol() * 1e-4;
+   R lowstab = this->tolerances()->scaleWithMachineTolerance(DEFAULT_LOWSTAB);
    assert(!instable || this->solver()->instableLeaveNum >= 0);
 
    sel = 0.0;
@@ -1554,7 +1560,7 @@ void SPxFastRT<R>::setType(typename SPxSolverBase<R>::Type type)
 {
    this->m_type = type;
 
-   minStab = this->thesolver->tolerances()->floatingPointFeastol() * 1e1;
+   minStab = this->tolerances()->scaleWithMachineTolerance(DEFAULT_MINSTAB);
    fastDelta = this->delta;
 }
 } // namespace soplex

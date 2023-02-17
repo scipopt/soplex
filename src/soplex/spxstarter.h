@@ -115,6 +115,11 @@ public:
    {
       _tolerances = tolerances;
    }
+   /// get the toelrances used by the starter
+   virtual const std::shared_ptr<Tolerances>& tolerances() const
+   {
+      return _tolerances;
+   }
 
    //-------------------------------------
    /**@name Misc */

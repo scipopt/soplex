@@ -369,6 +369,11 @@ public:
    Real floatingPointOpttol();
    /// set floating point optimality tolerance used within the solver
    void setFloatingPointOpttol(Real otol);
+   /// scale a value such that it remains unchanged at default epsilon, but is scaled withs smaller epsilon values
+   inline Real scaleWithMachineTolerance(Real a)
+   {
+      return a * std::pow(10, -0.5 * (log10(DEFAULT_EPS_ZERO) - log10(s_epsilon)));
+   }
    ///@}
 };
 

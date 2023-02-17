@@ -32,8 +32,7 @@
 
 namespace soplex
 {
-#define EPS     1e-6
-#define STABLE  1e-3    // the sparsest row/column may only have a pivot of size STABLE*maxEntry
+#define DEFAULT_STABLE  1e-3    // the sparsest row/column may only have a pivot of size STABLE*maxEntry
 
 
 template <class R>
@@ -314,7 +313,9 @@ void SPxWeightST<R>::generate(SPxSolverBase<R>& base)
             int  k = vec.index(j);
             int  nRowEntries = base.coVector(k).size();
 
-            if(!forbidden[k] && (spxAbs(x) > STABLE * maxEntry) && (nRowEntries < minRowEntries))
+            if(!forbidden[k]
+                  && (spxAbs(x) > this->tolerances()->scaleWithMachineTolerance(DEFAULT_STABLE) * maxEntry)
+                  && (nRowEntries < minRowEntries))
             {
                minRowEntries = nRowEntries;
                sel  = k;
@@ -345,8 +346,9 @@ void SPxWeightST<R>::generate(SPxSolverBase<R>& base)
          {
             R x = vec.value(j);
             int  k = vec.index(j);
+            R feastol = this->tolerances()->floatingPointFeastol();
 
-            if(!forbidden[k] && (x > EPS * maxEntry || -x > EPS * maxEntry))
+            if(!forbidden[k] && (x > feastol * maxEntry || -x > feastol * maxEntry))
             {
                forbidden[k] = 1;
                --dim;
