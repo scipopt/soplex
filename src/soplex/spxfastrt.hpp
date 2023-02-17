@@ -62,7 +62,7 @@ void SPxFastRT<R>::tighten()
    {
       fastDelta -= delta_shift;
 
-      if(fastDelta > 1e-4)
+      if(fastDelta > this->tolerances()->scaleAccordingToEpsilon(1e-4))
          fastDelta -= 2 * delta_shift;
    }
 
@@ -70,7 +70,7 @@ void SPxFastRT<R>::tighten()
    {
       minStab /= 0.90;
 
-      if(minStab < 1e-6)
+      if(minStab < this->tolerances()->floatingPointFeastol())
          minStab /= 0.90;
    }
 }
