@@ -364,7 +364,7 @@ SPxId SPxHarrisRT<R>::selectEnter(R& val, int, bool)
    R rmaxabs = 1;
    int pnr, cnr;
 
-   R minStability = this->tolerances()->scaleWithMachineTolerance(1e-5);
+   R minStability = this->tolerances()->scaleAccordingToEpsilon(1e-5);
    R epsilon      = this->solver()->epsilon();
    R degeneps     = degenerateEps();
 

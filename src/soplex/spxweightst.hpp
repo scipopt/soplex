@@ -314,7 +314,7 @@ void SPxWeightST<R>::generate(SPxSolverBase<R>& base)
             int  nRowEntries = base.coVector(k).size();
 
             if(!forbidden[k]
-                  && (spxAbs(x) > this->tolerances()->scaleWithMachineTolerance(DEFAULT_STABLE) * maxEntry)
+                  && (spxAbs(x) > this->tolerances()->scaleAccordingToEpsilon(DEFAULT_STABLE) * maxEntry)
                   && (nRowEntries < minRowEntries))
             {
                minRowEntries = nRowEntries;
