@@ -408,7 +408,7 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
             else
             {
                adjust = true;
-               v[j] = SOPLEX_VECTOR_MARKER;
+               v[j] = SOPLEX_VECTOR_MARKER * this->tolerances()->epsilon();
             }
          }
          else
@@ -721,7 +721,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A,
             // by setting a value which is nearly 0; otherwise, store
             // the value. Values below epsilon will be removed later.
             if(oldval == 0)
-               VectorBase<R>::val[elt.idx] = SOPLEX_VECTOR_MARKER;
+               VectorBase<R>::val[elt.idx] = SOPLEX_VECTOR_MARKER * this->tolerances()->epsilon();
             else
                VectorBase<R>::val[elt.idx] = oldval;
          }

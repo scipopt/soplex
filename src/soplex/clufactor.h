@@ -55,6 +55,11 @@ public:
    {
       this->_tolerances = tolerances;
    }
+   /// get tolerances
+   const virtual std::shared_ptr<Tolerances> tolerances() const
+   {
+      return _tolerances;
+   }
 
    //----------------------------------------
    /**@name Public types */
