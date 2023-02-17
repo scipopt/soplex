@@ -843,31 +843,17 @@ public:
    R entertol() const
    {
       if(theRep == COLUMN)
-         return this->tolerances()->feastol() * this->entertolscale;
+         return this->tolerances()->floatingPointFeastol() * this->entertolscale;
       else
-         return this->tolerances()->opttol() * this->entertolscale;
+         return this->tolerances()->floatingPointOpttol() * this->entertolscale;
    }
    /// feasibility tolerance maintained by ratio test during LEAVE algorithm.
    R leavetol() const
    {
       if(theRep == COLUMN)
-         return this->tolerances()->opttol() * this->leavetolscale;
+         return this->tolerances()->floatingPointOpttol() * this->leavetolscale;
       else
-         return this->tolerances()->feastol() * this->leavetolscale;
-   }
-   /// allowed primal feasibility tolerance.
-   R feastol() const
-   {
-      assert(this->tolerances()->feastol() >= 0.0);
-
-      return this->tolerances()->feastol();
-   }
-   /// allowed optimality, i.e., dual feasibility tolerance.
-   R opttol() const
-   {
-      assert(this->tolerances()->opttol() >= 0.0);
-
-      return this->tolerances()->opttol();
+         return this->tolerances()->floatingPointFeastol() * this->leavetolscale;
    }
    /// scale the entering tolerance
    void scaleEntertol(R d)
@@ -884,10 +870,11 @@ public:
       this->scaleEntertol(d);
       this->scaleLeavetol(d);
    }
-   /// guaranteed primal and dual bound violation for optimal solution, returning the maximum of feastol() and opttol(), i.e., the less tight tolerance.
+   /// guaranteed primal and dual bound violation for optimal solution, returning the maximum of floatingPointFeastol() and floatingPointOpttol().
    R delta() const
    {
-      return std::max(this->tolerances()->feastol(), this->tolerances()->opttol());
+      return std::max(this->tolerances()->floatingPointFeastol(),
+                      this->tolerances()->floatingPointOpttol());
    }
 
    /// set timing type

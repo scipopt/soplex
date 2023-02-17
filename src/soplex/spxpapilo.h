@@ -60,15 +60,8 @@ public:
       return new Presol(*this);
    }
 
-   virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, R eps, R delta,
-         Real remainingTime)
-   {
-      return SPxSimplifier<R>::OKAY;
-   }
-
-   virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
-         Real remainingTime,
-         bool keepbounds, uint32_t seed)
+   virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp,
+         Real remainingTime, bool keepbounds, uint32_t seed)
    {
       assert(false);
       return SPxSimplifier<R>::OKAY;
@@ -201,9 +194,6 @@ private:
 
    bool postsolved;           ///< was the solution already postsolve?
    bool vanished = false;
-   R m_epsilon;                 ///< epsilon zero.
-   R m_feastol;                 ///< primal feasibility tolerance.
-   R m_opttol;                  ///< dual feasibility tolerance.
    R modifyRowsFac;             ///<
    DataArray<int> m_stat;       ///< preprocessing history.
    typename SPxLPBase<R>::SPxSense m_thesense;   ///< optimization sense.
@@ -225,17 +215,17 @@ protected:
 
    R epsZero() const
    {
-      return m_epsilon;
+      return this->tolerances()->epsilon();
    }
 
    R feastol() const
    {
-      return m_feastol;
+      return this->tolerances()->floatingPointFeastol();
    }
 
    R opttol() const
    {
-      return m_opttol;
+      return this->tolerances()->floatingPointOpttol();
    }
 
 public:
@@ -245,8 +235,7 @@ public:
    ///@{
    /// default constructor.
    explicit Presol(Timer::TYPE ttype = Timer::USER_TIME)
-      : SPxSimplifier<R>("PaPILO", ttype), postsolved(false), m_epsilon(DEFAULT_EPS_ZERO),
-        m_feastol(DEFAULT_BND_VIOL), m_opttol(DEFAULT_BND_VIOL), modifyRowsFac(1.0),
+      : SPxSimplifier<R>("PaPILO", ttype), postsolved(false), modifyRowsFac(1.0),
         m_thesense(SPxLPBase<R>::MAXIMIZE),
         m_keepbounds(false), m_result(this->OKAY)
    { ; };
@@ -255,8 +244,7 @@ public:
    Presol(const Presol& old)
       : SPxSimplifier<R>(old), m_prim(old.m_prim), m_slack(old.m_slack), m_dual(old.m_dual),
         m_redCost(old.m_redCost), m_cBasisStat(old.m_cBasisStat), m_rBasisStat(old.m_rBasisStat),
-        postsolveStorage(old.postsolveStorage), postsolved(old.postsolved), m_epsilon(old.m_epsilon),
-        m_feastol(old.m_feastol), m_opttol(old.m_opttol),
+        postsolveStorage(old.postsolveStorage), postsolved(old.postsolved),
         modifyRowsFac(old.modifyRowsFac), m_thesense(old.m_thesense),
         m_keepbounds(old.m_keepbounds), m_result(old.m_result)
    {
@@ -276,9 +264,6 @@ public:
          m_cBasisStat = rhs.m_cBasisStat;
          m_rBasisStat = rhs.m_rBasisStat;
          postsolved = rhs.postsolved;
-         m_epsilon = rhs.m_epsilon;
-         m_feastol = rhs.m_feastol;
-         m_opttol = rhs.m_opttol;
          m_thesense = rhs.m_thesense;
          m_keepbounds = rhs.m_keepbounds;
          m_result = rhs.m_result;
@@ -354,15 +339,8 @@ public:
       enableDominatedCols = value;
    }
 
-   virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, R eps, R delta,
-         Real remainingTime)
-   {
-      return simplify(lp, eps, delta, delta, remainingTime, false, 0);
-   }
-
-   virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
-         Real remainingTime,
-         bool keepbounds, uint32_t seed);
+   virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp,
+         Real remainingTime, bool keepbounds, uint32_t seed);
 
    virtual void unsimplify(const VectorBase<R>&, const VectorBase<R>&, const VectorBase<R>&,
                            const VectorBase<R>&,
@@ -543,8 +521,8 @@ void Presol<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
    }
 
    papilo::Num<R> num {};
-   num.setEpsilon(m_epsilon);
-   num.setFeasTol(m_feastol);
+   num.setEpsilon(this->epsZero());
+   num.setFeasTol(this->feastol());
    /* since PaPILO verbosity is quiet it's irrelevant what the messenger is */
    papilo::Message msg{};
    msg.setVerbosityLevel(verbosityLevel);
@@ -694,8 +672,7 @@ papilo::Problem<R> buildProblem(SPxLPBase<R>& lp)
 
 template<class R>
 typename SPxSimplifier<R>::Result
-Presol<R>::simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
-                    Real remainingTime, bool keepbounds, uint32_t seed)
+Presol<R>::simplify(SPxLPBase<R>& lp, Real remainingTime, bool keepbounds, uint32_t seed)
 {
 
    //TODO: how to use the keepbounds parameter?
@@ -710,7 +687,8 @@ Presol<R>::simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
    papilo::Problem<R> problem = buildProblem(lp);
    papilo::Presolve<R> presolve;
 
-   configurePapilo(presolve, ftol, eps, seed, remainingTime);
+   configurePapilo(presolve, this->tolerances()->floatingPointFeastol(), this->tolerances()->epsilon(),
+                   seed, remainingTime);
    MSG_INFO1((*this->spxout), (*this->spxout)
              << " --- starting PaPILO" << std::endl;
             )

@@ -684,10 +684,8 @@ bool SoPlexBase<R>::_isRefinementOver(
    int numFailedRefinements)
 {
    // terminate if tolerances are satisfied
-   primalFeasible = (boundsViolation <= this->tolerances()->feastolRational()
-                     && sideViolation <= this->tolerances()->feastolRational());
-   dualFeasible = (redCostViolation <= this->tolerances()->opttolRational()
-                   && dualViolation <= this->tolerances()->opttolRational());
+   primalFeasible = (boundsViolation <= _rationalFeastol && sideViolation <= _rationalFeastol);
+   dualFeasible = (redCostViolation <= _rationalOpttol && dualViolation <= _rationalOpttol);
 
    if(primalFeasible && dualFeasible)
    {
@@ -1363,7 +1361,8 @@ void SoPlexBase<R>::_correctDualSolution(
          }
       }
 
-      if(R(debugRedCostViolation) > _solver.opttol() || R(debugDualViolation) > _solver.opttol()
+      if(R(debugRedCostViolation) > _solver.tolerances()->floatingPointOpttol()
+            || R(debugDualViolation) > _solver.tolerances()->floatingPointOpttol()
             || debugBasicDualViolation > 1e-9)
       {
          MSG_WARNING(spxout, spxout << "Warning: floating-point dual solution with violation "
@@ -1819,7 +1818,7 @@ void SoPlexBase<R>::_performUnboundedIRStable(
 
       // because the right-hand side and all bounds (but tau's upper bound) are zero, tau should be approximately
       // zero if basic; otherwise at its upper bound 1
-      error = !(tau >= _rationalPosone || tau <= this->tolerances()->feastolRational());
+      error = !(tau >= _rationalPosone || tau <= _rationalFeastol);
       assert(!error);
 
       hasUnboundedRay = (tau >= 1);
@@ -1898,8 +1897,7 @@ void SoPlexBase<R>::_performFeasIRStable(
          assert(tau >= -realParam(SoPlexBase<R>::FEASTOL));
          assert(tau <= 1.0 + realParam(SoPlexBase<R>::FEASTOL));
 
-         error = (tau < -this->tolerances()->feastolRational()
-                  || tau > _rationalPosone + this->tolerances()->feastolRational());
+         error = (tau < -_rationalFeastol || tau > _rationalPosone + _rationalFeastol);
          withDualFarkas = (tau < _rationalPosone);
 
          if(withDualFarkas)
@@ -2158,7 +2156,7 @@ void SoPlexBase<R>::_project(SolRational& sol)
 
    for(int i = _beforeLiftCols; i < numColsRational() && sol._isDualFeasible; i++)
    {
-      if(spxAbs(Rational(maxValue * sol._redCost[i])) > this->tolerances()->opttolRational())
+      if(spxAbs(Rational(maxValue * sol._redCost[i])) > _rationalOpttol)
       {
          MSG_INFO1(spxout, spxout << "Warning: lost dual solution during project phase.\n");
          sol._isDualFeasible = false;
@@ -2669,12 +2667,12 @@ void SoPlexBase<R>::_untransformUnbounded(SolRational& sol, bool unbounded)
       _basisStatusCols.reSize(numOrigCols);
       _basisStatusRows.reSize(numOrigRows);
    }
-   else if(boolParam(SoPlexBase<R>::TESTDUALINF) && tau < this->tolerances()->feastolRational())
+   else if(boolParam(SoPlexBase<R>::TESTDUALINF) && tau < _rationalFeastol)
    {
       const Rational& alpha = sol._dual[numOrigRows];
 
       assert(sol._isDualFeasible);
-      assert(alpha <= this->tolerances()->feastolRational() - _rationalPosone);
+      assert(alpha <= _rationalFeastol - _rationalPosone);
 
       sol._isPrimalFeasible = false;
       sol._hasPrimalRay = false;
@@ -3591,8 +3589,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
          // do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used
          bool keepbounds = intParam(SoPlexBase<R>::RATIOTESTER) == SoPlexBase<R>::RATIOTESTER_BOUNDFLIPPING;
          Real remainingTime = _solver.getMaxTime() - _solver.time();
-         simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlexBase<R>::EPSILON_ZERO),
-                                realParam(SoPlexBase<R>::FPFEASTOL), realParam(SoPlexBase<R>::FPOPTTOL), remainingTime, keepbounds,
+         simplificationStatus = _simplifier->simplify(_solver, remainingTime, keepbounds,
                                 _solver.random.getSeed());
       }
 

@@ -317,8 +317,7 @@ void SoPlexBase<R>::_preprocessAndSolveReal(bool applySimplifier, volatile bool*
          keepbounds &= boolParam(SoPlexBase<R>::ROWBOUNDFLIPS);
 
       Real remainingTime = _solver.getMaxTime() - _solver.time();
-      simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlexBase<R>::EPSILON_ZERO),
-                             realParam(SoPlexBase<R>::FEASTOL), realParam(SoPlexBase<R>::OPTTOL), remainingTime, keepbounds,
+      simplificationStatus = _simplifier->simplify(_solver, remainingTime, keepbounds,
                              _solver.random.getSeed());
       _solver.changeObjOffset(_simplifier->getObjoffset() + realParam(SoPlexBase<R>::OBJ_OFFSET));
       _solver.setScalingInfo(false);
@@ -446,8 +445,10 @@ void SoPlexBase<R>::_verifySolutionReal()
    (void) getDualViolation(dualviol, sumviol);
    (void) getRedCostViolation(redcostviol, sumviol);
 
-   if(boundviol >= _solver.feastol() || rowviol >= _solver.feastol() || dualviol >= _solver.opttol()
-         || redcostviol >= _solver.opttol())
+   if(boundviol >= _solver.tolerances()->floatingPointFeastol()
+         || rowviol >= _solver.tolerances()->floatingPointFeastol()
+         || dualviol >= _solver.tolerances()->floatingPointOpttol()
+         || redcostviol >= _solver.tolerances()->floatingPointOpttol())
    {
       assert(&_solver == _realLP);
       assert(_isRealLPLoaded);

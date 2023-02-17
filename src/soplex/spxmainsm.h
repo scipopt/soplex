@@ -144,7 +144,7 @@ private:
       virtual R feastol() const
       {
          // todo change to feastol
-         return _tolerances->epsilon();
+         return _tolerances->floatingPointFeastol();
       }
       virtual R epsilon() const
       {
@@ -1350,9 +1350,6 @@ private:
    Array<DSVectorBase<R>>
                        m_dupCols;    ///< arrange duplicate columns w.r.t. their pClass values
    bool                            m_postsolved; ///< status of postsolving.
-   R                            m_epsilon;    ///< epsilon zero.
-   R                            m_feastol;    ///< primal feasibility tolerance.
-   R                            m_opttol;     ///< dual feasibility tolerance.
    DataArray<int>                  m_stat;       ///< preprocessing history.
    typename SPxLPBase<R>::SPxSense                 m_thesense;   ///< optimization sense.
    bool                            m_keepbounds;  ///< keep some bounds (for boundflipping)
@@ -1450,17 +1447,17 @@ protected:
    ///
    R epsZero() const
    {
-      return m_epsilon;
+      return this->tolerances()->epsilon();
    }
    ///
    R feastol() const
    {
-      return m_feastol;
+      return this->tolerances()->floatingPointFeastol();
    }
    ///
    R opttol() const
    {
-      return m_opttol;
+      return this->tolerances()->floatingPointOpttol();
    }
 
 public:
@@ -1472,9 +1469,6 @@ public:
    SPxMainSM(Timer::TYPE ttype = Timer::USER_TIME)
       : SPxSimplifier<R>("MainSM", ttype)
       , m_postsolved(0)
-      , m_epsilon(DEFAULT_EPS_ZERO)
-      , m_feastol(DEFAULT_BND_VIOL)
-      , m_opttol(DEFAULT_BND_VIOL)
       , m_stat(16)
       , m_thesense(SPxLPBase<R>::MAXIMIZE)
       , m_keepbounds(false)
@@ -1496,9 +1490,6 @@ public:
       , m_rIdx(old.m_rIdx)
       , m_hist(old.m_hist)
       , m_postsolved(old.m_postsolved)
-      , m_epsilon(old.m_epsilon)
-      , m_feastol(old.m_feastol)
-      , m_opttol(old.m_opttol)
       , m_stat(old.m_stat)
       , m_thesense(old.m_thesense)
       , m_keepbounds(old.m_keepbounds)
@@ -1524,9 +1515,6 @@ public:
          m_cIdx = rhs.m_cIdx;
          m_rIdx = rhs.m_rIdx;
          m_postsolved = rhs.m_postsolved;
-         m_epsilon = rhs.m_epsilon;
-         m_feastol = rhs.m_feastol;
-         m_opttol = rhs.m_opttol;
          m_stat = rhs.m_stat;
          m_thesense = rhs.m_thesense;
          m_keepbounds = rhs.m_keepbounds;
@@ -1555,15 +1543,8 @@ public:
    //------------------------------------
    //**@name LP simplification */
    ///@{
-   /// simplify SPxLPBase<R> \p lp with identical primal and dual feasibility tolerance.
-   virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, R eps, R delta,
-         Real remainingTime)
-   {
-      return simplify(lp, eps, delta, delta, remainingTime);
-   }
-   /// simplify SPxLPBase<R> \p lp with independent primal and dual feasibility tolerance.
-   virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
-         Real remainingTime,
+   /// simplify SPxLPBase<R> \p lp.
+   virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, Real remainingTime,
          bool keepbounds = false, uint32_t seed = 0);
 
    /// reconstructs an optimal solution for the unsimplified LP.

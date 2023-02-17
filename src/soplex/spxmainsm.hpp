@@ -3088,7 +3088,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
             R aij = row.value(k);
             int  j   = row.index(k);
 
-            fixedCol[k] = !(EQrel(lp.upper(j), lp.lower(j), m_epsilon));
+            fixedCol[k] = !(EQrel(lp.upper(j), lp.lower(j), this->epsZero()));
 
             lowers[k] = lp.lower(j);
             uppers[k] = lp.upper(j);
@@ -3132,7 +3132,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
             R aij   = row.value(k);
             int  j     = row.index(k);
 
-            fixedCol[k] = !(EQrel(lp.upper(j), lp.lower(j), m_epsilon));
+            fixedCol[k] = !(EQrel(lp.upper(j), lp.lower(j), this->epsZero()));
 
             lowers[k] = lp.lower(j);
             uppers[k] = lp.upper(j);
@@ -5081,8 +5081,7 @@ void SPxMainSM<R>::fixColumn(SPxLPBase<R>& lp, int j, bool correctIdx)
 }
 
 template <class R>
-typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
-      Real remainingTime,
+typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLPBase<R>& lp, Real remainingTime,
       bool keepbounds, uint32_t seed)
 {
    // transfer message handler
@@ -5116,20 +5115,6 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLPBase<R>& lp, R eps
 
    m_hist.reSize(0);
    m_postsolved = false;
-
-   if(eps < 0.0)
-      throw SPxInterfaceException("XMAISM30 Cannot use negative this->epsilon in simplify().");
-
-   if(ftol < 0.0)
-      throw SPxInterfaceException("XMAISM31 Cannot use negative feastol in simplify().");
-
-   if(otol < 0.0)
-      throw SPxInterfaceException("XMAISM32 Cannot use negative opttol in simplify().");
-
-   m_epsilon = eps;
-   m_feastol = ftol;
-   m_opttol = otol;
-
 
    MSG_INFO2((*this->spxout),
              int numRangedRows = 0;

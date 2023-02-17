@@ -618,8 +618,9 @@ void SPxSolverBase<R>::setType(Type tp)
          assert(SPxBasisBase<R>::status() == SPxBasisBase<R>::SINGULAR);
          m_status = SINGULAR;
          std::stringstream s;
-         s << "Basis is singular (numerical troubles, feastol = " << feastol() << ", opttol = " << opttol()
-           << ")";
+         s << "Basis is singular (numerical troubles, feastol = "
+           << tolerances()->floatingPointFeastol()
+           << ", opttol = " << tolerances()->floatingPointOpttol() << ")";
          throw SPxStatusException(s.str());
       }
 
@@ -1827,7 +1828,7 @@ void SPxSolverBase<R>::setType(Type tp)
       switch(stat)
       {
       case FIXED :
-         assert(EQ(this->rhs(row), this->lhs(row), feastol()));
+         assert(EQ(this->rhs(row), this->lhs(row), tolerances()->floatingPointFeastol()));
          rstat = SPxBasisBase<R>::Desc::P_FIXED;
          break;
 
@@ -2049,7 +2050,7 @@ void SPxSolverBase<R>::setType(Type tp)
          {
             // degeneracy in the dual simplex exists if there are rows with a zero dual multiplier or columns with a zero
             // reduced costs. This requirement is regardless of the objective sense.
-            if(isZero(degenvec[i], feastol()))
+            if(isZero(degenvec[i], tolerances()->floatingPointFeastol()))
                numDegenerate++;
          }
 
@@ -2071,14 +2072,14 @@ void SPxSolverBase<R>::setType(Type tp)
          {
             if(type() == LEAVE)     // dual simplex
             {
-               if(isZero(this->maxObj()[i] - degenvec[i], feastol()))
+               if(isZero(this->maxObj()[i] - degenvec[i], tolerances()->floatingPointFeastol()))
                   numDegenerate++;
             }
             else                    // primal simplex
             {
                assert(type() == ENTER);
 
-               if(isZero(degenvec[i], feastol()))
+               if(isZero(degenvec[i], tolerances()->floatingPointFeastol()))
                   numDegenerate++;
             }
          }

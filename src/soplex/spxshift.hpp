@@ -35,7 +35,7 @@ template <class R>
 void SPxSolverBase<R>::shiftFvec()
 {
 
-   /* the allowed tolerance is (rep() == COLUMN) ? feastol() : opttol() because theFvec is the primal VectorBase<R> in COLUMN
+   /* the allowed tolerance is (rep() == COLUMN) ? tolerances()->floatingPointFeastol() : tolerances()->floatingPointOpttol() because theFvec is the primal VectorBase<R> in COLUMN
     * and the dual VectorBase<R> in ROW representation; this is equivalent to entertol()
     */
    R minrandom = 10.0 * entertol();
@@ -97,7 +97,7 @@ template <class R>
 void SPxSolverBase<R>::shiftPvec()
 {
 
-   /* the allowed tolerance is (rep() == ROW) ? feastol() : opttol() because thePvec is the primal VectorBase<R> in ROW and the
+   /* the allowed tolerance is (rep() == ROW) ? tolerances()->floatingPointFeastol() : tolerances()->floatingPointOpttol() because thePvec is the primal VectorBase<R> in ROW and the
     * dual VectorBase<R> in COLUMN representation; this is equivalent to leavetol()
     */
    R minrandom = 10.0 * leavetol();

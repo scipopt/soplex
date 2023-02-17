@@ -115,24 +115,24 @@ void Tolerances::setOpttol(Real otol)
    s_opttol = otol;
 }
 
-Real Tolerances::feastolRational()
+Real Tolerances::floatingPointFeastol()
 {
-   return s_feastol_rational;
+   return s_floating_point_feastol;
 }
 
-void Tolerances::setFeastolRational(Real ftol)
+void Tolerances::setFloatingPointFeastol(Real ftol)
 {
-   s_feastol_rational = ftol;
+   s_floating_point_feastol = ftol;
 }
 
-Real Tolerances::opttolRational()
+Real Tolerances::floatingPointOpttol()
 {
-   return s_opttol_rational;
+   return s_floating_point_opttol;
 }
 
-void Tolerances::setOpttolRational(Real otol)
+void Tolerances::setFloatingPointOpttol(Real otol)
 {
-   s_opttol_rational = otol;
+   s_floating_point_opttol = otol;
 }
 // namespace soplex
 }

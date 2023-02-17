@@ -119,6 +119,7 @@ public:
    /// returns current tolerances
    const std::shared_ptr<Tolerances>& tolerances() const
    {
+      assert(this->_tolerances != nullptr);
       return this->_tolerances;
    }
 
@@ -130,6 +131,7 @@ public:
 
    R getEpsilon() const
    {
+      assert(this->_tolerances != nullptr);
       return this->_tolerances == nullptr ? R(0) : this->tolerances()->epsilon();
    }
 

@@ -79,7 +79,7 @@ void SoPlexBase<R>::_checkScaling(SPxLPBase<R>* origLP) const
 
       for(int j = 0; j < col.size(); ++j)
       {
-         if(NE(col.value(j), origLP->colVector(i).value(j), _solver.feastol()))
+         if(NE(col.value(j), origLP->colVector(i).value(j), _solver.tolerances()->floatingPointFeastol()))
          {
             MSG_INFO1(spxout, spxout << "DEBUG: scaling error in col " << i << ", row " << j
                       << ": orig " << origLP->colVector(i).value(j)
@@ -161,13 +161,14 @@ void SoPlexBase<R>::_checkBasisScaling()
             else
                error = spxAbs(result[j] - 1.0);
 
-            if(error > _solver.feastol())
+            if(error > _solver.tolerances()->floatingPointFeastol())
                MSG_INFO1(spxout, spxout << "ERROR: col " << i << " " << j << ", " << result[j] << std::endl);
 
             sumerror += error;
          }
 
-         assert(_solver.rep() == SPxSolverBase<R>::ROW || sumerror < _solver.feastol());
+         assert(_solver.rep() == SPxSolverBase<R>::ROW
+                || sumerror < _solver.tolerances()->floatingPointFeastol());
       }
    }
 
@@ -189,13 +190,13 @@ void SoPlexBase<R>::_checkBasisScaling()
          else
             error = spxAbs(result[j] - 1.0);
 
-         if(error > _solver.feastol())
+         if(error > _solver.tolerances()->floatingPointFeastol())
             MSG_INFO1(spxout, spxout << "ERROR: row " << i << " " << j << ", " << result[j] << std::endl);
 
          sumerror += error;
       }
 
-      assert(sumerror < _solver.feastol());
+      assert(sumerror < _solver.tolerances()->floatingPointFeastol());
    }
 
    if(_solver.isScaled())
@@ -245,7 +246,7 @@ void SoPlexBase<R>::_checkBasisScaling()
          {
             if(colrep)
             {
-               if(NE((*binvcol[i])[j], (*binvcol2[i])[j], _solver.feastol()))
+               if(NE((*binvcol[i])[j], (*binvcol2[i])[j], _solver.tolerances()->floatingPointFeastol()))
                {
                   MSG_INFO1(spxout, spxout << "ERROR: col " << i << " " << j << ", " << (*binvcol[i])[j] << " " <<
                             (*binvcol2[i])[j] << std::endl);
@@ -253,7 +254,7 @@ void SoPlexBase<R>::_checkBasisScaling()
                }
             }
 
-            if(NE((*binvrow[i])[j], (*binvrow2[i])[j], _solver.feastol()))
+            if(NE((*binvrow[i])[j], (*binvrow2[i])[j], _solver.tolerances()->floatingPointFeastol()))
             {
                MSG_INFO1(spxout, spxout << "ERROR: row " << i << " " << j << ", " << (*binvrow[i])[j] /
                          (*binvrow2[i])[j] << std::endl);
@@ -261,7 +262,7 @@ void SoPlexBase<R>::_checkBasisScaling()
             }
          }
 
-         assert(sumerror < _solver.feastol());
+         assert(sumerror < _solver.tolerances()->floatingPointFeastol());
       }
 
       spx_free(binvcol2);

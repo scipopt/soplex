@@ -1000,10 +1000,7 @@ void SoPlexBase<R>::_decompSimplifyAndSolve(SPxSolverBase<R>& solver, SLUFactor<
    if(_simplifier != 0)
    {
       Real remainingTime = _solver.getMaxTime() - _solver.time();
-      result = _simplifier->simplify(solver, realParam(SoPlexBase<R>::EPSILON_ZERO),
-                                     realParam(SoPlexBase<R>::FEASTOL),
-                                     realParam(SoPlexBase<R>::OPTTOL),
-                                     remainingTime);
+      result = _simplifier->simplify(solver, remainingTime);
       solver.changeObjOffset(_simplifier->getObjoffset() + realParam(SoPlexBase<R>::OBJ_OFFSET));
    }
 

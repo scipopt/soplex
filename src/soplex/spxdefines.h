@@ -317,10 +317,10 @@ private:
    Real s_feastol;
    /// optimality tolerance
    Real s_opttol;
-   /// rational feasibility tolerance
-   Real s_feastol_rational;
-   /// rational optimality tolerance
-   Real s_opttol_rational;
+   /// floating point feasibility tolerance
+   Real s_floating_point_feastol;
+   /// floating point optimality tolerance
+   Real s_floating_point_opttol;
    ///@}
 
 public:
@@ -328,44 +328,47 @@ public:
    // default constructor
    explicit Tolerances()
       : s_epsilon(DEFAULT_EPS_ZERO), s_epsilon_factorization(DEFAULT_EPS_FACTOR),
-        s_epsilon_update(DEFAULT_EPS_UPDATE), s_epsilon_pivot(DEFAULT_EPS_PIVOT)
+        s_epsilon_update(DEFAULT_EPS_UPDATE), s_epsilon_pivot(DEFAULT_EPS_PIVOT),
+        s_feastol(DEFAULT_BND_VIOL), s_opttol(DEFAULT_BND_VIOL),
+        s_floating_point_feastol(DEFAULT_BND_VIOL),
+        s_floating_point_opttol(DEFAULT_BND_VIOL)
    {}
 
    //------------------------------------
    /**@name Access / modification */
    ///@{
-   ///
+   /// global zero epsilon
    Real epsilon();
-   ///
+   /// set global zero epsilon
    void setEpsilon(Real eps);
-   ///
+   /// zero espilon used in factorization
    Real epsilonFactorization();
-   ///
+   /// set zero espilon used in factorization
    void setEpsilonFactorization(Real eps);
-   ///
+   /// zero espilon used in factorization update
    Real epsilonUpdate();
-   ///
+   /// set zero espilon used in factorization update
    void setEpsilonUpdate(Real eps);
-   ///
+   /// zero espilon used in pivot
    Real epsilonPivot();
-   ///
+   /// set zero espilon used in pivot
    void setEpsilonPivot(Real eps);
-   ///
+   /// global feasibility tolerance
    Real feastol();
-   ///
+   /// set global feasibility tolerance
    void setFeastol(Real ftol);
-   ///
+   /// global optimality tolerance
    Real opttol();
-   ///
+   /// set global optimality tolerance
    void setOpttol(Real otol);
-   ///
-   Real feastolRational();
-   ///
-   void setFeastolRational(Real ftol);
-   ///
-   Real opttolRational();
-   ///
-   void setOpttolRational(Real otol);
+   /// floating point feasibility tolerance used within the solver
+   Real floatingPointFeastol();
+   /// set floating point feasibility tolerance used within the solver
+   void setFloatingPointFeastol(Real ftol);
+   ///  floating point optimality tolerance used within the solver
+   Real floatingPointOpttol();
+   /// set floating point optimality tolerance used within the solver
+   void setFloatingPointOpttol(Real otol);
    ///@}
 };
 

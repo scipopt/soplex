@@ -58,7 +58,9 @@ bool SPxSolverBase<R>::precisionReached(R& newpricertol) const
    qualConstraintViolation(maxViolConst, sumViolConst);
 
    // is the solution good enough ?
-   bool reached = maxViolRedCost < opttol() && maxViolBounds < feastol() && maxViolConst < feastol();
+   bool reached = maxViolRedCost < tolerances()->floatingPointOpttol()
+                  && maxViolBounds < tolerances()->floatingPointFeastol()
+                  && maxViolConst < tolerances()->floatingPointFeastol();
 
    if(!reached)
    {
@@ -581,8 +583,8 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                       << ", value: " << value()
                       << ", shift: " << shift()
                       << ", epsilon: " << epsilon()
-                      << ", feastol: " << feastol()
-                      << ", opttol: " << opttol()
+                      << ", feastol: " << tolerances()->floatingPointFeastol()
+                      << ", opttol: " << tolerances()->floatingPointOpttol()
                       << std::endl
                       << "ISOLVE56 stop: " << stop
                       << ", basis status: " << static_cast<int>(SPxBasisBase<R>::status()) << " (" << static_cast<int>
@@ -907,8 +909,8 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                       << ", value: " << value()
                       << ", shift: " << shift()
                       << ", epsilon: " << epsilon()
-                      << ", feastol: " << feastol()
-                      << ", opttol: " << opttol()
+                      << ", feastol: " << tolerances()->floatingPointFeastol()
+                      << ", opttol: " << tolerances()->floatingPointOpttol()
                       << std::endl
                       << "ISOLVE57 stop: " << stop
                       << ", basis status: " << static_cast<int>(SPxBasisBase<R>::status()) << " (" << static_cast<int>
@@ -1142,8 +1144,8 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
             for(c = 0; c < rowvec.size(); ++c)
                val += rowvec.value(c) * sol[rowvec.index(c)];
 
-            if(LT(val, this->lhs(row), feastol()) ||
-                  GT(val, this->rhs(row), feastol()))
+            if(LT(val, this->lhs(row), tolerances()->floatingPointFeastol()) ||
+                  GT(val, this->rhs(row), tolerances()->floatingPointFeastol()))
             {
                // Minor rhs violations happen frequently, so print these
                // warnings only with verbose level INFO2 and higher.
@@ -1173,8 +1175,8 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
 
          for(int col = 0; col < this->nCols(); ++col)
          {
-            if(LT(sol[col], this->lower(col), feastol()) ||
-                  GT(sol[col], this->upper(col), feastol()))
+            if(LT(sol[col], this->lower(col), tolerances()->floatingPointFeastol()) ||
+                  GT(sol[col], this->upper(col), tolerances()->floatingPointFeastol()))
             {
                // Minor bound violations happen frequently, so print these
                // warnings only with verbose level INFO2 and higher.
@@ -1793,7 +1795,7 @@ bool SPxSolverBase<R>::terminate()
       // It might be even possible to use this termination value in case of
       // bound violations (shifting) but in this case it is quite difficult
       // to determine if we already reached the limit.
-      if(shift() < epsilon() && noViols(opttol() - shift()))
+      if(shift() < epsilon() && noViols(tolerances()->floatingPointOpttol() - shift()))
       {
          // SPxSense::MINIMIZE == -1, so we have sign = 1 on minimizing
          if(int(this->spxSense()) * value() <= int(this->spxSense()) * objLimit)

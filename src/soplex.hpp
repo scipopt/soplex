@@ -518,7 +518,7 @@ SoPlexBase<R>::Settings::RealParam::RealParam()
       "working tolerance for feasibility in floating-point solver during iterative refinement";
    lower[SoPlexBase<R>::FPFEASTOL] = 0;
    upper[SoPlexBase<R>::FPFEASTOL] = 1.0;
-   defaultValue[SoPlexBase<R>::FPFEASTOL] = 1e-6;
+   defaultValue[SoPlexBase<R>::FPFEASTOL] = 1e-9;
 
    // working tolerance for optimality in floating-point solver during iterative refinement
    name[SoPlexBase<R>::FPOPTTOL] = "fpopttol";
@@ -526,7 +526,7 @@ SoPlexBase<R>::Settings::RealParam::RealParam()
       "working tolerance for optimality in floating-point solver during iterative refinement";
    lower[SoPlexBase<R>::FPOPTTOL] = 0;
    upper[SoPlexBase<R>::FPOPTTOL] = 1.0;
-   defaultValue[SoPlexBase<R>::FPOPTTOL] = 1e-6;
+   defaultValue[SoPlexBase<R>::FPOPTTOL] = 1e-9;
 
    // maximum increase of scaling factors between refinements
    name[SoPlexBase<R>::MAXSCALEINCR] = "maxscaleincr";
@@ -4052,17 +4052,13 @@ bool SoPlexBase<R>::getRedCostViolationRational(Rational& maxviol, Rational& sum
       // basis must not necessarily hold exactly, even within tolerances; hence the following assertions are relaxed by
       // a factor of two
       assert(!_hasBasis || basisColStatus(c) != SPxSolverBase<R>::ON_LOWER
-             || spxAbs(Rational(_solRational._primal[c] - lowerRational(c))) <= 2 *
-             this->tolerances()->feastolRational());
+             || spxAbs(Rational(_solRational._primal[c] - lowerRational(c))) <= 2 * _rationalFeastol);
       assert(!_hasBasis || basisColStatus(c) != SPxSolverBase<R>::ON_UPPER
-             || spxAbs(Rational(_solRational._primal[c] - upperRational(c))) <= 2 *
-             this->tolerances()->feastolRational());
+             || spxAbs(Rational(_solRational._primal[c] - upperRational(c))) <= 2 * _rationalFeastol);
       assert(!_hasBasis || basisColStatus(c) != SPxSolverBase<R>::FIXED
-             || spxAbs(Rational(_solRational._primal[c] - lowerRational(c))) <= 2 *
-             this->tolerances()->feastolRational());
+             || spxAbs(Rational(_solRational._primal[c] - lowerRational(c))) <= 2 * _rationalFeastol);
       assert(!_hasBasis || basisColStatus(c) != SPxSolverBase<R>::FIXED
-             || spxAbs(Rational(_solRational._primal[c] - upperRational(c))) <= 2 *
-             this->tolerances()->feastolRational());
+             || spxAbs(Rational(_solRational._primal[c] - upperRational(c))) <= 2 * _rationalFeastol);
 
       if(intParam(SoPlexBase<R>::OBJSENSE) == OBJSENSE_MINIMIZE)
       {
@@ -4155,21 +4151,17 @@ bool SoPlexBase<R>::getDualViolationRational(Rational& maxviol, Rational& sumvio
       // basis must not necessarily hold exactly, even within tolerances; hence the following assertions are relaxed by
       // a factor of two
       assert(!_hasBasis || basisRowStatus(r) != SPxSolverBase<R>::ON_LOWER
-             || spxAbs(Rational(_solRational._slacks[r] - lhsRational(r))) <= 2 *
-             this->tolerances()->feastolRational());
+             || spxAbs(Rational(_solRational._slacks[r] - lhsRational(r))) <= 2 * _rationalFeastol);
       assert(!_hasBasis || basisRowStatus(r) != SPxSolverBase<R>::ON_UPPER
-             || spxAbs(Rational(_solRational._slacks[r] - rhsRational(r))) <= 2 *
-             this->tolerances()->feastolRational());
+             || spxAbs(Rational(_solRational._slacks[r] - rhsRational(r))) <= 2 * _rationalFeastol);
       assert(!_hasBasis || basisRowStatus(r) != SPxSolverBase<R>::FIXED
-             || spxAbs(Rational(_solRational._slacks[r] - lhsRational(r))) <= 2 *
-             this->tolerances()->feastolRational());
+             || spxAbs(Rational(_solRational._slacks[r] - lhsRational(r))) <= 2 * _rationalFeastol);
       assert(!_hasBasis || basisRowStatus(r) != SPxSolverBase<R>::FIXED
-             || spxAbs(Rational(_solRational._slacks[r] - rhsRational(r))) <= 2 *
-             this->tolerances()->feastolRational());
+             || spxAbs(Rational(_solRational._slacks[r] - rhsRational(r))) <= 2 * _rationalFeastol);
 
       if(intParam(SoPlexBase<R>::OBJSENSE) == OBJSENSE_MINIMIZE)
       {
-         if(_solRational._slacks[r] < rhsRational(r) - this->tolerances()->feastolRational() && dual[r] < 0)
+         if(_solRational._slacks[r] < rhsRational(r) - _rationalFeastol && dual[r] < 0)
          {
             sumviol += -dual[r];
 
@@ -4185,7 +4177,7 @@ bool SoPlexBase<R>::getDualViolationRational(Rational& maxviol, Rational& sumvio
             }
          }
 
-         if(_solRational._slacks[r] > lhsRational(r) + this->tolerances()->feastolRational() && dual[r] > 0)
+         if(_solRational._slacks[r] > lhsRational(r) + _rationalFeastol && dual[r] > 0)
          {
             sumviol += dual[r];
 
@@ -4203,7 +4195,7 @@ bool SoPlexBase<R>::getDualViolationRational(Rational& maxviol, Rational& sumvio
       }
       else
       {
-         if(_solRational._slacks[r] < rhsRational(r) - this->tolerances()->feastolRational() && dual[r] > 0)
+         if(_solRational._slacks[r] < rhsRational(r) - _rationalFeastol && dual[r] > 0)
          {
             sumviol += dual[r];
 
@@ -4219,7 +4211,7 @@ bool SoPlexBase<R>::getDualViolationRational(Rational& maxviol, Rational& sumvio
             }
          }
 
-         if(_solRational._slacks[r] > lhsRational(r) + this->tolerances()->feastolRational() && dual[r] < 0)
+         if(_solRational._slacks[r] > lhsRational(r) + _rationalFeastol && dual[r] < 0)
          {
             sumviol += -dual[r];
 
@@ -6387,14 +6379,14 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
       {
          MSG_WARNING(spxout, spxout << "Cannot set feasibility tolerance to small value " << value <<
                      " without GMP - using " << DEFAULT_EPS_PIVOT << ".\n");
+         _rationalFeastol = DEFAULT_EPS_PIVOT;
          this->_tolerances->setFeastol(DEFAULT_EPS_PIVOT);
-         this->_tolerances->setFeastolRational(DEFAULT_EPS_PIVOT);
          break;
       }
 
 #endif
+      _rationalFeastol = value;
       this->_tolerances->setFeastol(value);
-      this->_tolerances->setFeastolRational(value);
       break;
 
    // dual feasibility tolerance; passed to the floating point solver only when calling solve()
@@ -6404,14 +6396,14 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
       {
          MSG_WARNING(spxout, spxout << "Cannot set optimality tolerance to small value " << value <<
                      " without GMP - using " << DEFAULT_EPS_PIVOT << ".\n");
+         _rationalOpttol = DEFAULT_EPS_PIVOT;
          this->_tolerances->setOpttol(DEFAULT_EPS_PIVOT);
-         this->_tolerances->setOpttolRational(DEFAULT_EPS_PIVOT);
          break;
       }
 
 #endif
+      _rationalOpttol = value;
       this->_tolerances->setOpttol(value);
-      this->_tolerances->setOpttolRational(value);
       break;
 
    // general zero tolerance
@@ -6467,12 +6459,12 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
 
    // working tolerance for feasibility in floating-point solver
    case SoPlexBase<R>::FPFEASTOL:
-      this->_tolerances->setFeastol(value);
+      this->_tolerances->setFloatingPointFeastol(value);
       break;
 
    // working tolerance for optimality in floating-point solver
    case SoPlexBase<R>::FPOPTTOL:
-      this->_tolerances->setOpttol(value);
+      this->_tolerances->setFloatingPointOpttol(value);
       break;
 
    // maximum increase of scaling factors between refinements
@@ -8176,11 +8168,11 @@ void SoPlexBase<R>::_solveRealLPAndRecordStatistics(volatile bool* interrupt)
    // ensure that tolerances are not too small
    R mintol = 1e4 * _solver.epsilon();
 
-   if(this->tolerances()->feastol() < mintol)
-      this->tolerances()->setFeastol(Real(mintol));
+   if(this->tolerances()->floatingPointFeastol() < mintol)
+      this->tolerances()->setFloatingPointFeastol(Real(mintol));
 
-   if(this->tolerances()->opttol() < mintol)
-      this->tolerances()->setOpttol(Real(mintol));
+   if(this->tolerances()->floatingPointOpttol() < mintol)
+      this->tolerances()->setFloatingPointOpttol(Real(mintol));
 
    // set correct representation
    if((intParam(SoPlexBase<R>::REPRESENTATION) == SoPlexBase<R>::REPRESENTATION_COLUMN
@@ -9661,20 +9653,28 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::optimize(volatile bool* interru
            || (intParam(SoPlexBase<R>::SOLVEMODE) == SOLVEMODE_AUTO
                && realParam(SoPlexBase<R>::FEASTOL) >= 1e-9 && realParam(SoPlexBase<R>::OPTTOL) >= 1e-9))
    {
+      // the only tolerances used are the ones for the floating-point solver, so set them to the global tolerances
+      this->tolerances()->setFloatingPointFeastol(realParam(SoPlexBase<R>::FEASTOL));
+      this->tolerances()->setFloatingPointOpttol(realParam(SoPlexBase<R>::OPTTOL));
+
       // ensure that tolerances are reasonable for the floating-point solver
       // todo: refactor to take into account epsilon value instead
-      if(this->tolerances()->feastol() < _currentSettings->realParam.lower[SoPlexBase<R>::FPFEASTOL])
+      if(this->tolerances()->floatingPointFeastol() <
+            _currentSettings->realParam.lower[SoPlexBase<R>::FPFEASTOL])
       {
          MSG_WARNING(spxout, spxout << "Cannot call floating-point solver with feasibility tolerance below "
                      << _currentSettings->realParam.lower[SoPlexBase<R>::FPFEASTOL] << " - relaxing tolerance\n");
-         this->_tolerances->setFeastol(_currentSettings->realParam.lower[SoPlexBase<R>::FPFEASTOL]);
+         this->_tolerances->setFloatingPointFeastol(
+            _currentSettings->realParam.lower[SoPlexBase<R>::FPFEASTOL]);
       }
 
-      if(this->tolerances()->opttol() < _currentSettings->realParam.lower[SoPlexBase<R>::FPOPTTOL])
+      if(this->tolerances()->floatingPointOpttol() <
+            _currentSettings->realParam.lower[SoPlexBase<R>::FPOPTTOL])
       {
          MSG_WARNING(spxout, spxout << "Cannot call floating-point solver with optimality tolerance below "
                      << _currentSettings->realParam.lower[SoPlexBase<R>::FPOPTTOL] << " - relaxing tolerance\n");
-         this->_tolerances->setOpttol(_currentSettings->realParam.lower[SoPlexBase<R>::FPOPTTOL]);
+         this->_tolerances->setFloatingPointOpttol(
+            _currentSettings->realParam.lower[SoPlexBase<R>::FPOPTTOL]);
       }
 
       _solver.setComputeDegenFlag(boolParam(COMPUTEDEGEN));
