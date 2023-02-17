@@ -34,6 +34,9 @@ bool SPxHybridPR<R>::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
+   if(this->_tolerances == nullptr)
+      return MSGinconsistent("SPxHybridPR");
+
    if(this->thesolver != 0 &&
          (this->thesolver != steep.solver() ||
           this->thesolver != devex.solver() ||
@@ -68,11 +71,11 @@ void SPxHybridPR<R>::clear()
 }
 
 template <class R>
-void SPxHybridPR<R>::setEpsilon(R eps)
+void SPxHybridPR<R>::setPricingTolerance(R tol)
 {
-   steep.setEpsilon(eps);
-   devex.setEpsilon(eps);
-   parmult.setEpsilon(eps);
+   steep.setPricingTolerance(tol);
+   devex.setPricingTolerance(tol);
+   parmult.setPricingTolerance(tol);
 }
 
 template <class R>

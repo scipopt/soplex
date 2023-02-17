@@ -147,6 +147,7 @@ void SPxSolverBase<R>::setPricer(SPxPricer<R>* x, const bool destroy)
       thepricer->clear();
 
    thepricer = x;
+   thepricer->setTolerances(this->tolerances());
 
    freePricer = destroy;
 }
@@ -173,6 +174,8 @@ void SPxSolverBase<R>::setTester(SPxRatioTester<R>* x, const bool destroy)
          theratiotester->clear();
    }
 
+   theratiotester->setTolerances(this->tolerances());
+
    freeRatioTester = destroy;
 }
 
@@ -185,10 +188,13 @@ void SPxSolverBase<R>::setStarter(SPxStarter<R>* x, const bool destroy)
    if(freeStarter)
    {
       delete thestarter;
-      thestarter = 0;
+      thestarter = nullptr;
    }
 
    thestarter = x;
+
+   if(thestarter != nullptr)
+      thestarter->setTolerances(this->tolerances());
 
    freeStarter = destroy;
 }
@@ -227,10 +233,6 @@ void SPxSolverBase<R>::setType(Type tp)
    template <class R>
    void SPxSolverBase<R>::initRep(Representation p_rep)
    {
-
-      R tmpfeastol = feastol();
-      R tmpopttol = opttol();
-
       theRep = p_rep;
 
       if(theRep == COLUMN)
@@ -272,9 +274,6 @@ void SPxSolverBase<R>::setType(Type tp)
       reDim();
 
       forceRecompNonbasicValue();
-
-      setFeastol(tmpfeastol);
-      setOpttol(tmpopttol);
 
       SPxBasisBase<R>::setRep();
 
@@ -619,8 +618,9 @@ void SPxSolverBase<R>::setType(Type tp)
          assert(SPxBasisBase<R>::status() == SPxBasisBase<R>::SINGULAR);
          m_status = SINGULAR;
          std::stringstream s;
-         s << "Basis is singular (numerical troubles, feastol = " << feastol() << ", opttol = " << opttol()
-           << ")";
+         s << "Basis is singular (numerical troubles, feastol = "
+           << tolerances()->floatingPointFeastol()
+           << ", opttol = " << tolerances()->floatingPointOpttol() << ")";
          throw SPxStatusException(s.str());
       }
 
@@ -842,7 +842,7 @@ void SPxSolverBase<R>::setType(Type tp)
                   break;
 
                case SPxBasisBase<R>::Desc::P_FIXED :
-                  assert(EQ(SPxLPBase<R>::lower(i), SPxLPBase<R>::upper(i)));
+                  assert(EQ(SPxLPBase<R>::lower(i), SPxLPBase<R>::upper(i), this->epsilon()));
                   val += this->maxObj(i) * SPxLPBase<R>::lower(i);
                   break;
 
@@ -864,7 +864,7 @@ void SPxSolverBase<R>::setType(Type tp)
                   break;
 
                case SPxBasisBase<R>::Desc::P_FIXED :
-                  assert(EQ(SPxLPBase<R>::lhs(i), SPxLPBase<R>::rhs(i)));
+                  assert(EQ(SPxLPBase<R>::lhs(i), SPxLPBase<R>::rhs(i), this->epsilon()));
                   val += this->maxRowObj(i) * SPxLPBase<R>::lhs(i);
                   break;
 
@@ -890,7 +890,7 @@ void SPxSolverBase<R>::setType(Type tp)
                   break;
 
                case SPxBasisBase<R>::Desc::P_FIXED :
-                  assert(EQ(theLCbound[i], theUCbound[i]));
+                  assert(EQ(theLCbound[i], theUCbound[i], this->epsilon()));
                   val += this->maxObj(i) * theLCbound[i];
                   break;
 
@@ -912,7 +912,7 @@ void SPxSolverBase<R>::setType(Type tp)
                   break;
 
                case SPxBasisBase<R>::Desc::P_FIXED :
-                  assert(EQ(theLRbound[i], theURbound[i]));
+                  assert(EQ(theLRbound[i], theURbound[i], this->epsilon()));
                   val += this->maxRowObj(i) * theURbound[i];
                   break;
 
@@ -1035,57 +1035,6 @@ void SPxSolverBase<R>::setType(Type tp)
       return m_nonbasicValueUpToDate;
    }
 
-
-
-   template <class R>
-   void SPxSolverBase<R>::setFeastol(R d)
-   {
-
-      if(d <= 0.0)
-         throw SPxInterfaceException("XSOLVE30 Cannot set feastol less than or equal to zero.");
-
-      if(theRep == COLUMN)
-         m_entertol = d;
-      else
-         m_leavetol = d;
-   }
-
-   template <class R>
-   void SPxSolverBase<R>::setOpttol(R d)
-   {
-
-      if(d <= 0.0)
-         throw SPxInterfaceException("XSOLVE31 Cannot set opttol less than or equal to zero.");
-
-      if(theRep == COLUMN)
-         m_leavetol = d;
-      else
-         m_entertol = d;
-   }
-
-   template <class R>
-   void SPxSolverBase<R>::setDelta(R d)
-   {
-
-      if(d <= 0.0)
-         throw SPxInterfaceException("XSOLVE32 Cannot set delta less than or equal to zero.");
-
-      m_entertol = d;
-      m_leavetol = d;
-   }
-
-   // set parameter \p epsilon for semi-sparse primal, dual and pricing vectors
-   template <class R>
-   void SPxSolverBase<R>::setEpsilon(R d)
-   {
-      if(d <= R(0.0))
-         throw SPxInterfaceException("XSOLVE33 Cannot set epsilon less than or equal to zero.");
-
-      primVec.delta().setEpsilon(d);
-      dualVec.delta().setEpsilon(d);
-      addVec.delta().setEpsilon(d);
-   }
-
    template <class R>
    void SPxSolverBase<R>::hyperPricing(bool h)
    {
@@ -1124,6 +1073,8 @@ void SPxSolverBase<R>::setType(Type tp)
       , m_pricingViolCo(0.0)
       , m_pricingViolCoUpToDate(false)
       , m_numViol(0)
+      , entertolscale(1.0)
+      , leavetolscale(1.0)
       , theShift(0)
       , m_maxCycle(100)
       , m_numCycle(0)
@@ -1144,9 +1095,9 @@ void SPxSolverBase<R>::setType(Type tp)
       , fullPerturbation(false)
       , printBasisMetric(0)
       , unitVecs(0)
-      , primVec(0, Param::epsilon())
-      , dualVec(0, Param::epsilon())
-      , addVec(0, Param::epsilon())
+      , primVec(0)
+      , dualVec(0)
+      , addVec(0)
       , thepricer(0)
       , theratiotester(0)
       , thestarter(0)
@@ -1180,8 +1131,6 @@ void SPxSolverBase<R>::setType(Type tp)
       multTimeFull = TimerFactory::createTimer(timerType);
       multTimeColwise = TimerFactory::createTimer(timerType);
       multTimeUnsetup = TimerFactory::createTimer(timerType);
-
-      setDelta(DEFAULT_BND_VIOL);
 
       this->theLP = this;
       initRep(p_rep);
@@ -1257,8 +1206,8 @@ void SPxSolverBase<R>::setType(Type tp)
          m_pricingViolCo = base.m_pricingViolCo;
          m_pricingViolCoUpToDate = base.m_pricingViolCoUpToDate;
          m_numViol = base.m_numViol;
-         m_entertol = base.m_entertol;
-         m_leavetol = base.m_leavetol;
+         entertolscale = base.entertolscale;
+         leavetolscale = base.leavetolscale;
          theShift = base.theShift;
          lastShift = base.lastShift;
          m_maxCycle = base.m_maxCycle;
@@ -1460,8 +1409,8 @@ void SPxSolverBase<R>::setType(Type tp)
       , m_pricingViolCo(base.m_pricingViolCo)
       , m_pricingViolCoUpToDate(base.m_pricingViolCoUpToDate)
       , m_numViol(base.m_numViol)
-      , m_entertol(base.m_entertol)
-      , m_leavetol(base.m_leavetol)
+      , entertolscale(base.entertolscale)
+      , leavetolscale(base.leavetolscale)
       , theShift(base.theShift)
       , lastShift(base.lastShift)
       , m_maxCycle(base.m_maxCycle)
@@ -1631,13 +1580,13 @@ void SPxSolverBase<R>::setType(Type tp)
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
-      if(epsilon() < 0)
+      if(epsilon() < 0 || tolerances() == nullptr)
          return MSGinconsistent("SPxSolverBase");
 
-      if(primVec.delta().getEpsilon() != dualVec.delta().getEpsilon())
+      if(primVec.delta().tolerances() != dualVec.delta().tolerances())
          return MSGinconsistent("SPxSolverBase");
 
-      if(dualVec.delta().getEpsilon() != addVec.delta().getEpsilon())
+      if(dualVec.delta().tolerances() != addVec.delta().tolerances())
          return MSGinconsistent("SPxSolverBase");
 
       if(unitVecs.size() < SPxLPBase<R>::nCols() || unitVecs.size() < SPxLPBase<R>::nRows())
@@ -1690,7 +1639,7 @@ void SPxSolverBase<R>::setType(Type tp)
          if(thecovectors !=
                reinterpret_cast<const SVSetBase<R> *>(static_cast<const LPRowSetBase<R>*>(this))
                || thevectors !=
-               reinterpret_cast<const SVSetBase<R> *>(static_cast<const LPColSet*>(this))
+               reinterpret_cast<const SVSetBase<R> *>(static_cast<const LPColSetBase<R>*>(this))
                || theFrhs != &primRhs ||
                theFvec != &primVec ||
                theCoPrhs != &dualRhs ||
@@ -1707,7 +1656,7 @@ void SPxSolverBase<R>::setType(Type tp)
       else
       {
          if(thecovectors
-               != reinterpret_cast<const SVSetBase<R> *>(static_cast<const LPColSet*>(this))
+               != reinterpret_cast<const SVSetBase<R> *>(static_cast<const LPColSetBase<R>*>(this))
                || thevectors
                != reinterpret_cast<const SVSetBase<R> *>(static_cast<const LPRowSetBase<R>*>(this))
                || theFrhs != &dualRhs ||
@@ -1879,7 +1828,7 @@ void SPxSolverBase<R>::setType(Type tp)
       switch(stat)
       {
       case FIXED :
-         assert(EQ(this->rhs(row), this->lhs(row), feastol()));
+         assert(EQ(this->rhs(row), this->lhs(row), tolerances()->floatingPointFeastol()));
          rstat = SPxBasisBase<R>::Desc::P_FIXED;
          break;
 
@@ -2101,7 +2050,7 @@ void SPxSolverBase<R>::setType(Type tp)
          {
             // degeneracy in the dual simplex exists if there are rows with a zero dual multiplier or columns with a zero
             // reduced costs. This requirement is regardless of the objective sense.
-            if(isZero(degenvec[i], feastol()))
+            if(isZero(degenvec[i], tolerances()->floatingPointFeastol()))
                numDegenerate++;
          }
 
@@ -2123,14 +2072,14 @@ void SPxSolverBase<R>::setType(Type tp)
          {
             if(type() == LEAVE)     // dual simplex
             {
-               if(isZero(this->maxObj()[i] - degenvec[i], feastol()))
+               if(isZero(this->maxObj()[i] - degenvec[i], tolerances()->floatingPointFeastol()))
                   numDegenerate++;
             }
             else                    // primal simplex
             {
                assert(type() == ENTER);
 
-               if(isZero(degenvec[i], feastol()))
+               if(isZero(degenvec[i], tolerances()->floatingPointFeastol()))
                   numDegenerate++;
             }
          }

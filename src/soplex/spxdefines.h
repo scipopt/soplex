@@ -174,7 +174,7 @@ extern bool msginconsistent(const char* name, const char* file, int line);
 #define MSGinconsistent(name) msginconsistent(name, __FILE__, __LINE__)
 
 #if defined(SOPLEX_DEBUG)
-// print output in any case, regardless of Param::verbose():
+// print output in any case, regardless of _tolerances->verbose():
 #define MSG_DEBUG(x) { x; }
 #else
 #define MSG_DEBUG(x) /**/
@@ -298,7 +298,7 @@ typedef double Real;
 
 THREADLOCAL extern const Real infinity;
 
-class Param
+class Tolerances
 {
 private:
 
@@ -306,36 +306,69 @@ private:
    /**@name Data */
    ///@{
    /// default allowed additive zero: 1.0 + EPS_ZERO == 1.0
-   THREADLOCAL static Real s_epsilon;
+   Real s_epsilon;
    /// epsilon for factorization
-   THREADLOCAL static Real s_epsilon_factorization;
+   Real s_epsilon_factorization;
    /// epsilon for factorization update
-   THREADLOCAL static Real s_epsilon_update;
+   Real s_epsilon_update;
    /// epsilon for pivot zero tolerance in factorization
-   THREADLOCAL static Real s_epsilon_pivot;
+   Real s_epsilon_pivot;
+   /// feasibility tolerance
+   Real s_feastol;
+   /// optimality tolerance
+   Real s_opttol;
+   /// floating point feasibility tolerance
+   Real s_floating_point_feastol;
+   /// floating point optimality tolerance
+   Real s_floating_point_opttol;
    ///@}
 
 public:
 
+   // default constructor
+   explicit Tolerances()
+      : s_epsilon(DEFAULT_EPS_ZERO), s_epsilon_factorization(DEFAULT_EPS_FACTOR),
+        s_epsilon_update(DEFAULT_EPS_UPDATE), s_epsilon_pivot(DEFAULT_EPS_PIVOT),
+        s_feastol(DEFAULT_BND_VIOL), s_opttol(DEFAULT_BND_VIOL),
+        s_floating_point_feastol(DEFAULT_BND_VIOL),
+        s_floating_point_opttol(DEFAULT_BND_VIOL)
+   {}
+
    //------------------------------------
    /**@name Access / modification */
    ///@{
-   ///
-   static Real epsilon();
-   ///
-   static void setEpsilon(Real eps);
-   ///
-   static Real epsilonFactorization();
-   ///
-   static void setEpsilonFactorization(Real eps);
-   ///
-   static Real epsilonUpdate();
-   ///
-   static void setEpsilonUpdate(Real eps);
-   ///
-   static Real epsilonPivot();
-   ///
-   static void setEpsilonPivot(Real eps);
+   /// global zero epsilon
+   Real epsilon();
+   /// set global zero epsilon
+   void setEpsilon(Real eps);
+   /// zero espilon used in factorization
+   Real epsilonFactorization();
+   /// set zero espilon used in factorization
+   void setEpsilonFactorization(Real eps);
+   /// zero espilon used in factorization update
+   Real epsilonUpdate();
+   /// set zero espilon used in factorization update
+   void setEpsilonUpdate(Real eps);
+   /// zero espilon used in pivot
+   Real epsilonPivot();
+   /// set zero espilon used in pivot
+   void setEpsilonPivot(Real eps);
+   /// global feasibility tolerance
+   Real feastol();
+   /// set global feasibility tolerance
+   void setFeastol(Real ftol);
+   /// global optimality tolerance
+   Real opttol();
+   /// set global optimality tolerance
+   void setOpttol(Real otol);
+   /// floating point feasibility tolerance used within the solver
+   Real floatingPointFeastol();
+   /// set floating point feasibility tolerance used within the solver
+   void setFloatingPointFeastol(Real ftol);
+   ///  floating point optimality tolerance used within the solver
+   Real floatingPointOpttol();
+   /// set floating point optimality tolerance used within the solver
+   void setFloatingPointOpttol(Real otol);
    ///@}
 };
 

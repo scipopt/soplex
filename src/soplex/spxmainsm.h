@@ -91,23 +91,25 @@ private:
       /// number of rows
       int nRows;
       /// 0-epsilon of this poststep
-      R m_eps;
+      std::shared_ptr<Tolerances> _tolerances;
 
    public:
       /// constructor.
-      PostStep(const char* p_name, int nR = 0, int nC = 0, R ftol = 1e-6)
+      PostStep(const char* p_name, std::shared_ptr<Tolerances> tols, int nR = 0, int nC = 0)
          : m_name(p_name)
          , nCols(nC)
          , nRows(nR)
-         , m_eps(ftol)
-      {}
+      {
+         _tolerances = tols;
+      }
       /// copy constructor.
       PostStep(const PostStep& old)
          : m_name(old.m_name)
          , nCols(old.nCols)
          , nRows(old.nRows)
-         , m_eps(old.m_eps)
-      {}
+      {
+         _tolerances = old._tolerances;
+      }
       /// assignment operator
       PostStep& operator=(const PostStep& /*rhs*/)
       {
@@ -139,9 +141,14 @@ private:
       virtual bool checkBasisDim(DataArray<typename SPxSolverBase<R>::VarStatus> rows,
                                  DataArray<typename SPxSolverBase<R>::VarStatus> cols) const;
 
-      virtual R eps() const
+      virtual R feastol() const
       {
-         return m_eps;
+         // todo change to feastol
+         return _tolerances->floatingPointFeastol();
+      }
+      virtual R epsilon() const
+      {
+         return _tolerances->epsilon();
       }
    };
 
@@ -156,8 +163,8 @@ private:
 
    public:
       ///
-      RowObjPS(const SPxLPBase<R>& lp, int _i, int _j, R m_epsilon)
-         : PostStep("RowObj", lp.nRows(), lp.nCols(), m_epsilon)
+      RowObjPS(const SPxLPBase<R>& lp, int _i, int _j, std::shared_ptr<Tolerances> tols)
+         : PostStep("RowObj", tols, lp.nRows(), lp.nCols())
          , m_i(_i)
          , m_j(_j)
       {}
@@ -202,8 +209,8 @@ private:
 
    public:
       ///
-      FreeConstraintPS(const SPxLPBase<R>& lp, int _i, R m_epsilon)
-         : PostStep("FreeConstraint", lp.nRows(), lp.nCols(), m_epsilon)
+      FreeConstraintPS(const SPxLPBase<R>& lp, int _i, std::shared_ptr<Tolerances> tols)
+         : PostStep("FreeConstraint", tols, lp.nRows(), lp.nCols())
          , m_i(_i)
          , m_old_i(lp.nRows() - 1)
          , m_row(lp.rowVector(_i))
@@ -253,8 +260,8 @@ private:
 
    public:
       ///
-      EmptyConstraintPS(const SPxLPBase<R>& lp, int _i, R m_epsilon)
-         : PostStep("EmptyConstraint", lp.nRows(), lp.nCols(), m_epsilon)
+      EmptyConstraintPS(const SPxLPBase<R>& lp, int _i, std::shared_ptr<Tolerances> tols)
+         : PostStep("EmptyConstraint", tols, lp.nRows(), lp.nCols())
          , m_i(_i)
          , m_old_i(lp.nRows() - 1)
          , m_row_obj(lp.rowObj(_i))
@@ -314,8 +321,8 @@ private:
    public:
       ///
       RowSingletonPS(const SPxLPBase<R>& lp, int _i, int _j, bool strictLo, bool strictUp,
-                     R newLo, R newUp, R oldLo, R oldUp, R m_epsilon)
-         : PostStep("RowSingleton", lp.nRows(), lp.nCols(), m_epsilon)
+                     R newLo, R newUp, R oldLo, R oldUp, std::shared_ptr<Tolerances> tols)
+         : PostStep("RowSingleton", tols, lp.nRows(), lp.nCols())
          , m_i(_i)
          , m_old_i(lp.nRows() - 1)
          , m_j(_j)
@@ -398,8 +405,8 @@ private:
       ///
       ForceConstraintPS(const SPxLPBase<R>& lp, int _i, bool lhsFixed,
                         DataArray<bool>& fixCols,
-                        Array<R>& lo, Array<R>& up, R m_epsilon)
-         : PostStep("ForceConstraint", lp.nRows(), lp.nCols(), m_epsilon)
+                        Array<R>& lo, Array<R>& up, std::shared_ptr<Tolerances> tols)
+         : PostStep("ForceConstraint", tols, lp.nRows(), lp.nCols())
          , m_i(_i)
          , m_old_i(lp.nRows() - 1)
          , m_lRhs(lhsFixed ? lp.lhs(_i) : lp.rhs(_i))
@@ -485,8 +492,8 @@ private:
    public:
       ///
       FixVariablePS(const SPxLPBase<R>& lp, SPxMainSM& simplifier, int _j, const R val,
-                    R m_epsilon, bool correctIdx = true)
-         : PostStep("FixVariable", lp.nRows(), lp.nCols(), m_epsilon)
+                    std::shared_ptr<Tolerances> tols, bool correctIdx = true)
+         : PostStep("FixVariable", tols, lp.nRows(), lp.nCols())
          , m_j(_j)
          , m_old_j(lp.nCols() - 1)
          , m_val(val)
@@ -543,15 +550,15 @@ private:
 
    public:
       ///
-      FixBoundsPS(const SPxLPBase<R>& lp, int j, R val, R m_epsilon)
-         : PostStep("FixBounds", lp.nRows(), lp.nCols(), m_epsilon)
+      FixBoundsPS(const SPxLPBase<R>& lp, int j, R val, std::shared_ptr<Tolerances> tols)
+         : PostStep("FixBounds", tols, lp.nRows(), lp.nCols())
          , m_j(j)
       {
-         if(EQrel(lp.lower(j), lp.upper(j), this->eps()))
+         if(EQrel(lp.lower(j), lp.upper(j), this->feastol()))
             m_status = SPxSolverBase<R>::FIXED;
-         else if(EQrel(val, lp.lower(j), this->eps()))
+         else if(EQrel(val, lp.lower(j), this->feastol()))
             m_status = SPxSolverBase<R>::ON_LOWER;
-         else if(EQrel(val, lp.upper(j), this->eps()))
+         else if(EQrel(val, lp.upper(j), this->feastol()))
             m_status = SPxSolverBase<R>::ON_UPPER;
          else if(lp.lower(j) <= R(-infinity) && lp.upper(j) >= R(infinity))
             m_status = SPxSolverBase<R>::ZERO;
@@ -610,8 +617,8 @@ private:
    public:
       ///
       FreeZeroObjVariablePS(const SPxLPBase<R>& lp, int _j, bool loFree,
-                            DSVectorBase<R> col_idx_sorted, R m_epsilon)
-         : PostStep("FreeZeroObjVariable", lp.nRows(), lp.nCols(), m_epsilon)
+                            DSVectorBase<R> col_idx_sorted, std::shared_ptr<Tolerances> tols)
+         : PostStep("FreeZeroObjVariable", tols, lp.nRows(), lp.nCols())
          , m_j(_j)
          , m_old_j(lp.nCols() - 1)
          , m_old_i(lp.nRows() - 1)
@@ -693,8 +700,9 @@ private:
 
    public:
       ///
-      ZeroObjColSingletonPS(const SPxLPBase<R>& lp, const SPxMainSM&, int _j, int _i, R m_epsilon)
-         : PostStep("ZeroObjColSingleton", lp.nRows(), lp.nCols(), m_epsilon)
+      ZeroObjColSingletonPS(const SPxLPBase<R>& lp, const SPxMainSM&, int _j, int _i,
+                            std::shared_ptr<Tolerances> tols)
+         : PostStep("ZeroObjColSingleton", tols, lp.nRows(), lp.nCols())
          , m_j(_j)
          , m_i(_i)
          , m_old_j(lp.nCols() - 1)
@@ -759,16 +767,16 @@ private:
    public:
       ///
       FreeColSingletonPS(const SPxLPBase<R>& lp, SPxMainSM& simplifier, int _j, int _i,
-                         R slackVal, R m_epsilon)
-         : PostStep("FreeColSingleton", lp.nRows(), lp.nCols(), m_epsilon)
+                         R slackVal, std::shared_ptr<Tolerances> tols)
+         : PostStep("FreeColSingleton", tols, lp.nRows(), lp.nCols())
          , m_j(_j)
          , m_i(_i)
          , m_old_j(lp.nCols() - 1)
          , m_old_i(lp.nRows() - 1)
          , m_obj(lp.spxSense() == SPxLPBase<R>::MINIMIZE ? lp.obj(_j) : -lp.obj(_j))
          , m_lRhs(slackVal)
-         , m_onLhs(EQ(slackVal, lp.lhs(_i)))
-         , m_eqCons(EQ(lp.lhs(_i), lp.rhs(_i)))
+         , m_onLhs(EQ(slackVal, lp.lhs(_i), this->epsilon()))
+         , m_eqCons(EQ(lp.lhs(_i), lp.rhs(_i), this->epsilon()))
          , m_row(lp.rowVector(_i))
       {
          assert(m_row[m_j] != 0.0);
@@ -839,13 +847,14 @@ private:
 
    public:
       ///
-      DoubletonEquationPS(const SPxLPBase<R>& lp, int _j, int _k, int _i, R oldLo, R oldUp, R m_epsilon)
-         : PostStep("DoubletonEquation", lp.nRows(), lp.nCols(), m_epsilon)
+      DoubletonEquationPS(const SPxLPBase<R>& lp, int _j, int _k, int _i, R oldLo, R oldUp,
+                          std::shared_ptr<Tolerances> tols)
+         : PostStep("DoubletonEquation", tols, lp.nRows(), lp.nCols())
          , m_j(_j)
          , m_k(_k)
          , m_i(_i)
          , m_maxSense(lp.spxSense() == SPxLPBase<R>::MAXIMIZE)
-         , m_jFixed(EQ(lp.lower(_j), lp.upper(_j)))
+         , m_jFixed(EQ(lp.lower(_j), lp.upper(_j), this->epsilon()))
          , m_jObj(lp.spxSense() == SPxLPBase<R>::MINIMIZE ? lp.obj(_j) : -lp.obj(_j))
          , m_kObj(lp.spxSense() == SPxLPBase<R>::MINIMIZE ? lp.obj(_k) : -lp.obj(_k))
          , m_aij(lp.colVector(_j).value(0))
@@ -933,8 +942,8 @@ private:
       DuplicateRowsPS(const SPxLPBase<R>& lp, int _i,
                       int maxLhsIdx, int minRhsIdx, const DSVectorBase<R>& dupRows,
                       const Array<R> scale, const DataArray<int> perm, const DataArray<bool> isLhsEqualRhs,
-                      bool isTheLast, bool isFixedRow, R m_epsilon, bool isFirst = false)
-         : PostStep("DuplicateRows", lp.nRows(), lp.nCols(), m_epsilon)
+                      bool isTheLast, bool isFixedRow, std::shared_ptr<Tolerances> tols, bool isFirst = false)
+         : PostStep("DuplicateRows", tols, lp.nRows(), lp.nCols())
          , m_i(_i)
          , m_i_rowObj(lp.rowObj(_i))
          , m_maxLhsIdx((maxLhsIdx == -1) ? -1 : maxLhsIdx)
@@ -1023,8 +1032,8 @@ private:
 
    public:
       DuplicateColsPS(const SPxLPBase<R>& lp, int _j, int _k, R scale, DataArray<int>  perm,
-                      R m_epsilon, bool isFirst = false, bool isTheLast = false)
-         : PostStep("DuplicateCols", lp.nRows(), lp.nCols(), m_epsilon)
+                      std::shared_ptr<Tolerances> tols, bool isFirst = false, bool isTheLast = false)
+         : PostStep("DuplicateCols", tols, lp.nRows(), lp.nCols())
          , m_j(_j)
          , m_k(_k)
          , m_loJ(lp.lower(_j))
@@ -1093,8 +1102,9 @@ private:
 
    public:
       ///
-      AggregationPS(const SPxLPBase<R>& lp, int _i, int _j, R rhs, R oldupper, R oldlower, R m_epsilon)
-         : PostStep("Aggregation", lp.nRows(), lp.nCols(), m_epsilon)
+      AggregationPS(const SPxLPBase<R>& lp, int _i, int _j, R rhs, R oldupper, R oldlower,
+                    std::shared_ptr<Tolerances> tols)
+         : PostStep("Aggregation", tols, lp.nRows(), lp.nCols())
          , m_j(_j)
          , m_i(_i)
          , m_old_j(lp.nCols() - 1)
@@ -1173,8 +1183,8 @@ private:
    public:
       ///
       MultiAggregationPS(const SPxLPBase<R>& lp, SPxMainSM& simplifier, int _i, int _j,
-                         R constant, R m_epsilon)
-         : PostStep("MultiAggregation", lp.nRows(), lp.nCols(), m_epsilon)
+                         R constant, std::shared_ptr<Tolerances> tols)
+         : PostStep("MultiAggregation", tols, lp.nRows(), lp.nCols())
          , m_j(_j)
          , m_i(_i)
          , m_old_j(lp.nCols() - 1)
@@ -1183,8 +1193,8 @@ private:
          , m_lower(lp.lower(_j))
          , m_obj(lp.spxSense() == SPxLPBase<R>::MINIMIZE ? lp.obj(_j) : -lp.obj(_j))
          , m_const(constant)
-         , m_onLhs(EQ(constant, lp.lhs(_i)))
-         , m_eqCons(EQ(lp.lhs(_i), lp.rhs(_i)))
+         , m_onLhs(EQ(constant, lp.lhs(_i), this->epsilon()))
+         , m_eqCons(EQ(lp.lhs(_i), lp.rhs(_i), this->epsilon()))
          , m_row(lp.rowVector(_i))
          , m_col(lp.colVector(_j))
       {
@@ -1244,8 +1254,9 @@ private:
 
    public:
       ///
-      TightenBoundsPS(const SPxLPBase<R>& lp, int j, R origupper, R origlower, R m_epsilon)
-         : PostStep("TightenBounds", lp.nRows(), lp.nCols(), m_epsilon)
+      TightenBoundsPS(const SPxLPBase<R>& lp, int j, R origupper, R origlower,
+                      std::shared_ptr<Tolerances> tols)
+         : PostStep("TightenBounds", tols, lp.nRows(), lp.nCols())
          , m_j(j)
          , m_origupper(origupper)
          , m_origlower(origlower)
@@ -1339,9 +1350,6 @@ private:
    Array<DSVectorBase<R>>
                        m_dupCols;    ///< arrange duplicate columns w.r.t. their pClass values
    bool                            m_postsolved; ///< status of postsolving.
-   R                            m_epsilon;    ///< epsilon zero.
-   R                            m_feastol;    ///< primal feasibility tolerance.
-   R                            m_opttol;     ///< dual feasibility tolerance.
    DataArray<int>                  m_stat;       ///< preprocessing history.
    typename SPxLPBase<R>::SPxSense                 m_thesense;   ///< optimization sense.
    bool                            m_keepbounds;  ///< keep some bounds (for boundflipping)
@@ -1439,17 +1447,17 @@ protected:
    ///
    R epsZero() const
    {
-      return m_epsilon;
+      return this->tolerances()->epsilon();
    }
    ///
    R feastol() const
    {
-      return m_feastol;
+      return this->tolerances()->floatingPointFeastol();
    }
    ///
    R opttol() const
    {
-      return m_opttol;
+      return this->tolerances()->floatingPointOpttol();
    }
 
 public:
@@ -1461,9 +1469,6 @@ public:
    SPxMainSM(Timer::TYPE ttype = Timer::USER_TIME)
       : SPxSimplifier<R>("MainSM", ttype)
       , m_postsolved(0)
-      , m_epsilon(DEFAULT_EPS_ZERO)
-      , m_feastol(DEFAULT_BND_VIOL)
-      , m_opttol(DEFAULT_BND_VIOL)
       , m_stat(16)
       , m_thesense(SPxLPBase<R>::MAXIMIZE)
       , m_keepbounds(false)
@@ -1485,9 +1490,6 @@ public:
       , m_rIdx(old.m_rIdx)
       , m_hist(old.m_hist)
       , m_postsolved(old.m_postsolved)
-      , m_epsilon(old.m_epsilon)
-      , m_feastol(old.m_feastol)
-      , m_opttol(old.m_opttol)
       , m_stat(old.m_stat)
       , m_thesense(old.m_thesense)
       , m_keepbounds(old.m_keepbounds)
@@ -1513,9 +1515,6 @@ public:
          m_cIdx = rhs.m_cIdx;
          m_rIdx = rhs.m_rIdx;
          m_postsolved = rhs.m_postsolved;
-         m_epsilon = rhs.m_epsilon;
-         m_feastol = rhs.m_feastol;
-         m_opttol = rhs.m_opttol;
          m_stat = rhs.m_stat;
          m_thesense = rhs.m_thesense;
          m_keepbounds = rhs.m_keepbounds;
@@ -1544,15 +1543,8 @@ public:
    //------------------------------------
    //**@name LP simplification */
    ///@{
-   /// simplify SPxLPBase<R> \p lp with identical primal and dual feasibility tolerance.
-   virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, R eps, R delta,
-         Real remainingTime)
-   {
-      return simplify(lp, eps, delta, delta, remainingTime);
-   }
-   /// simplify SPxLPBase<R> \p lp with independent primal and dual feasibility tolerance.
-   virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
-         Real remainingTime,
+   /// simplify SPxLPBase<R> \p lp.
+   virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, Real remainingTime,
          bool keepbounds = false, uint32_t seed = 0);
 
    /// reconstructs an optimal solution for the unsimplified LP.
@@ -1632,12 +1624,17 @@ private:
    struct ElementCompare
    {
    public:
-      ElementCompare() {}
+      R epsilon;
+
+      ElementCompare(R epsilon)
+      {
+         this->epsilon = epsilon;
+      }
 
       int operator()(const typename SVectorBase<R>::Element& e1,
                      const typename SVectorBase<R>::Element& e2) const
       {
-         if(EQ(e1.val, e2.val))
+         if(EQ(e1.val, e2.val, this->epsilon))
             return 0;
 
          if(e1.val < e2.val)

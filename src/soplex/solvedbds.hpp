@@ -860,10 +860,10 @@ void SoPlexBase<R>::_formDecompComplementaryProblem()
 
          if(_realLP->rowType(i) == LPRowBase<R>::RANGE || _realLP->rowType(i) == LPRowBase<R>::EQUAL)
          {
-            assert(EQ(_compSolver.lhs(rangedRowIds[addedrangedrows]), _realLP->lhs(i)));
-            assert(LE(_compSolver.rhs(rangedRowIds[addedrangedrows]), R(infinity)));
-            assert(LE(_compSolver.lhs(i), R(-infinity)));
-            assert(LT(_compSolver.rhs(i), R(infinity)));
+            assert(EQ(_compSolver.lhs(rangedRowIds[addedrangedrows]), _realLP->lhs(i), _compSolver.epsilon()));
+            assert(LE(_compSolver.rhs(rangedRowIds[addedrangedrows]), R(infinity), _compSolver.epsilon()));
+            assert(LE(_compSolver.lhs(i), R(-infinity), _compSolver.epsilon()));
+            assert(LT(_compSolver.rhs(i), R(infinity), _compSolver.epsilon()));
 
             _decompPrimalRowIDs[_nPrimalRows] = _realLP->rId(i);
             _decompCompPrimalRowIDs[_nCompPrimalRows] = rangedRowIds[addedrangedrows];
@@ -1000,10 +1000,7 @@ void SoPlexBase<R>::_decompSimplifyAndSolve(SPxSolverBase<R>& solver, SLUFactor<
    if(_simplifier != 0)
    {
       Real remainingTime = _solver.getMaxTime() - _solver.time();
-      result = _simplifier->simplify(solver, realParam(SoPlexBase<R>::EPSILON_ZERO),
-                                     realParam(SoPlexBase<R>::FEASTOL),
-                                     realParam(SoPlexBase<R>::OPTTOL),
-                                     remainingTime);
+      result = _simplifier->simplify(solver, remainingTime);
       solver.changeObjOffset(_simplifier->getObjoffset() + realParam(SoPlexBase<R>::OBJ_OFFSET));
    }
 
@@ -1405,7 +1402,7 @@ void SoPlexBase<R>::_updateDecompReducedProblemViol(bool allrows)
    if(allrows)
       nrowstoadd = _nDecompViolRows;   // adding all violated rows
 
-   SSVectorBase<R>  y(_solver.nCols());
+   SSVectorBase<R>  y(_solver.nCols(), _solver.tolerances());
    y.unSetup();
 
    // identifying the rows not included in the reduced problem that are violated by the current solution.
@@ -1452,7 +1449,7 @@ void SoPlexBase<R>::_updateDecompReducedProblemViol(bool allrows)
          // the best row is added if no violated row is found
          norm = soplex::spxSqrt(norm);
 
-         if(LT(norm, bestrownorm))
+         if(LT(norm, bestrownorm, _solver.epsilon()))
          {
             bestrow = rowNumber;
             bestrownorm = norm;
@@ -1460,7 +1457,7 @@ void SoPlexBase<R>::_updateDecompReducedProblemViol(bool allrows)
 
 
          // adding the violated row
-         if(isZero(norm, feastol) && LT(nnewrowidx / R(numRows()), percenttoadd))
+         if(isZero(norm, feastol) && LT(nnewrowidx / R(numRows()), percenttoadd, _solver.epsilon()))
          {
             updaterows.add(_transformedRows.lhs(rowNumber), _transformedRows.rowVector(rowNumber),
                            _transformedRows.rhs(rowNumber));
@@ -1732,7 +1729,7 @@ void SoPlexBase<R>::_getCompatibleColumns(VectorBase<R> feasVector, int* nonposi
 #endif
 
    bool compatible;
-   SSVectorBase<R>  y(_solver.nCols());
+   SSVectorBase<R>  y(_solver.nCols(), _solver.tolerances());
    y.unSetup();
 
    *ncompatind  = 0;
@@ -1840,7 +1837,7 @@ void SoPlexBase<R>::_getCompatibleColumns(VectorBase<R> feasVector, int* nonposi
 
 
       // Making all equality constraints compatible, i.e. they are included in the reduced problem
-      if(EQ(rowtoupdate.lhs(), rowtoupdate.rhs()))
+      if(EQ(rowtoupdate.lhs(), rowtoupdate.rhs(), _solver.epsilon()))
          compatible = true;
 
       if(compatible)
@@ -1896,7 +1893,7 @@ void SoPlexBase<R>::_computeReducedProbObjCoeff(bool& stop)
 #endif
 #endif
 
-   SSVectorBase<R>  y(numCols());
+   SSVectorBase<R>  y(numCols(), _solver.tolerances());
    y.unSetup();
 
    // the rhs of this calculation is the original objective coefficient vector
@@ -1969,7 +1966,7 @@ void SoPlexBase<R>::_getCompatibleBoundCons(LPRowSetBase<R>& boundcons, int* com
 
    bool compatible;
    int ncols = numCols();
-   SSVectorBase<R>  y(ncols);
+   SSVectorBase<R>  y(ncols, _solver.tolerances());
    y.unSetup();
 
    _decompReducedProbColRowIDs.reSize(numCols());
@@ -2003,7 +2000,7 @@ void SoPlexBase<R>::_getCompatibleBoundCons(LPRowSetBase<R>& boundcons, int* com
       for(int j = 0; j < nnonposind; ++j)
       {
          // @todo really need to check this part of the code. Run through this with Ambros or Matthias.
-         if(!isZero(y[nonposind[j]]))
+         if(!isZero(y[nonposind[j]], _solver.epsilon()))
          {
             compatible = false;
             break;
@@ -2050,13 +2047,13 @@ void SoPlexBase<R>::_getCompatibleBoundCons(LPRowSetBase<R>& boundcons, int* com
          R lhs = R(-infinity);
          R rhs = R(infinity);
 
-         if(GT(_solver.lower(i), R(-infinity)))
+         if(_solver.lower(i) > R(-infinity))
             lhs = _solver.lower(i);
 
-         if(LT(_solver.upper(i), R(infinity)))
+         if(_solver.upper(i) < R(infinity))
             rhs = _solver.upper(i);
 
-         if(GT(lhs, R(-infinity)) || LT(rhs, R(infinity)))
+         if(lhs > R(-infinity) || rhs < R(infinity))
          {
             compatboundcons[(*ncompatboundcons)] = i;
             (*ncompatboundcons)++;
@@ -2140,7 +2137,7 @@ void SoPlexBase<R>::_deleteAndUpdateRowsComplementaryProblem(SPxRowId rangedRowI
       {
          if(_realLP->rowType(i) == LPRowBase<R>::RANGE || _realLP->rowType(i) == LPRowBase<R>::EQUAL)
          {
-            assert(GT(_compSolver.lhs(i), R(-infinity)) && LT(_compSolver.rhs(i), R(infinity)));
+            assert(_compSolver.lhs(i) > R(-infinity));
             assert(_compSolver.rowType(i) == LPRowBase<R>::RANGE
                    || _compSolver.rowType(i) == LPRowBase<R>::EQUAL);
 
@@ -2269,7 +2266,7 @@ void SoPlexBase<R>::_updateDecompComplementaryDualProblem(bool origObj)
                (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_LOWER &&
                 LE(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], R(0.0), feastol)))
          {
-            assert(LT(_realLP->rhs(_decompElimPrimalRowIDs[i]), R(infinity)));
+            assert(_realLP->rhs(_decompElimPrimalRowIDs[i]) < R(infinity));
             addElimCols.add(_realLP->rhs(_decompElimPrimalRowIDs[i]), R(-infinity), coltoaddVec, R(infinity));
 
             if(_nPrimalRows >= _decompPrimalRowIDs.size())
@@ -2293,7 +2290,7 @@ void SoPlexBase<R>::_updateDecompComplementaryDualProblem(bool origObj)
          {
             // this assert should stay, but there is an issue with the status and the dual vector
             //assert(LT(dualVector[_solver.number(_decompReducedProbRowIDs[rowNumber])], 0.0));
-            assert(GT(_realLP->lhs(_decompElimPrimalRowIDs[i]), R(-infinity)));
+            assert(_realLP->lhs(_decompElimPrimalRowIDs[i]) > R(-infinity));
             addElimCols.add(_realLP->lhs(_decompElimPrimalRowIDs[i]), R(-infinity), coltoaddVec, R(infinity));
 
             _decompPrimalRowIDs[_nPrimalRows] = _decompElimPrimalRowIDs[i];
@@ -2389,7 +2386,6 @@ void SoPlexBase<R>::_updateDecompComplementaryDualProblem(bool origObj)
                (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_LOWER &&
                 LE(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], R(0.0), feastol)))
          {
-            //assert(GT(dualVector[solverRowNum], 0.0));
             _compSolver.changeObj(_decompDualColIDs[i], _realLP->rhs(SPxRowId(_decompPrimalRowIDs[i])));
             _compSolver.changeBounds(_decompDualColIDs[i], R(-infinity), R(infinity));
          }
@@ -2635,7 +2631,7 @@ void SoPlexBase<R>::_updateDecompComplementaryPrimalProblem(bool origObj)
                || (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_LOWER &&
                    EQ(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], R(0.0), feastol)))
          {
-            assert(LT(_realLP->rhs(_decompElimPrimalRowIDs[i]), R(infinity)));
+            assert(_realLP->rhs(_decompElimPrimalRowIDs[i]) < R(infinity));
 
             if(_nPrimalRows >= _decompPrimalRowIDs.size())
             {
@@ -2659,7 +2655,7 @@ void SoPlexBase<R>::_updateDecompComplementaryPrimalProblem(bool origObj)
                  || (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_UPPER &&
                      EQ(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), R(0.0), feastol)))
          {
-            assert(GT(_realLP->lhs(_decompElimPrimalRowIDs[i]), R(-infinity)));
+            assert(_realLP->lhs(_decompElimPrimalRowIDs[i]) > R(-infinity));
 
             if(_nPrimalRows >= _decompPrimalRowIDs.size())
             {
@@ -2842,7 +2838,7 @@ void SoPlexBase<R>::_updateDecompComplementaryPrimalProblem(bool origObj)
 template <class R>
 void SoPlexBase<R>::_checkOriginalProblemOptimality(VectorBase<R> primalVector, bool printViol)
 {
-   SSVectorBase<R>  x(_solver.nCols());
+   SSVectorBase<R>  x(_solver.nCols(), this->tolerances());
    x.unSetup();
 
    // multiplying the solution vector of the reduced problem with the transformed basis to identify the original
@@ -3030,11 +3026,11 @@ void SoPlexBase<R>::_removeComplementaryDualFixedPrimalVars(int* currFixedVars)
          else //if( false && !_decompReducedProbColRowIDs[i].isValid() ) // we want to remove all valid columns
             // in the current implementation, the only columns not included in the reduced problem are free columns.
          {
-            assert((LE(_realLP->lower(i), R(-infinity)) && GE(_realLP->upper(i), R(infinity))) ||
+            assert((_realLP->lower(i) <= R(-infinity) && _realLP->upper(i) >= R(infinity)) ||
                    _compSolver.number(SPxColId(_decompVarBoundDualIDs[i * 2])) >= 0);
             int varcount = 0;
 
-            if(GT(_realLP->lower(i), R(-infinity)))
+            if(GT(_realLP->lower(i), R(-infinity), this->tolerances()->epsilon()))
             {
                colsforremoval[ncolsforremoval] = _compSolver.number(SPxColId(_decompVarBoundDualIDs[i * 2 +
                                                  varcount]));
@@ -3044,7 +3040,7 @@ void SoPlexBase<R>::_removeComplementaryDualFixedPrimalVars(int* currFixedVars)
                varcount++;
             }
 
-            if(LT(_realLP->upper(i), R(infinity)))
+            if(_realLP->upper(i) < R(infinity))
             {
                colsforremoval[ncolsforremoval] = _compSolver.number(SPxColId(_decompVarBoundDualIDs[i * 2 +
                                                  varcount]));
@@ -3125,7 +3121,7 @@ void SoPlexBase<R>::_updateComplementaryDualFixedPrimalVars(int* currFixedVars)
             bool isRedProbCol = _decompReducedProbColRowIDs[i].isValid();
 
             // 29.04.15 in the current implementation only free variables are not included in the reduced problem
-            if(GT(_realLP->lower(i), R(-infinity)))
+            if(_realLP->lower(i) > R(-infinity))
             {
                if(!isRedProbCol)
                   col.add(_compSolver.number(SPxRowId(_compSlackDualRowId)), -SLACKCOEFF);
@@ -3139,7 +3135,7 @@ void SoPlexBase<R>::_updateComplementaryDualFixedPrimalVars(int* currFixedVars)
                numBoundConsCols++;
             }
 
-            if(LT(_realLP->upper(i), R(infinity)))
+            if(_realLP->upper(i) < R(infinity))
             {
                if(!isRedProbCol)
                   col.add(_compSolver.number(SPxRowId(_compSlackDualRowId)), SLACKCOEFF);
@@ -3318,7 +3314,7 @@ void SoPlexBase<R>::_setComplementaryDualOriginalObjective()
             // variable with a finite upper bound
             _compSolver.changeRhs(compRowNumber, _realLP->obj(i));
 
-            if(isZero(_realLP->upper(i)))
+            if(isZero(_realLP->upper(i), this->tolerances()->epsilon()))
                _compSolver.changeLhs(compRowNumber, R(-infinity));
             else
                _compSolver.changeLhs(compRowNumber, _realLP->obj(i));
@@ -3328,7 +3324,7 @@ void SoPlexBase<R>::_setComplementaryDualOriginalObjective()
             // variable with a finite lower bound
             _compSolver.changeLhs(compRowNumber, _realLP->obj(i));
 
-            if(isZero(_realLP->upper(i)))
+            if(isZero(_realLP->upper(i), this->tolerances()->epsilon()))
                _compSolver.changeRhs(compRowNumber, R(infinity));
             else
                _compSolver.changeRhs(compRowNumber, _realLP->obj(i));
@@ -3336,12 +3332,12 @@ void SoPlexBase<R>::_setComplementaryDualOriginalObjective()
          else if(NE(_realLP->lower(i), _realLP->upper(i)))
          {
             // variable with a finite upper and lower bound
-            if(isZero(_realLP->upper(i)))
+            if(isZero(_realLP->upper(i), this->tolerances()->epsilon()))
             {
                _compSolver.changeLhs(compRowNumber, _realLP->obj(i));
                _compSolver.changeRhs(compRowNumber, R(infinity));
             }
-            else if(isZero(_realLP->upper(i)))
+            else if(isZero(_realLP->upper(i), this->tolerances->epsilon()))
             {
                _compSolver.changeLhs(compRowNumber, R(-infinity));
                _compSolver.changeRhs(compRowNumber, _realLP->obj(i));
@@ -3746,7 +3742,7 @@ void SoPlexBase<R>::getOriginalProblemStatistics()
 
       if(hasRhs && hasLhs)
       {
-         if(EQ(_realLP->rhs(i), _realLP->lhs(i)))
+         if(EQ(_realLP->rhs(i), _realLP->lhs(i), _solver.epsilon()))
             origCountEqual++;
          else
             origCountRanged++;

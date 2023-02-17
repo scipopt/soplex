@@ -36,9 +36,8 @@ namespace soplex
 
 template <class R>
 static R computeScalingVec(
-   const SVSetBase<R>*             vecset,
-   const std::vector<R>& coScaleval,
-   std::vector<R>&       scaleval)
+   const SVSetBase<R>*   vecset, const std::vector<R>& coScaleval,
+   std::vector<R>&       scaleval, R epsilon)
 {
    R pmax = 0.0;
 
@@ -55,7 +54,7 @@ static R computeScalingVec(
       {
          const R x = spxAbs(vec.value(j) * coScaleval[unsigned(vec.index(j))]);
 
-         if(!isZero(x))
+         if(!isZero(x, epsilon))
          {
             if(x > maxi)
                maxi = x;
@@ -138,6 +137,7 @@ void SPxGeometSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
     */
    const R colratio = this->maxColRatio(lp);
    const R rowratio = this->maxRowRatio(lp);
+   R epsilon = this->tolerances()->epsilon();
 
    const bool colFirst = colratio < rowratio;
 
@@ -196,13 +196,13 @@ void SPxGeometSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
       {
          if(colFirst)
          {
-            p0 = computeScalingVec(lp.colSet(), rowscale, colscale);
-            p1 = computeScalingVec(lp.rowSet(), colscale, rowscale);
+            p0 = computeScalingVec(lp.colSet(), rowscale, colscale, epsilon);
+            p1 = computeScalingVec(lp.rowSet(), colscale, rowscale, epsilon);
          }
          else
          {
-            p0 = computeScalingVec(lp.rowSet(), colscale, rowscale);
-            p1 = computeScalingVec(lp.colSet(), rowscale, colscale);
+            p0 = computeScalingVec(lp.rowSet(), colscale, rowscale, epsilon);
+            p1 = computeScalingVec(lp.colSet(), rowscale, colscale, epsilon);
          }
 
          MSG_INFO3((*this->spxout), (*this->spxout) << "Geometric scaling round " << count
@@ -239,7 +239,7 @@ void SPxGeometSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
             std::fill(colscale.begin(), colscale.end(), 1.0);
          }
 
-         SPxEquiliSC<R>::computePostequiExpVecs(lp, rowscale, colscale, rowscaleExp, colscaleExp);
+         SPxEquiliSC<R>::computePostequiExpVecs(lp, rowscale, colscale, rowscaleExp, colscaleExp, epsilon);
       }
       else
       {

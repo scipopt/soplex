@@ -93,8 +93,6 @@ protected:
    R minThreshold;
    /// minimum stability to achieve by setting threshold.
    R minStability;
-   /// |x| < epsililon is considered to be 0.
-   R epsilon;
    /// Time spent in solves
    Timer* solveTime;
    Timer::TYPE timerType;
@@ -303,6 +301,20 @@ public:
 
    /// consistency check.
    bool isConsistent() const;
+
+   /// set tolerances
+   virtual void setTolerances(std::shared_ptr<Tolerances> tolerances)
+   {
+      this->_tolerances = tolerances;
+      this->eta.setTolerances(tolerances);
+      this->forest.setTolerances(tolerances);
+      this->ssvec.setTolerances(tolerances);
+   }
+
+   std::shared_ptr<Tolerances> tolerances()
+   {
+      return this->_tolerances;
+   }
    ///@}
 
    //------------------------------------

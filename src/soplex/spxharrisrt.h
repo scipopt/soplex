@@ -66,8 +66,7 @@ private:
       const R* upd,      ///< update VectorBase<R> for \p vec
       const R* vec,      ///< current vector
       const R* low,      ///< lower bounds for \p vec
-      const R* up,       ///< upper bounds for \p vec
-      R epsilon          ///< what is 0?
+      const R* up        ///< upper bounds for \p vec
    ) const;
 
    ///
@@ -79,8 +78,7 @@ private:
       const R* upd,      ///< update VectorBase<R> for \p vec
       const R* vec,      ///< current vector
       const R* low,      ///< lower bounds for \p vec
-      const R* up,       ///< upper bounds for \p vec
-      R epsilon          ///< what is 0?
+      const R* up        ///< upper bounds for \p vec
    ) const;
    ///@}
 

@@ -43,14 +43,14 @@ int SPxDantzigPR<R>::selectLeave()
    //    const R* up  = this->thesolver->ubBound();
    //    const R* low = this->thesolver->lbBound();
 
-   R best = -this->theeps;
+   R best = -this->thetolerance;
    int  n    = -1;
 
    for(int i = this->thesolver->dim() - 1; i >= 0; --i)
    {
       R x = this->thesolver->fTest()[i];
 
-      if(x < -this->theeps)
+      if(x < -this->thetolerance)
       {
          // x *= EQ_PREF * (1 + (up[i] == low[i]));
          if(x < best)
@@ -69,7 +69,7 @@ int SPxDantzigPR<R>::selectLeaveSparse()
 {
    assert(this->thesolver != 0);
 
-   R best   = -this->theeps;
+   R best   = -this->thetolerance;
    R x;
    int  n      = -1;
    int  index;
@@ -79,7 +79,7 @@ int SPxDantzigPR<R>::selectLeaveSparse()
       index = this->thesolver->infeasibilities.index(i);
       x = this->thesolver->fTest()[index];
 
-      if(x < -this->theeps)
+      if(x < -this->thetolerance)
       {
          if(x < best)
          {
@@ -119,8 +119,8 @@ SPxId SPxDantzigPR<R>::selectEnterX()
    R best;
    R bestCo;
 
-   best = -this->theeps;
-   bestCo = -this->theeps;
+   best = -this->thetolerance;
+   bestCo = -this->thetolerance;
    enterId = (this->thesolver->sparsePricingEnter) ? selectEnterSparseDim(best,
              enterId) : selectEnterDenseDim(best, enterId);
    enterIdCo = (this->thesolver->sparsePricingEnterCo) ? selectEnterSparseCoDim(bestCo,
@@ -147,7 +147,7 @@ SPxId SPxDantzigPR<R>::selectEnterSparseDim(R& best, SPxId& enterId)
       idx = this->thesolver->infeasibilities.index(i);
       x = this->thesolver->coTest()[idx];
 
-      if(x < -this->theeps)
+      if(x < -this->thetolerance)
       {
          // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasisBase<R>::Desc::P_FREE
          //                || ds.coStatus(i) == SPxBasisBase<R>::Desc::D_FREE));
@@ -182,7 +182,7 @@ SPxId SPxDantzigPR<R>::selectEnterSparseCoDim(R& best, SPxId& enterId)
       idx = this->thesolver->infeasibilitiesCo.index(i);
       x = this->thesolver->test()[idx];
 
-      if(x < -this->theeps)
+      if(x < -this->thetolerance)
       {
          // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasisBase<R>::Desc::P_FREE
          //                || ds.coStatus(i) == SPxBasisBase<R>::Desc::D_FREE));
@@ -214,7 +214,7 @@ SPxId SPxDantzigPR<R>::selectEnterDenseDim(R& best, SPxId& enterId)
    {
       x = this->thesolver->coTest()[i];
 
-      if(x < -this->theeps)
+      if(x < -this->thetolerance)
       {
          // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasisBase<R>::Desc::P_FREE
          //                || ds.coStatus(i) == SPxBasisBase<R>::Desc::D_FREE));
@@ -240,7 +240,7 @@ SPxId SPxDantzigPR<R>::selectEnterDenseCoDim(R& best, SPxId& enterId)
    {
       x = this->thesolver->test()[i];
 
-      if(x < -this->theeps)
+      if(x < -this->thetolerance)
       {
          // x *= EQ_PREF * (1 + (ds.status(i) == SPxBasisBase<R>::Desc::P_FREE
          //                || ds.status(i) == SPxBasisBase<R>::Desc::D_FREE));

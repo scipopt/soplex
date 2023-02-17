@@ -83,10 +83,11 @@ void SLUFactor<R>::solveRight4update(SSVectorBase<R>& x, const SVectorBase<R>& b
    x.clear();
    ssvec = b;
    n = ssvec.size();
+   R epsilon = this->tolerances()->epsilon();
 
    if(this->l.updateType == ETA)
    {
-      m = this->vSolveRight4update(x.getEpsilon(), x.altValues(), x.altIndexMem(),
+      m = this->vSolveRight4update(epsilon, x.altValues(), x.altIndexMem(),
                                    ssvec.altValues(), ssvec.altIndexMem(), n, 0, 0, 0);
       x.setSize(m);
       //x.forceSetup();
@@ -96,7 +97,7 @@ void SLUFactor<R>::solveRight4update(SSVectorBase<R>& x, const SVectorBase<R>& b
    else
    {
       forest.clear();
-      m = this->vSolveRight4update(x.getEpsilon(), x.altValues(), x.altIndexMem(),
+      m = this->vSolveRight4update(epsilon, x.altValues(), x.altIndexMem(),
                                    ssvec.altValues(), ssvec.altIndexMem(), n,
                                    forest.altValues(), &f, forest.altIndexMem());
       forest.setSize(f);
@@ -131,6 +132,7 @@ void SLUFactor<R>::solve2right4update(
    ssvec.forceSetup();
    int  rsize = rhs.size();
    int* ridx = rhs.altIndexMem();
+   R epsilon = this->tolerances()->epsilon();
 
    x.clear();
    y.clear();
@@ -140,9 +142,9 @@ void SLUFactor<R>::solve2right4update(
    if(this->l.updateType == ETA)
    {
       n = ssvec.size();
-      m = this->vSolveRight4update2(x.getEpsilon(), x.altValues(), x.altIndexMem(),
+      m = this->vSolveRight4update2(epsilon, x.altValues(), x.altIndexMem(),
                                     ssvec.get_ptr(), sidx, n, y.get_ptr(),
-                                    rhs.getEpsilon(), rhs.altValues(), ridx, rsize, 0, 0, 0);
+                                    epsilon, rhs.altValues(), ridx, rsize, 0, 0, 0);
       x.setSize(m);
       //      x.forceSetup();
       x.unSetup();
@@ -152,9 +154,9 @@ void SLUFactor<R>::solve2right4update(
    {
       forest.clear();
       n = ssvec.size();
-      m = this->vSolveRight4update2(x.getEpsilon(), x.altValues(), x.altIndexMem(),
+      m = this->vSolveRight4update2(epsilon, x.altValues(), x.altIndexMem(),
                                     ssvec.get_ptr(), sidx, n, y.get_ptr(),
-                                    rhs.getEpsilon(), rhs.altValues(), ridx, rsize,
+                                    epsilon, rhs.altValues(), ridx, rsize,
                                     forest.altValues(), &f, forest.altIndexMem());
       x.setSize(m);
       x.forceSetup();
@@ -187,6 +189,7 @@ void SLUFactor<R>::solve2right4update(
    ssvec.forceSetup();
    int  rsize = rhs.size();
    int* ridx = rhs.altIndexMem();
+   R epsilon = this->tolerances()->epsilon();
 
    x.clear();
    y.clear();
@@ -196,9 +199,9 @@ void SLUFactor<R>::solve2right4update(
    if(this->l.updateType == ETA)
    {
       n = ssvec.size();
-      this->vSolveRight4update2sparse(x.getEpsilon(), x.altValues(), x.altIndexMem(),
+      this->vSolveRight4update2sparse(epsilon, x.altValues(), x.altIndexMem(),
                                       ssvec.get_ptr(), sidx, n,
-                                      y.getEpsilon(), y.altValues(), y.altIndexMem(),
+                                      epsilon, y.altValues(), y.altIndexMem(),
                                       rhs.altValues(), ridx, rsize,
                                       0, 0, 0);
       x.setSize(n);
@@ -212,9 +215,9 @@ void SLUFactor<R>::solve2right4update(
    {
       forest.clear();
       n = ssvec.size();
-      this->vSolveRight4update2sparse(x.getEpsilon(), x.altValues(), x.altIndexMem(),
+      this->vSolveRight4update2sparse(epsilon, x.altValues(), x.altIndexMem(),
                                       ssvec.get_ptr(), sidx, n,
-                                      y.getEpsilon(), y.altValues(), y.altIndexMem(),
+                                      epsilon, y.altValues(), y.altIndexMem(),
                                       rhs.altValues(), ridx, rsize,
                                       forest.altValues(), &f, forest.altIndexMem());
       x.setSize(n);
@@ -256,6 +259,7 @@ void SLUFactor<R>::solve3right4update(
    int* ridx = rhs.altIndexMem();
    int  rsize2 = rhs2.size();
    int* ridx2 = rhs2.altIndexMem();
+   R epsilon = this->tolerances()->epsilon();
 
    x.clear();
    y.clear();
@@ -266,10 +270,10 @@ void SLUFactor<R>::solve3right4update(
    if(this->l.updateType == ETA)
    {
       n = ssvec.size();
-      m = this->vSolveRight4update3(x.getEpsilon(),
+      m = this->vSolveRight4update3(epsilon,
                                     x.altValues(), x.altIndexMem(), ssvec.get_ptr(), sidx, n,
-                                    y.get_ptr(), rhs.getEpsilon(), rhs.altValues(), ridx, rsize,
-                                    y2.get_ptr(), rhs2.getEpsilon(), rhs2.altValues(), ridx2, rsize2,
+                                    y.get_ptr(), epsilon, rhs.altValues(), ridx, rsize,
+                                    y2.get_ptr(), epsilon, rhs2.altValues(), ridx2, rsize2,
                                     0, 0, 0);
       x.setSize(m);
       //      x.forceSetup();
@@ -280,10 +284,10 @@ void SLUFactor<R>::solve3right4update(
    {
       forest.clear();
       n = ssvec.size();
-      m = this->vSolveRight4update3(x.getEpsilon(),
+      m = this->vSolveRight4update3(epsilon,
                                     x.altValues(), x.altIndexMem(), ssvec.get_ptr(), sidx, n,
-                                    y.get_ptr(), rhs.getEpsilon(), rhs.altValues(), ridx, rsize,
-                                    y2.get_ptr(), rhs2.getEpsilon(), rhs2.altValues(), ridx2, rsize2,
+                                    y.get_ptr(), epsilon, rhs.altValues(), ridx, rsize,
+                                    y2.get_ptr(), epsilon, rhs2.altValues(), ridx2, rsize2,
                                     forest.altValues(), &f, forest.altIndexMem());
       x.setSize(m);
       x.forceSetup();
@@ -320,6 +324,7 @@ void SLUFactor<R>::solve3right4update(
    int* ridx = rhs.altIndexMem();
    int  rsize2 = rhs2.size();
    int* ridx2 = rhs2.altIndexMem();
+   R epsilon = this->tolerances()->epsilon();
 
    x.clear();
    y.clear();
@@ -330,11 +335,11 @@ void SLUFactor<R>::solve3right4update(
    if(this->l.updateType == ETA)
    {
       n = ssvec.size();
-      this->vSolveRight4update3sparse(x.getEpsilon(), x.altValues(), x.altIndexMem(),
+      this->vSolveRight4update3sparse(epsilon, x.altValues(), x.altIndexMem(),
                                       ssvec.get_ptr(), sidx, n,
-                                      y.getEpsilon(), y.altValues(), y.altIndexMem(),
+                                      epsilon, y.altValues(), y.altIndexMem(),
                                       rhs.altValues(), ridx, rsize,
-                                      y2.getEpsilon(), y2.altValues(), y2.altIndexMem(),
+                                      epsilon, y2.altValues(), y2.altIndexMem(),
                                       rhs2.altValues(), ridx2, rsize2,
                                       0, 0, 0);
       x.setSize(n);
@@ -350,11 +355,11 @@ void SLUFactor<R>::solve3right4update(
    {
       forest.clear();
       n = ssvec.size();
-      this->vSolveRight4update3sparse(x.getEpsilon(), x.altValues(), x.altIndexMem(),
+      this->vSolveRight4update3sparse(epsilon, x.altValues(), x.altIndexMem(),
                                       ssvec.get_ptr(), sidx, n,
-                                      y.getEpsilon(), y.altValues(), y.altIndexMem(),
+                                      epsilon, y.altValues(), y.altIndexMem(),
                                       rhs.altValues(), ridx, rsize,
-                                      y2.getEpsilon(), y2.altValues(), y2.altIndexMem(),
+                                      epsilon, y2.altValues(), y2.altIndexMem(),
                                       rhs2.altValues(), ridx2, rsize2,
                                       forest.altValues(), &f, forest.altIndexMem());
       x.setSize(n);
@@ -395,6 +400,7 @@ void SLUFactor<R>::solveLeft(VectorBase<R>& x, const VectorBase<R>& b) //const
 template <class R>
 void SLUFactor<R>::solveLeft(SSVectorBase<R>& x, const SVectorBase<R>& b)  //const
 {
+   R epsilon = this->tolerances()->epsilon();
 
    solveTime->start();
 
@@ -404,7 +410,7 @@ void SLUFactor<R>::solveLeft(SSVectorBase<R>& x, const SVectorBase<R>& b)  //con
 
    x.clear();
    int sz = ssvec.size(); // see .altValues()
-   int n = this->vSolveLeft(x.getEpsilon(), x.altValues(), x.altIndexMem(),
+   int n = this->vSolveLeft(epsilon, x.altValues(), x.altIndexMem(),
                             ssvec.altValues(), ssvec.altIndexMem(), sz);
 
    if(n > 0)
@@ -437,12 +443,13 @@ void SLUFactor<R>::solveLeft(
    int*  sidx = ssvec.altIndexMem();
    int   rn   = rhs2.size();
    int*  ridx = rhs2.altIndexMem();
+   R epsilon = this->tolerances()->epsilon();
 
    x.clear();
    y.clear();
    ssvec.assign(rhs1);
    n = ssvec.size(); // see altValues();
-   n = this->vSolveLeft2(x.getEpsilon(), x.altValues(), x.altIndexMem(), svec, sidx, n,
+   n = this->vSolveLeft2(epsilon, x.altValues(), x.altIndexMem(), svec, sidx, n,
                          y.get_ptr(), rhs2.altValues(), ridx, rn);
 
    // this will unsetup x
@@ -471,6 +478,7 @@ void SLUFactor<R>::solveLeft(
    int   n1, n2;
    R* svec = ssvec.altValues();
    int*  sidx = ssvec.altIndexMem();
+   R epsilon = this->tolerances()->epsilon();
 
    x.clear();
    y.clear();
@@ -480,7 +488,7 @@ void SLUFactor<R>::solveLeft(
 
    if(n2 < 10)
    {
-      this->vSolveLeft2sparse(x.getEpsilon(),
+      this->vSolveLeft2sparse(epsilon,
                               x.altValues(), x.altIndexMem(),
                               svec, sidx, n1,
                               y.altValues(), y.altIndexMem(),
@@ -492,7 +500,7 @@ void SLUFactor<R>::solveLeft(
    }
    else
    {
-      n1 = this->vSolveLeft2(x.getEpsilon(), x.altValues(), x.altIndexMem(), svec, sidx, n1,
+      n1 = this->vSolveLeft2(epsilon, x.altValues(), x.altIndexMem(), svec, sidx, n1,
                              y.altValues(), rhs2.altValues(), rhs2.altIndexMem(), n2);
       //      y.setup();
    }
@@ -528,6 +536,7 @@ void SLUFactor<R>::solveLeft(
    int   n, n2, n3;
    R* svec = ssvec.altValues();
    int*  sidx = ssvec.altIndexMem();
+   R epsilon = this->tolerances()->epsilon();
 
    x.clear();
    y.clear();
@@ -537,7 +546,7 @@ void SLUFactor<R>::solveLeft(
    n2 = rhs2.size();
    n3 = rhs3.size();
 
-   n = this->vSolveLeft3(x.getEpsilon(), x.altValues(), x.altIndexMem(), svec, sidx, n,
+   n = this->vSolveLeft3(epsilon, x.altValues(), x.altIndexMem(), svec, sidx, n,
                          y.get_ptr(), rhs2.altValues(), rhs2.altIndexMem(), n2,
                          z.get_ptr(), rhs3.altValues(), rhs3.altIndexMem(), n3);
 
@@ -568,6 +577,7 @@ void SLUFactor<R>::solveLeft(
    int   n1, n2, n3;
    R* svec = ssvec.altValues();
    int*  sidx = ssvec.altIndexMem();
+   R epsilon = this->tolerances()->epsilon();
 
    x.clear();
    y.clear();
@@ -576,7 +586,7 @@ void SLUFactor<R>::solveLeft(
    n1 = ssvec.size(); // see altValues();
    n2 = rhs2.size();
    n3 = rhs3.size();
-   this->vSolveLeft3sparse(x.getEpsilon(),
+   this->vSolveLeft3sparse(epsilon,
                            x.altValues(), x.altIndexMem(),
                            svec, sidx, n1,
                            y.altValues(), y.altIndexMem(),
@@ -771,7 +781,6 @@ void SLUFactor<R>::clear()
    this->l.firstUnused = 0;
    this->thedim        = 0;
 
-   epsilon       = Param::epsilonFactorization();
    usetup        = false;
    this->maxabs        = 1;
    this->initMaxabs    = 1;
@@ -858,7 +867,6 @@ void SLUFactor<R>::assign(const SLUFactor<R>& old)
    uptype        = old.uptype;
    minThreshold  = old.minThreshold;
    minStability  = old.minStability;
-   epsilon       = old.epsilon;
    lastThreshold = old.lastThreshold;
 
    // clufactor
@@ -1367,11 +1375,11 @@ static R betterThreshold(R th)
 {
    assert(th < R(1.0));
 
-   if(LT(th, R(0.1)))
+   if(th < R(0.1))
       th *= R(10.0);
-   else if(LT(th, R(0.9)))
+   else if(th < R(0.9))
       th = (th + R(1.0)) / R(2.0);
-   else if(LT(th, R(0.999)))
+   else if(th < R(0.999))
       th = R(0.99999);
 
    assert(th < R(1.0));
@@ -1465,7 +1473,7 @@ typename SLUFactor<R>::Status SLUFactor<R>::load(const SVectorBase<R>* matrix[],
       ///an empty column) and singularity due to numerics, that could be avoided by changing minStability and
       ///lastThreshold; in the first case, we want to abort, otherwise change the numerics
       this->stat = this->OK;
-      this->factor(matrix, lastThreshold, epsilon);
+      this->factor(matrix, lastThreshold, this->tolerances()->epsilon());
 
       // finish if the factorization is stable
       if(stability() >= minStability)
@@ -1476,7 +1484,7 @@ typename SLUFactor<R>::Status SLUFactor<R>::load(const SVectorBase<R>* matrix[],
       lastThreshold = betterThreshold(lastThreshold);
 
       // until it doesn't change anymore at its maximum value
-      if(EQ(x, lastThreshold))
+      if(EQ(x, lastThreshold, this->tolerances()->epsilon()))
          break;
 
       // we relax the stability requirement

@@ -1569,6 +1569,9 @@ public:
    /// returns current parameter settings
    const Settings& settings() const;
 
+   /// returns current tolerances
+   const std::shared_ptr<Tolerances> tolerances() const;
+
    /// sets boolean parameter value; returns true on success
    bool setBoolParam(const BoolParam param, const bool value, const bool init = true);
 
@@ -1668,6 +1671,8 @@ private:
    ///@{
 
    Settings* _currentSettings;
+
+   std::shared_ptr<Tolerances> _tolerances;
 
    Rational _rationalPosInfty;
    Rational _rationalNegInfty;

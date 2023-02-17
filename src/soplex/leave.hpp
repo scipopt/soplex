@@ -753,7 +753,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
 #ifdef ENABLE_ADDITIONAL_CHECKS
    else
    {
-      SSVectorBase<R>  tmp(dim(), epsilon());
+      SSVectorBase<R>  tmp(dim(), this->tolerances());
       tmp.clear();
       this->coSolve(tmp, unitVecs[leaveIdx]);
       tmp -= theCoPvec->delta();
@@ -804,7 +804,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
    R oldShift = theShift;
    SPxId enterId = theratiotester->selectEnter(enterVal, leaveIdx, polish);
 
-   if(NE(theShift, oldShift))
+   if(NE(theShift, oldShift, this->tolerances()->epsilon()))
    {
       MSG_DEBUG(std::cout << "DLEAVE71 trigger recomputation of nonbasic value due to shifts in ratiotest"
                 << std::endl;)
@@ -832,7 +832,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
       if(polish)
          return false;
 
-      if(NE(enterVal, leaveMax))
+      if(NE(enterVal, leaveMax, this->tolerances()->epsilon()))
       {
          MSG_DEBUG(std::cout << "DLEAVE61 rejecting leave A (leaveIdx=" << leaveIdx
                    << ", theCoTest=" << theCoTest[leaveIdx] << ")"
@@ -979,7 +979,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
 
 #ifdef ENABLE_ADDITIONAL_CHECKS
          {
-            SSVectorBase<R>  tmp(dim(), epsilon());
+            SSVectorBase<R>  tmp(dim(), this->tolerances());
             SPxBasisBase<R>::solve(tmp, newVector);
             tmp -= fVec().delta();
 

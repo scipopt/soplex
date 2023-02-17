@@ -330,8 +330,6 @@ int main(int argc, char **argv)
    const char* inpfile  = argv[optidx];
    const char* outfile  = argv[optidx + 1];
 
-   Param::setVerbose(verbose);
-
    SPxLP       lp;
    NameSet     rownames;
    NameSet     colnames;

@@ -48,11 +48,11 @@ void SPxAutoPR<R>::clear()
 }
 
 template <class R>
-void SPxAutoPR<R>::setEpsilon(R eps)
+void SPxAutoPR<R>::setPricingTolerance(R tol)
 {
-   steep.setEpsilon(eps);
-   devex.setEpsilon(eps);
-   this->theeps = eps;
+   steep.setPricingTolerance(tol);
+   devex.setPricingTolerance(tol);
+   this->thetolerance = tol;
 }
 
 template <class R>

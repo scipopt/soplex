@@ -57,6 +57,8 @@ protected:
    ///@{
    /// name of the starter
    const char* m_name;
+   /// tolerances for the starter
+   std::shared_ptr<Tolerances> _tolerances;
    ///@}
 
 public:
@@ -107,6 +109,12 @@ public:
    /// generates start basis for loaded basis.
    virtual void generate(SPxSolverBase<R>& base) = 0;
    ///@}
+
+   /// set the tolerances to be used by the starter
+   virtual void setTolerances(const std::shared_ptr<Tolerances>& tolerances)
+   {
+      _tolerances = tolerances;
+   }
 
    //-------------------------------------
    /**@name Misc */

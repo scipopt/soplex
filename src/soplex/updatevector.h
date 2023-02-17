@@ -77,10 +77,10 @@ public:
    ///@{
    /// default constructor.
    explicit
-   UpdateVector<R>(int p_dim /*=0*/, R p_eps /*=1e-16*/)
+   UpdateVector<R>(int p_dim /*=0*/, std::shared_ptr<Tolerances> tols = nullptr)
       : VectorBase<R> (p_dim)
       , theval(0)
-      , thedelta(p_dim, p_eps)
+      , thedelta(p_dim, tols)
    {
       assert(isConsistent());
    }
@@ -168,6 +168,12 @@ public:
    {
       VectorBase<R>::reDim(newdim);
       thedelta.reDim(newdim);
+   }
+
+   /// set tolerances
+   virtual void setTolerances(std::shared_ptr<Tolerances>& tolerances)
+   {
+      thedelta.setTolerances(tolerances);
    }
    ///@}
 

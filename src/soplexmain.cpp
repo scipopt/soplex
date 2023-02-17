@@ -281,7 +281,7 @@ void printPrimalSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rown
 {
    int printprec;
    int printwidth;
-   printprec = (int) - log10(Real(Param::epsilon()));
+   printprec = (int) - log10(Real(soplex.tolerances()->epsilon()));
    printwidth = printprec + 10;
 
    if(real)
@@ -294,7 +294,7 @@ void printPrimalSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rown
 
          for(int i = 0; i < soplex.numCols(); ++i)
          {
-            if(isNotZero(primal[i]))
+            if(isNotZero(primal[i], soplex.tolerances()->epsilon()))
             {
                MSG_INFO1(soplex.spxout, soplex.spxout << colnames[i] << "\t"
                          << std::setw(printwidth) << std::setprecision(printprec)
@@ -303,7 +303,7 @@ void printPrimalSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rown
          }
 
          MSG_INFO1(soplex.spxout, soplex.spxout << "All other entries are zero (within "
-                   << std::setprecision(1) << std::scientific << Param::epsilon()
+                   << std::setprecision(1) << std::scientific << soplex.tolerances()->epsilon()
                    << std::setprecision(8) << std::fixed
                    << ")." << std::endl;)
       }
@@ -314,7 +314,7 @@ void printPrimalSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rown
 
          for(int i = 0; i < soplex.numCols(); ++i)
          {
-            if(isNotZero(primal[i]))
+            if(isNotZero(primal[i], soplex.tolerances()->epsilon()))
             {
                MSG_INFO1(soplex.spxout, soplex.spxout << colnames[i] << "\t"
                          << std::setw(printwidth) << std::setprecision(printprec)
@@ -324,7 +324,7 @@ void printPrimalSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rown
          }
 
          MSG_INFO1(soplex.spxout, soplex.spxout << "All other variables are zero (within "
-                   << std::setprecision(1) << std::scientific << Param::epsilon()
+                   << std::setprecision(1) << std::scientific << soplex.tolerances()->epsilon()
                    << std::setprecision(8) << std::fixed
                    << "). Solution has " << nNonzeros << " nonzero entries." << std::endl;)
       }
@@ -383,7 +383,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 {
    int printprec;
    int printwidth;
-   printprec = (int) - log10(Real(Param::epsilon()));
+   printprec = (int) - log10(Real(soplex.tolerances()->epsilon()));
    printwidth = printprec + 10;
 
    if(real)
@@ -396,7 +396,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 
          for(int i = 0; i < soplex.numRows(); ++i)
          {
-            if(isNotZero(dual[i]))
+            if(isNotZero(dual[i], soplex.tolerances()->epsilon()))
             {
                MSG_INFO1(soplex.spxout, soplex.spxout << rownames[i] << "\t"
                          << std::setw(printwidth) << std::setprecision(printprec)
@@ -405,7 +405,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
          }
 
          MSG_INFO1(soplex.spxout, soplex.spxout << "All other entries are zero (within "
-                   << std::setprecision(1) << std::scientific << Param::epsilon()
+                   << std::setprecision(1) << std::scientific << soplex.tolerances()->epsilon()
                    << std::setprecision(8) << std::fixed << ")." << std::endl;)
       }
       else if(soplex.isDualFeasible() && soplex.getDual(dual))
@@ -414,7 +414,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 
          for(int i = 0; i < soplex.numRows(); ++i)
          {
-            if(isNotZero(dual[i]))
+            if(isNotZero(dual[i], soplex.tolerances()->epsilon()))
             {
                MSG_INFO1(soplex.spxout, soplex.spxout << rownames[i] << "\t"
                          << std::setw(printwidth) << std::setprecision(printprec)
@@ -423,7 +423,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
          }
 
          MSG_INFO1(soplex.spxout, soplex.spxout << "All other dual values are zero (within "
-                   << std::setprecision(1) << std::scientific << Param::epsilon()
+                   << std::setprecision(1) << std::scientific << soplex.tolerances()->epsilon()
                    << std::setprecision(8) << std::fixed << ")." << std::endl;)
 
          VectorBase<R> redcost(soplex.numCols());
@@ -434,7 +434,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 
             for(int i = 0; i < soplex.numCols(); ++i)
             {
-               if(isNotZero(redcost[i]))
+               if(isNotZero(redcost[i], soplex.tolerances()->epsilon()))
                {
                   MSG_INFO1(soplex.spxout, soplex.spxout << colnames[i] << "\t"
                             << std::setw(printwidth) << std::setprecision(printprec)
@@ -443,7 +443,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
             }
 
             MSG_INFO1(soplex.spxout, soplex.spxout << "All other reduced costs are zero (within "
-                      << std::setprecision(1) << std::scientific << Param::epsilon()
+                      << std::setprecision(1) << std::scientific << soplex.tolerances()->epsilon()
                       << std::setprecision(8) << std::fixed << ")." << std::endl;)
          }
       }

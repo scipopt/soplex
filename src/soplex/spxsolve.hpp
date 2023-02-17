@@ -58,14 +58,16 @@ bool SPxSolverBase<R>::precisionReached(R& newpricertol) const
    qualConstraintViolation(maxViolConst, sumViolConst);
 
    // is the solution good enough ?
-   bool reached = maxViolRedCost < opttol() && maxViolBounds < feastol() && maxViolConst < feastol();
+   bool reached = maxViolRedCost < tolerances()->floatingPointOpttol()
+                  && maxViolBounds < tolerances()->floatingPointFeastol()
+                  && maxViolConst < tolerances()->floatingPointFeastol();
 
    if(!reached)
    {
-      newpricertol = thepricer->epsilon() / 10.0;
+      newpricertol = thepricer->pricingTolerance() / 10.0;
 
       MSG_INFO3((*this->spxout), (*this->spxout) << "Precision not reached: Pricer tolerance = "
-                << thepricer->epsilon()
+                << thepricer->pricingTolerance()
                 << " new tolerance = " << newpricertol
                 << std::endl
                 << " maxViolRedCost= " << maxViolRedCost
@@ -299,7 +301,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
             R maxpricertol = leavetol();
             R minpricertol = 0.01 * maxpricertol;
 
-            thepricer->setEpsilon(maxpricertol);
+            thepricer->setPricingTolerance(maxpricertol);
             priced = false;
 
             // to avoid shifts we restrict tolerances in the ratio test
@@ -437,7 +439,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
 
                      // is the solution good enough ?
                      // max three times reduced
-                     if((thepricer->epsilon() > minpricertol) && !precisionReached(newpricertol))
+                     if((thepricer->pricingTolerance() > minpricertol) && !precisionReached(newpricertol))
                      {
                         // no!
                         // we reduce the pricer tolerance. Note that if the pricer does not find a candiate
@@ -445,10 +447,10 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                         if(newpricertol < minpricertol)
                            newpricertol = minpricertol;
 
-                        thepricer->setEpsilon(newpricertol);
+                        thepricer->setPricingTolerance(newpricertol);
 
                         MSG_INFO2((*this->spxout), (*this->spxout) << " --- setting pricer tolerance to "
-                                  << thepricer->epsilon()
+                                  << thepricer->pricingTolerance()
                                   << std::endl;)
                      }
                   }
@@ -581,8 +583,8 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                       << ", value: " << value()
                       << ", shift: " << shift()
                       << ", epsilon: " << epsilon()
-                      << ", feastol: " << feastol()
-                      << ", opttol: " << opttol()
+                      << ", feastol: " << tolerances()->floatingPointFeastol()
+                      << ", opttol: " << tolerances()->floatingPointOpttol()
                       << std::endl
                       << "ISOLVE56 stop: " << stop
                       << ", basis status: " << static_cast<int>(SPxBasisBase<R>::status()) << " (" << static_cast<int>
@@ -675,7 +677,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
             R maxpricertol = entertol();
             R minpricertol = 0.01 * maxpricertol;
 
-            thepricer->setEpsilon(maxpricertol);
+            thepricer->setPricingTolerance(maxpricertol);
             priced = false;
 
             // to avoid shifts we restrict tolerances in the ratio test
@@ -764,7 +766,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
 
                      // is the solution good enough ?
                      // max three times reduced
-                     if((thepricer->epsilon() > minpricertol) && !precisionReached(newpricertol))
+                     if((thepricer->pricingTolerance() > minpricertol) && !precisionReached(newpricertol))
                      {
                         // no
                         // we reduce the pricer tolerance. Note that if the pricer does not find a candiate
@@ -772,11 +774,10 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                         if(newpricertol < minpricertol)
                            newpricertol = minpricertol;
 
-                        thepricer->setEpsilon(newpricertol);
+                        thepricer->setPricingTolerance(newpricertol);
 
                         MSG_INFO2((*this->spxout), (*this->spxout) << " --- setting pricer tolerance to "
-                                  << thepricer->epsilon()
-                                  << std::endl;);
+                                  << thepricer->pricingTolerance() << std::endl;);
                      }
                   }
 
@@ -908,8 +909,8 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                       << ", value: " << value()
                       << ", shift: " << shift()
                       << ", epsilon: " << epsilon()
-                      << ", feastol: " << feastol()
-                      << ", opttol: " << opttol()
+                      << ", feastol: " << tolerances()->floatingPointFeastol()
+                      << ", opttol: " << tolerances()->floatingPointOpttol()
                       << std::endl
                       << "ISOLVE57 stop: " << stop
                       << ", basis status: " << static_cast<int>(SPxBasisBase<R>::status()) << " (" << static_cast<int>
@@ -1020,19 +1021,19 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
 
             if(tightenedtype == ENTER)
             {
-               m_entertol = 0.01 * m_entertol;
+               this->scaleEntertol(0.01);
 
                MSG_INFO2((*this->spxout), (*this->spxout) <<
-                         " --- basis singular: reloading basis and solving with tighter ratio test tolerance " << m_entertol
-                         << std::endl;)
+                         " --- basis singular: reloading basis and solving with tighter ratio test tolerance " <<
+                         this->entertol() << std::endl;)
             }
             else
             {
-               m_leavetol = 0.01 * m_leavetol;
+               this->scaleLeavetol(0.01);
 
                MSG_INFO2((*this->spxout), (*this->spxout) <<
-                         " --- basis singular: reloading basis and solving with tighter ratio test tolerance " << m_leavetol
-                         << std::endl;)
+                         " --- basis singular: reloading basis and solving with tighter ratio test tolerance " <<
+                         this->leavetol() << std::endl;)
             }
 
             // load original basis
@@ -1054,9 +1055,9 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                          " --- reloaded basis singular, resetting original tolerances" << std::endl;)
 
                if(tightenedtype == ENTER)
-                  m_entertol = 100.0 * m_entertol;
+                  this->scaleEntertol(1);
                else
-                  m_leavetol = 100.0 * m_leavetol;
+                  this->scaleLeavetol(1);
 
                theratiotester->setType(type());
 
@@ -1078,9 +1079,9 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
          else if(tightened)
          {
             if(tightenedtype == ENTER)
-               m_entertol = 100.0 * m_entertol;
+               this->scaleEntertol(1);
             else
-               m_leavetol = 100.0 * m_leavetol;
+               this->scaleLeavetol(1);
 
             theratiotester->setType(type());
 
@@ -1096,9 +1097,9 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
    if(tightened)
    {
       if(tightenedtype == ENTER)
-         m_entertol = 100.0 * m_entertol;
+         this->scaleEntertol(1);
       else
-         m_leavetol = 100.0 * m_leavetol;
+         this->scaleLeavetol(1);
 
       theratiotester->setType(type());
    }
@@ -1143,8 +1144,8 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
             for(c = 0; c < rowvec.size(); ++c)
                val += rowvec.value(c) * sol[rowvec.index(c)];
 
-            if(LT(val, this->lhs(row), feastol()) ||
-                  GT(val, this->rhs(row), feastol()))
+            if(LT(val, this->lhs(row), tolerances()->floatingPointFeastol()) ||
+                  GT(val, this->rhs(row), tolerances()->floatingPointFeastol()))
             {
                // Minor rhs violations happen frequently, so print these
                // warnings only with verbose level INFO2 and higher.
@@ -1174,8 +1175,8 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
 
          for(int col = 0; col < this->nCols(); ++col)
          {
-            if(LT(sol[col], this->lower(col), feastol()) ||
-                  GT(sol[col], this->upper(col), feastol()))
+            if(LT(sol[col], this->lower(col), tolerances()->floatingPointFeastol()) ||
+                  GT(sol[col], this->upper(col), tolerances()->floatingPointFeastol()))
             {
                // Minor bound violations happen frequently, so print these
                // warnings only with verbose level INFO2 and higher.
@@ -1264,7 +1265,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
                   || rowstatus[i] == SPxBasisBase<R>::Desc::P_ON_UPPER)
             {
                // only consider rows with zero dual multiplier to preserve optimality
-               if(EQrel((*theCoPvec)[i], (R) 0))
+               if(EQrel((*theCoPvec)[i], (R) 0, this->epsilon()))
                   slackcandidates.addIdx(i);
             }
          }
@@ -1279,7 +1280,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
                      || colstatus[i] ==  SPxBasisBase<R>::Desc::P_ON_UPPER)
                {
                   // only consider continuous variables with zero dual multiplier to preserve optimality
-                  if(EQrel(this->maxObj(i) - (*thePvec)[i], (R) 0) && integerVariables[i] == 0)
+                  if(EQrel(this->maxObj(i) - (*thePvec)[i], (R) 0, this->epsilon()) && integerVariables[i] == 0)
                      continuousvars.addIdx(i);
                }
             }
@@ -1362,7 +1363,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
                   || colstatus[i] == SPxBasisBase<R>::Desc::P_ON_UPPER)
             {
                // only consider variables with zero reduced costs to preserve optimality
-               if(EQrel(this->maxObj(i) - (*thePvec)[i], (R) 0))
+               if(EQrel(this->maxObj(i) - (*thePvec)[i], (R) 0, this->epsilon()))
                   candidates.addIdx(i);
             }
          }
@@ -1447,7 +1448,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
 
             if(stat == SPxBasisBase<R>::Desc::P_ON_LOWER || stat ==  SPxBasisBase<R>::Desc::P_ON_UPPER)
             {
-               if(EQrel((*theFvec)[i], (R) 0))
+               if(EQrel((*theFvec)[i], (R) 0, this->epsilon()))
                   basiccandidates.addIdx(i);
             }
          }
@@ -1512,7 +1513,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
 
             if(stat == SPxBasisBase<R>::Desc::P_ON_LOWER || stat ==  SPxBasisBase<R>::Desc::P_ON_UPPER)
             {
-               if(EQrel((*theFvec)[i], (R) 0))
+               if(EQrel((*theFvec)[i], (R) 0, this->epsilon()))
                   basiccandidates.addIdx(i);
             }
          }
@@ -1794,7 +1795,7 @@ bool SPxSolverBase<R>::terminate()
       // It might be even possible to use this termination value in case of
       // bound violations (shifting) but in this case it is quite difficult
       // to determine if we already reached the limit.
-      if(shift() < epsilon() && noViols(opttol() - shift()))
+      if(shift() < epsilon() && noViols(tolerances()->floatingPointOpttol() - shift()))
       {
          // SPxSense::MINIMIZE == -1, so we have sign = 1 on minimizing
          if(int(this->spxSense()) * value() <= int(this->spxSense()) * objLimit)

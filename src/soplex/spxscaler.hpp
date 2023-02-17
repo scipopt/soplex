@@ -76,7 +76,6 @@ SPxScaler<R>::SPxScaler(
    , m_doBoth(doBoth)
    , spxout(outstream)
 {
-   assert(SPxScaler<R>::isConsistent());
 }
 
 template <class R>
@@ -88,7 +87,6 @@ SPxScaler<R>::SPxScaler(const SPxScaler<R>& old)
    , m_doBoth(old.m_doBoth)
    , spxout(old.spxout)
 {
-   assert(SPxScaler<R>::isConsistent());
 }
 
 template <class R>
@@ -174,7 +172,7 @@ int SPxScaler<R>::computeScaleExp(const SVectorBase<R>& vec,
    {
       R x = spxAbs(spxLdexp(vec.value(i), oldScaleExp[vec.index(i)]));
 
-      if(GT(x, maxi))
+      if(GT(x, maxi, this->tolerances()->epsilon()))
          maxi = x;
    }
 
@@ -537,7 +535,7 @@ R SPxScaler<R>::getRowMaxAbsUnscaled(const SPxLPBase<R>& lp, int i) const
       exp1 = colscaleExp[rowVec.index(j)];
       R abs = spxAbs(spxLdexp(rowVec.value(j), -exp1 - exp2));
 
-      if(GT(abs, max))
+      if(GT(abs, max, this->tolerances()->epsilon()))
          max = abs;
    }
 
@@ -564,7 +562,7 @@ R SPxScaler<R>::getRowMinAbsUnscaled(const SPxLPBase<R>& lp, int i) const
       exp1 = colscaleExp[rowVec.index(j)];
       R abs = spxAbs(spxLdexp(rowVec.value(j), -exp1 - exp2));
 
-      if(LT(abs, min))
+      if(LT(abs, min, this->tolerances()->epsilon()))
          min = abs;
    }
 
@@ -892,7 +890,7 @@ R SPxScaler<R>::maxColRatio(const SPxLPBase<R>& lp) const
       {
          R x = spxAbs(vec.value(j));
 
-         if(isZero(x))
+         if(isZero(x, this->tolerances()->epsilon()))
             continue;
 
          if(x < mini)
@@ -934,7 +932,7 @@ R SPxScaler<R>::maxRowRatio(const SPxLPBase<R>& lp) const
       {
          R x = spxAbs(vec.value(j));
 
-         if(isZero(x))
+         if(isZero(x, this->tolerances()->epsilon()))
             continue;
 
          if(x < mini)

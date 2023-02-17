@@ -283,8 +283,8 @@ private:
    bool           m_pricingViolCoUpToDate;   ///< true, if the stored violation in coDim is up to date
    int            m_numViol;     ///< number of violations of current solution
 
-   R           m_entertol;    ///< feasibility tolerance maintained during entering algorithm
-   R           m_leavetol;    ///< feasibility tolerance maintained during leaving algorithm
+   R           entertolscale;    ///< factor to temporarily decrease the entering tolerance
+   R           leavetolscale;    ///< factor to temporarily decrease the leaving tolerance
    R           theShift;      ///< sum of all shifts applied to any bound.
    R           lastShift;     ///< for forcing feasibility.
    int            m_maxCycle;    ///< maximum steps before cycling is detected.
@@ -500,6 +500,27 @@ public:
    {
       spxout = &newOutstream;
       SPxLPBase<R>::spxout = &newOutstream;
+   }
+
+   /// set the _tolerances member variable
+   virtual void setTolerances(std::shared_ptr<Tolerances> newTolerances)
+   {
+      this->_tolerances = newTolerances;
+      // set tolerances for all the UpdateVectors
+      this->primVec.setTolerances(newTolerances);
+      this->dualVec.setTolerances(newTolerances);
+      this->addVec.setTolerances(newTolerances);
+      this->theFvec->setTolerances(newTolerances);
+      this->theCoPvec->setTolerances(newTolerances);
+      this->thePvec->setTolerances(newTolerances);
+      this->theRPvec->setTolerances(newTolerances);
+      this->theCPvec->setTolerances(newTolerances);
+   }
+
+   /// returns current tolerances
+   const std::shared_ptr<Tolerances>& tolerances() const
+   {
+      return this->_tolerances;
    }
 
    /// set refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
@@ -812,58 +833,50 @@ public:
    ///@{
    /// values \f$|x| < \epsilon\f$ are considered to be 0.
    /** if you want another value for epsilon, use
-    * \ref soplex::Param::setEpsilon() "Param::setEpsilon()".
+    * \ref soplex::Tolerances::setEpsilon() "Tolerances::setEpsilon()".
     */
    R epsilon() const
    {
-      return primVec.delta().getEpsilon();
+      return this->tolerances()->epsilon();
    }
    /// feasibility tolerance maintained by ratio test during ENTER algorithm.
    R entertol() const
    {
-      assert(m_entertol > 0.0);
-
-      return m_entertol;
+      if(theRep == COLUMN)
+         return this->tolerances()->floatingPointFeastol() * this->entertolscale;
+      else
+         return this->tolerances()->floatingPointOpttol() * this->entertolscale;
    }
    /// feasibility tolerance maintained by ratio test during LEAVE algorithm.
    R leavetol() const
    {
-      assert(m_leavetol > 0.0);
-
-      return m_leavetol;
+      if(theRep == COLUMN)
+         return this->tolerances()->floatingPointOpttol() * this->leavetolscale;
+      else
+         return this->tolerances()->floatingPointFeastol() * this->leavetolscale;
    }
-   /// allowed primal feasibility tolerance.
-   R feastol() const
+   /// scale the entering tolerance
+   void scaleEntertol(R d)
    {
-      assert(m_entertol > 0.0);
-      assert(m_leavetol > 0.0);
-
-      return theRep == COLUMN ? m_entertol : m_leavetol;
+      this->entertolscale = d;
    }
-   /// allowed optimality, i.e., dual feasibility tolerance.
-   R opttol() const
+   /// scale the leaving tolerance
+   void scaleLeavetol(R d)
    {
-      assert(m_entertol > 0.0);
-      assert(m_leavetol > 0.0);
-
-      return theRep == COLUMN ? m_leavetol : m_entertol;
+      this->leavetolscale = d;
    }
-   /// guaranteed primal and dual bound violation for optimal solution, returning the maximum of feastol() and opttol(), i.e., the less tight tolerance.
+   void scaleTolerances(R d)
+   {
+      this->scaleEntertol(d);
+      this->scaleLeavetol(d);
+   }
+   /// guaranteed primal and dual bound violation for optimal solution, returning the maximum of floatingPointFeastol() and floatingPointOpttol().
    R delta() const
    {
-      assert(m_entertol > 0.0);
-      assert(m_leavetol > 0.0);
-
-      return m_entertol > m_leavetol ? m_entertol : m_leavetol;
+      return std::max(this->tolerances()->floatingPointFeastol(),
+                      this->tolerances()->floatingPointOpttol());
    }
-   /// set parameter \p feastol.
-   void setFeastol(R d);
-   /// set parameter \p opttol.
-   void setOpttol(R d);
-   /// set parameter \p delta, i.e., set \p feastol and \p opttol to same value.
-   void setDelta(R d);
-   /// set parameter \p epsilon for semi-sparse primal, dual and pricing vectors
-   void setEpsilon(R d);
+
    /// set timing type
    void setTiming(Timer::TYPE ttype)
    {

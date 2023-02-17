@@ -1361,7 +1361,8 @@ void SoPlexBase<R>::_correctDualSolution(
          }
       }
 
-      if(R(debugRedCostViolation) > _solver.opttol() || R(debugDualViolation) > _solver.opttol()
+      if(R(debugRedCostViolation) > _solver.tolerances()->floatingPointOpttol()
+            || R(debugDualViolation) > _solver.tolerances()->floatingPointOpttol()
             || debugBasicDualViolation > 1e-9)
       {
          MSG_WARNING(spxout, spxout << "Warning: floating-point dual solution with violation "
@@ -1477,10 +1478,6 @@ void SoPlexBase<R>::_performOptIRStable(
    stoppedTime = false;
    stoppedIter = false;
    error = false;
-
-   // set working tolerances in floating-point solver
-   _solver.setFeastol(realParam(SoPlexBase<R>::FPFEASTOL));
-   _solver.setOpttol(realParam(SoPlexBase<R>::FPOPTTOL));
 
    // declare vectors and variables
    typename SPxSolverBase<R>::Status result = SPxSolverBase<R>::UNKNOWN;
@@ -3312,7 +3309,7 @@ void SoPlexBase<R>::_computeInfeasBox(SolRational& sol, bool transformed)
 
    // prepare ytransA and ytransb; since we want exact arithmetic, we set the zero threshold of the semi-sparse
    // vector to zero
-   ytransA.setEpsilon(0);
+   ytransA.setTolerances(0);
    ytransA.clear();
    ytransb = 0;
 
@@ -3592,8 +3589,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
          // do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used
          bool keepbounds = intParam(SoPlexBase<R>::RATIOTESTER) == SoPlexBase<R>::RATIOTESTER_BOUNDFLIPPING;
          Real remainingTime = _solver.getMaxTime() - _solver.time();
-         simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlexBase<R>::EPSILON_ZERO),
-                                realParam(SoPlexBase<R>::FPFEASTOL), realParam(SoPlexBase<R>::FPOPTTOL), remainingTime, keepbounds,
+         simplificationStatus = _simplifier->simplify(_solver, remainingTime, keepbounds,
                                 _solver.random.getSeed());
       }
 
@@ -3839,7 +3835,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
 
    while(true)
    {
-      assert(!increasedMarkowitz || GE(_slufactor.markowitz(), R(0.9)));
+      assert(!increasedMarkowitz || GE(_slufactor.markowitz(), R(0.9), this->tolerances()->epsilon()));
 
       result = _solveRealForRational(fromScratch, primal, dual, basisStatusRows, basisStatusCols);
 
@@ -3942,8 +3938,19 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
          MSG_INFO1(spxout, spxout << "Relaxing tolerances." << std::endl);
 
          setIntParam(SoPlexBase<R>::ALGORITHM, SoPlexBase<R>::ALGORITHM_PRIMAL);
-         _solver.setDelta((_solver.feastol() * 1e3 > 1e-3) ? 1e-3 : (_solver.feastol() * 1e3));
-         relaxedTolerances = _solver.feastol() >= 1e-3;
+
+         // scale tols by up 1e3 but so that they do not exceed 1e-3
+         if(_solver.entertol() > 1e-6)
+            _solver.scaleEntertol(1e-3 / _solver.entertol());
+         else
+            _solver.scaleEntertol(1e3);
+
+         if(_solver.leavetol() > 1e-6)
+            _solver.scaleLeavetol(1e-3 / _solver.leavetol());
+         else
+            _solver.scaleLeavetol(1e3);
+
+         relaxedTolerances = _solver.entertol() >= 1e-3;
          solvedFromScratch = false;
          continue;
       }
@@ -3953,8 +3960,14 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
          MSG_INFO1(spxout, spxout << "Tightening tolerances." << std::endl);
 
          setIntParam(SoPlexBase<R>::ALGORITHM, SoPlexBase<R>::ALGORITHM_DUAL);
-         _solver.setDelta(_solver.feastol() * 1e-3 < 1e-9 ? 1e-9 : _solver.feastol() * 1e-3);
-         tightenedTolerances = _solver.feastol() <= 1e-9;
+
+         // scale tols by up 1e-3 but so that they are not smaller than 1e-9
+         if(_solver.entertol() < 1e-6)
+            _solver.scaleEntertol(1e-9 / _solver.entertol());
+         else
+            _solver.scaleEntertol(1e-3);
+
+         tightenedTolerances = _solver.entertol() <= 1e-9;
          solvedFromScratch = false;
          continue;
       }
@@ -4000,8 +4013,6 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
       break;
    }
 
-   _solver.setFeastol(realParam(SoPlexBase<R>::FPFEASTOL));
-   _solver.setOpttol(realParam(SoPlexBase<R>::FPOPTTOL));
    _slufactor.setMarkowitz(markowitz);
 
    setIntParam(SoPlexBase<R>::RATIOTESTER, ratiotester);

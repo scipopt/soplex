@@ -335,7 +335,7 @@ void SPxBoundFlippingRT<R>::collectBreakpointsMax(
       int i = *idx;
       R x = upd[i];
 
-      if(x > this->epsilon)
+      if(x > this->epsilonZero())
       {
          if(upp[i] < R(infinity))
          {
@@ -356,7 +356,7 @@ void SPxBoundFlippingRT<R>::collectBreakpointsMax(
             nBp++;
          }
       }
-      else if(x < -this->epsilon)
+      else if(x < -this->epsilonZero())
       {
          if(low[i] > R(-infinity))
          {
@@ -412,7 +412,7 @@ void SPxBoundFlippingRT<R>::collectBreakpointsMin(
       int i = *idx;
       R x = upd[i];
 
-      if(x > this->epsilon)
+      if(x > this->epsilonZero())
       {
          if(low[i] > R(-infinity))
          {
@@ -434,7 +434,7 @@ void SPxBoundFlippingRT<R>::collectBreakpointsMin(
             nBp++;
          }
       }
-      else if(x < -this->epsilon)
+      else if(x < -this->epsilonZero())
       {
          if(upp[i] < R(infinity))
          {
@@ -643,8 +643,6 @@ SPxId SPxBoundFlippingRT<R>::selectEnter(
    int          cupdnnz = this->thesolver->coPvec().delta().size();
    const R*  lcb  = this->thesolver->lcBound().get_const_ptr();
    const R*  ucb  = this->thesolver->ucBound().get_const_ptr();
-
-   this->resetTols();
 
    R max;
 
@@ -1010,8 +1008,6 @@ int SPxBoundFlippingRT<R>::selectLeave(
       this->thesolver->lbBound().get_const_ptr();      /**< pointer to lower bound/lhs of current VectorBase<R> */
    const R*  ub  =
       this->thesolver->ubBound().get_const_ptr();      /**< pointer to upper bound/rhs of current VectorBase<R> */
-
-   this->resetTols();
 
    R max;
 

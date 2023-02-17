@@ -61,7 +61,7 @@ void SPxSteepPR<R>::load(SPxSolverBase<R>* base)
 template <class R>
 void SPxSteepPR<R>::setType(typename SPxSolverBase<R>::Type type)
 {
-   workRhs.setEpsilon(this->thesolver->epsilon());
+   workRhs.setTolerances(this->_tolerances);
 
    setupWeights(type);
    workVec.clear();
@@ -157,7 +157,7 @@ void SPxSteepPR<R>::setupWeights(typename SPxSolverBase<R>::Type type)
       {
          assert(type == SPxSolverBase<R>::LEAVE);
          coWeights.reDim(this->thesolver->dim(), false);
-         SSVectorBase<R>  tmp(this->thesolver->dim(), this->thesolver->epsilon());
+         SSVectorBase<R>  tmp(this->thesolver->dim(), this->thesolver->tolerances());
 
          for(i = this->thesolver->dim() - 1; i >= endDim && !this->thesolver->isTimeLimitReached(); --i)
          {
@@ -200,11 +200,11 @@ void SPxSteepPR<R>::left4(int n, SPxId id)
 
 #ifndef NDEBUG
 
-      if(spxAbs(rhoVec[n]) < this->theeps * 0.5)
+      if(spxAbs(rhoVec[n]) < this->thetolerance * 0.5)
       {
          MSG_INFO3((*this->thesolver->spxout), (*this->thesolver->spxout) << "WSTEEP04: rhoVec = "
-                   << rhoVec[n] << " with smaller absolute value than 0.5*theeps = " << 0.5 * this->theeps <<
-                   std::endl;)
+                   << rhoVec[n] << " with smaller absolute value than 0.5*thetolerance = " << 0.5 * this->thetolerance
+                   << std::endl;)
       }
 
 #endif
@@ -220,7 +220,7 @@ void SPxSteepPR<R>::left4(int n, SPxId id)
          if(coWeights_ptr[j] < delta)
             coWeights_ptr[j] = delta; // coWeights_ptr[j] = delta / (1+delta-x);
          else if(coWeights_ptr[j] >= R(infinity))
-            coWeights_ptr[j] = 1.0 / this->theeps;
+            coWeights_ptr[j] = 1.0 / this->thetolerance;
       }
 
       coWeights_ptr[n] = beta_q;
@@ -300,22 +300,22 @@ int SPxSteepPR<R>::selectLeave()
       if(bestPrices.size() < 2 || this->thesolver->basis().lastUpdate() == 0)
       {
          // call init method to build up price-vector and return index of largest price
-         retid = buildBestPriceVectorLeave(this->theeps);
+         retid = buildBestPriceVectorLeave(this->thetolerance);
       }
       else
-         retid = selectLeaveHyper(this->theeps);
+         retid = selectLeaveHyper(this->thetolerance);
    }
    else if(this->thesolver->sparsePricingLeave)
-      retid = selectLeaveSparse(this->theeps);
+      retid = selectLeaveSparse(this->thetolerance);
    else
-      retid = selectLeaveX(this->theeps);
+      retid = selectLeaveX(this->thetolerance);
 
    if(retid < 0 && !refined)
    {
       refined = true;
       MSG_INFO3((*this->thesolver->spxout),
                 (*this->thesolver->spxout) << "WSTEEP03 trying refinement step..\n";)
-      retid = selectLeaveX(this->theeps / STEEP_REFINETOL);
+      retid = selectLeaveX(this->thetolerance / STEEP_REFINETOL);
    }
 
    if(retid >= 0)
@@ -660,14 +660,14 @@ SPxId SPxSteepPR<R>::selectEnter()
    assert(this->thesolver != 0);
    SPxId enterId;
 
-   enterId = selectEnterX(this->theeps);
+   enterId = selectEnterX(this->thetolerance);
 
    if(!enterId.isValid() && !refined)
    {
       refined = true;
       MSG_INFO3((*this->thesolver->spxout),
                 (*this->thesolver->spxout) << "WSTEEP05 trying refinement step..\n";)
-      enterId = selectEnterX(this->theeps / STEEP_REFINETOL);
+      enterId = selectEnterX(this->thetolerance / STEEP_REFINETOL);
    }
 
    assert(isConsistent());
@@ -1113,7 +1113,7 @@ bool SPxSteepPR<R>::isConsistent() const
    if(this->thesolver != 0 && this->thesolver->type() == SPxSolverBase<R>::LEAVE && setup == EXACT)
    {
       int i;
-      SSVectorBase<R>  tmp(this->thesolver->dim(), this->thesolver->epsilon());
+      SSVectorBase<R>  tmp(this->thesolver->dim(), this->thesolver->tolerances());
       R x;
 
       for(i = this->thesolver->dim() - 1; i >= 0; --i)

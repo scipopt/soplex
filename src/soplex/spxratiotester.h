@@ -62,6 +62,8 @@ protected:
    typename SPxSolverBase<R>::Type m_type;
    /// allowed bound violation
    R delta;
+   /// tolerances used by the solver
+   std::shared_ptr<Tolerances> _tolerances;
    ///@}
 
 public:
@@ -97,8 +99,8 @@ public:
    /// set allowed bound violation
    virtual void setDelta(R newDelta)
    {
-      if(newDelta <= DEFAULT_EPS_ZERO)
-         delta = DEFAULT_EPS_ZERO;
+      if(newDelta <= this->tolerances()->epsilon())
+         delta = this->tolerances()->epsilon();
       else
          delta = newDelta;
    }
@@ -107,6 +109,17 @@ public:
    virtual R getDelta()
    {
       return delta;
+   }
+
+   /// set the _tolerances member variable
+   virtual void setTolerances(std::shared_ptr<Tolerances> newTolerances)
+   {
+      this->_tolerances = newTolerances;
+   }
+   /// get the _tolerances member variable
+   const std::shared_ptr<Tolerances> tolerances() const
+   {
+      return _tolerances;
    }
    ///@}
 

@@ -7,7 +7,6 @@
  */
 #ifndef __SOPLEX_MULTIPRECISION_HPP_
 #define __SOPLEX_MULTIPRECISION_HPP_
-#define SOPLEX_DEBUG
 #include <numeric>
 #include <vector>
 #include <string>
