@@ -753,7 +753,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
 #ifdef ENABLE_ADDITIONAL_CHECKS
    else
    {
-      SSVectorBase<R>  tmp(dim(), epsilon());
+      SSVectorBase<R>  tmp(dim(), this->tolerances());
       tmp.clear();
       this->coSolve(tmp, unitVecs[leaveIdx]);
       tmp -= theCoPvec->delta();
@@ -979,7 +979,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
 
 #ifdef ENABLE_ADDITIONAL_CHECKS
          {
-            SSVectorBase<R>  tmp(dim(), epsilon());
+            SSVectorBase<R>  tmp(dim(), this->tolerances());
             SPxBasisBase<R>::solve(tmp, newVector);
             tmp -= fVec().delta();
 

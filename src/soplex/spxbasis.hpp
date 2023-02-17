@@ -1118,10 +1118,8 @@ R SPxBasisBase<R>::condition(int maxiters, R tolerance)
    if(dimension <= 0)
       return 1.0;
 
-   SSVectorBase<R> x(dimension);
-   SSVectorBase<R> y(dimension);
-   x.setTolerances(theLP->tolerances());
-   y.setTolerances(theLP->tolerances());
+   SSVectorBase<R> x(dimension, theLP->tolerances());
+   SSVectorBase<R> y(dimension, theLP->tolerances());
 
    // check whether a regular basis matrix is available
    if(status() < REGULAR)

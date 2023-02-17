@@ -1402,8 +1402,7 @@ void SoPlexBase<R>::_updateDecompReducedProblemViol(bool allrows)
    if(allrows)
       nrowstoadd = _nDecompViolRows;   // adding all violated rows
 
-   SSVectorBase<R>  y(_solver.nCols());
-   y.setTolerances(_solver.tolerances());
+   SSVectorBase<R>  y(_solver.nCols(), _solver.tolerances());
    y.unSetup();
 
    // identifying the rows not included in the reduced problem that are violated by the current solution.
@@ -1730,8 +1729,7 @@ void SoPlexBase<R>::_getCompatibleColumns(VectorBase<R> feasVector, int* nonposi
 #endif
 
    bool compatible;
-   SSVectorBase<R>  y(_solver.nCols());
-   y.setTolerances(_solver.tolerances());
+   SSVectorBase<R>  y(_solver.nCols(), _solver.tolerances());
    y.unSetup();
 
    *ncompatind  = 0;
@@ -1895,8 +1893,7 @@ void SoPlexBase<R>::_computeReducedProbObjCoeff(bool& stop)
 #endif
 #endif
 
-   SSVectorBase<R>  y(numCols());
-   y.setTolerances(_solver.tolerances());
+   SSVectorBase<R>  y(numCols(), _solver.tolerances());
    y.unSetup();
 
    // the rhs of this calculation is the original objective coefficient vector
@@ -2841,8 +2838,7 @@ void SoPlexBase<R>::_updateDecompComplementaryPrimalProblem(bool origObj)
 template <class R>
 void SoPlexBase<R>::_checkOriginalProblemOptimality(VectorBase<R> primalVector, bool printViol)
 {
-   SSVectorBase<R>  x(_solver.nCols());
-   x.setTolerances(this->tolerances());
+   SSVectorBase<R>  x(_solver.nCols(), this->tolerances());
    x.unSetup();
 
    // multiplying the solution vector of the reduced problem with the transformed basis to identify the original

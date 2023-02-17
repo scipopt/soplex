@@ -4593,7 +4593,7 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
    if(_solver.rep() == SPxSolverBase<R>::COLUMN)
    {
       int idx;
-      SSVectorBase<R> x(numRows());
+      SSVectorBase<R> x(numRows(), this->tolerances());
 
       try
       {
@@ -4665,7 +4665,7 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
 
       // @todo should rhs be a reference?
       DSVectorBase<R> rhs(numCols());
-      SSVectorBase<R>  y(numCols());
+      SSVectorBase<R>  y(numCols(), this->tolerances());
       int* bind = 0;
       int index;
 
@@ -4787,7 +4787,7 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
    if(_solver.rep() == SPxSolverBase<R>::COLUMN)
    {
       int idx;
-      SSVectorBase<R> x(numRows());
+      SSVectorBase<R> x(numRows(), this->tolerances());
 
       try
       {
@@ -4885,7 +4885,7 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
       }
       else
       {
-         SSVectorBase<R> x(numCols());
+         SSVectorBase<R> x(numCols(), this->tolerances());
 
          for(int k = 0; k < numCols(); k++)
          {
@@ -5062,7 +5062,7 @@ bool SoPlexBase<R>::getBasisInverseTimesVecReal(R* rhs, R* sol, bool unscale)
       assert(_solver.rep() == SPxSolverBase<R>::ROW);
 
       DSVectorBase<R> rowrhs(numCols());
-      SSVectorBase<R> y(numCols());
+      SSVectorBase<R> y(numCols(), this->tolerances());
       int* bind = 0;
 
       bool adaptScaling = unscale && _realLP->isScaled();
