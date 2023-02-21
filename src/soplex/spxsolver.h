@@ -874,7 +874,7 @@ public:
    R delta() const
    {
       return SOPLEX_MAX(this->tolerances()->floatingPointFeastol(),
-                      this->tolerances()->floatingPointOpttol());
+                        this->tolerances()->floatingPointOpttol());
    }
 
    /// set timing type

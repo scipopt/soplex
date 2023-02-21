@@ -764,7 +764,7 @@ typename SLUFactor<R>::Status SLUFactor<R>::change(
    usetup = false;
 
    SPX_MSG_DEBUG(std::cout << "DSLUFA01\tupdated\t\tstability = " << stability()
-             << std::endl;)
+                 << std::endl;)
 
    return status();
 }
@@ -1491,13 +1491,13 @@ typename SLUFactor<R>::Status SLUFactor<R>::load(const SVectorBase<R>* matrix[],
       minStability /= 2.0;
 
       SPX_MSG_INFO3((*this->spxout), (*this->spxout) <<
-                "ISLUFA01 refactorizing with increased Markowitz threshold: "
-                << lastThreshold << std::endl;)
+                    "ISLUFA01 refactorizing with increased Markowitz threshold: "
+                    << lastThreshold << std::endl;)
    }
 
    SPX_MSG_DEBUG(std::cout << "DSLUFA02 threshold = " << lastThreshold
-             << "\tstability = " << stability()
-             << "\tminStability = " << minStability << std::endl;)
+                 << "\tstability = " << stability()
+                 << "\tminStability = " << minStability << std::endl;)
    SPX_MSG_DEBUG(
    {
       int i;

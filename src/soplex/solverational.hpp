@@ -601,10 +601,10 @@ void SoPlexBase<R>::_computeReducedCostViolation(
             && sol._redCost[c] < -redCostViolation)
       {
          SPX_MSG_DEBUG(std::cout << "basisStatusCol = " << basisStatusCol
-                   << ", lower tight = " << bool(sol._primal[c] <= lowerRational(c))
-                   << ", upper tight = " << bool(sol._primal[c] >= upperRational(c))
-                   << ", sol._redCost[c] = " << sol._redCost[c].str()
-                   << "\n");
+                       << ", lower tight = " << bool(sol._primal[c] <= lowerRational(c))
+                       << ", upper tight = " << bool(sol._primal[c] >= upperRational(c))
+                       << ", sol._redCost[c] = " << sol._redCost[c].str()
+                       << "\n");
          redCostViolation = -sol._redCost[c];
       }
 
@@ -613,10 +613,10 @@ void SoPlexBase<R>::_computeReducedCostViolation(
             && sol._redCost[c] > redCostViolation)
       {
          SPX_MSG_DEBUG(std::cout << "basisStatusCol = " << basisStatusCol
-                   << ", lower tight = " << bool(sol._primal[c] <= lowerRational(c))
-                   << ", upper tight = " << bool(sol._primal[c] >= upperRational(c))
-                   << ", sol._redCost[c] = " << sol._redCost[c].str()
-                   << "\n");
+                       << ", lower tight = " << bool(sol._primal[c] <= lowerRational(c))
+                       << ", upper tight = " << bool(sol._primal[c] >= upperRational(c))
+                       << ", sol._redCost[c] = " << sol._redCost[c].str()
+                       << "\n");
          redCostViolation = sol._redCost[c];
       }
    }
@@ -646,10 +646,10 @@ void SoPlexBase<R>::_computeDualViolation(
             && sol._dual[r] < -dualViolation)
       {
          SPX_MSG_DEBUG(std::cout << "basisStatusRow = " << basisStatusRow
-                   << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
-                   << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
-                   << ", sol._dual[r] = " << sol._dual[r].str()
-                   << "\n");
+                       << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
+                       << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
+                       << ", sol._dual[r] = " << sol._dual[r].str()
+                       << "\n");
          dualViolation = -sol._dual[r];
       }
 
@@ -658,10 +658,10 @@ void SoPlexBase<R>::_computeDualViolation(
             && sol._dual[r] > dualViolation)
       {
          SPX_MSG_DEBUG(std::cout << "basisStatusRow = " << basisStatusRow
-                   << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
-                   << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
-                   << ", sol._dual[r] = " << sol._dual[r].str()
-                   << "\n");
+                       << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
+                       << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
+                       << ", sol._dual[r] = " << sol._dual[r].str()
+                       << "\n");
          dualViolation = sol._dual[r];
       }
    }
@@ -697,7 +697,7 @@ bool SoPlexBase<R>::_isRefinementOver(
       else
       {
          SPX_MSG_INFO1(spxout, spxout <<
-                   "Tolerances reached but minRounds forcing additional refinement rounds.\n");
+                       "Tolerances reached but minRounds forcing additional refinement rounds.\n");
       }
    }
 
@@ -805,7 +805,7 @@ void SoPlexBase<R>::_ratrecAndOrRatfac(
 
       nextRatrecRefinement = int(_statistics->refinements * realParam(SoPlexBase<R>::RATREC_FREQ)) + 1;
       SPX_MSG_DEBUG(spxout << "Next rational reconstruction after refinement " << nextRatrecRefinement <<
-                ".\n");
+                    ".\n");
    }
 
    // solve basis systems exactly
@@ -1287,11 +1287,11 @@ void SoPlexBase<R>::_correctDualSolution(
                && debugRedCost[c] < -debugRedCostViolation)
          {
             SPX_MSG_DEBUG(std::cout << "basisStatusCol = " << basisStatusCol
-                      << ", lower tight = " << bool(sol._primal[c] <= lowerRational(c))
-                      << ", upper tight = " << bool(sol._primal[c] >= upperRational(c))
-                      << ", obj[c] = " << _realLP->obj(c)
-                      << ", debugRedCost[c] = " << debugRedCost[c].str()
-                      << "\n");
+                          << ", lower tight = " << bool(sol._primal[c] <= lowerRational(c))
+                          << ", upper tight = " << bool(sol._primal[c] >= upperRational(c))
+                          << ", obj[c] = " << _realLP->obj(c)
+                          << ", debugRedCost[c] = " << debugRedCost[c].str()
+                          << "\n");
             debugRedCostViolation = -debugRedCost[c];
          }
 
@@ -1300,11 +1300,11 @@ void SoPlexBase<R>::_correctDualSolution(
                && debugRedCost[c] > debugRedCostViolation)
          {
             SPX_MSG_DEBUG(std::cout << "basisStatusCol = " << basisStatusCol
-                      << ", lower tight = " << bool(sol._primal[c] <= lowerRational(c))
-                      << ", upper tight = " << bool(sol._primal[c] >= upperRational(c))
-                      << ", obj[c] = " << _realLP->obj(c)
-                      << ", debugRedCost[c] = " << debugRedCost[c].str()
-                      << "\n");
+                          << ", lower tight = " << bool(sol._primal[c] <= lowerRational(c))
+                          << ", upper tight = " << bool(sol._primal[c] >= upperRational(c))
+                          << ", obj[c] = " << _realLP->obj(c)
+                          << ", debugRedCost[c] = " << debugRedCost[c].str()
+                          << "\n");
             debugRedCostViolation = debugRedCost[c];
          }
       }
@@ -1328,11 +1328,11 @@ void SoPlexBase<R>::_correctDualSolution(
                && val > debugDualViolation)
          {
             SPX_MSG_DEBUG(std::cout << "basisStatusRow = " << basisStatusRow
-                      << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
-                      << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
-                      << ", dualReal[r] = " << val.str()
-                      << ", dualReal[r] = " << dualReal[r]
-                      << "\n");
+                          << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
+                          << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
+                          << ", dualReal[r] = " << val.str()
+                          << ", dualReal[r] = " << dualReal[r]
+                          << "\n");
             debugDualViolation = val;
          }
 
@@ -1341,22 +1341,22 @@ void SoPlexBase<R>::_correctDualSolution(
                && val < -debugDualViolation)
          {
             SPX_MSG_DEBUG(std::cout << "basisStatusRow = " << basisStatusRow
-                      << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
-                      << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
-                      << ", dualReal[r] = " << val.str()
-                      << ", dualReal[r] = " << dualReal[r]
-                      << "\n");
+                          << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
+                          << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
+                          << ", dualReal[r] = " << val.str()
+                          << ", dualReal[r] = " << dualReal[r]
+                          << "\n");
             debugDualViolation = -val;
          }
 
          if(basisStatusRow == SPxSolverBase<R>::BASIC && spxAbs(val) > debugBasicDualViolation)
          {
             SPX_MSG_DEBUG(std::cout << "basisStatusRow = " << basisStatusRow
-                      << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
-                      << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
-                      << ", dualReal[r] = " << val.str()
-                      << ", dualReal[r] = " << dualReal[r]
-                      << "\n");
+                          << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
+                          << ", upper tight = " << bool(sol._slacks[r] >= rhsRational(r))
+                          << ", dualReal[r] = " << val.str()
+                          << ", dualReal[r] = " << dualReal[r]
+                          << "\n");
             debugBasicDualViolation = spxAbs(val);
          }
       }
@@ -1366,10 +1366,10 @@ void SoPlexBase<R>::_correctDualSolution(
             || debugBasicDualViolation > 1e-9)
       {
          SPX_MSG_WARNING(spxout, spxout << "Warning: floating-point dual solution with violation "
-                     << debugRedCostViolation.str() << " / "
-                     << debugDualViolation.str() << " / "
-                     << debugBasicDualViolation.str()
-                     << " (red. cost, dual, basic).\n");
+                         << debugRedCostViolation.str() << " / "
+                         << debugDualViolation.str() << " / "
+                         << debugBasicDualViolation.str()
+                         << " (red. cost, dual, basic).\n");
       }
    }
 #endif
@@ -1447,7 +1447,7 @@ void SoPlexBase<R>::_updateReducedCosts(SolRational& sol, int& dualSize,
    if(numCorrectedPrimals + numCorrectedDuals > 0)
    {
       SPX_MSG_INFO2(spxout, spxout << "Corrected " << numCorrectedPrimals << " primal variables and " <<
-                numCorrectedDuals << " dual values.\n");
+                    numCorrectedDuals << " dual values.\n");
    }
 }
 
@@ -1586,22 +1586,22 @@ void SoPlexBase<R>::_performOptIRStable(
 
       // output violations; the reduced cost violations for artificially introduced slack columns are actually violations of the dual multipliers
       SPX_MSG_INFO1(spxout, spxout
-                << "Max. bound violation = " << boundsViolation.str() << "\n"
-                << "Max. row violation = " << sideViolation.str() << "\n"
-                << "Max. reduced cost violation = " << redCostViolation.str() << "\n"
-                << "Max. dual violation = " << dualViolation.str() << "\n");
+                    << "Max. bound violation = " << boundsViolation.str() << "\n"
+                    << "Max. row violation = " << sideViolation.str() << "\n"
+                    << "Max. reduced cost violation = " << redCostViolation.str() << "\n"
+                    << "Max. dual violation = " << dualViolation.str() << "\n");
 
       SPX_MSG_DEBUG(spxout
-                << std::fixed << std::setprecision(2) << std::setw(10)
-                << "Progress table: "
-                << std::setw(10) << _statistics->refinements << " & "
-                << std::setw(10) << _statistics->iterations << " & "
-                << std::setw(10) << _statistics->solvingTime->time() << " & "
-                << std::setw(10) << _statistics->rationalTime->time() << " & "
-                << std::setw(10) << boundsViolation > sideViolation ? boundsViolation :
-                sideViolation << " & "
-                << std::setw(10) << redCostViolation > dualViolation ? redCostViolation :
-                dualViolation << "\n");
+                    << std::fixed << std::setprecision(2) << std::setw(10)
+                    << "Progress table: "
+                    << std::setw(10) << _statistics->refinements << " & "
+                    << std::setw(10) << _statistics->iterations << " & "
+                    << std::setw(10) << _statistics->solvingTime->time() << " & "
+                    << std::setw(10) << _statistics->rationalTime->time() << " & "
+                    << std::setw(10) << boundsViolation > sideViolation ? boundsViolation :
+                    sideViolation << " & "
+                    << std::setw(10) << redCostViolation > dualViolation ? redCostViolation :
+                    dualViolation << "\n");
 
       // check termination criteria for refinement loop
       if(_isRefinementOver(primalFeasible, dualFeasible, boundsViolation, sideViolation, redCostViolation,
@@ -1672,14 +1672,14 @@ void SoPlexBase<R>::_performOptIRStable(
       if(_hasBasis && _solver.basis().status() < SPxBasisBase<R>::REGULAR)
       {
          SPX_MSG_DEBUG(spxout << "basis (status = " << _solver.basis().status() << ") desc before set:\n";
-                   _solver.basis().desc().dump());
+                       _solver.basis().desc().dump());
          _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
          SPX_MSG_DEBUG(spxout << "basis (status = " << _solver.basis().status() << ") desc after set:\n";
-                   _solver.basis().desc().dump());
+                       _solver.basis().desc().dump());
 
          _hasBasis = _solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM;
          SPX_MSG_DEBUG(spxout << "setting basis in solver " << (_hasBasis ? "successful" : "failed") <<
-                   " (3)\n");
+                       " (3)\n");
       }
 
       // solve modified problem
@@ -1974,7 +1974,7 @@ void SoPlexBase<R>::_lift()
          if(spxAbs(value) > maxValue)
          {
             SPX_MSG_DEBUG(std::cout << "   --> nonzero " << k << " has value " << value.str() << " in row " <<
-                      colVector.index(k) << "\n");
+                          colVector.index(k) << "\n");
 
             // add new column equal to maxValue times original column
             if(!addedLiftingRow)
@@ -2043,7 +2043,7 @@ void SoPlexBase<R>::_lift()
          if(spxAbs(value) < minValue)
          {
             SPX_MSG_DEBUG(std::cout << "   --> nonzero " << k << " has value " << value.str() << " in row " <<
-                      colVector.index(k) << "\n");
+                          colVector.index(k) << "\n");
 
             // add new column equal to maxValue times original column
             if(!addedLiftingRow)
@@ -2110,7 +2110,7 @@ void SoPlexBase<R>::_lift()
    if(numColsRational() > _beforeLiftCols || numRowsRational() > _beforeLiftRows)
    {
       SPX_MSG_INFO1(spxout, spxout << "Added " << numColsRational() - _beforeLiftCols << " columns and "
-                << numRowsRational() - _beforeLiftRows << " rows to reduce large matrix coefficients\n.");
+                    << numRowsRational() - _beforeLiftRows << " rows to reduce large matrix coefficients\n.");
    }
 }
 
@@ -2180,7 +2180,7 @@ void SoPlexBase<R>::_project(SolRational& sol)
       if(_basisStatusCols[i] != SPxSolverBase<R>::BASIC)
       {
          SPX_MSG_INFO1(spxout, spxout <<
-                   "Warning: lost basis during project phase because of nonbasic lifting column.\n");
+                       "Warning: lost basis during project phase because of nonbasic lifting column.\n");
          _hasBasis = false;
          _rationalLUSolver.clear();
       }
@@ -2191,7 +2191,7 @@ void SoPlexBase<R>::_project(SolRational& sol)
       if(_basisStatusRows[i] == SPxSolverBase<R>::BASIC)
       {
          SPX_MSG_INFO1(spxout, spxout <<
-                   "Warning: lost basis during project phase because of basic lifting row.\n");
+                       "Warning: lost basis during project phase because of basic lifting row.\n");
          _hasBasis = false;
          _rationalLUSolver.clear();
       }
@@ -2377,7 +2377,7 @@ void SoPlexBase<R>::_transformEquality()
    if(_slackCols.num() > 0)
    {
       SPX_MSG_INFO1(spxout, spxout << "Added " << _slackCols.num() <<
-                " slack columns to transform rows to equality form.\n");
+                    " slack columns to transform rows to equality form.\n");
    }
 }
 
@@ -2435,10 +2435,10 @@ void SoPlexBase<R>::_untransformEquality(SolRational& sol)
                 || _basisStatusCols[col] != SPxSolverBase<R>::BASIC);
 
          SPX_MSG_DEBUG(std::cout << "slack column " << col << " for row " << row
-                   << ": col status=" << _basisStatusCols[col]
-                   << ", row status=" << _basisStatusRows[row]
-                   << ", redcost=" << sol._redCost[col].str()
-                   << ", dual=" << sol._dual[row].str() << "\n");
+                       << ": col status=" << _basisStatusCols[col]
+                       << ", row status=" << _basisStatusRows[row]
+                       << ", redcost=" << sol._redCost[col].str()
+                       << ", dual=" << sol._dual[row].str() << "\n");
 
          if(_basisStatusRows[row] != SPxSolverBase<R>::BASIC)
          {
@@ -3357,7 +3357,7 @@ void SoPlexBase<R>::_computeInfeasBox(SolRational& sol, bool transformed)
    }
 
    SPX_MSG_DEBUG(std::cout << "max ytransA*[x_l,x_u] = " << (isTempFinite ? temp.str() : "infinite") <<
-             "\n");
+                 "\n");
 
    // ytransb - temp is the increase in the dual objective along the Farkas ray; if this is positive, the dual is
    // unbounded and certifies primal infeasibility
@@ -3396,7 +3396,7 @@ void SoPlexBase<R>::_computeInfeasBox(SolRational& sol, bool transformed)
    if(ytransb < 0)
    {
       SPX_MSG_INFO1(spxout, spxout <<
-                "Approximate Farkas proof to weak.  Could not compute Farkas box. (1)\n");
+                    "Approximate Farkas proof to weak.  Could not compute Farkas box. (1)\n");
       return;
    }
 
@@ -3455,7 +3455,7 @@ void SoPlexBase<R>::_computeInfeasBox(SolRational& sol, bool transformed)
          if(temp == 0 && ytransb == 0)
          {
             SPX_MSG_INFO1(spxout, spxout <<
-                      "Approximate Farkas proof to weak.  Could not compute Farkas box. (2)\n");
+                          "Approximate Farkas proof to weak.  Could not compute Farkas box. (2)\n");
             return;
          }
          // if ytransb is positive and ytransA is zero, we have 0^T x > 0, proving infeasibility
@@ -3489,7 +3489,7 @@ void SoPlexBase<R>::_computeInfeasBox(SolRational& sol, bool transformed)
          if(temp == 0 && ytransb == 0)
          {
             SPX_MSG_INFO1(spxout, spxout <<
-                      "Approximate Farkas proof to weak.  Could not compute Farkas box. (2)\n");
+                          "Approximate Farkas proof to weak.  Could not compute Farkas box. (2)\n");
             return;
          }
          // if ytransb is positive and ytransA is zero, we have 0^T x > 0, proving infeasibility
@@ -3519,8 +3519,8 @@ void SoPlexBase<R>::_computeInfeasBox(SolRational& sol, bool transformed)
    if(B > 0)
    {
       SPX_MSG_INFO1(spxout, spxout <<
-                "Computed Farkas box: provably no feasible solutions with components less than "
-                << B.str() << " in absolute value.\n");
+                    "Computed Farkas box: provably no feasible solutions with components less than "
+                    << B.str() << " in absolute value.\n");
    }
 }
 
@@ -4108,7 +4108,7 @@ void SoPlexBase<R>::_factorizeColumnRational(SolRational& sol,
                       || matrixdim != _rationalLUSolverBind.size()))
    {
       SPX_MSG_WARNING(spxout, spxout <<
-                  "Warning: dimensioning error in rational matrix factorization (recovered).\n");
+                      "Warning: dimensioning error in rational matrix factorization (recovered).\n");
       loadMatrix = true;
    }
 
@@ -4252,7 +4252,8 @@ void SoPlexBase<R>::_factorizeColumnRational(SolRational& sol,
 
    if(_isSolveStopped(stoppedTime, stoppedIter))
    {
-      SPX_MSG_INFO2(spxout, spxout << "Rational factorization hit time limit while solving for primal.\n");
+      SPX_MSG_INFO2(spxout, spxout <<
+                    "Rational factorization hit time limit while solving for primal.\n");
       return;
    }
 
@@ -4380,10 +4381,10 @@ void SoPlexBase<R>::_factorizeColumnRational(SolRational& sol,
                dualViolation = violation;
 
             SPX_MSG_DEBUG(spxout << "negative dual multliplier for row " << i
-                      << " with dual " << basicDual[i].str()
-                      << " and status " << basisStatusRows[i]
-                      << " and [lhs,rhs] = [" << lhsRational(i).str() << "," << rhsRational(i).str() << "]"
-                      << "\n");
+                          << " with dual " << basicDual[i].str()
+                          << " and status " << basisStatusRows[i]
+                          << " and [lhs,rhs] = [" << lhsRational(i).str() << "," << rhsRational(i).str() << "]"
+                          << "\n");
          }
       }
       else if(basicDual[i] > 0)
@@ -4398,10 +4399,10 @@ void SoPlexBase<R>::_factorizeColumnRational(SolRational& sol,
                dualViolation = basicDual[i];
 
             SPX_MSG_DEBUG(spxout << "positive dual multliplier for row " << i
-                      << " with dual " << basicDual[i].str()
-                      << " and status " << basisStatusRows[i]
-                      << " and [lhs,rhs] = [" << lhsRational(i).str() << "," << rhsRational(i).str() << "]"
-                      << "\n");
+                          << " with dual " << basicDual[i].str()
+                          << " and status " << basisStatusRows[i]
+                          << " and [lhs,rhs] = [" << lhsRational(i).str() << "," << rhsRational(i).str() << "]"
+                          << "\n");
          }
       }
    }
@@ -4603,7 +4604,7 @@ bool SoPlexBase<R>::_reconstructSolutionRational(SolRational& sol,
       if(_lowerFinite(_colTypes[c]) && _workSol._primal[c] < lowerRational(c))
       {
          SPX_MSG_DEBUG(std::cout << "Lower bound of variable " << c << " violated by " <<
-                   (lowerRational(c) - _workSol._primal[c]).str() << "\n");
+                       (lowerRational(c) - _workSol._primal[c]).str() << "\n");
          SPX_MSG_INFO1(spxout, spxout << "Reconstructed solution primal infeasible (1).\n");
          _statistics->reconstructionTime->stop();
          return false;
@@ -4612,7 +4613,7 @@ bool SoPlexBase<R>::_reconstructSolutionRational(SolRational& sol,
       if(_upperFinite(_colTypes[c]) && _workSol._primal[c] > upperRational(c))
       {
          SPX_MSG_DEBUG(std::cout << "Upper bound of variable " << c << " violated by " <<
-                   (_workSol._primal[c] - upperRational(c)).str() << "\n");
+                       (_workSol._primal[c] - upperRational(c)).str() << "\n");
          SPX_MSG_INFO1(spxout, spxout << "Reconstructed solution primal infeasible (2).\n");
          _statistics->reconstructionTime->stop();
          return false;
@@ -4642,7 +4643,7 @@ bool SoPlexBase<R>::_reconstructSolutionRational(SolRational& sol,
       if(_lowerFinite(_rowTypes[r]) && _workSol._slacks[r] < lhsRational(r))
       {
          SPX_MSG_DEBUG(std::cout << "Lhs of row " << r << " violated by " <<
-                   (lhsRational(r) - _workSol._slacks[r]).str() << "\n");
+                       (lhsRational(r) - _workSol._slacks[r]).str() << "\n");
          SPX_MSG_INFO1(spxout, spxout << "Reconstructed solution primal infeasible (3).\n");
          _statistics->reconstructionTime->stop();
          return false;
@@ -4651,7 +4652,7 @@ bool SoPlexBase<R>::_reconstructSolutionRational(SolRational& sol,
       if(_upperFinite(_rowTypes[r]) && _workSol._slacks[r] > rhsRational(r))
       {
          SPX_MSG_DEBUG(std::cout << "Rhs of row " << r << " violated by " <<
-                   (_workSol._slacks[r] - rhsRational(r)) << "\n");
+                       (_workSol._slacks[r] - rhsRational(r)) << "\n");
          SPX_MSG_INFO1(spxout, spxout << "Reconstructed solution primal infeasible (4).\n");
          _statistics->reconstructionTime->stop();
          return false;
@@ -4685,10 +4686,10 @@ bool SoPlexBase<R>::_reconstructSolutionRational(SolRational& sol,
          if(!_lowerFinite(_rowTypes[r]) || _workSol._slacks[r] > lhsRational(r))
          {
             SPX_MSG_DEBUG(std::cout << "complementary slackness violated by row " << r
-                      << " with dual " << _workSol._dual[r].str()
-                      << " and slack " << _workSol._slacks[r].str()
-                      << " not at lhs " << lhsRational(r).str()
-                      << "\n");
+                          << " with dual " << _workSol._dual[r].str()
+                          << " and slack " << _workSol._slacks[r].str()
+                          << " not at lhs " << lhsRational(r).str()
+                          << "\n");
             SPX_MSG_INFO1(spxout, spxout << "Reconstructed solution dual infeasible (1).\n");
             _statistics->reconstructionTime->stop();
             return false;
@@ -4709,10 +4710,10 @@ bool SoPlexBase<R>::_reconstructSolutionRational(SolRational& sol,
          if(!_upperFinite(_rowTypes[r]) || _workSol._slacks[r] < rhsRational(r))
          {
             SPX_MSG_DEBUG(std::cout << "complementary slackness violated by row " << r
-                      << " with dual " << _workSol._dual[r].str()
-                      << " and slack " << _workSol._slacks[r].str()
-                      << " not at rhs " << rhsRational(r).str()
-                      << "\n");
+                          << " with dual " << _workSol._dual[r].str()
+                          << " and slack " << _workSol._slacks[r].str()
+                          << " not at rhs " << rhsRational(r).str()
+                          << "\n");
             SPX_MSG_INFO1(spxout, spxout << "Reconstructed solution dual infeasible (2).\n");
             _statistics->reconstructionTime->stop();
             return false;
@@ -4748,10 +4749,10 @@ bool SoPlexBase<R>::_reconstructSolutionRational(SolRational& sol,
          if(!_lowerFinite(_colTypes[c]) || _workSol._primal[c] > lowerRational(c))
          {
             SPX_MSG_DEBUG(std::cout << "complementary slackness violated by column " << c
-                      << " with reduced cost " << _workSol._redCost[c].str()
-                      << " and value " << _workSol._primal[c].str()
-                      << " not at lower bound " << lowerRational(c).str()
-                      << "\n");
+                          << " with reduced cost " << _workSol._redCost[c].str()
+                          << " and value " << _workSol._primal[c].str()
+                          << " not at lower bound " << lowerRational(c).str()
+                          << "\n");
             SPX_MSG_INFO1(spxout, spxout << "Reconstructed solution dual infeasible (3).\n");
             _statistics->reconstructionTime->stop();
             return false;
@@ -4772,10 +4773,10 @@ bool SoPlexBase<R>::_reconstructSolutionRational(SolRational& sol,
          if(!_upperFinite(_colTypes[c]) || _workSol._primal[c] < upperRational(c))
          {
             SPX_MSG_DEBUG(std::cout << "complementary slackness violated by column " << c
-                      << " with reduced cost " << _workSol._redCost[c].str()
-                      << " and value " << _workSol._primal[c].str()
-                      << " not at upper bound " << upperRational(c).str()
-                      << "\n");
+                          << " with reduced cost " << _workSol._redCost[c].str()
+                          << " and value " << _workSol._primal[c].str()
+                          << " not at upper bound " << upperRational(c).str()
+                          << "\n");
             SPX_MSG_INFO1(spxout, spxout << "Reconstructed solution dual infeasible (4).\n");
             _statistics->reconstructionTime->stop();
             return false;

@@ -47,7 +47,7 @@ bool msginconsistent(const char* name, const char* file, int line)
    assert(line >= 0);
 
    SPX_MSG_ERROR(std::cerr << file << "(" << line << ") "
-             << "Inconsistency detected in " << name << std::endl;)
+                 << "Inconsistency detected in " << name << std::endl;)
 
    return 0;
 }

@@ -306,11 +306,10 @@ void CLUFactor<R>::setPivot(const int p_stage,
    {
 #ifndef NDEBUG
       SPX_MSG_ERROR(std::cerr
-                << "LU pivot element is almost zero (< "
-                << _tolerances->epsilonPivot()
-                << ") - Basis is numerically singular"
-                << std::endl;
-               )
+                    << "LU pivot element is almost zero (< "
+                    << _tolerances->epsilonPivot()
+                    << ") - Basis is numerically singular"
+                    << std::endl;)
 #endif
       this->stat = SLinSolver<R>::SINGULAR;
    }
@@ -3381,8 +3380,8 @@ void CLUFactor<R>::solveLright(R* vec)
 
          for(j = lbeg[i + 1]; j > k; --j)
          {
-            SPX_MSG_DEBUG(std::cout << "                         -> y" << *idx << " -= " << x << " * " << *val <<
-                      " = " << x * (*val) << "    -> " << vec[*idx] - x * (*val) << std::endl;)
+            SPX_MSG_DEBUG(std::cout << "                         -> y" << *idx << " -= " << x << " * " << *val
+                          << " = " << x * (*val) << "    -> " << vec[*idx] - x * (*val) << std::endl;)
             vec[*idx++] -= x * (*val++);
          }
       }

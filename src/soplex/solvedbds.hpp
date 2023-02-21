@@ -225,10 +225,10 @@ void SoPlexBase<R>::_solveDecompositionDualSimplex()
    /************************/
 
    SPX_MSG_INFO1(spxout,
-             spxout << "========      Degeneracy Detected       ========" << std::endl
-             << std::endl
-             << "======== Commencing decomposition solve ========" << std::endl
-            );
+                 spxout << "========      Degeneracy Detected       ========" << std::endl
+                 << std::endl
+                 << "======== Commencing decomposition solve ========" << std::endl
+                );
 
    //spxout.setVerbosity( SPxOut::DEBUG );
    SPX_MSG_INFO2(spxout, spxout << "Creating the Reduced and Complementary problems." << std::endl);
@@ -277,11 +277,11 @@ void SoPlexBase<R>::_solveDecompositionDualSimplex()
       // solve the reduced problem
 
       SPX_MSG_INFO2(spxout,
-                spxout << std::endl
-                << "=========================" << std::endl
-                << "Solving: Reduced Problem." << std::endl
-                << "=========================" << std::endl
-                << std::endl);
+                    spxout << std::endl
+                    << "=========================" << std::endl
+                    << "Solving: Reduced Problem." << std::endl
+                    << "=========================" << std::endl
+                    << std::endl);
 
       _hasBasis = hasRedBasis;
       // solving the reduced problem
@@ -311,7 +311,7 @@ void SoPlexBase<R>::_solveDecompositionDualSimplex()
             SPX_MSG_INFO2(spxout, spxout << "Infeasible reduced problem." << std::endl);
 
          SPX_MSG_INFO2(spxout, spxout << "Reduced problem status: " << static_cast<int>
-                   (_solver.status()) << std::endl);
+                       (_solver.status()) << std::endl);
 
          redProbError = true;
          break;
@@ -321,7 +321,7 @@ void SoPlexBase<R>::_solveDecompositionDualSimplex()
       if(_statistics->iterations == previter)
       {
          SPX_MSG_WARNING(spxout,
-                     spxout << "WIMDSM02: reduced problem performed zero iterations. Terminating." << std::endl;);
+                         spxout << "WIMDSM02: reduced problem performed zero iterations. Terminating." << std::endl;);
 
          noRedprobIter = true;
          stop = true;
@@ -356,11 +356,11 @@ void SoPlexBase<R>::_solveDecompositionDualSimplex()
 
       // solve the complementary problem
       SPX_MSG_INFO2(spxout,
-                spxout << std::endl
-                << "=========================" << std::endl
-                << "Solving: Complementary Problem." << std::endl
-                << "=========================" << std::endl
-                << std::endl);
+                    spxout << std::endl
+                    << "=========================" << std::endl
+                    << "Solving: Complementary Problem." << std::endl
+                    << "=========================" << std::endl
+                    << std::endl);
 
       if(!explicitviol)
       {
@@ -369,8 +369,8 @@ void SoPlexBase<R>::_solveDecompositionDualSimplex()
          _decompSimplifyAndSolve(_compSolver, _compSlufactor, true, true);
 
          SPX_MSG_INFO2(spxout, spxout << "Iteration " << algIterCount
-                   << "Objective Value: " << std::setprecision(10) << _compSolver.objValue()
-                   << std::endl);
+                       << "Objective Value: " << std::setprecision(10) << _compSolver.objValue()
+                       << std::endl);
       }
 
 
@@ -508,14 +508,14 @@ void SoPlexBase<R>::_solveDecompositionDualSimplex()
       // checking the bound violation of the solution from  complementary problem
       if(getDecompBoundViolation(maxviol, sumviol))
          SPX_MSG_INFO1(spxout, spxout << "Bound violation - "
-                   << "Max: " << std::setprecision(20) << maxviol << " "
-                   << "Sum: " << sumviol << std::endl);
+                       << "Max: " << std::setprecision(20) << maxviol << " "
+                       << "Sum: " << sumviol << std::endl);
 
       // checking the row violation of the solution from the complementary problem
       if(getDecompRowViolation(maxviol, sumviol))
          SPX_MSG_INFO1(spxout, spxout << "Row violation - "
-                   << "Max: " << std::setprecision(21) << maxviol << " "
-                   << "Sum: " << sumviol << std::endl);
+                       << "Max: " << std::setprecision(21) << maxviol << " "
+                       << "Sum: " << sumviol << std::endl);
 
       SPX_MSG_INFO1(spxout, spxout << "Objective Value: " << _compSolver.objValue() << std::endl);
 #endif
@@ -525,10 +525,10 @@ void SoPlexBase<R>::_solveDecompositionDualSimplex()
    spxout.setVerbosity(orig_verbosity);
 
    SPX_MSG_INFO1(spxout,
-             spxout << "========  Decomposition solve completed ========" << std::endl
-             << std::endl
-             << "========   Resolving original problem   ========" << std::endl
-            );
+                 spxout << "========  Decomposition solve completed ========" << std::endl
+                 << std::endl
+                 << "========   Resolving original problem   ========" << std::endl
+                );
 
    // if there is a reduced problem error in the first iteration the complementary problme has not been
    // set up. In this case no memory has been allocated for _decompCompProbColIDsIdx and _fixedOrigVars.
@@ -683,7 +683,7 @@ void SoPlexBase<R>::_formDecompReducedProblem(bool& stop)
 
    // get the compatible columns from the constraint matrix w.r.t the current basis matrix
    SPX_MSG_INFO2(spxout, spxout << "Computing the compatible columns" << std::endl
-             << "Solving time: " << solveTime() << std::endl);
+                 << "Solving time: " << solveTime() << std::endl);
 
    spx_alloc(compatind, _solver.nRows());
    spx_alloc(rowsforremoval, _solver.nRows());
@@ -705,7 +705,7 @@ void SoPlexBase<R>::_formDecompReducedProblem(bool& stop)
 
    // delete rows and columns from the LP to form the reduced problem
    SPX_MSG_INFO2(spxout, spxout << "Deleting rows and columns to form the reduced problem" << std::endl
-             << "Solving time: " << solveTime() << std::endl);
+                 << "Solving time: " << solveTime() << std::endl);
 
    // allocating memory to add bound constraints
    SPxRowId* addedrowids = 0;
@@ -1133,12 +1133,12 @@ void SoPlexBase<R>::_decompResolveWithoutPreprocessing(SPxSolverBase<R>& solver,
       catch(const SPxException& E)
       {
          SPX_MSG_ERROR(spxout << "Caught exception <" << E.what() <<
-                   "> during unsimplification. Resolving without simplifier and scaler.\n");
+                       "> during unsimplification. Resolving without simplifier and scaler.\n");
       }
       catch(...)
       {
          SPX_MSG_ERROR(spxout <<
-                   "Caught unknown exception during unsimplification. Resolving without simplifier and scaler.\n");
+                       "Caught unknown exception during unsimplification. Resolving without simplifier and scaler.\n");
          _status = SPxSolverBase<R>::ERROR;
       }
    }
@@ -1195,7 +1195,7 @@ void SoPlexBase<R>::_updateDecompReducedProblem(R objValue, VectorBase<R> dualVe
          if(EQ(reducedProbDual, R(0.0), feastol))
          {
             SPX_MSG_WARNING(spxout,
-                        spxout << "WIMDSM01: reduced problem dual value is very close to zero." << std::endl;);
+                            spxout << "WIMDSM01: reduced problem dual value is very close to zero." << std::endl;);
             continue;
          }
 
@@ -2302,7 +2302,7 @@ void SoPlexBase<R>::_updateDecompComplementaryDualProblem(bool origObj)
    }
 
    SPX_MSG_INFO2(spxout, spxout << "Number of eliminated columns added to complementary problem: "
-             << numElimColsAdded << std::endl);
+                 << numElimColsAdded << std::endl);
 
    // updating the _decompDualColIDs with the additional columns from the eliminated rows.
    _compSolver.addCols(addElimCols);
@@ -2675,7 +2675,7 @@ void SoPlexBase<R>::_updateDecompComplementaryPrimalProblem(bool origObj)
    }
 
    SPX_MSG_INFO2(spxout, spxout << "Number of eliminated rows added to the complementary problem: "
-             << numElimRowsAdded << std::endl);
+                 << numElimRowsAdded << std::endl);
 
    // adding the eliminated rows to the complementary problem.
    _compSolver.addRows(addElimRows);
@@ -2844,7 +2844,7 @@ void SoPlexBase<R>::_checkOriginalProblemOptimality(VectorBase<R> primalVector, 
    if(printViol)
    {
       SPX_MSG_INFO1(spxout, spxout << std::endl
-                << "Checking consistency between the reduced problem and the original problem." << std::endl);
+                    << "Checking consistency between the reduced problem and the original problem." << std::endl);
    }
 
 
@@ -2861,7 +2861,7 @@ void SoPlexBase<R>::_checkOriginalProblemOptimality(VectorBase<R> primalVector, 
    if(printViol)
    {
       SPX_MSG_INFO1(spxout, spxout << "Reduced Problem Objective Value: " << redObjVal << std::endl
-                << "Original Problem Objective Value: " << objectiveVal << std::endl);
+                    << "Original Problem Objective Value: " << objectiveVal << std::endl);
    }
 
    _solReal._isPrimalFeasible = true;
@@ -2878,7 +2878,7 @@ void SoPlexBase<R>::_checkOriginalProblemOptimality(VectorBase<R> primalVector, 
    {
       if(printViol)
          SPX_MSG_INFO1(spxout, spxout << "Bound violation - "
-                   << "Max violation: " << maxviol << " Sum violation: " << sumviol << std::endl);
+                       << "Max violation: " << maxviol << " Sum violation: " << sumviol << std::endl);
    }
 
    _statistics->totalBoundViol = sumviol;
@@ -2889,7 +2889,7 @@ void SoPlexBase<R>::_checkOriginalProblemOptimality(VectorBase<R> primalVector, 
    {
       if(printViol)
          SPX_MSG_INFO1(spxout, spxout << "Row violation - "
-                   << "Max violation: " << maxviol << " Sum violation: " << sumviol << std::endl);
+                       << "Max violation: " << maxviol << " Sum violation: " << sumviol << std::endl);
    }
 
    _statistics->totalRowViol = sumviol;
@@ -2984,8 +2984,9 @@ void SoPlexBase<R>::_identifyComplementaryDualFixedPrimalVars(int* currFixedVars
       }
    }
 
-   SPX_MSG_INFO3(spxout, spxout << "Number of fixed primal variables in the complementary (dual) problem: "
-             << numFixedVar << std::endl);
+   SPX_MSG_INFO3(spxout, spxout <<
+                 "Number of fixed primal variables in the complementary (dual) problem: "
+                 << numFixedVar << std::endl);
 }
 
 
@@ -3238,8 +3239,8 @@ void SoPlexBase<R>::_identifyComplementaryPrimalFixedPrimalVars(int* currFixedVa
    }
 
    SPX_MSG_INFO3(spxout, spxout <<
-             "Number of fixed primal variables in the complementary (primal) problem: "
-             << numFixedVar << std::endl);
+                 "Number of fixed primal variables in the complementary (primal) problem: "
+                 << numFixedVar << std::endl);
 }
 
 
@@ -3639,7 +3640,7 @@ void SoPlexBase<R>::printDecompDisplayLine(SPxSolverBase<R>& solver,
 
    SPX_MSG_INFO1(spxout,
 
-             if(forceHead || (_decompDisplayLine % (displayFreq * 30) == 0))
+                 if(forceHead || (_decompDisplayLine % (displayFreq * 30) == 0))
 {
    spxout << "type |   time |   iters | red iter | alg iter |     rows |     cols |  shift   |    value\n";
 }
@@ -3664,7 +3665,7 @@ if(force || (_decompDisplayLine % displayFreq == 0))
 
    }
    _decompDisplayLine++;
-            );
+                );
 
    spxout.setVerbosity(currVerb);
 }
@@ -4011,7 +4012,7 @@ bool SoPlexBase<R>::decompTerminate(R timeLimit)
    if(currentTime >= maxTime)
    {
       SPX_MSG_INFO2(spxout, spxout << " --- timelimit (" << _solver.getMaxTime()
-                << ") reached" << std::endl;)
+                    << ") reached" << std::endl;)
       _solver.setSolverStatus(SPxSolverBase<R>::ABORT_TIME);
       return true;
    }
@@ -4214,7 +4215,7 @@ void SoPlexBase<R>::getOriginalProblemBasisRowStatus(DataArray< int >& degenerat
 
    nNonBasicRows = _realLP->nRows() - basicRow - nDegenerateRows;
    SPX_MSG_INFO2(spxout, spxout << "Number of non-basic rows: " << nNonBasicRows << " (from "
-             << _realLP->nRows() << ")" << std::endl);
+                 << _realLP->nRows() << ")" << std::endl);
 }
 
 
@@ -4272,9 +4273,9 @@ void SoPlexBase<R>::getOriginalProblemBasisColStatus(int& nNonBasicCols)
 
    nNonBasicCols = _realLP->nCols() - basicCol;
    SPX_MSG_INFO2(spxout, spxout << "Number of non-basic columns: "
-             << nNonBasicCols << " (from " << _realLP->nCols() << ")" << std::endl
-             << "Number of zero dual columns: " << numZeroDual << " (from " << _realLP->nCols() << ")" <<
-             std::endl);
+                 << nNonBasicCols << " (from " << _realLP->nCols() << ")" << std::endl
+                 << "Number of zero dual columns: " << numZeroDual << " (from " << _realLP->nCols() << ")" <<
+                 std::endl);
 }
 
 

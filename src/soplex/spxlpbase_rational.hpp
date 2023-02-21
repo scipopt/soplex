@@ -239,7 +239,7 @@ static Rational LPFreadValue(char*& pos, SPxOut* spxout, const int lineno = -1)
             (*s == '.') || (*s == '+') || (*s == '-') || (tolower(*s) == 'e'))
       {
          SPX_MSG_WARNING((*spxout), (*spxout) << "WLPFRD03 Warning: In line " << lineno <<
-                     ": malformed rational value in LP file\n";)
+                         ": malformed rational value in LP file\n";)
       }
    }
 
@@ -249,7 +249,7 @@ static Rational LPFreadValue(char*& pos, SPxOut* spxout, const int lineno = -1)
    if(has_emptyexponent)
    {
       SPX_MSG_WARNING((*spxout), (*spxout) << "WLPFRD01 Warning: In line " << lineno <<
-                  ": found empty exponent in LP file - check for forbidden variable names with initial 'e' or 'E'\n");
+                      ": found empty exponent in LP file - check for forbidden variable names with initial 'e' or 'E'\n");
    }
 
    if(!has_digits)
@@ -268,7 +268,7 @@ static Rational LPFreadValue(char*& pos, SPxOut* spxout, const int lineno = -1)
       catch(const std::exception& e)
       {
          SPX_MSG_WARNING((*spxout), (*spxout) << "WLPFRD04 Warning: In line " << lineno <<
-                     ": malformed rational value in LP file\n");
+                         ": malformed rational value in LP file\n");
          std::cerr << e.what() << '\n';
       }
    }
@@ -449,7 +449,7 @@ bool SPxLPBase<Rational>::readLPF(
          if(strlen(buf) == SOPLEX_LPF_MAX_LINE_LEN - 1)
          {
             SPX_MSG_ERROR(std::cerr << "ELPFRD06 Line exceeds " << SOPLEX_LPF_MAX_LINE_LEN - 2
-                      << " characters" << std::endl;)
+                          << " characters" << std::endl;)
          }
          else
          {
@@ -465,7 +465,7 @@ bool SPxLPBase<Rational>::readLPF(
       pos = buf;
 
       SPX_MSG_DEBUG(std::cout << "DLPFRD08 Reading line " << lineno
-                << " (pos=" << pos << ")" << std::endl;)
+                    << " (pos=" << pos << ")" << std::endl;)
 
       // 1. Remove comments.
       if(0 != (s = strchr(buf, '\\')))
@@ -727,9 +727,9 @@ bool SPxLPBase<Rational>::readLPF(
                         assert(cnames->has(colidx));
 
                         SPX_MSG_WARNING((*this->spxout), (*this->spxout) << "WLPFRD10 Duplicate index "
-                                    << (*cnames)[colidx]
-                                    << " in line " << lineno
-                                    << std::endl;)
+                                        << (*cnames)[colidx]
+                                        << " in line " << lineno
+                                        << std::endl;)
                      }
                   }
 
@@ -777,7 +777,7 @@ bool SPxLPBase<Rational>::readLPF(
             if((colidx = LPFreadColName(pos, cnames, cset, 0, spxout)) < 0)
             {
                SPX_MSG_WARNING((*this->spxout), (*this->spxout) << "WLPFRD11 in Bounds section line "
-                           << lineno << " ignored" << std::endl;)
+                               << lineno << " ignored" << std::endl;)
                *pos = '\0';
                continue;
             }
@@ -837,8 +837,9 @@ bool SPxLPBase<Rational>::readLPF(
          case INTEGERS:
             if((colidx = LPFreadColName(pos, cnames, cset, 0, spxout)) < 0)
             {
-               SPX_MSG_WARNING((*this->spxout), (*this->spxout) << "WLPFRD12 in Binary/General section line " << lineno
-                           << " ignored" << std::endl;)
+               SPX_MSG_WARNING((*this->spxout),
+                               (*this->spxout) << "WLPFRD12 in Binary/General section line " << lineno
+                               << " ignored" << std::endl;)
             }
             else
             {
@@ -887,7 +888,7 @@ syntax_error:
    if(finished)
    {
       SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "Finished reading " << lineno << " lines" <<
-                std::endl;)
+                    std::endl;)
    }
    else
       SPX_MSG_ERROR(std::cerr << "ELPFRD15 Syntax error in line " << lineno << std::endl;)
@@ -1021,7 +1022,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
          if(cnames.size() <= ncnames)
          {
             SPX_MSG_ERROR(std::cerr << "ERROR in COLUMNS: duplicate column name or not column-wise ordering" <<
-                      std::endl;)
+                          std::endl;)
             break;
          }
 
@@ -1579,7 +1580,7 @@ bool SPxLPBase<Rational>::readMPS(
                   SPxLPBase<Rational>::MAXIMIZE);
 
       SPX_MSG_INFO2((*spxout), (*spxout) << "IMPSRD06 Objective sense: " << ((mps.objSense() ==
-                MPSInput::MINIMIZE) ? "Minimize\n" : "Maximize\n"));
+                    MPSInput::MINIMIZE) ? "Minimize\n" : "Maximize\n"));
 
       added2Set(
          *(reinterpret_cast<SVSetBase<Rational>*>(static_cast<LPRowSetBase<Rational>*>(this))),
@@ -1696,7 +1697,8 @@ static void LPFwriteSVector(
       {
          // insert a line break every SOPLEX_NUM_ENTRIES_PER_LINE columns or whenever max line length is nearly exceeded
          if(num_coeffs == SOPLEX_NUM_ENTRIES_PER_LINE ||
-               (long long)(p_output.tellp()) - pos + (long long)(coeff.str().length() + 100) > SOPLEX_MAX_LINE_WRITE_LEN)
+               (long long)(p_output.tellp()) - pos + (long long)(coeff.str().length() + 100) >
+               SOPLEX_MAX_LINE_WRITE_LEN)
          {
             num_coeffs = 0;
             p_output << "\n\t";
@@ -1704,7 +1706,7 @@ static void LPFwriteSVector(
             if((long long)(p_output.tellp()) - pos  >  SOPLEX_MAX_LINE_WRITE_LEN)
             {
                SPX_MSG_WARNING((*spxout), (*spxout) <<
-                           "XLPSWR01 Warning: SOPLEX_MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n");
+                               "XLPSWR01 Warning: SOPLEX_MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n");
             }
 
             pos = p_output.tellp();
@@ -1778,7 +1780,7 @@ static void LPFwriteRow(
       if((long long)(p_output.tellp()) - pos  >  SOPLEX_MAX_LINE_WRITE_LEN)
       {
          SPX_MSG_WARNING((*spxout), (*spxout) <<
-                     "XLPSWR02 Warning: SOPLEX_MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n");
+                         "XLPSWR02 Warning: SOPLEX_MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n");
       }
 
       pos = p_output.tellp();
@@ -1800,7 +1802,7 @@ static void LPFwriteRow(
    if((long long)(p_output.tellp()) - pos  >  SOPLEX_MAX_LINE_WRITE_LEN)
    {
       SPX_MSG_WARNING((*spxout), (*spxout) <<
-                  "XLPSWR03 Warning: SOPLEX_MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n");
+                      "XLPSWR03 Warning: SOPLEX_MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n");
    }
 }
 
@@ -1900,7 +1902,7 @@ static void LPFwriteBounds(
       if((long long)(p_output.tellp()) - pos  >  SOPLEX_MAX_LINE_WRITE_LEN)
       {
          SPX_MSG_WARNING((*spxout), (*spxout) <<
-                     "XLPSWR04 Warning: SOPLEX_MAX_LINE_WRITE_LEN exceeded when writing LP file\n");
+                         "XLPSWR04 Warning: SOPLEX_MAX_LINE_WRITE_LEN exceeded when writing LP file\n");
       }
 
       pos = p_output.tellp();
@@ -1992,7 +1994,7 @@ static void MPSwriteRecord(
    if((long long)(os.tellp()) - pos > SOPLEX_MAX_LINE_WRITE_LEN)
    {
       SPX_MSG_WARNING((*spxout), (*spxout) <<
-                  "XMPSWR04 Warning: SOPLEX_MAX_LINE_WRITE_LEN exceeded when writing MPS file\n");
+                      "XMPSWR04 Warning: SOPLEX_MAX_LINE_WRITE_LEN exceeded when writing MPS file\n");
    }
 }
 
@@ -2230,7 +2232,7 @@ void SPxLPBase<Rational>::writeMPS(
    if(spxSense() == SPxLPBase<Rational>::MAXIMIZE)
    {
       SPX_MSG_WARNING((*spxout), (*spxout) <<
-                  "XMPSWR03 Warning: objective function inverted when writing maximization problem in MPS file format\n");
+                      "XMPSWR03 Warning: objective function inverted when writing maximization problem in MPS file format\n");
    }
 }
 

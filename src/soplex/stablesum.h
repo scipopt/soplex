@@ -97,7 +97,8 @@ public:
 
       if(spxAbs(checksum - (sum + c)) >= 1e-6)
          printf("stablesum viol: %g, rel: %g, checksum: %g\n", spxAbs(checksum - (sum + c)),
-                spxAbs(checksum - (sum + c)) / SOPLEX_MAX(1.0, SOPLEX_MAX(spxAbs(checksum), spxAbs(sum + c))), checksum);
+                spxAbs(checksum - (sum + c)) / SOPLEX_MAX(1.0, SOPLEX_MAX(spxAbs(checksum), spxAbs(sum + c))),
+                checksum);
 
       assert(spxAbs(checksum - (sum + c)) < 1e-6);
 #endif

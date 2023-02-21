@@ -57,8 +57,8 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
 
    Dbound = (Integer) sqrt(Dbound);
 
-   SPX_MSG_DEBUG(std::cout << "reconstructing " << dim << " dimensional vector with denominator bound " <<
-             Dbound << "\n");
+   SPX_MSG_DEBUG(std::cout << "reconstructing " << dim << " dimensional vector with denominator bound "
+                 << Dbound << "\n");
 
    /* if Dbound is below 2^24 increase it to this value, this avoids changing input vectors that have low denominator
     * because they are floating point representable
@@ -176,7 +176,8 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
 
             if(gcd > Dbound)
             {
-               SPX_MSG_DEBUG(std::cout << "terminating with gcd " << &gcd << " exceeding Dbound " << &Dbound << "\n");
+               SPX_MSG_DEBUG(std::cout << "terminating with gcd " << &gcd << " exceeding Dbound " << &Dbound <<
+                             "\n");
                rval = false;
                break;
             }

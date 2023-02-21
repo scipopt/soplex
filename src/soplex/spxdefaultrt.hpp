@@ -391,7 +391,7 @@ SPxId SPxDefaultRT<R>::selectEnter(R& max, int, bool)
    if(enterId.isValid() && this->solver()->isBasic(enterId))
    {
       SPX_MSG_DEBUG(std::cout << "DDEFRT01 isValid() && isBasic(): max=" << max
-                << std::endl;)
+                    << std::endl;)
 
       if(cnum >= 0)
          this->solver()->coPvec().delta().clearNum(cnum);

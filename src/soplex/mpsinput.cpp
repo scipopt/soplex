@@ -86,7 +86,7 @@ bool MPSInput::readLine()
          m_lineno++;
 
          SPX_MSG_DEBUG(std::cout << "DMPSIN01 Line " << m_lineno
-                   << " " << m_buf << std::endl;)
+                       << " " << m_buf << std::endl;)
 
          /* check if comment line */
          is_comment = true;
@@ -249,17 +249,16 @@ bool MPSInput::readLine()
    while(is_marker);
 
    SPX_MSG_DEBUG(std::cerr
-             << "DMPSIN02 -----------------------------------------------"
-             << std::endl
-             << "DMPSIN03 f0=" << ((m_f0 == 0) ? "nil" : m_f0) << std::endl
-             << "DMPSIN04 f1=" << ((m_f1 == 0) ? "nil" : m_f1) << std::endl
-             << "DMPSIN05 f2=" << ((m_f2 == 0) ? "nil" : m_f2) << std::endl
-             << "DMPSIN06 f3=" << ((m_f3 == 0) ? "nil" : m_f3) << std::endl
-             << "DMPSIN07 f4=" << ((m_f4 == 0) ? "nil" : m_f4) << std::endl
-             << "DMPSIN08 f5=" << ((m_f5 == 0) ? "nil" : m_f5) << std::endl
-             << "DMPSIN09 -----------------------------------------------"
-             << std::endl;
-            )
+                 << "DMPSIN02 -----------------------------------------------"
+                 << std::endl
+                 << "DMPSIN03 f0=" << ((m_f0 == 0) ? "nil" : m_f0) << std::endl
+                 << "DMPSIN04 f1=" << ((m_f1 == 0) ? "nil" : m_f1) << std::endl
+                 << "DMPSIN05 f2=" << ((m_f2 == 0) ? "nil" : m_f2) << std::endl
+                 << "DMPSIN06 f3=" << ((m_f3 == 0) ? "nil" : m_f3) << std::endl
+                 << "DMPSIN07 f4=" << ((m_f4 == 0) ? "nil" : m_f4) << std::endl
+                 << "DMPSIN08 f5=" << ((m_f5 == 0) ? "nil" : m_f5) << std::endl
+                 << "DMPSIN09 -----------------------------------------------"
+                 << std::endl;)
 
    return true;
 }

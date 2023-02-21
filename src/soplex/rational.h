@@ -111,7 +111,7 @@ inline void powRound(Rational& r)
    Integer num;
 
    SPX_MSG_DEBUG(std::cout << "rounding " << str(r) <<
-             " to power of two" << "\n");
+                 " to power of two" << "\n");
 
    num = numerator(r);
    den = denominator(r);
@@ -234,8 +234,8 @@ public:
 
    inline void rationalErrorMessage() const
    {
-      SPX_MSG_ERROR(std::cerr << "Using rational methods without linking boost is not supported" << std::endl;
-               )
+      SPX_MSG_ERROR(std::cerr << "Using rational methods without linking boost is not supported" <<
+                    std::endl;)
    };
 
    /// default constructor

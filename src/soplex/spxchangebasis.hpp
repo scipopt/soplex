@@ -38,17 +38,17 @@ void SPxBasisBase<R>::reDim()
    assert(theLP != 0);
 
    SPX_MSG_DEBUG(std::cout << "DCHBAS01 SPxBasisBase<R>::reDim():"
-             << " matrixIsSetup=" << matrixIsSetup
-             << " fatorized=" << factorized
-             << std::endl;)
+                 << " matrixIsSetup=" << matrixIsSetup
+                 << " fatorized=" << factorized
+                 << std::endl;)
 
    thedesc.reSize(theLP->nRows(), theLP->nCols());
 
    if(theLP->dim() != matrix.size())
    {
       SPX_MSG_INFO3((*this->spxout), (*this->spxout) <<
-                "ICHBAS02 basis redimensioning invalidates factorization"
-                << std::endl;)
+                    "ICHBAS02 basis redimensioning invalidates factorization"
+                    << std::endl;)
 
       matrix.reSize(theLP->dim());
       theBaseId.reSize(theLP->dim());
@@ -57,9 +57,9 @@ void SPxBasisBase<R>::reDim()
    }
 
    SPX_MSG_DEBUG(std::cout << "DCHBAS03 SPxBasisBase<R>::reDim(): -->"
-             << " matrixIsSetup=" << matrixIsSetup
-             << " fatorized=" << factorized
-             << std::endl;)
+                 << " matrixIsSetup=" << matrixIsSetup
+                 << " fatorized=" << factorized
+                 << std::endl;)
 
    assert(matrix.size()    >= theLP->dim());
    assert(theBaseId.size() >= theLP->dim());
@@ -431,8 +431,9 @@ void SPxBasisBase<R>::invalidate()
 {
    if(factorized || matrixIsSetup)
    {
-      SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "ICHBAS09 explicit invalidation of factorization" <<
-                std::endl;)
+      SPX_MSG_INFO3((*this->spxout),
+                    (*this->spxout) << "ICHBAS09 explicit invalidation of factorization" <<
+                    std::endl;)
    }
 
    factorized    = false;

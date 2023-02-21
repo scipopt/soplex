@@ -447,8 +447,8 @@ public:
       {
 #ifdef SOPLEX_DEBUG
          SPX_MSG_DEBUG(std::cout << "DBSTAT01 SPxBasisBase<R>::setStatus(): status: "
-                   << int(thestatus) << " (" << thestatus << ") -> "
-                   << int(stat) << " (" << stat << ")" << std::endl;)
+                       << int(thestatus) << " (" << thestatus << ") -> "
+                       << int(stat) << " (" << stat << ")" << std::endl;)
 #endif
 
          thestatus = stat;

@@ -275,7 +275,7 @@ void SPxSolverBase<R>::changeLowerStatus(int i, R newLower, R oldLower)
    R                    objChange = 0.0;
 
    SPX_MSG_DEBUG(std::cout << "DCHANG01 changeLowerStatus(): col " << i
-             << "[" << newLower << ":" << currUpper << "] " << stat;)
+                 << "[" << newLower << ":" << currUpper << "] " << stat;)
 
    switch(stat)
    {
@@ -404,7 +404,7 @@ void SPxSolverBase<R>::changeUpperStatus(int i, R newUpper, R oldUpper)
    R                    objChange = 0.0;
 
    SPX_MSG_DEBUG(std::cout << "DCHANG02 changeUpperStatus(): col " << i
-             << "[" << currLower << ":" << newUpper << "] " << stat;)
+                 << "[" << currLower << ":" << newUpper << "] " << stat;)
 
    switch(stat)
    {
@@ -551,7 +551,7 @@ void SPxSolverBase<R>::changeLhsStatus(int i, R newLhs, R oldLhs)
    R                    objChange = 0.0;
 
    SPX_MSG_DEBUG(std::cout << "DCHANG03 changeLhsStatus()  : row " << i
-             << ": " << stat;)
+                 << ": " << stat;)
 
    switch(stat)
    {
@@ -678,7 +678,7 @@ void SPxSolverBase<R>::changeRhsStatus(int i, R newRhs, R oldRhs)
    R                    objChange = 0.0;
 
    SPX_MSG_DEBUG(std::cout << "DCHANG04 changeRhsStatus()  : row " << i
-             << ": " << stat;)
+                 << ": " << stat;)
 
    switch(stat)
    {

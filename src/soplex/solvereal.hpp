@@ -121,8 +121,8 @@ void SoPlexBase<R>::_evaluateSolutionReal(typename SPxSimplifier<R>::Result simp
       if(boolParam(SoPlexBase<R>::ENSURERAY))
       {
          SPX_MSG_INFO1(spxout, spxout <<
-                   "simplifier detected infeasibility or unboundedness - solve again without simplifying" << std::endl;
-                  )
+                       "simplifier detected infeasibility or unboundedness - solve again without simplifying" << std::endl;
+                      )
          _preprocessAndSolveReal(false);
       }
       else
@@ -189,8 +189,9 @@ void SoPlexBase<R>::_evaluateSolutionReal(typename SPxSimplifier<R>::Result simp
       // if preprocessing was applied, try to run again without to avoid singularity
       if(!_isRealLPLoaded)
       {
-         SPX_MSG_INFO1(spxout, spxout << "encountered singularity - trying to solve again without simplifying" <<
-                   std::endl;)
+         SPX_MSG_INFO1(spxout, spxout <<
+                       "encountered singularity - trying to solve again without simplifying" <<
+                       std::endl;)
          _preprocessAndSolveReal(false);
          return;
       }
@@ -205,7 +206,7 @@ void SoPlexBase<R>::_evaluateSolutionReal(typename SPxSimplifier<R>::Result simp
       if(!_isRealLPLoaded || _isRealLPScaled)
       {
          SPX_MSG_INFO1(spxout, spxout << "encountered cycling - trying to solve again without simplifying" <<
-                   std::endl;)
+                       std::endl;)
          // store and unsimplify sub-optimal solution and basis, may trigger re-solve
          _storeSolutionReal(true);
          return;
@@ -402,7 +403,7 @@ void SoPlexBase<R>::_resolveWithoutPreprocessing(typename SPxSimplifier<R>::Resu
       catch(const SPxException& E)
       {
          SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                   "> during unsimplification. Resolving without simplifier and scaler.\n");
+                       "> during unsimplification. Resolving without simplifier and scaler.\n");
          _hasBasis = false;
       }
    }
@@ -453,12 +454,12 @@ void SoPlexBase<R>::_verifySolutionReal()
       assert(&_solver == _realLP);
       assert(_isRealLPLoaded);
       SPX_MSG_INFO3(spxout, spxout << "bound violation: " << boundviol
-                << ", row violation: " << rowviol
-                << ", dual violation: " << dualviol
-                << ", redcost violation: " << redcostviol << std::endl;)
+                    << ", row violation: " << rowviol
+                    << ", dual violation: " << dualviol
+                    << ", redcost violation: " << redcostviol << std::endl;)
       SPX_MSG_INFO1(spxout, spxout <<
-                " --- detected violations in original problem space -- solve again without presolving/scaling" <<
-                std::endl;)
+                    " --- detected violations in original problem space -- solve again without presolving/scaling" <<
+                    std::endl;)
 
       if(_isRealLPScaled)
       {
@@ -599,7 +600,7 @@ void SoPlexBase<R>::_storeSolutionReal(bool verify)
       catch(const SPxException& E)
       {
          SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                   "> during unsimplification. Resolving without simplifier and scaler.\n");
+                       "> during unsimplification. Resolving without simplifier and scaler.\n");
          _hasBasis = false;
          _preprocessAndSolveReal(false);
          return;
@@ -689,7 +690,7 @@ void SoPlexBase<R>::_storeSolutionRealFromPresol()
    catch(const SPxException& E)
    {
       SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                "> during unsimplification. Resolving without simplifier and scaler.\n");
+                    "> during unsimplification. Resolving without simplifier and scaler.\n");
       _preprocessAndSolveReal(false);
       return;
    }
@@ -748,7 +749,7 @@ template <class R>
 void SoPlexBase<R>::_unscaleSolutionReal(SPxLPBase<R>& LP, bool persistent)
 {
    SPX_MSG_INFO1(spxout, spxout << " --- unscaling " << (persistent ? "external" : "internal") <<
-             " solution" << std::endl;)
+                 " solution" << std::endl;)
    assert(_scaler);
    assert(!persistent || (boolParam(SoPlexBase<R>::PERSISTENTSCALING) && _isRealLPScaled));
    _scaler->unscalePrimal(LP, _solReal._primal);

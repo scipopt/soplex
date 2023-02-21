@@ -3316,8 +3316,8 @@ inline void CLUFactorRational::solveLright(Rational* vec)
 
          for(j = lbeg[i + 1]; j > k; --j)
          {
-            SPX_MSG_DEBUG(std::cout << "                         -> y" << *idx << " -= " << x << " * " << *val <<
-                      " = " << x * (*val) << "    -> " << vec[*idx] - x * (*val) << std::endl;)
+            SPX_MSG_DEBUG(std::cout << "                         -> y" << *idx << " -= " << x << " * " << *val
+                          << " = " << x * (*val) << "    -> " << vec[*idx] - x * (*val) << std::endl;)
             vec[*idx++] -= x * (*val++);
          }
       }

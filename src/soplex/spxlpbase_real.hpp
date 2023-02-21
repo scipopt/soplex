@@ -573,8 +573,8 @@ static R LPFreadValue(char*& pos, SPxOut* spxout)
    if(has_emptyexponent)
    {
       SPX_MSG_WARNING((*spxout), (*spxout) <<
-                  "WLPFRD01 Warning: found empty exponent in LP file - check for forbidden variable names with initial 'e' or 'E'\n";
-                 )
+                      "WLPFRD01 Warning: found empty exponent in LP file - check for forbidden variable names with initial 'e' or 'E'\n";
+                     )
    }
 
    if(!has_digits)
@@ -896,7 +896,7 @@ bool SPxLPBase<R>::readLPF(
          if(strlen(buf) == SOPLEX_LPF_MAX_LINE_LEN - 1)
          {
             SPX_MSG_ERROR(std::cerr << "ELPFRD06 Line exceeds " << SOPLEX_LPF_MAX_LINE_LEN - 2
-                      << " characters" << std::endl;)
+                          << " characters" << std::endl;)
          }
          else
          {
@@ -912,7 +912,7 @@ bool SPxLPBase<R>::readLPF(
       pos = buf;
 
       SPX_MSG_DEBUG(std::cout << "DLPFRD08 Reading line " << lineno
-                << " (pos=" << pos << ")" << std::endl;)
+                    << " (pos=" << pos << ")" << std::endl;)
 
       // 1. Remove comments.
       if(0 != (s = strchr(buf, '\\')))
@@ -1186,9 +1186,9 @@ bool SPxLPBase<R>::readLPF(
                         assert(cnames->has(colidx));
 
                         SPX_MSG_WARNING((*this->spxout), (*this->spxout) << "WLPFRD10 Duplicate index "
-                                    << (*cnames)[colidx]
-                                    << " in line " << lineno
-                                    << std::endl;)
+                                        << (*cnames)[colidx]
+                                        << " in line " << lineno
+                                        << std::endl;)
                      }
                   }
 
@@ -1236,7 +1236,7 @@ bool SPxLPBase<R>::readLPF(
             if((colidx = LPFreadColName<R>(pos, cnames, cset, nullptr, spxout)) < 0)
             {
                SPX_MSG_WARNING((*this->spxout), (*this->spxout) << "WLPFRD11 in Bounds section line "
-                           << lineno << " ignored" << std::endl;)
+                               << lineno << " ignored" << std::endl;)
                *pos = '\0';
                continue;
             }
@@ -1296,8 +1296,9 @@ bool SPxLPBase<R>::readLPF(
          case INTEGERS:
             if((colidx = LPFreadColName<R>(pos, cnames, cset, 0, spxout)) < 0)
             {
-               SPX_MSG_WARNING((*this->spxout), (*this->spxout) << "WLPFRD12 in Binary/General section line " << lineno
-                           << " ignored" << std::endl;)
+               SPX_MSG_WARNING((*this->spxout),
+                               (*this->spxout) << "WLPFRD12 in Binary/General section line " << lineno
+                               << " ignored" << std::endl;)
             }
             else
             {
@@ -1346,7 +1347,7 @@ syntax_error:
    if(finished)
    {
       SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "Finished reading " << lineno << " lines" <<
-                std::endl;)
+                    std::endl;)
    }
    else
       SPX_MSG_ERROR(std::cerr << "ELPFRD15 Syntax error in line " << lineno << std::endl;)
@@ -1591,7 +1592,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSe
          if(cnames.size() <= ncnames)
          {
             SPX_MSG_ERROR(std::cerr << "ERROR in COLUMNS: duplicate column name or not column-wise ordering" <<
-                      std::endl;)
+                          std::endl;)
             break;
          }
 
@@ -2084,7 +2085,7 @@ bool SPxLPBase<R>::readMPS(
       changeSense(mps.objSense() == MPSInput::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE);
 
       SPX_MSG_INFO2((*spxout), (*spxout) << "IMPSRD06 Objective sense: " << ((mps.objSense() ==
-                MPSInput::MINIMIZE) ? "Minimize\n" : "Maximize\n"));
+                    MPSInput::MINIMIZE) ? "Minimize\n" : "Maximize\n"));
 
       added2Set(
          *(reinterpret_cast<SVSetBase<R>*>(static_cast<LPRowSetBase<R>*>(this))),
@@ -2672,7 +2673,7 @@ void SPxLPBase<R>::writeMPS(
    if(spxSense() == SPxLPBase<R>::MAXIMIZE)
    {
       SPX_MSG_WARNING((*spxout), (*spxout) <<
-                  "XMPSWR03 Warning: objective function inverted when writing maximization problem in MPS file format\n");
+                      "XMPSWR03 Warning: objective function inverted when writing maximization problem in MPS file format\n");
    }
 }
 

@@ -138,7 +138,7 @@ void SPxSteepPR<R>::setupWeights(typename SPxSolverBase<R>::Type type)
    else
    {
       SPX_MSG_INFO1((*this->thesolver->spxout),
-                (*this->thesolver->spxout) << " --- initializing steepest edge multipliers" << std::endl;)
+                    (*this->thesolver->spxout) << " --- initializing steepest edge multipliers" << std::endl;)
 
       if(type == SPxSolverBase<R>::ENTER)
       {
@@ -202,8 +202,8 @@ void SPxSteepPR<R>::left4(int n, SPxId id)
       if(spxAbs(rhoVec[n]) < this->thetolerance * 0.5)
       {
          SPX_MSG_INFO3((*this->thesolver->spxout), (*this->thesolver->spxout) << "WSTEEP04: rhoVec = "
-                   << rhoVec[n] << " with smaller absolute value than 0.5*thetolerance = " << 0.5 * this->thetolerance
-                   << std::endl;)
+                       << rhoVec[n] << " with smaller absolute value than 0.5*thetolerance = " << 0.5 * this->thetolerance
+                       << std::endl;)
       }
 
 #endif
@@ -271,7 +271,8 @@ int SPxSteepPR<R>::buildBestPriceVectorLeave(R feastol)
    this->compare.elements = prices.get_const_ptr();
    // do a partial sort to move the best ones to the front
    // TODO this can be done more efficiently, since we only need the indices
-   nsorted = SPxQuicksortPart(prices.get_ptr(), this->compare, 0, prices.size(), SOPLEX_HYPERPRICINGSIZE);
+   nsorted = SPxQuicksortPart(prices.get_ptr(), this->compare, 0, prices.size(),
+                              SOPLEX_HYPERPRICINGSIZE);
 
    // copy indices of best values to bestPrices
    for(int i = 0; i < nsorted; ++i)
@@ -313,7 +314,7 @@ int SPxSteepPR<R>::selectLeave()
    {
       refined = true;
       SPX_MSG_INFO3((*this->thesolver->spxout),
-                (*this->thesolver->spxout) << "WSTEEP03 trying refinement step..\n";)
+                    (*this->thesolver->spxout) << "WSTEEP03 trying refinement step..\n";)
       retid = selectLeaveX(this->thetolerance / SOPLEX_STEEP_REFINETOL);
    }
 
@@ -577,7 +578,8 @@ SPxId SPxSteepPR<R>::buildBestPriceVectorEnterDim(R& best, R feastol)
    this->compare.elements = prices.get_const_ptr();
    // do a partial sort to move the best ones to the front
    // TODO this can be done more efficiently, since we only need the indices
-   nsorted = SPxQuicksortPart(prices.get_ptr(), this->compare, 0, prices.size(), SOPLEX_HYPERPRICINGSIZE);
+   nsorted = SPxQuicksortPart(prices.get_ptr(), this->compare, 0, prices.size(),
+                              SOPLEX_HYPERPRICINGSIZE);
 
    // copy indices of best values to bestPrices
    for(int i = 0; i < nsorted; ++i)
@@ -634,7 +636,8 @@ SPxId SPxSteepPR<R>::buildBestPriceVectorEnterCoDim(R& best, R feastol)
    this->compare.elements = pricesCo.get_const_ptr();
    // do a partial sort to move the best ones to the front
    // TODO this can be done more efficiently, since we only need the indices
-   nsorted = SPxQuicksortPart(pricesCo.get_ptr(), this->compare, 0, pricesCo.size(), SOPLEX_HYPERPRICINGSIZE);
+   nsorted = SPxQuicksortPart(pricesCo.get_ptr(), this->compare, 0, pricesCo.size(),
+                              SOPLEX_HYPERPRICINGSIZE);
 
    // copy indices of best values to bestPrices
    for(int i = 0; i < nsorted; ++i)
@@ -665,7 +668,7 @@ SPxId SPxSteepPR<R>::selectEnter()
    {
       refined = true;
       SPX_MSG_INFO3((*this->thesolver->spxout),
-                (*this->thesolver->spxout) << "WSTEEP05 trying refinement step..\n";)
+                    (*this->thesolver->spxout) << "WSTEEP05 trying refinement step..\n";)
       enterId = selectEnterX(this->thetolerance / SOPLEX_STEEP_REFINETOL);
    }
 

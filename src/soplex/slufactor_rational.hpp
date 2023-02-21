@@ -422,7 +422,7 @@ inline SLUFactorRational::Status SLUFactorRational::change(
    usetup = false;
 
    SPX_MSG_DEBUG(std::cout << "DSLUFA01\tupdated\t\tstability = " << stability()
-             << std::endl;)
+                 << std::endl;)
 
    return status();
 }
@@ -863,8 +863,8 @@ inline SLUFactorRational::Status SLUFactorRational::load(const SVectorRational* 
    factor(matrix, lastThreshold);
 
    SPX_MSG_DEBUG(std::cout << "DSLUFA02 threshold = " << lastThreshold
-             << "\tstability = " << stability()
-             << "\tSOPLEX_MINSTABILITYRAT = " << SOPLEX_MINSTABILITYRAT << std::endl;)
+                 << "\tstability = " << stability()
+                 << "\tSOPLEX_MINSTABILITYRAT = " << SOPLEX_MINSTABILITYRAT << std::endl;)
    SPX_MSG_DEBUG(
       int i;
       FILE* fl = fopen("dump.lp", "w");

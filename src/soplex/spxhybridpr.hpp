@@ -106,7 +106,7 @@ void SPxHybridPR<R>::setType(typename SPxSolverBase<R>::Type tp)
    }
 
    SPX_MSG_INFO1((*this->thesolver->spxout), (*this->thesolver->spxout) << "IPRHYB01 switching to "
-             << thepricer->getName() << std::endl;)
+                 << thepricer->getName() << std::endl;)
 
    thepricer->setType(tp);
 }

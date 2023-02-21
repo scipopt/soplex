@@ -104,8 +104,9 @@ void SPxBasisBase<R>::loadMatrixVecs()
    assert(theLP != 0);
    assert(theLP->dim() == matrix.size());
 
-   SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "IBASIS01 loadMatrixVecs() invalidates factorization"
-             << std::endl;)
+   SPX_MSG_INFO3((*this->spxout),
+                 (*this->spxout) << "IBASIS01 loadMatrixVecs() invalidates factorization"
+                 << std::endl;)
 
    int i;
    nzCount = 0;
@@ -147,7 +148,7 @@ bool SPxBasisBase<R>::isDescValid(const Desc& ds)
          if(ds.rowstat[row] != dualRowStatus(row))
          {
             SPX_MSG_DEBUG(std::cout << "IBASIS21 Basic row " << row << " with incorrect dual status " <<
-                      dualRowStatus(row) << "\n");
+                          dualRowStatus(row) << "\n");
             return false;
          }
       }
@@ -161,8 +162,8 @@ bool SPxBasisBase<R>::isDescValid(const Desc& ds)
                || (ds.rowstat[row] == Desc::P_ON_LOWER && theLP->SPxLPBase<R>::lhs(row) <= R(-infinity)))
          {
             SPX_MSG_DEBUG(std::cout << "IBASIS22 Nonbasic row with incorrect status: lhs=" <<
-                      theLP->SPxLPBase<R>::lhs(row) << ", rhs=" << theLP->SPxLPBase<R>::rhs(
-                         row) << ", stat=" << ds.rowstat[row] << "\n");
+                          theLP->SPxLPBase<R>::lhs(row) << ", rhs=" << theLP->SPxLPBase<R>::rhs(
+                             row) << ", stat=" << ds.rowstat[row] << "\n");
             return false;
          }
       }
@@ -175,7 +176,7 @@ bool SPxBasisBase<R>::isDescValid(const Desc& ds)
          if(ds.colstat[col] !=  dualColStatus(col))
          {
             SPX_MSG_DEBUG(std::cout << "IBASIS23 Basic column " << col << " with incorrect dual status " <<
-                      ds.colstat[col] << " != " << dualColStatus(col) << "\n");
+                          ds.colstat[col] << " != " << dualColStatus(col) << "\n");
             return false;
          }
       }
@@ -189,8 +190,8 @@ bool SPxBasisBase<R>::isDescValid(const Desc& ds)
                || (ds.colstat[col] == Desc::P_ON_LOWER && theLP->SPxLPBase<R>::lower(col) <= R(-infinity)))
          {
             SPX_MSG_DEBUG(std::cout << "IBASIS24 Nonbasic column " << col << " with incorrect status: lower=" <<
-                      theLP->SPxLPBase<R>::lower(col) << ", upper=" << theLP->SPxLPBase<R>::upper(
-                         col) << ", stat=" << ds.colstat[col] << "\n");
+                          theLP->SPxLPBase<R>::lower(col) << ", upper=" << theLP->SPxLPBase<R>::upper(
+                             col) << ", stat=" << ds.colstat[col] << "\n");
             return false;
          }
       }
@@ -198,8 +199,9 @@ bool SPxBasisBase<R>::isDescValid(const Desc& ds)
 
    if(basisdim != theLP->nCols())
    {
-      SPX_MSG_DEBUG(std::cout << "IBASIS25 Incorrect basis dimension " << basisdim << " != " << theLP->nCols()
-                << "\n");
+      SPX_MSG_DEBUG(std::cout << "IBASIS25 Incorrect basis dimension " << basisdim << " != " <<
+                    theLP->nCols()
+                    << "\n");
       return false;
    }
 
@@ -227,8 +229,9 @@ void SPxBasisBase<R>::loadDesc(const Desc& ds)
    int   j;
    bool consistent = true;
 
-   SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "IBASIS02 loading of Basis invalidates factorization"
-             << std::endl;)
+   SPX_MSG_INFO3((*this->spxout),
+                 (*this->spxout) << "IBASIS02 loading of Basis invalidates factorization"
+                 << std::endl;)
 
    lastin      = none;
    lastout     = none;
@@ -384,8 +387,9 @@ void SPxBasisBase<R>::loadBasisSolver(SLinSolver<R>* p_solver, const bool destro
 
    setOutstream(*p_solver->spxout);
 
-   SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "IBASIS03 loading of Solver invalidates factorization"
-             << std::endl;)
+   SPX_MSG_INFO3((*this->spxout),
+                 (*this->spxout) << "IBASIS03 loading of Solver invalidates factorization"
+                 << std::endl;)
 
    if(freeSlinSolver)
    {
@@ -824,13 +828,13 @@ void SPxBasisBase<R>::change(
       ++updateCount;
 
       SPX_MSG_DEBUG(std::cout << "factor_stats: iteration= " << this->iteration()
-                << " update= " << updateCount
-                << " total_update= " << totalUpdateCount
-                << " nonzero_B= " << nzCount
-                << " nonzero_LU= " << factor->memory()
-                << " factor_fill= " << lastFill
-                << " time= " << theLP->time()
-                << std::endl;)
+                    << " update= " << updateCount
+                    << " total_update= " << totalUpdateCount
+                    << " nonzero_B= " << nzCount
+                    << " nonzero_LU= " << factor->memory()
+                    << " factor_fill= " << lastFill
+                    << " time= " << theLP->time()
+                    << std::endl;)
 
       // never factorize? Just do it !
       if(!factorized)
@@ -840,11 +844,11 @@ void SPxBasisBase<R>::change(
       else if(R(factor->memory()) > 1000 + factor->dim() + lastMem * memFactor)
       {
          SPX_MSG_INFO3((*this->spxout), (*this->spxout) <<
-                   "IBASIS04 memory growth factor triggers refactorization"
-                   << " memory= " << factor->memory()
-                   << " lastMem= " << lastMem
-                   << " memFactor= " << memFactor
-                   << std::endl;)
+                       "IBASIS04 memory growth factor triggers refactorization"
+                       << " memory= " << factor->memory()
+                       << " lastMem= " << lastMem
+                       << " memFactor= " << memFactor
+                       << std::endl;)
          factorize();
       }
 
@@ -852,10 +856,10 @@ void SPxBasisBase<R>::change(
       else if(R(factor->memory()) > lastFill * R(nzCount))
       {
          SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "IBASIS04 fill factor triggers refactorization"
-                   << " memory= " << factor->memory()
-                   << " nzCount= " << nzCount
-                   << " lastFill= " << lastFill
-                   << std::endl;)
+                       << " memory= " << factor->memory()
+                       << " nzCount= " << nzCount
+                       << " lastFill= " << lastFill
+                       << std::endl;)
 
          factorize();
       }
@@ -863,19 +867,19 @@ void SPxBasisBase<R>::change(
       else if(nzCount > lastNzCount)
       {
          SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "IBASIS05 nonzero factor triggers refactorization"
-                   << " nzCount= " << nzCount
-                   << " lastNzCount= " << lastNzCount
-                   << " nonzeroFactor= " << nonzeroFactor
-                   << std::endl;)
+                       << " nzCount= " << nzCount
+                       << " lastNzCount= " << lastNzCount
+                       << " nonzeroFactor= " << nonzeroFactor
+                       << std::endl;)
          factorize();
       }
       // too many updates ?
       else if(updateCount >= maxUpdates)
       {
          SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "IBASIS06 update count triggers refactorization"
-                   << " updateCount= " << updateCount
-                   << " maxUpdates= " << maxUpdates
-                   << std::endl;)
+                       << " updateCount= " << updateCount
+                       << " maxUpdates= " << maxUpdates
+                       << std::endl;)
          factorize();
       }
       else
@@ -894,8 +898,8 @@ void SPxBasisBase<R>::change(
          catch(...)
          {
             SPX_MSG_INFO3((*this->spxout), (*this->spxout) <<
-                      "IBASIS13 problems updating factorization; refactorizing basis"
-                      << std::endl;)
+                          "IBASIS13 problems updating factorization; refactorizing basis"
+                          << std::endl;)
 
 #ifdef MEASUREUPDATETIME
             theTime.stop();
@@ -924,8 +928,8 @@ void SPxBasisBase<R>::change(
             catch(const SPxException& F)
             {
                SPX_MSG_INFO3((*this->spxout), (*this->spxout) <<
-                         "IBASIS14 problems updating factorization; invalidating factorization"
-                         << std::endl;)
+                             "IBASIS14 problems updating factorization; invalidating factorization"
+                             << std::endl;)
 
 #ifdef MEASUREUPDATETIME
                theTime.stop();
@@ -941,9 +945,9 @@ void SPxBasisBase<R>::change(
          if(factor->status() != SLinSolver<R>::OK || factor->stability() < minStab)
          {
             SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "IBASIS07 stability triggers refactorization"
-                      << " stability= " << factor->stability()
-                      << " minStab= " << minStab
-                      << std::endl;)
+                          << " stability= " << factor->stability()
+                          << " minStab= " << minStab
+                          << std::endl;)
             factorize();
          }
       }

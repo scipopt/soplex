@@ -570,7 +570,8 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product4setup(const SVSetBase<S>& A,
 
       ++nCallsSparse;
    }
-   else if(isSetup() && (double(x.size()) * A.memSize() <= SOPLEX_SHORTPRODUCT_FACTOR * dim() * A.num()))
+   else if(isSetup()
+           && (double(x.size()) * A.memSize() <= SOPLEX_SHORTPRODUCT_FACTOR * dim() * A.num()))
    {
       if(timeSparse != 0)
          timeSparse->start();

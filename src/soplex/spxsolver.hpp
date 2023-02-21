@@ -224,9 +224,9 @@ void SPxSolverBase<R>::setType(Type tp)
          m_numCycle = 0;
 #endif
          SPX_MSG_INFO3((*spxout), (*spxout) << "Switching to "
-                   << static_cast<const char*>((tp == LEAVE)
-                                               ? "leaving" : "entering")
-                   << " algorithm" << std::endl;)
+                       << static_cast<const char*>((tp == LEAVE)
+                             ? "leaving" : "entering")
+                       << " algorithm" << std::endl;)
       }
    }
 
@@ -662,7 +662,8 @@ void SPxSolverBase<R>::setType(Type tp)
 
                if(ftmp.length() > SOPLEX_DEFAULT_BND_VIOL)
                   SPX_MSG_INFO1((*spxout), (*spxout) << "ESOLVE29 " << this->iteration() << ": fVec error = "
-                            << ftmp.length() << " exceeding SOPLEX_DEFAULT_BND_VIOL = " << SOPLEX_DEFAULT_BND_VIOL << std::endl;)
+                                << ftmp.length() << " exceeding SOPLEX_DEFAULT_BND_VIOL = " << SOPLEX_DEFAULT_BND_VIOL << std::endl;
+                               )
                }
 
             if(ctmp.length() > SOPLEX_DEFAULT_BND_VIOL)
@@ -674,7 +675,8 @@ void SPxSolverBase<R>::setType(Type tp)
 
                if(ctmp.length() > SOPLEX_DEFAULT_BND_VIOL)
                   SPX_MSG_INFO1((*spxout), (*spxout) << "ESOLVE30 " << this->iteration() << ": coPvec error = "
-                            << ctmp.length() << " exceeding SOPLEX_DEFAULT_BND_VIOL = " << SOPLEX_DEFAULT_BND_VIOL << std::endl;)
+                                << ctmp.length() << " exceeding SOPLEX_DEFAULT_BND_VIOL = " << SOPLEX_DEFAULT_BND_VIOL << std::endl;
+                               )
                }
 
             if(ptmp.length() > SOPLEX_DEFAULT_BND_VIOL)
@@ -977,8 +979,8 @@ void SPxSolverBase<R>::setType(Type tp)
       if(m_nonbasicValueUpToDate && NE(m_nonbasicValue, val))
       {
          SPX_MSG_ERROR(std::cerr << "stored nonbasic value: " << m_nonbasicValue
-                   << ", correct nonbasic value: " << val
-                   << ", violation: " << val - m_nonbasicValue << std::endl;)
+                       << ", correct nonbasic value: " << val
+                       << ", violation: " << val - m_nonbasicValue << std::endl;)
          assert(EQrel(m_nonbasicValue, val, 1e-12));
       }
 
@@ -1025,12 +1027,12 @@ void SPxSolverBase<R>::setType(Type tp)
          m_nonbasicValue += objChange;
 
       SPX_MSG_DEBUG(std::cout
-                << "Iteration: " << this->iteration()
-                << ": updated objValue: " << objChange
-                << ", new value: " << m_nonbasicValue
-                << ", correct value: " << nonbasicValue()
-                << std::endl;
-               )
+                    << "Iteration: " << this->iteration()
+                    << ": updated objValue: " << objChange
+                    << ", new value: " << m_nonbasicValue
+                    << ", correct value: " << nonbasicValue()
+                    << std::endl;
+                   )
 
       return m_nonbasicValueUpToDate;
    }
@@ -1811,7 +1813,7 @@ void SPxSolverBase<R>::setType(Type tp)
 
       default:
          SPX_MSG_ERROR(std::cerr << "ESOLVE26 ERROR: unknown basis status (" << static_cast<int>(stat) << ")"
-                   << std::endl;)
+                       << std::endl;)
          throw SPxInternalCodeException("XSOLVE22 This should never happen.");
       }
 
@@ -1859,7 +1861,7 @@ void SPxSolverBase<R>::setType(Type tp)
 
       default:
          SPX_MSG_ERROR(std::cerr << "ESOLVE27 ERROR: unknown VarStatus (" << int(stat) << ")"
-                   << std::endl;)
+                       << std::endl;)
          throw SPxInternalCodeException("XSOLVE23 This should never happen.");
       }
 
@@ -1914,7 +1916,7 @@ void SPxSolverBase<R>::setType(Type tp)
 
       default:
          SPX_MSG_ERROR(std::cerr << "ESOLVE28 ERROR: unknown VarStatus (" << int(stat) << ")"
-                   << std::endl;)
+                       << std::endl;)
          throw SPxInternalCodeException("XSOLVE24 This should never happen.");
       }
 

@@ -167,7 +167,8 @@ int SPxDevexPR<R>::buildBestPriceVectorLeave(R feastol)
    this->compare.elements = prices.get_const_ptr();
    // do a partial sort to move the best ones to the front
    // TODO this can be done more efficiently, since we only need the indices
-   nsorted = SPxQuicksortPart(prices.get_ptr(), this->compare, 0, prices.size(), SOPLEX_HYPERPRICINGSIZE);
+   nsorted = SPxQuicksortPart(prices.get_ptr(), this->compare, 0, prices.size(),
+                              SOPLEX_HYPERPRICINGSIZE);
 
    // copy indices of best values to bestPrices
    for(int i = 0; i < nsorted; ++i)
@@ -206,7 +207,7 @@ int SPxDevexPR<R>::selectLeave()
    {
       refined = true;
       SPX_MSG_INFO3((*this->thesolver->spxout),
-                (*this->thesolver->spxout) << "WDEVEX02 trying refinement step..\n";)
+                    (*this->thesolver->spxout) << "WDEVEX02 trying refinement step..\n";)
       retid = selectLeaveX(this->thetolerance / SOPLEX_DEVEX_REFINETOL);
    }
 
@@ -375,8 +376,8 @@ void SPxDevexPR<R>::left4(int n, SPxId id)
       if(spxAbs(rhoVec[n]) < this->thetolerance)
       {
          SPX_MSG_INFO3((*this->thesolver->spxout), (*this->thesolver->spxout) << "WDEVEX01: rhoVec = "
-                   << rhoVec[n] << " with smaller absolute value than this->thetolerance = " << this->thetolerance <<
-                   std::endl;)
+                       << rhoVec[n] << " with smaller absolute value than this->thetolerance = " << this->thetolerance <<
+                       std::endl;)
       }
 
 #endif  // NDEBUG
@@ -433,7 +434,8 @@ SPxId SPxDevexPR<R>::buildBestPriceVectorEnterDim(R& best, R feastol)
    this->compare.elements = prices.get_const_ptr();
    // do a partial sort to move the best ones to the front
    // TODO this can be done more efficiently, since we only need the indices
-   nsorted = SPxQuicksortPart(prices.get_ptr(), this->compare, 0, prices.size(), SOPLEX_HYPERPRICINGSIZE);
+   nsorted = SPxQuicksortPart(prices.get_ptr(), this->compare, 0, prices.size(),
+                              SOPLEX_HYPERPRICINGSIZE);
 
    // copy indices of best values to bestPrices
    for(int i = 0; i < nsorted; ++i)
@@ -487,7 +489,8 @@ SPxId SPxDevexPR<R>::buildBestPriceVectorEnterCoDim(R& best, R feastol)
    this->compare.elements = pricesCo.get_const_ptr();
    // do a partial sort to move the best ones to the front
    // TODO this can be done more efficiently, since we only need the indices
-   nsorted = SPxQuicksortPart(pricesCo.get_ptr(), this->compare, 0, pricesCo.size(), SOPLEX_HYPERPRICINGSIZE);
+   nsorted = SPxQuicksortPart(pricesCo.get_ptr(), this->compare, 0, pricesCo.size(),
+                              SOPLEX_HYPERPRICINGSIZE);
 
    // copy indices of best values to bestPrices
    for(int i = 0; i < nsorted; ++i)
@@ -524,7 +527,7 @@ SPxId SPxDevexPR<R>::selectEnter()
    {
       refined = true;
       SPX_MSG_INFO3((*this->thesolver->spxout),
-                (*this->thesolver->spxout) << "WDEVEX02 trying refinement step..\n";)
+                    (*this->thesolver->spxout) << "WDEVEX02 trying refinement step..\n";)
       enterId = selectEnterX(this->thetolerance / SOPLEX_DEVEX_REFINETOL);
 
       if(enterId.isSPxColId() && this->thesolver->isBasic(SPxColId(enterId)))

@@ -250,7 +250,7 @@ template <class R>
 void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
 {
    SPX_MSG_INFO1((*this->spxout), (*this->spxout) << "Least squares LP scaling" <<
-             (persistent ? " (persistent)" : "") << std::endl;)
+                 (persistent ? " (persistent)" : "") << std::endl;)
 
    this->setup(lp);
 
@@ -313,11 +313,11 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    SSVectorBase<R>* rscprev = &rowscale2;
 
    SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "before scaling:"
-             << " min= " << lp.minAbsNzo()
-             << " max= " << lp.maxAbsNzo()
-             << " col-ratio= " << this->maxColRatio(lp)
-             << " row-ratio= " << this->maxRowRatio(lp)
-             << std::endl;)
+                 << " min= " << lp.minAbsNzo()
+                 << " max= " << lp.maxAbsNzo()
+                 << " col-ratio= " << this->maxColRatio(lp)
+                 << " row-ratio= " << this->maxRowRatio(lp)
+                 << std::endl;)
 
    /* initialize scalars, vectors and matrices */
 
@@ -426,18 +426,18 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    this->applyScaling(lp);
 
    SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "Row scaling min= " << this->minAbsRowscale()
-             << " max= " << this->maxAbsRowscale()
-             << std::endl
-             << "Col scaling min= " << this->minAbsColscale()
-             << " max= " << this->maxAbsColscale()
-             << std::endl;)
+                 << " max= " << this->maxAbsRowscale()
+                 << std::endl
+                 << "Col scaling min= " << this->minAbsColscale()
+                 << " max= " << this->maxAbsColscale()
+                 << std::endl;)
 
    SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "after scaling: "
-             << " min= " << lp.minAbsNzo(false)
-             << " max= " << lp.maxAbsNzo(false)
-             << " col-ratio= " << this->maxColRatio(lp)
-             << " row-ratio= " << this->maxRowRatio(lp)
-             << std::endl;)
+                 << " min= " << lp.minAbsNzo(false)
+                 << " max= " << lp.maxAbsNzo(false)
+                 << " col-ratio= " << this->maxColRatio(lp)
+                 << " row-ratio= " << this->maxRowRatio(lp)
+                 << std::endl;)
 }
 
 } // namespace soplex

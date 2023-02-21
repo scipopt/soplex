@@ -257,15 +257,15 @@ public:
       if(m_ignored < m_max_ignore)
       {
          SPX_MSG_ERROR(std::cerr << "Warning: line " << m_lineno << ": "
-                   << what << " \"" << what_name << "\""
-                   << " for " << entity << " \""
-                   << entity_name << "\" ignored" << std::endl;)
+                       << what << " \"" << what_name << "\""
+                       << " for " << entity << " \""
+                       << entity_name << "\" ignored" << std::endl;)
          ++m_ignored;
 
          if(m_ignored == m_max_ignore)
             SPX_MSG_ERROR(std::cerr << "Warning: This was the " << m_max_ignore
-                      << " ignored entry. No further warnings on "
-                      << "ignored entries will be given." << std::endl;)
+                          << " ignored entry. No further warnings on "
+                          << "ignored entries will be given." << std::endl;)
          }
    }
    ///@}

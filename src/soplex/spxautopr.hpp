@@ -96,7 +96,7 @@ int SPxAutoPR<R>::selectLeave()
 {
    if(setActivePricer(SPxSolverBase<R>::LEAVE))
       SPX_MSG_INFO1((*this->thesolver->spxout),
-                (*this->thesolver->spxout) << " --- active pricer: " << activepricer->getName() << std::endl;)
+                    (*this->thesolver->spxout) << " --- active pricer: " << activepricer->getName() << std::endl;)
 
       return activepricer->selectLeave();
 }
@@ -112,7 +112,7 @@ SPxId SPxAutoPR<R>::selectEnter()
 {
    if(setActivePricer(SPxSolverBase<R>::ENTER))
       SPX_MSG_INFO1((*this->thesolver->spxout),
-                (*this->thesolver->spxout) << " --- active pricer: " << activepricer->getName() << std::endl;)
+                    (*this->thesolver->spxout) << " --- active pricer: " << activepricer->getName() << std::endl;)
 
       return activepricer->selectEnter();
 }
