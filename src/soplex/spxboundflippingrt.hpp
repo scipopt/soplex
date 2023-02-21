@@ -32,7 +32,7 @@
 namespace soplex
 {
 
-#define DEFAULT_LOWSTAB  1e-10
+#define SOPLEX_LOWSTAB   1e-10
 #define MAX_RELAX_COUNT  2
 #define LONGSTEP_FREQ    100
 
@@ -870,7 +870,7 @@ SPxId SPxBoundFlippingRT<R>::selectEnter(
    // get stability requirements
    instable = this->thesolver->instableLeave;
    assert(!instable || this->thesolver->instableLeaveNum >= 0);
-   R lowstab = this->tolerances()->scaleAccordingToEpsilon(DEFAULT_LOWSTAB);
+   R lowstab = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_LOWSTAB);
    stab = instable ? lowstab : SPxFastRT<R>::minStability(moststable);
 
    bool foundStable = false;
@@ -1184,7 +1184,7 @@ int SPxBoundFlippingRT<R>::selectLeave(
    // get stability requirements
    instable = this->thesolver->instableEnter;
    assert(!instable || this->thesolver->instableEnterId.isValid());
-   R lowstab = this->tolerances()->scaleAccordingToEpsilon(DEFAULT_LOWSTAB);
+   R lowstab = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_LOWSTAB);
    stab = instable ? lowstab : SPxFastRT<R>::minStability(moststable);
 
    bool foundStable = false;

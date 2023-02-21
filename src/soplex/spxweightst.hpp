@@ -32,7 +32,7 @@
 
 namespace soplex
 {
-#define DEFAULT_STABLE  1e-3    // the sparsest row/column may only have a pivot of size STABLE*maxEntry
+#define SOPLEX_STABLE   1e-3    // the sparsest row/column may only have a pivot of size STABLE*maxEntry
 
 
 template <class R>
@@ -314,7 +314,7 @@ void SPxWeightST<R>::generate(SPxSolverBase<R>& base)
             int  nRowEntries = base.coVector(k).size();
 
             if(!forbidden[k]
-                  && (spxAbs(x) > this->tolerances()->scaleAccordingToEpsilon(DEFAULT_STABLE) * maxEntry)
+                  && (spxAbs(x) > this->tolerances()->scaleAccordingToEpsilon(SOPLEX_STABLE) * maxEntry)
                   && (nRowEntries < minRowEntries))
             {
                minRowEntries = nRowEntries;

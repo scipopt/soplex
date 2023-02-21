@@ -46,17 +46,17 @@ namespace soplex
 {
 
 
-#define DEFAULT_MINSTAB         1e-5
-#define DEFAULT_LOWSTAB         1e-10
-#define TRIES                   2
-#define DEFAULT_SHORTVAL        1e-5
-#define DEFAULT_DELTA_SHIFT     1e-5
-#define DEFAULT_EPSILON         1e-10
+#define SOPLEX_MINSTAB          1e-5
+#define SOPLEX_LOWSTAB          1e-10
+#define SOPLEX_TRIES                   2
+#define SOPLEX_SHORTVAL         1e-5
+#define SOPLEX_DELTA_SHIFT      1e-5
+#define SOPLEX_EPSILON          1e-10
 
 template <class R>
 void SPxFastRT<R>::tighten()
 {
-   R delta_shift = this->tolerances()->scaleAccordingToEpsilon(DEFAULT_DELTA_SHIFT);
+   R delta_shift = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_DELTA_SHIFT);
 
    if(fastDelta >= this->delta + delta_shift)
    {
@@ -66,7 +66,7 @@ void SPxFastRT<R>::tighten()
          fastDelta -= 2 * delta_shift;
    }
 
-   if(minStab < this->tolerances()->scaleAccordingToEpsilon(DEFAULT_MINSTAB))
+   if(minStab < this->tolerances()->scaleAccordingToEpsilon(SOPLEX_MINSTAB))
    {
       minStab /= 0.90;
 
@@ -78,7 +78,7 @@ void SPxFastRT<R>::tighten()
 template <class R>
 void SPxFastRT<R>::relax()
 {
-   R delta_shift = this->tolerances()->scaleAccordingToEpsilon(DEFAULT_DELTA_SHIFT);
+   R delta_shift = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_DELTA_SHIFT);
    minStab *= 0.95;
    fastDelta += 3 * delta_shift;
 }
@@ -823,7 +823,7 @@ bool SPxFastRT<R>::maxShortLeave(R& sel, int leave, R maxabs)
    assert(leave >= 0);
    assert(maxabs >= 0);
 
-   R shortval = this->tolerances()->scaleAccordingToEpsilon(DEFAULT_SHORTVAL);
+   R shortval = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_SHORTVAL);
 
    sel = this->thesolver->fVec().delta()[leave];
 
@@ -848,7 +848,7 @@ bool SPxFastRT<R>::minShortLeave(R& sel, int leave, R maxabs)
    assert(leave >= 0);
    assert(maxabs >= 0);
 
-   R shortval = this->tolerances()->scaleAccordingToEpsilon(DEFAULT_SHORTVAL);
+   R shortval = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_SHORTVAL);
 
    sel = this->thesolver->fVec().delta()[leave];
 
@@ -959,7 +959,7 @@ template <class R>
 int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
 {
    R maxabs, max, sel;
-   R delta_shift = this->tolerances()->scaleAccordingToEpsilon(DEFAULT_DELTA_SHIFT);
+   R delta_shift = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_DELTA_SHIFT);
    int leave = -1;
    int cnt = 0;
 
@@ -967,7 +967,7 @@ int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
 
    // force instable pivot iff true (see explanation in enter.cpp and spxsolve.hpp)
    bool instable = this->solver()->instableEnter;
-   R lowstab = this->tolerances()->scaleAccordingToEpsilon(DEFAULT_LOWSTAB);
+   R lowstab = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_LOWSTAB);
    assert(!instable || this->solver()->instableEnterId.isValid());
 
    if(val > epsilonZero())
@@ -1002,10 +1002,10 @@ int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
             else
                leave = maxSelect(sel, stab, bestDelta, max);
 
-            if(bestDelta < delta_shift * TRIES)
+            if(bestDelta < delta_shift * SOPLEX_TRIES)
                cnt++;
             else
-               cnt += TRIES;
+               cnt += SOPLEX_TRIES;
          }
 
          if(!maxReLeave(sel, leave, maxabs, polish))
@@ -1013,7 +1013,7 @@ int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
 
          relax();
       }
-      while(cnt < TRIES);
+      while(cnt < SOPLEX_TRIES);
    }
    else if(val < -epsilonZero())
    {
@@ -1050,10 +1050,10 @@ int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
                    || this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(
                             leave)))) != SPxBasisBase<R>::Desc::P_FIXED);
 
-            if(bestDelta < delta_shift * TRIES)
+            if(bestDelta < delta_shift * SOPLEX_TRIES)
                cnt++;
             else
-               cnt += TRIES;
+               cnt += SOPLEX_TRIES;
          }
 
          if(!minReLeave(sel, leave, maxabs, polish))
@@ -1061,7 +1061,7 @@ int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
 
          relax();
       }
-      while(cnt < TRIES);
+      while(cnt < SOPLEX_TRIES);
    }
    else
       return -1;
@@ -1349,7 +1349,7 @@ bool SPxFastRT<R>::shortEnter(
    R max,
    R maxabs) const
 {
-   R shortval = this->tolerances()->scaleAccordingToEpsilon(DEFAULT_SHORTVAL);
+   R shortval = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_SHORTVAL);
 
    if(this->thesolver->isCoId(enterId))
    {
@@ -1385,7 +1385,7 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
    SPxId enterId;
    R max, sel;
    R maxabs = 0.0;
-   R delta_shift = this->tolerances()->scaleAccordingToEpsilon(DEFAULT_DELTA_SHIFT);
+   R delta_shift = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_DELTA_SHIFT);
    int nr;
    int cnt = 0;
 
@@ -1393,7 +1393,7 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
 
    // force instable pivot iff true (see explanation in leave.hpp and spxsolve.hpp)
    bool instable = this->solver()->instableLeave;
-   R lowstab = this->tolerances()->scaleAccordingToEpsilon(DEFAULT_LOWSTAB);
+   R lowstab = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_LOWSTAB);
    assert(!instable || this->solver()->instableLeaveNum >= 0);
 
    sel = 0.0;
@@ -1429,10 +1429,10 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
                enterId = maxSelect(nr, sel, stab, bestDelta, max);
             }
 
-            if(bestDelta < delta_shift * TRIES)
+            if(bestDelta < delta_shift * SOPLEX_TRIES)
                cnt++;
             else
-               cnt += TRIES;
+               cnt += SOPLEX_TRIES;
          }
 
          if(!maxReEnter(sel, maxabs, enterId, nr, polish))
@@ -1440,7 +1440,7 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
 
          relax();
       }
-      while(cnt < TRIES);
+      while(cnt < SOPLEX_TRIES);
    }
    else if(val < -epsilonZero())
    {
@@ -1472,10 +1472,10 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
                enterId = minSelect(nr, sel, stab, bestDelta, max);
             }
 
-            if(bestDelta < delta_shift * TRIES)
+            if(bestDelta < delta_shift * SOPLEX_TRIES)
                cnt++;
             else
-               cnt += TRIES;
+               cnt += SOPLEX_TRIES;
          }
 
          if(!minReEnter(sel, maxabs, enterId, nr, polish))
@@ -1483,7 +1483,7 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
 
          relax();
       }
-      while(cnt < TRIES);
+      while(cnt < SOPLEX_TRIES);
    }
 
    MSG_DEBUG(
@@ -1560,7 +1560,7 @@ void SPxFastRT<R>::setType(typename SPxSolverBase<R>::Type type)
 {
    this->m_type = type;
 
-   minStab = this->tolerances()->scaleAccordingToEpsilon(DEFAULT_MINSTAB);
+   minStab = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_MINSTAB);
    fastDelta = this->delta;
 }
 } // namespace soplex

@@ -40,7 +40,7 @@ namespace soplex
 {
 /// note: we keep this constant since it is just a tradeoff between sparsity and stability and does
 /// not need to be changed when precisions are decreased
-#define MINSTABILITY    R(4e-2)
+#define SOPLEX_MINSTABILITY    R(4e-2)
 
 template <class R>
 void SLUFactor<R>::solveRight(VectorBase<R>& x, const VectorBase<R>& b) //const
@@ -785,7 +785,7 @@ void SLUFactor<R>::clear()
    this->maxabs        = 1;
    this->initMaxabs    = 1;
    lastThreshold = minThreshold;
-   minStability  = MINSTABILITY;
+   minStability  = SOPLEX_MINSTABILITY;
    this->stat          = this->UNLOADED;
 
    vec.clear();
@@ -1454,7 +1454,7 @@ typename SLUFactor<R>::Status SLUFactor<R>::load(const SVectorBase<R>* matrix[],
 
       // we reset the minimum stability (which might have been decreased below) to ensure that the increased sparsity
       // does not hurt the stability
-      minStability  = 2 * MINSTABILITY;
+      minStability  = 2 * SOPLEX_MINSTABILITY;
    }
 
    this->u.row.list.idx      = this->thedim;
