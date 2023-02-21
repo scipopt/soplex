@@ -192,7 +192,7 @@ template <class R>
 void SPxEquiliSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
 {
 
-   MSG_INFO1((*this->spxout), (*this->spxout) << "Equilibrium scaling LP" <<
+   SPX_MSG_INFO1((*this->spxout), (*this->spxout) << "Equilibrium scaling LP" <<
              (persistent ? " (persistent)" : "") << std::endl;)
 
    this->setup(lp);
@@ -223,7 +223,7 @@ void SPxEquiliSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
 
    bool colFirst = colratio < rowratio;
 
-   MSG_INFO2((*this->spxout), (*this->spxout) << "before scaling:"
+   SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "before scaling:"
              << " min= " << lp.minAbsNzo()
              << " max= " << lp.maxAbsNzo()
              << " col-ratio= " << colratio
@@ -248,14 +248,14 @@ void SPxEquiliSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
    /* scale */
    this->applyScaling(lp);
 
-   MSG_INFO3((*this->spxout), (*this->spxout) << "Row scaling min= " << this->minAbsRowscale()
+   SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "Row scaling min= " << this->minAbsRowscale()
              << " max= " << this->maxAbsRowscale()
              << std::endl
              << "Col scaling min= " << this->minAbsColscale()
              << " max= " << this->maxAbsColscale()
              << std::endl;)
 
-   MSG_INFO2((*this->spxout), (*this->spxout) << "after scaling: "
+   SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "after scaling: "
              << " min= " << lp.minAbsNzo(false)
              << " max= " << lp.maxAbsNzo(false)
              << " col-ratio= " << this->maxColRatio(lp)

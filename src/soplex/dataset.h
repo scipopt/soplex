@@ -518,20 +518,20 @@ public:
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
       if(theitem == 0 || thekey == 0)
-         return MSGinconsistent("DataSet");
+         return SPX_MSG_INCONSISTENT("DataSet");
 
       if(thesize > themax || thenum > themax || thenum > thesize)
-         return MSGinconsistent("DataSet");
+         return SPX_MSG_INCONSISTENT("DataSet");
 
       if(thesize == thenum && firstfree != -themax - 1)
-         return MSGinconsistent("DataSet");
+         return SPX_MSG_INCONSISTENT("DataSet");
 
       if(thesize != thenum && firstfree == -themax - 1)
-         return MSGinconsistent("DataSet");
+         return SPX_MSG_INCONSISTENT("DataSet");
 
       for(int i = 0; i < thenum; ++i)
          if(theitem[thekey[i].idx].info != i)
-            return MSGinconsistent("DataSet");
+            return SPX_MSG_INCONSISTENT("DataSet");
 
 #endif
 

@@ -763,7 +763,7 @@ typename SLUFactor<R>::Status SLUFactor<R>::change(
 
    usetup = false;
 
-   MSG_DEBUG(std::cout << "DSLUFA01\tupdated\t\tstability = " << stability()
+   SPX_MSG_DEBUG(std::cout << "DSLUFA01\tupdated\t\tstability = " << stability()
              << std::endl;)
 
    return status();
@@ -1430,7 +1430,7 @@ typename SLUFactor<R>::Status SLUFactor<R>::load(const SVectorBase<R>* matrix[],
       spx_realloc(this->u.col.max,   this->thedim + 1);
       spx_realloc(this->u.col.start, this->thedim + 1);
 
-      this->l.startSize = this->thedim + MAXUPDATES;
+      this->l.startSize = this->thedim + SOPLEX_MAXUPDATES;
 
       spx_realloc(this->l.row,   this->l.startSize);
       spx_realloc(this->l.start, this->l.startSize);
@@ -1490,15 +1490,15 @@ typename SLUFactor<R>::Status SLUFactor<R>::load(const SVectorBase<R>* matrix[],
       // we relax the stability requirement
       minStability /= 2.0;
 
-      MSG_INFO3((*this->spxout), (*this->spxout) <<
+      SPX_MSG_INFO3((*this->spxout), (*this->spxout) <<
                 "ISLUFA01 refactorizing with increased Markowitz threshold: "
                 << lastThreshold << std::endl;)
    }
 
-   MSG_DEBUG(std::cout << "DSLUFA02 threshold = " << lastThreshold
+   SPX_MSG_DEBUG(std::cout << "DSLUFA02 threshold = " << lastThreshold
              << "\tstability = " << stability()
              << "\tminStability = " << minStability << std::endl;)
-   MSG_DEBUG(
+   SPX_MSG_DEBUG(
    {
       int i;
       FILE* fl = fopen("dump.lp", "w");

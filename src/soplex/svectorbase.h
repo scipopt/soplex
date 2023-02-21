@@ -837,7 +837,7 @@ public:
          const int my_max = max();
 
          if(my_size < 0 || my_max < 0 || my_size > my_max)
-            return MSGinconsistent("SVectorBase");
+            return SPX_MSG_INCONSISTENT("SVectorBase");
 
          for(int i = 1; i < my_size; ++i)
          {
@@ -845,7 +845,7 @@ public:
             {
                // allow trailing zeros
                if(m_elem[i].idx == m_elem[j].idx && m_elem[i].val != 0)
-                  return MSGinconsistent("SVectorBase");
+                  return SPX_MSG_INCONSISTENT("SVectorBase");
             }
          }
       }

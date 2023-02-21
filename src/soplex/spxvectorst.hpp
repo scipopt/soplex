@@ -47,7 +47,7 @@ void SPxVectorST<R>::setupWeights(SPxSolverBase<R>& base)
       R x, y;
       int i;
 
-      MSG_DEBUG(std::cout << "DVECST01 colWeight[]: ";)
+      SPX_MSG_DEBUG(std::cout << "DVECST01 colWeight[]: ";)
 
       for(i = base.nCols(); i--;)
       {
@@ -65,12 +65,12 @@ void SPxVectorST<R>::setupWeights(SPxSolverBase<R>& base)
             this->colUp[i] = 1;
          }
 
-         MSG_DEBUG(std::cout << this->colWeight[i] << " ";)
+         SPX_MSG_DEBUG(std::cout << this->colWeight[i] << " ";)
       }
 
-      MSG_DEBUG(std::cout << std::endl << std::endl;)
+      SPX_MSG_DEBUG(std::cout << std::endl << std::endl;)
 
-      MSG_DEBUG(std::cout << "DVECST02 rowWeight[]: ";)
+      SPX_MSG_DEBUG(std::cout << "DVECST02 rowWeight[]: ";)
 
       for(i = base.nRows(); i--;)
       {
@@ -90,10 +90,10 @@ void SPxVectorST<R>::setupWeights(SPxSolverBase<R>& base)
             this->rowRight[i] = 1;
          }
 
-         MSG_DEBUG(std::cout << this->rowWeight[i] << " ";)
+         SPX_MSG_DEBUG(std::cout << this->rowWeight[i] << " ";)
       }
 
-      MSG_DEBUG(std::cout << std::endl;)
+      SPX_MSG_DEBUG(std::cout << std::endl;)
    }
 
    else if(state == DVEC)

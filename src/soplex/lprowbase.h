@@ -210,7 +210,7 @@ public:
          break;
 
       case RANGE:
-         MSG_ERROR(std::cerr << "ELPROW01 RANGE not supported in LPRow::setType()"
+         SPX_MSG_ERROR(std::cerr << "ELPROW01 RANGE not supported in LPRow::setType()"
                    << std::endl;)
          throw SPxInternalCodeException("XLPROW01 This should never happen.");
 

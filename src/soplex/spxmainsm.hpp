@@ -35,40 +35,40 @@
 
 
 //rows
-#define FREE_LHS_RHS            1
-#define FREE_CONSTRAINT         1
-#define EMPTY_CONSTRAINT        1
-#define ROW_SINGLETON           1
-#define AGGREGATE_VARS          1
-#define FORCE_CONSTRAINT        1
+#define SOPLEX_FREE_LHS_RHS            1
+#define SOPLEX_FREE_CONSTRAINT         1
+#define SOPLEX_EMPTY_CONSTRAINT        1
+#define SOPLEX_ROW_SINGLETON           1
+#define SOPLEX_AGGREGATE_VARS          1
+#define SOPLEX_FORCE_CONSTRAINT        1
 //cols
-#define FREE_BOUNDS             1
-#define EMPTY_COLUMN            1
-#define FIX_VARIABLE            1
-#define FREE_ZERO_OBJ_VARIABLE  1
-#define ZERO_OBJ_COL_SINGLETON  1
-#define DOUBLETON_EQUATION      1
-#define FREE_COL_SINGLETON      1
+#define SOPLEX_FREE_BOUNDS             1
+#define SOPLEX_COMPTY_COLUMN           1
+#define SOPLEX_FIX_VARIABLE            1
+#define SOPLEX_FREE_ZERO_OBJ_VARIABLE  1
+#define SOPLEX_ZERO_OBJ_COL_SINGLETON  1
+#define SOPLEX_DOUBLETON_EQUATION      1
+#define SOPLEX_FREE_COL_SINGLETON      1
 //dual
-#define DOMINATED_COLUMN        1
-#define WEAKLY_DOMINATED_COLUMN 1
-#define MULTI_AGGREGATE         1
+#define SOPLEX_DOMINATED_COLUMN        1
+#define SOPLEX_WEAKLY_DOMINATED_COLUMN 1
+#define SOPLEX_MULTI_AGGREGATE         1
 //other
-#define TRIVIAL_HEURISTICS      1
-#define PSEUDOOBJ               1
+#define SOPLEX_TRIVIAL_HEURISTICS      1
+#define SOPLEX_PSEUDOOBJ               1
 
 
-#define EXTREMES                1
-#define ROWS_SPXMAINSM                    1
-#define COLS_SPXMAINSM                    1
-#define DUAL_SPXMAINSM                    1
+#define SOPLEX_EXTREMES                1
+#define SOPLEX_ROWS_SPXMAINSM          1
+#define SOPLEX_COLS_SPXMAINSM          1
+#define SOPLEX_DUAL_SPXMAINSM          1
 ///@todo check: with this simplification step, the unsimplified basis seems to be slightly suboptimal for some instances
-#define DUPLICATE_ROWS          1
-#define DUPLICATE_COLS          1
+#define SOPLEX_DUPLICATE_ROWS          1
+#define SOPLEX_DUPLICATE_COLS          1
 
 
 #ifndef NDEBUG
-#define CHECK_BASIC_DIM
+#define SOPLEX_CHECK_BASIS_DIM
 #endif  // NDEBUG
 
 namespace soplex
@@ -108,7 +108,7 @@ void SPxMainSM<R>::RowObjPS::execute(VectorBase<R>& x, VectorBase<R>& y, VectorB
    assert(cStatus[m_j] != SPxSolverBase<R>::UNDEFINED);
    assert(rStatus[m_i] != SPxSolverBase<R>::BASIC || cStatus[m_j] != SPxSolverBase<R>::BASIC);
 
-   MSG_DEBUG(std::cout << "RowObjPS: removing slack column " << m_j << " (" << cStatus[m_j] <<
+   SPX_MSG_DEBUG(std::cout << "RowObjPS: removing slack column " << m_j << " (" << cStatus[m_j] <<
              ") for row " << m_i << " (" << rStatus[m_i] << ").\n");
 
    if(rStatus[m_i] != SPxSolverBase<R>::BASIC)
@@ -131,7 +131,7 @@ void SPxMainSM<R>::RowObjPS::execute(VectorBase<R>& x, VectorBase<R>& y, VectorB
       cStatus[m_j] = SPxSolverBase<R>::ZERO;
    }
 
-#ifdef CHECK_BASIC_DIM
+#ifdef SOPLEX_CHECK_BASIS_DIM
 
    if(!this->checkBasisDim(rStatus, cStatus))
    {
@@ -170,7 +170,7 @@ void SPxMainSM<R>::FreeConstraintPS::execute(VectorBase<R>& x, VectorBase<R>& y,
    // basis:
    rStatus[m_i] = SPxSolverBase<R>::BASIC;
 
-#ifdef CHECK_BASIC_DIM
+#ifdef SOPLEX_CHECK_BASIS_DIM
 
    if(!this->checkBasisDim(rStatus, cStatus))
    {
@@ -203,7 +203,7 @@ void SPxMainSM<R>::EmptyConstraintPS::execute(VectorBase<R>&, VectorBase<R>& y, 
    // basis:
    rStatus[m_i] = SPxSolverBase<R>::BASIC;
 
-#ifdef CHECK_BASIC_DIM
+#ifdef SOPLEX_CHECK_BASIS_DIM
 
    if(!this->checkBasisDim(rStatus, cStatus))
    {
@@ -403,7 +403,7 @@ void SPxMainSM<R>::RowSingletonPS::execute(VectorBase<R>& x, VectorBase<R>& y, V
       break;
    }
 
-#ifdef CHECK_BASIC_DIM
+#ifdef SOPLEX_CHECK_BASIS_DIM
 
    if(!this->checkBasisDim(rStatus, cStatus))
    {
@@ -519,7 +519,7 @@ void SPxMainSM<R>::ForceConstraintPS::execute(VectorBase<R>& x, VectorBase<R>& y
       y[m_i] = m_rowobj;
    }
 
-#ifdef CHECK_BASIC_DIM
+#ifdef SOPLEX_CHECK_BASIS_DIM
 
    if(!this->checkBasisDim(rStatus, cStatus))
    {
@@ -573,7 +573,7 @@ void SPxMainSM<R>::FixVariablePS::execute(VectorBase<R>& x, VectorBase<R>& y, Ve
                      m_upper, this->epsilon()) ? SPxSolverBase<R>::ON_UPPER : SPxSolverBase<R>::ZERO);
    }
 
-#ifdef CHECK_BASIC_DIM
+#ifdef SOPLEX_CHECK_BASIS_DIM
 
    if(m_correctIdx)
    {
@@ -751,7 +751,7 @@ void SPxMainSM<R>::FreeZeroObjVariablePS::execute(VectorBase<R>& x, VectorBase<R
          cStatus[m_j] = SPxSolverBase<R>::ON_LOWER;
    }
 
-#ifdef CHECK_BASIC_DIM
+#ifdef SOPLEX_CHECK_BASIS_DIM
 
    if(!this->checkBasisDim(rStatus, cStatus))
    {
@@ -812,7 +812,7 @@ void SPxMainSM<R>::ZeroObjColSingletonPS::execute(VectorBase<R>& x, VectorBase<R
       up = 0.0;
 
    assert(LErel(lo, up, this->epsilon()));
-   ASSERT_WARN("WMAISM01", isNotZero(aij, R(1.0 / R(infinity))));
+   SOPLEX_ASSERT_WARN("WMAISM01", isNotZero(aij, R(1.0 / R(infinity))));
 
    if(rStatus[m_i] == SPxSolverBase<R>::ON_LOWER)
    {
@@ -918,7 +918,7 @@ void SPxMainSM<R>::ZeroObjColSingletonPS::execute(VectorBase<R>& x, VectorBase<R
 
    assert(!isOptimal || (cStatus[m_j] != SPxSolverBase<R>::BASIC || isZero(r[m_j], this->feastol())));
 
-#ifdef CHECK_BASIC_DIM
+#ifdef SOPLEX_CHECK_BASIS_DIM
 
    if(!this->checkBasisDim(rStatus, cStatus))
    {
@@ -988,7 +988,7 @@ void SPxMainSM<R>::FreeColSingletonPS::execute(VectorBase<R>& x, VectorBase<R>& 
    else
       rStatus[m_i] = SPxSolverBase<R>::ON_UPPER;
 
-#ifdef CHECK_BASIC_DIM
+#ifdef SOPLEX_CHECK_BASIS_DIM
 
    if(!this->checkBasisDim(rStatus, cStatus))
    {
@@ -1026,7 +1026,7 @@ void SPxMainSM<R>::DoubletonEquationPS::execute(VectorBase<R>& x, VectorBase<R>&
 
       r[m_j] = m_jObj - val * m_aij / aik;
 
-      ASSERT_WARN("WMAISM73", isNotZero(m_aij * aik, this->epsilon()));
+      SOPLEX_ASSERT_WARN("WMAISM73", isNotZero(m_aij * aik, this->epsilon()));
 
       // basis:
       if(m_jFixed)
@@ -1043,7 +1043,7 @@ void SPxMainSM<R>::DoubletonEquationPS::execute(VectorBase<R>& x, VectorBase<R>&
       cStatus[m_k] = SPxSolverBase<R>::BASIC;
    }
 
-#ifdef CHECK_BASIC_DIM
+#ifdef SOPLEX_CHECK_BASIS_DIM
 
    if(!this->checkBasisDim(rStatus, cStatus))
    {
@@ -1098,7 +1098,7 @@ void SPxMainSM<R>::DuplicateRowsPS::execute(VectorBase<R>&, VectorBase<R>& y, Ve
          continue;
       }
 
-      ASSERT_WARN("WMAISM02", isNotZero(m_scale.value(k), this->epsilon()));
+      SOPLEX_ASSERT_WARN("WMAISM02", isNotZero(m_scale.value(k), this->epsilon()));
 
       if(rStatus[m_i] == SPxSolverBase<R>::FIXED && (i == m_maxLhsIdx || i == m_minRhsIdx))
       {
@@ -1164,7 +1164,7 @@ void SPxMainSM<R>::DuplicateRowsPS::execute(VectorBase<R>&, VectorBase<R>& y, Ve
       }
    }
 
-#ifdef CHECK_BASIC_DIM
+#ifdef SOPLEX_CHECK_BASIS_DIM
 
    if(m_isFirst && !this->checkBasisDim(rStatus, cStatus))
    {
@@ -1187,7 +1187,7 @@ void SPxMainSM<R>::DuplicateColsPS::execute(VectorBase<R>& x,
 
    if(m_isFirst)
    {
-#ifdef CHECK_BASIC_DIM
+#ifdef SOPLEX_CHECK_BASIS_DIM
 
       if(!this->checkBasisDim(rStatus, cStatus))
       {
@@ -1218,7 +1218,7 @@ void SPxMainSM<R>::DuplicateColsPS::execute(VectorBase<R>& x,
    }
 
    // primal & basis:
-   ASSERT_WARN("WMAISM03", isNotZero(m_scale, this->epsilon()));
+   SOPLEX_ASSERT_WARN("WMAISM03", isNotZero(m_scale, this->epsilon()));
 
    if(cStatus[m_k] == SPxSolverBase<R>::ON_LOWER)
    {
@@ -1471,7 +1471,7 @@ void SPxMainSM<R>::AggregationPS::execute(VectorBase<R>& x, VectorBase<R>& y, Ve
 
    if(isOptimal && (LT(x[m_j], m_lower, this->feastol()) || GT(x[m_j], m_upper, this->feastol())))
    {
-      MSG_ERROR(std::cerr << "EMAISM: numerical violation after disaggregating variable" << std::endl;)
+      SPX_MSG_ERROR(std::cerr << "EMAISM: numerical violation after disaggregating variable" << std::endl;)
    }
 
    // dual:
@@ -1518,7 +1518,7 @@ void SPxMainSM<R>::AggregationPS::execute(VectorBase<R>& x, VectorBase<R>& y, Ve
    // (in theory and with exact arithmetic setting it to FIXED would be correct)
    rStatus[m_i] = SPxSolverBase<R>::ON_UPPER;
 
-#ifdef CHECK_BASIC_DIM
+#ifdef SOPLEX_CHECK_BASIS_DIM
 
    if(!this->checkBasisDim(rStatus, cStatus))
    {
@@ -1577,7 +1577,7 @@ void SPxMainSM<R>::MultiAggregationPS::execute(VectorBase<R>& x, VectorBase<R>& 
 #ifndef NDEBUG
 
    if(isOptimal && (LT(x[m_j], m_lower, this->feastol()) || GT(x[m_j], m_upper, this->feastol())))
-      MSG_ERROR(std::cerr << "numerical violation in original space due to MultiAggregation\n";)
+      SPX_MSG_ERROR(std::cerr << "numerical violation in original space due to MultiAggregation\n";)
 #endif
 
       // dual:
@@ -1604,7 +1604,7 @@ void SPxMainSM<R>::MultiAggregationPS::execute(VectorBase<R>& x, VectorBase<R>& 
    else
       rStatus[m_i] = SPxSolverBase<R>::ON_UPPER;
 
-#ifdef CHECK_BASIC_DIM
+#ifdef SOPLEX_CHECK_BASIS_DIM
 
    if(!this->checkBasisDim(rStatus, cStatus))
    {
@@ -1649,7 +1649,7 @@ void SPxMainSM<R>::TightenBoundsPS::execute(VectorBase<R>& x, VectorBase<R>&, Ve
       break;
    }
 
-#ifdef CHECK_BASIC_DIM
+#ifdef SOPLEX_CHECK_BASIS_DIM
 
    if(!this->checkBasisDim(rStatus, cStatus))
    {
@@ -1816,7 +1816,7 @@ void SPxMainSM<R>::handleExtremes(SPxLPBase<R>& lp)
 
                col.remove(i);
 
-               MSG_DEBUG((*this->spxout) << "IMAISM04 aij=" << aij
+               SPX_MSG_DEBUG((*this->spxout) << "IMAISM04 aij=" << aij
                          << " removed, absBnd=" << absBnd
                          << std::endl;)
                ++remNzos;
@@ -1825,12 +1825,12 @@ void SPxMainSM<R>::handleExtremes(SPxLPBase<R>& lp)
             {
                if(aij > maxVal)
                {
-                  MSG_WARNING((*this->spxout), (*this->spxout) << "WMAISM05 Warning! Big matrix coefficient " << aij
+                  SPX_MSG_WARNING((*this->spxout), (*this->spxout) << "WMAISM05 Warning! Big matrix coefficient " << aij
                               << std::endl);
                }
                else if(isZero(aij, tol))
                {
-                  MSG_WARNING((*this->spxout), (*this->spxout) << "WMAISM06 Warning! Tiny matrix coefficient " << aij
+                  SPX_MSG_WARNING((*this->spxout), (*this->spxout) << "WMAISM06 Warning! Tiny matrix coefficient " << aij
                               << std::endl);
                }
 
@@ -1866,7 +1866,7 @@ void SPxMainSM<R>::handleExtremes(SPxLPBase<R>& lp)
       this->m_chgLRhs += chgLRhs;
       this->m_chgBnds += chgBnds;
 
-      MSG_INFO2((*this->spxout), (*this->spxout) << "Simplifier (extremes) removed "
+      SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "Simplifier (extremes) removed "
                 << remRows << " rows, "
                 << remNzos << " non-zeros, "
                 << chgBnds << " col bounds, "
@@ -2010,7 +2010,7 @@ void SPxMainSM<R>::trivialHeuristic(SPxLPBase<R>& lp)
       {
          R aij = col.value(k);
 
-         ASSERT_WARN("WMAISM45", isNotZero(aij, R(1.0 / R(infinity))));
+         SOPLEX_ASSERT_WARN("WMAISM45", isNotZero(aij, R(1.0 / R(infinity))));
 
          if(GT(lp.lhs(col.index(k)), R(-infinity), this->tolerances()->epsilon())
                && LT(lp.rhs(col.index(k)), R(infinity), this->tolerances()->epsilon()))
@@ -2038,10 +2038,10 @@ void SPxMainSM<R>::trivialHeuristic(SPxLPBase<R>& lp)
       R upper = lp.upper(j);
 
       if(LE(lower, R(-infinity), this->tolerances()->epsilon()))
-         lower = MINIMUM(-largeValue, upper);
+         lower = SOPLEX_MIN(-largeValue, upper);
 
       if(GE(upper, R(infinity), this->tolerances()->epsilon()))
-         upper = MAXIMUM(lp.lower(j), largeValue);
+         upper = SOPLEX_MAX(lp.lower(j), largeValue);
 
       if(zerovalid)
       {
@@ -2201,17 +2201,17 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::removeEmpty(SPxLPBase<R>& lp)
 
       if(row.size() == 0)
       {
-         MSG_DEBUG((*this->spxout) << "IMAISM07 row " << i
+         SPX_MSG_DEBUG((*this->spxout) << "IMAISM07 row " << i
                    << ": empty ->";)
 
          if(LT(lp.rhs(i), R(0.0), feastol()) || GT(lp.lhs(i), R(0.0), feastol()))
          {
-            MSG_DEBUG((*this->spxout) << " infeasible lhs=" << lp.lhs(i)
+            SPX_MSG_DEBUG((*this->spxout) << " infeasible lhs=" << lp.lhs(i)
                       << " rhs=" << lp.rhs(i) << std::endl;)
             return this->INFEASIBLE;
          }
 
-         MSG_DEBUG((*this->spxout) << " removed" << std::endl;)
+         SPX_MSG_DEBUG((*this->spxout) << " removed" << std::endl;)
 
          std::shared_ptr<PostStep> ptr(new EmptyConstraintPS(lp, i, this->_tolerances));
          m_hist.append(ptr);
@@ -2229,7 +2229,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::removeEmpty(SPxLPBase<R>& lp)
 
       if(col.size() == 0)
       {
-         MSG_DEBUG((*this->spxout) << "IMAISM08 col " << j
+         SPX_MSG_DEBUG((*this->spxout) << "IMAISM08 col " << j
                    << ": empty -> maxObj=" << lp.maxObj(j)
                    << " lower=" << lp.lower(j)
                    << " upper=" << lp.upper(j);)
@@ -2240,7 +2240,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::removeEmpty(SPxLPBase<R>& lp)
          {
             if(lp.upper(j) >= R(infinity))
             {
-               MSG_DEBUG((*this->spxout) << " unbounded" << std::endl;)
+               SPX_MSG_DEBUG((*this->spxout) << " unbounded" << std::endl;)
                return this->UNBOUNDED;
             }
 
@@ -2250,7 +2250,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::removeEmpty(SPxLPBase<R>& lp)
          {
             if(lp.lower(j) <= R(-infinity))
             {
-               MSG_DEBUG((*this->spxout) << " unbounded" << std::endl;)
+               SPX_MSG_DEBUG((*this->spxout) << " unbounded" << std::endl;)
                return this->UNBOUNDED;
             }
 
@@ -2258,7 +2258,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::removeEmpty(SPxLPBase<R>& lp)
          }
          else
          {
-            ASSERT_WARN("WMAISM09", isZero(lp.maxObj(j), this->epsZero()));
+            SOPLEX_ASSERT_WARN("WMAISM09", isZero(lp.maxObj(j), this->epsZero()));
 
             // any value within the bounds is ok
             if(lp.lower(j) > R(-infinity))
@@ -2269,7 +2269,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::removeEmpty(SPxLPBase<R>& lp)
                val = 0.0;
          }
 
-         MSG_DEBUG((*this->spxout) << " removed" << std::endl;)
+         SPX_MSG_DEBUG((*this->spxout) << " removed" << std::endl;)
 
          std::shared_ptr<PostStep> ptr1(new FixBoundsPS(lp, j, val, this->_tolerances));
          std::shared_ptr<PostStep> ptr2(new FixVariablePS(lp, *this, j, val, this->_tolerances));
@@ -2288,7 +2288,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::removeEmpty(SPxLPBase<R>& lp)
       this->m_remRows += remRows;
       this->m_remCols += remCols;
 
-      MSG_INFO2((*this->spxout), (*this->spxout) << "Simplifier (empty rows/colums) removed "
+      SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "Simplifier (empty rows/colums) removed "
                 << remRows << " rows, "
                 << remCols << " cols"
                 << std::endl;)
@@ -2309,7 +2309,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::removeRowSingleton(SPxLPBase<R>&
    R lo  = R(-infinity);
    R up  =  R(infinity);
 
-   MSG_DEBUG((*this->spxout) << "IMAISM22 row " << i
+   SPX_MSG_DEBUG((*this->spxout) << "IMAISM22 row " << i
              << ": singleton -> val=" << aij
              << " lhs=" << lp.lhs(i)
              << " rhs=" << lp.rhs(i);)
@@ -2327,7 +2327,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::removeRowSingleton(SPxLPBase<R>&
    else if(LT(lp.rhs(i), R(0.0), feastol()) || GT(lp.lhs(i), R(0.0), feastol()))
    {
       // aij == 0, rhs < 0 or lhs > 0
-      MSG_DEBUG((*this->spxout) << " infeasible" << std::endl;)
+      SPX_MSG_DEBUG((*this->spxout) << " infeasible" << std::endl;)
       return this->INFEASIBLE;
    }
 
@@ -2337,7 +2337,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::removeRowSingleton(SPxLPBase<R>&
    if(isZero(up, this->epsZero()))
       up = 0.0;
 
-   MSG_DEBUG((*this->spxout) << " removed, lower=" << lo
+   SPX_MSG_DEBUG((*this->spxout) << " removed, lower=" << lo
              << " (" << lp.lower(j)
              << ") upper=" << up
              << " (" << lp.upper(j)
@@ -2401,7 +2401,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::aggregateVars(SPxLPBase<R>& lp,
 
    assert(isNotZero(aij, this->epsZero()) && isNotZero(aik, this->epsZero()));
 
-   MSG_DEBUG((*this->spxout) << "IMAISM22 row " << i << ": doubleton equation -> "
+   SPX_MSG_DEBUG((*this->spxout) << "IMAISM22 row " << i << ": doubleton equation -> "
              << aij << " x_" << j << " + " << aik << " x_" << k << " = " << rhs;)
 
    // determine which variable can be aggregated without requiring bound tightening of the other variable
@@ -2492,7 +2492,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::aggregateVars(SPxLPBase<R>& lp,
    R aggr_coef = - (aik / aij);
    R aggr_const = rhs / aij;
 
-   MSG_DEBUG((*this->spxout) << " removed, replacing x_" << j << " with "
+   SPX_MSG_DEBUG((*this->spxout) << " removed, replacing x_" << j << " with "
              << aggr_const << " + " << aggr_coef << " * x_" << k << std::endl;)
 
    // replace all occurrences of x_j
@@ -2660,7 +2660,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
          if(!isNotZero(aij, R(1.0 / R(infinity))))
          {
-            MSG_WARNING((*this->spxout), (*this->spxout) << "Warning: tiny nonzero coefficient " << aij <<
+            SPX_MSG_WARNING((*this->spxout), (*this->spxout) << "Warning: tiny nonzero coefficient " << aij <<
                         " in row " << i << "\n");
          }
 
@@ -2690,7 +2690,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
          }
       }
 
-#if FREE_BOUNDS
+#if SOPLEX_FREE_BOUNDS
 
       // 1. detect implied free variables
       if(rhsCnt <= 1 || lhsCnt <= 1)
@@ -2703,7 +2703,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
             redundantLower = false;
             redundantUpper = false;
 
-            ASSERT_WARN("WMAISM12", isNotZero(aij, R(1.0 / R(infinity))));
+            SOPLEX_ASSERT_WARN("WMAISM12", isNotZero(aij, R(1.0 / R(infinity))));
 
             if(aij > 0.0)
             {
@@ -2735,7 +2735,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
                   if(GErel(lo, lp.lower(j), feastol()))
                   {
-                     MSG_DEBUG((*this->spxout) << "IMAISM13 row " << i
+                     SPX_MSG_DEBUG((*this->spxout) << "IMAISM13 row " << i
                                << ": redundant lower bound on x" << j
                                << " -> lower=" << lo
                                << " (" << lp.lower(j)
@@ -2774,7 +2774,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
                   if(LErel(up, lp.upper(j), feastol()))
                   {
-                     MSG_DEBUG((*this->spxout) << "IMAISM14 row " << i
+                     SPX_MSG_DEBUG((*this->spxout) << "IMAISM14 row " << i
                                << ": redundant upper bound on x" << j
                                << " -> upper=" << up
                                << " (" << lp.upper(j)
@@ -2844,7 +2844,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
                   if(LErel(up, lp.upper(j), feastol()))
                   {
-                     MSG_DEBUG((*this->spxout) << "IMAISM15 row " << i
+                     SPX_MSG_DEBUG((*this->spxout) << "IMAISM15 row " << i
                                << ": redundant upper bound on x" << j
                                << " -> upper=" << up
                                << " (" << lp.upper(j)
@@ -2882,7 +2882,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
                   if(GErel(lo, lp.lower(j), this->tolerances()->epsilon()))
                   {
-                     MSG_DEBUG((*this->spxout) << "IMAISM16 row " << i
+                     SPX_MSG_DEBUG((*this->spxout) << "IMAISM16 row " << i
                                << ": redundant lower bound on x" << j
                                << " -> lower=" << lo
                                << " (" << lp.lower(j)
@@ -2927,7 +2927,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
 #endif
 
-#if FREE_LHS_RHS
+#if SOPLEX_FREE_LHS_RHS
 
       redundantLhs = false;
       redundantRhs = false;
@@ -2935,7 +2935,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
       // 2. detect implied free constraints
       if(lp.lhs(i) > R(-infinity) && lhsCnt == 0 && GErel(lhsBnd, lp.lhs(i), feastol()))
       {
-         MSG_DEBUG((*this->spxout) << "IMAISM17 row " << i
+         SPX_MSG_DEBUG((*this->spxout) << "IMAISM17 row " << i
                    << ": redundant lhs -> lhsBnd=" << lhsBnd
                    << " lhs=" << lp.lhs(i)
                    << std::endl;)
@@ -2945,7 +2945,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
       if(lp.rhs(i) <  R(infinity) && rhsCnt == 0 && LErel(rhsBnd, lp.rhs(i), feastol()))
       {
-         MSG_DEBUG((*this->spxout) << "IMAISM18 row " << i
+         SPX_MSG_DEBUG((*this->spxout) << "IMAISM18 row " << i
                    << ": redundant rhs -> rhsBnd=" << rhsBnd
                    << " rhs=" << lp.rhs(i)
                    << std::endl;)
@@ -2984,7 +2984,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
             (LTrel(rhsBnd,   lp.lhs(i), feastol()) && rhsCnt == 0) ||
             (GTrel(lhsBnd,   lp.rhs(i), feastol()) && lhsCnt == 0))
       {
-         MSG_DEBUG((*this->spxout) << "IMAISM19 row " << std::setprecision(20) << i
+         SPX_MSG_DEBUG((*this->spxout) << "IMAISM19 row " << std::setprecision(20) << i
                    << ": infeasible -> lhs=" << lp.lhs(i)
                    << " rhs=" << lp.rhs(i)
                    << " lhsBnd=" << lhsBnd
@@ -2993,12 +2993,12 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
          return this->INFEASIBLE;
       }
 
-#if FREE_CONSTRAINT
+#if SOPLEX_FREE_CONSTRAINT
 
       // 4. unconstrained constraint
       if(lp.lhs(i) <= R(-infinity) && lp.rhs(i) >= R(infinity))
       {
-         MSG_DEBUG((*this->spxout) << "IMAISM20 row " << i
+         SPX_MSG_DEBUG((*this->spxout) << "IMAISM20 row " << i
                    << ": unconstrained -> removed" << std::endl;)
 
          std::shared_ptr<PostStep> ptr(new FreeConstraintPS(lp, i, this->_tolerances));
@@ -3015,22 +3015,22 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
 #endif
 
-#if EMPTY_CONSTRAINT
+#if SOPLEX_EMPTY_CONSTRAINT
 
       // 5. empty constraint
       if(row.size() == 0)
       {
-         MSG_DEBUG((*this->spxout) << "IMAISM21 row " << i
+         SPX_MSG_DEBUG((*this->spxout) << "IMAISM21 row " << i
                    << ": empty ->";)
 
          if(LT(lp.rhs(i), R(0.0), feastol()) || GT(lp.lhs(i), R(0.0), feastol()))
          {
-            MSG_DEBUG((*this->spxout) << " infeasible lhs=" << lp.lhs(i)
+            SPX_MSG_DEBUG((*this->spxout) << " infeasible lhs=" << lp.lhs(i)
                       << " rhs=" << lp.rhs(i) << std::endl;)
             return this->INFEASIBLE;
          }
 
-         MSG_DEBUG((*this->spxout) << " removed" << std::endl;)
+         SPX_MSG_DEBUG((*this->spxout) << " removed" << std::endl;)
 
          std::shared_ptr<PostStep> ptr(new EmptyConstraintPS(lp, i, this->_tolerances));
          m_hist.append(ptr);
@@ -3045,7 +3045,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
 #endif
 
-#if ROW_SINGLETON
+#if SOPLEX_ROW_SINGLETON
 
       // 6. row singleton
       if(row.size() == 1)
@@ -3056,7 +3056,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
 #endif
 
-#if AGGREGATE_VARS
+#if SOPLEX_AGGREGATE_VARS
 
       // 7. row doubleton, aka. simple aggregation of two variables in an equation
       if(row.size() == 2 && EQrel(lp.lhs(i), lp.rhs(i), feastol()))
@@ -3067,13 +3067,13 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
 #endif
 
-#if FORCE_CONSTRAINT
+#if SOPLEX_FORCE_CONSTRAINT
 
       // 8. forcing constraint (postsolving)
       // fix variables to obtain the upper bound on constraint value
       if(rhsCnt == 0 && EQrel(rhsBnd, lp.lhs(i), feastol()))
       {
-         MSG_DEBUG((*this->spxout) << "IMAISM24 row " << i
+         SPX_MSG_DEBUG((*this->spxout) << "IMAISM24 row " << i
                    << ": forcing constraint fix on lhs ->"
                    << " lhs=" << lp.lhs(i)
                    << " rhsBnd=" << rhsBnd
@@ -3093,7 +3093,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
             lowers[k] = lp.lower(j);
             uppers[k] = lp.upper(j);
 
-            ASSERT_WARN("WMAISM25", isNotZero(aij, R(1.0 / R(infinity))));
+            SOPLEX_ASSERT_WARN("WMAISM25", isNotZero(aij, R(1.0 / R(infinity))));
 
             if(aij > 0.0)
                lp.changeLower(j, lp.upper(j));
@@ -3117,7 +3117,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
       // fix variables to obtain the lower bound on constraint value
       if(lhsCnt == 0 && EQrel(lhsBnd, lp.rhs(i), feastol()))
       {
-         MSG_DEBUG((*this->spxout) << "IMAISM26 row " << i
+         SPX_MSG_DEBUG((*this->spxout) << "IMAISM26 row " << i
                    << ": forcing constraint fix on rhs ->"
                    << " rhs=" << lp.rhs(i)
                    << " lhsBnd=" << lhsBnd
@@ -3137,7 +3137,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
             lowers[k] = lp.lower(j);
             uppers[k] = lp.upper(j);
 
-            ASSERT_WARN("WMAISM27", isNotZero(aij, R(1.0 / R(infinity))));
+            SOPLEX_ASSERT_WARN("WMAISM27", isNotZero(aij, R(1.0 / R(infinity))));
 
             if(aij > 0.0)
                lp.changeUpper(j, lp.lower(j));
@@ -3172,7 +3172,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
       this->m_keptBnds += keptBnds;
       this->m_keptLRhs += keptLRhs;
 
-      MSG_INFO2((*this->spxout), (*this->spxout) << "Simplifier (rows) removed "
+      SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "Simplifier (rows) removed "
                 << remRows << " rows, "
                 << remNzos << " non-zeros, "
                 << chgBnds << " col bounds, "
@@ -3219,7 +3219,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
       // infeasible bounds
       if(GTrel(lp.lower(j), lp.upper(j), feastol()))
       {
-         MSG_DEBUG((*this->spxout) << "IMAISM29 col " << j
+         SPX_MSG_DEBUG((*this->spxout) << "IMAISM29 col " << j
                    << ": infeasible bounds on x" << j
                    << " -> lower=" << lp.lower(j)
                    << " upper=" << lp.upper(j)
@@ -3230,8 +3230,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
       // 1. empty column
       if(col.size() == 0)
       {
-#if EMPTY_COLUMN
-         MSG_DEBUG((*this->spxout) << "IMAISM30 col " << j
+#if SOPLEX_COMPTY_COLUMN
+         SPX_MSG_DEBUG((*this->spxout) << "IMAISM30 col " << j
                    << ": empty -> maxObj=" << lp.maxObj(j)
                    << " lower=" << lp.lower(j)
                    << " upper=" << lp.upper(j);)
@@ -3242,7 +3242,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
          {
             if(lp.upper(j) >= R(infinity))
             {
-               MSG_DEBUG((*this->spxout) << " unbounded" << std::endl;)
+               SPX_MSG_DEBUG((*this->spxout) << " unbounded" << std::endl;)
                return this->UNBOUNDED;
             }
 
@@ -3252,7 +3252,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
          {
             if(lp.lower(j) <= R(-infinity))
             {
-               MSG_DEBUG((*this->spxout) << " unbounded" << std::endl;)
+               SPX_MSG_DEBUG((*this->spxout) << " unbounded" << std::endl;)
                return this->UNBOUNDED;
             }
 
@@ -3271,7 +3271,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
                val = 0.0;
          }
 
-         MSG_DEBUG((*this->spxout) << " removed" << std::endl;)
+         SPX_MSG_DEBUG((*this->spxout) << " removed" << std::endl;)
 
          std::shared_ptr<PostStep> ptr1(new FixBoundsPS(lp, j, val, this->_tolerances));
          std::shared_ptr<PostStep> ptr2(new FixVariablePS(lp, *this, j, val, this->_tolerances));
@@ -3302,7 +3302,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
             int i = col.index(k);
 
             // warn since this unhandled case may slip through unnoticed otherwise
-            ASSERT_WARN("WMAISM31", isNotZero(col.value(k), R(1.0 / R(infinity))));
+            SOPLEX_ASSERT_WARN("WMAISM31", isNotZero(col.value(k), R(1.0 / R(infinity))));
 
             if(col.value(k) > 0.0)
             {
@@ -3327,19 +3327,19 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
          // s.t. 5 x >= 8
          if(GT(lp.maxObj(j), R(0.0), this->epsZero()) && upFree)
          {
-#if FIX_VARIABLE
-            MSG_DEBUG((*this->spxout) << "IMAISM32 col " << j
+#if SOPLEX_FIX_VARIABLE
+            SPX_MSG_DEBUG((*this->spxout) << "IMAISM32 col " << j
                       << ": x" << j
                       << " unconstrained above ->";)
 
             if(lp.upper(j) >= R(infinity))
             {
-               MSG_DEBUG((*this->spxout) << " unbounded" << std::endl;)
+               SPX_MSG_DEBUG((*this->spxout) << " unbounded" << std::endl;)
 
                return this->UNBOUNDED;
             }
 
-            MSG_DEBUG((*this->spxout) << " fixed at upper=" << lp.upper(j) << std::endl;)
+            SPX_MSG_DEBUG((*this->spxout) << " fixed at upper=" << lp.upper(j) << std::endl;)
 
             std::shared_ptr<PostStep> ptr(new FixBoundsPS(lp, j, lp.upper(j), this->_tolerances));
             m_hist.append(ptr);
@@ -3349,18 +3349,18 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
          // s.t. 5 x <= 8
          else if(LT(lp.maxObj(j), R(0.0), this->epsZero()) && loFree)
          {
-            MSG_DEBUG((*this->spxout) << "IMAISM33 col " << j
+            SPX_MSG_DEBUG((*this->spxout) << "IMAISM33 col " << j
                       << ": x" << j
                       << " unconstrained below ->";)
 
             if(lp.lower(j) <= R(-infinity))
             {
-               MSG_DEBUG((*this->spxout) << " unbounded" << std::endl;)
+               SPX_MSG_DEBUG((*this->spxout) << " unbounded" << std::endl;)
 
                return this->UNBOUNDED;
             }
 
-            MSG_DEBUG((*this->spxout) << " fixed at lower=" << lp.lower(j) << std::endl;)
+            SPX_MSG_DEBUG((*this->spxout) << " fixed at lower=" << lp.lower(j) << std::endl;)
 
             std::shared_ptr<PostStep> ptr(new FixBoundsPS(lp, j, lp.lower(j), this->_tolerances));
             m_hist.append(ptr);
@@ -3369,13 +3369,13 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
          }
          else if(isZero(lp.maxObj(j), this->epsZero()))
          {
-#if FREE_ZERO_OBJ_VARIABLE
+#if SOPLEX_FREE_ZERO_OBJ_VARIABLE
             bool unconstrained_below = loFree && lp.lower(j) <= R(-infinity);
             bool unconstrained_above = upFree && lp.upper(j) >= R(infinity);
 
             if(unconstrained_below || unconstrained_above)
             {
-               MSG_DEBUG((*this->spxout) << "IMAISM34 col " << j
+               SPX_MSG_DEBUG((*this->spxout) << "IMAISM34 col " << j
                          << ": x" << j
                          << " unconstrained "
                          << (unconstrained_below ? "below" : "above")
@@ -3419,12 +3419,12 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
          }
       }
 
-#if FIX_VARIABLE
+#if SOPLEX_FIX_VARIABLE
 
       // 3. fix variable
       if(EQrel(lp.lower(j), lp.upper(j), feastol()))
       {
-         MSG_DEBUG((*this->spxout) << "IMAISM36 col " << j
+         SPX_MSG_DEBUG((*this->spxout) << "IMAISM36 col " << j
                    << ": x" << j
                    << " fixed -> lower=" << lp.lower(j)
                    << " upper=" << lp.upper(j) << std::endl;)
@@ -3451,8 +3451,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
          // 4. column singleton with zero objective
          if(isZero(lp.maxObj(j), this->epsZero()))
          {
-#if ZERO_OBJ_COL_SINGLETON
-            MSG_DEBUG((*this->spxout) << "IMAISM37 col " << j
+#if SOPLEX_ZERO_OBJ_COL_SINGLETON
+            SPX_MSG_DEBUG((*this->spxout) << "IMAISM37 col " << j
                       << ": singleton in row " << i
                       << " with zero objective";)
 
@@ -3487,7 +3487,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
             if(isZero(rhs, this->epsZero()))
                rhs = 0.0;
 
-            MSG_DEBUG((*this->spxout) << " removed -> lhs=" << lhs
+            SPX_MSG_DEBUG((*this->spxout) << " removed -> lhs=" << lhs
                       << " (" << lp.lhs(i)
                       << ") rhs=" << rhs
                       << " (" << lp.rhs(i)
@@ -3524,8 +3524,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
                  lp.rowVector(i).size() == 2                         &&
                  (lp.lower(j) > R(-infinity) || lp.upper(j) < R(infinity)))
          {
-#if DOUBLETON_EQUATION
-            MSG_DEBUG((*this->spxout) << "IMAISM38 col " << j
+#if SOPLEX_DOUBLETON_EQUATION
+            SPX_MSG_DEBUG((*this->spxout) << "IMAISM38 col " << j
                       << ": singleton in row " << i
                       << " with doubleton equation ->";)
 
@@ -3549,7 +3549,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
             else
                throw SPxInternalCodeException("XMAISM11 This should never happen.");
 
-            ASSERT_WARN("WMAISM39", isNotZero(aik, R(1.0 / R(infinity))));
+            SOPLEX_ASSERT_WARN("WMAISM39", isNotZero(aik, R(1.0 / R(infinity))));
 
             R lo, up;
             R oldLower = lp.lower(k);
@@ -3592,7 +3592,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
             if(LTrel(up, lp.upper(k), this->epsZero()))
                lp.changeUpper(k, up);
 
-            MSG_DEBUG((*this->spxout) << " made free, bounds on x" << k
+            SPX_MSG_DEBUG((*this->spxout) << " made free, bounds on x" << k
                       << ": lower=" << lp.lower(k)
                       << " (" << oldLower
                       << ") upper=" << lp.upper(k)
@@ -3602,7 +3602,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
             // infeasible bounds
             if(GTrel(lp.lower(k), lp.upper(k), feastol()))
             {
-               MSG_DEBUG((*this->spxout) << "new bounds are infeasible"
+               SPX_MSG_DEBUG((*this->spxout) << "new bounds are infeasible"
                          << std::endl;)
                return this->INFEASIBLE;
             }
@@ -3625,13 +3625,13 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
          // 6. (implied) free column singleton
          if(lp.lower(j) <= R(-infinity) && lp.upper(j) >= R(infinity))
          {
-#if FREE_COL_SINGLETON
+#if SOPLEX_FREE_COL_SINGLETON
             R slackVal = lp.lhs(i);
 
             // constraint i is an inequality constraint -> transform into equation type
             if(NErel(lp.lhs(i), lp.rhs(i), feastol()))
             {
-               MSG_DEBUG((*this->spxout) << "IMAISM40 col " << j
+               SPX_MSG_DEBUG((*this->spxout) << "IMAISM40 col " << j
                          << ": free singleton in inequality constraint" << std::endl;)
 
                // do nothing if constraint i is unconstrained
@@ -3647,7 +3647,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
                {
                   if(sUp >= R(infinity))
                   {
-                     MSG_DEBUG((*this->spxout) << " -> problem unbounded" << std::endl;)
+                     SPX_MSG_DEBUG((*this->spxout) << " -> problem unbounded" << std::endl;)
                      return this->UNBOUNDED;
                   }
 
@@ -3657,7 +3657,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
                {
                   if(sLo <= R(-infinity))
                   {
-                     MSG_DEBUG((*this->spxout) << " -> problem unbounded" << std::endl;)
+                     SPX_MSG_DEBUG((*this->spxout) << " -> problem unbounded" << std::endl;)
                      return this->UNBOUNDED;
                   }
 
@@ -3680,7 +3680,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
             std::shared_ptr<PostStep> ptr(new FreeColSingletonPS(lp, *this, j, i, slackVal, this->_tolerances));
             m_hist.append(ptr);
 
-            MSG_DEBUG((*this->spxout) << "IMAISM41 col " << j
+            SPX_MSG_DEBUG((*this->spxout) << "IMAISM41 col " << j
                       << ": free singleton removed" << std::endl;)
 
             const SVectorBase<R>& row = lp.rowVector(i);
@@ -3717,7 +3717,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
       this->m_remNzos += remNzos;
       this->m_chgBnds += chgBnds;
 
-      MSG_INFO2((*this->spxout), (*this->spxout) << "Simplifier (columns) removed "
+      SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "Simplifier (columns) removed "
                 << remRows << " rows, "
                 << remCols << " cols, "
                 << remNzos << " non-zeros, "
@@ -3761,7 +3761,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLPBase<R>& lp, b
       // check for unconstrained constraints
       if(lp.lhs(i) <= R(-infinity) && lp.rhs(i) >= R(infinity))
       {
-         MSG_DEBUG((*this->spxout) << "IMAISM43 row " << i
+         SPX_MSG_DEBUG((*this->spxout) << "IMAISM43 row " << i
                    << ": unconstrained" << std::endl;)
 
          std::shared_ptr<PostStep> ptr(new FreeConstraintPS(lp, i, this->_tolerances));
@@ -3789,7 +3789,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLPBase<R>& lp, b
          int  i   = lp.colVector(j).index(0);
          R aij = lp.colVector(j).value(0);
 
-         ASSERT_WARN("WMAISM44", isNotZero(aij, R(1.0 / R(infinity))));
+         SOPLEX_ASSERT_WARN("WMAISM44", isNotZero(aij, R(1.0 / R(infinity))));
 
          R bound = lp.maxObj(j) / aij;
 
@@ -3828,7 +3828,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLPBase<R>& lp, b
          R aij = col.value(k);
          int  i   = col.index(k);
 
-         ASSERT_WARN("WMAISM45", isNotZero(aij, R(1.0 / R(infinity))));
+         SOPLEX_ASSERT_WARN("WMAISM45", isNotZero(aij, R(1.0 / R(infinity))));
 
          if(aij > 0)
          {
@@ -3865,7 +3865,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLPBase<R>& lp, b
       // dual infeasibility checks
       if(LTrel(dualConsUp[j], dualConsLo[j], opttol()))
       {
-         MSG_DEBUG((*this->spxout) << "IMAISM46 col " << j
+         SPX_MSG_DEBUG((*this->spxout) << "IMAISM46 col " << j
                    << ": dual infeasible -> dual lhs bound=" << dualConsLo[j]
                    << " dual rhs bound=" << dualConsUp[j] << std::endl;)
          return this->DUAL_INFEASIBLE;
@@ -3877,18 +3877,18 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLPBase<R>& lp, b
       // Is the problem really unbounded in the cases below ??? Or is only dual infeasibility be shown
       if(GTrel(obj, dualConsUp[j], opttol()))
       {
-#if DOMINATED_COLUMN
-         MSG_DEBUG((*this->spxout) << "IMAISM47 col " << j
+#if SOPLEX_DOMINATED_COLUMN
+         SPX_MSG_DEBUG((*this->spxout) << "IMAISM47 col " << j
                    << ": dominated -> maxObj=" << obj
                    << " dual rhs bound=" << dualConsUp[j] << std::endl;)
 
          if(lp.upper(j) >= R(infinity))
          {
-            MSG_INFO2((*this->spxout), (*this->spxout) << " unbounded" << std::endl;)
+            SPX_MSG_INFO2((*this->spxout), (*this->spxout) << " unbounded" << std::endl;)
             return this->UNBOUNDED;
          }
 
-         MSG_DEBUG((*this->spxout) << " fixed at upper=" << lp.upper(j) << std::endl;)
+         SPX_MSG_DEBUG((*this->spxout) << " fixed at upper=" << lp.upper(j) << std::endl;)
 
          std::shared_ptr<PostStep> ptr(new FixBoundsPS(lp, j, lp.upper(j), this->_tolerances));
          m_hist.append(ptr);
@@ -3899,18 +3899,18 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLPBase<R>& lp, b
       }
       else if(LTrel(obj, dualConsLo[j], opttol()))
       {
-#if DOMINATED_COLUMN
-         MSG_DEBUG((*this->spxout) << "IMAISM48 col " << j
+#if SOPLEX_DOMINATED_COLUMN
+         SPX_MSG_DEBUG((*this->spxout) << "IMAISM48 col " << j
                    << ": dominated -> maxObj=" << obj
                    << " dual lhs bound=" << dualConsLo[j] << std::endl;)
 
          if(lp.lower(j) <= R(-infinity))
          {
-            MSG_INFO2((*this->spxout), (*this->spxout) << " unbounded" << std::endl;)
+            SPX_MSG_INFO2((*this->spxout), (*this->spxout) << " unbounded" << std::endl;)
             return this->UNBOUNDED;
          }
 
-         MSG_DEBUG((*this->spxout) << " fixed at lower=" << lp.lower(j) << std::endl;)
+         SPX_MSG_DEBUG((*this->spxout) << " fixed at lower=" << lp.lower(j) << std::endl;)
 
          std::shared_ptr<PostStep> ptr(new FixBoundsPS(lp, j, lp.lower(j), this->_tolerances));
          m_hist.append(ptr);
@@ -3923,8 +3923,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLPBase<R>& lp, b
       // 2. weakly dominated column (no postsolving)
       else if(lp.upper(j) < R(infinity) && EQrel(obj, dualConsUp[j], opttol()))
       {
-#if WEAKLY_DOMINATED_COLUMN
-         MSG_DEBUG((*this->spxout) << "IMAISM49 col " << j
+#if SOPLEX_WEAKLY_DOMINATED_COLUMN
+         SPX_MSG_DEBUG((*this->spxout) << "IMAISM49 col " << j
                    << ": weakly dominated -> maxObj=" << obj
                    << " dual rhs bound=" << dualConsUp[j] << std::endl;)
 
@@ -3937,8 +3937,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLPBase<R>& lp, b
       }
       else if(lp.lower(j) > R(-infinity) && EQrel(obj, dualConsLo[j], opttol()))
       {
-#if WEAKLY_DOMINATED_COLUMN
-         MSG_DEBUG((*this->spxout) << "IMAISM50 col " << j
+#if SOPLEX_WEAKLY_DOMINATED_COLUMN
+         SPX_MSG_DEBUG((*this->spxout) << "IMAISM50 col " << j
                    << ": weakly dominated -> maxObj=" << obj
                    << " dual lhs bound=" << dualConsLo[j] << std::endl;)
 
@@ -3953,7 +3953,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLPBase<R>& lp, b
       // fix column
       if(EQrel(lp.lower(j), lp.upper(j), feastol()))
       {
-#if FIX_VARIABLE
+#if SOPLEX_FIX_VARIABLE
          fixColumn(lp, j);
 
          ++remCols;
@@ -3974,7 +3974,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLPBase<R>& lp, b
       this->m_remCols += remCols;
       this->m_remNzos += remNzos;
 
-      MSG_INFO2((*this->spxout), (*this->spxout) << "Simplifier (dual) removed "
+      SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "Simplifier (dual) removed "
                 << remRows << " rows, "
                 << remCols << " cols, "
                 << remNzos << " non-zeros"
@@ -4019,7 +4019,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::multiaggregation(SPxLPBase<R>& l
       {
          R aij = col.value(k);
 
-         ASSERT_WARN("WMAISM45", isNotZero(aij, R(1.0 / R(infinity))));
+         SOPLEX_ASSERT_WARN("WMAISM45", isNotZero(aij, R(1.0 / R(infinity))));
 
          if(lp.lhs(col.index(k)) > R(-infinity) && lp.rhs(col.index(k)) < R(infinity))
          {
@@ -4150,7 +4150,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::multiaggregation(SPxLPBase<R>& l
             R aggAij =
                bestRow[j];                                   // this is the coefficient of the deleted col
 
-            MSG_DEBUG(
+            SPX_MSG_DEBUG(
                (*this->spxout) << "IMAISM51 col " << j
                << ": Aggregating row: " << bestpos
                << " Aggregation Constant=" << aggConstant
@@ -4224,7 +4224,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::multiaggregation(SPxLPBase<R>& l
       this->m_remCols += remCols;
       this->m_remNzos += remNzos;
 
-      MSG_INFO2((*this->spxout), (*this->spxout) << "Simplifier (multi-aggregation) removed "
+      SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "Simplifier (multi-aggregation) removed "
                 << remRows << " rows, "
                 << remCols << " cols, "
                 << remNzos << " non-zeros"
@@ -4260,7 +4260,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLPBase<R>& lp, 
    if(ret != this->OKAY)
       return ret;
 
-#if ROW_SINGLETON
+#if SOPLEX_ROW_SINGLETON
    int rs_remRows = 0;
 
    for(int i = 0; i < lp.nRows(); ++i)
@@ -4276,7 +4276,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLPBase<R>& lp, 
 
    if(rs_remRows > 0)
    {
-      MSG_INFO2((*this->spxout), (*this->spxout) <<
+      SPX_MSG_INFO2((*this->spxout), (*this->spxout) <<
                 "Simplifier duplicate rows (row singleton stage) removed "
                 << rs_remRows << " rows, "
                 << rs_remRows << " non-zeros"
@@ -4441,7 +4441,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLPBase<R>& lp, 
    {
       if(m_dupRows[k].size() > 1 && !(lp.rowVector(m_dupRows[k].index(0)).size() == 1))
       {
-         MSG_DEBUG((*this->spxout) << "IMAISM53 " << m_dupRows[k].size()
+         SPX_MSG_DEBUG((*this->spxout) << "IMAISM53 " << m_dupRows[k].size()
                    << " duplicate rows found" << std::endl;)
 
          m_stat[DUPLICATE_ROW] += m_dupRows[k].size() - 1;
@@ -4461,7 +4461,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLPBase<R>& lp, 
             int i = m_dupRows[k].index(l);
             isLhsEqualRhs[l] = (lp.lhs(i) == lp.rhs(i));
 
-            ASSERT_WARN("WMAISM54", isNotZero(scale[i], R(1.0 / R(infinity))));
+            SOPLEX_ASSERT_WARN("WMAISM54", isNotZero(scale[i], R(1.0 / R(infinity))));
 
             if(rowIdx == -1)
             {
@@ -4537,7 +4537,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLPBase<R>& lp, 
 
                if(LTrel(newRhs, newLhs, feastol()))
                {
-                  MSG_DEBUG((*this->spxout) << "IMAISM55 duplicate rows yield infeasible bounds:"
+                  SPX_MSG_DEBUG((*this->spxout) << "IMAISM55 duplicate rows yield infeasible bounds:"
                             << " lhs=" << newLhs
                             << " rhs=" << newRhs << std::endl;)
                   spx_free(perm_tmp);
@@ -4598,7 +4598,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLPBase<R>& lp, 
       this->m_remRows += remRows;
       this->m_remNzos += remNzos;
 
-      MSG_INFO2((*this->spxout), (*this->spxout) << "Simplifier (duplicate rows) removed "
+      SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "Simplifier (duplicate rows) removed "
                 << remRows << " rows, "
                 << remNzos << " non-zeros"
                 << std::endl;)
@@ -4740,7 +4740,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
    {
       if(m_dupCols[k].size() > 1 && !(lp.colVector(m_dupCols[k].index(0)).size() == 1))
       {
-         MSG_DEBUG((*this->spxout) << "IMAISM58 " << m_dupCols[k].size()
+         SPX_MSG_DEBUG((*this->spxout) << "IMAISM58 " << m_dupCols[k].size()
                    << " duplicate columns found" << std::endl;)
 
          if(!hasDuplicateCol)
@@ -4767,7 +4767,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
                   R factor = scale[j1] / scale[j2];
                   R objDif = cj1 - cj2 * scale[j1] / scale[j2];
 
-                  ASSERT_WARN("WMAISM59", isNotZero(factor, this->epsZero()));
+                  SOPLEX_ASSERT_WARN("WMAISM59", isNotZero(factor, this->epsZero()));
 
                   if(isZero(objDif, this->epsZero()))
                   {
@@ -4811,7 +4811,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
                               lp.changeUpper(j2, lp.upper(j2) + factor * lp.lower(j1));
                         }
 
-                        MSG_DEBUG((*this->spxout) << "IMAISM60 two duplicate columns " << j1
+                        SPX_MSG_DEBUG((*this->spxout) << "IMAISM60 two duplicate columns " << j1
                                   << ", " << j2
                                   << " replaced by one" << std::endl;)
 
@@ -4821,7 +4821,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
                      }
                      else
                      {
-                        MSG_DEBUG((*this->spxout) << "IMAISM80 not removing two duplicate columns " << j1
+                        SPX_MSG_DEBUG((*this->spxout) << "IMAISM80 not removing two duplicate columns " << j1
                                   << ", " << j2
                                   << " because zero not contained in their bounds" << std::endl;)
                      }
@@ -4836,12 +4836,12 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
                         {
                            if(lp.upper(j1) >= R(infinity))
                            {
-                              MSG_DEBUG((*this->spxout) << "IMAISM75 LP unbounded" << std::endl;)
+                              SPX_MSG_DEBUG((*this->spxout) << "IMAISM75 LP unbounded" << std::endl;)
                               return this->UNBOUNDED;
                            }
 
                            // fix j1 at upper bound
-                           MSG_DEBUG((*this->spxout) << "IMAISM61 two duplicate columns " << j1
+                           SPX_MSG_DEBUG((*this->spxout) << "IMAISM61 two duplicate columns " << j1
                                      << ", " << j2
                                      << " first one fixed at upper bound=" << lp.upper(j1) << std::endl;)
 
@@ -4853,12 +4853,12 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
                         {
                            if(lp.lower(j1) <= R(-infinity))
                            {
-                              MSG_DEBUG((*this->spxout) << "IMAISM76 LP unbounded" << std::endl;)
+                              SPX_MSG_DEBUG((*this->spxout) << "IMAISM76 LP unbounded" << std::endl;)
                               return this->UNBOUNDED;
                            }
 
                            // fix j1 at lower bound
-                           MSG_DEBUG((*this->spxout) << "IMAISM62 two duplicate columns " << j1
+                           SPX_MSG_DEBUG((*this->spxout) << "IMAISM62 two duplicate columns " << j1
                                      << ", " << j2
                                      << " first one fixed at lower bound=" << lp.lower(j1) << std::endl;)
 
@@ -4874,12 +4874,12 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
                         {
                            if(lp.upper(j1) >= R(infinity))
                            {
-                              MSG_DEBUG((*this->spxout) << "IMAISM77 LP unbounded" << std::endl;)
+                              SPX_MSG_DEBUG((*this->spxout) << "IMAISM77 LP unbounded" << std::endl;)
                               return this->UNBOUNDED;
                            }
 
                            // fix j1 at upper bound
-                           MSG_DEBUG((*this->spxout) << "IMAISM63 two duplicate columns " << j1
+                           SPX_MSG_DEBUG((*this->spxout) << "IMAISM63 two duplicate columns " << j1
                                      << ", " << j2
                                      << " first one fixed at upper bound=" << lp.upper(j1) << std::endl;)
 
@@ -4893,12 +4893,12 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
                         {
                            if(lp.lower(j1) <= R(-infinity))
                            {
-                              MSG_DEBUG((*this->spxout) << "IMAISM78 LP unbounded" << std::endl;)
+                              SPX_MSG_DEBUG((*this->spxout) << "IMAISM78 LP unbounded" << std::endl;)
                               return this->UNBOUNDED;
                            }
 
                            // fix j1 at lower bound
-                           MSG_DEBUG((*this->spxout) << "IMAISM64 two duplicate columns " << j1
+                           SPX_MSG_DEBUG((*this->spxout) << "IMAISM64 two duplicate columns " << j1
                                      << ", " << j2
                                      << " first one fixed at lower bound=" << lp.lower(j1) << std::endl;)
 
@@ -4981,7 +4981,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
       this->m_remCols += remCols;
       this->m_remNzos += remNzos;
 
-      MSG_INFO2((*this->spxout), (*this->spxout) << "Simplifier (duplicate columns) removed "
+      SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "Simplifier (duplicate columns) removed "
                 << remCols << " cols, "
                 << remNzos << " non-zeros"
                 << std::endl;)
@@ -5011,7 +5011,7 @@ void SPxMainSM<R>::fixColumn(SPxLPBase<R>& lp, int j, bool correctIdx)
    assert(lo < R(infinity) && lo > R(-infinity));
    assert(up < R(infinity) && up > R(-infinity));
 
-   MSG_DEBUG((*this->spxout) << "IMAISM66 fix variable x" << j
+   SPX_MSG_DEBUG((*this->spxout) << "IMAISM66 fix variable x" << j
              << ": lower=" << lo
              << " upper=" << up
              << "to new value: " << mid
@@ -5038,7 +5038,7 @@ void SPxMainSM<R>::fixColumn(SPxLPBase<R>& lp, int j, bool correctIdx)
             else
                rhs *= scale;
 
-            MSG_DEBUG((*this->spxout) << "IMAISM67 row " << i
+            SPX_MSG_DEBUG((*this->spxout) << "IMAISM67 row " << i
                       << ": rhs=" << rhs
                       << " (" << lp.rhs(i)
                       << ") aij=" << col.value(k)
@@ -5062,7 +5062,7 @@ void SPxMainSM<R>::fixColumn(SPxLPBase<R>& lp, int j, bool correctIdx)
             else
                lhs *= scale;
 
-            MSG_DEBUG((*this->spxout) << "IMAISM68 row " << i
+            SPX_MSG_DEBUG((*this->spxout) << "IMAISM68 row " << i
                       << ": lhs=" << lhs
                       << " (" << lp.lhs(i)
                       << ") aij=" << col.value(k)
@@ -5116,7 +5116,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLPBase<R>& lp, Real 
    m_hist.reSize(0);
    m_postsolved = false;
 
-   MSG_INFO2((*this->spxout),
+   SPX_MSG_INFO2((*this->spxout),
              int numRangedRows = 0;
              int numBoxedCols = 0;
              int numEqualities = 0;
@@ -5173,7 +5173,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLPBase<R>& lp, Real 
       m_cIdx[j] = j;
 
    // round extreme values (set all values smaller than this->eps to zero and all values bigger than R(infinity)/5 to R(infinity))
-#if EXTREMES
+#if SOPLEX_EXTREMES
    handleExtremes(lp);
 #endif
 
@@ -5181,38 +5181,38 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLPBase<R>& lp, Real 
    while(again && m_result == this->OKAY)
    {
       nrounds++;
-      MSG_INFO3((*this->spxout), (*this->spxout) << "Round " << nrounds << ":" << std::endl;)
+      SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "Round " << nrounds << ":" << std::endl;)
       again = false;
 
-#if ROWS_SPXMAINSM
+#if SOPLEX_ROWS_SPXMAINSM
 
       if(m_result == this->OKAY)
          m_result = simplifyRows(lp, again);
 
 #endif
 
-#if COLS_SPXMAINSM
+#if SOPLEX_COLS_SPXMAINSM
 
       if(m_result == this->OKAY)
          m_result = simplifyCols(lp, again);
 
 #endif
 
-#if DUAL_SPXMAINSM
+#if SOPLEX_DUAL_SPXMAINSM
 
       if(m_result == this->OKAY)
          m_result = simplifyDual(lp, again);
 
 #endif
 
-#if DUPLICATE_ROWS
+#if SOPLEX_DUPLICATE_ROWS
 
       if(m_result == this->OKAY)
          m_result = duplicateRows(lp, again);
 
 #endif
 
-#if DUPLICATE_COLS
+#if SOPLEX_DUPLICATE_COLS
 
       if(m_result == this->OKAY)
          m_result = duplicateCols(lp, again);
@@ -5221,15 +5221,15 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLPBase<R>& lp, Real 
 
       if(!again)
       {
-#if TRIVIAL_HEURISTICS
+#if SOPLEX_TRIVIAL_HEURISTICS
          trivialHeuristic(lp);
 #endif
 
-#if PSEUDOOBJ
+#if SOPLEX_PSEUDOOBJ
          propagatePseudoobj(lp);
 #endif
 
-#if MULTI_AGGREGATE
+#if SOPLEX_MULTI_AGGREGATE
 
          if(m_result == this->OKAY)
             m_result = multiaggregation(lp, again);
@@ -5242,14 +5242,14 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLPBase<R>& lp, Real 
    // preprocessing detected infeasibility or unboundedness
    if(m_result != this->OKAY)
    {
-      MSG_INFO1((*this->spxout), (*this->spxout) << "Simplifier result: " << static_cast<int>
+      SPX_MSG_INFO1((*this->spxout), (*this->spxout) << "Simplifier result: " << static_cast<int>
                 (m_result) << std::endl;)
       return m_result;
    }
 
    this->m_remCols -= m_addedcols;
    this->m_remNzos -= m_addedcols;
-   MSG_INFO1((*this->spxout), (*this->spxout) << "Simplifier removed "
+   SPX_MSG_INFO1((*this->spxout), (*this->spxout) << "Simplifier removed "
              << this->m_remRows << " rows, "
              << this->m_remCols << " columns, "
              << this->m_remNzos << " nonzeros, "
@@ -5258,18 +5258,18 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLPBase<R>& lp, Real 
              << std::endl;)
 
    if(keepbounds)
-      MSG_INFO2((*this->spxout), (*this->spxout) << "Simplifier kept "
+      SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "Simplifier kept "
                 << this->m_keptBnds << " column bounds, "
                 << this->m_keptLRhs << " row bounds"
                 << std::endl;)
 
-      MSG_INFO1((*this->spxout), (*this->spxout) << "Reduced LP has "
+      SPX_MSG_INFO1((*this->spxout), (*this->spxout) << "Reduced LP has "
                 << lp.nRows() << " rows "
                 << lp.nCols() << " columns "
                 << lp.nNzos() << " nonzeros"
                 << std::endl;)
 
-      MSG_INFO2((*this->spxout),
+      SPX_MSG_INFO2((*this->spxout),
                 int numRangedRows = 0;
                 int numBoxedCols  = 0;
                 int numEqualities = 0;
@@ -5297,12 +5297,12 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLPBase<R>& lp, Real 
 
          if(lp.nCols() == 0 && lp.nRows() == 0)
          {
-            MSG_INFO1((*this->spxout), (*this->spxout) << "Simplifier removed all rows and columns" <<
+            SPX_MSG_INFO1((*this->spxout), (*this->spxout) << "Simplifier removed all rows and columns" <<
                       std::endl;)
             m_result = this->VANISHED;
          }
 
-   MSG_INFO2((*this->spxout), (*this->spxout) << "\nSimplifier performed:\n"
+   SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "\nSimplifier performed:\n"
              << m_stat[EMPTY_ROW]            << " empty rows\n"
              << m_stat[FREE_ROW]             << " free rows\n"
              << m_stat[SINGLETON_ROW]        << " singleton rows\n"
@@ -5333,7 +5333,7 @@ void SPxMainSM<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
                               const typename SPxSolverBase<R>::VarStatus rows[],
                               const typename SPxSolverBase<R>::VarStatus cols[], bool isOptimal)
 {
-   MSG_INFO1((*this->spxout), (*this->spxout) << " --- unsimplifying solution and basis" << std::endl;)
+   SPX_MSG_INFO1((*this->spxout), (*this->spxout) << " --- unsimplifying solution and basis" << std::endl;)
    assert(x.dim() <= m_prim.dim());
    assert(y.dim() <= m_dual.dim());
    assert(x.dim() == r.dim());
@@ -5361,7 +5361,7 @@ void SPxMainSM<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
    // undo preprocessing
    for(int k = m_hist.size() - 1; k >= 0; --k)
    {
-      MSG_DEBUG(std::cout << "unsimplifying " << m_hist[k]->getName() << "\n");
+      SPX_MSG_DEBUG(std::cout << "unsimplifying " << m_hist[k]->getName() << "\n");
 
       try
       {
@@ -5369,7 +5369,7 @@ void SPxMainSM<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
       }
       catch(const SPxException& ex)
       {
-         MSG_INFO1((*this->spxout), (*this->spxout) << "Exception thrown while unsimplifying " <<
+         SPX_MSG_INFO1((*this->spxout), (*this->spxout) << "Exception thrown while unsimplifying " <<
                    m_hist[k]->getName() << ":\n" << ex.what() << "\n");
          throw SPxInternalCodeException("XMAISM00 Exception thrown during unsimply().");
       }
@@ -5396,7 +5396,7 @@ void SPxMainSM<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
       m_cIdx.reSize(m_cIdx.size() - m_addedcols);
    }
 
-#ifdef CHECK_BASIC_DIM
+#ifdef SOPLEX_CHECK_BASIS_DIM
    int numBasis = 0;
 
    for(int rs = 0; rs < m_rBasisStat.size(); ++rs)

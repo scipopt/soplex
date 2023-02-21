@@ -330,7 +330,7 @@ public:
             || (themax < thesize)
             || (thesize < 0)
             || (memFactor < 1.0))
-         return MSGinconsistent("ClassArray");
+         return SPX_MSG_INCONSISTENT("ClassArray");
 
 #endif
       return true;

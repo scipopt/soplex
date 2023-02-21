@@ -635,10 +635,10 @@ public:
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
       if(VectorBase<R>::dim() > IdxSet::max())
-         return MSGinconsistent("SSVectorBase");
+         return SPX_MSG_INCONSISTENT("SSVectorBase");
 
       if(VectorBase<R>::dim() < IdxSet::dim())
-         return MSGinconsistent("SSVectorBase");
+         return SPX_MSG_INCONSISTENT("SSVectorBase");
 
       if(isSetup())
       {
@@ -648,12 +648,12 @@ public:
 
             if(j < 0 && spxAbs(VectorBase<R>::val[i]) > 0)
             {
-               MSG_ERROR(std::cerr << "ESSVEC01 i = " << i
+               SPX_MSG_ERROR(std::cerr << "ESSVEC01 i = " << i
                          << "\tidx = " << j
                          << "\tval = " << std::setprecision(16) << VectorBase<R>::val[i]
                          << std::endl;)
 
-               return MSGinconsistent("SSVectorBase");
+               return SPX_MSG_INCONSISTENT("SSVectorBase");
             }
          }
       }

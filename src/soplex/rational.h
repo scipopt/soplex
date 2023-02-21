@@ -110,27 +110,27 @@ inline void powRound(Rational& r)
    Integer den;
    Integer num;
 
-   MSG_DEBUG(std::cout << "rounding " << str(r) <<
+   SPX_MSG_DEBUG(std::cout << "rounding " << str(r) <<
              " to power of two" << "\n");
 
    num = numerator(r);
    den = denominator(r);
    roundval = num / den;
 
-   MSG_DEBUG(std::cout << "   --> " << str(roundval) << "\n");
+   SPX_MSG_DEBUG(std::cout << "   --> " << str(roundval) << "\n");
 
    size_t binlog = roundval == 0 ? 1 : msb(roundval) + 1;
    Integer base = 2;
 
-   MSG_DEBUG(std::cout << "   --> 2^" << binlog << "\n");
+   SPX_MSG_DEBUG(std::cout << "   --> 2^" << binlog << "\n");
 
    roundval = boost::multiprecision::pow(base, (unsigned int)binlog);
 
-   MSG_DEBUG(std::cout << "   --> " << str(roundval) << "\n");
+   SPX_MSG_DEBUG(std::cout << "   --> " << str(roundval) << "\n");
 
    r = roundval;
 
-   MSG_DEBUG(std::cout << "   --> " << str(r) << "\n");
+   SPX_MSG_DEBUG(std::cout << "   --> " << str(r) << "\n");
 }
 
 /* find substring, ignore case */
@@ -201,9 +201,9 @@ inline Rational ratFromString(const char* desc)
 
          // remove padding 0s
          if(s[0] == '-')
-            s.erase(1, std::min(s.substr(1).find_first_not_of('0'), s.size() - 1));
+            s.erase(1, SOPLEX_MIN(s.substr(1).find_first_not_of('0'), s.size() - 1));
          else
-            s.erase(0, std::min(s.find_first_not_of('0'), s.size() - 1));
+            s.erase(0, SOPLEX_MIN(s.find_first_not_of('0'), s.size() - 1));
 
          s.append("/");
          s.append(den);
@@ -234,7 +234,7 @@ public:
 
    inline void rationalErrorMessage() const
    {
-      MSG_ERROR(std::cerr << "Using rational methods without linking boost is not supported" << std::endl;
+      SPX_MSG_ERROR(std::cerr << "Using rational methods without linking boost is not supported" << std::endl;
                )
    };
 
@@ -962,7 +962,7 @@ namespace soplex
 inline int sizeInBase(const Rational R, const int base)
 {
 #ifndef SOPLEX_WITH_BOOST
-   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
    return 0;
 #else
 
@@ -1016,7 +1016,7 @@ inline int dlcmSizeRational(const Rational* vector, const int length, const int 
    assert(length >= 0);
 
 #ifndef SOPLEX_WITH_BOOST
-   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
    return 0;
 #else
 
@@ -1037,7 +1037,7 @@ inline int dmaxSizeRational(const Rational* vector, const int length, const int 
    assert(vector != 0);
    assert(length >= 0);
 #ifndef SOPLEX_WITH_BOOST
-   MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
+   SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
    return 0;
 #else
 

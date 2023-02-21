@@ -25,8 +25,6 @@
 #include <assert.h>
 #include <iostream>
 
-// #define EQ_PREF 1000
-
 #include "soplex/spxdefines.h"
 
 namespace soplex
@@ -52,7 +50,6 @@ int SPxDantzigPR<R>::selectLeave()
 
       if(x < -this->thetolerance)
       {
-         // x *= EQ_PREF * (1 + (up[i] == low[i]));
          if(x < best)
          {
             n    = i;
@@ -127,7 +124,7 @@ SPxId SPxDantzigPR<R>::selectEnterX()
                enterId) : selectEnterDenseCoDim(bestCo, enterId);
 
    // prefer slack indices to reduce nonzeros in basis matrix
-   if(enterId.isValid() && (best > SPARSITY_TRADEOFF * bestCo || !enterIdCo.isValid()))
+   if(enterId.isValid() && (best > SOPLEX_SPARSITY_TRADEOFF * bestCo || !enterIdCo.isValid()))
       return enterId;
    else
       return enterIdCo;
@@ -149,8 +146,6 @@ SPxId SPxDantzigPR<R>::selectEnterSparseDim(R& best, SPxId& enterId)
 
       if(x < -this->thetolerance)
       {
-         // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasisBase<R>::Desc::P_FREE
-         //                || ds.coStatus(i) == SPxBasisBase<R>::Desc::D_FREE));
          if(x < best)
          {
             enterId = this->thesolver->coId(idx);
@@ -184,8 +179,6 @@ SPxId SPxDantzigPR<R>::selectEnterSparseCoDim(R& best, SPxId& enterId)
 
       if(x < -this->thetolerance)
       {
-         // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasisBase<R>::Desc::P_FREE
-         //                || ds.coStatus(i) == SPxBasisBase<R>::Desc::D_FREE));
          if(x < best)
          {
             enterId = this->thesolver->id(idx);
@@ -216,8 +209,6 @@ SPxId SPxDantzigPR<R>::selectEnterDenseDim(R& best, SPxId& enterId)
 
       if(x < -this->thetolerance)
       {
-         // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasisBase<R>::Desc::P_FREE
-         //                || ds.coStatus(i) == SPxBasisBase<R>::Desc::D_FREE));
          if(x < best)
          {
             enterId   = this->thesolver->coId(i);
@@ -242,8 +233,6 @@ SPxId SPxDantzigPR<R>::selectEnterDenseCoDim(R& best, SPxId& enterId)
 
       if(x < -this->thetolerance)
       {
-         // x *= EQ_PREF * (1 + (ds.status(i) == SPxBasisBase<R>::Desc::P_FREE
-         //                || ds.status(i) == SPxBasisBase<R>::Desc::D_FREE));
          if(x < best)
          {
             enterId   = this->thesolver->id(i);

@@ -131,13 +131,13 @@ public:
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
       if(mem() != &themem)
-         return MSGinconsistent("UnitVectorBase");
+         return SPX_MSG_INCONSISTENT("UnitVectorBase");
 
       if(size() != 1)
-         return MSGinconsistent("UnitVectorBase");
+         return SPX_MSG_INCONSISTENT("UnitVectorBase");
 
       if(max() != 1)
-         return MSGinconsistent("UnitVectorBase");
+         return SPX_MSG_INCONSISTENT("UnitVectorBase");
 
       return SVectorBase<R>::isConsistent();
 #else

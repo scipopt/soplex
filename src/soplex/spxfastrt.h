@@ -181,8 +181,8 @@ public:
    /// default constructor
    SPxFastRT()
       : SPxRatioTester<R>("Fast")
-      , minStab(DEFAULT_BND_VIOL)
-      , fastDelta(DEFAULT_BND_VIOL)
+      , minStab(SOPLEX_DEFAULT_BND_VIOL)
+      , fastDelta(SOPLEX_DEFAULT_BND_VIOL)
       , iscoid(false)
    {}
    /// copy constructor
@@ -208,8 +208,8 @@ public:
    /// bound flipping constructor
    SPxFastRT(const char* name)
       : SPxRatioTester<R>(name)
-      , minStab(DEFAULT_BND_VIOL)
-      , fastDelta(DEFAULT_BND_VIOL)
+      , minStab(SOPLEX_DEFAULT_BND_VIOL)
+      , fastDelta(SOPLEX_DEFAULT_BND_VIOL)
       , iscoid(false)
    {}
    /// destructor

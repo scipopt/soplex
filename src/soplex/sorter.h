@@ -32,7 +32,7 @@
 
 namespace soplex
 {
-#define SHELLSORTMAX 25
+#define SOPLEX_SHELLSORTMAX 25
 
 /** shell-sort an array of data elements; use it only for arrays smaller than 25 entries */
 template < class T, class COMPARATOR >
@@ -91,7 +91,7 @@ void SPxQuicksort(T* keys, int end, COMPARATOR& compare, int start = 0, bool typ
    --end;
 
    /* use quick-sort for long lists */
-   while(end - start >= SHELLSORTMAX)
+   while(end - start >= SOPLEX_SHELLSORTMAX)
    {
       T pivotkey;
       T tmp;

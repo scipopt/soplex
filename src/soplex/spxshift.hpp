@@ -49,7 +49,7 @@ void SPxSolverBase<R>::shiftFvec()
    {
       if(theUBbound[i] + allow < (*theFvec)[i])
       {
-         MSG_DEBUG(std::cout << "DSHIFT08 theUBbound[" << i << "] violated by " <<
+         SPX_MSG_DEBUG(std::cout << "DSHIFT08 theUBbound[" << i << "] violated by " <<
                    (*theFvec)[i] - theUBbound[i] - allow << std::endl);
 
          if(theUBbound[i] != theLBbound[i])
@@ -67,7 +67,7 @@ void SPxSolverBase<R>::shiftFvec()
       }
       else if((*theFvec)[i] < theLBbound[i] - allow)
       {
-         MSG_DEBUG(std::cout << "DSHIFT08 theLBbound[" << i << "] violated by " << theLBbound[i] -
+         SPX_MSG_DEBUG(std::cout << "DSHIFT08 theLBbound[" << i << "] violated by " << theLBbound[i] -
                    (*theFvec)[i] - allow << std::endl);
 
          if(theUBbound[i] != theLBbound[i])
@@ -82,7 +82,7 @@ void SPxSolverBase<R>::shiftFvec()
 
 #ifndef NDEBUG
    testBounds();
-   MSG_DEBUG(std::cout << "DSHIFT01 shiftFvec: OK" << std::endl;)
+   SPX_MSG_DEBUG(std::cout << "DSHIFT01 shiftFvec: OK" << std::endl;)
 #endif
 }
 
@@ -163,7 +163,7 @@ void SPxSolverBase<R>::shiftPvec()
 
 #ifndef NDEBUG
    testBounds();
-   MSG_DEBUG(std::cout << "DSHIFT02 shiftPvec: OK" << std::endl;)
+   SPX_MSG_DEBUG(std::cout << "DSHIFT02 shiftPvec: OK" << std::endl;)
 #endif
 }
 // -----------------------------------------------------------------
@@ -330,20 +330,20 @@ void SPxSolverBase<R>::perturbMax(
 template <class R>
 void SPxSolverBase<R>::perturbMinEnter(void)
 {
-   MSG_DEBUG(std::cout << "DSHIFT03 iteration= " << this->iteration() << ": perturbing " << shift();)
+   SPX_MSG_DEBUG(std::cout << "DSHIFT03 iteration= " << this->iteration() << ": perturbing " << shift();)
    fVec().delta().setup();
    perturbMin(fVec(), lbBound(), ubBound(), epsilon(), entertol());
-   MSG_DEBUG(std::cout << "\t->" << shift() << std::endl;)
+   SPX_MSG_DEBUG(std::cout << "\t->" << shift() << std::endl;)
 }
 
 
 template <class R>
 void SPxSolverBase<R>::perturbMaxEnter(void)
 {
-   MSG_DEBUG(std::cout << "DSHIFT04 iteration= " << this->iteration() << ": perturbing " << shift();)
+   SPX_MSG_DEBUG(std::cout << "DSHIFT04 iteration= " << this->iteration() << ": perturbing " << shift();)
    fVec().delta().setup();
    perturbMax(fVec(), lbBound(), ubBound(), epsilon(), entertol());
-   MSG_DEBUG(std::cout << "\t->" << shift() << std::endl;)
+   SPX_MSG_DEBUG(std::cout << "\t->" << shift() << std::endl;)
 }
 
 
@@ -507,35 +507,35 @@ R SPxSolverBase<R>::perturbMax(
 template <class R>
 void SPxSolverBase<R>::perturbMinLeave(void)
 {
-   MSG_DEBUG(std::cout << "DSHIFT05 iteration= " << this->iteration() << ": perturbing " << shift();)
+   SPX_MSG_DEBUG(std::cout << "DSHIFT05 iteration= " << this->iteration() << ": perturbing " << shift();)
    pVec().delta().setup();
    coPvec().delta().setup();
    theShift += perturbMin(pVec(), lpBound(), upBound(), epsilon(), leavetol(),
                           this->desc().status(), 0, 1);
    theShift += perturbMin(coPvec(), lcBound(), ucBound(), epsilon(), leavetol(),
                           this->desc().coStatus(), 0, 1);
-   MSG_DEBUG(std::cout << "\t->" << shift() << std::endl;)
+   SPX_MSG_DEBUG(std::cout << "\t->" << shift() << std::endl;)
 }
 
 
 template <class R>
 void SPxSolverBase<R>::perturbMaxLeave(void)
 {
-   MSG_DEBUG(std::cout << "DSHIFT06 iteration= " << this->iteration() << ": perturbing " << shift();)
+   SPX_MSG_DEBUG(std::cout << "DSHIFT06 iteration= " << this->iteration() << ": perturbing " << shift();)
    pVec().delta().setup();
    coPvec().delta().setup();
    theShift += perturbMax(pVec(), lpBound(), upBound(), epsilon(), leavetol(),
                           this->desc().status(), 0, 1);
    theShift += perturbMax(coPvec(), lcBound(), ucBound(), epsilon(), leavetol(),
                           this->desc().coStatus(), 0, 1);
-   MSG_DEBUG(std::cout << "\t->" << shift() << std::endl;)
+   SPX_MSG_DEBUG(std::cout << "\t->" << shift() << std::endl;)
 }
 
 
 template <class R>
 void SPxSolverBase<R>::unShift(void)
 {
-   MSG_INFO3((*this->spxout), (*this->spxout) << "DSHIFT07 = " << "unshifting ..." << std::endl;);
+   SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "DSHIFT07 = " << "unshifting ..." << std::endl;);
 
    if(isInitialized())
    {

@@ -50,7 +50,7 @@
 #include "soplex/spxout.h"
 #include "soplex/timerfactory.h"
 
-//#define MEASUREUPDATETIME
+//#define SOPLEX_MEASUREUPDATETIME
 
 namespace soplex
 {
@@ -446,7 +446,7 @@ public:
       if(thestatus != stat)
       {
 #ifdef SOPLEX_DEBUG
-         MSG_DEBUG(std::cout << "DBSTAT01 SPxBasisBase<R>::setStatus(): status: "
+         SPX_MSG_DEBUG(std::cout << "DBSTAT01 SPxBasisBase<R>::setStatus(): status: "
                    << int(thestatus) << " (" << thestatus << ") -> "
                    << int(stat) << " (" << stat << ")" << std::endl;)
 #endif
@@ -948,7 +948,7 @@ public:
    {
       std::stringstream s;
       s  << factor->statistics()
-#ifdef MEASUREUPDATETIME
+#ifdef SOPLEX_MEASUREUPDATETIME
          << "Updates            : " << std::setw(10) << getTotalUpdateCount() << std::endl
          << "  Time spent       : " << std::setw(10) << getTotalUpdateTime() << std::endl
 #endif

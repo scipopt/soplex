@@ -46,16 +46,16 @@
 
 #include "soplex/spxlpbase.h"
 
-#define HYPERPRICINGTHRESHOLD    5000     /**< do (auto) hyper pricing only if problem size (cols+rows) is larger than HYPERPRICINGTHRESHOLD */
-#define HYPERPRICINGSIZE         100      /**< size of initial candidate list for hyper pricing */
-#define SPARSITYFACTOR           0.6      /**< percentage of infeasibilities that is considered sparse */
-#define DENSEROUNDS               5       /**< number of refactorizations until sparsity is tested again */
-#define SPARSITY_TRADEOFF        0.8      /**< threshold to decide whether Ids or coIds are preferred to enter the basis;
-                                           * coIds are more likely to enter if SPARSITY_TRADEOFF is close to 0
-                                           */
-#define MAXNCLCKSKIPS            32       /**< maximum number of clock skips (iterations without time measuring) */
-#define SAFETYFACTOR             1e-2     /**< the probability to skip the clock when the time limit has been reached */
-#define NINITCALLS               200      /**< the number of clock updates in isTimelimitReached() before clock skipping starts */
+#define SOPLEX_HYPERPRICINGTHRESHOLD 5000     /**< do (auto) hyper pricing only if problem size (cols+rows) is larger than SOPLEX_HYPERPRICINGTHRESHOLD */
+#define SOPLEX_HYPERPRICINGSIZE      100      /**< size of initial candidate list for hyper pricing */
+#define SOPLEX_SPARSITYFACTOR        0.6      /**< percentage of infeasibilities that is considered sparse */
+#define SOPLEX_DENSEROUNDS           5        /**< number of refactorizations until sparsity is tested again */
+#define SOPLEX_SPARSITY_TRADEOFF     0.8      /**< threshold to decide whether Ids or coIds are preferred to enter the basis;
+                                              //  * coIds are more likely to enter if SOPLEX_SPARSITY_TRADEOFF is close to 0
+                                              //  */
+#define SOPLEX_MAXNCLCKSKIPS         32       /**< maximum number of clock skips (iterations without time measuring) */
+#define SOPLEX_SAFETYFACTOR          1e-2     /**< the probability to skip the clock when the time limit has been reached */
+#define SOPLEX_NINITCALLS            200      /**< the number of clock updates in isTimelimitReached() before clock skipping starts */
 namespace soplex
 {
 template <class R>
@@ -873,7 +873,7 @@ public:
    /// guaranteed primal and dual bound violation for optimal solution, returning the maximum of floatingPointFeastol() and floatingPointOpttol().
    R delta() const
    {
-      return std::max(this->tolerances()->floatingPointFeastol(),
+      return SOPLEX_MAX(this->tolerances()->floatingPointFeastol(),
                       this->tolerances()->floatingPointOpttol());
    }
 
@@ -1647,7 +1647,7 @@ public:
    {
       assert(theType == ENTER);
       // use maximum to not count tightened bounds in case of equality shifts
-      theShift += MAXIMUM(to - theUBbound[i], 0.0);
+      theShift += SOPLEX_MAX(to - theUBbound[i], 0.0);
       theUBbound[i] = to;
    }
    /// shift \p i 'th \ref soplex::SPxSolver::lbBound "lbBound" to \p to.
@@ -1655,7 +1655,7 @@ public:
    {
       assert(theType == ENTER);
       // use maximum to not count tightened bounds in case of equality shifts
-      theShift += MAXIMUM(theLBbound[i] - to, 0.0);
+      theShift += SOPLEX_MAX(theLBbound[i] - to, 0.0);
       theLBbound[i] = to;
    }
    /// shift \p i 'th \ref soplex::SPxSolver::upBound "upBound" to \p to.
@@ -1663,7 +1663,7 @@ public:
    {
       assert(theType == LEAVE);
       // use maximum to not count tightened bounds in case of equality shifts
-      theShift += MAXIMUM(to - (*theUbound)[i], 0.0);
+      theShift += SOPLEX_MAX(to - (*theUbound)[i], 0.0);
       (*theUbound)[i] = to;
    }
    /// shift \p i 'th \ref soplex::SPxSolver::lpBound "lpBound" to \p to.
@@ -1671,7 +1671,7 @@ public:
    {
       assert(theType == LEAVE);
       // use maximum to not count tightened bounds in case of equality shifts
-      theShift += MAXIMUM((*theLbound)[i] - to, 0.0);
+      theShift += SOPLEX_MAX((*theLbound)[i] - to, 0.0);
       (*theLbound)[i] = to;
    }
    /// shift \p i 'th \ref soplex::SPxSolver::ucBound "ucBound" to \p to.
@@ -1679,7 +1679,7 @@ public:
    {
       assert(theType == LEAVE);
       // use maximum to not count tightened bounds in case of equality shifts
-      theShift += MAXIMUM(to - (*theCoUbound)[i], 0.0);
+      theShift += SOPLEX_MAX(to - (*theCoUbound)[i], 0.0);
       (*theCoUbound)[i] = to;
    }
    /// shift \p i 'th \ref soplex::SPxSolver::lcBound "lcBound" to \p to.
@@ -1687,7 +1687,7 @@ public:
    {
       assert(theType == LEAVE);
       // use maximum to not count tightened bounds in case of equality shifts
-      theShift += MAXIMUM((*theCoLbound)[i] - to, 0.0);
+      theShift += SOPLEX_MAX((*theCoLbound)[i] - to, 0.0);
       (*theCoLbound)[i] = to;
    }
    ///

@@ -33,8 +33,8 @@
 #include <iostream>
 #include <string.h>  // for memcpy
 
-#ifdef GZSTREAM_NAMESPACE
-namespace GZSTREAM_NAMESPACE
+#ifdef SOPLEX_GZSTREAM_NAMESPACE
+namespace SOPLEX_GZSTREAM_NAMESPACE
 {
 #endif
 
@@ -197,8 +197,8 @@ void gzstreambase::close()
    // clear( rdstate() | std::ios::badbit);
 }
 
-#ifdef GZSTREAM_NAMESPACE
-} // namespace GZSTREAM_NAMESPACE
+#ifdef SOPLEX_GZSTREAM_NAMESPACE
+} // namespace SOPLEX_GZSTREAM_NAMESPACE
 #endif
 
 // ============================================================================

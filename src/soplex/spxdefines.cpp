@@ -38,7 +38,7 @@ bool EQ(int a, int b)
    return (a == b);
 }
 
-THREADLOCAL const Real infinity                 = DEFAULT_INFINITY;
+SOPLEX_THREADLOCAL const Real infinity                 = SOPLEX_DEFAULT_INFINITY;
 
 bool msginconsistent(const char* name, const char* file, int line)
 {
@@ -46,7 +46,7 @@ bool msginconsistent(const char* name, const char* file, int line)
    assert(file != 0);
    assert(line >= 0);
 
-   MSG_ERROR(std::cerr << file << "(" << line << ") "
+   SPX_MSG_ERROR(std::cerr << file << "(" << line << ") "
              << "Inconsistency detected in " << name << std::endl;)
 
    return 0;

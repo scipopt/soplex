@@ -317,7 +317,7 @@ public:
             || (themax < thesize)
             || (thesize < 0)
             || (memFactor < 1.0))
-         return MSGinconsistent("DataArray");
+         return SPX_MSG_INCONSISTENT("DataArray");
 
 #endif
 

@@ -120,7 +120,7 @@ int SPxDefaultRT<R>::selectLeave(R& val, R, bool)
          }
       }
 
-      ASSERT_WARN("WDEFRT01", val > -epsilon);
+      SOPLEX_ASSERT_WARN("WDEFRT01", val > -epsilon);
    }
    else
    {
@@ -174,7 +174,7 @@ int SPxDefaultRT<R>::selectLeave(R& val, R, bool)
          }
       }
 
-      ASSERT_WARN("WDEFRT02", val < epsilon);
+      SOPLEX_ASSERT_WARN("WDEFRT02", val < epsilon);
    }
 
    return leave;
@@ -390,7 +390,7 @@ SPxId SPxDefaultRT<R>::selectEnter(R& max, int, bool)
 
    if(enterId.isValid() && this->solver()->isBasic(enterId))
    {
-      MSG_DEBUG(std::cout << "DDEFRT01 isValid() && isBasic(): max=" << max
+      SPX_MSG_DEBUG(std::cout << "DDEFRT01 isValid() && isBasic(): max=" << max
                 << std::endl;)
 
       if(cnum >= 0)
@@ -401,7 +401,7 @@ SPxId SPxDefaultRT<R>::selectEnter(R& max, int, bool)
       return SPxDefaultRT<R>::selectEnter(max, 0, false);
    }
 
-   MSG_DEBUG(
+   SPX_MSG_DEBUG(
 
       if(!enterId.isValid())
       std::cout << "DDEFRT02 !isValid(): max=" << max << ", x=" << x << std::endl;

@@ -438,13 +438,13 @@ public:
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
       if(first() != 0 && last() == 0)
-         return MSGinconsistent("IsList");
+         return SPX_MSG_INCONSISTENT("IsList");
 
       if(first() == 0 && last() != 0)
-         return MSGinconsistent("IsList");
+         return SPX_MSG_INCONSISTENT("IsList");
 
       if(first() && find(last()) == 0)
-         return MSGinconsistent("IsList");
+         return SPX_MSG_INCONSISTENT("IsList");
 
 #endif
 

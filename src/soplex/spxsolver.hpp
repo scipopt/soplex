@@ -223,7 +223,7 @@ void SPxSolverBase<R>::setType(Type tp)
          factorized = false;
          m_numCycle = 0;
 #endif
-         MSG_INFO3((*spxout), (*spxout) << "Switching to "
+         SPX_MSG_INFO3((*spxout), (*spxout) << "Switching to "
                    << static_cast<const char*>((tp == LEAVE)
                                                ? "leaving" : "entering")
                    << " algorithm" << std::endl;)
@@ -607,7 +607,7 @@ void SPxSolverBase<R>::setType(Type tp)
    void SPxSolverBase<R>::factorize()
    {
 
-      MSG_INFO3((*spxout), (*spxout) << " --- refactorizing basis matrix" << std::endl;)
+      SPX_MSG_INFO3((*spxout), (*spxout) << " --- refactorizing basis matrix" << std::endl;)
 
       try
       {
@@ -653,33 +653,33 @@ void SPxSolverBase<R>::setType(Type tp)
             ptmp -= pVec();
             ctmp -= coPvec();
 
-            if(ftmp.length() > DEFAULT_BND_VIOL)
+            if(ftmp.length() > SOPLEX_DEFAULT_BND_VIOL)
             {
-               MSG_DEBUG(std::cout << "DSOLVE21 fVec:   " << ftmp.length() << std::endl;)
+               SPX_MSG_DEBUG(std::cout << "DSOLVE21 fVec:   " << ftmp.length() << std::endl;)
                ftmp = fVec();
                this->multBaseWith(ftmp);
                ftmp -= fRhs();
 
-               if(ftmp.length() > DEFAULT_BND_VIOL)
-                  MSG_INFO1((*spxout), (*spxout) << "ESOLVE29 " << this->iteration() << ": fVec error = "
-                            << ftmp.length() << " exceeding DEFAULT_BND_VIOL = " << DEFAULT_BND_VIOL << std::endl;)
+               if(ftmp.length() > SOPLEX_DEFAULT_BND_VIOL)
+                  SPX_MSG_INFO1((*spxout), (*spxout) << "ESOLVE29 " << this->iteration() << ": fVec error = "
+                            << ftmp.length() << " exceeding SOPLEX_DEFAULT_BND_VIOL = " << SOPLEX_DEFAULT_BND_VIOL << std::endl;)
                }
 
-            if(ctmp.length() > DEFAULT_BND_VIOL)
+            if(ctmp.length() > SOPLEX_DEFAULT_BND_VIOL)
             {
-               MSG_DEBUG(std::cout << "DSOLVE23 coPvec: " << ctmp.length() << std::endl;)
+               SPX_MSG_DEBUG(std::cout << "DSOLVE23 coPvec: " << ctmp.length() << std::endl;)
                ctmp = coPvec();
                this->multWithBase(ctmp);
                ctmp -= coPrhs();
 
-               if(ctmp.length() > DEFAULT_BND_VIOL)
-                  MSG_INFO1((*spxout), (*spxout) << "ESOLVE30 " << this->iteration() << ": coPvec error = "
-                            << ctmp.length() << " exceeding DEFAULT_BND_VIOL = " << DEFAULT_BND_VIOL << std::endl;)
+               if(ctmp.length() > SOPLEX_DEFAULT_BND_VIOL)
+                  SPX_MSG_INFO1((*spxout), (*spxout) << "ESOLVE30 " << this->iteration() << ": coPvec error = "
+                            << ctmp.length() << " exceeding SOPLEX_DEFAULT_BND_VIOL = " << SOPLEX_DEFAULT_BND_VIOL << std::endl;)
                }
 
-            if(ptmp.length() > DEFAULT_BND_VIOL)
+            if(ptmp.length() > SOPLEX_DEFAULT_BND_VIOL)
             {
-               MSG_DEBUG(std::cout << "DSOLVE24 pVec:   " << ptmp.length() << std::endl;)
+               SPX_MSG_DEBUG(std::cout << "DSOLVE24 pVec:   " << ptmp.length() << std::endl;)
             }
 
 #endif  // NDEBUG
@@ -732,9 +732,9 @@ void SPxSolverBase<R>::setType(Type tp)
          for(int i = 0; i < dim(); i++)
          {
             if((*theFvec)[i] > theUBbound[i])
-               inf = MAXIMUM(inf, (*theFvec)[i] - theUBbound[i]);
+               inf = SOPLEX_MAX(inf, (*theFvec)[i] - theUBbound[i]);
             else if((*theFvec)[i] < theLBbound[i])
-               inf = MAXIMUM(inf, theLBbound[i] - (*theFvec)[i]);
+               inf = SOPLEX_MAX(inf, theLBbound[i] - (*theFvec)[i]);
          }
       }
       else
@@ -747,17 +747,17 @@ void SPxSolverBase<R>::setType(Type tp)
          for(int i = 0; i < dim(); i++)
          {
             if((*theCoPvec)[i] > (*theCoUbound)[i])
-               inf = MAXIMUM(inf, (*theCoPvec)[i] - (*theCoUbound)[i]);
+               inf = SOPLEX_MAX(inf, (*theCoPvec)[i] - (*theCoUbound)[i]);
             else if((*theCoPvec)[i] < (*theCoLbound)[i])
-               inf = MAXIMUM(inf, (*theCoLbound)[i] - (*theCoPvec)[i]);
+               inf = SOPLEX_MAX(inf, (*theCoLbound)[i] - (*theCoPvec)[i]);
          }
 
          for(int i = 0; i < coDim(); i++)
          {
             if((*thePvec)[i] > (*theUbound)[i])
-               inf = MAXIMUM(inf, (*thePvec)[i] - (*theUbound)[i]);
+               inf = SOPLEX_MAX(inf, (*thePvec)[i] - (*theUbound)[i]);
             else if((*thePvec)[i] < (*theLbound)[i])
-               inf = MAXIMUM(inf, (*theLbound)[i] - (*thePvec)[i]);
+               inf = SOPLEX_MAX(inf, (*theLbound)[i] - (*thePvec)[i]);
          }
       }
 
@@ -976,7 +976,7 @@ void SPxSolverBase<R>::setType(Type tp)
 
       if(m_nonbasicValueUpToDate && NE(m_nonbasicValue, val))
       {
-         MSG_ERROR(std::cerr << "stored nonbasic value: " << m_nonbasicValue
+         SPX_MSG_ERROR(std::cerr << "stored nonbasic value: " << m_nonbasicValue
                    << ", correct nonbasic value: " << val
                    << ", violation: " << val - m_nonbasicValue << std::endl;)
          assert(EQrel(m_nonbasicValue, val, 1e-12));
@@ -1024,7 +1024,7 @@ void SPxSolverBase<R>::setType(Type tp)
       if(m_nonbasicValueUpToDate)
          m_nonbasicValue += objChange;
 
-      MSG_DEBUG(std::cout
+      SPX_MSG_DEBUG(std::cout
                 << "Iteration: " << this->iteration()
                 << ": updated objValue: " << objChange
                 << ", new value: " << m_nonbasicValue
@@ -1088,7 +1088,7 @@ void SPxSolverBase<R>::setType(Type tp)
       , freeStarter(false)
       , displayLine(0)
       , displayFreq(200)
-      , sparsePricingFactor(SPARSITYFACTOR)
+      , sparsePricingFactor(SOPLEX_SPARSITYFACTOR)
       , getStartingDecompBasis(false)
       , computeDegeneracy(false)
       , degenCompIterOffset(0)
@@ -1581,57 +1581,57 @@ void SPxSolverBase<R>::setType(Type tp)
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
       if(epsilon() < 0 || tolerances() == nullptr)
-         return MSGinconsistent("SPxSolverBase");
+         return SPX_MSG_INCONSISTENT("SPxSolverBase");
 
       if(primVec.delta().tolerances() != dualVec.delta().tolerances())
-         return MSGinconsistent("SPxSolverBase");
+         return SPX_MSG_INCONSISTENT("SPxSolverBase");
 
       if(dualVec.delta().tolerances() != addVec.delta().tolerances())
-         return MSGinconsistent("SPxSolverBase");
+         return SPX_MSG_INCONSISTENT("SPxSolverBase");
 
       if(unitVecs.size() < SPxLPBase<R>::nCols() || unitVecs.size() < SPxLPBase<R>::nRows())
-         return MSGinconsistent("SPxSolverBase");
+         return SPX_MSG_INCONSISTENT("SPxSolverBase");
 
       if(initialized)
       {
          if(theFrhs->dim() != dim())
-            return MSGinconsistent("SPxSolverBase");
+            return SPX_MSG_INCONSISTENT("SPxSolverBase");
 
          if(theFvec->dim() != dim())
-            return MSGinconsistent("SPxSolverBase");
+            return SPX_MSG_INCONSISTENT("SPxSolverBase");
 
          if(theCoPrhs->dim() != dim())
-            return MSGinconsistent("SPxSolverBase");
+            return SPX_MSG_INCONSISTENT("SPxSolverBase");
 
          if(thePvec->dim() != coDim())
-            return MSGinconsistent("SPxSolverBase");
+            return SPX_MSG_INCONSISTENT("SPxSolverBase");
 
          if(theCoPvec->dim() != dim())
-            return MSGinconsistent("SPxSolverBase");
+            return SPX_MSG_INCONSISTENT("SPxSolverBase");
 
          if(theTest.dim() != coDim())
-            return MSGinconsistent("SPxSolverBase");
+            return SPX_MSG_INCONSISTENT("SPxSolverBase");
 
          if(theCoTest.dim() != dim())
-            return MSGinconsistent("SPxSolverBase");
+            return SPX_MSG_INCONSISTENT("SPxSolverBase");
 
          if(theURbound.dim() != SPxLPBase<R>::nRows())
-            return MSGinconsistent("SPxSolverBase");
+            return SPX_MSG_INCONSISTENT("SPxSolverBase");
 
          if(theLRbound.dim() != SPxLPBase<R>::nRows())
-            return MSGinconsistent("SPxSolverBase");
+            return SPX_MSG_INCONSISTENT("SPxSolverBase");
 
          if(theUCbound.dim() != SPxLPBase<R>::nCols())
-            return MSGinconsistent("SPxSolverBase");
+            return SPX_MSG_INCONSISTENT("SPxSolverBase");
 
          if(theLCbound.dim() != SPxLPBase<R>::nCols())
-            return MSGinconsistent("SPxSolverBase");
+            return SPX_MSG_INCONSISTENT("SPxSolverBase");
 
          if(theUBbound.dim() != dim())
-            return MSGinconsistent("SPxSolverBase");
+            return SPX_MSG_INCONSISTENT("SPxSolverBase");
 
          if(theLBbound.dim() != dim())
-            return MSGinconsistent("SPxSolverBase");
+            return SPX_MSG_INCONSISTENT("SPxSolverBase");
       }
 
       if(rep() == COLUMN)
@@ -1651,7 +1651,7 @@ void SPxSolverBase<R>::setType(Type tp)
                theLbound != &theLCbound ||
                theCoUbound != &theURbound ||
                theCoLbound != &theLRbound)
-            return MSGinconsistent("SPxSolverBase");
+            return SPX_MSG_INCONSISTENT("SPxSolverBase");
       }
       else
       {
@@ -1670,7 +1670,7 @@ void SPxSolverBase<R>::setType(Type tp)
                theLbound != &theLRbound ||
                theCoUbound != &theUCbound ||
                theCoLbound != &theLCbound)
-            return MSGinconsistent("SPxSolverBase");
+            return SPX_MSG_INCONSISTENT("SPxSolverBase");
       }
 
       return SPxLPBase<R>::isConsistent()
@@ -1735,7 +1735,7 @@ void SPxSolverBase<R>::setType(Type tp)
          return false;
 
       // check if the expensive system call to update the time should be skipped again
-      if(forceCheck || nCallsToTimelim < NINITCALLS ||  nClckSkipsLeft <= 0)
+      if(forceCheck || nCallsToTimelim < SOPLEX_NINITCALLS ||  nClckSkipsLeft <= 0)
       {
          Real currtime = time();
 
@@ -1743,11 +1743,11 @@ void SPxSolverBase<R>::setType(Type tp)
             return true;
 
          // determine the number of times the clock can be skipped again.
-         int nClckSkips = MAXNCLCKSKIPS;
+         int nClckSkips = SOPLEX_MAXNCLCKSKIPS;
          Real avgtimeinterval = (currtime + cumulativeTime()) / (Real)(nCallsToTimelim);
 
          // it would not be safe to skip the clock so many times since we are approaching the time limit
-         if(SAFETYFACTOR * (maxTime - currtime) / (avgtimeinterval + 1e-6) < nClckSkips)
+         if(SOPLEX_SAFETYFACTOR * (maxTime - currtime) / (avgtimeinterval + 1e-6) < nClckSkips)
             nClckSkips = 0;
 
          nClckSkipsLeft = nClckSkips;
@@ -1810,7 +1810,7 @@ void SPxSolverBase<R>::setType(Type tp)
          break;
 
       default:
-         MSG_ERROR(std::cerr << "ESOLVE26 ERROR: unknown basis status (" << static_cast<int>(stat) << ")"
+         SPX_MSG_ERROR(std::cerr << "ESOLVE26 ERROR: unknown basis status (" << static_cast<int>(stat) << ")"
                    << std::endl;)
          throw SPxInternalCodeException("XSOLVE22 This should never happen.");
       }
@@ -1858,7 +1858,7 @@ void SPxSolverBase<R>::setType(Type tp)
          break;
 
       default:
-         MSG_ERROR(std::cerr << "ESOLVE27 ERROR: unknown VarStatus (" << int(stat) << ")"
+         SPX_MSG_ERROR(std::cerr << "ESOLVE27 ERROR: unknown VarStatus (" << int(stat) << ")"
                    << std::endl;)
          throw SPxInternalCodeException("XSOLVE23 This should never happen.");
       }
@@ -1913,7 +1913,7 @@ void SPxSolverBase<R>::setType(Type tp)
          break;
 
       default:
-         MSG_ERROR(std::cerr << "ESOLVE28 ERROR: unknown VarStatus (" << int(stat) << ")"
+         SPX_MSG_ERROR(std::cerr << "ESOLVE28 ERROR: unknown VarStatus (" << int(stat) << ")"
                    << std::endl;)
          throw SPxInternalCodeException("XSOLVE24 This should never happen.");
       }

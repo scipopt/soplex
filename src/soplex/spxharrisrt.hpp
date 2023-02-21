@@ -481,7 +481,7 @@ SPxId SPxHarrisRT<R>::selectEnter(R& val, int, bool)
             }
             else
             {
-               MSG_DEBUG(std::cout << "DHARRI01 removing value " << pupd[i] << std::endl;)
+               SPX_MSG_DEBUG(std::cout << "DHARRI01 removing value " << pupd[i] << std::endl;)
                pupd.clearNum(j);
             }
          }
@@ -531,7 +531,7 @@ SPxId SPxHarrisRT<R>::selectEnter(R& val, int, bool)
             }
             else
             {
-               MSG_DEBUG(std::cout << "DHARRI02 removing value " << cupd[i] << std::endl;)
+               SPX_MSG_DEBUG(std::cout << "DHARRI02 removing value " << cupd[i] << std::endl;)
                cupd.clearNum(j);
             }
          }
@@ -692,7 +692,7 @@ SPxId SPxHarrisRT<R>::selectEnter(R& val, int, bool)
             }
             else
             {
-               MSG_DEBUG(std::cout << "DHARRI03 removing value " << pupd[i] << std::endl;)
+               SPX_MSG_DEBUG(std::cout << "DHARRI03 removing value " << pupd[i] << std::endl;)
                pupd.clearNum(j);
             }
          }
@@ -742,7 +742,7 @@ SPxId SPxHarrisRT<R>::selectEnter(R& val, int, bool)
             }
             else
             {
-               MSG_DEBUG(std::cout << "DHARRI04 removing value " << x << std::endl;);
+               SPX_MSG_DEBUG(std::cout << "DHARRI04 removing value " << x << std::endl;);
                cupd.clearNum(j);
             }
          }

@@ -35,7 +35,7 @@
 
 #include "vector"
 
-#define WITH_L_ROWS 1
+#define SOPLEX_WITH_L_ROWS 1
 
 namespace soplex
 {

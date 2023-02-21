@@ -85,7 +85,7 @@ bool MPSInput::readLine()
 
          m_lineno++;
 
-         MSG_DEBUG(std::cout << "DMPSIN01 Line " << m_lineno
+         SPX_MSG_DEBUG(std::cout << "DMPSIN01 Line " << m_lineno
                    << " " << m_buf << std::endl;)
 
          /* check if comment line */
@@ -248,7 +248,7 @@ bool MPSInput::readLine()
    }
    while(is_marker);
 
-   MSG_DEBUG(std::cerr
+   SPX_MSG_DEBUG(std::cerr
              << "DMPSIN02 -----------------------------------------------"
              << std::endl
              << "DMPSIN03 f0=" << ((m_f0 == 0) ? "nil" : m_f0) << std::endl

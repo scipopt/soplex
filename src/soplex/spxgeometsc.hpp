@@ -126,7 +126,7 @@ template <class R>
 void SPxGeometSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
 {
 
-   MSG_INFO1((*this->spxout), (*this->spxout) << "Geometric scaling LP" <<
+   SPX_MSG_INFO1((*this->spxout), (*this->spxout) << "Geometric scaling LP" <<
              (persistent ? " (persistent)" : "") << (postequilibration ? " with post-equilibration" : "") <<
              std::endl;)
 
@@ -155,7 +155,7 @@ void SPxGeometSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
       p1start = colratio;
    }
 
-   MSG_INFO2((*this->spxout), (*this->spxout) << "before scaling:"
+   SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "before scaling:"
              << " min= " << lp.minAbsNzo()
              << " max= " << lp.maxAbsNzo()
              << " col-ratio= " << colratio
@@ -167,7 +167,7 @@ void SPxGeometSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
 
    if(!geoscale)
    {
-      MSG_INFO2((*this->spxout), (*this->spxout) << "No geometric scaling done, ratio good enough" <<
+      SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "No geometric scaling done, ratio good enough" <<
                 std::endl;)
 
       if(!postequilibration)
@@ -176,7 +176,7 @@ void SPxGeometSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
          return;
       }
 
-      MSG_INFO2((*this->spxout), (*this->spxout) << " ... but will still perform equilibrium scaling" <<
+      SPX_MSG_INFO2((*this->spxout), (*this->spxout) << " ... but will still perform equilibrium scaling" <<
                 std::endl;)
    }
 
@@ -205,7 +205,7 @@ void SPxGeometSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
             p1 = computeScalingVec(lp.colSet(), rowscale, colscale, epsilon);
          }
 
-         MSG_INFO3((*this->spxout), (*this->spxout) << "Geometric scaling round " << count
+         SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "Geometric scaling round " << count
                    << " col-ratio= " << (colFirst ? p0 : p1)
                    << " row-ratio= " << (colFirst ? p1 : p0)
                    << std::endl;)
@@ -223,7 +223,7 @@ void SPxGeometSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
 
    if(!geoscale && !postequilibration)
    {
-      MSG_INFO2((*this->spxout), (*this->spxout) << "No geometric scaling done." << std::endl;)
+      SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "No geometric scaling done." << std::endl;)
       lp.setScalingInfo(true);
    }
    else
@@ -249,14 +249,14 @@ void SPxGeometSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
 
       this->applyScaling(lp);
 
-      MSG_INFO3((*this->spxout), (*this->spxout) << "Row scaling min= " << this->minAbsRowscale()
+      SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "Row scaling min= " << this->minAbsRowscale()
                 << " max= " << this->maxAbsRowscale()
                 << std::endl
                 << "IGEOSC06 Col scaling min= " << this->minAbsColscale()
                 << " max= " << this->maxAbsColscale()
                 << std::endl;)
 
-      MSG_INFO2((*this->spxout), (*this->spxout) << "after scaling: "
+      SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "after scaling: "
                 << " min= " << lp.minAbsNzo(false)
                 << " max= " << lp.maxAbsNzo(false)
                 << " col-ratio= " << this->maxColRatio(lp)

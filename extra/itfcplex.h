@@ -32,9 +32,6 @@
 #ifndef _ITFCPLEX_H_
 #define _ITFCPLEX_H_
 
-    /** what to use as $\infty$ */
-#define INFBOUND 1e+100 /* SoPlex::infinity ; */
-
     /** optimality status */
 #define  CPX_OPTIMAL 1
     /** infeasibility status */

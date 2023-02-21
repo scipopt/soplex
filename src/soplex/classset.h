@@ -534,20 +534,20 @@ public:
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
       if(theitem == 0 || thekey == 0)
-         return MSGinconsistent("ClassSet");
+         return SPX_MSG_INCONSISTENT("ClassSet");
 
       if(thesize > themax || thenum > themax || thenum > thesize)
-         return MSGinconsistent("ClassSet");
+         return SPX_MSG_INCONSISTENT("ClassSet");
 
       if(thesize == thenum && firstfree != -themax - 1)
-         return MSGinconsistent("ClassSet");
+         return SPX_MSG_INCONSISTENT("ClassSet");
 
       if(thesize != thenum && firstfree == -themax - 1)
-         return MSGinconsistent("ClassSet");
+         return SPX_MSG_INCONSISTENT("ClassSet");
 
       for(int i = 0; i < thenum; ++i)
          if(theitem[thekey[i].idx].info != i)
-            return MSGinconsistent("ClassSet");
+            return SPX_MSG_INCONSISTENT("ClassSet");
 
 #endif
 

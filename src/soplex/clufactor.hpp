@@ -30,7 +30,7 @@ namespace soplex
 
 /* Macro to print a warning message for huge values */
 #ifndef NDEBUG
-#define DEBUG_CHECK_HUGE_VALUE( prefix, value )                                                    \
+#define SOPLEX_DEBUG_CHECK_HUGE_VALUE( prefix, value )                                                    \
    if(spxAbs(value) >= 1e40 && this->hugeValues < 3)                                               \
    {                                                                                               \
       this->hugeValues++;                                                                          \
@@ -41,7 +41,7 @@ namespace soplex
          std::cout << "Skipping further warnings of this type during current solve." << std::endl; \
    }
 #else
-#define DEBUG_CHECK_HUGE_VALUE( prefix, value ) /**/
+#define SOPLEX_DEBUG_CHECK_HUGE_VALUE( prefix, value ) /**/
 #endif
 
 /* This number is used to decide wether a value is zero
@@ -305,7 +305,7 @@ void CLUFactor<R>::setPivot(const int p_stage,
    if(spxAbs(val) < _tolerances->epsilonPivot())
    {
 #ifndef NDEBUG
-      MSG_ERROR(std::cerr
+      SPX_MSG_ERROR(std::cerr
                 << "LU pivot element is almost zero (< "
                 << _tolerances->epsilonPivot()
                 << ") - Basis is numerically singular"
@@ -2697,7 +2697,7 @@ int CLUFactor<R>::setupColVals()
 
 /*****************************************************************************/
 
-#ifdef WITH_L_ROWS
+#ifdef SOPLEX_WITH_L_ROWS
 template <class R>
 void CLUFactor<R>::setupRowVals()
 {
@@ -2863,7 +2863,7 @@ TERMINATE:
 
    if(this->stat == SLinSolver<R>::OK)
    {
-#ifdef WITH_L_ROWS
+#ifdef SOPLEX_WITH_L_ROWS
       setupRowVals();
 #endif
       nzCnt = setupColVals();
@@ -3373,7 +3373,7 @@ void CLUFactor<R>::solveLright(R* vec)
    {
       if((x = vec[lrow[i]]) != 0.0)
       {
-         MSG_DEBUG(std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl;)
+         SPX_MSG_DEBUG(std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl;)
 
          k = lbeg[i];
          idx = &(lidx[k]);
@@ -3381,7 +3381,7 @@ void CLUFactor<R>::solveLright(R* vec)
 
          for(j = lbeg[i + 1]; j > k; --j)
          {
-            MSG_DEBUG(std::cout << "                         -> y" << *idx << " -= " << x << " * " << *val <<
+            SPX_MSG_DEBUG(std::cout << "                         -> y" << *idx << " -= " << x << " * " << *val <<
                       " = " << x * (*val) << "    -> " << vec[*idx] - x * (*val) << std::endl;)
             vec[*idx++] -= x * (*val++);
          }
@@ -3390,7 +3390,7 @@ void CLUFactor<R>::solveLright(R* vec)
 
    if(l.updateType)                      /* Forest-Tomlin Updates */
    {
-      MSG_DEBUG(std::cout << "performing FT updates..." << std::endl;)
+      SPX_MSG_DEBUG(std::cout << "performing FT updates..." << std::endl;)
 
       end = l.firstUnused;
 
@@ -3406,10 +3406,10 @@ void CLUFactor<R>::solveLright(R* vec)
 
          vec[lrow[i]] = -R(tmp);
 
-         MSG_DEBUG(std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl;)
+         SPX_MSG_DEBUG(std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl;)
       }
 
-      MSG_DEBUG(std::cout << "finished FT updates." << std::endl;)
+      SPX_MSG_DEBUG(std::cout << "finished FT updates." << std::endl;)
    }
 }
 
@@ -3701,8 +3701,8 @@ void CLUFactor<R>::solveUleft(R* p_work, R* vec)
 
       if(x != 0.0)
       {
-         DEBUG_CHECK_HUGE_VALUE("WSOLVE01", x);
-         DEBUG_CHECK_HUGE_VALUE("WSOLVE02", diag[r]);
+         SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE01", x);
+         SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE02", diag[r]);
 
          x        *= diag[r];
          p_work[r] = x;
@@ -3712,7 +3712,7 @@ void CLUFactor<R>::solveUleft(R* p_work, R* vec)
          for(int m = u.row.start[r]; m < end; m++)
          {
             vec[u.row.idx[m]] -= x * u.row.val[m];
-            DEBUG_CHECK_HUGE_VALUE("WSOLVE03", vec[u.row.idx[m]]);
+            SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE03", vec[u.row.idx[m]]);
          }
       }
    }
@@ -3746,9 +3746,9 @@ void CLUFactor<R>::solveUleft2(
 
       if((x1 != 0.0) && (x2 != 0.0))
       {
-         DEBUG_CHECK_HUGE_VALUE("WSOLVE04", x1);
-         DEBUG_CHECK_HUGE_VALUE("WSOLVE05", x2);
-         DEBUG_CHECK_HUGE_VALUE("WSOLVE06", diag[r]);
+         SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE04", x1);
+         SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE05", x2);
+         SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE06", diag[r]);
          x1 *= diag[r];
          x2 *= diag[r];
          p_work1[r] = x1;
@@ -3761,15 +3761,15 @@ void CLUFactor<R>::solveUleft2(
          {
             vec1[*idx] -= x1 * (*val);
             vec2[*idx] -= x2 * (*val++);
-            DEBUG_CHECK_HUGE_VALUE("WSOLVE07", vec1[*idx]);
-            DEBUG_CHECK_HUGE_VALUE("WSOLVE08", vec2[*idx]);
+            SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE07", vec1[*idx]);
+            SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE08", vec2[*idx]);
             idx++;
          }
       }
       else if(x1 != 0.0)
       {
-         DEBUG_CHECK_HUGE_VALUE("WSOLVE09", x1);
-         DEBUG_CHECK_HUGE_VALUE("WSOLVE10", diag[r]);
+         SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE09", x1);
+         SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE10", diag[r]);
          x1 *= diag[r];
          p_work1[r] = x1;
          k = rbeg[r];
@@ -3779,14 +3779,14 @@ void CLUFactor<R>::solveUleft2(
          for(int m = rlen[r]; m != 0; --m)
          {
             vec1[*idx] -= x1 * (*val++);
-            DEBUG_CHECK_HUGE_VALUE("WSOLVE11", vec1[*idx]);
+            SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE11", vec1[*idx]);
             idx++;
          }
       }
       else if(x2 != 0.0)
       {
-         DEBUG_CHECK_HUGE_VALUE("WSOLVE12", x2);
-         DEBUG_CHECK_HUGE_VALUE("WSOLVE13", diag[r]);
+         SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE12", x2);
+         SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE13", diag[r]);
          x2 *= diag[r];
          p_work2[r] = x2;
          k = rbeg[r];
@@ -3796,7 +3796,7 @@ void CLUFactor<R>::solveUleft2(
          for(int m = rlen[r]; m != 0; --m)
          {
             vec2[*idx] -= x2 * (*val++);
-            DEBUG_CHECK_HUGE_VALUE("WSOLVE14", vec2[*idx]);
+            SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE14", vec2[*idx]);
             idx++;
          }
       }
@@ -3891,7 +3891,7 @@ void CLUFactor<R>::solveLleft2(
    rbeg  = l.rbeg;
    rorig = l.rorig;
 
-#ifndef WITH_L_ROWS
+#ifndef SOPLEX_WITH_L_ROWS
    R*   lval  = l.val.data();
    int*    lidx  = l.idx;
    int*    lrow  = l.row;
@@ -4008,7 +4008,7 @@ template <class R>
 void CLUFactor<R>::solveLleft(R* vec) const
 {
 
-#ifndef WITH_L_ROWS
+#ifndef SOPLEX_WITH_L_ROWS
    int*  idx;
    R* val;
    R* lval  = l.val.data();
@@ -4049,7 +4049,7 @@ void CLUFactor<R>::solveLleft(R* vec) const
       }
    }
 
-#endif // WITH_L_ROWS
+#endif // SOPLEX_WITH_L_ROWS
 }
 
 template <class R>
@@ -4068,7 +4068,7 @@ int CLUFactor<R>::solveLleftEps(R* vec, int* nonz, R eps)
    rbeg = l.rbeg;
    rorig = l.rorig;
    n = 0;
-#ifndef WITH_L_ROWS
+#ifndef SOPLEX_WITH_L_ROWS
    R* lval = l.val.data();
    int*  lidx = l.idx;
    int*  lrow = l.row;
@@ -4569,8 +4569,8 @@ int CLUFactor<R>::solveLleft(R eps, R* vec, int* nonz, int rn)
    n     = 0;
 
    i = l.firstUpdate - 1;
-#ifndef WITH_L_ROWS
-#pragma warn "Not yet implemented, define WITH_L_ROWS"
+#ifndef SOPLEX_WITH_L_ROWS
+#pragma warn "Not yet implemented, define SOPLEX_WITH_L_ROWS"
    R*   lval = l.val.data();
    int*    lidx = l.idx;
    int*    lrow = l.row;
@@ -4665,7 +4665,7 @@ void CLUFactor<R>::solveLleftNoNZ(R* vec)
    rbeg = l.rbeg;
    rorig = l.rorig;
 
-#ifndef WITH_L_ROWS
+#ifndef SOPLEX_WITH_L_ROWS
    R* lval = l.val.data();
    int*    lidx = l.idx;
    int*    lrow = l.row;

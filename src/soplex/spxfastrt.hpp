@@ -1066,7 +1066,7 @@ int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
    else
       return -1;
 
-   MSG_DEBUG(
+   SPX_MSG_DEBUG(
 
       if(leave >= 0)
       std::cout
@@ -1486,7 +1486,7 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
       while(cnt < SOPLEX_TRIES);
    }
 
-   MSG_DEBUG(
+   SPX_MSG_DEBUG(
 
       if(enterId.isValid())
 {

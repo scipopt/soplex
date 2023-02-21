@@ -40,7 +40,7 @@
 
 namespace soplex
 {
-#define MINSTABILITYRAT    REAL(4e-2)
+#define SOPLEX_MINSTABILITYRAT    SOPLEX_REAL(4e-2)
 
 inline void SLUFactorRational::solveRight(VectorRational& x, const VectorRational& b) //const
 {
@@ -421,7 +421,7 @@ inline SLUFactorRational::Status SLUFactorRational::change(
 
    usetup = false;
 
-   MSG_DEBUG(std::cout << "DSLUFA01\tupdated\t\tstability = " << stability()
+   SPX_MSG_DEBUG(std::cout << "DSLUFA01\tupdated\t\tstability = " << stability()
              << std::endl;)
 
    return status();
@@ -442,7 +442,7 @@ inline void SLUFactorRational::clear()
    maxabs        = 1;
    initMaxabs    = 1;
    lastThreshold = minThreshold;
-   minStability  = MINSTABILITYRAT;
+   minStability  = SOPLEX_MINSTABILITYRAT;
    stat          = UNLOADED;
 
    vec.clear();
@@ -822,14 +822,14 @@ inline SLUFactorRational::Status SLUFactorRational::load(const SVectorRational* 
       spx_realloc(u.col.max,   thedim + 1);
       spx_realloc(u.col.start, thedim + 1);
 
-      l.startSize = thedim + MAXUPDATES;
+      l.startSize = thedim + SOPLEX_MAXUPDATES;
 
       spx_realloc(l.row,   l.startSize);
       spx_realloc(l.start, l.startSize);
    }
    // the last factorization was reasonably stable, so we decrease the Markowitz threshold (stored in lastThreshold) in
    // order favour sparsity
-   else if(lastStability > 2.0 * MINSTABILITYRAT)
+   else if(lastStability > 2.0 * SOPLEX_MINSTABILITYRAT)
    {
       // we reset lastThreshold to its previous value in the sequence minThreshold, betterThreshold(minThreshold),
       // betterThreshold(betterThreshold(minThreshold)), ...
@@ -846,7 +846,7 @@ inline SLUFactorRational::Status SLUFactorRational::load(const SVectorRational* 
 
       // we reset the minimum stability (which might have been decreased below) to ensure that the increased sparsity
       // does not hurt the stability
-      minStability  = 2 * MINSTABILITYRAT;
+      minStability  = 2 * SOPLEX_MINSTABILITYRAT;
    }
 
    u.row.list.idx      = thedim;
@@ -862,10 +862,10 @@ inline SLUFactorRational::Status SLUFactorRational::load(const SVectorRational* 
    stat = OK;
    factor(matrix, lastThreshold);
 
-   MSG_DEBUG(std::cout << "DSLUFA02 threshold = " << lastThreshold
+   SPX_MSG_DEBUG(std::cout << "DSLUFA02 threshold = " << lastThreshold
              << "\tstability = " << stability()
-             << "\tMINSTABILITYRAT = " << MINSTABILITYRAT << std::endl;)
-   MSG_DEBUG(
+             << "\tSOPLEX_MINSTABILITYRAT = " << SOPLEX_MINSTABILITYRAT << std::endl;)
+   SPX_MSG_DEBUG(
       int i;
       FILE* fl = fopen("dump.lp", "w");
       std::cout << "DSLUFA03 Basis:\n";

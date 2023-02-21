@@ -27,7 +27,6 @@
  */
 
 // Defining the static members of the Param class
-// THREADLOCAL is a #define to thread_local. (Is it really needed?)
 
 namespace soplex
 {

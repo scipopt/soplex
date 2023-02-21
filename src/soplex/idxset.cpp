@@ -129,16 +129,16 @@ bool IdxSet::isConsistent() const
    int i, j;
 
    if(len > 0 && idx == 0)
-      return MSGinconsistent("IdxSet");
+      return SPX_MSG_INCONSISTENT("IdxSet");
 
    for(i = 0; i < size(); ++i)
    {
       if(index(i) < 0)
-         return MSGinconsistent("IdxSet");
+         return SPX_MSG_INCONSISTENT("IdxSet");
 
       for(j = 0; j < i; j++)
          if(index(i) == index(j))
-            return MSGinconsistent("IdxSet");
+            return SPX_MSG_INCONSISTENT("IdxSet");
    }
 
 #endif

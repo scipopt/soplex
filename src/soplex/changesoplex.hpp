@@ -274,7 +274,7 @@ void SPxSolverBase<R>::changeLowerStatus(int i, R newLower, R oldLower)
    R                    currUpper = this->upper(i);
    R                    objChange = 0.0;
 
-   MSG_DEBUG(std::cout << "DCHANG01 changeLowerStatus(): col " << i
+   SPX_MSG_DEBUG(std::cout << "DCHANG01 changeLowerStatus(): col " << i
              << "[" << newLower << ":" << currUpper << "] " << stat;)
 
    switch(stat)
@@ -352,7 +352,7 @@ void SPxSolverBase<R>::changeLowerStatus(int i, R newLower, R oldLower)
       throw SPxInternalCodeException("XCHANG01 This should never happen.");
    }
 
-   MSG_DEBUG(std::cout << " -> " << stat << std::endl;)
+   SPX_MSG_DEBUG(std::cout << " -> " << stat << std::endl;)
 
    // we only need to update the nonbasic value in column representation (see nonbasicValue() for comparison/explanation)
    if(rep() == COLUMN)
@@ -403,7 +403,7 @@ void SPxSolverBase<R>::changeUpperStatus(int i, R newUpper, R oldUpper)
    R                    currLower = this->lower(i);
    R                    objChange = 0.0;
 
-   MSG_DEBUG(std::cout << "DCHANG02 changeUpperStatus(): col " << i
+   SPX_MSG_DEBUG(std::cout << "DCHANG02 changeUpperStatus(): col " << i
              << "[" << currLower << ":" << newUpper << "] " << stat;)
 
    switch(stat)
@@ -481,7 +481,7 @@ void SPxSolverBase<R>::changeUpperStatus(int i, R newUpper, R oldUpper)
       throw SPxInternalCodeException("XCHANG02 This should never happen.");
    }
 
-   MSG_DEBUG(std::cout << " -> " << stat << std::endl;);
+   SPX_MSG_DEBUG(std::cout << " -> " << stat << std::endl;);
 
    // we only need to update the nonbasic value in column representation (see nonbasicValue() for comparison/explanation)
    if(rep() == COLUMN)
@@ -550,7 +550,7 @@ void SPxSolverBase<R>::changeLhsStatus(int i, R newLhs, R oldLhs)
    R                    currRhs   = this->rhs(i);
    R                    objChange = 0.0;
 
-   MSG_DEBUG(std::cout << "DCHANG03 changeLhsStatus()  : row " << i
+   SPX_MSG_DEBUG(std::cout << "DCHANG03 changeLhsStatus()  : row " << i
              << ": " << stat;)
 
    switch(stat)
@@ -628,7 +628,7 @@ void SPxSolverBase<R>::changeLhsStatus(int i, R newLhs, R oldLhs)
       throw SPxInternalCodeException("XCHANG03 This should never happen.");
    }
 
-   MSG_DEBUG(std::cout << " -> " << stat << std::endl;)
+   SPX_MSG_DEBUG(std::cout << " -> " << stat << std::endl;)
 
    // we only need to update the nonbasic value in column representation (see nonbasicValue() for comparison/explanation)
    if(rep() == COLUMN)
@@ -677,7 +677,7 @@ void SPxSolverBase<R>::changeRhsStatus(int i, R newRhs, R oldRhs)
    R                    currLhs   = this->lhs(i);
    R                    objChange = 0.0;
 
-   MSG_DEBUG(std::cout << "DCHANG04 changeRhsStatus()  : row " << i
+   SPX_MSG_DEBUG(std::cout << "DCHANG04 changeRhsStatus()  : row " << i
              << ": " << stat;)
 
    switch(stat)
@@ -755,7 +755,7 @@ void SPxSolverBase<R>::changeRhsStatus(int i, R newRhs, R oldRhs)
       throw SPxInternalCodeException("XCHANG04 This should never happen.");
    }
 
-   MSG_DEBUG(std::cout << " -> " << stat << std::endl;)
+   SPX_MSG_DEBUG(std::cout << " -> " << stat << std::endl;)
 
    // we only need to update the nonbasic value in column representation (see nonbasicValue() for comparison/explanation)
    if(rep() == COLUMN)

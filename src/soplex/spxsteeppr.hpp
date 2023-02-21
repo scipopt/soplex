@@ -32,11 +32,10 @@
 #include "soplex/spxsteeppr.h"
 #include "soplex/random.h"
 
-#define STEEP_REFINETOL 2.0
+#define SOPLEX_STEEP_REFINETOL 2.0
 
 namespace soplex
 {
-// #define EQ_PREF 1000
 
 template <class R>
 void SPxSteepPR<R>::clear()
@@ -138,7 +137,7 @@ void SPxSteepPR<R>::setupWeights(typename SPxSolverBase<R>::Type type)
    }
    else
    {
-      MSG_INFO1((*this->thesolver->spxout),
+      SPX_MSG_INFO1((*this->thesolver->spxout),
                 (*this->thesolver->spxout) << " --- initializing steepest edge multipliers" << std::endl;)
 
       if(type == SPxSolverBase<R>::ENTER)
@@ -202,7 +201,7 @@ void SPxSteepPR<R>::left4(int n, SPxId id)
 
       if(spxAbs(rhoVec[n]) < this->thetolerance * 0.5)
       {
-         MSG_INFO3((*this->thesolver->spxout), (*this->thesolver->spxout) << "WSTEEP04: rhoVec = "
+         SPX_MSG_INFO3((*this->thesolver->spxout), (*this->thesolver->spxout) << "WSTEEP04: rhoVec = "
                    << rhoVec[n] << " with smaller absolute value than 0.5*thetolerance = " << 0.5 * this->thetolerance
                    << std::endl;)
       }
@@ -272,7 +271,7 @@ int SPxSteepPR<R>::buildBestPriceVectorLeave(R feastol)
    this->compare.elements = prices.get_const_ptr();
    // do a partial sort to move the best ones to the front
    // TODO this can be done more efficiently, since we only need the indices
-   nsorted = SPxQuicksortPart(prices.get_ptr(), this->compare, 0, prices.size(), HYPERPRICINGSIZE);
+   nsorted = SPxQuicksortPart(prices.get_ptr(), this->compare, 0, prices.size(), SOPLEX_HYPERPRICINGSIZE);
 
    // copy indices of best values to bestPrices
    for(int i = 0; i < nsorted; ++i)
@@ -313,9 +312,9 @@ int SPxSteepPR<R>::selectLeave()
    if(retid < 0 && !refined)
    {
       refined = true;
-      MSG_INFO3((*this->thesolver->spxout),
+      SPX_MSG_INFO3((*this->thesolver->spxout),
                 (*this->thesolver->spxout) << "WSTEEP03 trying refinement step..\n";)
-      retid = selectLeaveX(this->thetolerance / STEEP_REFINETOL);
+      retid = selectLeaveX(this->thetolerance / SOPLEX_STEEP_REFINETOL);
    }
 
    if(retid >= 0)
@@ -578,7 +577,7 @@ SPxId SPxSteepPR<R>::buildBestPriceVectorEnterDim(R& best, R feastol)
    this->compare.elements = prices.get_const_ptr();
    // do a partial sort to move the best ones to the front
    // TODO this can be done more efficiently, since we only need the indices
-   nsorted = SPxQuicksortPart(prices.get_ptr(), this->compare, 0, prices.size(), HYPERPRICINGSIZE);
+   nsorted = SPxQuicksortPart(prices.get_ptr(), this->compare, 0, prices.size(), SOPLEX_HYPERPRICINGSIZE);
 
    // copy indices of best values to bestPrices
    for(int i = 0; i < nsorted; ++i)
@@ -635,7 +634,7 @@ SPxId SPxSteepPR<R>::buildBestPriceVectorEnterCoDim(R& best, R feastol)
    this->compare.elements = pricesCo.get_const_ptr();
    // do a partial sort to move the best ones to the front
    // TODO this can be done more efficiently, since we only need the indices
-   nsorted = SPxQuicksortPart(pricesCo.get_ptr(), this->compare, 0, pricesCo.size(), HYPERPRICINGSIZE);
+   nsorted = SPxQuicksortPart(pricesCo.get_ptr(), this->compare, 0, pricesCo.size(), SOPLEX_HYPERPRICINGSIZE);
 
    // copy indices of best values to bestPrices
    for(int i = 0; i < nsorted; ++i)
@@ -665,9 +664,9 @@ SPxId SPxSteepPR<R>::selectEnter()
    if(!enterId.isValid() && !refined)
    {
       refined = true;
-      MSG_INFO3((*this->thesolver->spxout),
+      SPX_MSG_INFO3((*this->thesolver->spxout),
                 (*this->thesolver->spxout) << "WSTEEP05 trying refinement step..\n";)
-      enterId = selectEnterX(this->thetolerance / STEEP_REFINETOL);
+      enterId = selectEnterX(this->thetolerance / SOPLEX_STEEP_REFINETOL);
    }
 
    assert(isConsistent());
@@ -723,7 +722,7 @@ SPxId SPxSteepPR<R>::selectEnterX(R tol)
    }
 
    // prefer slack indices to reduce nonzeros in basis matrix
-   if(enterCoId.isValid() && (best > SPARSITY_TRADEOFF * bestCo || !enterId.isValid()))
+   if(enterCoId.isValid() && (best > SOPLEX_SPARSITY_TRADEOFF * bestCo || !enterId.isValid()))
       return enterCoId;
    else
       return enterId;
@@ -1123,7 +1122,7 @@ bool SPxSteepPR<R>::isConsistent() const
 
          if(x > this->thesolver->leavetol() || -x > this->thesolver->leavetol())
          {
-            MSG_ERROR(std::cerr << "ESTEEP03 x[" << i << "] = " << x << std::endl;)
+            SPX_MSG_ERROR(std::cerr << "ESTEEP03 x[" << i << "] = " << x << std::endl;)
          }
       }
    }
@@ -1135,13 +1134,13 @@ bool SPxSteepPR<R>::isConsistent() const
       for(i = this->thesolver->dim() - 1; i >= 0; --i)
       {
          if(coW[i] < this->thesolver->epsilon())
-            return MSGinconsistent("SPxSteepPR");
+            return SPX_MSG_INCONSISTENT("SPxSteepPR");
       }
 
       for(i = this->thesolver->coDim() - 1; i >= 0; --i)
       {
          if(w[i] < this->thesolver->epsilon())
-            return MSGinconsistent("SPxSteepPR");
+            return SPX_MSG_INCONSISTENT("SPxSteepPR");
       }
    }
 

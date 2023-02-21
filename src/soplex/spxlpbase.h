@@ -2029,7 +2029,7 @@ public:
    bool isConsistent() const
    {
       if(this->_tolerances == nullptr && nCols() != 0)
-         return MSGinconsistent("SPxLPBase");
+         return SPX_MSG_INCONSISTENT("SPxLPBase");
 
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
@@ -2043,10 +2043,10 @@ public:
             int n = w.pos(i);
 
             if(n < 0)
-               return MSGinconsistent("SPxLPBase");
+               return SPX_MSG_INCONSISTENT("SPxLPBase");
 
             if(v.value(j) != w.value(n))
-               return MSGinconsistent("SPxLPBase");
+               return SPX_MSG_INCONSISTENT("SPxLPBase");
          }
       }
 
@@ -2060,10 +2060,10 @@ public:
             int n = w.pos(i);
 
             if(n < 0)
-               return MSGinconsistent("SPxLPBase");
+               return SPX_MSG_INCONSISTENT("SPxLPBase");
 
             if(v.value(j) != w.value(n))
-               return MSGinconsistent("SPxLPBase");
+               return SPX_MSG_INCONSISTENT("SPxLPBase");
          }
       }
 

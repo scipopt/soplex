@@ -154,7 +154,7 @@ void checkSolutionReal(SoPlexBase<R>& soplex)
 
       if(soplex.getBoundViolation(boundviol, sumviol) && soplex.getRowViolation(rowviol, sumviol))
       {
-         MSG_INFO1(soplex.spxout,
+         SPX_MSG_INFO1(soplex.spxout,
                    R maxviol = boundviol > rowviol ? boundviol : rowviol;
                    bool feasible = (maxviol <= soplex.realParam(SoPlexBase<R>::FEASTOL));
                    soplex.spxout << "Primal solution " << (feasible ? "feasible" : "infeasible")
@@ -163,12 +163,12 @@ void checkSolutionReal(SoPlexBase<R>& soplex)
       }
       else
       {
-         MSG_INFO1(soplex.spxout, soplex.spxout << "Could not check primal solution.\n");
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "Could not check primal solution.\n");
       }
    }
    else
    {
-      MSG_INFO1(soplex.spxout, soplex.spxout << "No primal solution available.\n");
+      SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "No primal solution available.\n");
    }
 
    if(soplex.hasDual())
@@ -179,7 +179,7 @@ void checkSolutionReal(SoPlexBase<R>& soplex)
 
       if(soplex.getRedCostViolation(redcostviol, sumviol) && soplex.getDualViolation(dualviol, sumviol))
       {
-         MSG_INFO1(soplex.spxout,
+         SPX_MSG_INFO1(soplex.spxout,
                    R maxviol = redcostviol > dualviol ? redcostviol : dualviol;
                    bool feasible = (maxviol <= soplex.realParam(SoPlexBase<R>::OPTTOL));
                    soplex.spxout << "Dual solution " << (feasible ? "feasible" : "infeasible")
@@ -189,12 +189,12 @@ void checkSolutionReal(SoPlexBase<R>& soplex)
       }
       else
       {
-         MSG_INFO1(soplex.spxout, soplex.spxout << "Could not check dual solution.\n");
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "Could not check dual solution.\n");
       }
    }
    else
    {
-      MSG_INFO1(soplex.spxout, soplex.spxout << "No dual solution available.\n");
+      SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "No dual solution available.\n");
    }
 }
 
@@ -212,7 +212,7 @@ static void checkSolutionRational(SoPlexBase<R>& soplex)
       if(soplex.getBoundViolationRational(boundviol, sumviol)
             && soplex.getRowViolationRational(rowviol, sumviol))
       {
-         MSG_INFO1(soplex.spxout,
+         SPX_MSG_INFO1(soplex.spxout,
                    Rational maxviol = boundviol > rowviol ? boundviol : rowviol;
                    bool feasible = (maxviol <= soplex.realParam(SoPlexBase<R>::FEASTOL));
                    soplex.spxout << "Primal solution " << (feasible ? "feasible" : "infeasible") <<
@@ -221,12 +221,12 @@ static void checkSolutionRational(SoPlexBase<R>& soplex)
       }
       else
       {
-         MSG_INFO1(soplex.spxout, soplex.spxout << "Could not check primal solution.\n");
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "Could not check primal solution.\n");
       }
    }
    else
    {
-      MSG_INFO1(soplex.spxout, soplex.spxout << "No primal solution available.\n");
+      SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "No primal solution available.\n");
    }
 
    if(soplex.hasDual())
@@ -238,7 +238,7 @@ static void checkSolutionRational(SoPlexBase<R>& soplex)
       if(soplex.getRedCostViolationRational(redcostviol, sumviol)
             && soplex.getDualViolationRational(dualviol, sumviol))
       {
-         MSG_INFO1(soplex.spxout,
+         SPX_MSG_INFO1(soplex.spxout,
                    Rational maxviol = redcostviol > dualviol ? redcostviol : dualviol;
                    bool feasible = (maxviol <= soplex.realParam(SoPlexBase<R>::OPTTOL));
                    soplex.spxout << "Dual solution " << (feasible ? "feasible" : "infeasible") <<
@@ -247,12 +247,12 @@ static void checkSolutionRational(SoPlexBase<R>& soplex)
       }
       else
       {
-         MSG_INFO1(soplex.spxout, soplex.spxout << "Could not check dual solution.\n");
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "Could not check dual solution.\n");
       }
    }
    else
    {
-      MSG_INFO1(soplex.spxout, soplex.spxout << "No dual solution available.\n");
+      SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "No dual solution available.\n");
    }
 }
 
@@ -271,7 +271,7 @@ void checkSolution(SoPlexBase<R>& soplex)
       checkSolutionReal(soplex);
    }
 
-   MSG_INFO1(soplex.spxout, soplex.spxout << "\n");
+   SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "\n");
 }
 
 template <class R>
@@ -290,19 +290,19 @@ void printPrimalSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rown
 
       if(soplex.getPrimalRay(primal))
       {
-         MSG_INFO1(soplex.spxout, soplex.spxout << "\nPrimal ray (name, value):\n";)
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "\nPrimal ray (name, value):\n";)
 
          for(int i = 0; i < soplex.numCols(); ++i)
          {
             if(isNotZero(primal[i], soplex.tolerances()->epsilon()))
             {
-               MSG_INFO1(soplex.spxout, soplex.spxout << colnames[i] << "\t"
+               SPX_MSG_INFO1(soplex.spxout, soplex.spxout << colnames[i] << "\t"
                          << std::setw(printwidth) << std::setprecision(printprec)
                          << primal[i] << std::endl;)
             }
          }
 
-         MSG_INFO1(soplex.spxout, soplex.spxout << "All other entries are zero (within "
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "All other entries are zero (within "
                    << std::setprecision(1) << std::scientific << soplex.tolerances()->epsilon()
                    << std::setprecision(8) << std::fixed
                    << ")." << std::endl;)
@@ -310,26 +310,26 @@ void printPrimalSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rown
       else if(soplex.isPrimalFeasible() && soplex.getPrimal(primal))
       {
          int nNonzeros = 0;
-         MSG_INFO1(soplex.spxout, soplex.spxout << "\nPrimal solution (name, value):\n";)
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "\nPrimal solution (name, value):\n";)
 
          for(int i = 0; i < soplex.numCols(); ++i)
          {
             if(isNotZero(primal[i], soplex.tolerances()->epsilon()))
             {
-               MSG_INFO1(soplex.spxout, soplex.spxout << colnames[i] << "\t"
+               SPX_MSG_INFO1(soplex.spxout, soplex.spxout << colnames[i] << "\t"
                          << std::setw(printwidth) << std::setprecision(printprec)
                          << primal[i] << std::endl;)
                ++nNonzeros;
             }
          }
 
-         MSG_INFO1(soplex.spxout, soplex.spxout << "All other variables are zero (within "
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "All other variables are zero (within "
                    << std::setprecision(1) << std::scientific << soplex.tolerances()->epsilon()
                    << std::setprecision(8) << std::fixed
                    << "). Solution has " << nNonzeros << " nonzero entries." << std::endl;)
       }
       else
-         MSG_INFO1(soplex.spxout, soplex.spxout << "No primal information available.\n")
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "No primal information available.\n")
       }
 
    if(rational)
@@ -338,40 +338,40 @@ void printPrimalSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rown
 
       if(soplex.getPrimalRayRational(primal))
       {
-         MSG_INFO1(soplex.spxout, soplex.spxout << "\nPrimal ray (name, value):\n";)
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "\nPrimal ray (name, value):\n";)
 
          for(int i = 0; i < soplex.numCols(); ++i)
          {
             if(primal[i] != (Rational) 0)
             {
-               MSG_INFO1(soplex.spxout, soplex.spxout << colnames[i] << "\t"
+               SPX_MSG_INFO1(soplex.spxout, soplex.spxout << colnames[i] << "\t"
                          << std::setw(printwidth) << std::setprecision(printprec)
                          << primal[i] << std::endl;)
             }
          }
 
-         MSG_INFO1(soplex.spxout, soplex.spxout << "All other entries are zero." << std::endl;)
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "All other entries are zero." << std::endl;)
       }
 
       if(soplex.isPrimalFeasible() && soplex.getPrimalRational(primal))
       {
          int nNonzeros = 0;
-         MSG_INFO1(soplex.spxout, soplex.spxout << "\nPrimal solution (name, value):\n";)
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "\nPrimal solution (name, value):\n";)
 
          for(int i = 0; i < soplex.numColsRational(); ++i)
          {
             if(primal[i] != (Rational) 0)
             {
-               MSG_INFO1(soplex.spxout, soplex.spxout << colnames[i] << "\t" << primal[i] << std::endl;)
+               SPX_MSG_INFO1(soplex.spxout, soplex.spxout << colnames[i] << "\t" << primal[i] << std::endl;)
                ++nNonzeros;
             }
          }
 
-         MSG_INFO1(soplex.spxout, soplex.spxout << "All other variables are zero. Solution has "
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "All other variables are zero. Solution has "
                    << nNonzeros << " nonzero entries." << std::endl;)
       }
       else
-         MSG_INFO1(soplex.spxout, soplex.spxout << "No primal (rational) solution available.\n")
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "No primal (rational) solution available.\n")
 
       }
 }
@@ -392,37 +392,37 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 
       if(soplex.getDualFarkas(dual))
       {
-         MSG_INFO1(soplex.spxout, soplex.spxout << "\nDual ray (name, value):\n";)
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "\nDual ray (name, value):\n";)
 
          for(int i = 0; i < soplex.numRows(); ++i)
          {
             if(isNotZero(dual[i], soplex.tolerances()->epsilon()))
             {
-               MSG_INFO1(soplex.spxout, soplex.spxout << rownames[i] << "\t"
+               SPX_MSG_INFO1(soplex.spxout, soplex.spxout << rownames[i] << "\t"
                          << std::setw(printwidth) << std::setprecision(printprec)
                          << dual[i] << std::endl;)
             }
          }
 
-         MSG_INFO1(soplex.spxout, soplex.spxout << "All other entries are zero (within "
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "All other entries are zero (within "
                    << std::setprecision(1) << std::scientific << soplex.tolerances()->epsilon()
                    << std::setprecision(8) << std::fixed << ")." << std::endl;)
       }
       else if(soplex.isDualFeasible() && soplex.getDual(dual))
       {
-         MSG_INFO1(soplex.spxout, soplex.spxout << "\nDual solution (name, value):\n";)
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "\nDual solution (name, value):\n";)
 
          for(int i = 0; i < soplex.numRows(); ++i)
          {
             if(isNotZero(dual[i], soplex.tolerances()->epsilon()))
             {
-               MSG_INFO1(soplex.spxout, soplex.spxout << rownames[i] << "\t"
+               SPX_MSG_INFO1(soplex.spxout, soplex.spxout << rownames[i] << "\t"
                          << std::setw(printwidth) << std::setprecision(printprec)
                          << dual[i] << std::endl;)
             }
          }
 
-         MSG_INFO1(soplex.spxout, soplex.spxout << "All other dual values are zero (within "
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "All other dual values are zero (within "
                    << std::setprecision(1) << std::scientific << soplex.tolerances()->epsilon()
                    << std::setprecision(8) << std::fixed << ")." << std::endl;)
 
@@ -430,25 +430,25 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 
          if(soplex.getRedCost(redcost))
          {
-            MSG_INFO1(soplex.spxout, soplex.spxout << "\nReduced costs (name, value):\n";)
+            SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "\nReduced costs (name, value):\n";)
 
             for(int i = 0; i < soplex.numCols(); ++i)
             {
                if(isNotZero(redcost[i], soplex.tolerances()->epsilon()))
                {
-                  MSG_INFO1(soplex.spxout, soplex.spxout << colnames[i] << "\t"
+                  SPX_MSG_INFO1(soplex.spxout, soplex.spxout << colnames[i] << "\t"
                             << std::setw(printwidth) << std::setprecision(printprec)
                             << redcost[i] << std::endl;)
                }
             }
 
-            MSG_INFO1(soplex.spxout, soplex.spxout << "All other reduced costs are zero (within "
+            SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "All other reduced costs are zero (within "
                       << std::setprecision(1) << std::scientific << soplex.tolerances()->epsilon()
                       << std::setprecision(8) << std::fixed << ")." << std::endl;)
          }
       }
       else
-         MSG_INFO1(soplex.spxout, soplex.spxout << "No dual information available.\n")
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "No dual information available.\n")
       }
 
    if(rational)
@@ -457,51 +457,51 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 
       if(soplex.getDualFarkasRational(dual))
       {
-         MSG_INFO1(soplex.spxout, soplex.spxout << "\nDual ray (name, value):\n";)
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "\nDual ray (name, value):\n";)
 
          for(int i = 0; i < soplex.numRows(); ++i)
          {
             if(dual[i] != (Rational) 0)
             {
-               MSG_INFO1(soplex.spxout, soplex.spxout << rownames[i] << "\t"
+               SPX_MSG_INFO1(soplex.spxout, soplex.spxout << rownames[i] << "\t"
                          << std::setw(printwidth)
                          << std::setprecision(printprec)
                          << dual[i] << std::endl;)
             }
          }
 
-         MSG_INFO1(soplex.spxout, soplex.spxout << "All other entries are zero." << std::endl;)
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "All other entries are zero." << std::endl;)
       }
 
       if(soplex.isDualFeasible() && soplex.getDualRational(dual))
       {
-         MSG_INFO1(soplex.spxout, soplex.spxout << "\nDual solution (name, value):\n";)
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "\nDual solution (name, value):\n";)
 
          for(int i = 0; i < soplex.numRowsRational(); ++i)
          {
             if(dual[i] != (Rational) 0)
-               MSG_INFO1(soplex.spxout, soplex.spxout << rownames[i] << "\t" << dual[i] << std::endl;)
+               SPX_MSG_INFO1(soplex.spxout, soplex.spxout << rownames[i] << "\t" << dual[i] << std::endl;)
             }
 
-         MSG_INFO1(soplex.spxout, soplex.spxout << "All other dual values are zero." << std::endl;)
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "All other dual values are zero." << std::endl;)
 
          VectorRational redcost(soplex.numCols());
 
          if(soplex.getRedCostRational(redcost))
          {
-            MSG_INFO1(soplex.spxout, soplex.spxout << "\nReduced costs (name, value):\n";)
+            SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "\nReduced costs (name, value):\n";)
 
             for(int i = 0; i < soplex.numCols(); ++i)
             {
                if(redcost[i] != (Rational) 0)
-                  MSG_INFO1(soplex.spxout, soplex.spxout << colnames[i] << "\t" << redcost[i] << std::endl;)
+                  SPX_MSG_INFO1(soplex.spxout, soplex.spxout << colnames[i] << "\t" << redcost[i] << std::endl;)
                }
 
-            MSG_INFO1(soplex.spxout, soplex.spxout << "All other reduced costs are zero." << std::endl;)
+            SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "All other reduced costs are zero." << std::endl;)
          }
       }
       else
-         MSG_INFO1(soplex.spxout, soplex.spxout << "No dual (rational) solution available.\n")
+         SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "No dual (rational) solution available.\n")
       }
 }
 
@@ -544,7 +544,7 @@ int runSoPlex(int argc, char* argv[])
       new(soplex) SoPlexBase<R>();
 
       soplex->printVersion();
-      MSG_INFO1(soplex->spxout, soplex->spxout << SOPLEX_COPYRIGHT << std::endl << std::endl);
+      SPX_MSG_INFO1(soplex->spxout, soplex->spxout << SOPLEX_COPYRIGHT << std::endl << std::endl);
 
       validation = nullptr;
       spx_alloc(validation);
@@ -884,7 +884,7 @@ int runSoPlex(int argc, char* argv[])
             // -h : display all parameters
             if(!soplex->saveSettingsFile(0, false))
             {
-               MSG_ERROR(std::cerr << "Error printing parameters\n");
+               SPX_MSG_ERROR(std::cerr << "Error printing parameters\n");
             }
 
             break;
@@ -899,7 +899,7 @@ int runSoPlex(int argc, char* argv[])
          }
       }
 
-      MSG_INFO1(soplex->spxout, soplex->printUserSettings();)
+      SPX_MSG_INFO1(soplex->spxout, soplex->printUserSettings();)
 
       // no LP file was given and no settings files are written
       if(lpfilename == nullptr && savesetname == nullptr && diffsetname == nullptr)
@@ -912,7 +912,7 @@ int runSoPlex(int argc, char* argv[])
       // ensure that syncmode is not manual
       if(soplex->intParam(soplex->SYNCMODE) == soplex->SYNCMODE_MANUAL)
       {
-         MSG_ERROR(std::cerr <<
+         SPX_MSG_ERROR(std::cerr <<
                    "Error: manual synchronization is invalid on command line.  Change parameter int:syncmode.\n");
          returnValue = 1;
          goto TERMINATE_FREESTRINGS;
@@ -921,23 +921,23 @@ int runSoPlex(int argc, char* argv[])
       // save settings files
       if(savesetname != nullptr)
       {
-         MSG_INFO1(soplex->spxout, soplex->spxout << "Saving parameters to settings file <" << savesetname <<
+         SPX_MSG_INFO1(soplex->spxout, soplex->spxout << "Saving parameters to settings file <" << savesetname <<
                    "> . . .\n");
 
          if(!soplex->saveSettingsFile(savesetname, false))
          {
-            MSG_ERROR(std::cerr << "Error writing parameters to file <" << savesetname << ">\n");
+            SPX_MSG_ERROR(std::cerr << "Error writing parameters to file <" << savesetname << ">\n");
          }
       }
 
       if(diffsetname != nullptr)
       {
-         MSG_INFO1(soplex->spxout, soplex->spxout << "Saving modified parameters to settings file <" <<
+         SPX_MSG_INFO1(soplex->spxout, soplex->spxout << "Saving modified parameters to settings file <" <<
                    diffsetname << "> . . .\n");
 
          if(!soplex->saveSettingsFile(diffsetname, true))
          {
-            MSG_ERROR(std::cerr << "Error writing modified parameters to file <" << diffsetname << ">\n");
+            SPX_MSG_ERROR(std::cerr << "Error writing modified parameters to file <" << diffsetname << ">\n");
          }
       }
 
@@ -946,7 +946,7 @@ int runSoPlex(int argc, char* argv[])
       {
          if(loadsetname != nullptr || savesetname != nullptr || diffsetname != nullptr)
          {
-            MSG_INFO1(soplex->spxout, soplex->spxout << "\n");
+            SPX_MSG_INFO1(soplex->spxout, soplex->spxout << "\n");
          }
 
          goto TERMINATE_FREESTRINGS;
@@ -964,13 +964,13 @@ int runSoPlex(int argc, char* argv[])
       }
 
       // read LP from input file
-      MSG_INFO1(soplex->spxout, soplex->spxout << "Reading "
+      SPX_MSG_INFO1(soplex->spxout, soplex->spxout << "Reading "
                 << (soplex->intParam(soplex->READMODE) == soplex->READMODE_REAL ? "(real)" : "(rational)")
                 << " LP file <" << lpfilename << "> . . .\n");
 
       if(!soplex->readFile(lpfilename, &rownames, &colnames))
       {
-         MSG_ERROR(std::cerr << "Error while reading file <" << lpfilename << ">.\n");
+         SPX_MSG_ERROR(std::cerr << "Error while reading file <" << lpfilename << ">.\n");
          returnValue = 1;
          goto TERMINATE_FREESTRINGS;
       }
@@ -980,13 +980,13 @@ int runSoPlex(int argc, char* argv[])
       {
          if(!soplex->writeFile(writefilename, &rownames, &colnames))
          {
-            MSG_ERROR(std::cerr << "Error while writing file <" << writefilename << ">.\n\n");
+            SPX_MSG_ERROR(std::cerr << "Error while writing file <" << writefilename << ">.\n\n");
             returnValue = 1;
             goto TERMINATE_FREESTRINGS;
          }
          else
          {
-            MSG_INFO1(soplex->spxout, soplex->spxout << "Written LP to file <" << writefilename << ">.\n\n");
+            SPX_MSG_INFO1(soplex->spxout, soplex->spxout << "Written LP to file <" << writefilename << ">.\n\n");
          }
       }
 
@@ -995,13 +995,13 @@ int runSoPlex(int argc, char* argv[])
       {
          if(!soplex->writeDualFileReal(writedualfilename, &rownames, &colnames))
          {
-            MSG_ERROR(std::cerr << "Error while writing dual file <" << writedualfilename << ">.\n\n");
+            SPX_MSG_ERROR(std::cerr << "Error while writing dual file <" << writedualfilename << ">.\n\n");
             returnValue = 1;
             goto TERMINATE_FREESTRINGS;
          }
          else
          {
-            MSG_INFO1(soplex->spxout, soplex->spxout << "Written dual LP to file <" << writedualfilename <<
+            SPX_MSG_INFO1(soplex->spxout, soplex->spxout << "Written dual LP to file <" << writedualfilename <<
                       ">.\n\n");
          }
       }
@@ -1009,11 +1009,11 @@ int runSoPlex(int argc, char* argv[])
       // read basis file if specified
       if(readbasname != nullptr)
       {
-         MSG_INFO1(soplex->spxout, soplex->spxout << "Reading basis file <" << readbasname << "> . . . ");
+         SPX_MSG_INFO1(soplex->spxout, soplex->spxout << "Reading basis file <" << readbasname << "> . . . ");
 
          if(!soplex->readBasisFile(readbasname, &rownames, &colnames))
          {
-            MSG_ERROR(std::cerr << "Error while reading file <" << readbasname << ">.\n");
+            SPX_MSG_ERROR(std::cerr << "Error while reading file <" << readbasname << ">.\n");
             returnValue = 1;
             goto TERMINATE_FREESTRINGS;
          }
@@ -1021,14 +1021,14 @@ int runSoPlex(int argc, char* argv[])
 
       readingTime->stop();
 
-      MSG_INFO1(soplex->spxout,
+      SPX_MSG_INFO1(soplex->spxout,
                 std::streamsize prec = soplex->spxout.precision();
                 soplex->spxout << "Reading took "
                 << std::fixed << std::setprecision(2) << readingTime->time()
                 << std::scientific << std::setprecision(int(prec))
                 << " seconds.\n\n");
 
-      MSG_INFO1(soplex->spxout, soplex->spxout << "LP has " << soplex->numRows() << " rows "
+      SPX_MSG_INFO1(soplex->spxout, soplex->spxout << "LP has " << soplex->numRows() << " rows "
                 << soplex->numCols() << " columns and " << soplex->numNonzeros() << " nonzeros.\n\n");
 
       // solve the LP
@@ -1043,7 +1043,7 @@ int runSoPlex(int argc, char* argv[])
 
       if(displayStatistics)
       {
-         MSG_INFO1(soplex->spxout, soplex->spxout << "Statistics\n==========\n\n");
+         SPX_MSG_INFO1(soplex->spxout, soplex->spxout << "Statistics\n==========\n\n");
          soplex->printStatistics(soplex->spxout.getStream(SPxOut::INFO1));
       }
 
@@ -1055,25 +1055,25 @@ int runSoPlex(int argc, char* argv[])
       {
          if(!soplex->hasBasis())
          {
-            MSG_WARNING(soplex->spxout, soplex->spxout <<
+            SPX_MSG_WARNING(soplex->spxout, soplex->spxout <<
                         "No basis information available.  Could not write file <" << writebasname << ">\n\n");
          }
          else if(!soplex->writeBasisFile(writebasname, &rownames, &colnames))
          {
-            MSG_ERROR(std::cerr << "Error while writing file <" << writebasname << ">.\n\n");
+            SPX_MSG_ERROR(std::cerr << "Error while writing file <" << writebasname << ">.\n\n");
             returnValue = 1;
             goto TERMINATE_FREESTRINGS;
          }
          else
          {
-            MSG_INFO1(soplex->spxout, soplex->spxout << "Written basis information to file <" << writebasname <<
+            SPX_MSG_INFO1(soplex->spxout, soplex->spxout << "Written basis information to file <" << writebasname <<
                       ">.\n\n");
          }
       }
    }
    catch(const SPxException& x)
    {
-      MSG_ERROR(std::cerr << "Exception caught: " << x.what() << "\n");
+      SPX_MSG_ERROR(std::cerr << "Exception caught: " << x.what() << "\n");
       returnValue = 1;
       goto TERMINATE_FREESTRINGS;
    }
@@ -1153,7 +1153,7 @@ int main(int argc, char* argv[])
             if(option[11] == '1')
             {
 #ifndef SOPLEX_WITH_FLOAT128
-               MSG_ERROR(std::cerr <<
+               SPX_MSG_ERROR(std::cerr <<
                          "Cannot set arithmetic type to quadprecision - Soplex compiled without quadprecision support\n";)
                printUsage(argv, 0);
                return 1;
@@ -1164,7 +1164,7 @@ int main(int argc, char* argv[])
             else if(option[11] == '2')
             {
 #ifndef SOPLEX_WITH_BOOST
-               MSG_ERROR(std::cerr <<
+               SPX_MSG_ERROR(std::cerr <<
                          "Cannot set arithmetic type to multiprecision - Soplex compiled without boost\n";)
                printUsage(argv, 0);
                return 1;
@@ -1183,7 +1183,7 @@ int main(int argc, char* argv[])
          {
             precision = atoi(option + 10);
 #ifndef SOPLEX_WITH_BOOST
-            MSG_ERROR(std::cerr << "Setting precision to non-default value without Boost has no effect\n";)
+            SPX_MSG_ERROR(std::cerr << "Setting precision to non-default value without Boost has no effect\n";)
 #endif
          }
 
@@ -1196,7 +1196,7 @@ int main(int argc, char* argv[])
 
    if(precision != 0 && arithmetic != 2)
    {
-      MSG_ERROR(std::cerr <<
+      SPX_MSG_ERROR(std::cerr <<
                 "Setting precision to non-default value without enabling multiprecision solve has no effect\n";)
    }
 

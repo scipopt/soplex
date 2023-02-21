@@ -35,13 +35,13 @@ bool SPxHybridPR<R>::isConsistent() const
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
    if(this->_tolerances == nullptr)
-      return MSGinconsistent("SPxHybridPR");
+      return SPX_MSG_INCONSISTENT("SPxHybridPR");
 
    if(this->thesolver != 0 &&
          (this->thesolver != steep.solver() ||
           this->thesolver != devex.solver() ||
           this->thesolver != parmult.solver()))
-      return MSGinconsistent("SPxHybridPR");
+      return SPX_MSG_INCONSISTENT("SPxHybridPR");
 
    return steep.isConsistent()
           && devex.isConsistent()
@@ -105,7 +105,7 @@ void SPxHybridPR<R>::setType(typename SPxSolverBase<R>::Type tp)
       }
    }
 
-   MSG_INFO1((*this->thesolver->spxout), (*this->thesolver->spxout) << "IPRHYB01 switching to "
+   SPX_MSG_INFO1((*this->thesolver->spxout), (*this->thesolver->spxout) << "IPRHYB01 switching to "
              << thepricer->getName() << std::endl;)
 
    thepricer->setType(tp);

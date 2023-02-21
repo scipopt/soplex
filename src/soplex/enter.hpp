@@ -158,9 +158,9 @@ void SPxSolverBase<R>::computeTest()
 
             if(infeasibilitiesCo.size() > sparsitythreshold)
             {
-               MSG_INFO2((*this->spxout), (*this->spxout) << " --- using dense pricing"
+               SPX_MSG_INFO2((*this->spxout), (*this->spxout) << " --- using dense pricing"
                          << std::endl;)
-               remainingRoundsEnterCo = DENSEROUNDS;
+               remainingRoundsEnterCo = SOPLEX_DENSEROUNDS;
                sparsePricingEnterCo = false;
                infeasibilitiesCo.clear();
             }
@@ -177,7 +177,7 @@ void SPxSolverBase<R>::computeTest()
       --remainingRoundsEnterCo;
    else if(infeasibilitiesCo.size() <= sparsitythreshold && !sparsePricingEnterCo)
    {
-      MSG_INFO2((*this->spxout),
+      SPX_MSG_INFO2((*this->spxout),
                 std::streamsize prec = spxout->precision();
 
                 if(hyperPricingEnter)
@@ -299,9 +299,9 @@ void SPxSolverBase<R>::computeCoTest()
 
             if(infeasibilities.size() > sparsitythreshold)
             {
-               MSG_INFO2((*this->spxout), (*this->spxout) << " --- using dense pricing"
+               SPX_MSG_INFO2((*this->spxout), (*this->spxout) << " --- using dense pricing"
                          << std::endl;)
-               remainingRoundsEnter = DENSEROUNDS;
+               remainingRoundsEnter = SOPLEX_DENSEROUNDS;
                sparsePricingEnter = false;
                infeasibilities.clear();
             }
@@ -318,7 +318,7 @@ void SPxSolverBase<R>::computeCoTest()
       --remainingRoundsEnter;
    else if(infeasibilities.size() <= sparsitythreshold && !sparsePricingEnter)
    {
-      MSG_INFO2((*this->spxout),
+      SPX_MSG_INFO2((*this->spxout),
                 std::streamsize prec = spxout->precision();
 
                 if(hyperPricingEnter)
@@ -624,7 +624,7 @@ void SPxSolverBase<R>::getEnterVals
          throw SPxInternalCodeException("XENTER01 This should never happen.");
       }
 
-      MSG_DEBUG(std::cout << "DENTER03 SPxSolverBase::getEnterVals() : col " << enterIdx
+      SPX_MSG_DEBUG(std::cout << "DENTER03 SPxSolverBase::getEnterVals() : col " << enterIdx
                 << ": " << enterStat
                 << " -> " << ds.colStatus(enterIdx)
                 << " objChange: " << objChange
@@ -698,7 +698,7 @@ void SPxSolverBase<R>::getEnterVals
 #if 1
          throw SPxInternalCodeException("XENTER02 This should never happen.");
 #else
-         MSG_ERROR(std::cerr << "EENTER99 ERROR: not yet debugged!" << std::endl;)
+         SPX_MSG_ERROR(std::cerr << "EENTER99 ERROR: not yet debugged!" << std::endl;)
          enterPric = (*theCoPvec)[enterIdx];
          enterRO = this->maxRowObj(enterIdx);
          ds.rowStatus(enterIdx) = SPxBasisBase<R>::Desc::D_UNDEFINED;
@@ -775,7 +775,7 @@ void SPxSolverBase<R>::getEnterVals
          throw SPxInternalCodeException("XENTER03 This should never happen.");
       }
 
-      MSG_DEBUG(std::cout << "DENTER05 SPxSolverBase::getEnterVals() : row "
+      SPX_MSG_DEBUG(std::cout << "DENTER05 SPxSolverBase::getEnterVals() : row "
                 << enterIdx << ": " << enterStat
                 << " -> " << ds.rowStatus(enterIdx)
                 << " objChange: " << objChange
@@ -870,7 +870,7 @@ void SPxSolverBase<R>::getEnterVals2
 #if 1
          throw SPxInternalCodeException("XENTER05 This should never happen.");
 #else
-         MSG_ERROR(std::cerr << "EENTER98 ERROR: not yet debugged!" << std::endl;)
+         SPX_MSG_ERROR(std::cerr << "EENTER98 ERROR: not yet debugged!" << std::endl;)
 
          if((*theCoPvec)[leaveIdx] - theLBbound[leaveIdx] <
                theUBbound[leaveIdx] - (*theCoPvec)[leaveIdx])
@@ -948,7 +948,7 @@ void SPxSolverBase<R>::getEnterVals2
          throw SPxInternalCodeException("XENTER07 This should never happen.");
       }
 
-      MSG_DEBUG(std::cout << "DENTER06 SPxSolverBase::getEnterVals2(): row "
+      SPX_MSG_DEBUG(std::cout << "DENTER06 SPxSolverBase::getEnterVals2(): row "
                 << idx << ": " << leaveStat
                 << " -> " << ds.rowStatus(idx)
                 << " objChange: " << objChange
@@ -1096,7 +1096,7 @@ void SPxSolverBase<R>::getEnterVals2
          throw SPxInternalCodeException("XENTER09 This should never happen.");
       }
 
-      MSG_DEBUG(std::cout << "DENTER07 SPxSolverBase::getEnterVals2(): col "
+      SPX_MSG_DEBUG(std::cout << "DENTER07 SPxSolverBase::getEnterVals2(): col "
                 << idx << ": " << leaveStat
                 << " -> " << ds.colStatus(idx)
                 << " objChange: " << objChange
@@ -1257,7 +1257,7 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
       rejectEnter(enterId, enterTest, enterStat);
       this->change(-1, none, 0);
 
-      MSG_DEBUG(std::cout << "DENTER08 rejecting false enter pivot" << std::endl;)
+      SPX_MSG_DEBUG(std::cout << "DENTER08 rejecting false enter pivot" << std::endl;)
 
       return false;
    }
@@ -1288,7 +1288,7 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
       {
          // This happens frequently and does usually not hurt, so print these
          // warnings only with verbose level INFO2 and higher.
-         MSG_INFO2((*this->spxout), (*this->spxout) << "WENTER09 fVec updated error = "
+         SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "WENTER09 fVec updated error = "
                    << tmp.length() << std::endl;)
       }
    }
@@ -1379,7 +1379,7 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
          else
             enterPric = (*thePvec)[this->number(SPxRowId(enterId))];
 
-         MSG_DEBUG(std::cout << "IEBFRT02 breakpoints passed / bounds flipped = " << boundflips << std::endl;
+         SPX_MSG_DEBUG(std::cout << "IEBFRT02 breakpoints passed / bounds flipped = " << boundflips << std::endl;
                   )
          totalboundflips += boundflips;
       }
@@ -1472,14 +1472,14 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
          instableEnterId = enterId;
          instableEnterVal = enterTest;
 
-         MSG_DEBUG(std::cout << "DENTER09 rejecting enter pivot and looking for others" << std::endl;)
+         SPX_MSG_DEBUG(std::cout << "DENTER09 rejecting enter pivot and looking for others" << std::endl;)
 
          rejectEnter(enterId, enterTest / 10.0, enterStat);
          this->change(-1, none, 0);
       }
       else
       {
-         MSG_DEBUG(std::cout << "DENTER10 rejecting enter pivot in instable state, resetting values" <<
+         SPX_MSG_DEBUG(std::cout << "DENTER10 rejecting enter pivot in instable state, resetting values" <<
                    std::endl;)
          rejectEnter(enterId, enterTest, enterStat);
          this->change(-1, none, 0);
@@ -1509,7 +1509,7 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
       // update objective funtion value
       updateNonbasicValue(objChange);
 
-      MSG_DEBUG(std::cout << "DENTER11 moving entering variable from one bound to the other" << std::endl;
+      SPX_MSG_DEBUG(std::cout << "DENTER11 moving entering variable from one bound to the other" << std::endl;
                )
 
       return false;
@@ -1531,7 +1531,7 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
 
       else if(this->lastUpdate() > 1)
       {
-         MSG_INFO3((*this->spxout), (*this->spxout) << "IENTER01 factorization triggered in "
+         SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "IENTER01 factorization triggered in "
                    << "enter() for feasibility test" << std::endl;)
 
          try
@@ -1542,7 +1542,7 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
          {
             // don't exit immediately but handle the singularity correctly
             assert(SPxBasisBase<R>::status() == SPxBasisBase<R>::SINGULAR);
-            MSG_INFO3((*this->spxout), (*this->spxout) << "Caught exception in factorization: " << E.what() <<
+            SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "Caught exception in factorization: " << E.what() <<
                       std::endl;)
          }
 
@@ -1557,7 +1557,7 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
        */
       else if(spxAbs(enterTest) < entertol())
       {
-         MSG_INFO3((*this->spxout), (*this->spxout) << "IENTER11 clean up step to reduce numerical errors" <<
+         SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "IENTER11 clean up step to reduce numerical errors" <<
                    std::endl;)
 
          SPxBasisBase<R>::coSolve(*theCoPvec, *theCoPrhs);
@@ -1568,7 +1568,7 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
          return false;
       }
 
-      MSG_INFO3((*this->spxout), (*this->spxout) << "IENTER02 unboundedness/infeasibility found in "
+      SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "IENTER02 unboundedness/infeasibility found in "
                 << "enter()" << std::endl;)
 
       if(rep() == ROW)

@@ -72,7 +72,7 @@ public:
          break;
 
       default:
-         MSG_ERROR(std::cerr << "wrong timer specified" << std::endl;)
+         SPX_MSG_ERROR(std::cerr << "wrong timer specified" << std::endl;)
       }
 
       return timer;

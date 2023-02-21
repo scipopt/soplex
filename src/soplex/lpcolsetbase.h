@@ -574,13 +574,13 @@ public:
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
       if(low.dim() != object.dim())
-         return MSGinconsistent("LPColSetBase");
+         return SPX_MSG_INCONSISTENT("LPColSetBase");
 
       if(low.dim() != up.dim())
-         return MSGinconsistent("LPColSetBase");
+         return SPX_MSG_INCONSISTENT("LPColSetBase");
 
       if(low.dim() != num())
-         return MSGinconsistent("LPColSetBase");
+         return SPX_MSG_INCONSISTENT("LPColSetBase");
 
       return low.isConsistent() && up.isConsistent() && SVSetBase<R>::isConsistent();
 #else

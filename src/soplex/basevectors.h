@@ -543,7 +543,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product(const SSVectorBase<S>& x, const
 
 
 /// Assigns SSVectorBase to \f$A \cdot x\f$ for a setup \p x.
-#define shortProductFactor 0.5
+#define SOPLEX_SHORTPRODUCT_FACTOR 0.5
 template < class R >
 template < class S, class T >
 inline
@@ -570,7 +570,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product4setup(const SVSetBase<S>& A,
 
       ++nCallsSparse;
    }
-   else if(isSetup() && (double(x.size()) * A.memSize() <= shortProductFactor * dim() * A.num()))
+   else if(isSetup() && (double(x.size()) * A.memSize() <= SOPLEX_SHORTPRODUCT_FACTOR * dim() * A.num()))
    {
       if(timeSparse != 0)
          timeSparse->start();
