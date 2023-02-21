@@ -11,16 +11,32 @@ code quality:
 
 fixed bugs:
 
-upcoming Release 6.0.1
+Upcoming Bugfix Release 6.0.4
 =============================
 
 features:
 
-interface & parameters:
-
 performance:
 
-code quality:
+interface & parameters:
+
+fixed bugs:
+
+miscellaneous:
+
+December 2022 Release 6.0.3
+=============================
+
+miscellaneous:
+- changed license to Apache 2.0, see https://www.apache.org/licenses/LICENSE-2.0.
+
+October 2022 - Release 6.0.2
+=============================
+
+- version bump
+
+June 2022 - Release 6.0.1
+=============================
 
 fixed bugs:
 - fix bug in varStatusToBasisStatusCol when setting Basis for implicitly free variables

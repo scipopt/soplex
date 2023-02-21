@@ -3,13 +3,22 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -41,7 +50,7 @@
 #include "soplex/spxout.h"
 #include "soplex/timerfactory.h"
 
-//#define MEASUREUPDATETIME
+//#define SOPLEX_MEASUREUPDATETIME
 
 namespace soplex
 {
@@ -437,9 +446,9 @@ public:
       if(thestatus != stat)
       {
 #ifdef SOPLEX_DEBUG
-         MSG_DEBUG(std::cout << "DBSTAT01 SPxBasisBase<R>::setStatus(): status: "
-                   << int(thestatus) << " (" << thestatus << ") -> "
-                   << int(stat) << " (" << stat << ")" << std::endl;)
+         SPX_MSG_DEBUG(std::cout << "DBSTAT01 SPxBasisBase<R>::setStatus(): status: "
+                       << int(thestatus) << " (" << thestatus << ") -> "
+                       << int(stat) << " (" << stat << ")" << std::endl;)
 #endif
 
          thestatus = stat;
@@ -939,7 +948,7 @@ public:
    {
       std::stringstream s;
       s  << factor->statistics()
-#ifdef MEASUREUPDATETIME
+#ifdef SOPLEX_MEASUREUPDATETIME
          << "Updates            : " << std::setw(10) << getTotalUpdateCount() << std::endl
          << "  Time spent       : " << std::setw(10) << getTotalUpdateTime() << std::endl
 #endif
@@ -958,13 +967,13 @@ public:
    /**@name Constructors / Destructors */
    ///@{
    /// default constructor.
-   SPxBasisBase<R>(Timer::TYPE ttype = Timer::USER_TIME);
+   SPxBasisBase(Timer::TYPE ttype = Timer::USER_TIME);
    /// copy constructor
-   SPxBasisBase<R>(const SPxBasisBase<R>& old);
+   SPxBasisBase(const SPxBasisBase<R>& old);
    /// assignment operator
    SPxBasisBase<R>& operator=(const SPxBasisBase<R>& rhs);
    /// destructor.
-   virtual ~SPxBasisBase<R>();
+   virtual ~SPxBasisBase();
    ///@}
 
 

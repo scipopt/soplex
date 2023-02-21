@@ -3,13 +3,22 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -76,8 +85,8 @@ bool MPSInput::readLine()
 
          m_lineno++;
 
-         MSG_DEBUG(std::cout << "DMPSIN01 Line " << m_lineno
-                   << " " << m_buf << std::endl;)
+         SPX_MSG_DEBUG(std::cout << "DMPSIN01 Line " << m_lineno
+                       << " " << m_buf << std::endl;)
 
          /* check if comment line */
          is_comment = true;
@@ -239,18 +248,17 @@ bool MPSInput::readLine()
    }
    while(is_marker);
 
-   MSG_DEBUG(std::cerr
-             << "DMPSIN02 -----------------------------------------------"
-             << std::endl
-             << "DMPSIN03 f0=" << ((m_f0 == 0) ? "nil" : m_f0) << std::endl
-             << "DMPSIN04 f1=" << ((m_f1 == 0) ? "nil" : m_f1) << std::endl
-             << "DMPSIN05 f2=" << ((m_f2 == 0) ? "nil" : m_f2) << std::endl
-             << "DMPSIN06 f3=" << ((m_f3 == 0) ? "nil" : m_f3) << std::endl
-             << "DMPSIN07 f4=" << ((m_f4 == 0) ? "nil" : m_f4) << std::endl
-             << "DMPSIN08 f5=" << ((m_f5 == 0) ? "nil" : m_f5) << std::endl
-             << "DMPSIN09 -----------------------------------------------"
-             << std::endl;
-            )
+   SPX_MSG_DEBUG(std::cerr
+                 << "DMPSIN02 -----------------------------------------------"
+                 << std::endl
+                 << "DMPSIN03 f0=" << ((m_f0 == 0) ? "nil" : m_f0) << std::endl
+                 << "DMPSIN04 f1=" << ((m_f1 == 0) ? "nil" : m_f1) << std::endl
+                 << "DMPSIN05 f2=" << ((m_f2 == 0) ? "nil" : m_f2) << std::endl
+                 << "DMPSIN06 f3=" << ((m_f3 == 0) ? "nil" : m_f3) << std::endl
+                 << "DMPSIN07 f4=" << ((m_f4 == 0) ? "nil" : m_f4) << std::endl
+                 << "DMPSIN08 f5=" << ((m_f5 == 0) ? "nil" : m_f5) << std::endl
+                 << "DMPSIN09 -----------------------------------------------"
+                 << std::endl;)
 
    return true;
 }

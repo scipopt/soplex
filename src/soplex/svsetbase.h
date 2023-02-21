@@ -3,13 +3,22 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -115,8 +124,13 @@ private:
       DLPSV& operator=(DLPSV&& rhs)
       {
          SVectorBase<R>::operator=(std::move(rhs));
-         this->thenext = rhs.thenext;
-         this->theprev = rhs.theprev;
+
+         if(this != & rhs)
+         {
+            this->thenext = rhs.thenext;
+            this->theprev = rhs.theprev;
+         }
+
          return *this;
       }
       ///@}
@@ -179,8 +193,8 @@ private:
    void countUnusedMem()
    {
 #ifdef SOPLEX_DEBUG
-      MSG_DEBUG(std::cout << "counting unused memory (unusedMem = " << unusedMem <<
-                ", numUnusedMemUpdates = " << numUnusedMemUpdates << ", this = " << (void*)this << ")\n");
+      SPX_MSG_DEBUG(std::cout << "counting unused memory (unusedMem = " << unusedMem <<
+                    ", numUnusedMemUpdates = " << numUnusedMemUpdates << ", this = " << (void*)this << ")\n");
 #endif
 
       unusedMem = memSize();
@@ -191,7 +205,7 @@ private:
       numUnusedMemUpdates = 0;
 
 #ifdef SOPLEX_DEBUG
-      MSG_DEBUG(std::cout << "               --> NEW: unusedMem = " << unusedMem << "\n");
+      SPX_MSG_DEBUG(std::cout << "               --> NEW: unusedMem = " << unusedMem << "\n");
 #endif
    }
 
@@ -235,8 +249,8 @@ private:
 
          // decrease counter of unused memory
 #ifdef SOPLEX_DEBUG
-         MSG_DEBUG(std::cout << "ensureMem, this = " << (void*)this << ": updateUnusedMemEstimation -= " <<
-                   unusedPsMem << "\n");
+         SPX_MSG_DEBUG(std::cout << "ensureMem, this = " << (void*)this << ": updateUnusedMemEstimation -= "
+                       << unusedPsMem << "\n");
 #endif
          updateUnusedMemEstimation(-unusedPsMem);
       }
@@ -271,8 +285,9 @@ private:
 
          // decrease counter of unused memory
 #ifdef SOPLEX_DEBUG
-         MSG_DEBUG(std::cout << "deleteVec (1), this = " << (void*)this << ": updateUnusedMemEstimation -= "
-                   << ps->max() - ps->size() << "\n");
+         SPX_MSG_DEBUG(std::cout << "deleteVec (1), this = " << (void*)this <<
+                       ": updateUnusedMemEstimation -= "
+                       << ps->max() - ps->size() << "\n");
 #endif
          updateUnusedMemEstimation(ps->size() - ps->max());
       }
@@ -289,8 +304,9 @@ private:
 
          // increase counter of unused memory
 #ifdef SOPLEX_DEBUG
-         MSG_DEBUG(std::cout << "deleteVec (2), this = " << (void*)this << ": updateUnusedMemEstimation += "
-                   << ps->size() << "\n");
+         SPX_MSG_DEBUG(std::cout << "deleteVec (2), this = " << (void*)this <<
+                       ": updateUnusedMemEstimation += "
+                       << ps->size() << "\n");
 #endif
          updateUnusedMemEstimation(ps->size());
       }
@@ -301,8 +317,9 @@ private:
       {
          // increase counter of unused memory
 #ifdef SOPLEX_DEBUG
-         MSG_DEBUG(std::cout << "deleteVec (3), this = " << (void*)this << ": updateUnusedMemEstimation += "
-                   << ps->size() << "\n");
+         SPX_MSG_DEBUG(std::cout << "deleteVec (3), this = " << (void*)this <<
+                       ": updateUnusedMemEstimation += "
+                       << ps->size() << "\n");
 #endif
          updateUnusedMemEstimation(ps->size());
       }
@@ -517,8 +534,8 @@ public:
 
             // decrease counter of unused memory (assume that new entries will be used)
 #ifdef SOPLEX_DEBUG
-            MSG_DEBUG(std::cout << "xtend (1), this = " << (void*)this << ": updateUnusedMemEstimation -= " <<
-                      ps->max() - sz << "\n");
+            SPX_MSG_DEBUG(std::cout << "xtend (1), this = " << (void*)this << ": updateUnusedMemEstimation -= "
+                          << ps->max() - sz << "\n");
 #endif
             updateUnusedMemEstimation(sz - ps->max());
 
@@ -555,8 +572,8 @@ public:
 
             // increase counter of unused memory (assume that new entries will be used)
 #ifdef SOPLEX_DEBUG
-            MSG_DEBUG(std::cout << "xtend (2), this = " << (void*)this << ": updateUnusedMemEstimation += " <<
-                      ps->size() << "\n");
+            SPX_MSG_DEBUG(std::cout << "xtend (2), this = " << (void*)this << ": updateUnusedMemEstimation += "
+                          << ps->size() << "\n");
 #endif
             updateUnusedMemEstimation(ps->size());
 
@@ -847,8 +864,8 @@ public:
       if(delta != 0)
       {
 #ifdef SOPLEX_DEBUG
-         MSG_DEBUG(std::cout << "counting unused memory (unusedMem = " << unusedMem <<
-                   ", numUnusedMemUpdates = " << numUnusedMemUpdates << ", this = " << (void*)this << ")\n");
+         SPX_MSG_DEBUG(std::cout << "counting unused memory (unusedMem = " << unusedMem <<
+                       ", numUnusedMemUpdates = " << numUnusedMemUpdates << ", this = " << (void*)this << ")\n");
 #endif
 
          int used = 0;
@@ -876,8 +893,8 @@ public:
          numUnusedMemUpdates = 0;
 
 #ifdef SOPLEX_DEBUG
-         MSG_DEBUG(std::cout << "               --> NEW: unusedMem = " << unusedMem << " after memRemax(" <<
-                   newmax << ")\n");
+         SPX_MSG_DEBUG(std::cout << "               --> NEW: unusedMem = " << unusedMem << " after memRemax("
+                       << newmax << ")\n");
 #endif
       }
    }
@@ -918,10 +935,10 @@ public:
       }
 
 #ifdef SOPLEX_DEBUG
-      MSG_DEBUG(std::cout << "counting unused memory (unusedMem = " << unusedMem <<
-                ", numUnusedMemUpdates = " << numUnusedMemUpdates << ", this = " << (void*)this << ")\n");
-      MSG_DEBUG(std::cout << "               --> NEW: unusedMem = " << memSize() - used <<
-                ", zero after memPack() at memMax() = " << memMax() << "\n");
+      SPX_MSG_DEBUG(std::cout << "counting unused memory (unusedMem = " << unusedMem <<
+                    ", numUnusedMemUpdates = " << numUnusedMemUpdates << ", this = " << (void*)this << ")\n");
+      SPX_MSG_DEBUG(std::cout << "               --> NEW: unusedMem = " << memSize() - used <<
+                    ", zero after memPack() at memMax() = " << memMax() << "\n");
 #endif
 #ifndef NDEBUG
       Nonzero<R>* olddata = SVSetBaseArray::data;
@@ -957,15 +974,15 @@ public:
       for(ps = list.first(); ps; ps = next)
       {
          if(!ps->isConsistent())
-            return MSGinconsistent("SVSetBase");
+            return SPX_MSG_INCONSISTENT("SVSetBase");
 
          if(ps->mem() > &SVSetBaseArray::last())
-            return MSGinconsistent("SVSetBase");
+            return SPX_MSG_INCONSISTENT("SVSetBase");
 
          next = list.next(ps);
 
          if(next && ps->mem() + ps->max() != next->mem())
-            return MSGinconsistent("SVSetBase");
+            return SPX_MSG_INCONSISTENT("SVSetBase");
       }
 
       return SVSetBaseArray::isConsistent() && set.isConsistent() && list.isConsistent();
@@ -982,7 +999,7 @@ public:
 
    /// Default constructor.
    explicit
-   SVSetBase<R>(int pmax = -1, int pmemmax = -1, double pfac = 1.1, double pmemFac = 1.2)
+   SVSetBase(int pmax = -1, int pmemmax = -1, double pfac = 1.1, double pmemFac = 1.2)
       : SVSetBaseArray(0, (pmemmax > 0) ? pmemmax : 8 * ((pmax > 0) ? pmax : 8), pmemFac)
       , set((pmax > 0) ? pmax : 8)
       , unusedMem(0)
@@ -993,7 +1010,7 @@ public:
    }
 
    /// Destructor
-   virtual ~SVSetBase<R>()
+   virtual ~SVSetBase()
    {}
 
    /// Assignment operator.
@@ -1049,7 +1066,7 @@ public:
    }
 
    /// Copy constructor.
-   SVSetBase<R>(const SVSetBase<R>& old)
+   SVSetBase(const SVSetBase<R>& old)
       : SVSetBaseArray()
       , unusedMem(old.unusedMem)
       , numUnusedMemUpdates(old.numUnusedMemUpdates)
@@ -1062,7 +1079,7 @@ public:
 
    /// Copy constructor.
    template < class S >
-   SVSetBase<R>(const SVSetBase<S>& old)
+   SVSetBase(const SVSetBase<S>& old)
       : SVSetBaseArray()
       , unusedMem(old.unusedMem)
       , numUnusedMemUpdates(old.numUnusedMemUpdates)

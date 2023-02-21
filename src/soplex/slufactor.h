@@ -3,13 +3,22 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -29,7 +38,7 @@
 namespace soplex
 {
 /// maximum nr. of factorization updates allowed before refactorization.
-#define MAXUPDATES      1000
+#define SOPLEX_MAXUPDATES      1000
 
 /**@brief   Implementation of Sparse Linear Solver.
  * @ingroup Algo
@@ -84,8 +93,6 @@ protected:
    R minThreshold;
    /// minimum stability to achieve by setting threshold.
    R minStability;
-   /// |x| < epsililon is considered to be 0.
-   R epsilon;
    /// Time spent in solves
    Timer* solveTime;
    Timer::TYPE timerType;
@@ -294,19 +301,29 @@ public:
 
    /// consistency check.
    bool isConsistent() const;
+
+   /// set tolerances
+   virtual void setTolerances(std::shared_ptr<Tolerances> tolerances)
+   {
+      this->_tolerances = tolerances;
+      this->eta.setTolerances(tolerances);
+      this->forest.setTolerances(tolerances);
+      this->ssvec.setTolerances(tolerances);
+   }
+
    ///@}
 
    //------------------------------------
    /**@name Constructors / Destructors */
    ///@{
    /// default constructor.
-   SLUFactor<R>();
+   SLUFactor();
    /// assignment operator.
    SLUFactor<R>& operator=(const SLUFactor<R>& old);
    /// copy constructor.
-   SLUFactor<R>(const SLUFactor<R>& old);
+   SLUFactor(const SLUFactor<R>& old);
    /// destructor.
-   virtual ~SLUFactor<R>();
+   virtual ~SLUFactor();
    /// clone function for polymorphism
    inline virtual SLinSolver<R>* clone() const
    {

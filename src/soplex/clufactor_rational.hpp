@@ -3,13 +3,22 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -22,7 +31,7 @@ namespace soplex
  * or was explicitly set to zero.
  */
 /*
-#define MARKER     1e-100
+#define SOPLEX_MARKER     1e-100
 */
 
 static const Real verySparseFactorRat = 0.001;
@@ -1007,7 +1016,7 @@ inline void CLUFactorRational::forestUpdate(int p_col, Rational* p_work, int num
 
                y -= x * rval[j];
 
-               //p_work[jj] = y + (( y == 0 ) ? MARKER : 0 );
+               //p_work[jj] = y + (( y == 0 ) ? SOPLEX_MARKER : 0 );
                p_work[jj] = y;
             }
          }
@@ -2636,7 +2645,7 @@ inline int CLUFactorRational::setupColVals()
 
 /*****************************************************************************/
 
-#ifdef WITH_L_ROWS
+#ifdef SOPLEX_WITH_L_ROWS
 inline void CLUFactorRational::setupRowVals()
 {
    int   i, j, k, m;
@@ -2750,7 +2759,7 @@ inline void CLUFactorRational::factor(
    const Rational& threshold            ///< pivoting threshold
 )
 {
-   MSG_DEBUG(std::cout << "CLUFactorRational::factor()\n");
+   SPX_MSG_DEBUG(std::cout << "CLUFactorRational::factor()\n");
 
    factorTime->start();
 
@@ -2802,7 +2811,7 @@ TERMINATE:
 
    if(stat == SLinSolverRational::OK)
    {
-#ifdef WITH_L_ROWS
+#ifdef SOPLEX_WITH_L_ROWS
       setupRowVals();
 #endif
       nzCnt = setupColVals();
@@ -3299,7 +3308,7 @@ inline void CLUFactorRational::solveLright(Rational* vec)
          if(timeLimitReached())
             return;
 
-         MSG_DEBUG(std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl;)
+         SPX_MSG_DEBUG(std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl;)
 
          k = lbeg[i];
          idx = &(lidx[k]);
@@ -3307,8 +3316,8 @@ inline void CLUFactorRational::solveLright(Rational* vec)
 
          for(j = lbeg[i + 1]; j > k; --j)
          {
-            MSG_DEBUG(std::cout << "                         -> y" << *idx << " -= " << x << " * " << *val <<
-                      " = " << x * (*val) << "    -> " << vec[*idx] - x * (*val) << std::endl;)
+            SPX_MSG_DEBUG(std::cout << "                         -> y" << *idx << " -= " << x << " * " << *val
+                          << " = " << x * (*val) << "    -> " << vec[*idx] - x * (*val) << std::endl;)
             vec[*idx++] -= x * (*val++);
          }
       }
@@ -3316,7 +3325,7 @@ inline void CLUFactorRational::solveLright(Rational* vec)
 
    if(l.updateType)                      /* Forest-Tomlin Updates */
    {
-      MSG_DEBUG(std::cout << "performing FT updates..." << std::endl;)
+      SPX_MSG_DEBUG(std::cout << "performing FT updates..." << std::endl;)
 
       end = l.firstUnused;
 
@@ -3332,10 +3341,10 @@ inline void CLUFactorRational::solveLright(Rational* vec)
 
          vec[lrow[i]] -= x;
 
-         MSG_DEBUG(std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl;)
+         SPX_MSG_DEBUG(std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl;)
       }
 
-      MSG_DEBUG(std::cout << "finished FT updates." << std::endl;)
+      SPX_MSG_DEBUG(std::cout << "finished FT updates." << std::endl;)
    }
 }
 
@@ -3778,7 +3787,7 @@ inline void CLUFactorRational::solveLleft2(Rational* vec1, int* /* nonz */, Rati
    rbeg  = l.rbeg;
    rorig = l.rorig;
 
-#ifndef WITH_L_ROWS
+#ifndef SOPLEX_WITH_L_ROWS
    VectorRational& lval  = l.val;
    int*    lidx  = l.idx;
    int*    lrow  = l.row;
@@ -3896,7 +3905,7 @@ inline int CLUFactorRational::solveLleftForest(Rational* vec, int* /* nonz */)
 inline void CLUFactorRational::solveLleft(Rational* vec)
 {
 
-#ifndef WITH_L_ROWS
+#ifndef SOPLEX_WITH_L_ROWS
    int*  idx;
    Rational* val;
    VectorRational& lval  = l.val;
@@ -3943,7 +3952,7 @@ inline void CLUFactorRational::solveLleft(Rational* vec)
       }
    }
 
-#endif // WITH_L_ROWS
+#endif // SOPLEX_WITH_L_ROWS
 }
 
 inline int CLUFactorRational::solveLleftEps(Rational* vec, int* nonz)
@@ -3961,7 +3970,7 @@ inline int CLUFactorRational::solveLleftEps(Rational* vec, int* nonz)
    rbeg = l.rbeg;
    rorig = l.rorig;
    n = 0;
-#ifndef WITH_L_ROWS
+#ifndef SOPLEX_WITH_L_ROWS
    VectorRational& lval = l.val;
    int*  lidx = l.idx;
    int*  lrow = l.row;
@@ -4127,7 +4136,7 @@ inline int CLUFactorRational::solveUpdateLeft(Rational* vec, int* nonz, int n)
       else
       {
          y -= x;
-         //vec[k] = ( y != 0 ) ? y : MARKER;
+         //vec[k] = ( y != 0 ) ? y : SOPLEX_MARKER;
          vec[k] = y;
       }
    }
@@ -4262,7 +4271,7 @@ inline int CLUFactorRational::solveUleft(Rational* vec, int* vecidx,
             else
             {
                y -= x * (*val++);
-               //               rhs[j] = ( y != 0 ) ? y : MARKER;
+               //               rhs[j] = ( y != 0 ) ? y : SOPLEX_MARKER;
                rhs[j] = y;
             }
          }
@@ -4338,7 +4347,7 @@ inline void CLUFactorRational::solveUleftNoNZ(Rational* vec, Rational* rhs, int*
             else
             {
                y -= x * (*val++);
-               //               rhs[j] = ( y != 0 ) ? y : MARKER;
+               //               rhs[j] = ( y != 0 ) ? y : SOPLEX_MARKER;
                rhs[j] = y;
             }
          }
@@ -4452,8 +4461,8 @@ inline int CLUFactorRational::solveLleft(Rational* vec, int* nonz, int rn)
    n     = 0;
 
    i = l.firstUpdate - 1;
-#ifndef WITH_L_ROWS
-#pragma warn "Not yet implemented, define WITH_L_ROWS"
+#ifndef SOPLEX_WITH_L_ROWS
+#pragma warn "Not yet implemented, define SOPLEX_WITH_L_ROWS"
    VectorRational& lval = l.val;
    int*    lidx = l.idx;
    int*    lrow = l.row;
@@ -4515,7 +4524,7 @@ inline int CLUFactorRational::solveLleft(Rational* vec, int* nonz, int rn)
             else
             {
                y -= x * *val++;
-               //               vec[m] = ( y != 0 ) ? y : MARKER;
+               //               vec[m] = ( y != 0 ) ? y : SOPLEX_MARKER;
                vec[m] = y;
             }
          }
@@ -4548,7 +4557,7 @@ inline void CLUFactorRational::solveLleftNoNZ(Rational* vec)
    rbeg = l.rbeg;
    rorig = l.rorig;
 
-#ifndef WITH_L_ROWS
+#ifndef SOPLEX_WITH_L_ROWS
    VectorRational& lval = l.val;
    int*    lidx = l.idx;
    int*    lrow = l.row;
@@ -4631,7 +4640,7 @@ inline int CLUFactorRational::vSolveLright(Rational* vec, int* ridx, int rn)
             ridx[rn] = n = *idx++;
             rn += (vec[n] == 0) ? 1 : 0;
             vec[n] -= x * (*val++);
-            //            vec[n] += ( vec[n] == 0 ) ? MARKER : 0;
+            //            vec[n] += ( vec[n] == 0 ) ? SOPLEX_MARKER : 0;
          }
       }
    }
@@ -4657,7 +4666,7 @@ inline int CLUFactorRational::vSolveLright(Rational* vec, int* ridx, int rn)
 
          rn += (vec[j] == 0) ? 1 : 0;
          vec[j] -= x;
-         //         vec[j] += ( vec[j] == 0 ) ? MARKER : 0;
+         //         vec[j] += ( vec[j] == 0 ) ? SOPLEX_MARKER : 0;
       }
    }
 
@@ -4709,8 +4718,8 @@ inline void CLUFactorRational::vSolveLright2(Rational* vec, int* ridx, int* rnpt
                rn2 += (y2 == 0) ? 1 : 0;
                y -= x * (*val);
                y2 -= x2 * (*val++);
-               //               vec[n] = y + ( y == 0 ? MARKER : 0 );
-               //               vec2[n] = y2 + ( y2 == 0 ? MARKER : 0 );
+               //               vec[n] = y + ( y == 0 ? SOPLEX_MARKER : 0 );
+               //               vec2[n] = y2 + ( y2 == 0 ? SOPLEX_MARKER : 0 );
                vec[n] = y;
                vec2[n] = y2;
             }
@@ -4724,7 +4733,7 @@ inline void CLUFactorRational::vSolveLright2(Rational* vec, int* ridx, int* rnpt
                y = vec[n];
                rn += (y == 0) ? 1 : 0;
                y -= x * (*val++);
-               //               vec[n] = y + ( y == 0 ? MARKER : 0 );
+               //               vec[n] = y + ( y == 0 ? SOPLEX_MARKER : 0 );
                vec[n] = y;
             }
          }
@@ -4742,7 +4751,7 @@ inline void CLUFactorRational::vSolveLright2(Rational* vec, int* ridx, int* rnpt
             y2 = vec2[n];
             rn2 += (y2 == 0) ? 1 : 0;
             y2 -= x2 * (*val++);
-            //               vec2[n] = y2 + ( y2 == 0 ? MARKER : 0 );
+            //               vec2[n] = y2 + ( y2 == 0 ? SOPLEX_MARKER : 0 );
             vec2[n] = y2;
          }
       }
@@ -4772,8 +4781,8 @@ inline void CLUFactorRational::vSolveLright2(Rational* vec, int* ridx, int* rnpt
          rn2 += (vec2[j] == 0) ? 1 : 0;
          vec[j] -= x;
          vec2[j] -= x2;
-         //         vec[j] += ( vec[j] == 0 ) ? MARKER : 0;
-         //         vec2[j] += ( vec2[j] == 0 ) ? MARKER : 0;
+         //         vec[j] += ( vec[j] == 0 ) ? SOPLEX_MARKER : 0;
+         //         vec2[j] += ( vec2[j] == 0 ) ? SOPLEX_MARKER : 0;
       }
    }
 
@@ -4837,9 +4846,9 @@ inline void CLUFactorRational::vSolveLright3(Rational* vec, int* ridx, int* rnpt
                   y -= x * (*val);
                   y2 -= x2 * (*val);
                   y3 -= x3 * (*val++);
-                  //                  vec[n] = y + ( y == 0 ? MARKER : 0 );
-                  //                  vec2[n] = y2 + ( y2 == 0 ? MARKER : 0 );
-                  //                  vec3[n] = y3 + ( y3 == 0 ? MARKER : 0 );
+                  //                  vec[n] = y + ( y == 0 ? SOPLEX_MARKER : 0 );
+                  //                  vec2[n] = y2 + ( y2 == 0 ? SOPLEX_MARKER : 0 );
+                  //                  vec3[n] = y3 + ( y3 == 0 ? SOPLEX_MARKER : 0 );
                   vec[n] = y;
                   vec2[n] = y2;
                   vec3[n] = y3;
@@ -4858,8 +4867,8 @@ inline void CLUFactorRational::vSolveLright3(Rational* vec, int* ridx, int* rnpt
                   rn2 += (y2 == 0) ? 1 : 0;
                   y -= x * (*val);
                   y2 -= x2 * (*val++);
-                  //                  vec[n] = y + ( y == 0 ? MARKER : 0 );
-                  //vec2[n] = y2 + ( y2 == 0 ? MARKER : 0 );
+                  //                  vec[n] = y + ( y == 0 ? SOPLEX_MARKER : 0 );
+                  //vec2[n] = y2 + ( y2 == 0 ? SOPLEX_MARKER : 0 );
                   vec[n] = y;
                   vec2[n] = y2;
                }
@@ -4878,8 +4887,8 @@ inline void CLUFactorRational::vSolveLright3(Rational* vec, int* ridx, int* rnpt
                rn3 += (y3 == 0) ? 1 : 0;
                y -= x * (*val);
                y3 -= x3 * (*val++);
-               //                  vec[n] = y + ( y == 0 ? MARKER : 0 );
-               //                  vec3[n] = y3 + ( y3 == 0 ? MARKER : 0 );
+               //                  vec[n] = y + ( y == 0 ? SOPLEX_MARKER : 0 );
+               //                  vec3[n] = y3 + ( y3 == 0 ? SOPLEX_MARKER : 0 );
                vec[n] = y;
                vec3[n] = y3;
             }
@@ -4894,7 +4903,7 @@ inline void CLUFactorRational::vSolveLright3(Rational* vec, int* ridx, int* rnpt
                y = vec[n];
                rn += (y == 0) ? 1 : 0;
                y -= x * (*val++);
-               //                  vec[n] = y + ( y == 0 ? MARKER : 0 );
+               //                  vec[n] = y + ( y == 0 ? SOPLEX_MARKER : 0 );
                vec[n] = y;
             }
          }
@@ -4918,8 +4927,8 @@ inline void CLUFactorRational::vSolveLright3(Rational* vec, int* ridx, int* rnpt
                rn3 += (y3 == 0) ? 1 : 0;
                y2 -= x2 * (*val);
                y3 -= x3 * (*val++);
-               //                  vec2[n] = y2 + ( y2 == 0 ? MARKER : 0 );
-               //                  vec3[n] = y3 + ( y3 == 0 ? MARKER : 0 );
+               //                  vec2[n] = y2 + ( y2 == 0 ? SOPLEX_MARKER : 0 );
+               //                  vec3[n] = y3 + ( y3 == 0 ? SOPLEX_MARKER : 0 );
                vec2[n] = y2;
                vec3[n] = y3;
             }
@@ -4934,7 +4943,7 @@ inline void CLUFactorRational::vSolveLright3(Rational* vec, int* ridx, int* rnpt
                y2 = vec2[n];
                rn2 += (y2 == 0) ? 1 : 0;
                y2 -= x2 * (*val++);
-               //                  vec2[n] = y2 + ( y2 == 0 ? MARKER : 0 );
+               //                  vec2[n] = y2 + ( y2 == 0 ? SOPLEX_MARKER : 0 );
                vec2[n] = y2;
             }
          }
@@ -4953,7 +4962,7 @@ inline void CLUFactorRational::vSolveLright3(Rational* vec, int* ridx, int* rnpt
             y3 = vec3[n];
             rn3 += (y3 == 0) ? 1 : 0;
             y3 -= x3 * (*val++);
-            //                  vec3[n] = y3 + ( y3 == 0 ? MARKER : 0 );
+            //                  vec3[n] = y3 + ( y3 == 0 ? SOPLEX_MARKER : 0 );
             vec3[n] = y3;
          }
       }
@@ -4986,9 +4995,9 @@ inline void CLUFactorRational::vSolveLright3(Rational* vec, int* ridx, int* rnpt
          vec[j] -= x;
          vec2[j] -= x2;
          vec3[j] -= x3;
-         //         vec[j] += ( vec[j] == 0 ) ? MARKER : 0;
-         //         vec2[j] += ( vec2[j] == 0 ) ? MARKER : 0;
-         //         vec3[j] += ( vec3[j] == 0 ) ? MARKER : 0;
+         //         vec[j] += ( vec[j] == 0 ) ? SOPLEX_MARKER : 0;
+         //         vec2[j] += ( vec2[j] == 0 ) ? SOPLEX_MARKER : 0;
+         //         vec3[j] += ( vec3[j] == 0 ) ? SOPLEX_MARKER : 0;
       }
    }
 
@@ -5063,7 +5072,7 @@ inline int CLUFactorRational::vSolveUright(Rational* vec, int* vidx,
             else
             {
                y -= x * (*val++);
-               //               y += ( y == 0 ) ? MARKER : 0;
+               //               y += ( y == 0 ) ? SOPLEX_MARKER : 0;
                rhs[k] = y;
             }
          }
@@ -5198,7 +5207,7 @@ inline void CLUFactorRational::vSolveUrightNoNZ(Rational* vec, Rational* rhs, in
             else
             {
                y -= x * (*val++);
-               //               y += ( y == 0 ) ? MARKER : 0;
+               //               y += ( y == 0 ) ? SOPLEX_MARKER : 0;
                rhs[k] = y;
             }
          }
@@ -5291,7 +5300,7 @@ inline int CLUFactorRational::vSolveUright2(Rational* vec, int* vidx, Rational* 
                else
                {
                   y2 -= x2 * (*val);
-                  //                  rhs2[k] = ( y2 != 0 ) ? y2 : MARKER;
+                  //                  rhs2[k] = ( y2 != 0 ) ? y2 : SOPLEX_MARKER;
                   rhs2[k] = y2;
                }
 
@@ -5310,7 +5319,7 @@ inline int CLUFactorRational::vSolveUright2(Rational* vec, int* vidx, Rational* 
                else
                {
                   y -= x * (*val++);
-                  //                  y += ( y == 0 ) ? MARKER : 0;
+                  //                  y += ( y == 0 ) ? SOPLEX_MARKER : 0;
                   rhs[k] = y;
                }
             }
@@ -5336,7 +5345,7 @@ inline int CLUFactorRational::vSolveUright2(Rational* vec, int* vidx, Rational* 
                else
                {
                   y -= x * (*val++);
-                  //                  y += ( y == 0 ) ? MARKER : 0;
+                  //                  y += ( y == 0 ) ? SOPLEX_MARKER : 0;
                   rhs[k] = y;
                }
             }
@@ -5370,7 +5379,7 @@ inline int CLUFactorRational::vSolveUright2(Rational* vec, int* vidx, Rational* 
             else
             {
                y2 -= x2 * (*val++);
-               //                  rhs2[k] = ( y2 != 0 ) ? y2 : MARKER;
+               //                  rhs2[k] = ( y2 != 0 ) ? y2 : SOPLEX_MARKER;
                rhs2[k] = y2;
             }
          }
@@ -5485,7 +5494,7 @@ inline int CLUFactorRational::vSolveUpdateRight(Rational* vec, int* ridx, int n)
             y = vec[m];
             n += (y == 0) ? 1 : 0;
             y = y - x * (*val++);
-            //            vec[m] = ( y != 0 ) ? y : MARKER;
+            //            vec[m] = ( y != 0 ) ? y : SOPLEX_MARKER;
             vec[m] = y;
          }
       }

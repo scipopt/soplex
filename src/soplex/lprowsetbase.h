@@ -3,13 +3,22 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -266,7 +275,7 @@ public:
          break;
 
       case LPRowBase<R>::RANGE:
-         MSG_ERROR(std::cerr << "EROWST01 RANGE not supported in LPRowSet::setType()" << std::endl);
+         SPX_MSG_ERROR(std::cerr << "EROWST01 RANGE not supported in LPRowSet::setType()" << std::endl);
          throw SPxInternalCodeException("XROWST01 This should never happen.");
 
       default:
@@ -655,13 +664,13 @@ public:
       const int ldim = left.dim();
 
       if(ldim != right.dim())
-         return MSGinconsistent("LPRowSetBase");
+         return SPX_MSG_INCONSISTENT("LPRowSetBase");
 
       if(ldim != object.dim())
-         return MSGinconsistent("LPRowSetBase");
+         return SPX_MSG_INCONSISTENT("LPRowSetBase");
 
       if(ldim != num())
-         return MSGinconsistent("LPRowSetBase");
+         return SPX_MSG_INCONSISTENT("LPRowSetBase");
 
       return SVSetBase<R>::isConsistent();
 #else
@@ -681,7 +690,7 @@ public:
     *  rows to the LPRowSetBase, which may result in automated memory realllocation.
     */
    explicit
-   LPRowSetBase<R>(int pmax = -1, int pmemmax = -1)
+   LPRowSetBase(int pmax = -1, int pmemmax = -1)
       : SVSetBase<R>(pmax, pmemmax), left(0), right(0), object(0), scaleExp(0)
    {
       assert(isConsistent());
@@ -723,7 +732,7 @@ public:
    }
 
    /// Copy constructor.
-   LPRowSetBase<R>(const LPRowSetBase<R>& rs)
+   LPRowSetBase(const LPRowSetBase<R>& rs)
       : SVSetBase<R>(rs)
       , left(rs.left)
       , right(rs.right)
@@ -735,7 +744,7 @@ public:
 
    /// Copy constructor.
    template < class S >
-   LPRowSetBase<R>(const LPRowSetBase<S>& rs)
+   LPRowSetBase(const LPRowSetBase<S>& rs)
       : SVSetBase<R>(rs)
       , left(rs.left)
       , right(rs.right)
@@ -746,7 +755,7 @@ public:
    }
 
    /// Destructor.
-   virtual ~LPRowSetBase<R>()
+   virtual ~LPRowSetBase()
    {}
 
    ///@}

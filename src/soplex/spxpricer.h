@@ -3,13 +3,22 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -58,7 +67,9 @@ protected:
    SPxSolverBase<R>*
    thesolver; //@todo The template type should be identified? Do I have to defined two of them?
    /// violation bound
-   R        theeps;
+   R        thetolerance;
+   /// tolerances used by the solver
+   std::shared_ptr<Tolerances> _tolerances;
    ///@}
 
 
@@ -130,20 +141,26 @@ public:
       return thesolver;
    }
 
-   /// returns violation bound \ref soplex::SPxPricer::theeps "theeps".
-   virtual R epsilon() const
+   /// sets pricing tolerance.
+   /** Inequality violations are accepted, if their size is less than \p tol.
+    */
+   virtual void setPricingTolerance(R tol)
    {
-      return theeps;
+      assert(tol >= 0.0);
+
+      thetolerance = tol;
+   }
+   /// returns the pricing tolerance
+   virtual R pricingTolerance() const
+   {
+      return thetolerance;
    }
 
-   /// sets violation bound.
-   /** Inequality violations are accepted, if their size is less than \p eps.
-    */
-   virtual void setEpsilon(R eps)
-   {
-      assert(eps >= 0.0);
 
-      theeps = eps;
+   /// set the _tolerances member variable
+   virtual void setTolerances(std::shared_ptr<Tolerances> newTolerances)
+   {
+      this->_tolerances = newTolerances;
    }
 
    /// sets pricing type.
@@ -171,7 +188,7 @@ public:
    /// returns selected index to leave basis.
    /** Selects the index of a vector to leave the basis. The selected index
        i, say, must be in the range 0 <= i < solver()->dim() and its
-       tested value must fullfill solver()->test()[i] < -#epsilon().
+       tested value must fullfill solver()->test()[i] < -#tolerance().
    */
    virtual int selectLeave() = 0;
 
@@ -192,7 +209,7 @@ public:
    /** Selects the SPxId of a vector to enter the basis. The selected
        id, must not represent a basic index (i.e. solver()->isBasic(id) must
        be false). However, the corresponding test value needs not to be less
-       than -#epsilon(). If not, SoPlex will discard the pivot.
+       than -#tolerance(). If not, SoPlex will discard the pivot.
 
        Note:
        When method #selectEnter() is called by the loaded SoPlex
@@ -267,14 +284,14 @@ public:
    explicit SPxPricer(const char* p_name)
       : m_name(p_name)
       , thesolver(0)
-      , theeps(0.0)
+      , thetolerance(0.0)
    {}
 
    /// copy constructor
    SPxPricer(const SPxPricer& old)
       : m_name(old.m_name)
       , thesolver(old.thesolver)
-      , theeps(old.theeps)
+      , thetolerance(old.thetolerance)
    {}
 
    /// assignment operator
@@ -284,7 +301,7 @@ public:
       {
          m_name = rhs.m_name;
          thesolver = rhs.thesolver;
-         theeps = rhs.theeps;
+         thetolerance = rhs.thetolerance;
          assert(isConsistent());
       }
 

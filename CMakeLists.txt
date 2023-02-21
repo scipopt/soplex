@@ -16,12 +16,12 @@ endif()
 
 set(SOPLEX_VERSION_MAJOR 6)
 set(SOPLEX_VERSION_MINOR 0)
-set(SOPLEX_VERSION_PATCH 0)
-set(SOPLEX_VERSION_SUB 2)
+set(SOPLEX_VERSION_PATCH 3)
+set(SOPLEX_VERSION_SUB 5)
 set(SOPLEX_VERSION_API 11)
 
 
-set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING")
+set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
 set(CPACK_PACKAGE_VERSION_MAJOR "${SOPLEX_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${SOPLEX_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${SOPLEX_VERSION_PATCH}")
@@ -30,6 +30,7 @@ include(CPack)
 
 option(ZLIB "Use ZLIB" ON)
 option(GMP "Use GMP" ON)
+option(EMSCRIPTEN_HTML "Emscripten HTML output" OFF)
 option(STATIC_GMP "Prefer static GMP lib" OFF)
 option(BOOST "Use Boost (required to build the binary). Disable if you only want to build libsoplex." ON)
 option(QUADMATH "should quadmath library be used" OFF)
@@ -182,7 +183,7 @@ if(BOOST)
     find_package(Boost 1.65.0) # PaPILO requires at least Boost 1.65 (on mac 1.72)
     if(Boost_FOUND)
         set(SOPLEX_WITH_BOOST on)
-        include_directories(${Boost_INCLUDE_DIRS})
+        include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
         if(NOT Boost_VERSION_MACRO)
            set(Boost_VERSION_MACRO ${Boost_VERSION})
         endif()
@@ -228,6 +229,8 @@ endif()
 
 # export compilation settings to header file
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/soplex/config.h.in ${PROJECT_BINARY_DIR}/soplex/config.h @ONLY)
+
+configure_file(${PROJECT_SOURCE_DIR}/soplex-config.cmake.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/soplex-config.cmake" @ONLY)
 
 add_subdirectory(src)
 add_subdirectory(tests/c_interface)

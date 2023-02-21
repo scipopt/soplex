@@ -3,14 +3,22 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996      Roland Wunderling                              */
-/*                  1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -395,19 +403,19 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
          {
             x = v[j] + xx * vec.value(i);
 
-            if(isNotZero(x, epsilon))
+            if(isNotZero(x, this->tolerances()->epsilon()))
                v[j] = x;
             else
             {
                adjust = true;
-               v[j] = SOPLEX_VECTOR_MARKER;
+               v[j] = SOPLEX_VECTOR_MARKER * this->tolerances()->epsilon();
             }
          }
          else
          {
             x = xx * vec.value(i);
 
-            if(isNotZero(x, epsilon))
+            if(isNotZero(x, this->tolerances()->epsilon()))
             {
                v[j] = x;
                addIdx(j);
@@ -425,7 +433,7 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
          {
             x = v[*iptr];
 
-            if(isNotZero(x, epsilon))
+            if(isNotZero(x, this->tolerances()->epsilon()))
                *iiptr++ = *iptr;
             else
                v[*iptr] = 0;
@@ -520,7 +528,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product(const SSVectorBase<S>& x, const
    {
       y = A[i] * x;
 
-      if(isNotZero(y, epsilon))
+      if(isNotZero(y, this->tolerances()->epsilon()))
       {
          VectorBase<R>::val[i] = y;
          IdxSet::addIdx(i);
@@ -535,7 +543,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product(const SSVectorBase<S>& x, const
 
 
 /// Assigns SSVectorBase to \f$A \cdot x\f$ for a setup \p x.
-#define shortProductFactor 0.5
+#define SOPLEX_SHORTPRODUCT_FACTOR 0.5
 template < class R >
 template < class S, class T >
 inline
@@ -562,7 +570,8 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product4setup(const SVSetBase<S>& A,
 
       ++nCallsSparse;
    }
-   else if(isSetup() && (double(x.size()) * A.memSize() <= shortProductFactor * dim() * A.num()))
+   else if(isSetup()
+           && (double(x.size()) * A.memSize() <= SOPLEX_SHORTPRODUCT_FACTOR * dim() * A.num()))
    {
       if(timeSparse != 0)
          timeSparse->start();
@@ -611,7 +620,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product1(const SVSetBase<S>& A, const S
    const SVectorBase<S>& Ai = A[nzidx];
 
    // compute A[nzidx] * nzval:
-   if(isZero(nzval, epsilon) || Ai.size() == 0)
+   if(isZero(nzval, this->tolerances()->epsilon()) || Ai.size() == 0)
       clear();    // this := zero vector
    else
    {
@@ -657,7 +666,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A,
 
    num = A0.size();
 
-   if(isZero(x0, epsilon) || num == 0)
+   if(isZero(x0, this->tolerances()->epsilon()) || num == 0)
    {
       // A[0] == 0 or x[0] == 0 => this := zero vector
       clear();
@@ -689,7 +698,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A,
       // If A[i] == 0 or x[i] == 0, do nothing.
       Aisize = Ai.size();
 
-      if(isNotZero(xi, epsilon) || Aisize == 0)
+      if(isNotZero(xi, this->tolerances()->epsilon()) || Aisize == 0)
       {
          // Compute x[i] * A[i] and add it to the existing vector.
          for(int j = 0; j < Aisize; ++j)
@@ -713,7 +722,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A,
             // by setting a value which is nearly 0; otherwise, store
             // the value. Values below epsilon will be removed later.
             if(oldval == 0)
-               VectorBase<R>::val[elt.idx] = SOPLEX_VECTOR_MARKER;
+               VectorBase<R>::val[elt.idx] = SOPLEX_VECTOR_MARKER * this->tolerances()->epsilon();
             else
                VectorBase<R>::val[elt.idx] = oldval;
          }
@@ -728,7 +737,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A,
    {
       curidx = idx[i];
 
-      if(isZero(VectorBase<R>::val[curidx], epsilon))
+      if(isZero(VectorBase<R>::val[curidx], this->tolerances()->epsilon()))
          VectorBase<R>::val[curidx] = 0;
       else
       {
@@ -819,7 +828,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, 
          {
             // If x[i] is really nonzero, compute A[i] * x[i] and adapt x.idx,
             // otherwise set x[i] to 0.
-            if(isNotZero(xval, epsilon))
+            if(isNotZero(xval, this->tolerances()->epsilon()))
             {
                const SVectorBase<S>& Ai = A[i];
                x.idx[ nzcount++ ] = i;
@@ -864,7 +873,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign(const SVectorBase<S>& rhs)
       int k = rhs.index(i);
       S v = rhs.value(i);
 
-      if(isZero(v, epsilon))
+      if(isZero(v, this->tolerances()->epsilon()))
          VectorBase<R>::val[k] = 0;
       else
       {

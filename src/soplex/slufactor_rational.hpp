@@ -3,13 +3,22 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -31,7 +40,7 @@
 
 namespace soplex
 {
-#define MINSTABILITYRAT    REAL(4e-2)
+#define SOPLEX_MINSTABILITYRAT    SOPLEX_REAL(4e-2)
 
 inline void SLUFactorRational::solveRight(VectorRational& x, const VectorRational& b) //const
 {
@@ -412,8 +421,8 @@ inline SLUFactorRational::Status SLUFactorRational::change(
 
    usetup = false;
 
-   MSG_DEBUG(std::cout << "DSLUFA01\tupdated\t\tstability = " << stability()
-             << std::endl;)
+   SPX_MSG_DEBUG(std::cout << "DSLUFA01\tupdated\t\tstability = " << stability()
+                 << std::endl;)
 
    return status();
 }
@@ -433,7 +442,7 @@ inline void SLUFactorRational::clear()
    maxabs        = 1;
    initMaxabs    = 1;
    lastThreshold = minThreshold;
-   minStability  = MINSTABILITYRAT;
+   minStability  = SOPLEX_MINSTABILITYRAT;
    stat          = UNLOADED;
 
    vec.clear();
@@ -813,14 +822,14 @@ inline SLUFactorRational::Status SLUFactorRational::load(const SVectorRational* 
       spx_realloc(u.col.max,   thedim + 1);
       spx_realloc(u.col.start, thedim + 1);
 
-      l.startSize = thedim + MAXUPDATES;
+      l.startSize = thedim + SOPLEX_MAXUPDATES;
 
       spx_realloc(l.row,   l.startSize);
       spx_realloc(l.start, l.startSize);
    }
    // the last factorization was reasonably stable, so we decrease the Markowitz threshold (stored in lastThreshold) in
    // order favour sparsity
-   else if(lastStability > 2.0 * MINSTABILITYRAT)
+   else if(lastStability > 2.0 * SOPLEX_MINSTABILITYRAT)
    {
       // we reset lastThreshold to its previous value in the sequence minThreshold, betterThreshold(minThreshold),
       // betterThreshold(betterThreshold(minThreshold)), ...
@@ -837,7 +846,7 @@ inline SLUFactorRational::Status SLUFactorRational::load(const SVectorRational* 
 
       // we reset the minimum stability (which might have been decreased below) to ensure that the increased sparsity
       // does not hurt the stability
-      minStability  = 2 * MINSTABILITYRAT;
+      minStability  = 2 * SOPLEX_MINSTABILITYRAT;
    }
 
    u.row.list.idx      = thedim;
@@ -853,10 +862,10 @@ inline SLUFactorRational::Status SLUFactorRational::load(const SVectorRational* 
    stat = OK;
    factor(matrix, lastThreshold);
 
-   MSG_DEBUG(std::cout << "DSLUFA02 threshold = " << lastThreshold
-             << "\tstability = " << stability()
-             << "\tMINSTABILITYRAT = " << MINSTABILITYRAT << std::endl;)
-   MSG_DEBUG(
+   SPX_MSG_DEBUG(std::cout << "DSLUFA02 threshold = " << lastThreshold
+                 << "\tstability = " << stability()
+                 << "\tSOPLEX_MINSTABILITYRAT = " << SOPLEX_MINSTABILITYRAT << std::endl;)
+   SPX_MSG_DEBUG(
       int i;
       FILE* fl = fopen("dump.lp", "w");
       std::cout << "DSLUFA03 Basis:\n";

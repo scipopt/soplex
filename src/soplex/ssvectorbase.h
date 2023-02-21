@@ -3,16 +3,24 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
 
 /**@file  ssvectorbase.h
  * @brief Semi sparse vector.
@@ -59,9 +67,6 @@ private:
    /// Is the SSVectorBase set up?
    bool setupStatus;
 
-   /// A value x with |x| < epsilon is considered zero.
-   R epsilon;
-
    /// Allocates enough space to accommodate \p newmax values.
    void setMax(int newmax)
    {
@@ -74,6 +79,9 @@ private:
    }
 
    ///@}
+
+protected:
+   std::shared_ptr<Tolerances> _tolerances;
 
 public:
 
@@ -101,26 +109,30 @@ public:
    {
       return VectorBase<R>::get_ptr();
    }
-   /// Returns the non-zero epsilon used.
-   R getEpsilon() const
+
+   /// set the _tolerances member variable
+   virtual void setTolerances(std::shared_ptr<Tolerances> newTolerances)
    {
-      return epsilon;
+      this->_tolerances = newTolerances;
    }
 
-   /// Changes the non-zero epsilon, invalidating the setup. */
-   void setEpsilon(R eps)
+   /// returns current tolerances
+   const std::shared_ptr<Tolerances>& tolerances() const
    {
-      if(eps != epsilon)
-      {
-         epsilon = eps;
-         setupStatus = false;
-      }
+      assert(this->_tolerances != nullptr);
+      return this->_tolerances;
    }
 
    /// Returns setup status.
    bool isSetup() const
    {
       return setupStatus;
+   }
+
+   R getEpsilon() const
+   {
+      assert(this->_tolerances != nullptr);
+      return this->_tolerances == nullptr ? R(0) : this->tolerances()->epsilon();
    }
 
    /// Makes SSVectorBase not setup.
@@ -143,7 +155,7 @@ public:
          {
             if(VectorBase<R>::val[i] != R(0))
             {
-               if(spxAbs(VectorBase<R>::val[i]) <= epsilon)
+               if(spxAbs(VectorBase<R>::val[i]) <= this->getEpsilon())
                   VectorBase<R>::val[i] = R(0);
                else
                {
@@ -227,7 +239,7 @@ public:
 
          if(n < 0)
          {
-            if(spxAbs(x) > epsilon)
+            if(spxAbs(x) > this->getEpsilon())
                IdxSet::add(1, &i);
          }
          else if(x == R(0))
@@ -623,10 +635,10 @@ public:
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
       if(VectorBase<R>::dim() > IdxSet::max())
-         return MSGinconsistent("SSVectorBase");
+         return SPX_MSG_INCONSISTENT("SSVectorBase");
 
       if(VectorBase<R>::dim() < IdxSet::dim())
-         return MSGinconsistent("SSVectorBase");
+         return SPX_MSG_INCONSISTENT("SSVectorBase");
 
       if(isSetup())
       {
@@ -636,12 +648,12 @@ public:
 
             if(j < 0 && spxAbs(VectorBase<R>::val[i]) > 0)
             {
-               MSG_ERROR(std::cerr << "ESSVEC01 i = " << i
-                         << "\tidx = " << j
-                         << "\tval = " << std::setprecision(16) << VectorBase<R>::val[i]
-                         << std::endl;)
+               SPX_MSG_ERROR(std::cerr << "ESSVEC01 i = " << i
+                             << "\tidx = " << j
+                             << "\tval = " << std::setprecision(16) << VectorBase<R>::val[i]
+                             << std::endl;)
 
-               return MSGinconsistent("SSVectorBase");
+               return SPX_MSG_INCONSISTENT("SSVectorBase");
             }
          }
       }
@@ -659,30 +671,30 @@ public:
    ///@{
 
    /// Default constructor.
-   explicit SSVectorBase<R>(int p_dim, R p_eps = Param::epsilon())
+   explicit SSVectorBase<R>(int p_dim, std::shared_ptr<Tolerances> tol = nullptr)
       : VectorBase<R>(p_dim)
       , IdxSet()
       , setupStatus(true)
-      , epsilon(p_eps)
    {
       len = (p_dim < 1) ? 1 : p_dim;
       spx_alloc(idx, len);
       VectorBase<R>::clear();
+      _tolerances = tol;
 
       assert(isConsistent());
    }
 
    /// Copy constructor.
    template < class S >
-   SSVectorBase<R>(const SSVectorBase<S>& vec)
+   SSVectorBase(const SSVectorBase<S>& vec)
       : VectorBase<R>(vec)
       , IdxSet()
       , setupStatus(vec.setupStatus)
-      , epsilon(vec.epsilon)
    {
       len = (vec.dim() < 1) ? 1 : vec.dim();
       spx_alloc(idx, len);
       IdxSet::operator=(vec);
+      _tolerances = vec._tolerances;
 
       assert(isConsistent());
    }
@@ -691,26 +703,25 @@ public:
    /** The redundancy with the copy constructor below is necessary since otherwise the compiler doesn't realize that it
     *  could use the more general one with S = R and generates a shallow copy constructor.
     */
-   SSVectorBase<R>(const SSVectorBase<R>& vec)
+   SSVectorBase(const SSVectorBase<R>& vec)
       : VectorBase<R>(vec)
       , IdxSet()
       , setupStatus(vec.setupStatus)
-      , epsilon(vec.epsilon)
    {
       len = (vec.dim() < 1) ? 1 : vec.dim();
       spx_alloc(idx, len);
       IdxSet::operator=(vec);
+      _tolerances = vec._tolerances;
 
       assert(isConsistent());
    }
 
    /// Constructs nonsetup copy of \p vec.
    template < class S >
-   explicit SSVectorBase<R>(const VectorBase<S>& vec, R eps = Param::epsilon())
+   explicit SSVectorBase<R>(const VectorBase<S>& vec)
       : VectorBase<R>(vec)
       , IdxSet()
       , setupStatus(false)
-      , epsilon(eps)
    {
       len = (vec.dim() < 1) ? 1 : vec.dim();
       spx_alloc(idx, len);
@@ -723,9 +734,9 @@ public:
    void setup_and_assign(SSVectorBase<S>& rhs)
    {
       clear();
-      epsilon = rhs.epsilon;
       setMax(rhs.max());
       VectorBase<R>::reDim(rhs.dim());
+      _tolerances = rhs.tolerances();
 
       if(rhs.isSetup())
       {
@@ -746,7 +757,7 @@ public:
          {
             if(rhs.val[i] != 0)
             {
-               if(spxAbs(rhs.val[i]) > epsilon)
+               if(spxAbs(rhs.val[i]) > this->getEpsilon())
                {
                   rhs.idx[num] = i;
                   idx[num] = i;
@@ -781,7 +792,7 @@ public:
       if(this != &rhs)
       {
          clear();
-         epsilon = rhs.epsilon;
+         _tolerances = rhs._tolerances;
          setMax(rhs.max());
          VectorBase<R>::reDim(rhs.dim());
 
@@ -802,7 +813,7 @@ public:
 
             for(int i = 0; i < d; ++i)
             {
-               if(spxAbs(rhs.val[i]) > epsilon)
+               if(spxAbs(rhs.val[i]) > this->getEpsilon())
                {
                   VectorBase<R>::val[i] = rhs.val[i];
                   idx[num] = i;
@@ -827,7 +838,7 @@ public:
       if(this != &rhs)
       {
          clear();
-         epsilon = rhs.epsilon;
+         _tolerances = rhs._tolerances;
          setMax(rhs.max());
          VectorBase<R>::reDim(rhs.dim());
 
@@ -847,7 +858,7 @@ public:
 
             for(int i = 0; i < rhs.dim(); ++i)
             {
-               if(spxAbs(rhs.val[i]) > epsilon)
+               if(spxAbs(rhs.val[i]) > this->getEpsilon())
                {
                   VectorBase<R>::val[i] = rhs.val[i];
                   idx[num] = i;
@@ -881,7 +892,7 @@ public:
    }
 
    /// destructor
-   ~SSVectorBase<R>()
+   ~SSVectorBase()
    {
       if(idx)
          spx_free(idx);

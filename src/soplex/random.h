@@ -3,13 +3,22 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -27,14 +36,14 @@ namespace soplex
 {
 
 /* initial seeds for KISS random number generator */
-#define  DEFAULT_LIN  UINT32_C(123456789)
-#define  DEFAULT_XOR  UINT32_C(362436000)
-#define  DEFAULT_MWC  UINT32_C(521288629)
-#define  DEFAULT_CST  UINT32_C(7654321)
+#define SOPLEX_DEFAULT_LIN  UINT32_C(123456789)
+#define SOPLEX_DEFAULT_XOR  UINT32_C(362436000)
+#define SOPLEX_DEFAULT_MWC  UINT32_C(521288629)
+#define SOPLEX_DEFAULT_CST  UINT32_C(7654321)
 
 /* defines for linear congruential generator */
-#define  RSTEP    UINT64_C(1103515245)
-#define  RADD     UINT64_C(12345)
+#define SOPLEX_RSTEP    UINT64_C(1103515245)
+#define SOPLEX_RADD     UINT64_C(12345)
 
 /**@brief   Random numbers.
    @ingroup Elementary
@@ -76,7 +85,7 @@ private:
       uint64_t t;
 
       /* linear congruential */
-      lin_seed = (uint32_t)(lin_seed * RSTEP + RADD);
+      lin_seed = (uint32_t)(lin_seed * SOPLEX_RSTEP + SOPLEX_RADD);
 
       /* Xorshift */
       xor_seed ^= (xor_seed << 13);
@@ -125,11 +134,11 @@ public:
    {
       seedshift = initshift;
 
-      /* use std::max to avoid zero after over flowing */
-      lin_seed = std::max(DEFAULT_LIN + initshift, 1u);
-      xor_seed = std::max(DEFAULT_XOR + initshift, 1u);
-      mwc_seed = std::max(DEFAULT_MWC + initshift, 1u);
-      cst_seed = DEFAULT_CST + initshift;
+      /* use SOPLEX_MAX to avoid zero after over flowing */
+      lin_seed = SOPLEX_MAX(SOPLEX_DEFAULT_LIN + initshift, 1u);
+      xor_seed = SOPLEX_MAX(SOPLEX_DEFAULT_XOR + initshift, 1u);
+      mwc_seed = SOPLEX_MAX(SOPLEX_DEFAULT_MWC + initshift, 1u);
+      cst_seed = SOPLEX_DEFAULT_CST + initshift;
 
       assert(lin_seed > 0);
       assert(xor_seed > 0);

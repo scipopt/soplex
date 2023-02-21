@@ -3,13 +3,22 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -17,8 +26,6 @@
 #include <stdio.h>
 
 #include "soplex/spxdefines.h"
-#include "soplex/spxfastrt.h"
-
 
 /*
   Here comes our implementation of the Harris procedure improved by shifting
@@ -38,38 +45,32 @@
 namespace soplex
 {
 
-#define TRIES           2
 
-
-template <class R>
-void SPxFastRT<R>::resetTols()
-{
-   // epsilon = thesolver->epsilon();
-   epsilon = this->thesolver->epsilon() * 1e6;
-   /*
-     if(thesolver->basis().stability() < 1e-4)
-     epsilon *= 1e-4 / thesolver->basis().stability();
-   */
-}
+#define SOPLEX_MINSTAB          1e-5
+#define SOPLEX_LOWSTAB          1e-10
+#define SOPLEX_TRIES                   2
+#define SOPLEX_SHORTVAL         1e-5
+#define SOPLEX_DELTA_SHIFT      1e-5
+#define SOPLEX_EPSILON          1e-10
 
 template <class R>
 void SPxFastRT<R>::tighten()
 {
-   R delta_shift = this->thesolver->feastol() * 1e4;
+   R delta_shift = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_DELTA_SHIFT);
 
    if(fastDelta >= this->delta + delta_shift)
    {
       fastDelta -= delta_shift;
 
-      if(fastDelta > 1e-4)
+      if(fastDelta > this->tolerances()->scaleAccordingToEpsilon(1e-4))
          fastDelta -= 2 * delta_shift;
    }
 
-   if(minStab < this->thesolver->feastol() * 1e4)
+   if(minStab < this->tolerances()->scaleAccordingToEpsilon(SOPLEX_MINSTAB))
    {
       minStab /= 0.90;
 
-      if(minStab < 1e-6)
+      if(minStab < this->tolerances()->floatingPointFeastol())
          minStab /= 0.90;
    }
 }
@@ -77,7 +78,7 @@ void SPxFastRT<R>::tighten()
 template <class R>
 void SPxFastRT<R>::relax()
 {
-   R delta_shift = this->thesolver->feastol() * 1e4;
+   R delta_shift = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_DELTA_SHIFT);
    minStab *= 0.95;
    fastDelta += 3 * delta_shift;
 }
@@ -145,7 +146,7 @@ int SPxFastRT<R>::maxDelta(
 
          x = upd[i];
 
-         if(x > epsilon)
+         if(x > epsilonZero())
          {
             // @todo check wether mabs should be computed only over bounded vars, i.e., in the if block below
             mabs = (x > mabs) ? x : mabs;
@@ -167,7 +168,7 @@ int SPxFastRT<R>::maxDelta(
                }
             }
          }
-         else if(x < -epsilon)
+         else if(x < -epsilonZero())
          {
             // @todo check wether mabs should be computed only over bounded vars, i.e., in the if block below
             mabs = (-x > mabs) ? -x : mabs;
@@ -205,7 +206,7 @@ int SPxFastRT<R>::maxDelta(
 
          if(x != 0.0)
          {
-            if(x >= -epsilon && x <= epsilon)
+            if(x >= -epsilonZero() && x <= epsilonZero())
             {
                *uval = 0.0;
                continue;
@@ -223,7 +224,7 @@ int SPxFastRT<R>::maxDelta(
                   == SPxBasisBase<R>::Desc::P_FIXED)
                continue;
 
-            if(x > epsilon)
+            if(x > epsilonZero())
             {
                mabs = (x > mabs) ? x : mabs;
                u = up[i];
@@ -244,7 +245,7 @@ int SPxFastRT<R>::maxDelta(
                   }
                }
             }
-            else if(x < -epsilon)
+            else if(x < -epsilonZero())
             {
                mabs = (-x > mabs) ? -x : mabs;
                l = low[i];
@@ -324,7 +325,7 @@ int SPxFastRT<R>::minDelta(
                == SPxBasisBase<R>::Desc::P_FIXED)
             continue;
 
-         if(x > epsilon)
+         if(x > epsilonZero())
          {
             // @todo check wether mabs should be computed only over bounded vars, i.e., in the if block below
             mabs = (x > mabs) ? x : mabs;
@@ -346,7 +347,7 @@ int SPxFastRT<R>::minDelta(
                }
             }
          }
-         else if(x < -epsilon)
+         else if(x < -epsilonZero())
          {
             // @todo check wether mabs should be computed only over bounded vars, i.e., in the if block below
             mabs = (-x > mabs) ? -x : mabs;
@@ -384,7 +385,7 @@ int SPxFastRT<R>::minDelta(
 
          if(x != 0.0)
          {
-            if(x >= -epsilon && x <= epsilon)
+            if(x >= -epsilonZero() && x <= epsilonZero())
             {
                *uval = 0.0;
                continue;
@@ -403,7 +404,7 @@ int SPxFastRT<R>::minDelta(
                continue;
 
 
-            if(x > epsilon)
+            if(x > epsilonZero())
             {
                mabs = (x > mabs) ? x : mabs;
                l = low[i];
@@ -424,7 +425,7 @@ int SPxFastRT<R>::minDelta(
                   }
                }
             }
-            else if(x < -epsilon)
+            else if(x < -epsilonZero())
             {
                mabs = (-x > mabs) ? -x : mabs;
                u = up[i];
@@ -822,7 +823,7 @@ bool SPxFastRT<R>::maxShortLeave(R& sel, int leave, R maxabs)
    assert(leave >= 0);
    assert(maxabs >= 0);
 
-   R shortval = this->thesolver->feastol() * 1e4;
+   R shortval = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_SHORTVAL);
 
    sel = this->thesolver->fVec().delta()[leave];
 
@@ -847,7 +848,7 @@ bool SPxFastRT<R>::minShortLeave(R& sel, int leave, R maxabs)
    assert(leave >= 0);
    assert(maxabs >= 0);
 
-   R shortval = this->thesolver->feastol() * 1e4;
+   R shortval = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_SHORTVAL);
 
    sel = this->thesolver->fVec().delta()[leave];
 
@@ -958,7 +959,7 @@ template <class R>
 int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
 {
    R maxabs, max, sel;
-   R delta_shift = this->thesolver->feastol() * 1e4;
+   R delta_shift = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_DELTA_SHIFT);
    int leave = -1;
    int cnt = 0;
 
@@ -966,12 +967,10 @@ int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
 
    // force instable pivot iff true (see explanation in enter.cpp and spxsolve.hpp)
    bool instable = this->solver()->instableEnter;
-   R lowstab = this->thesolver->feastol() * 1e-1;
+   R lowstab = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_LOWSTAB);
    assert(!instable || this->solver()->instableEnterId.isValid());
 
-   resetTols();
-
-   if(val > epsilon)
+   if(val > epsilonZero())
    {
       do
       {
@@ -1003,10 +1002,10 @@ int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
             else
                leave = maxSelect(sel, stab, bestDelta, max);
 
-            if(bestDelta < delta_shift * TRIES)
+            if(bestDelta < delta_shift * SOPLEX_TRIES)
                cnt++;
             else
-               cnt += TRIES;
+               cnt += SOPLEX_TRIES;
          }
 
          if(!maxReLeave(sel, leave, maxabs, polish))
@@ -1014,9 +1013,9 @@ int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
 
          relax();
       }
-      while(cnt < TRIES);
+      while(cnt < SOPLEX_TRIES);
    }
-   else if(val < -epsilon)
+   else if(val < -epsilonZero())
    {
       do
       {
@@ -1051,10 +1050,10 @@ int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
                    || this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(
                             leave)))) != SPxBasisBase<R>::Desc::P_FIXED);
 
-            if(bestDelta < delta_shift * TRIES)
+            if(bestDelta < delta_shift * SOPLEX_TRIES)
                cnt++;
             else
-               cnt += TRIES;
+               cnt += SOPLEX_TRIES;
          }
 
          if(!minReLeave(sel, leave, maxabs, polish))
@@ -1062,12 +1061,12 @@ int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
 
          relax();
       }
-      while(cnt < TRIES);
+      while(cnt < SOPLEX_TRIES);
    }
    else
       return -1;
 
-   MSG_DEBUG(
+   SPX_MSG_DEBUG(
 
       if(leave >= 0)
       std::cout
@@ -1350,7 +1349,7 @@ bool SPxFastRT<R>::shortEnter(
    R max,
    R maxabs) const
 {
-   R shortval = this->thesolver->feastol() * 1e4;
+   R shortval = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_SHORTVAL);
 
    if(this->thesolver->isCoId(enterId))
    {
@@ -1386,7 +1385,7 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
    SPxId enterId;
    R max, sel;
    R maxabs = 0.0;
-   R delta_shift = this->thesolver->feastol() * 1e4;
+   R delta_shift = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_DELTA_SHIFT);
    int nr;
    int cnt = 0;
 
@@ -1394,13 +1393,12 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
 
    // force instable pivot iff true (see explanation in leave.hpp and spxsolve.hpp)
    bool instable = this->solver()->instableLeave;
-   R lowstab = this->thesolver->feastol() * 1e-1;
+   R lowstab = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_LOWSTAB);
    assert(!instable || this->solver()->instableLeaveNum >= 0);
 
-   resetTols();
    sel = 0.0;
 
-   if(val > epsilon)
+   if(val > epsilonZero())
    {
       do
       {
@@ -1431,10 +1429,10 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
                enterId = maxSelect(nr, sel, stab, bestDelta, max);
             }
 
-            if(bestDelta < delta_shift * TRIES)
+            if(bestDelta < delta_shift * SOPLEX_TRIES)
                cnt++;
             else
-               cnt += TRIES;
+               cnt += SOPLEX_TRIES;
          }
 
          if(!maxReEnter(sel, maxabs, enterId, nr, polish))
@@ -1442,9 +1440,9 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
 
          relax();
       }
-      while(cnt < TRIES);
+      while(cnt < SOPLEX_TRIES);
    }
-   else if(val < -epsilon)
+   else if(val < -epsilonZero())
    {
       do
       {
@@ -1474,10 +1472,10 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
                enterId = minSelect(nr, sel, stab, bestDelta, max);
             }
 
-            if(bestDelta < delta_shift * TRIES)
+            if(bestDelta < delta_shift * SOPLEX_TRIES)
                cnt++;
             else
-               cnt += TRIES;
+               cnt += SOPLEX_TRIES;
          }
 
          if(!minReEnter(sel, maxabs, enterId, nr, polish))
@@ -1485,10 +1483,10 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
 
          relax();
       }
-      while(cnt < TRIES);
+      while(cnt < SOPLEX_TRIES);
    }
 
-   MSG_DEBUG(
+   SPX_MSG_DEBUG(
 
       if(enterId.isValid())
 {
@@ -1537,7 +1535,7 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
       }
 
 
-   if(enterId.isValid() || minStab > 2 * epsilon)
+   if(enterId.isValid() || minStab > 2 * epsilonZero())
    {
       val = sel;
 
@@ -1562,7 +1560,7 @@ void SPxFastRT<R>::setType(typename SPxSolverBase<R>::Type type)
 {
    this->m_type = type;
 
-   minStab = this->thesolver->feastol() * 1e4;
+   minStab = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_MINSTAB);
    fastDelta = this->delta;
 }
 } // namespace soplex

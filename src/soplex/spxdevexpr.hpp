@@ -3,20 +3,28 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "soplex/spxdefines.h"
-#include "soplex/spxdevexpr.h"
 
-#define DEVEX_REFINETOL 2.0
+#define SOPLEX_DEVEX_REFINETOL 2.0
 
 namespace soplex
 {
@@ -38,7 +46,7 @@ bool SPxDevexPR<R>::isConsistent() const
    if(this->thesolver != 0)
       if(this->thesolver->weights.dim() != this->thesolver->coDim()
             || this->thesolver->coWeights.dim() != this->thesolver->dim())
-         return MSGinconsistent("SPxDevexPR");
+         return SPX_MSG_INCONSISTENT("SPxDevexPR");
 
 #endif
 
@@ -159,7 +167,8 @@ int SPxDevexPR<R>::buildBestPriceVectorLeave(R feastol)
    this->compare.elements = prices.get_const_ptr();
    // do a partial sort to move the best ones to the front
    // TODO this can be done more efficiently, since we only need the indices
-   nsorted = SPxQuicksortPart(prices.get_ptr(), this->compare, 0, prices.size(), HYPERPRICINGSIZE);
+   nsorted = SPxQuicksortPart(prices.get_ptr(), this->compare, 0, prices.size(),
+                              SOPLEX_HYPERPRICINGSIZE);
 
    // copy indices of best values to bestPrices
    for(int i = 0; i < nsorted; ++i)
@@ -184,22 +193,22 @@ int SPxDevexPR<R>::selectLeave()
       if(bestPrices.size() < 2 || this->thesolver->basis().lastUpdate() == 0)
       {
          // call init method to build up price-vector and return index of largest price
-         retid = buildBestPriceVectorLeave(this->theeps);
+         retid = buildBestPriceVectorLeave(this->thetolerance);
       }
       else
-         retid = selectLeaveHyper(this->theeps);
+         retid = selectLeaveHyper(this->thetolerance);
    }
    else if(this->thesolver->sparsePricingLeave)
-      retid = selectLeaveSparse(this->theeps);
+      retid = selectLeaveSparse(this->thetolerance);
    else
-      retid = selectLeaveX(this->theeps);
+      retid = selectLeaveX(this->thetolerance);
 
    if(retid < 0 && !refined)
    {
       refined = true;
-      MSG_INFO3((*this->thesolver->spxout),
-                (*this->thesolver->spxout) << "WDEVEX02 trying refinement step..\n";)
-      retid = selectLeaveX(this->theeps / DEVEX_REFINETOL);
+      SPX_MSG_INFO3((*this->thesolver->spxout),
+                    (*this->thesolver->spxout) << "WDEVEX02 trying refinement step..\n";)
+      retid = selectLeaveX(this->thetolerance / SOPLEX_DEVEX_REFINETOL);
    }
 
    assert(retid < this->thesolver->dim());
@@ -364,10 +373,11 @@ void SPxDevexPR<R>::left4(int n, SPxId id)
 
 #ifndef NDEBUG
 
-      if(spxAbs(rhoVec[n]) < this->theeps)
+      if(spxAbs(rhoVec[n]) < this->thetolerance)
       {
-         MSG_INFO3((*this->thesolver->spxout), (*this->thesolver->spxout) << "WDEVEX01: rhoVec = "
-                   << rhoVec[n] << " with smaller absolute value than this->theeps = " << this->theeps << std::endl;)
+         SPX_MSG_INFO3((*this->thesolver->spxout), (*this->thesolver->spxout) << "WDEVEX01: rhoVec = "
+                       << rhoVec[n] << " with smaller absolute value than this->thetolerance = " << this->thetolerance <<
+                       std::endl;)
       }
 
 #endif  // NDEBUG
@@ -424,7 +434,8 @@ SPxId SPxDevexPR<R>::buildBestPriceVectorEnterDim(R& best, R feastol)
    this->compare.elements = prices.get_const_ptr();
    // do a partial sort to move the best ones to the front
    // TODO this can be done more efficiently, since we only need the indices
-   nsorted = SPxQuicksortPart(prices.get_ptr(), this->compare, 0, prices.size(), HYPERPRICINGSIZE);
+   nsorted = SPxQuicksortPart(prices.get_ptr(), this->compare, 0, prices.size(),
+                              SOPLEX_HYPERPRICINGSIZE);
 
    // copy indices of best values to bestPrices
    for(int i = 0; i < nsorted; ++i)
@@ -478,7 +489,8 @@ SPxId SPxDevexPR<R>::buildBestPriceVectorEnterCoDim(R& best, R feastol)
    this->compare.elements = pricesCo.get_const_ptr();
    // do a partial sort to move the best ones to the front
    // TODO this can be done more efficiently, since we only need the indices
-   nsorted = SPxQuicksortPart(pricesCo.get_ptr(), this->compare, 0, pricesCo.size(), HYPERPRICINGSIZE);
+   nsorted = SPxQuicksortPart(pricesCo.get_ptr(), this->compare, 0, pricesCo.size(),
+                              SOPLEX_HYPERPRICINGSIZE);
 
    // copy indices of best values to bestPrices
    for(int i = 0; i < nsorted; ++i)
@@ -503,7 +515,7 @@ SPxId SPxDevexPR<R>::selectEnter()
 
    SPxId enterId;
 
-   enterId = selectEnterX(this->theeps);
+   enterId = selectEnterX(this->thetolerance);
 
    if(enterId.isSPxColId() && this->thesolver->isBasic(SPxColId(enterId)))
       enterId.info = 0;
@@ -514,9 +526,9 @@ SPxId SPxDevexPR<R>::selectEnter()
    if(!enterId.isValid() && !refined)
    {
       refined = true;
-      MSG_INFO3((*this->thesolver->spxout),
-                (*this->thesolver->spxout) << "WDEVEX02 trying refinement step..\n";)
-      enterId = selectEnterX(this->theeps / DEVEX_REFINETOL);
+      SPX_MSG_INFO3((*this->thesolver->spxout),
+                    (*this->thesolver->spxout) << "WDEVEX02 trying refinement step..\n";)
+      enterId = selectEnterX(this->thetolerance / SOPLEX_DEVEX_REFINETOL);
 
       if(enterId.isSPxColId() && this->thesolver->isBasic(SPxColId(enterId)))
          enterId.info = 0;
@@ -569,7 +581,7 @@ SPxId SPxDevexPR<R>::selectEnterX(R tol)
    }
 
    // prefer coIds to increase the number of unit vectors in the basis matrix, i.e., rows in colrep and cols in rowrep
-   if(enterCoId.isValid() && (best > SPARSITY_TRADEOFF * bestCo || !enterId.isValid()))
+   if(enterCoId.isValid() && (best > SOPLEX_SPARSITY_TRADEOFF * bestCo || !enterId.isValid()))
       return enterCoId;
    else
       return enterId;

@@ -3,13 +3,22 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -153,6 +162,18 @@ public:
 
    /**@name Inquiry */
    ///@{
+
+   /// returns current tolerances
+   const std::shared_ptr<Tolerances> tolerances() const
+   {
+      return _tolerances;
+   }
+
+   /// set tolerances
+   virtual void setTolerances(std::shared_ptr<Tolerances> tolerances)
+   {
+      this->_tolerances = tolerances;
+   }
 
    /// Returns true if and only if the LP is scaled
    bool isScaled() const
@@ -1310,7 +1331,7 @@ public:
 
          if(hasRhs && hasLhs)
          {
-            if(EQ(lhs(i), rhs(i)))
+            if(EQ(lhs(i), rhs(i), this->tolerances()->epsilon()))
                countEqual++;
             else
                countRanged++;
@@ -1823,7 +1844,7 @@ public:
       SVectorBase<R>& row = rowVector_w(i);
       SVectorBase<R>& col = colVector_w(j);
 
-      if(isNotZero(val))
+      if(isNotZero(val, this->tolerances()->epsilon()))
       {
          R newVal;
 
@@ -2007,6 +2028,9 @@ public:
    /// Consistency check.
    bool isConsistent() const
    {
+      if(this->_tolerances == nullptr && nCols() != 0)
+         return SPX_MSG_INCONSISTENT("SPxLPBase");
+
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
       for(int i = nCols() - 1; i >= 0; --i)
@@ -2019,10 +2043,10 @@ public:
             int n = w.pos(i);
 
             if(n < 0)
-               return MSGinconsistent("SPxLPBase");
+               return SPX_MSG_INCONSISTENT("SPxLPBase");
 
             if(v.value(j) != w.value(n))
-               return MSGinconsistent("SPxLPBase");
+               return SPX_MSG_INCONSISTENT("SPxLPBase");
          }
       }
 
@@ -2036,10 +2060,10 @@ public:
             int n = w.pos(i);
 
             if(n < 0)
-               return MSGinconsistent("SPxLPBase");
+               return SPX_MSG_INCONSISTENT("SPxLPBase");
 
             if(v.value(j) != w.value(n))
-               return MSGinconsistent("SPxLPBase");
+               return SPX_MSG_INCONSISTENT("SPxLPBase");
          }
       }
 
@@ -2052,6 +2076,8 @@ public:
    ///@}
 
 protected:
+
+   std::shared_ptr<Tolerances> _tolerances;
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Protected write access */
@@ -2797,7 +2823,7 @@ public:
    ///@{
 
    /// Default constructor.
-   SPxLPBase<R>()
+   SPxLPBase()
    {
       SPxLPBase<R>::clear(); // clear is virtual.
 
@@ -2805,11 +2831,11 @@ public:
    }
 
    /// Destructor.
-   virtual ~SPxLPBase<R>()
+   virtual ~SPxLPBase()
    {}
 
    /// Copy constructor.
-   SPxLPBase<R>(const SPxLPBase<R>& old)
+   SPxLPBase(const SPxLPBase<R>& old)
       : LPRowSetBase<R>(old)
       , LPColSetBase<R>(old)
       , thesense(old.thesense)
@@ -2818,12 +2844,13 @@ public:
       , lp_scaler(old.lp_scaler)
       , spxout(old.spxout)
    {
+      _tolerances = old._tolerances;
       assert(isConsistent());
    }
 
    /// Copy constructor.
    template < class S >
-   SPxLPBase<R>(const SPxLPBase<S>& old)
+   SPxLPBase(const SPxLPBase<S>& old)
       : LPRowSetBase<R>(old)
       , LPColSetBase<R>(old)
       , thesense(old.thesense == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE)
@@ -2832,6 +2859,7 @@ public:
       , spxout(old.spxout)
    {
       lp_scaler = nullptr;
+      _tolerances = old._tolerances;
       assert(isConsistent());
    }
 
@@ -2847,6 +2875,7 @@ public:
          _isScaled = old._isScaled;
          lp_scaler = old.lp_scaler;
          spxout = old.spxout;
+         _tolerances = old._tolerances;
 
          assert(isConsistent());
       }
@@ -2870,6 +2899,7 @@ public:
                     SPxLPBase<R>::MAXIMIZE;
          offset = R(old.offset);
          _isScaled = old._isScaled;
+         _tolerances = old._tolerances;
 
          // this may have un-intended consequences in the future
          lp_scaler = nullptr;

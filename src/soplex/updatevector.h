@@ -3,13 +3,22 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -68,18 +77,18 @@ public:
    ///@{
    /// default constructor.
    explicit
-   UpdateVector<R>(int p_dim /*=0*/, R p_eps /*=1e-16*/)
+   UpdateVector<R>(int p_dim /*=0*/, std::shared_ptr<Tolerances> tols = nullptr)
       : VectorBase<R> (p_dim)
       , theval(0)
-      , thedelta(p_dim, p_eps)
+      , thedelta(p_dim, tols)
    {
       assert(isConsistent());
    }
    ///
-   ~UpdateVector<R>()
+   ~UpdateVector()
    {}
    /// copy constructor
-   UpdateVector<R>(const UpdateVector<R>&);
+   UpdateVector(const UpdateVector<R>&);
    /// assignment from VectorBase<R>
    UpdateVector<R>& operator=(const VectorBase<R>& rhs)
    {
@@ -159,6 +168,12 @@ public:
    {
       VectorBase<R>::reDim(newdim);
       thedelta.reDim(newdim);
+   }
+
+   /// set tolerances
+   virtual void setTolerances(std::shared_ptr<Tolerances>& tolerances)
+   {
+      thedelta.setTolerances(tolerances);
    }
    ///@}
 

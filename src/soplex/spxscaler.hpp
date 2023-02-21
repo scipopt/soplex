@@ -3,13 +3,22 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -67,7 +76,6 @@ SPxScaler<R>::SPxScaler(
    , m_doBoth(doBoth)
    , spxout(outstream)
 {
-   assert(SPxScaler<R>::isConsistent());
 }
 
 template <class R>
@@ -79,7 +87,6 @@ SPxScaler<R>::SPxScaler(const SPxScaler<R>& old)
    , m_doBoth(old.m_doBoth)
    , spxout(old.spxout)
 {
-   assert(SPxScaler<R>::isConsistent());
 }
 
 template <class R>
@@ -165,7 +172,7 @@ int SPxScaler<R>::computeScaleExp(const SVectorBase<R>& vec,
    {
       R x = spxAbs(spxLdexp(vec.value(i), oldScaleExp[vec.index(i)]));
 
-      if(GT(x, maxi))
+      if(GT(x, maxi, this->tolerances()->epsilon()))
          maxi = x;
    }
 
@@ -210,7 +217,7 @@ void SPxScaler<R>::applyScaling(SPxLPBase<R>& lp)
       if(lp.lhs(i) > R(-infinity))
          lp.lhs_w(i) = spxLdexp(lp.lhs_w(i), exp2);
 
-      MSG_DEBUG(std::cout << "DEBUG: rowscaleExp(" << i << "): " << exp2 << std::endl;)
+      SPX_MSG_DEBUG(std::cout << "DEBUG: rowscaleExp(" << i << "): " << exp2 << std::endl;)
    }
 
    for(int i = 0; i < lp.nCols(); ++i)
@@ -233,7 +240,7 @@ void SPxScaler<R>::applyScaling(SPxLPBase<R>& lp)
       if(lp.lower(i) > R(-infinity))
          lp.lower_w(i) = spxLdexp(lp.lower_w(i), -exp2);
 
-      MSG_DEBUG(std::cout << "DEBUG: colscaleExp(" << i << "): " << exp2 << std::endl;)
+      SPX_MSG_DEBUG(std::cout << "DEBUG: colscaleExp(" << i << "): " << exp2 << std::endl;)
    }
 
    lp.setScalingInfo(true);
@@ -528,7 +535,7 @@ R SPxScaler<R>::getRowMaxAbsUnscaled(const SPxLPBase<R>& lp, int i) const
       exp1 = colscaleExp[rowVec.index(j)];
       R abs = spxAbs(spxLdexp(rowVec.value(j), -exp1 - exp2));
 
-      if(GT(abs, max))
+      if(GT(abs, max, this->tolerances()->epsilon()))
          max = abs;
    }
 
@@ -555,7 +562,7 @@ R SPxScaler<R>::getRowMinAbsUnscaled(const SPxLPBase<R>& lp, int i) const
       exp1 = colscaleExp[rowVec.index(j)];
       R abs = spxAbs(spxLdexp(rowVec.value(j), -exp1 - exp2));
 
-      if(LT(abs, min))
+      if(LT(abs, min, this->tolerances()->epsilon()))
          min = abs;
    }
 
@@ -883,7 +890,7 @@ R SPxScaler<R>::maxColRatio(const SPxLPBase<R>& lp) const
       {
          R x = spxAbs(vec.value(j));
 
-         if(isZero(x))
+         if(isZero(x, this->tolerances()->epsilon()))
             continue;
 
          if(x < mini)
@@ -925,7 +932,7 @@ R SPxScaler<R>::maxRowRatio(const SPxLPBase<R>& lp) const
       {
          R x = spxAbs(vec.value(j));
 
-         if(isZero(x))
+         if(isZero(x, this->tolerances()->epsilon()))
             continue;
 
          if(x < mini)

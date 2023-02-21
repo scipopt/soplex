@@ -3,13 +3,22 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -18,14 +27,12 @@
 #include <iostream>
 
 #include "soplex/spxdefines.h"
-#include "soplex/spxweightst.h"
 #include "soplex/svset.h"
 #include "soplex/sorter.h"
 
 namespace soplex
 {
-#define EPS     1e-6
-#define STABLE  1e-3    // the sparsest row/column may only have a pivot of size STABLE*maxEntry
+#define SOPLEX_STABLE   1e-3    // the sparsest row/column may only have a pivot of size STABLE*maxEntry
 
 
 template <class R>
@@ -306,7 +313,9 @@ void SPxWeightST<R>::generate(SPxSolverBase<R>& base)
             int  k = vec.index(j);
             int  nRowEntries = base.coVector(k).size();
 
-            if(!forbidden[k] && (spxAbs(x) > STABLE * maxEntry) && (nRowEntries < minRowEntries))
+            if(!forbidden[k]
+                  && (spxAbs(x) > this->tolerances()->scaleAccordingToEpsilon(SOPLEX_STABLE) * maxEntry)
+                  && (nRowEntries < minRowEntries))
             {
                minRowEntries = nRowEntries;
                sel  = k;
@@ -317,7 +326,7 @@ void SPxWeightST<R>::generate(SPxSolverBase<R>& base)
       // we found a valid index
       if(sel >= 0)
       {
-         MSG_DEBUG(
+         SPX_MSG_DEBUG(
 
             if(pref[i].type() == SPxId::ROW_ID)
             std::cout << "DWEIST01 r" << base.number(pref[i]);
@@ -337,8 +346,9 @@ void SPxWeightST<R>::generate(SPxSolverBase<R>& base)
          {
             R x = vec.value(j);
             int  k = vec.index(j);
+            R feastol = this->tolerances()->floatingPointFeastol();
 
-            if(!forbidden[k] && (x > EPS * maxEntry || -x > EPS * maxEntry))
+            if(!forbidden[k] && (x > feastol * maxEntry || -x > feastol * maxEntry))
             {
                forbidden[k] = 1;
                --dim;
@@ -678,7 +688,7 @@ void SPxWeightST<R>::setupWeights(SPxSolverBase<R>& base)
       }
    }
 
-   MSG_DEBUG(
+   SPX_MSG_DEBUG(
    {
       for(i = 0; i < base.nCols(); i++)
          std::cout << "C i= " << i

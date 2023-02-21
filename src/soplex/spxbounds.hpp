@@ -3,13 +3,22 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -349,28 +358,28 @@ void SPxSolverBase<R>::testBounds() const
          // warnings only with verbose level INFO2 and higher.
          if((*theFvec)[i] > theUBbound[i] + viol_max)   //@ &&  theUBbound[i] != theLBbound[i])
          {
-            MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND01 Invalid upper enter bound " << i
-                      << " Fvec: " << (*theFvec)[i]
-                      << " UBbound: " << theUBbound[i]
-                      << " tolerance: " << viol_max
-                      << " violation: " << (*theFvec)[i] - theUBbound[i] << std::endl;)
+            SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND01 Invalid upper enter bound " << i
+                          << " Fvec: " << (*theFvec)[i]
+                          << " UBbound: " << theUBbound[i]
+                          << " tolerance: " << viol_max
+                          << " violation: " << (*theFvec)[i] - theUBbound[i] << std::endl;)
             nlinesprinted++;
          }
 
          if((*theFvec)[i] < theLBbound[i] - viol_max)   //@ &&  theUBbound[i] != theLBbound[i])
          {
-            MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND02 Invalid lower enter bound " << i
-                      << " Fvec: " << (*theFvec)[i]
-                      << " LBbound: " << theLBbound[i]
-                      << " tolerance: " << viol_max
-                      << " violation: " << theLBbound[i] - (*theFvec)[i] << std::endl;)
+            SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND02 Invalid lower enter bound " << i
+                          << " Fvec: " << (*theFvec)[i]
+                          << " LBbound: " << theLBbound[i]
+                          << " tolerance: " << viol_max
+                          << " violation: " << theLBbound[i] - (*theFvec)[i] << std::endl;)
             nlinesprinted++;
          }
 
          if(nlinesprinted >= 3)
          {
-            MSG_INFO2((*this->spxout), (*this->spxout) <<
-                      "WBOUND10 suppressing further warnings of type WBOUND{01,02} in this round" << std::endl);
+            SPX_MSG_INFO2((*this->spxout), (*this->spxout) <<
+                          "WBOUND10 suppressing further warnings of type WBOUND{01,02} in this round" << std::endl);
             break;
          }
       }
@@ -386,28 +395,28 @@ void SPxSolverBase<R>::testBounds() const
       {
          if((*theCoPvec)[i] > (*theCoUbound)[i] + viol_max)  // && (*theCoUbound)[i] != (*theCoLbound)[i])
          {
-            MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND03 Invalid upper cobound " << i
-                      << " CoPvec: " << (*theCoPvec)[i]
-                      << " CoUbound: " << (*theCoUbound)[i]
-                      << " tolerance: " << viol_max
-                      << " violation: " << (*theCoPvec)[i] - (*theCoUbound)[i] << std::endl;)
+            SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND03 Invalid upper cobound " << i
+                          << " CoPvec: " << (*theCoPvec)[i]
+                          << " CoUbound: " << (*theCoUbound)[i]
+                          << " tolerance: " << viol_max
+                          << " violation: " << (*theCoPvec)[i] - (*theCoUbound)[i] << std::endl;)
             nlinesprinted++;
          }
 
          if((*theCoPvec)[i] < (*theCoLbound)[i] - viol_max)  // && (*theCoUbound)[i] != (*theCoLbound)[i])
          {
-            MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND04 Invalid lower cobound " << i
-                      << " CoPvec: " << (*theCoPvec)[i]
-                      << " CoLbound: " << (*theCoLbound)[i]
-                      << " tolerance: " << viol_max
-                      << " violation: " << (*theCoLbound)[i] - (*theCoPvec)[i] << std::endl;)
+            SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND04 Invalid lower cobound " << i
+                          << " CoPvec: " << (*theCoPvec)[i]
+                          << " CoLbound: " << (*theCoLbound)[i]
+                          << " tolerance: " << viol_max
+                          << " violation: " << (*theCoLbound)[i] - (*theCoPvec)[i] << std::endl;)
             nlinesprinted++;
          }
 
          if(nlinesprinted >= 3)
          {
-            MSG_INFO2((*this->spxout), (*this->spxout) <<
-                      "WBOUND11 suppressing further warnings of type WBOUND{03,04} in this round" << std::endl);
+            SPX_MSG_INFO2((*this->spxout), (*this->spxout) <<
+                          "WBOUND11 suppressing further warnings of type WBOUND{03,04} in this round" << std::endl);
             break;
          }
       }
@@ -418,28 +427,28 @@ void SPxSolverBase<R>::testBounds() const
       {
          if((*thePvec)[i] > (*theUbound)[i] + viol_max)   // &&  (*theUbound)[i] != (*theLbound)[i])
          {
-            MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND05 Invalid upper bound " << i
-                      << " Pvec: " << (*thePvec)[i]
-                      << " Ubound: " << (*theUbound)[i]
-                      << " tolerance: " << viol_max
-                      << " violation: " << (*thePvec)[i] - (*theUbound)[i] << std::endl;)
+            SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND05 Invalid upper bound " << i
+                          << " Pvec: " << (*thePvec)[i]
+                          << " Ubound: " << (*theUbound)[i]
+                          << " tolerance: " << viol_max
+                          << " violation: " << (*thePvec)[i] - (*theUbound)[i] << std::endl;)
             nlinesprinted++;
          }
 
          if((*thePvec)[i] < (*theLbound)[i] - viol_max)   // &&  (*theUbound)[i] != (*theLbound)[i])
          {
-            MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND06 Invalid lower bound " << i
-                      << " Pvec: " << (*thePvec)[i]
-                      << " Lbound: " << (*theLbound)[i]
-                      << " tolerance: " << viol_max
-                      << " violation: " << (*theLbound)[i] - (*thePvec)[i] << std::endl;)
+            SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND06 Invalid lower bound " << i
+                          << " Pvec: " << (*thePvec)[i]
+                          << " Lbound: " << (*theLbound)[i]
+                          << " tolerance: " << viol_max
+                          << " violation: " << (*theLbound)[i] - (*thePvec)[i] << std::endl;)
             nlinesprinted++;
          }
 
          if(nlinesprinted >= 3)
          {
-            MSG_INFO2((*this->spxout), (*this->spxout) <<
-                      "WBOUND12 suppressing further warnings of type WBOUND{05,06} in this round" << std::endl);
+            SPX_MSG_INFO2((*this->spxout), (*this->spxout) <<
+                          "WBOUND12 suppressing further warnings of type WBOUND{05,06} in this round" << std::endl);
             break;
          }
       }

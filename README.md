@@ -15,8 +15,7 @@ programs via a C++ class library. The main features of SoPlex are:
 - routines for an exact rational LU factorization and continued fraction approximations in order to compute exact solutions.
 
 SoPlex has been used in numerous research and industry projects and is the standard LP solver linked to the mixed-integer
-nonlinear programming and constraint integer programming solver SCIP. SoPlex is free for academic research and available
-in source code. It can be licensed for commercial use.
+nonlinear programming and constraint integer programming solver SCIP.
 
 The original instance of this repository is hosted at
 [git.zib.de](https://git.zib.de) and a read-only

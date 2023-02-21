@@ -3,13 +3,22 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -84,14 +93,28 @@ public:
    ///@{
 
    /// Constructs LPRowBase with a vector ready to hold \p defDim nonzeros.
-   explicit LPRowBase<R>(int defDim = 0)
+   explicit LPRowBase(int defDim = 0)
       : left(0), right(R(infinity)), object(0), vec(defDim)
    {
       assert(isConsistent());
    }
 
+   /// Assignment operator.
+   LPRowBase<R>& operator=(const LPRowBase<R>& row)
+   {
+      if(this != &row)
+      {
+         left = row.left;
+         right = row.right;
+         object = row.object;
+         vec = row.vec;
+      }
+
+      assert(isConsistent());
+   }
+
    /// Copy constructor.
-   LPRowBase<R>(const LPRowBase<R>& row)
+   LPRowBase(const LPRowBase<R>& row)
       : left(row.left), right(row.right), object(row.object), vec(row.vec)
    {
       assert(isConsistent());
@@ -99,21 +122,21 @@ public:
 
    /// Copy constructor.
    template < class S >
-   LPRowBase<R>(const LPRowBase<S>& row)
+   LPRowBase(const LPRowBase<S>& row)
       : left(row.left), right(row.right), object(row.object), vec(row.vec)
    {
       assert(isConsistent());
    }
 
    /// Constructs LPRowBase with the given left-hand side, right-hand side and rowVector.
-   LPRowBase<R>(const R& p_lhs, const SVectorBase<R>& p_rowVector, const R& p_rhs, const R& p_obj = 0)
+   LPRowBase(const R& p_lhs, const SVectorBase<R>& p_rowVector, const R& p_rhs, const R& p_obj = 0)
       : left(p_lhs), right(p_rhs), object(p_obj), vec(p_rowVector)
    {
       assert(isConsistent());
    }
 
    /// Constructs LPRowBase from passed \p rowVector, \p type and \p value.
-   LPRowBase<R>(const SVectorBase<R>& p_rowVector, Type p_type, const R& p_value, const R& p_obj = 0)
+   LPRowBase(const SVectorBase<R>& p_rowVector, Type p_type, const R& p_value, const R& p_obj = 0)
       : object(p_obj), vec(p_rowVector)
    {
       switch(p_type)
@@ -187,8 +210,8 @@ public:
          break;
 
       case RANGE:
-         MSG_ERROR(std::cerr << "ELPROW01 RANGE not supported in LPRow::setType()"
-                   << std::endl;)
+         SPX_MSG_ERROR(std::cerr << "ELPROW01 RANGE not supported in LPRow::setType()"
+                       << std::endl;)
          throw SPxInternalCodeException("XLPROW01 This should never happen.");
 
       default:

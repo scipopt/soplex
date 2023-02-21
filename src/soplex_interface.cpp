@@ -45,6 +45,7 @@ void SoPlex_setRational(void* soplex)
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
 #endif
+   /* coverity[unreachable] */
    SoPlex* so = (SoPlex*)(soplex);
    so->setIntParam(SoPlex::READMODE, SoPlex::READMODE_RATIONAL);
    so->setIntParam(SoPlex::SOLVEMODE, SoPlex::SOLVEMODE_RATIONAL);
@@ -110,6 +111,7 @@ void SoPlex_addColRational(
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
 #endif
+   /* coverity[unreachable] */
    SoPlex* so = (SoPlex*)(soplex);
    DSVectorRational col(nnonzeros);
 
@@ -175,6 +177,7 @@ void SoPlex_addRowRational(
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
 #endif
+   /* coverity[unreachable] */
    SoPlex* so = (SoPlex*)(soplex);
    DSVectorRational row(nnonzeros);
 
@@ -213,10 +216,12 @@ char* SoPlex_getPrimalRationalString(void* soplex, int dim)
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
 #endif
+   /* coverity[unreachable] */
    SoPlex* so = (SoPlex*)(soplex);
    VectorRational primal(dim);
    std::string primalstring;
    char* rawstring;
+   long unsigned int stringlength;
 
    so->getPrimalRational(primal);
 
@@ -226,8 +231,9 @@ char* SoPlex_getPrimalRationalString(void* soplex, int dim)
       primalstring.append(" ");
    }
 
-   rawstring = new char[strlen(primalstring.c_str()) + 1];
-   strcpy(rawstring, primalstring.c_str());
+   stringlength = strlen(primalstring.c_str()) + 1;
+   rawstring = new char[stringlength];
+   strncpy(rawstring, primalstring.c_str(), stringlength);
    return rawstring;
 }
 
@@ -259,6 +265,7 @@ void SoPlex_changeObjRational(void* soplex, long* objnums, long* objdenoms, int 
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
 #endif
+   /* coverity[unreachable] */
    SoPlex* so = (SoPlex*)(soplex);
    Rational* objrational = new Rational [dim];
 
@@ -287,6 +294,7 @@ void SoPlex_changeLhsRational(void* soplex, long* lhsnums, long* lhsdenoms, int 
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
 #endif
+   /* coverity[unreachable] */
    SoPlex* so = (SoPlex*)(soplex);
    Rational* lhsrational = new Rational [dim];
 
@@ -315,6 +323,7 @@ void SoPlex_changeRhsRational(void* soplex, long* rhsnums, long* rhsdenoms, int 
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
 #endif
+   /* coverity[unreachable] */
    SoPlex* so = (SoPlex*)(soplex);
    Rational* rhsrational = new Rational [dim];
 
@@ -351,12 +360,16 @@ char* SoPlex_objValueRationalString(void* soplex)
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
 #endif
+   /* coverity[unreachable] */
+   long unsigned int stringlength;
    char* value;
    std::string objstring;
    SoPlex* so = (SoPlex*)(soplex);
+
+   stringlength = strlen(objstring.c_str()) + 1;
    objstring = so->objValueRational().str();
-   value = new char[strlen(objstring.c_str()) + 1];
-   strcpy(value, objstring.c_str());
+   value = new char[stringlength];
+   strncpy(value, objstring.c_str(), stringlength);
    return value;
 }
 
@@ -389,6 +402,7 @@ void SoPlex_changeVarBoundsRational(
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
 #endif
+   /* coverity[unreachable] */
    SoPlex* so = (SoPlex*)(soplex);
 
    /* get rational lower bound */
@@ -417,6 +431,35 @@ void SoPlex_getUpperReal(void* soplex, double* ub, int dim)
 
    for(int i = 0; i < dim; ++i)
       ub[i] = ubvec[i];
+}
+
+/** returns status of row
+ *  0 -> row is set to its upper bound
+ *  1 -> row is set to its lower bound
+ *  2 -> row is fixed to its identical bounds
+ *  4 -> row is basic
+ *  5 -> nothing known about basis status
+ **/
+int SoPlex_basisRowStatus(void* soplex, int rowidx)
+{
+   SoPlex* so = (SoPlex*)(soplex);
+
+   return so->basisRowStatus(rowidx);
+}
+
+/** returns status of column
+ *  0 -> column is set to its upper bound
+ *  1 -> column is set to its lower bound
+ *  2 -> column is fixed to its identical bounds
+ *  3 -> column is free and fixed to zero
+ *  4 -> column is basic
+ *  5 -> nothing known about basis status
+ **/
+int SoPlex_basisColStatus(void* soplex, int colidx)
+{
+   SoPlex* so = (SoPlex*)(soplex);
+
+   return so->basisColStatus(colidx);
 }
 
 /** get non-zero entries and indices of row i **/

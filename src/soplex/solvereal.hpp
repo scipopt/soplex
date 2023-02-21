@@ -3,13 +3,22 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -19,8 +28,8 @@
 #include "soplex.h"
 #include "soplex/statistics.h"
 
-#define ALLOWED_UNSCALE_PERCENTAGE    0.1
-#define MIN_OPT_CALLS_WITH_SCALING     10
+#define SOPLEX_ALLOWED_UNSCALE_PERCENTAGE    0.1
+#define SOPLEX_MIN_OPT_CALLS_WITH_SCALING     10
 
 namespace soplex
 {
@@ -86,8 +95,8 @@ void SoPlexBase<R>::_optimize(volatile bool* interrupt)
 template <class R>
 bool SoPlexBase<R>::_reapplyPersistentScaling() const
 {
-   if((_unscaleCalls > _optimizeCalls * ALLOWED_UNSCALE_PERCENTAGE)
-         && _optimizeCalls > MIN_OPT_CALLS_WITH_SCALING)
+   if((_unscaleCalls > _optimizeCalls * SOPLEX_ALLOWED_UNSCALE_PERCENTAGE)
+         && _optimizeCalls > SOPLEX_MIN_OPT_CALLS_WITH_SCALING)
       return false;
    else
       return true;
@@ -111,9 +120,9 @@ void SoPlexBase<R>::_evaluateSolutionReal(typename SPxSimplifier<R>::Result simp
 
       if(boolParam(SoPlexBase<R>::ENSURERAY))
       {
-         MSG_INFO1(spxout, spxout <<
-                   "simplifier detected infeasibility or unboundedness - solve again without simplifying" << std::endl;
-                  )
+         SPX_MSG_INFO1(spxout, spxout <<
+                       "simplifier detected infeasibility or unboundedness - solve again without simplifying" << std::endl;
+                      )
          _preprocessAndSolveReal(false);
       }
       else
@@ -163,7 +172,7 @@ void SoPlexBase<R>::_evaluateSolutionReal(typename SPxSimplifier<R>::Result simp
       // in case of infeasibility or unboundedness, we currently can not unsimplify, but have to solve the original LP again
       if(!_isRealLPLoaded && boolParam(SoPlexBase<R>::ENSURERAY))
       {
-         MSG_INFO1(spxout, spxout << " --- loading original problem" << std::endl;)
+         SPX_MSG_INFO1(spxout, spxout << " --- loading original problem" << std::endl;)
          _solver.changeObjOffset(realParam(SoPlexBase<R>::OBJ_OFFSET));
          // we cannot do more to remove violations
          _resolveWithoutPreprocessing(simplificationStatus);
@@ -180,8 +189,9 @@ void SoPlexBase<R>::_evaluateSolutionReal(typename SPxSimplifier<R>::Result simp
       // if preprocessing was applied, try to run again without to avoid singularity
       if(!_isRealLPLoaded)
       {
-         MSG_INFO1(spxout, spxout << "encountered singularity - trying to solve again without simplifying" <<
-                   std::endl;)
+         SPX_MSG_INFO1(spxout, spxout <<
+                       "encountered singularity - trying to solve again without simplifying" <<
+                       std::endl;)
          _preprocessAndSolveReal(false);
          return;
       }
@@ -195,8 +205,8 @@ void SoPlexBase<R>::_evaluateSolutionReal(typename SPxSimplifier<R>::Result simp
       // avoid cycling
       if(!_isRealLPLoaded || _isRealLPScaled)
       {
-         MSG_INFO1(spxout, spxout << "encountered cycling - trying to solve again without simplifying" <<
-                   std::endl;)
+         SPX_MSG_INFO1(spxout, spxout << "encountered cycling - trying to solve again without simplifying" <<
+                       std::endl;)
          // store and unsimplify sub-optimal solution and basis, may trigger re-solve
          _storeSolutionReal(true);
          return;
@@ -308,8 +318,7 @@ void SoPlexBase<R>::_preprocessAndSolveReal(bool applySimplifier, volatile bool*
          keepbounds &= boolParam(SoPlexBase<R>::ROWBOUNDFLIPS);
 
       Real remainingTime = _solver.getMaxTime() - _solver.time();
-      simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlexBase<R>::EPSILON_ZERO),
-                             realParam(SoPlexBase<R>::FEASTOL), realParam(SoPlexBase<R>::OPTTOL), remainingTime, keepbounds,
+      simplificationStatus = _simplifier->simplify(_solver, remainingTime, keepbounds,
                              _solver.random.getSeed());
       _solver.changeObjOffset(_simplifier->getObjoffset() + realParam(SoPlexBase<R>::OBJ_OFFSET));
       _solver.setScalingInfo(false);
@@ -393,8 +402,8 @@ void SoPlexBase<R>::_resolveWithoutPreprocessing(typename SPxSimplifier<R>::Resu
       }
       catch(const SPxException& E)
       {
-         MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                   "> during unsimplification. Resolving without simplifier and scaler.\n");
+         SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
+                       "> during unsimplification. Resolving without simplifier and scaler.\n");
          _hasBasis = false;
       }
    }
@@ -424,7 +433,7 @@ void SoPlexBase<R>::_verifySolutionReal()
 {
    assert(_hasSolReal);
 
-   MSG_INFO1(spxout, spxout << " --- verifying computed solution" << std::endl;)
+   SPX_MSG_INFO1(spxout, spxout << " --- verifying computed solution" << std::endl;)
 
    R sumviol = 0;
    R boundviol = 0;
@@ -437,18 +446,20 @@ void SoPlexBase<R>::_verifySolutionReal()
    (void) getDualViolation(dualviol, sumviol);
    (void) getRedCostViolation(redcostviol, sumviol);
 
-   if(boundviol >= _solver.feastol() || rowviol >= _solver.feastol() || dualviol >= _solver.opttol()
-         || redcostviol >= _solver.opttol())
+   if(boundviol >= _solver.tolerances()->floatingPointFeastol()
+         || rowviol >= _solver.tolerances()->floatingPointFeastol()
+         || dualviol >= _solver.tolerances()->floatingPointOpttol()
+         || redcostviol >= _solver.tolerances()->floatingPointOpttol())
    {
       assert(&_solver == _realLP);
       assert(_isRealLPLoaded);
-      MSG_INFO3(spxout, spxout << "bound violation: " << boundviol
-                << ", row violation: " << rowviol
-                << ", dual violation: " << dualviol
-                << ", redcost violation: " << redcostviol << std::endl;)
-      MSG_INFO1(spxout, spxout <<
-                " --- detected violations in original problem space -- solve again without presolving/scaling" <<
-                std::endl;)
+      SPX_MSG_INFO3(spxout, spxout << "bound violation: " << boundviol
+                    << ", row violation: " << rowviol
+                    << ", dual violation: " << dualviol
+                    << ", redcost violation: " << redcostviol << std::endl;)
+      SPX_MSG_INFO1(spxout, spxout <<
+                    " --- detected violations in original problem space -- solve again without presolving/scaling" <<
+                    std::endl;)
 
       if(_isRealLPScaled)
       {
@@ -588,8 +599,8 @@ void SoPlexBase<R>::_storeSolutionReal(bool verify)
       }
       catch(const SPxException& E)
       {
-         MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                   "> during unsimplification. Resolving without simplifier and scaler.\n");
+         SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
+                       "> during unsimplification. Resolving without simplifier and scaler.\n");
          _hasBasis = false;
          _preprocessAndSolveReal(false);
          return;
@@ -678,8 +689,8 @@ void SoPlexBase<R>::_storeSolutionRealFromPresol()
    }
    catch(const SPxException& E)
    {
-      MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                "> during unsimplification. Resolving without simplifier and scaler.\n");
+      SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
+                    "> during unsimplification. Resolving without simplifier and scaler.\n");
       _preprocessAndSolveReal(false);
       return;
    }
@@ -737,8 +748,8 @@ void SoPlexBase<R>::_loadRealLP(bool initBasis)
 template <class R>
 void SoPlexBase<R>::_unscaleSolutionReal(SPxLPBase<R>& LP, bool persistent)
 {
-   MSG_INFO1(spxout, spxout << " --- unscaling " << (persistent ? "external" : "internal") <<
-             " solution" << std::endl;)
+   SPX_MSG_INFO1(spxout, spxout << " --- unscaling " << (persistent ? "external" : "internal") <<
+                 " solution" << std::endl;)
    assert(_scaler);
    assert(!persistent || (boolParam(SoPlexBase<R>::PERSISTENTSCALING) && _isRealLPScaled));
    _scaler->unscalePrimal(LP, _solReal._primal);

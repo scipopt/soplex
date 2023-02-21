@@ -31,18 +31,18 @@
 /**@file gzstream.h
  * @brief Utilities for handling gzipped input and output streams.
  */
-#ifndef GZSTREAM_H
-#define GZSTREAM_H 1
+#ifndef _GZSTREAM_H_
+#define _GZSTREAM_H_ 1
 
 // standard C++ with new header file names and std:: namespace
 #include <iostream>
 #include <fstream>
 #include <zlib.h>
 
-#define GZSTREAM_NAMESPACE gzstream
+#define SOPLEX_GZSTREAM_NAMESPACE gzstream
 
-#ifdef GZSTREAM_NAMESPACE
-namespace GZSTREAM_NAMESPACE
+#ifdef SOPLEX_GZSTREAM_NAMESPACE
+namespace SOPLEX_GZSTREAM_NAMESPACE
 {
 #endif
 
@@ -277,11 +277,11 @@ public:
    }
 };
 
-#ifdef GZSTREAM_NAMESPACE
-} // namespace GZSTREAM_NAMESPACE
+#ifdef SOPLEX_GZSTREAM_NAMESPACE
+} // namespace SOPLEX_GZSTREAM_NAMESPACE
 #endif
 
-#endif // GZSTREAM_H
+#endif // _GZSTREAM_H_
 // ============================================================================
 // EOF //
 

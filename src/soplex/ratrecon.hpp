@@ -3,13 +3,22 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -17,7 +26,6 @@
 #include <assert.h>
 
 #include "soplex/spxdefines.h"
-#include "soplex/ratrecon.h"
 #include "soplex/rational.h"
 
 namespace soplex
@@ -49,8 +57,8 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
 
    Dbound = (Integer) sqrt(Dbound);
 
-   MSG_DEBUG(std::cout << "reconstructing " << dim << " dimensional vector with denominator bound " <<
-             Dbound << "\n");
+   SPX_MSG_DEBUG(std::cout << "reconstructing " << dim << " dimensional vector with denominator bound "
+                 << Dbound << "\n");
 
    /* if Dbound is below 2^24 increase it to this value, this avoids changing input vectors that have low denominator
     * because they are floating point representable
@@ -73,7 +81,7 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
       assert(j >= 0);
       assert(j < dim);
 
-      MSG_DEBUG(std::cout << "  --> component " << j << " = " << &xnum[j] << " / denom\n");
+      SPX_MSG_DEBUG(std::cout << "  --> component " << j << " = " << &xnum[j] << " / denom\n");
 
       /* if xnum =0 , then just leave x[j] as zero */
       if(xnum[j] != 0)
@@ -89,13 +97,13 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
 
          if(td <= Dbound)
          {
-            MSG_DEBUG(std::cout << "marker 1\n");
+            SPX_MSG_DEBUG(std::cout << "marker 1\n");
 
             resvec[j] = Rational(tn, td);
          }
          else
          {
-            MSG_DEBUG(std::cout << "marker 2\n");
+            SPX_MSG_DEBUG(std::cout << "marker 2\n");
 
             temp = 1;
 
@@ -120,7 +128,7 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
             /* if q is already big, skip loop */
             if(q[2] > Dbound)
             {
-               MSG_DEBUG(std::cout << "marker 3\n");
+               SPX_MSG_DEBUG(std::cout << "marker 3\n");
                done = 1;
             }
 
@@ -152,7 +160,7 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
 
                cfcnt++;
 
-               MSG_DEBUG(std::cout << "  --> convergent denominator = " << &q[2] << "\n");
+               SPX_MSG_DEBUG(std::cout << "  --> convergent denominator = " << &q[2] << "\n");
             }
 
             assert(q[1] != 0);
@@ -168,7 +176,8 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
 
             if(gcd > Dbound)
             {
-               MSG_DEBUG(std::cout << "terminating with gcd " << &gcd << " exceeding Dbound " << &Dbound << "\n");
+               SPX_MSG_DEBUG(std::cout << "terminating with gcd " << &gcd << " exceeding Dbound " << &Dbound <<
+                             "\n");
                rval = false;
                break;
             }
@@ -221,7 +230,7 @@ inline bool reconstructVector(VectorRational& input, const Rational& denomBoundS
       }
    }
 
-   MSG_DEBUG(std::cout << "LCM = " << mpz_get_str(0, 10, denom) << "\n");
+   SPX_MSG_DEBUG(std::cout << "LCM = " << mpz_get_str(0, 10, denom) << "\n");
 
    /* reconstruct */
    rval = Reconstruct(input, xnum.data(), denom, dim, denomBoundSquared, indexSet);

@@ -3,14 +3,22 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996      Roland Wunderling                              */
-/*                  1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -106,20 +114,20 @@ public:
     */
 
    // Default constructor
-   VectorBase<R>()
+   VectorBase()
    {
       // Default constructor
       ;
    }
 
    // Construct from pointer, copies the values into the VectorBase
-   VectorBase<R>(int dimen, R* p_val)
+   VectorBase(int dimen, R* p_val)
    {
       val.assign(p_val, p_val + dimen);
    }
 
    // do not convert int to empty vectorbase
-   explicit VectorBase<R>(int p_dimen)
+   explicit VectorBase(int p_dimen)
    {
       val.resize(p_dimen);
    }
@@ -127,18 +135,18 @@ public:
    // Constructing an element (usually involving casting Real to Rational and
    // vice versa.)
    template <typename S>
-   VectorBase<R>(const VectorBase<S>& vec)
+   VectorBase(const VectorBase<S>& vec)
    {
       this->operator=(vec);
    }
 
    // The move constructor
-   VectorBase<R>(const VectorBase<R>&& vec)noexcept: val(std::move(vec.val))
+   VectorBase(const VectorBase<R>&& vec)noexcept: val(std::move(vec.val))
    {
    }
 
    // Copy constructor
-   VectorBase<R>(const VectorBase<R>& vec): val(vec.val)
+   VectorBase(const VectorBase<R>& vec): val(vec.val)
    {
    }
 
@@ -418,13 +426,13 @@ public:
    {
       assert(dim() > 0);
 
-      // A helper function for the std::min_element. Because we compare the absolute value.
+      // A helper function for the SOPLEX_MIN_element. Because we compare the absolute value.
       auto absCmpr = [](R a, R b)
       {
          return (spxAbs(a) < spxAbs(b));
       };
 
-      auto minReference = std::min_element(val.begin(), val.end(), absCmpr);
+      auto minReference = SOPLEX_MIN_element(val.begin(), val.end(), absCmpr);
 
       R mini = spxAbs(*minReference);
 

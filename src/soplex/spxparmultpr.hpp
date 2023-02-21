@@ -3,13 +3,22 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2022 Konrad-Zuse-Zentrum                            */
-/*                            fuer Informationstechnik Berlin                */
+/*  Copyright 1996-2022 Zuse Institute Berlin                                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  Licensed under the Apache License, Version 2.0 (the "License");          */
+/*  you may not use this file except in compliance with the License.         */
+/*  You may obtain a copy of the License at                                  */
 /*                                                                           */
-/*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*      http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                           */
+/*  Unless required by applicable law or agreed to in writing, software      */
+/*  distributed under the License is distributed on an "AS IS" BASIS,        */
+/*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. */
+/*  See the License for the specific language governing permissions and      */
+/*  limitations under the License.                                           */
+/*                                                                           */
+/*  You should have received a copy of the Apache-2.0 license                */
+/*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -17,7 +26,6 @@
 #include <iostream>
 
 #include "soplex/spxdefines.h"
-#include "soplex/spxparmultpr.h"
 
 namespace soplex
 {
@@ -66,7 +74,7 @@ SPxId SPxParMultPR<R>::selectEnter()
    if(this->thesolver->pricing() == SPxSolverBase<R>::PARTIAL)
    {
       R val;
-      R eps = -this->theeps;
+      R tol = -this->thetolerance;
       lastlast = last;
 
       for(i = used - 1; i >= 0; --i)
@@ -81,7 +89,7 @@ SPxId SPxParMultPR<R>::selectEnter()
          else
             pricSet[i].test = val = this->thesolver->coTest()[n];
 
-         if(val >= eps)
+         if(val >= tol)
             pricSet[i] = pricSet[--used];
       }
 
@@ -108,7 +116,7 @@ SPxId SPxParMultPR<R>::selectEnter()
             this->thesolver->computePvec(i);
             x = this->thesolver->computeTest(i);
 
-            if(x < eps)
+            if(x < tol)
             {
                pricSet[used].id = this->thesolver->id(i);
                pricSet[used].test = x;
@@ -121,7 +129,7 @@ SPxId SPxParMultPR<R>::selectEnter()
          {
             x = this->thesolver->coTest()[i];
 
-            if(x < eps)
+            if(x < tol)
             {
                pricSet[used].id = this->thesolver->coId(i);
                pricSet[used].test = x;
@@ -160,7 +168,7 @@ SPxId SPxParMultPR<R>::selectEnter()
    else
    {
       assert(this->thesolver->pricing() == SPxSolverBase<R>::FULL);
-      R bestx = -this->theeps;
+      R bestx = -this->thetolerance;
 
       for(i = this->thesolver->dim() - 1; i >= 0; --i)
       {
@@ -197,7 +205,7 @@ int SPxParMultPR<R>::selectLeave()
 {
    int i, n;
    R x;
-   R best = -this->theeps;
+   R best = -this->thetolerance;
    //    const R* up  = this->thesolver->ubBound();
    //    const R* low = this->thesolver->lbBound();
 
