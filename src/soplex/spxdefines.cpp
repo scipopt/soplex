@@ -61,6 +61,7 @@ Real Tolerances::epsilon()
 void Tolerances::setEpsilon(Real eps)
 {
    s_epsilon = eps;
+   s_epsilon_multiplier = std::sqrt(s_epsilon/SOPLEX_DEFAULT_EPS_ZERO);
 }
 
 

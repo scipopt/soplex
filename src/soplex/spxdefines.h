@@ -321,6 +321,8 @@ private:
    Real s_floating_point_feastol;
    /// floating point optimality tolerance
    Real s_floating_point_opttol;
+   /// multiplier for fixed numbers that should change if s_epsilon changes
+   Real s_epsilon_multiplier;
    ///@}
 
 public:
@@ -331,7 +333,8 @@ public:
         s_epsilon_update(SOPLEX_DEFAULT_EPS_UPDATE), s_epsilon_pivot(SOPLEX_DEFAULT_EPS_PIVOR),
         s_feastol(SOPLEX_DEFAULT_BND_VIOL), s_opttol(SOPLEX_DEFAULT_BND_VIOL),
         s_floating_point_feastol(SOPLEX_DEFAULT_BND_VIOL),
-        s_floating_point_opttol(SOPLEX_DEFAULT_BND_VIOL)
+        s_floating_point_opttol(SOPLEX_DEFAULT_BND_VIOL),
+        s_epsilon_multiplier(1.0)
    {}
 
    //------------------------------------
@@ -370,9 +373,10 @@ public:
    /// set floating point optimality tolerance used within the solver
    void setFloatingPointOpttol(Real otol);
    /// scale a value such that it remains unchanged at default epsilon, but is scaled withs smaller epsilon values
+   /// this is updated in setEpsilon()
    inline Real scaleAccordingToEpsilon(Real a)
    {
-      return a * std::pow(10, -0.5 * (log10(SOPLEX_DEFAULT_EPS_ZERO) - log10(s_epsilon)));
+      return a * s_epsilon_multiplier;
    }
    ///@}
 };
