@@ -1534,6 +1534,7 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
          _solRational = rhs._solRational;
 
       _solver.setTolerances(_tolerances);
+      _boostedSolver.setTolerances(_tolerances);
       // set tolerances for scalers
       _scalerUniequi.setTolerances(_tolerances);
       _scalerBiequi.setTolerances(_tolerances);
@@ -1541,8 +1542,17 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
       _scalerGeo8.setTolerances(_tolerances);
       _scalerGeoequi.setTolerances(_tolerances);
       _scalerLeastsq.setTolerances(_tolerances);
+
+      _boostedScalerUniequi.setTolerances(_tolerances);
+      _boostedScalerBiequi.setTolerances(_tolerances);
+      _boostedScalerGeo1.setTolerances(_tolerances);
+      _boostedScalerGeo8.setTolerances(_tolerances);
+      _boostedScalerGeoequi.setTolerances(_tolerances);
+      _boostedScalerLeastsq.setTolerances(_tolerances);
+
       // set tolerances for slufactor
       _slufactor.setTolerances(_tolerances);
+      _boostedSlufactor.setTolerances(_tolerances);
 
       // set message handlers in members
       _solver.setOutstream(spxout);
@@ -6179,6 +6189,9 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       if(_scaler != nullptr)
          _scaler->setTolerances(this->_tolerances);
 
+      if(_boostedScaler != nullptr)
+         _boostedScaler->setTolerances(this->_tolerances);
+
       break;
 
    // type of starter used to create crash basis
@@ -9239,8 +9252,17 @@ SoPlexBase<R>::SoPlexBase()
    _scalerGeo8.setTolerances(_tolerances);
    _scalerGeoequi.setTolerances(_tolerances);
    _scalerLeastsq.setTolerances(_tolerances);
+
+   _boostedScalerUniequi.setTolerances(_tolerances);
+   _boostedScalerBiequi.setTolerances(_tolerances);
+   _boostedScalerGeo1.setTolerances(_tolerances);
+   _boostedScalerGeo8.setTolerances(_tolerances);
+   _boostedScalerGeoequi.setTolerances(_tolerances);
+   _boostedScalerLeastsq.setTolerances(_tolerances);
+
    // set tolerances for slufactor
    _slufactor.setTolerances(_tolerances);
+   _boostedSlufactor.setTolerances(_tolerances);
    // transfer message handler
    _solver.setOutstream(spxout);
    _scalerUniequi.setOutstream(spxout);
