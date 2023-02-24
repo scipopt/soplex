@@ -1375,11 +1375,11 @@ static R betterThreshold(R th)
 {
    assert(th < R(1.0));
 
-   if(th < R(0.1))
+   if(LT(th, R(0.1), this->tolerances()->epsilon()))
       th *= R(10.0);
-   else if(th < R(0.9))
+   else if(LT(th, R(0.9), this->tolerances()->epsilon()))
       th = (th + R(1.0)) / R(2.0);
-   else if(th < R(0.999))
+   else if(LT(th, R(0.999), this->tolerances()->epsilon()))
       th = R(0.99999);
 
    assert(th < R(1.0));

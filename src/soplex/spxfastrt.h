@@ -36,6 +36,8 @@
 namespace soplex
 {
 
+#define SOPLEX_FASTRT_EPSILON 1e-10
+
 /**@brief   Fast shifting ratio test.
    @ingroup Algo
 
@@ -67,7 +69,7 @@ protected:
    ///@{
    const R epsilonZero() const
    {
-      return this->thesolver->epsilon() * 1e6;
+      return this->tolerances()->scaleWithEpsilon(SOPLEX_FASTRT_EPSILON);
    }
    /// relaxes stability requirements.
    void relax();
