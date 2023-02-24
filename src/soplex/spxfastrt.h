@@ -69,7 +69,7 @@ protected:
    ///@{
    const R epsilonZero() const
    {
-      return this->tolerances()->scaleWithEpsilon(SOPLEX_FASTRT_EPSILON);
+      return this->tolerances()->scaleAccordingToEpsilon(SOPLEX_FASTRT_EPSILON);
    }
    /// relaxes stability requirements.
    void relax();
