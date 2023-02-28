@@ -62,14 +62,19 @@ protected:
    R fastDelta;
    /// flag used in methods minSelect/maxSelect to retrieve correct basis status
    bool iscoid;
+   /// zero tolerance used by the ratio tester
+   R epsilon;
    ///@}
 
    //-------------------------------------
    /**@name Private helpers */
    ///@{
+   /// resets tolerances (epsilon).
+   void resetTols();
+   /// return epsilon
    const R epsilonZero() const
    {
-      return this->tolerances()->scaleAccordingToEpsilon(SOPLEX_FASTRT_EPSILON);
+      return epsilon;
    }
    /// relaxes stability requirements.
    void relax();
