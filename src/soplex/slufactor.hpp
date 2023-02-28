@@ -1371,15 +1371,15 @@ SLUFactor<R>::~SLUFactor()
 }
 
 template <class R>
-static R betterThreshold(R th)
+static R betterThreshold(R th, Real epsilon)
 {
    assert(th < R(1.0));
 
-   if(th < R(0.1))
+   if(LT(th, R(0.1), epsilon))
       th *= R(10.0);
-   else if(th < R(0.9))
+   else if(LT(th, R(0.9), epsilon))
       th = (th + R(1.0)) / R(2.0);
-   else if(th < R(0.999))
+   else if(LT(th, R(0.999), epsilon))
       th = R(0.99999);
 
    assert(th < R(1.0));
@@ -1442,12 +1442,12 @@ typename SLUFactor<R>::Status SLUFactor<R>::load(const SVectorBase<R>* matrix[],
       // we reset lastThreshold to its previous value in the sequence minThreshold, betterThreshold(minThreshold),
       // betterThreshold(betterThreshold(minThreshold)), ...
       R last   = minThreshold;
-      R better = betterThreshold(last);
+      R better = betterThreshold(last, this->tolerances()->epsilon());
 
       while(better < lastThreshold)
       {
          last   = better;
-         better = betterThreshold(last);
+         better = betterThreshold(last, this->tolerances()->epsilon());
       }
 
       lastThreshold = last;
@@ -1481,7 +1481,7 @@ typename SLUFactor<R>::Status SLUFactor<R>::load(const SVectorBase<R>* matrix[],
 
       // otherwise, we increase the Markowitz threshold
       R x = lastThreshold;
-      lastThreshold = betterThreshold(lastThreshold);
+      lastThreshold = betterThreshold(lastThreshold, this->tolerances()->epsilon());
 
       // until it doesn't change anymore at its maximum value
       if(EQ(x, lastThreshold, this->tolerances()->epsilon()))
