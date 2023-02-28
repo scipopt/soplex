@@ -54,6 +54,12 @@ namespace soplex
 #define SOPLEX_EPSILON          1e-10
 
 template <class R>
+void SPxFastRT<R>::resetTols()
+{
+   epsilon = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_EPSILON);
+}
+
+template <class R>
 void SPxFastRT<R>::tighten()
 {
    R delta_shift = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_DELTA_SHIFT);
@@ -970,6 +976,8 @@ int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
    R lowstab = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_LOWSTAB);
    assert(!instable || this->solver()->instableEnterId.isValid());
 
+   resetTols();
+
    if(val > epsilonZero())
    {
       do
@@ -1390,6 +1398,8 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
    int cnt = 0;
 
    assert(this->m_type == SPxSolverBase<R>::LEAVE);
+
+   resetTols();
 
    // force instable pivot iff true (see explanation in leave.hpp and spxsolve.hpp)
    bool instable = this->solver()->instableLeave;

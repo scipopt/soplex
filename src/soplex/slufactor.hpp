@@ -1473,7 +1473,7 @@ typename SLUFactor<R>::Status SLUFactor<R>::load(const SVectorBase<R>* matrix[],
       ///an empty column) and singularity due to numerics, that could be avoided by changing minStability and
       ///lastThreshold; in the first case, we want to abort, otherwise change the numerics
       this->stat = this->OK;
-      this->factor(matrix, lastThreshold, this->tolerances()->epsilon());
+      this->factor(matrix, lastThreshold, this->tolerances()->epsilonFactorization());
 
       // finish if the factorization is stable
       if(stability() >= minStability)

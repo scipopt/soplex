@@ -978,8 +978,15 @@ void SPxBasisBase<R>::factorize()
       factorized = true;
       minStab = factor->stability();
 
-      // set minstab to be at most 1e-9 * epsilon (1e-7 for default values)
-      minStab = SOPLEX_MIN(minStab, this->theLP->tolerances()->scaleAccordingToEpsilon(1e-7));
+      // This seems always to be about 1e-7
+      if(minStab > 1e-4)
+         minStab *= 0.001;
+
+      if(minStab > 1e-5)
+         minStab *= 0.01;
+
+      if(minStab > 1e-6)
+         minStab *= 0.1;
 
       break;
 

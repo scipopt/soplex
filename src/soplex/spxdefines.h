@@ -376,7 +376,11 @@ public:
    /// this is updated in setEpsilon()
    inline Real scaleAccordingToEpsilon(Real a)
    {
-      return a * s_epsilon_multiplier;
+#ifdef SOPLEX_WITH_MPFR
+      return s_epsilon_multiplier == 1.0 ? a : a * s_epsilon_multiplier;
+#else
+      return a;
+#endif
    }
    ///@}
 };
