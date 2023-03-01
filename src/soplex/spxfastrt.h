@@ -58,12 +58,12 @@ protected:
    ///@{
    /// parameter for computing minimum stability requirement
    R minStab;
+   /// zero tolerance used by the ratio tester
+   R epsilon;
    /// currently allowed infeasibility.
    R fastDelta;
    /// flag used in methods minSelect/maxSelect to retrieve correct basis status
    bool iscoid;
-   /// zero tolerance used by the ratio tester
-   R epsilon;
    ///@}
 
    //-------------------------------------
