@@ -189,6 +189,7 @@ public:
    SPxFastRT()
       : SPxRatioTester<R>("Fast")
       , minStab(SOPLEX_DEFAULT_BND_VIOL)
+      , epsilon(SOPLEX_DEFAULT_EPS_ZERO)
       , fastDelta(SOPLEX_DEFAULT_BND_VIOL)
       , iscoid(false)
    {}
@@ -196,6 +197,7 @@ public:
    SPxFastRT(const SPxFastRT& old)
       : SPxRatioTester<R>(old)
       , minStab(old.minStab)
+      , epsilon(old.epsilon)
       , fastDelta(old.fastDelta)
       , iscoid(false)
    {}
@@ -206,6 +208,7 @@ public:
       {
          SPxRatioTester<R>::operator=(rhs);
          minStab = rhs.minStab;
+         epsilon = rhs.epsilon;
          fastDelta = rhs.fastDelta;
          iscoid = false;
       }
@@ -216,6 +219,7 @@ public:
    SPxFastRT(const char* name)
       : SPxRatioTester<R>(name)
       , minStab(SOPLEX_DEFAULT_BND_VIOL)
+      , epsilon(SOPLEX_DEFAULT_EPS_ZERO)
       , fastDelta(SOPLEX_DEFAULT_BND_VIOL)
       , iscoid(false)
    {}
