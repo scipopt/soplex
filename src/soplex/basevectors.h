@@ -408,7 +408,7 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
             else
             {
                adjust = true;
-               v[j] = SOPLEX_VECTOR_MARKER();
+               v[j] = SOPLEX_VECTOR_MARKER;
             }
          }
          else
