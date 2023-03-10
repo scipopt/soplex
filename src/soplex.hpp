@@ -5652,7 +5652,26 @@ int SoPlexBase<R>::numIterations() const
    return _statistics->iterations;
 }
 
+/// number of precision boosts since last call to solve
+template <class R>
+int SoPlexBase<R>::numPrecisionBoosts() const
+{
+   return _statistics->precBoosts;
+}
 
+/// number of iterations in higher precision since last call to solve
+template <class R>
+int SoPlexBase<R>::numIterationsBoosted() const
+{
+   return _statistics->boostedIterations;
+}
+
+/// time spen in higher precision since last call to solve
+template <class R>
+Real SoPlexBase<R>::precisionBoostTime() const
+{
+   return _statistics->extendedPrecisionTime->time();
+}
 
 /// time spent in last call to solve
 template <class R>
