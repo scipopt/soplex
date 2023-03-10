@@ -856,6 +856,15 @@ public:
    /// number of iterations since last call to solve
    int numIterations() const;
 
+   /// number of precision boosts since last call to solve
+   int numPrecisionBoosts() const;
+
+   /// number of iterations in higher precision since last call to solve
+   int numIterationsBoosted() const;
+
+   /// time spen in higher precision since last call to solve
+   Real precisionBoostTime() const;
+
    /// time spent in last call to solve
    Real solveTime() const;
 
@@ -2471,6 +2480,9 @@ private:
 
    /// increase the multiprecision, return false if maximum precision is reached, true otherwise
    bool _boostPrecision();
+
+   /// reset the boosted precision to the default value
+   void _resetBoostedPrecision();
 
    /// setup recovery mecanism using multiprecision, return false if maximum precision reached, true otherwise
    bool _setupBoostedSolverAfterRecovery();

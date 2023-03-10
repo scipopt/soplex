@@ -52,6 +52,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
 
    // remember that last solve was rational
    _lastSolveMode = SOLVEMODE_RATIONAL;
+   _resetBoostedPrecision();
 
    // ensure that the solver has the original problemo
    if(!_isRealLPLoaded)
@@ -2469,6 +2470,14 @@ bool SoPlexBase<R>::_boostPrecision()
    _statistics->boostingStepTime->stop();
 
    return !_boostingLimitReached;
+}
+
+/// increase the multiprecision, return false if maximum precision is reached, true otherwise
+template <class R>
+void SoPlexBase<R>::_resetBoostedPrecision()
+{
+   _statistics->precBoosts = 0;
+   BP::default_precision(50);
 }
 
 
