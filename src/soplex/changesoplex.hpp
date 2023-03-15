@@ -535,12 +535,7 @@ template <class R>
 void SPxSolverBase<R>::changeBounds(int i, const R& newLower, const R& newUpper, bool scale)
 {
    changeLower(i, newLower, scale);
-
-   if(EQ(newLower, newUpper))
-      changeUpper(i, newLower, scale);
-   else
-      changeUpper(i, newUpper, scale);
-
+   changeUpper(i, newUpper, scale);
 }
 
 template <class R>
