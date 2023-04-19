@@ -128,6 +128,7 @@ public:
    Real luSolveTimeReal; ///< time for solving linear systems in real precision
    Real luFactorizationTimeRational; ///< time for factorizing bases matrices in rational precision
    Real luSolveTimeRational; ///< time for solving linear systems in rational precision
+   Real fpTime; ///< time for first floating-point LP solve
    int iterations; ///< number of iterations/pivots
    int iterationsPrimal; ///< number of iterations with Primal
    int iterationsFromBasis; ///< number of iterations from Basis
