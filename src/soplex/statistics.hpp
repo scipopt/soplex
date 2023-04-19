@@ -95,10 +95,12 @@ typename SoPlexBase<R>::Statistics& SoPlexBase<R>::Statistics::operator=(const S
    luSolveTimeReal = rhs.luSolveTimeReal;
    luFactorizationTimeRational = rhs.luFactorizationTimeRational;
    luSolveTimeRational = rhs.luSolveTimeRational;
+   fpTime = rhs.fpTime;
    iterations = rhs.iterations;
    iterationsPrimal = rhs.iterationsPrimal;
    iterationsFromBasis = rhs.iterationsFromBasis;
    iterationsPolish = rhs.iterationsPolish;
+   iterationsFP = rhs.iterationsFP;
    boundflips = rhs.boundflips;
    boostedIterations = rhs.boostedIterations;
    boostedIterationsPrimal = rhs.boostedIterationsPrimal;
@@ -157,10 +159,12 @@ void SoPlexBase<R>::Statistics::clearSolvingData()
    luSolveTimeReal = 0.0;
    luFactorizationTimeRational = 0.0;
    luSolveTimeRational = 0.0;
+   fpTime = 0.0;
    iterations = 0;
    iterationsPrimal = 0;
    iterationsFromBasis = 0;
    iterationsPolish = 0;
+   iterationsFP = 0;
    boundflips = 0;
    boostedIterations = 0;
    boostedIterationsPrimal = 0;
@@ -263,6 +267,11 @@ void SoPlexBase<R>::Statistics::print(std::ostream& os)
    if(solTime > 0)
       os << " (" << 100 * boostingStepTime->time() / solTime << "% of solving time)";
 
+   os << "\n  FpTime            : " << fpTime;
+
+   if(solTime > 0)
+      os << " (" << 100 * fpTime / solTime << "% of solving time)";
+
    os << "\n  Other             : " << otherTime;
 
    if(solTime > 0)
@@ -303,6 +312,7 @@ void SoPlexBase<R>::Statistics::print(std::ostream& os)
 
    os << "\n  Bound flips       : " << boundflips;
    os << "\n  Sol. polishing    : " << iterationsPolish;
+   os << "\n  First FP solve    : " << iterationsFP;
 
    os << "\nIterationsBoosted   : " << boostedIterations << "\n"
       << "  From scratch      : " << int(boostedIterations - boostedIterationsFromBasis);
