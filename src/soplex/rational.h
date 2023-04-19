@@ -174,7 +174,7 @@ inline Rational ratFromString(const char* desc)
       std::string s(desc);
 
       /* case 1: string is given in nom/den format */
-      if(s.find('.') == std::string::npos)
+      if(s.find_first_of(".Ee") == std::string::npos)
       {
          if(s[0] == '+')
             res = Rational(desc + 1);
@@ -199,23 +199,27 @@ inline Rational ratFromString(const char* desc)
             s.insert(0, "0");
 
          size_t pos = s.find('.');
-         size_t exp = s.length() - 1 - pos;
-         std::string den("1");
+         // if s contains a ., convert it to a rational
+         if( pos != std::string::npos )
+         {
+            size_t exp = s.length() - 1 - pos;
+            std::string den("1");
 
-         for(size_t i = 0; i < exp; ++i)
-            den.append("0");
+            for(size_t i = 0; i < exp; ++i)
+               den.append("0");
 
-         s.erase(pos, 1);
-         assert(std::all_of(s.begin() + 1, s.end(), ::isdigit));
+            s.erase(pos, 1);
+            assert(std::all_of(s.begin() + 1, s.end(), ::isdigit));
 
-         // remove padding 0s
-         if(s[0] == '-')
-            s.erase(1, SOPLEX_MIN(s.substr(1).find_first_not_of('0'), s.size() - 1));
-         else
-            s.erase(0, SOPLEX_MIN(s.find_first_not_of('0'), s.size() - 1));
+            // remove padding 0s
+            if(s[0] == '-')
+               s.erase(1, SOPLEX_MIN(s.substr(1).find_first_not_of('0'), s.size() - 1));
+            else
+               s.erase(0, SOPLEX_MIN(s.find_first_not_of('0'), s.size() - 1));
 
-         s.append("/");
-         s.append(den);
+            s.append("/");
+            s.append(den);
+         }
          res = Rational(s);
          res *= pow(10, mult);
       }

@@ -2074,19 +2074,12 @@ void SoPlexBase<R>::_performOptIRStable(
 
    _statistics->rationalTime->stop();
 
-   // if boosted solver is available, double precision solver is only used once.
-   // otherwise use the expensive pipeline from _solveRealStable
-#ifdef SOPLEX_WITH_MPFR
-   if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING) && !boolParam(SoPlexBase<R>::RECOVERY_MECHANISM))
+   // determine if we should use the recovery mechanism pipeline in case of fails
+   if(!boolParam(SoPlexBase<R>::RECOVERY_MECHANISM))
       result = _solveRealForRational(false, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
    else
       result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows,
                              _basisStatusCols);
-#else
-   result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows,
-                             _basisStatusCols);
-#endif
-
 
    // evalute result
    if(_evaluateResult<R>(_solver, result, false, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
@@ -2254,10 +2247,8 @@ void SoPlexBase<R>::_performOptIRStable(
       int prevIterations = _statistics->iterations;
       _statistics->rationalTime->stop();
 
-      // if boosted solver is available, double precision solver is only used once.
-      // otherwise use the expensive pipeline from _solveRealStable
-#ifdef SOPLEX_WITH_MPFR
-      if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING) && !boolParam(SoPlexBase<R>::RECOVERY_MECHANISM))
+      // determine if recovery pipeline should be used
+      if(!boolParam(SoPlexBase<R>::RECOVERY_MECHANISM))
       {
          // turn off simplifier if scaling factors are too high
          int simplifier = intParam(SoPlexBase<R>::SIMPLIFIER);
@@ -2270,10 +2261,6 @@ void SoPlexBase<R>::_performOptIRStable(
       else
          result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows,
                                 _basisStatusCols, primalScale > 1e20 || dualScale > 1e20);
-#else
-      result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows,
-                                _basisStatusCols, primalScale > 1e20 || dualScale > 1e20);
-#endif
 
       // count refinements and remember whether we moved to a new basis
       _statistics->refinements++;
@@ -2424,17 +2411,9 @@ bool SoPlexBase<R>::_boostPrecision()
    // remember the number of iterations for the next comparison
    _prevIterations = _statistics->iterations;
 
+   // leave out quad precision and immediately go to 167 bits
    if(_statistics->precBoosts == 1)
    {
-      // 50 decimal digits are already allocated by default
-      // we could set the precision to a lower number of digits but this would not improve the computation times
-      // So we do nothing.
-   }
-   else if(_statistics->precBoosts == 2)
-   {
-      // special case for the second boost. Normally we multiply the precision by 3/2 just like in QSopt_ex
-      // but the previous multiprecision type was stored in 167 bits and not 128 bits.
-      // so we hard set the number of bits for the multiprecision type to 192 bits
       BP nbDigitsSecondBoost = boost::multiprecision::floor(boost::multiprecision::log10(boost::multiprecision::pow(BP(2), 192)));
 
       if(intParam(SoPlexBase<R>::MULTIPRECISION_LIMIT) >= nbDigitsSecondBoost)
@@ -2449,7 +2428,7 @@ bool SoPlexBase<R>::_boostPrecision()
          _boostingLimitReached = true;
       }
    }
-   else if(_statistics->precBoosts > 2)
+   else if(_statistics->precBoosts >= 2)
    {
       // general case: increase the number of decimal digits by 3/2,
       int newNbDigits = (int)floor(BP::default_precision() * realParam(SoPlexBase<R>::PRECISION_BOOSTING_FACTOR));
@@ -2477,7 +2456,9 @@ template <class R>
 void SoPlexBase<R>::_resetBoostedPrecision()
 {
    _statistics->precBoosts = 0;
+#ifdef SOPLEX_WITH_MPFR
    BP::default_precision(50);
+#endif
 }
 
 
