@@ -1373,6 +1373,9 @@ bool SoPlexBase<R>::_evaluateResult(
    // set the fp Time
    if(_statistics->fpTime == 0)
       _statistics->fpTime = _statistics->solvingTime->time();
+
+   if(_statistics->iterationsFP == 0)
+      _statistics->iterationsFP = _statistics->iterations;
    switch(result)
    {
    case SPxSolverBase<R>::OPTIMAL:

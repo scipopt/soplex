@@ -133,6 +133,7 @@ public:
    int iterationsPrimal; ///< number of iterations with Primal
    int iterationsFromBasis; ///< number of iterations from Basis
    int iterationsPolish; ///< number of iterations during solution polishing
+   int iterationsFP; ///< number of iterations/pivots in first floating-point solve
    int boundflips; ///< number of dual bound flips
    int boostedIterations; ///< number of iterations/pivots in extended precision
    int boostedIterationsPrimal; ///< number of iterations with Primal

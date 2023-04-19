@@ -100,6 +100,7 @@ typename SoPlexBase<R>::Statistics& SoPlexBase<R>::Statistics::operator=(const S
    iterationsPrimal = rhs.iterationsPrimal;
    iterationsFromBasis = rhs.iterationsFromBasis;
    iterationsPolish = rhs.iterationsPolish;
+   iterationsFP = rhs.iterationsFP;
    boundflips = rhs.boundflips;
    boostedIterations = rhs.boostedIterations;
    boostedIterationsPrimal = rhs.boostedIterationsPrimal;
@@ -163,6 +164,7 @@ void SoPlexBase<R>::Statistics::clearSolvingData()
    iterationsPrimal = 0;
    iterationsFromBasis = 0;
    iterationsPolish = 0;
+   iterationsFP = 0;
    boundflips = 0;
    boostedIterations = 0;
    boostedIterationsPrimal = 0;
@@ -310,6 +312,7 @@ void SoPlexBase<R>::Statistics::print(std::ostream& os)
 
    os << "\n  Bound flips       : " << boundflips;
    os << "\n  Sol. polishing    : " << iterationsPolish;
+   os << "\n  First FP solve    : " << iterationsFP;
 
    os << "\nIterationsBoosted   : " << boostedIterations << "\n"
       << "  From scratch      : " << int(boostedIterations - boostedIterationsFromBasis);
