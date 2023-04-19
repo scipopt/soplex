@@ -4,6 +4,7 @@ import sys
 import math
 import json
 import fractions
+import io
 
 # this function checks for the type of parsed string
 def typeofvalue(text):
@@ -61,7 +62,7 @@ else:
     outname = sys.argv[1]
 dataname = outname.replace('.out','.json')
 
-outfile = open(outname,'r')
+outfile = io.open(outname,'r',encoding='utf-8',errors='ignore')
 outlines = outfile.readlines()
 outfile.close()
 

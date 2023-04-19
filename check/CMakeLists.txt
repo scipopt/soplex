@@ -69,7 +69,8 @@ if(BOOST)
    #need boost to run exact
    set(settings
        ${settings}
-       exact)
+       exact
+       exact-pure-boosting)
 if(${Boost_VERSION_MACRO} GREATER "106999")
     set(settings
         ${settings}
