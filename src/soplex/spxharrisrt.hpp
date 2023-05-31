@@ -49,8 +49,8 @@ int SPxHarrisRT<R>::maxDelta(
    const R* upd,             /* update VectorBase<R> for vec */
    const R* vec,             /* current VectorBase<R> */
    const R* low,             /* lower bounds for vec */
-   const R* up,              /* upper bounds for vec */
-   R epsilon)  const       /* what is 0? */
+   const R* up               /* upper bounds for vec */
+)  const
 {
    R x;
    R theval;
@@ -58,6 +58,7 @@ int SPxHarrisRT<R>::maxDelta(
    R themax;
    int sel;
    int i;
+   R epsilon = this->tolerances()->epsilon();
 
    assert(*val >= 0);
 
@@ -105,8 +106,8 @@ int SPxHarrisRT<R>::minDelta(
    const R* upd,             /* update VectorBase<R> for vec */
    const R* vec,             /* current VectorBase<R> */
    const R* low,             /* lower bounds for vec */
-   const R* up,              /* upper bounds for vec */
-   R epsilon) const         /* what is 0? */
+   const R* up               /* upper bounds for vec */
+) const
 {
    R x;
    R theval;
@@ -114,6 +115,7 @@ int SPxHarrisRT<R>::minDelta(
    R themax;
    int sel;
    int i;
+   R epsilon = this->tolerances()->epsilon();
 
    assert(*val < 0);
 
@@ -201,8 +203,8 @@ int SPxHarrisRT<R>::selectLeave(R& val, R, bool)
          upd.values(),        /* update VectorBase<R> for vec */
          vec.get_const_ptr(),         /* current VectorBase<R> */
          low.get_const_ptr(),                 /* lower bounds for vec */
-         up.get_const_ptr(),                  /* upper bounds for vec */
-         epsilon);             /* what is 0? */
+         up.get_const_ptr()                   /* upper bounds for vec */
+      );
 
       if(max == val)
          return -1;
@@ -274,8 +276,8 @@ int SPxHarrisRT<R>::selectLeave(R& val, R, bool)
          upd.values(),        /* update VectorBase<R> for vec */
          vec.get_const_ptr(),                 /* current VectorBase<R> */
          low.get_const_ptr(),                 /* lower bounds for vec */
-         up.get_const_ptr(),                  /* upper bounds for vec */
-         epsilon);             /* what is 0? */
+         up.get_const_ptr()                   /* upper bounds for vec */
+      );
 
       if(max == val)
          return -1;
@@ -362,7 +364,7 @@ SPxId SPxHarrisRT<R>::selectEnter(R& val, int, bool)
    R rmaxabs = 1;
    int pnr, cnr;
 
-   R minStability = 0.0001;
+   R minStability = this->tolerances()->scaleAccordingToEpsilon(1e-4);
    R epsilon      = this->solver()->epsilon();
    R degeneps     = degenerateEps();
 
@@ -403,8 +405,8 @@ SPxId SPxHarrisRT<R>::selectEnter(R& val, int, bool)
             pupd.values(),       /* update VectorBase<R> for vec */
             pvec.get_const_ptr(),                /* current VectorBase<R> */
             lpb.get_const_ptr(),                 /* lower bounds for vec */
-            upb.get_const_ptr(),                 /* upper bounds for vec */
-            epsilon);             /* what is 0? */
+            upb.get_const_ptr()                  /* upper bounds for vec */
+         );
 
          maxDelta(
             &cmaxabs,            /* max abs value in upd */
@@ -414,8 +416,8 @@ SPxId SPxHarrisRT<R>::selectEnter(R& val, int, bool)
             cupd.values(),       /* update VectorBase<R> for vec */
             cvec.get_const_ptr(),                /* current VectorBase<R> */
             lcb.get_const_ptr(),                 /* lower bounds for vec */
-            ucb.get_const_ptr(),                 /* upper bounds for vec */
-            epsilon);            /* what is 0? */
+            ucb.get_const_ptr()                  /* upper bounds for vec */
+         );
 
          if(max == val)
             return enterId;
@@ -479,7 +481,7 @@ SPxId SPxHarrisRT<R>::selectEnter(R& val, int, bool)
             }
             else
             {
-               MSG_DEBUG(std::cout << "DHARRI01 removing value " << pupd[i] << std::endl;)
+               SPX_MSG_DEBUG(std::cout << "DHARRI01 removing value " << pupd[i] << std::endl;)
                pupd.clearNum(j);
             }
          }
@@ -529,7 +531,7 @@ SPxId SPxHarrisRT<R>::selectEnter(R& val, int, bool)
             }
             else
             {
-               MSG_DEBUG(std::cout << "DHARRI02 removing value " << cupd[i] << std::endl;)
+               SPX_MSG_DEBUG(std::cout << "DHARRI02 removing value " << cupd[i] << std::endl;)
                cupd.clearNum(j);
             }
          }
@@ -620,8 +622,8 @@ SPxId SPxHarrisRT<R>::selectEnter(R& val, int, bool)
             pupd.values(),       /* update VectorBase<R> for vec */
             pvec.get_const_ptr(),                /* current VectorBase<R> */
             lpb.get_const_ptr(),                 /* lower bounds for vec */
-            upb.get_const_ptr(),                 /* upper bounds for vec */
-            epsilon);             /* what is 0? */
+            upb.get_const_ptr()                  /* upper bounds for vec */
+         );
 
          minDelta
          (
@@ -632,8 +634,8 @@ SPxId SPxHarrisRT<R>::selectEnter(R& val, int, bool)
             cupd.values(),       /* update VectorBase<R> for vec */
             cvec.get_const_ptr(),                /* current VectorBase<R> */
             lcb.get_const_ptr(),                 /* lower bounds for vec */
-            ucb.get_const_ptr(),                 /* upper bounds for vec */
-            epsilon);             /* what is 0? */
+            ucb.get_const_ptr()                  /* upper bounds for vec */
+         );
 
          if(max == val)
             return enterId;
@@ -690,7 +692,7 @@ SPxId SPxHarrisRT<R>::selectEnter(R& val, int, bool)
             }
             else
             {
-               MSG_DEBUG(std::cout << "DHARRI03 removing value " << pupd[i] << std::endl;)
+               SPX_MSG_DEBUG(std::cout << "DHARRI03 removing value " << pupd[i] << std::endl;)
                pupd.clearNum(j);
             }
          }
@@ -740,7 +742,7 @@ SPxId SPxHarrisRT<R>::selectEnter(R& val, int, bool)
             }
             else
             {
-               MSG_DEBUG(std::cout << "DHARRI04 removing value " << x << std::endl;);
+               SPX_MSG_DEBUG(std::cout << "DHARRI04 removing value " << x << std::endl;);
                cupd.clearNum(j);
             }
          }

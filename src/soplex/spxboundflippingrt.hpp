@@ -32,9 +32,9 @@
 namespace soplex
 {
 
-#define LOWSTAB          1e-10
-#define MAX_RELAX_COUNT  2
-#define LONGSTEP_FREQ    100
+#define SOPLEX_LOWSTAB          1e-10
+#define SOPLEX_MAX_RELAX_COUNT  2
+#define SOPLEX_LONGSTEP_FREQ    100
 
 
 /** perform necessary bound flips to restore dual feasibility */
@@ -105,27 +105,27 @@ void SPxBoundFlippingRT<R>::flipAndUpdate(
 
          default :
             ++skipped;
-            MSG_WARNING((*this->thesolver->spxout),
-                        (*this->thesolver->spxout) << "PVEC unexpected status: " << static_cast<int>(stat)
-                        << " index: " << idx
-                        << " val: " << this->thesolver->pVec()[idx]
-                        << " upd: " << this->thesolver->pVec().delta()[idx]
-                        << " lower: " << lower
-                        << " upper: " << upper
-                        << " bp.val: " << breakpoints[i].val
-                        << std::endl;)
+            SPX_MSG_WARNING((*this->thesolver->spxout),
+                            (*this->thesolver->spxout) << "PVEC unexpected status: " << static_cast<int>(stat)
+                            << " index: " << idx
+                            << " val: " << this->thesolver->pVec()[idx]
+                            << " upd: " << this->thesolver->pVec().delta()[idx]
+                            << " lower: " << lower
+                            << " upper: " << upper
+                            << " bp.val: " << breakpoints[i].val
+                            << std::endl;)
          }
 
-         MSG_DEBUG(std::cout << "PVEC flipped from: " << stat
-                   << " index: " << idx
-                   << " val: " << this->thesolver->pVec()[idx]
-                   << " upd: " << this->thesolver->pVec().delta()[idx]
-                   << " lower: " << lower
-                   << " upper: " << upper
-                   << " bp.val: " << breakpoints[i].val
-                   << " UCbound: " << this->thesolver->theUCbound[idx]
-                   << " LCbound: " << this->thesolver->theLCbound[idx]
-                   << std::endl;)
+         SPX_MSG_DEBUG(std::cout << "PVEC flipped from: " << stat
+                       << " index: " << idx
+                       << " val: " << this->thesolver->pVec()[idx]
+                       << " upd: " << this->thesolver->pVec().delta()[idx]
+                       << " lower: " << lower
+                       << " upper: " << upper
+                       << " bp.val: " << breakpoints[i].val
+                       << " UCbound: " << this->thesolver->theUCbound[idx]
+                       << " LCbound: " << this->thesolver->theLCbound[idx]
+                       << std::endl;)
          assert(spxAbs(range) < 1e20);
          updPrimRhs.multAdd(range, this->thesolver->vector(idx));
 
@@ -161,27 +161,27 @@ void SPxBoundFlippingRT<R>::flipAndUpdate(
 
          default :
             ++skipped;
-            MSG_WARNING((*this->thesolver->spxout),
-                        (*this->thesolver->spxout) << "COPVEC unexpected status: " << static_cast<int>(stat)
-                        << " index: " << idx
-                        << " val: " << this->thesolver->coPvec()[idx]
-                        << " upd: " << this->thesolver->coPvec().delta()[idx]
-                        << " lower: " << lower
-                        << " upper: " << upper
-                        << " bp.val: " << breakpoints[i].val
-                        << std::endl;)
+            SPX_MSG_WARNING((*this->thesolver->spxout),
+                            (*this->thesolver->spxout) << "COPVEC unexpected status: " << static_cast<int>(stat)
+                            << " index: " << idx
+                            << " val: " << this->thesolver->coPvec()[idx]
+                            << " upd: " << this->thesolver->coPvec().delta()[idx]
+                            << " lower: " << lower
+                            << " upper: " << upper
+                            << " bp.val: " << breakpoints[i].val
+                            << std::endl;)
          }
 
-         MSG_DEBUG(std::cout << "COPVEC flipped from: " << stat
-                   << " index: " << idx
-                   << " val: " << this->thesolver->coPvec()[idx]
-                   << " upd: " << this->thesolver->coPvec().delta()[idx]
-                   << " lower: " << lower
-                   << " upper: " << upper
-                   << " bp.val: " << breakpoints[i].val
-                   << " URbound: " << this->thesolver->theURbound[idx]
-                   << " LRbound: " << this->thesolver->theLRbound[idx]
-                   << std::endl;)
+         SPX_MSG_DEBUG(std::cout << "COPVEC flipped from: " << stat
+                       << " index: " << idx
+                       << " val: " << this->thesolver->coPvec()[idx]
+                       << " upd: " << this->thesolver->coPvec().delta()[idx]
+                       << " lower: " << lower
+                       << " upper: " << upper
+                       << " bp.val: " << breakpoints[i].val
+                       << " URbound: " << this->thesolver->theURbound[idx]
+                       << " LRbound: " << this->thesolver->theLRbound[idx]
+                       << std::endl;)
          assert(spxAbs(range) < 1e20);
          updPrimRhs.setValue(idx, updPrimRhs[idx] - range);
 
@@ -221,15 +221,15 @@ void SPxBoundFlippingRT<R>::flipAndUpdate(
 
             default :
                ++skipped;
-               MSG_WARNING((*this->thesolver->spxout),
-                           (*this->thesolver->spxout) << "unexpected basis status: " << static_cast<int>(stat)
-                           << " index: " << idx
-                           << " val: " << this->thesolver->fVec()[idx]
-                           << " upd: " << this->thesolver->fVec().delta()[idx]
-                           << " lower: " << lower
-                           << " upper: " << upper
-                           << " bp.val: " << breakpoints[i].val
-                           << std::endl;)
+               SPX_MSG_WARNING((*this->thesolver->spxout),
+                               (*this->thesolver->spxout) << "unexpected basis status: " << static_cast<int>(stat)
+                               << " index: " << idx
+                               << " val: " << this->thesolver->fVec()[idx]
+                               << " upd: " << this->thesolver->fVec().delta()[idx]
+                               << " lower: " << lower
+                               << " upper: " << upper
+                               << " bp.val: " << breakpoints[i].val
+                               << std::endl;)
             }
          }
          else
@@ -260,26 +260,26 @@ void SPxBoundFlippingRT<R>::flipAndUpdate(
 
             default :
                ++skipped;
-               MSG_WARNING((*this->thesolver->spxout),
-                           (*this->thesolver->spxout) << "FVEC unexpected status: " << static_cast<int>(stat)
-                           << " index: " << idx
-                           << " val: " << this->thesolver->fVec()[idx]
-                           << " upd: " << this->thesolver->fVec().delta()[idx]
-                           << " lower: " << lower
-                           << " upper: " << upper
-                           << " bp.val: " << breakpoints[i].val
-                           << std::endl;)
+               SPX_MSG_WARNING((*this->thesolver->spxout),
+                               (*this->thesolver->spxout) << "FVEC unexpected status: " << static_cast<int>(stat)
+                               << " index: " << idx
+                               << " val: " << this->thesolver->fVec()[idx]
+                               << " upd: " << this->thesolver->fVec().delta()[idx]
+                               << " lower: " << lower
+                               << " upper: " << upper
+                               << " bp.val: " << breakpoints[i].val
+                               << std::endl;)
             }
          }
 
-         MSG_DEBUG(std::cout << "basic row/col flipped from: " << stat
-                   << " index: " << idx
-                   << " val: " << this->thesolver->fVec()[idx]
-                   << " upd: " << this->thesolver->fVec().delta()[idx]
-                   << " lower: " << lower
-                   << " upper: " << upper
-                   << " bp.val: " << breakpoints[i].val
-                   << std::endl;)
+         SPX_MSG_DEBUG(std::cout << "basic row/col flipped from: " << stat
+                       << " index: " << idx
+                       << " val: " << this->thesolver->fVec()[idx]
+                       << " upd: " << this->thesolver->fVec().delta()[idx]
+                       << " lower: " << lower
+                       << " upper: " << upper
+                       << " bp.val: " << breakpoints[i].val
+                       << std::endl;)
          assert(spxAbs(range) < 1e20);
          assert(updPrimRhs[idx] == 0);
          updPrimRhs.add(idx, range);
@@ -335,7 +335,7 @@ void SPxBoundFlippingRT<R>::collectBreakpointsMax(
       int i = *idx;
       R x = upd[i];
 
-      if(x > this->epsilon)
+      if(x > this->epsilonZero())
       {
          if(upp[i] < R(infinity))
          {
@@ -356,7 +356,7 @@ void SPxBoundFlippingRT<R>::collectBreakpointsMax(
             nBp++;
          }
       }
-      else if(x < -this->epsilon)
+      else if(x < -this->epsilonZero())
       {
          if(low[i] > R(-infinity))
          {
@@ -412,7 +412,7 @@ void SPxBoundFlippingRT<R>::collectBreakpointsMin(
       int i = *idx;
       R x = upd[i];
 
-      if(x > this->epsilon)
+      if(x > this->epsilonZero())
       {
          if(low[i] > R(-infinity))
          {
@@ -434,7 +434,7 @@ void SPxBoundFlippingRT<R>::collectBreakpointsMin(
             nBp++;
          }
       }
-      else if(x < -this->epsilon)
+      else if(x < -this->epsilonZero())
       {
          if(upp[i] < R(infinity))
          {
@@ -617,16 +617,16 @@ SPxId SPxBoundFlippingRT<R>::selectEnter(
    assert(this->thesolver->boundflips == 0);
 
    // reset the history and try again to do some long steps
-   if(this->thesolver->leaveCount % LONGSTEP_FREQ == 0)
+   if(this->thesolver->leaveCount % SOPLEX_LONGSTEP_FREQ == 0)
    {
-      MSG_DEBUG(std::cout << "DLBFRT06 resetting long step history" << std::endl;)
+      SPX_MSG_DEBUG(std::cout << "DLBFRT06 resetting long step history" << std::endl;)
       flipPotential = 1;
    }
 
    if(!enableBoundFlips || polish || this->thesolver->rep() == SPxSolverBase<R>::ROW
          || flipPotential <= 0)
    {
-      MSG_DEBUG(std::cout << "DLBFRT07 switching to fast ratio test" << std::endl;)
+      SPX_MSG_DEBUG(std::cout << "DLBFRT07 switching to fast ratio test" << std::endl;)
       return SPxFastRT<R>::selectEnter(val, leaveIdx, polish);
    }
 
@@ -643,8 +643,6 @@ SPxId SPxBoundFlippingRT<R>::selectEnter(
    int          cupdnnz = this->thesolver->coPvec().delta().size();
    const R*  lcb  = this->thesolver->lcBound().get_const_ptr();
    const R*  ucb  = this->thesolver->ucBound().get_const_ptr();
-
-   this->resetTols();
 
    R max;
 
@@ -783,18 +781,18 @@ SPxId SPxBoundFlippingRT<R>::selectEnter(
    // check for unboundedness/infeasibility
    if(slope > this->delta && npassedBp >= nBp - 1)
    {
-      MSG_DEBUG(std::cout << "DLBFRT02 " << this->thesolver->basis().iteration()
-                << ": unboundedness in ratio test" << std::endl;)
+      SPX_MSG_DEBUG(std::cout << "DLBFRT02 " << this->thesolver->basis().iteration()
+                    << ": unboundedness in ratio test" << std::endl;)
       flipPotential -= 0.5;
       val = max;
       return SPxFastRT<R>::selectEnter(val, leaveIdx);
    }
 
-   MSG_DEBUG(std::cout << "DLBFRT01 "
-             << this->thesolver->basis().iteration()
-             << ": number of flip candidates: "
-             << npassedBp
-             << std::endl;)
+   SPX_MSG_DEBUG(std::cout << "DLBFRT01 "
+                 << this->thesolver->basis().iteration()
+                 << ": number of flip candidates: "
+                 << npassedBp
+                 << std::endl;)
 
    // try to get a more stable pivot by looking at those with similar step length
    int stableBp;              // index to walk over additional breakpoints (after slope change)
@@ -872,7 +870,8 @@ SPxId SPxBoundFlippingRT<R>::selectEnter(
    // get stability requirements
    instable = this->thesolver->instableLeave;
    assert(!instable || this->thesolver->instableLeaveNum >= 0);
-   stab = instable ? LOWSTAB : SPxFastRT<R>::minStability(moststable);
+   R lowstab = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_LOWSTAB);
+   stab = instable ? lowstab : SPxFastRT<R>::minStability(moststable);
 
    bool foundStable = false;
 
@@ -918,12 +917,12 @@ SPxId SPxBoundFlippingRT<R>::selectEnter(
    {
       assert(!enterId.isValid());
 
-      if(relax_count < MAX_RELAX_COUNT)
+      if(relax_count < SOPLEX_MAX_RELAX_COUNT)
       {
-         MSG_DEBUG(std::cout << "DLBFRT04 "
-                   << this->thesolver->basis().iteration()
-                   << ": no valid enterId found - relaxing..."
-                   << std::endl;)
+         SPX_MSG_DEBUG(std::cout << "DLBFRT04 "
+                       << this->thesolver->basis().iteration()
+                       << ": no valid enterId found - relaxing..."
+                       << std::endl;)
          this->relax();
          ++relax_count;
          // restore original value
@@ -933,10 +932,10 @@ SPxId SPxBoundFlippingRT<R>::selectEnter(
       }
       else
       {
-         MSG_DEBUG(std::cout << "DLBFRT05 "
-                   << this->thesolver->basis().iteration()
-                   << " no valid enterId found - breaking..."
-                   << std::endl;)
+         SPX_MSG_DEBUG(std::cout << "DLBFRT05 "
+                       << this->thesolver->basis().iteration()
+                       << " no valid enterId found - breaking..."
+                       << std::endl;)
          return enterId;
       }
    }
@@ -963,13 +962,13 @@ SPxId SPxBoundFlippingRT<R>::selectEnter(
       flipPotential -= 0.1;
    }
 
-   MSG_DEBUG(std::cout << "DLBFRT06 "
-             << this->thesolver->basis().iteration()
-             << ": selected Id: "
-             << enterId
-             << " number of candidates: "
-             << nBp
-             << std::endl;)
+   SPX_MSG_DEBUG(std::cout << "DLBFRT06 "
+                 << this->thesolver->basis().iteration()
+                 << ": selected Id: "
+                 << enterId
+                 << " number of candidates: "
+                 << nBp
+                 << std::endl;)
    return enterId;
 }
 
@@ -985,16 +984,16 @@ int SPxBoundFlippingRT<R>::selectLeave(
    assert(this->thesolver->boundflips == 0);
 
    // reset the history and try again to do some long steps
-   if(this->thesolver->enterCount % LONGSTEP_FREQ == 0)
+   if(this->thesolver->enterCount % SOPLEX_LONGSTEP_FREQ == 0)
    {
-      MSG_DEBUG(std::cout << "DEBFRT06 resetting long step history" << std::endl;)
+      SPX_MSG_DEBUG(std::cout << "DEBFRT06 resetting long step history" << std::endl;)
       flipPotential = 1;
    }
 
    if(polish || !enableBoundFlips || !enableRowBoundFlips
          || this->thesolver->rep() == SPxSolverBase<R>::COLUMN || flipPotential <= 0)
    {
-      MSG_DEBUG(std::cout << "DEBFRT07 switching to fast ratio test" << std::endl;)
+      SPX_MSG_DEBUG(std::cout << "DEBFRT07 switching to fast ratio test" << std::endl;)
       return SPxFastRT<R>::selectLeave(val, enterTest, polish);
    }
 
@@ -1010,8 +1009,6 @@ int SPxBoundFlippingRT<R>::selectLeave(
       this->thesolver->lbBound().get_const_ptr();      /**< pointer to lower bound/lhs of current VectorBase<R> */
    const R*  ub  =
       this->thesolver->ubBound().get_const_ptr();      /**< pointer to upper bound/rhs of current VectorBase<R> */
-
-   this->resetTols();
 
    R max;
 
@@ -1135,18 +1132,18 @@ int SPxBoundFlippingRT<R>::selectLeave(
    // check for unboundedness/infeasibility
    if(slope > this->delta && npassedBp >= nBp - 1)
    {
-      MSG_DEBUG(std::cout << "DEBFRT02 " << this->thesolver->basis().iteration()
-                << ": unboundedness in ratio test" << std::endl;)
+      SPX_MSG_DEBUG(std::cout << "DEBFRT02 " << this->thesolver->basis().iteration()
+                    << ": unboundedness in ratio test" << std::endl;)
       flipPotential -= 0.5;
       val = max;
       return SPxFastRT<R>::selectLeave(val, enterTest);
    }
 
-   MSG_DEBUG(std::cout << "DEBFRT01 "
-             << this->thesolver->basis().iteration()
-             << ": number of flip candidates: "
-             << npassedBp
-             << std::endl;)
+   SPX_MSG_DEBUG(std::cout << "DEBFRT01 "
+                 << this->thesolver->basis().iteration()
+                 << ": number of flip candidates: "
+                 << npassedBp
+                 << std::endl;)
 
    // try to get a more stable pivot by looking at those with similar step length
    int stableBp;              // index to walk over additional breakpoints (after slope change)
@@ -1187,7 +1184,8 @@ int SPxBoundFlippingRT<R>::selectLeave(
    // get stability requirements
    instable = this->thesolver->instableEnter;
    assert(!instable || this->thesolver->instableEnterId.isValid());
-   stab = instable ? LOWSTAB : SPxFastRT<R>::minStability(moststable);
+   R lowstab = this->tolerances()->scaleAccordingToEpsilon(SOPLEX_LOWSTAB);
+   stab = instable ? lowstab : SPxFastRT<R>::minStability(moststable);
 
    bool foundStable = false;
 
@@ -1228,12 +1226,12 @@ int SPxBoundFlippingRT<R>::selectLeave(
    {
       assert(leaveIdx < 0);
 
-      if(relax_count < MAX_RELAX_COUNT)
+      if(relax_count < SOPLEX_MAX_RELAX_COUNT)
       {
-         MSG_DEBUG(std::cout << "DEBFRT04 "
-                   << this->thesolver->basis().iteration()
-                   << ": no valid leaveIdx found - relaxing..."
-                   << std::endl;)
+         SPX_MSG_DEBUG(std::cout << "DEBFRT04 "
+                       << this->thesolver->basis().iteration()
+                       << ": no valid leaveIdx found - relaxing..."
+                       << std::endl;)
          this->relax();
          ++relax_count;
          // restore original value
@@ -1243,10 +1241,10 @@ int SPxBoundFlippingRT<R>::selectLeave(
       }
       else
       {
-         MSG_DEBUG(std::cout << "DEBFRT05 "
-                   << this->thesolver->basis().iteration()
-                   << " no valid leaveIdx found - breaking..."
-                   << std::endl;)
+         SPX_MSG_DEBUG(std::cout << "DEBFRT05 "
+                       << this->thesolver->basis().iteration()
+                       << " no valid leaveIdx found - breaking..."
+                       << std::endl;)
          return leaveIdx;
       }
    }
@@ -1273,13 +1271,13 @@ int SPxBoundFlippingRT<R>::selectLeave(
       flipPotential -= 0.1;
    }
 
-   MSG_DEBUG(std::cout << "DEBFRT06 "
-             << this->thesolver->basis().iteration()
-             << ": selected Index: "
-             << leaveIdx
-             << " number of candidates: "
-             << nBp
-             << std::endl;)
+   SPX_MSG_DEBUG(std::cout << "DEBFRT06 "
+                 << this->thesolver->basis().iteration()
+                 << ": selected Index: "
+                 << leaveIdx
+                 << " number of candidates: "
+                 << nBp
+                 << std::endl;)
 
    return leaveIdx;
 }

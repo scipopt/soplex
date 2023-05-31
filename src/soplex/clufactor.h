@@ -35,7 +35,7 @@
 
 #include "vector"
 
-#define WITH_L_ROWS 1
+#define SOPLEX_WITH_L_ROWS 1
 
 namespace soplex
 {
@@ -49,6 +49,17 @@ template <class R>
 class CLUFactor
 {
 public:
+
+   /// set tolerances
+   virtual void setTolerances(std::shared_ptr<Tolerances> tolerances)
+   {
+      this->_tolerances = tolerances;
+   }
+   /// get tolerances
+   const virtual std::shared_ptr<Tolerances> tolerances() const
+   {
+      return _tolerances;
+   }
 
    //----------------------------------------
    /**@name Public types */
@@ -216,6 +227,7 @@ protected:
    Timer*  factorTime;        ///< Time spent in factorizations
    int     factorCount;       ///< Number of factorizations
    int     hugeValues;        ///< number of times huge values occurred during solve (only used in debug mode)
+   std::shared_ptr<Tolerances> _tolerances; ///< Tolerances for the factorization
    ///@}
 
 private:

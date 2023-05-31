@@ -37,18 +37,18 @@ void SPxBasisBase<R>::reDim()
 
    assert(theLP != 0);
 
-   MSG_DEBUG(std::cout << "DCHBAS01 SPxBasisBase<R>::reDim():"
-             << " matrixIsSetup=" << matrixIsSetup
-             << " fatorized=" << factorized
-             << std::endl;)
+   SPX_MSG_DEBUG(std::cout << "DCHBAS01 SPxBasisBase<R>::reDim():"
+                 << " matrixIsSetup=" << matrixIsSetup
+                 << " fatorized=" << factorized
+                 << std::endl;)
 
    thedesc.reSize(theLP->nRows(), theLP->nCols());
 
    if(theLP->dim() != matrix.size())
    {
-      MSG_INFO3((*this->spxout), (*this->spxout) <<
-                "ICHBAS02 basis redimensioning invalidates factorization"
-                << std::endl;)
+      SPX_MSG_INFO3((*this->spxout), (*this->spxout) <<
+                    "ICHBAS02 basis redimensioning invalidates factorization"
+                    << std::endl;)
 
       matrix.reSize(theLP->dim());
       theBaseId.reSize(theLP->dim());
@@ -56,10 +56,10 @@ void SPxBasisBase<R>::reDim()
       factorized    = false;
    }
 
-   MSG_DEBUG(std::cout << "DCHBAS03 SPxBasisBase<R>::reDim(): -->"
-             << " matrixIsSetup=" << matrixIsSetup
-             << " fatorized=" << factorized
-             << std::endl;)
+   SPX_MSG_DEBUG(std::cout << "DCHBAS03 SPxBasisBase<R>::reDim(): -->"
+                 << " matrixIsSetup=" << matrixIsSetup
+                 << " fatorized=" << factorized
+                 << std::endl;)
 
    assert(matrix.size()    >= theLP->dim());
    assert(theBaseId.size() >= theLP->dim());
@@ -124,7 +124,7 @@ void SPxBasisBase<R>::addedRows(int n)
          break;
 
       default:
-         MSG_ERROR(std::cerr << "ECHBAS04 Unknown basis status!" << std::endl;)
+         SPX_MSG_ERROR(std::cerr << "ECHBAS04 Unknown basis status!" << std::endl;)
          throw SPxInternalCodeException("XCHBAS01 This should never happen.");
       }
    }
@@ -144,7 +144,7 @@ void SPxBasisBase<R>::removedRow(int i)
          setStatus(NO_PROBLEM);
          factorized = false;
 
-         MSG_DEBUG(std::cout << "DCHBAS05 Warning: deleting basic row!\n";)
+         SPX_MSG_DEBUG(std::cout << "DCHBAS05 Warning: deleting basic row!\n";)
       }
    }
    else
@@ -155,7 +155,7 @@ void SPxBasisBase<R>::removedRow(int i)
       if(!theLP->isBasic(thedesc.rowStatus(i)))
       {
          setStatus(NO_PROBLEM);
-         MSG_DEBUG(std::cout << "DCHBAS06 Warning: deleting nonbasic row!\n";)
+         SPX_MSG_DEBUG(std::cout << "DCHBAS06 Warning: deleting nonbasic row!\n";)
       }
       else if(status() > NO_PROBLEM && matrixIsSetup)
       {
@@ -201,7 +201,7 @@ void SPxBasisBase<R>::removedRows(const int perm[])
                {
                   setStatus(NO_PROBLEM);
                   factorized = matrixIsSetup = false;
-                  MSG_DEBUG(std::cout << "DCHBAS07 Warning: deleting basic row!\n";)
+                  SPX_MSG_DEBUG(std::cout << "DCHBAS07 Warning: deleting basic row!\n";)
                }
             }
             else                            // row was moved
@@ -329,7 +329,7 @@ void SPxBasisBase<R>::addedCols(int n)
          break;
 
       default:
-         MSG_ERROR(std::cerr << "ECHBAS08 Unknown basis status!" << std::endl;)
+         SPX_MSG_ERROR(std::cerr << "ECHBAS08 Unknown basis status!" << std::endl;)
          throw SPxInternalCodeException("XCHBAS02 This should never happen.");
       }
    }
@@ -431,8 +431,9 @@ void SPxBasisBase<R>::invalidate()
 {
    if(factorized || matrixIsSetup)
    {
-      MSG_INFO3((*this->spxout), (*this->spxout) << "ICHBAS09 explicit invalidation of factorization" <<
-                std::endl;)
+      SPX_MSG_INFO3((*this->spxout),
+                    (*this->spxout) << "ICHBAS09 explicit invalidation of factorization" <<
+                    std::endl;)
    }
 
    factorized    = false;
@@ -448,7 +449,7 @@ void SPxBasisBase<R>::restoreInitialBasis()
 {
    assert(!factorized);
 
-   MSG_INFO3((*this->spxout), (*this->spxout) << "ICHBAS10 setup slack basis" << std::endl;)
+   SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "ICHBAS10 setup slack basis" << std::endl;)
 
    if(theLP->rep() == SPxSolverBase<R>::COLUMN)
    {

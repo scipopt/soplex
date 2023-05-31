@@ -57,7 +57,7 @@ static R maxPrescaledRatio(const SPxLPBase<R>& lp, const std::vector<R>& coScale
          assert(vec.index(j) >= 0);
          const R x = spxAbs(vec.value(j)) * coScaleval[unsigned(vec.index(j))];
 
-         if(isZero(x))
+         if(isZero(x, lp.tolerances()->epsilon()))
             continue;
 
          if(x < mini)
@@ -81,7 +81,7 @@ static R maxPrescaledRatio(const SPxLPBase<R>& lp, const std::vector<R>& coScale
 
 template <class R>
 void SPxEquiliSC<R>::computeEquiExpVec(const SVSetBase<R>* vecset, const DataArray<int>& coScaleExp,
-                                       DataArray<int>& scaleExp)
+                                       DataArray<int>& scaleExp, R epsilon)
 {
    assert(vecset != nullptr);
 
@@ -95,7 +95,7 @@ void SPxEquiliSC<R>::computeEquiExpVec(const SVSetBase<R>* vecset, const DataArr
       {
          const R x = spxAbs(spxLdexp(vec.value(j), coScaleExp[vec.index(j)]));
 
-         if(GT(x, maxi))
+         if(GT(x, maxi, epsilon))
             maxi = x;
       }
 
@@ -113,7 +113,7 @@ void SPxEquiliSC<R>::computeEquiExpVec(const SVSetBase<R>* vecset, const DataArr
 
 template <class R>
 void SPxEquiliSC<R>::computeEquiExpVec(const SVSetBase<R>* vecset, const std::vector<R>& coScaleVal,
-                                       DataArray<int>& scaleExp)
+                                       DataArray<int>& scaleExp, R epsilon)
 {
    assert(vecset != nullptr);
 
@@ -128,7 +128,7 @@ void SPxEquiliSC<R>::computeEquiExpVec(const SVSetBase<R>* vecset, const std::ve
          assert(vec.index(j) >= 0);
          const R x = spxAbs(vec.value(j) * coScaleVal[unsigned(vec.index(j))]);
 
-         if(GT(x, maxi))
+         if(GT(x, maxi, epsilon))
             maxi = x;
       }
 
@@ -147,7 +147,7 @@ void SPxEquiliSC<R>::computeEquiExpVec(const SVSetBase<R>* vecset, const std::ve
 template <class R>
 void SPxEquiliSC<R>::computePostequiExpVecs(const SPxLPBase<R>& lp,
       const std::vector<R>& preRowscale, const std::vector<R>& preColscale,
-      DataArray<int>& rowscaleExp, DataArray<int>& colscaleExp)
+      DataArray<int>& rowscaleExp, DataArray<int>& colscaleExp, R epsilon)
 {
    const R colratio = maxPrescaledRatio(lp, preRowscale, false);
    const R rowratio = maxPrescaledRatio(lp, preColscale, true);
@@ -157,13 +157,13 @@ void SPxEquiliSC<R>::computePostequiExpVecs(const SPxLPBase<R>& lp,
    // see SPxEquiliSC<R>::scale for reason behind this branch
    if(colFirst)
    {
-      computeEquiExpVec(lp.colSet(), preRowscale, colscaleExp);
-      computeEquiExpVec(lp.rowSet(), colscaleExp, rowscaleExp);
+      computeEquiExpVec(lp.colSet(), preRowscale, colscaleExp, epsilon);
+      computeEquiExpVec(lp.rowSet(), colscaleExp, rowscaleExp, epsilon);
    }
    else
    {
-      computeEquiExpVec(lp.rowSet(), preColscale, rowscaleExp);
-      computeEquiExpVec(lp.colSet(), rowscaleExp, colscaleExp);
+      computeEquiExpVec(lp.rowSet(), preColscale, rowscaleExp, epsilon);
+      computeEquiExpVec(lp.colSet(), rowscaleExp, colscaleExp, epsilon);
    }
 }
 
@@ -192,8 +192,8 @@ template <class R>
 void SPxEquiliSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
 {
 
-   MSG_INFO1((*this->spxout), (*this->spxout) << "Equilibrium scaling LP" <<
-             (persistent ? " (persistent)" : "") << std::endl;)
+   SPX_MSG_INFO1((*this->spxout), (*this->spxout) << "Equilibrium scaling LP" <<
+                 (persistent ? " (persistent)" : "") << std::endl;)
 
    this->setup(lp);
 
@@ -219,47 +219,48 @@ void SPxEquiliSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
     */
    R colratio = this->maxColRatio(lp);
    R rowratio = this->maxRowRatio(lp);
+   R epsilon = this->tolerances()->epsilon();
 
    bool colFirst = colratio < rowratio;
 
-   MSG_INFO2((*this->spxout), (*this->spxout) << "before scaling:"
-             << " min= " << lp.minAbsNzo()
-             << " max= " << lp.maxAbsNzo()
-             << " col-ratio= " << colratio
-             << " row-ratio= " << rowratio
-             << std::endl;)
+   SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "before scaling:"
+                 << " min= " << lp.minAbsNzo()
+                 << " max= " << lp.maxAbsNzo()
+                 << " col-ratio= " << colratio
+                 << " row-ratio= " << rowratio
+                 << std::endl;)
 
    if(colFirst)
    {
-      computeEquiExpVec(lp.colSet(), *this->m_activeRowscaleExp, *this->m_activeColscaleExp);
+      computeEquiExpVec(lp.colSet(), *this->m_activeRowscaleExp, *this->m_activeColscaleExp, epsilon);
 
       if(this->m_doBoth)
-         computeEquiExpVec(lp.rowSet(), *this->m_activeColscaleExp, *this->m_activeRowscaleExp);
+         computeEquiExpVec(lp.rowSet(), *this->m_activeColscaleExp, *this->m_activeRowscaleExp, epsilon);
    }
    else
    {
-      computeEquiExpVec(lp.rowSet(), *this->m_activeColscaleExp, *this->m_activeRowscaleExp);
+      computeEquiExpVec(lp.rowSet(), *this->m_activeColscaleExp, *this->m_activeRowscaleExp, epsilon);
 
       if(this->m_doBoth)
-         computeEquiExpVec(lp.colSet(), *this->m_activeRowscaleExp, *this->m_activeColscaleExp);
+         computeEquiExpVec(lp.colSet(), *this->m_activeRowscaleExp, *this->m_activeColscaleExp, epsilon);
    }
 
    /* scale */
    this->applyScaling(lp);
 
-   MSG_INFO3((*this->spxout), (*this->spxout) << "Row scaling min= " << this->minAbsRowscale()
-             << " max= " << this->maxAbsRowscale()
-             << std::endl
-             << "Col scaling min= " << this->minAbsColscale()
-             << " max= " << this->maxAbsColscale()
-             << std::endl;)
+   SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "Row scaling min= " << this->minAbsRowscale()
+                 << " max= " << this->maxAbsRowscale()
+                 << std::endl
+                 << "Col scaling min= " << this->minAbsColscale()
+                 << " max= " << this->maxAbsColscale()
+                 << std::endl;)
 
-   MSG_INFO2((*this->spxout), (*this->spxout) << "after scaling: "
-             << " min= " << lp.minAbsNzo(false)
-             << " max= " << lp.maxAbsNzo(false)
-             << " col-ratio= " << this->maxColRatio(lp)
-             << " row-ratio= " << this->maxRowRatio(lp)
-             << std::endl;)
+   SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "after scaling: "
+                 << " min= " << lp.minAbsNzo(false)
+                 << " max= " << lp.maxAbsNzo(false)
+                 << " col-ratio= " << this->maxColRatio(lp)
+                 << " row-ratio= " << this->maxRowRatio(lp)
+                 << std::endl;)
 
 }
 

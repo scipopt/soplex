@@ -91,7 +91,7 @@ void SPxWeightPR<R>::computeRP(int start, int end)
 
       rPenalty[i] = (this->solver()->rowVector(i) * this->solver()->maxObj()) * objlength
                     / this->solver()->rowVector(i).length2();
-      ASSERT_WARN("WWGTPR01", rPenalty[i] > -1 - this->solver()->epsilon());
+      SOPLEX_ASSERT_WARN("WWGTPR01", rPenalty[i] > -1 - this->solver()->epsilon());
    }
 }
 
@@ -101,7 +101,7 @@ void SPxWeightPR<R>::computeCP(int start, int end)
    for(int i = start; i < end; ++i)
    {
       cPenalty[i] = this->solver()->maxObj(i) * objlength;
-      ASSERT_WARN("WWGTPR02", cPenalty[i] > -1 - this->solver()->epsilon());
+      SOPLEX_ASSERT_WARN("WWGTPR02", cPenalty[i] > -1 - this->solver()->epsilon());
    }
 }
 
@@ -132,7 +132,7 @@ int SPxWeightPR<R>::selectLeave()
    {
       x = test[i];
 
-      if(x < -this->theeps)
+      if(x < -this->thetolerance)
       {
          x *= leavePenalty[i];
 
@@ -165,7 +165,7 @@ SPxId SPxWeightPR<R>::selectEnter()
    {
       x = rTest[i];
 
-      if(x < -this->theeps)
+      if(x < -this->thetolerance)
       {
          x *= -x;
 
@@ -211,7 +211,7 @@ SPxId SPxWeightPR<R>::selectEnter()
    {
       x = cTest[i];
 
-      if(x < -this->theeps)
+      if(x < -this->thetolerance)
       {
          x *= -x;
 
@@ -406,13 +406,16 @@ bool SPxWeightPR<R>::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
+   if(this->_tolerances == nullptr)
+      return SPX_MSG_INCONSISTENT("SPxWeightPR");
+
    if(this->solver() != 0)
    {
       if(rPenalty.dim() != this->solver()->nRows())
-         return MSGinconsistent("SPxWeightPR");
+         return SPX_MSG_INCONSISTENT("SPxWeightPR");
 
       if(cPenalty.dim() != this->solver()->nCols())
-         return MSGinconsistent("SPxWeightPR");
+         return SPX_MSG_INCONSISTENT("SPxWeightPR");
    }
 
 #endif

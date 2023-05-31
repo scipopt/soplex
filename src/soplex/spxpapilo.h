@@ -60,15 +60,8 @@ public:
       return new Presol(*this);
    }
 
-   virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, R eps, R delta,
-         Real remainingTime)
-   {
-      return SPxSimplifier<R>::OKAY;
-   }
-
-   virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
-         Real remainingTime,
-         bool keepbounds, uint32_t seed)
+   virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp,
+         Real remainingTime, bool keepbounds, uint32_t seed)
    {
       assert(false);
       return SPxSimplifier<R>::OKAY;
@@ -201,9 +194,6 @@ private:
 
    bool postsolved;           ///< was the solution already postsolve?
    bool vanished = false;
-   R m_epsilon;                 ///< epsilon zero.
-   R m_feastol;                 ///< primal feasibility tolerance.
-   R m_opttol;                  ///< dual feasibility tolerance.
    R modifyRowsFac;             ///<
    DataArray<int> m_stat;       ///< preprocessing history.
    typename SPxLPBase<R>::SPxSense m_thesense;   ///< optimization sense.
@@ -225,17 +215,17 @@ protected:
 
    R epsZero() const
    {
-      return m_epsilon;
+      return this->tolerances()->epsilon();
    }
 
    R feastol() const
    {
-      return m_feastol;
+      return this->tolerances()->floatingPointFeastol();
    }
 
    R opttol() const
    {
-      return m_opttol;
+      return this->tolerances()->floatingPointOpttol();
    }
 
 public:
@@ -245,8 +235,7 @@ public:
    ///@{
    /// default constructor.
    explicit Presol(Timer::TYPE ttype = Timer::USER_TIME)
-      : SPxSimplifier<R>("PaPILO", ttype), postsolved(false), m_epsilon(DEFAULT_EPS_ZERO),
-        m_feastol(DEFAULT_BND_VIOL), m_opttol(DEFAULT_BND_VIOL), modifyRowsFac(1.0),
+      : SPxSimplifier<R>("PaPILO", ttype), postsolved(false), modifyRowsFac(1.0),
         m_thesense(SPxLPBase<R>::MAXIMIZE),
         m_keepbounds(false), m_result(this->OKAY)
    { ; };
@@ -255,8 +244,7 @@ public:
    Presol(const Presol& old)
       : SPxSimplifier<R>(old), m_prim(old.m_prim), m_slack(old.m_slack), m_dual(old.m_dual),
         m_redCost(old.m_redCost), m_cBasisStat(old.m_cBasisStat), m_rBasisStat(old.m_rBasisStat),
-        postsolveStorage(old.postsolveStorage), postsolved(old.postsolved), m_epsilon(old.m_epsilon),
-        m_feastol(old.m_feastol), m_opttol(old.m_opttol),
+        postsolveStorage(old.postsolveStorage), postsolved(old.postsolved),
         modifyRowsFac(old.modifyRowsFac), m_thesense(old.m_thesense),
         m_keepbounds(old.m_keepbounds), m_result(old.m_result)
    {
@@ -276,9 +264,6 @@ public:
          m_cBasisStat = rhs.m_cBasisStat;
          m_rBasisStat = rhs.m_rBasisStat;
          postsolved = rhs.postsolved;
-         m_epsilon = rhs.m_epsilon;
-         m_feastol = rhs.m_feastol;
-         m_opttol = rhs.m_opttol;
          m_thesense = rhs.m_thesense;
          m_keepbounds = rhs.m_keepbounds;
          m_result = rhs.m_result;
@@ -354,15 +339,8 @@ public:
       enableDominatedCols = value;
    }
 
-   virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, R eps, R delta,
-         Real remainingTime)
-   {
-      return simplify(lp, eps, delta, delta, remainingTime, false, 0);
-   }
-
-   virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
-         Real remainingTime,
-         bool keepbounds, uint32_t seed);
+   virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp,
+         Real remainingTime, bool keepbounds, uint32_t seed);
 
    virtual void unsimplify(const VectorBase<R>&, const VectorBase<R>&, const VectorBase<R>&,
                            const VectorBase<R>&,
@@ -468,10 +446,10 @@ void Presol<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
                            bool isOptimal)
 {
 
-   MSG_INFO1((*this->spxout), (*this->spxout)
-             << " --- unsimplifying solution and basis"
-             << std::endl;
-            )
+   SPX_MSG_INFO1((*this->spxout), (*this->spxout)
+                 << " --- unsimplifying solution and basis"
+                 << std::endl;
+                )
 
    assert(x.dim() <= m_prim.dim());
    assert(y.dim() <= m_dual.dim());
@@ -543,8 +521,8 @@ void Presol<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
    }
 
    papilo::Num<R> num {};
-   num.setEpsilon(m_epsilon);
-   num.setFeasTol(m_feastol);
+   num.setEpsilon(this->epsZero());
+   num.setFeasTol(this->feastol());
    /* since PaPILO verbosity is quiet it's irrelevant what the messenger is */
    papilo::Message msg{};
    msg.setVerbosityLevel(verbosityLevel);
@@ -554,7 +532,7 @@ void Presol<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
 
    if(status == PostsolveStatus::kFailed && isOptimal)
    {
-      MSG_ERROR(std::cerr << "PaPILO did not pass validation" << std::endl;)
+      SPX_MSG_ERROR(std::cerr << "PaPILO did not pass validation" << std::endl;)
       assert(false);
    }
 
@@ -694,26 +672,27 @@ papilo::Problem<R> buildProblem(SPxLPBase<R>& lp)
 
 template<class R>
 typename SPxSimplifier<R>::Result
-Presol<R>::simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
-                    Real remainingTime, bool keepbounds, uint32_t seed)
+Presol<R>::simplify(SPxLPBase<R>& lp, Real remainingTime, bool keepbounds, uint32_t seed)
 {
 
    //TODO: how to use the keepbounds parameter?
    m_keepbounds = keepbounds;
 
    if(m_keepbounds)
-      MSG_WARNING((*this->spxout), (*this->spxout) << "==== PaPILO doesn't handle parameter keepbounds" <<
-                  std::endl;)
+      SPX_MSG_WARNING((*this->spxout),
+                      (*this->spxout) << "==== PaPILO doesn't handle parameter keepbounds" <<
+                      std::endl;)
 
       initLocalVariables(lp);
 
    papilo::Problem<R> problem = buildProblem(lp);
    papilo::Presolve<R> presolve;
 
-   configurePapilo(presolve, ftol, eps, seed, remainingTime);
-   MSG_INFO1((*this->spxout), (*this->spxout)
-             << " --- starting PaPILO" << std::endl;
-            )
+   configurePapilo(presolve, this->tolerances()->floatingPointFeastol(), this->tolerances()->epsilon(),
+                   seed, remainingTime);
+   SPX_MSG_INFO1((*this->spxout), (*this->spxout)
+                 << " --- starting PaPILO" << std::endl;
+                )
 
    papilo::PresolveResult<R> res = presolve.apply(problem);
 
@@ -723,25 +702,25 @@ Presol<R>::simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
    {
    case papilo::PresolveStatus::kInfeasible:
       m_result = SPxSimplifier<R>::INFEASIBLE;
-      MSG_INFO1((*this->spxout), (*this->spxout)
-                << " --- presolving detected infeasibility" << std::endl;
-               )
+      SPX_MSG_INFO1((*this->spxout), (*this->spxout)
+                    << " --- presolving detected infeasibility" << std::endl;
+                   )
       return SPxSimplifier<R>::INFEASIBLE;
 
    case papilo::PresolveStatus::kUnbndOrInfeas:
    case papilo::PresolveStatus::kUnbounded:
       m_result = SPxSimplifier<R>::UNBOUNDED;
-      MSG_INFO1((*this->spxout), (*this->spxout) <<
-                "==== Presolving detected unboundedness of the problem" << std::endl;
-               )
+      SPX_MSG_INFO1((*this->spxout), (*this->spxout) <<
+                    "==== Presolving detected unboundedness of the problem" << std::endl;
+                   )
       return SPxSimplifier<R>::UNBOUNDED;
 
    case papilo::PresolveStatus::kUnchanged:
       // since Soplex has no state unchanged store the value in a new variable
       noChanges = true;
-      MSG_INFO1((*this->spxout), (*this->spxout)
-                << "==== Presolving found nothing " << std::endl;
-               )
+      SPX_MSG_INFO1((*this->spxout), (*this->spxout)
+                    << "==== Presolving found nothing " << std::endl;
+                   )
       return SPxSimplifier<R>::OKAY;
 
    case papilo::PresolveStatus::kReduced:
@@ -754,15 +733,15 @@ Presol<R>::simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
    if(newNonzeros == 0 || ((problem.getNRows() <= modifyRowsFac * lp.nRows() ||
                             newNonzeros <= modifyRowsFac * lp.nNzos())))
    {
-      MSG_INFO1((*this->spxout), (*this->spxout)
-                << " --- presolved problem has " << problem.getNRows() <<
-                " rows, "
-                << problem.getNCols() << " cols and "
-                << newNonzeros << " non-zeros and  "
-                << presolve.getStatistics().nboundchgs << " boundchanges and "
-                << presolve.getStatistics().nsidechgs << " sidechanges"
-                << std::endl;
-               )
+      SPX_MSG_INFO1((*this->spxout), (*this->spxout)
+                    << " --- presolved problem has " << problem.getNRows() <<
+                    " rows, "
+                    << problem.getNCols() << " cols and "
+                    << newNonzeros << " non-zeros and  "
+                    << presolve.getStatistics().nboundchgs << " boundchanges and "
+                    << presolve.getStatistics().nsidechgs << " sidechanges"
+                    << std::endl;
+                   )
       postsolveStorage = res.postsolve;
 
       // remove all constraints and variables
@@ -779,12 +758,12 @@ Presol<R>::simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol,
    else
    {
       noChanges = true;
-      MSG_INFO1((*this->spxout),
-                (*this->spxout)
+      SPX_MSG_INFO1((*this->spxout),
+                    (*this->spxout)
 
-                << " --- presolve results smaller than the modifyconsfac"
-                << std::endl;
-               )
+                    << " --- presolve results smaller than the modifyconsfac"
+                    << std::endl;
+                   )
    }
 
    if(newNonzeros == 0)

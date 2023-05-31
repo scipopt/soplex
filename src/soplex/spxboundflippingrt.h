@@ -265,6 +265,14 @@ public:
    {
       enableRowBoundFlips = bf;
    }
+
+   /// set tolerances
+   void setTolerances(std::shared_ptr<Tolerances> tolerances)
+   {
+      this->_tolerances = tolerances;
+      this->updPrimRhs.setTolerances(tolerances);
+      this->updPrimVec.setTolerances(tolerances);
+   }
    ///@}
 };
 

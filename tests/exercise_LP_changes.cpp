@@ -107,13 +107,12 @@ public:
       : SPxSolver( type_,
                    representation_ )
    {
-      setDelta( delta  );
       setTerminationTime( timelimit );
 
-      Param::setEpsilon( epsilon );
-      Param::setEpsilonFactorization( epsilon_factor );
-      Param::setEpsilonUpdate( epsilon_update );
-      Param::setVerbose( verbose );
+      _tolerances->setEpsilon( epsilon );
+      _tolerances->setEpsilonFactorization( epsilon_factor );
+      _tolerances->setEpsilonUpdate( epsilon_update );
+      _tolerances->setVerbose( verbose );
 
       setPricer( &_pricer );
       setTester( &_ratiotester );
@@ -130,11 +129,11 @@ public:
 // Define static members of "TestSolver".
 //
 const SLUFactor<Real>::UpdateType TestSolver::update;
-const Real TestSolver::delta = DEFAULT_BND_VIOL;
+const Real TestSolver::delta = SOPLEX_DEFAULT_BND_VIOL;
 const Real TestSolver::timelimit = -1.0;
-const Real TestSolver::epsilon = DEFAULT_EPS_ZERO;
-const Real TestSolver::epsilon_factor = DEFAULT_EPS_FACTOR;
-const Real TestSolver::epsilon_update = DEFAULT_EPS_UPDATE;
+const Real TestSolver::epsilon = SOPLEX_DEFAULT_EPS_ZERO;
+const Real TestSolver::epsilon_factor = SOPLEX_DEFAULT_EPS_FACTOR;
+const Real TestSolver::epsilon_update = SOPLEX_DEFAULT_EPS_UPDATE;
 const int TestSolver::verbose;
 const int TestSolver::precision;
 
@@ -434,7 +433,7 @@ void ChangeExerciser::test_add_delete_row()
    Real original_obj = work_ptr->objValue();
 
    // First test: Remove and readd single rows.
-   int solve_interval = std::max< int >( 1, work_ptr->nRows() / calls_solve );
+   int solve_interval = SOPLEX_MAX< int >( 1, work_ptr->nRows() / calls_solve );
 
    for( int row_idx = 0; row_idx < work_ptr->nRows(); row_idx += solve_interval )
    {
@@ -485,7 +484,7 @@ void ChangeExerciser::test_add_delete_row()
    for ( int block = 0; block < calls_solve + 1; ++block )
    {
       int first_block_row_idx = block * solve_interval;
-      int last_block_row_idx = std::min( work_ptr->nRows() - 1,
+      int last_block_row_idx = SOPLEX_MIN( work_ptr->nRows() - 1,
                                          (block+1) * solve_interval - 1 );
 
       // Save-and-delete loop.
@@ -658,7 +657,7 @@ void ChangeExerciser::test_add_delete_col()
    Real original_obj = work_ptr->objValue();
 
    // First test: Remove and readd single cols.
-   int solve_interval = std::max< int >( 1, work_ptr->nCols() / calls_solve );
+   int solve_interval = SOPLEX_MAX< int >( 1, work_ptr->nCols() / calls_solve );
 
    for( int col_idx = 0; col_idx < work_ptr->nCols(); col_idx += solve_interval )
    {
@@ -709,7 +708,7 @@ void ChangeExerciser::test_add_delete_col()
    for ( int block = 0; block < calls_solve + 1; ++block )
    {
       int first_block_col_idx = block * solve_interval;
-      int last_block_col_idx = std::min( work_ptr->nCols() - 1,
+      int last_block_col_idx = SOPLEX_MIN( work_ptr->nCols() - 1,
                                          (block+1) * solve_interval - 1 );
 
       // Save-and-delete loop.
@@ -995,7 +994,7 @@ void ChangeExerciser::test_change_lower()
    {
       if ( work_ptr->lower( col_idx ) < solution[col_idx] )
       {
-         const Real new_lower = std::min< Real >( solution[col_idx], work_ptr->upper( col_idx) );
+         const Real new_lower = SOPLEX_MIN< Real >( solution[col_idx], work_ptr->upper( col_idx) );
 
          const SPxColId& col_ID = work_ptr->cId( col_idx );
          work_ptr->changeLower( col_ID, new_lower );
@@ -1039,7 +1038,7 @@ void ChangeExerciser::test_change_upper()
    {
       if( work_ptr->upper( col_idx ) > solution[col_idx] )
       {
-         const Real new_upper = std::max< Real >( solution[col_idx], work_ptr->lower( col_idx ) );
+         const Real new_upper = SOPLEX_MAX< Real >( solution[col_idx], work_ptr->lower( col_idx ) );
 
          const SPxColId& col_ID = work_ptr->cId( col_idx );
          work_ptr->changeUpper( col_ID, new_upper );
@@ -1085,10 +1084,10 @@ void ChangeExerciser::test_change_bounds()
 
       // slack is bigger than 0
       if(upper > solution[col_idx])
-         upper = std::max< Real >( solution[col_idx], work_ptr->lower( col_idx ) );
+         upper = SOPLEX_MAX< Real >( solution[col_idx], work_ptr->lower( col_idx ) );
 
       if(solution[col_idx] > lower)
-         lower = std::min< Real >( solution[col_idx], work_ptr->upper( col_idx) );
+         lower = SOPLEX_MIN< Real >( solution[col_idx], work_ptr->upper( col_idx) );
 
       // get ID
       const SPxColId& col_ID = work_ptr->cId( col_idx );
@@ -1145,7 +1144,7 @@ void ChangeExerciser::test_change_lhs()
          const Real row_prod = solution * work_ptr->rowVector( row_ID );
 
          // The new LHS must not be larger than the RHS.
-         const Real new_lhs = std::min< Real >(  row_prod,
+         const Real new_lhs = SOPLEX_MIN< Real >(  row_prod,
                                                  work_ptr->rhs(row_idx) );
 
          work_ptr->changeLhs( row_ID, new_lhs );
@@ -1201,7 +1200,7 @@ void ChangeExerciser::test_change_rhs()
          const Real row_prod = solution * work_ptr->rowVector( row_ID );
 
          // The new RHS must not be smaller than the LHS.
-         const Real new_rhs = std::max< Real >(  row_prod,
+         const Real new_rhs = SOPLEX_MAX< Real >(  row_prod,
                                                  work_ptr->lhs(row_idx) );
 
          work_ptr->changeRhs( row_ID, new_rhs );
@@ -1242,8 +1241,8 @@ void ChangeExerciser::test_change_range()
    {
       const Real row_prod = solution * (work_ptr->rowVector( row_idx ) );
 
-      new_rhs[ row_idx ] = std::max< Real >( work_ptr->lhs( row_idx ), row_prod );
-      new_lhs[ row_idx ] = std::min< Real >( work_ptr->rhs( row_idx ), row_prod );
+      new_rhs[ row_idx ] = SOPLEX_MAX< Real >( work_ptr->lhs( row_idx ), row_prod );
+      new_lhs[ row_idx ] = SOPLEX_MIN< Real >( work_ptr->rhs( row_idx ), row_prod );
    }
    work_ptr->changeRange( new_lhs, new_rhs );
 
@@ -1333,7 +1332,7 @@ void ChangeExerciser::test_change_row()
    work_ptr->solve();
    Real original_obj = work_ptr->objValue();
 
-   int solve_interval = std::max< int >( 1, work_ptr->nRows() / calls_solve );
+   int solve_interval = SOPLEX_MAX< int >( 1, work_ptr->nRows() / calls_solve );
 
    for (int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx) {
       Real change_coeff = 1.0;
@@ -1389,7 +1388,7 @@ void ChangeExerciser::test_change_row()
    original_obj = work_ptr->objValue();
 
    const int nPairs = work_ptr->nRows()/2;
-   solve_interval = std::max< int >( 1, nPairs / calls_solve );
+   solve_interval = SOPLEX_MAX< int >( 1, nPairs / calls_solve );
 
    for (int pair_idx = 0; pair_idx < nPairs; ++pair_idx) {
       const int first_idx = 2 * pair_idx;
@@ -1450,10 +1449,10 @@ void ChangeExerciser::test_change_col()
       work_ptr->getCol( col_idx, current_col );
 
       const Real new_lb = ( current_col.lower() == -infinity ) ? -infinity :
-         std::max< Real >( current_col.lower(),
+         SOPLEX_MAX< Real >( current_col.lower(),
                            0.5 * current_col.lower() + 0.5 * solution[col_idx] );
       const Real new_ub = ( current_col.upper() == infinity ) ? infinity :
-         std::min< Real >( current_col.upper(),
+         SOPLEX_MIN< Real >( current_col.upper(),
                            0.5 * current_col.upper() + 0.5 * solution[col_idx] );
 
       SVector new_col = current_col.colVector();
@@ -1481,7 +1480,7 @@ void ChangeExerciser::test_change_col()
    original_obj = work_ptr->objValue();
 
    const int nPairs = work_ptr->nCols()/2;
-   int solve_interval = std::max< int >( 1, nPairs / calls_solve );
+   int solve_interval = SOPLEX_MAX< int >( 1, nPairs / calls_solve );
 
    for (int pair_idx = 0; pair_idx < nPairs; ++pair_idx)
    {
@@ -1524,7 +1523,7 @@ void ChangeExerciser::test_change_element()
 
    // Test: Exchange each pair of rows elementwise
    int nPairs = work_ptr->nRows()/2;
-   int solve_interval = std::max< int >( 1, nPairs / calls_solve );
+   int solve_interval = SOPLEX_MAX< int >( 1, nPairs / calls_solve );
 
    for (int pair_idx = 0; pair_idx < nPairs; ++pair_idx)
    {

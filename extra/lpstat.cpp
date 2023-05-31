@@ -94,8 +94,6 @@ int main(int argc, char **argv)
    }
    const char* inpfile  = argv[optidx];
 
-   Param::setVerbose(verbose);
-
    SPxLP       lp;
    NameSet     rownames;
    NameSet     colnames;

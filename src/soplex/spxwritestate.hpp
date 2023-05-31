@@ -90,8 +90,8 @@ bool SPxSolverBase<R>::writeState(
    else if(!strcmp(ratiotester()->getName(), "Bound Flipping"))
       ofs << "3" << std::endl;
 
-   ofs << "real:feastol = " << feastol() << std::endl;
-   ofs << "real:opttol = " << opttol() << std::endl;
+   ofs << "real:feastol = " << tolerances()->floatingPointFeastol() << std::endl;
+   ofs << "real:opttol = " << tolerances()->floatingPointOpttol() << std::endl;
    ofs << "real:epsilon_zero = " << epsilon() << std::endl;
    ofs << "real:infty = " << infinity << std::endl;
    ofs << "uint:random_seed = " << random.getSeed() << std::endl;

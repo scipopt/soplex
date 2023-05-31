@@ -305,7 +305,7 @@ public:
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
       if(theelem != 0 && SVectorBase<R>::mem() != theelem)
-         return MSGinconsistent("DSVectorBase");
+         return SPX_MSG_INCONSISTENT("DSVectorBase");
 
 #endif
 

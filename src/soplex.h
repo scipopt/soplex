@@ -91,7 +91,7 @@
 namespace mpf = boost::multiprecision;
 #endif
 
-#define DEFAULT_RANDOM_SEED   0   // used to suppress output when the seed was not changed
+#define SOPLEX_DEFAULT_RANDOM_SEED   0   // used to suppress output when the seed was not changed
 
 ///@todo implement automatic rep switch, based on row/col dim
 ///@todo introduce status codes for SoPlex, especially for rational solving
@@ -1569,6 +1569,9 @@ public:
    /// returns current parameter settings
    const Settings& settings() const;
 
+   /// returns current tolerances
+   const std::shared_ptr<Tolerances> tolerances() const;
+
    /// sets boolean parameter value; returns true on success
    bool setBoolParam(const BoolParam param, const bool value, const bool init = true);
 
@@ -1668,6 +1671,8 @@ private:
    ///@{
 
    Settings* _currentSettings;
+
+   std::shared_ptr<Tolerances> _tolerances;
 
    Rational _rationalPosInfty;
    Rational _rationalNegInfty;

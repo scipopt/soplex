@@ -36,14 +36,14 @@ namespace soplex
 {
 
 /* initial seeds for KISS random number generator */
-#define  DEFAULT_LIN  UINT32_C(123456789)
-#define  DEFAULT_XOR  UINT32_C(362436000)
-#define  DEFAULT_MWC  UINT32_C(521288629)
-#define  DEFAULT_CST  UINT32_C(7654321)
+#define SOPLEX_DEFAULT_LIN  UINT32_C(123456789)
+#define SOPLEX_DEFAULT_XOR  UINT32_C(362436000)
+#define SOPLEX_DEFAULT_MWC  UINT32_C(521288629)
+#define SOPLEX_DEFAULT_CST  UINT32_C(7654321)
 
 /* defines for linear congruential generator */
-#define  RSTEP    UINT64_C(1103515245)
-#define  RADD     UINT64_C(12345)
+#define SOPLEX_RSTEP    UINT64_C(1103515245)
+#define SOPLEX_RADD     UINT64_C(12345)
 
 /**@brief   Random numbers.
    @ingroup Elementary
@@ -85,7 +85,7 @@ private:
       uint64_t t;
 
       /* linear congruential */
-      lin_seed = (uint32_t)(lin_seed * RSTEP + RADD);
+      lin_seed = (uint32_t)(lin_seed * SOPLEX_RSTEP + SOPLEX_RADD);
 
       /* Xorshift */
       xor_seed ^= (xor_seed << 13);
@@ -134,11 +134,11 @@ public:
    {
       seedshift = initshift;
 
-      /* use std::max to avoid zero after over flowing */
-      lin_seed = std::max(DEFAULT_LIN + initshift, 1u);
-      xor_seed = std::max(DEFAULT_XOR + initshift, 1u);
-      mwc_seed = std::max(DEFAULT_MWC + initshift, 1u);
-      cst_seed = DEFAULT_CST + initshift;
+      /* use SOPLEX_MAX to avoid zero after over flowing */
+      lin_seed = SOPLEX_MAX(SOPLEX_DEFAULT_LIN + initshift, 1u);
+      xor_seed = SOPLEX_MAX(SOPLEX_DEFAULT_XOR + initshift, 1u);
+      mwc_seed = SOPLEX_MAX(SOPLEX_DEFAULT_MWC + initshift, 1u);
+      cst_seed = SOPLEX_DEFAULT_CST + initshift;
 
       assert(lin_seed > 0);
       assert(xor_seed > 0);

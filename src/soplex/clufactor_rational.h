@@ -35,7 +35,7 @@
 #include "soplex/rational.h"
 #include "soplex/basevectors.h"
 
-#define WITH_L_ROWS 1
+#define SOPLEX_WITH_L_ROWS 1
 
 namespace soplex
 {

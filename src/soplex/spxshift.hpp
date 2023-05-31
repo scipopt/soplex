@@ -35,7 +35,7 @@ template <class R>
 void SPxSolverBase<R>::shiftFvec()
 {
 
-   /* the allowed tolerance is (rep() == COLUMN) ? feastol() : opttol() because theFvec is the primal VectorBase<R> in COLUMN
+   /* the allowed tolerance is (rep() == COLUMN) ? tolerances()->floatingPointFeastol() : tolerances()->floatingPointOpttol() because theFvec is the primal VectorBase<R> in COLUMN
     * and the dual VectorBase<R> in ROW representation; this is equivalent to entertol()
     */
    R minrandom = 10.0 * entertol();
@@ -49,8 +49,8 @@ void SPxSolverBase<R>::shiftFvec()
    {
       if(theUBbound[i] + allow < (*theFvec)[i])
       {
-         MSG_DEBUG(std::cout << "DSHIFT08 theUBbound[" << i << "] violated by " <<
-                   (*theFvec)[i] - theUBbound[i] - allow << std::endl);
+         SPX_MSG_DEBUG(std::cout << "DSHIFT08 theUBbound[" << i << "] violated by " <<
+                       (*theFvec)[i] - theUBbound[i] - allow << std::endl);
 
          if(theUBbound[i] != theLBbound[i])
          {
@@ -67,8 +67,8 @@ void SPxSolverBase<R>::shiftFvec()
       }
       else if((*theFvec)[i] < theLBbound[i] - allow)
       {
-         MSG_DEBUG(std::cout << "DSHIFT08 theLBbound[" << i << "] violated by " << theLBbound[i] -
-                   (*theFvec)[i] - allow << std::endl);
+         SPX_MSG_DEBUG(std::cout << "DSHIFT08 theLBbound[" << i << "] violated by " << theLBbound[i] -
+                       (*theFvec)[i] - allow << std::endl);
 
          if(theUBbound[i] != theLBbound[i])
             shiftLBbound(i, (*theFvec)[i] - random.next((double)minrandom, (double)maxrandom));
@@ -82,7 +82,7 @@ void SPxSolverBase<R>::shiftFvec()
 
 #ifndef NDEBUG
    testBounds();
-   MSG_DEBUG(std::cout << "DSHIFT01 shiftFvec: OK" << std::endl;)
+   SPX_MSG_DEBUG(std::cout << "DSHIFT01 shiftFvec: OK" << std::endl;)
 #endif
 }
 
@@ -97,7 +97,7 @@ template <class R>
 void SPxSolverBase<R>::shiftPvec()
 {
 
-   /* the allowed tolerance is (rep() == ROW) ? feastol() : opttol() because thePvec is the primal VectorBase<R> in ROW and the
+   /* the allowed tolerance is (rep() == ROW) ? tolerances()->floatingPointFeastol() : tolerances()->floatingPointOpttol() because thePvec is the primal VectorBase<R> in ROW and the
     * dual VectorBase<R> in COLUMN representation; this is equivalent to leavetol()
     */
    R minrandom = 10.0 * leavetol();
@@ -163,7 +163,7 @@ void SPxSolverBase<R>::shiftPvec()
 
 #ifndef NDEBUG
    testBounds();
-   MSG_DEBUG(std::cout << "DSHIFT02 shiftPvec: OK" << std::endl;)
+   SPX_MSG_DEBUG(std::cout << "DSHIFT02 shiftPvec: OK" << std::endl;)
 #endif
 }
 // -----------------------------------------------------------------
@@ -196,13 +196,13 @@ void SPxSolverBase<R>::perturbMin(
          l = p_low[i];
          x = vec[i];
 
-         if(LT(u, R(infinity)) && NE(l, u) && u <= x + eps)
+         if(LT(u, R(infinity), eps) && NE(l, u, eps) && u <= x + eps)
          {
             p_up[i] = x + random.next((double) minrandom, (double)maxrandom);
             theShift += p_up[i] - u;
          }
 
-         if(GT(l, R(-infinity)) && NE(l, u) && l >= x - eps)
+         if(GT(l, R(-infinity), eps) && NE(l, u, eps) && l >= x - eps)
          {
             p_low[i] = x - random.next((double)minrandom, (double)maxrandom);
             theShift -= p_low[i] - l;
@@ -229,7 +229,7 @@ void SPxSolverBase<R>::perturbMin(
 
          if(x < -eps)
          {
-            if(LT(u, R(infinity)) && NE(l, u) && vec[i] >= u - eps)
+            if(LT(u, R(infinity), eps) && NE(l, u, eps) && vec[i] >= u - eps)
             {
                p_up[i] = vec[i] + random.next((double)minrandom, (double)maxrandom);
                theShift += p_up[i] - u;
@@ -237,7 +237,7 @@ void SPxSolverBase<R>::perturbMin(
          }
          else if(x > eps)
          {
-            if(GT(l, R(-infinity)) && NE(l, u) && vec[i] <= l + eps)
+            if(GT(l, R(-infinity), eps) && NE(l, u, eps) && vec[i] <= l + eps)
             {
                p_low[i] = vec[i] - random.next((double)minrandom, (double)maxrandom);
                theShift -= p_low[i] - l;
@@ -276,13 +276,13 @@ void SPxSolverBase<R>::perturbMax(
          l = p_low[i];
          x = vec[i];
 
-         if(LT(u, R(infinity)) && NE(l, u) && u <= x + eps)
+         if(LT(u, R(infinity), eps) && NE(l, u, eps) && u <= x + eps)
          {
             p_up[i] = x + random.next((double)minrandom, (double)maxrandom);
             theShift += p_up[i] - u;
          }
 
-         if(GT(l, R(-infinity)) && NE(l, u) && l >= x - eps)
+         if(GT(l, R(-infinity), eps) && NE(l, u, eps) && l >= x - eps)
          {
             p_low[i] = x - random.next((double)minrandom, (double)maxrandom);
             theShift -= p_low[i] - l;
@@ -309,7 +309,7 @@ void SPxSolverBase<R>::perturbMax(
 
          if(x > eps)
          {
-            if(LT(u, R(infinity)) && NE(l, u) && vec[i] >= u - eps)
+            if(LT(u, R(infinity), eps) && NE(l, u, eps) && vec[i] >= u - eps)
             {
                p_up[i] = vec[i] + random.next((double)minrandom, (double)maxrandom);
                theShift += p_up[i] - u;
@@ -317,7 +317,7 @@ void SPxSolverBase<R>::perturbMax(
          }
          else if(x < -eps)
          {
-            if(GT(l, R(-infinity)) && NE(l, u) && vec[i] <= l + eps)
+            if(GT(l, R(-infinity), eps) && NE(l, u, eps) && vec[i] <= l + eps)
             {
                p_low[i] = vec[i] - random.next((double)minrandom, (double)maxrandom);
                theShift -= p_low[i] - l;
@@ -330,20 +330,22 @@ void SPxSolverBase<R>::perturbMax(
 template <class R>
 void SPxSolverBase<R>::perturbMinEnter(void)
 {
-   MSG_DEBUG(std::cout << "DSHIFT03 iteration= " << this->iteration() << ": perturbing " << shift();)
+   SPX_MSG_DEBUG(std::cout << "DSHIFT03 iteration= " << this->iteration() << ": perturbing " <<
+                 shift();)
    fVec().delta().setup();
    perturbMin(fVec(), lbBound(), ubBound(), epsilon(), entertol());
-   MSG_DEBUG(std::cout << "\t->" << shift() << std::endl;)
+   SPX_MSG_DEBUG(std::cout << "\t->" << shift() << std::endl;)
 }
 
 
 template <class R>
 void SPxSolverBase<R>::perturbMaxEnter(void)
 {
-   MSG_DEBUG(std::cout << "DSHIFT04 iteration= " << this->iteration() << ": perturbing " << shift();)
+   SPX_MSG_DEBUG(std::cout << "DSHIFT04 iteration= " << this->iteration() << ": perturbing " <<
+                 shift();)
    fVec().delta().setup();
    perturbMax(fVec(), lbBound(), ubBound(), epsilon(), entertol());
-   MSG_DEBUG(std::cout << "\t->" << shift() << std::endl;)
+   SPX_MSG_DEBUG(std::cout << "\t->" << shift() << std::endl;)
 }
 
 
@@ -378,13 +380,13 @@ R SPxSolverBase<R>::perturbMin(
          l = p_low[i];
          x = vec[i];
 
-         if(LT(u, R(infinity)) && NE(l, u) && u <= x + eps && rep() * stat[i] < 0)
+         if(LT(u, R(infinity), eps) && NE(l, u, eps) && u <= x + eps && rep() * stat[i] < 0)
          {
             p_up[i] = vec[i] + random.next((double)minrandom, (double)maxrandom);
             l_theShift += p_up[i] - u;
          }
 
-         if(GT(l, R(-infinity)) && NE(l, u) && l >= x - eps && rep() * stat[i] < 0)
+         if(GT(l, R(-infinity), eps) && NE(l, u, eps) && l >= x - eps && rep() * stat[i] < 0)
          {
             p_low[i] = vec[i] - random.next((double)minrandom, (double)maxrandom);
             l_theShift -= p_low[i] - l;
@@ -405,7 +407,7 @@ R SPxSolverBase<R>::perturbMin(
 
          if(x < -eps)
          {
-            if(LT(u, R(infinity)) && NE(l, u) && vec[i] >= u - eps && rep() * stat[i] < 0)
+            if(LT(u, R(infinity), eps) && NE(l, u, eps) && vec[i] >= u - eps && rep() * stat[i] < 0)
             {
                p_up[i] = vec[i] + random.next((double)minrandom, (double)maxrandom);
                l_theShift += p_up[i] - u;
@@ -413,7 +415,7 @@ R SPxSolverBase<R>::perturbMin(
          }
          else if(x > eps)
          {
-            if(GT(l, R(-infinity)) && NE(l, u) && vec[i] <= l + eps && rep() * stat[i] < 0)
+            if(GT(l, R(-infinity), eps) && NE(l, u, eps) && vec[i] <= l + eps && rep() * stat[i] < 0)
             {
                p_low[i] = vec[i] - random.next((double)minrandom, (double)maxrandom);
                l_theShift -= p_low[i] - l;
@@ -456,13 +458,13 @@ R SPxSolverBase<R>::perturbMax(
          l = p_low[i];
          x = vec[i];
 
-         if(LT(u, R(infinity)) && NE(l, u) && u <= x + eps && rep() * stat[i] < 0)
+         if(LT(u, R(infinity), eps) && NE(l, u, eps) && u <= x + eps && rep() * stat[i] < 0)
          {
             p_up[i] = vec[i] + random.next((double)minrandom, (double)maxrandom);
             l_theShift += p_up[i] - u;
          }
 
-         if(GT(l, R(-infinity)) && NE(l, u) && l >= x - eps && rep() * stat[i] < 0)
+         if(GT(l, R(-infinity), eps) && NE(l, u, eps) && l >= x - eps && rep() * stat[i] < 0)
          {
             p_low[i] = vec[i] - random.next((double)minrandom, (double)maxrandom);
             l_theShift -= p_low[i] - l;
@@ -483,7 +485,7 @@ R SPxSolverBase<R>::perturbMax(
 
          if(x > eps)
          {
-            if(LT(u, R(infinity)) && NE(l, u) && vec[i] >= u - eps && rep() * stat[i] < 0)
+            if(LT(u, R(infinity), eps) && NE(l, u, eps) && vec[i] >= u - eps && rep() * stat[i] < 0)
             {
                p_up[i] = vec[i] + random.next((double)minrandom, (double)maxrandom);
                l_theShift += p_up[i] - u;
@@ -491,7 +493,7 @@ R SPxSolverBase<R>::perturbMax(
          }
          else if(x < -eps)
          {
-            if(GT(l, R(-infinity)) && NE(l, u) && vec[i] <= l + eps && rep() * stat[i] < 0)
+            if(GT(l, R(-infinity), eps) && NE(l, u, eps) && vec[i] <= l + eps && rep() * stat[i] < 0)
             {
                p_low[i] = vec[i] - random.next((double)minrandom, (double)maxrandom);
                l_theShift -= p_low[i] - l;
@@ -507,35 +509,37 @@ R SPxSolverBase<R>::perturbMax(
 template <class R>
 void SPxSolverBase<R>::perturbMinLeave(void)
 {
-   MSG_DEBUG(std::cout << "DSHIFT05 iteration= " << this->iteration() << ": perturbing " << shift();)
+   SPX_MSG_DEBUG(std::cout << "DSHIFT05 iteration= " << this->iteration() << ": perturbing " <<
+                 shift();)
    pVec().delta().setup();
    coPvec().delta().setup();
    theShift += perturbMin(pVec(), lpBound(), upBound(), epsilon(), leavetol(),
                           this->desc().status(), 0, 1);
    theShift += perturbMin(coPvec(), lcBound(), ucBound(), epsilon(), leavetol(),
                           this->desc().coStatus(), 0, 1);
-   MSG_DEBUG(std::cout << "\t->" << shift() << std::endl;)
+   SPX_MSG_DEBUG(std::cout << "\t->" << shift() << std::endl;)
 }
 
 
 template <class R>
 void SPxSolverBase<R>::perturbMaxLeave(void)
 {
-   MSG_DEBUG(std::cout << "DSHIFT06 iteration= " << this->iteration() << ": perturbing " << shift();)
+   SPX_MSG_DEBUG(std::cout << "DSHIFT06 iteration= " << this->iteration() << ": perturbing " <<
+                 shift();)
    pVec().delta().setup();
    coPvec().delta().setup();
    theShift += perturbMax(pVec(), lpBound(), upBound(), epsilon(), leavetol(),
                           this->desc().status(), 0, 1);
    theShift += perturbMax(coPvec(), lcBound(), ucBound(), epsilon(), leavetol(),
                           this->desc().coStatus(), 0, 1);
-   MSG_DEBUG(std::cout << "\t->" << shift() << std::endl;)
+   SPX_MSG_DEBUG(std::cout << "\t->" << shift() << std::endl;)
 }
 
 
 template <class R>
 void SPxSolverBase<R>::unShift(void)
 {
-   MSG_INFO3((*this->spxout), (*this->spxout) << "DSHIFT07 = " << "unshifting ..." << std::endl;);
+   SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "DSHIFT07 = " << "unshifting ..." << std::endl;);
 
    if(isInitialized())
    {

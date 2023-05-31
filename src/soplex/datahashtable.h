@@ -35,7 +35,7 @@
 #include "soplex/spxdefines.h"
 #include "soplex/array.h"
 
-#define   HASHTABLE_FILLFACTOR   0.7
+#define SOPLEX_HASHTABLE_FILLFACTOR   0.7
 
 namespace soplex
 {
@@ -176,7 +176,7 @@ public:
    {
       assert(!has(h));
 
-      if(m_used >= m_elem.size() * HASHTABLE_FILLFACTOR)
+      if(m_used >= m_elem.size() * SOPLEX_HASHTABLE_FILLFACTOR)
          reMax(int(m_memfactor * m_used) + 1);
 
       assert(m_used < m_elem.size());
@@ -258,12 +258,12 @@ public:
             total++;
 
             if(!has(m_elem[i].item))
-               return MSGinconsistent("DataHashTable");
+               return SPX_MSG_INCONSISTENT("DataHashTable");
          }
       }
 
       if(total != m_used)
-         return MSGinconsistent("DataHashTable");
+         return SPX_MSG_INCONSISTENT("DataHashTable");
 
       return m_elem.isConsistent();
 #else

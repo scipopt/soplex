@@ -33,7 +33,7 @@ template <class R>
 bool SPxStarter<R>::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-   MSG_ERROR(std::cerr << "ESTART95 Not yet implemented" << std::endl;)
+   SPX_MSG_ERROR(std::cerr << "ESTART95 Not yet implemented" << std::endl;)
 #endif
 
    return true;

@@ -68,7 +68,7 @@ int main(int argc, const char* const argv[])
       assert( work.isConsistent() );
 
       /* solve the problem */
-      // Param::setVerbose(5);
+      //work.tolerances()->setVerbose(5);
 
       /* uncomment to yield faster way to desaster: */
       work.solve();

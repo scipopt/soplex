@@ -39,7 +39,7 @@
 namespace soplex
 {
 /// maximum nr. of factorization updates allowed before refactorization.
-#define MAXUPDATES      1000
+#define SOPLEX_MAXUPDATES      1000
 
 /**@brief   Implementation of Sparse Linear Solver with Rational precision.
  * @ingroup Algo

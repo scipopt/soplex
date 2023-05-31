@@ -96,6 +96,7 @@ protected:
    bool               m_colFirst;  ///< do column scaling first
    bool               m_doBoth;    ///< do columns and rows
    SPxOut*            spxout;      ///< message handler
+   std::shared_ptr<Tolerances> _tolerances; ///< the tolerances
    ///@}
 
    //-------------------------------------
@@ -155,6 +156,16 @@ public:
    virtual void setRealParam(R param, const char* name = "realparam");
    /// set int parameter
    virtual void setIntParam(int param, const char* name = "intparam");
+   /// set tolerances
+   virtual void setTolerances(std::shared_ptr<Tolerances>& tolerances)
+   {
+      _tolerances = tolerances;
+   }
+   /// get the _tolerances member variable
+   const std::shared_ptr<Tolerances> tolerances() const
+   {
+      return _tolerances;
+   }
    ///@}
 
    //-------------------------------------

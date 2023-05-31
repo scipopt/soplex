@@ -76,7 +76,7 @@ void SPxSolverBase<R>::computeFrhs()
                   continue;
 
                case(SPxBasisBase<R>::Desc::P_FIXED) :
-                  assert(EQ(this->lhs(i), this->rhs(i)));
+                  assert(EQ(this->lhs(i), this->rhs(i), this->epsilon()));
 
                //lint -fallthrough
                case SPxBasisBase<R>::Desc::P_ON_UPPER :
@@ -88,9 +88,9 @@ void SPxSolverBase<R>::computeFrhs()
                   break;
 
                default:
-                  MSG_ERROR(std::cerr << "ESVECS01 ERROR: "
-                            << "inconsistent basis must not happen!"
-                            << std::endl;)
+                  SPX_MSG_ERROR(std::cerr << "ESVECS01 ERROR: "
+                                << "inconsistent basis must not happen!"
+                                << std::endl;)
                   throw SPxInternalCodeException("XSVECS01 This should never happen.");
                }
 
@@ -183,7 +183,7 @@ void SPxSolverBase<R>::computeFrhsXtra()
             continue;
 
          case(SPxBasisBase<R>::Desc::P_FIXED) :
-            assert(EQ(SPxLPBase<R>::lower(i), SPxLPBase<R>::upper(i)));
+            assert(EQ(SPxLPBase<R>::lower(i), SPxLPBase<R>::upper(i), this->epsilon()));
 
          //lint -fallthrough
          case SPxBasisBase<R>::Desc::P_ON_UPPER :
@@ -195,9 +195,9 @@ void SPxSolverBase<R>::computeFrhsXtra()
             break;
 
          default:
-            MSG_ERROR(std::cerr << "ESVECS02 ERROR: "
-                      << "inconsistent basis must not happen!"
-                      << std::endl;)
+            SPX_MSG_ERROR(std::cerr << "ESVECS02 ERROR: "
+                          << "inconsistent basis must not happen!"
+                          << std::endl;)
             throw SPxInternalCodeException("XSVECS02 This should never happen.");
          }
 
@@ -250,7 +250,7 @@ void SPxSolverBase<R>::computeFrhs1(
             break;
 
          case(SPxBasisBase<R>::Desc::P_FIXED) :
-            assert(EQ(lfb[i], ufb[i]));
+            assert(EQ(lfb[i], ufb[i], this->epsilon()));
 
          //lint -fallthrough
          case(SPxBasisBase<R>::Desc::D_ON_BOTH) :
@@ -258,9 +258,9 @@ void SPxSolverBase<R>::computeFrhs1(
             break;
 
          default:
-            MSG_ERROR(std::cerr << "ESVECS03 ERROR: "
-                      << "inconsistent basis must not happen!"
-                      << std::endl;)
+            SPX_MSG_ERROR(std::cerr << "ESVECS03 ERROR: "
+                          << "inconsistent basis must not happen!"
+                          << std::endl;)
             throw SPxInternalCodeException("XSVECS04 This should never happen.");
          }
 
@@ -315,12 +315,13 @@ void SPxSolverBase<R>::computeFrhs2(
 
             if(colfb[i] != coufb[i])
             {
-               MSG_WARNING((*this->spxout), (*this->spxout) << "WSVECS04 Frhs2[" << i << "]: " << static_cast<int>
-                           (stat) << " "
-                           << colfb[i] << " " << coufb[i]
-                           << " shouldn't be" << std::endl;)
+               SPX_MSG_WARNING((*this->spxout),
+                               (*this->spxout) << "WSVECS04 Frhs2[" << i << "]: " << static_cast<int>
+                               (stat) << " "
+                               << colfb[i] << " " << coufb[i]
+                               << " shouldn't be" << std::endl;)
 
-               if(isZero(colfb[i]) || isZero(coufb[i]))
+               if(isZero(colfb[i], this->epsilon()) || isZero(coufb[i], this->epsilon()))
                   colfb[i] = coufb[i] = 0.0;
                else
                {
@@ -329,14 +330,14 @@ void SPxSolverBase<R>::computeFrhs2(
                }
             }
 
-            assert(EQ(colfb[i], coufb[i]));
+            assert(EQ(colfb[i], coufb[i], this->epsilon()));
             x = colfb[i];
             break;
 
          default:
-            MSG_ERROR(std::cerr << "ESVECS05 ERROR: "
-                      << "inconsistent basis must not happen!"
-                      << std::endl;)
+            SPX_MSG_ERROR(std::cerr << "ESVECS05 ERROR: "
+                          << "inconsistent basis must not happen!"
+                          << std::endl;)
             throw SPxInternalCodeException("XSVECS05 This should never happen.");
          }
 
@@ -378,7 +379,7 @@ void SPxSolverBase<R>::computeEnterCoPrhs4Row(int i, int n)
    // rowwise representation:
    case SPxBasisBase<R>::Desc::P_FIXED :
       assert(this->lhs(n) > R(-infinity));
-      assert(EQ(this->rhs(n), this->lhs(n)));
+      assert(EQ(this->rhs(n), this->lhs(n), this->epsilon()));
 
    //lint -fallthrough
    case SPxBasisBase<R>::Desc::P_ON_UPPER :
@@ -411,7 +412,7 @@ void SPxSolverBase<R>::computeEnterCoPrhs4Col(int i, int n)
    {
    // rowwise representation:
    case SPxBasisBase<R>::Desc::P_FIXED :
-      assert(EQ(SPxLPBase<R>::upper(n), SPxLPBase<R>::lower(n)));
+      assert(EQ(SPxLPBase<R>::upper(n), SPxLPBase<R>::lower(n), this->epsilon()));
       assert(SPxLPBase<R>::lower(n) > R(-infinity));
 
    //lint -fallthrough
@@ -470,7 +471,7 @@ void SPxSolverBase<R>::computeLeaveCoPrhs4Row(int i, int n)
    case SPxBasisBase<R>::Desc::D_ON_BOTH :
    case SPxBasisBase<R>::Desc::P_FIXED :
       assert(theLRbound[n] > R(-infinity));
-      assert(EQ(theURbound[n], theLRbound[n]));
+      assert(EQ(theURbound[n], theLRbound[n], this->epsilon()));
 
    //lint -fallthrough
    case SPxBasisBase<R>::Desc::D_ON_UPPER :
@@ -503,7 +504,7 @@ void SPxSolverBase<R>::computeLeaveCoPrhs4Col(int i, int n)
    case SPxBasisBase<R>::Desc::D_ON_BOTH :
    case SPxBasisBase<R>::Desc::P_FIXED :
       assert(theLCbound[n] > R(-infinity));
-      assert(EQ(theUCbound[n], theLCbound[n]));
+      assert(EQ(theUCbound[n], theLCbound[n], this->epsilon()));
 
    //lint -fallthrough
    case SPxBasisBase<R>::Desc::D_ON_LOWER :

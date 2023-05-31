@@ -111,7 +111,7 @@ bool EQ(int a, int b);
    @param  expr    Expression that must be satisfied.
 */
 #if defined (NDEBUG) && defined (WITH_WARNINGS)
-#define ASSERT_WARN( prefix, expr )                        \
+#define SOPLEX_ASSERT_WARN( prefix, expr )                        \
    if ( !( expr ) )                                        \
       {                                                    \
          std::cerr                                         \
@@ -122,7 +122,7 @@ bool EQ(int a, int b);
          << std::endl;                                     \
       }
 #else // just a normal assert
-#define ASSERT_WARN( prefix, expr ) ( assert( expr ) )
+#define SOPLEX_ASSERT_WARN( prefix, expr ) ( assert( expr ) )
 #endif
 
 
@@ -136,13 +136,13 @@ bool EQ(int a, int b);
    Prints/Executes \p stream with verbosity level \p verbosity, resetting
    the old verbosity level afterwards.
    Usually the parameter \p stream prints something out.
-   This is an internal define used by MSG_ERROR, MSG_WARNING, etc.
+   This is an internal define used by SPX_MSG_ERROR, SPX_MSG_WARNING, etc.
 */
 #ifdef DISABLE_VERBOSITY
-#define DO_WITH_TMP_VERBOSITY( verbosity, spxout, do_something ) {}
-#define DO_WITH_ERR_VERBOSITY( do_something ) {}
+#define SOPLEX_DO_WITH_TMP_VERBOSITY( verbosity, spxout, do_something ) {}
+#define SOPLEX_DO_WITH_ERR_VERBOSITY( do_something ) {}
 #else
-#define DO_WITH_TMP_VERBOSITY( verbosity, spxout, do_something ) \
+#define SOPLEX_DO_WITH_TMP_VERBOSITY( verbosity, spxout, do_something ) \
    {                                                             \
      if( &spxout != NULL )                                       \
      {                                                           \
@@ -155,29 +155,29 @@ bool EQ(int a, int b);
         }                                                        \
      }                                                           \
    }
-#define DO_WITH_ERR_VERBOSITY( do_something ) { do_something; }
+#define SOPLEX_DO_WITH_ERR_VERBOSITY( do_something ) { do_something; }
 #endif
 
 /// Prints out message \p x if the verbosity level is at least SPxOut::ERROR.
-#define MSG_ERROR(x)            { DO_WITH_ERR_VERBOSITY( x ) }
+#define SPX_MSG_ERROR(x)            { SOPLEX_DO_WITH_ERR_VERBOSITY( x ) }
 /// Prints out message \p x if the verbosity level is at least SPxOut::WARNING.
-#define MSG_WARNING(spxout, x)  { DO_WITH_TMP_VERBOSITY( SPxOut::WARNING, spxout, x ) }
+#define SPX_MSG_WARNING(spxout, x)  { SOPLEX_DO_WITH_TMP_VERBOSITY( SPxOut::WARNING, spxout, x ) }
 /// Prints out message \p x if the verbosity level is at least SPxOut::INFO1.
-#define MSG_INFO1(spxout, x)    { DO_WITH_TMP_VERBOSITY( SPxOut::INFO1, spxout, x ) }
+#define SPX_MSG_INFO1(spxout, x)    { SOPLEX_DO_WITH_TMP_VERBOSITY( SPxOut::INFO1, spxout, x ) }
 /// Prints out message \p x if the verbosity level is at least SPxOut::INFO2.
-#define MSG_INFO2(spxout, x)    { DO_WITH_TMP_VERBOSITY( SPxOut::INFO2, spxout, x ) }
+#define SPX_MSG_INFO2(spxout, x)    { SOPLEX_DO_WITH_TMP_VERBOSITY( SPxOut::INFO2, spxout, x ) }
 /// Prints out message \p x if the verbosity level is at least SPxOut::INFO3.
-#define MSG_INFO3(spxout, x)    { DO_WITH_TMP_VERBOSITY( SPxOut::INFO3, spxout, x ) }
+#define SPX_MSG_INFO3(spxout, x)    { SOPLEX_DO_WITH_TMP_VERBOSITY( SPxOut::INFO3, spxout, x ) }
 
 extern bool msginconsistent(const char* name, const char* file, int line);
 
-#define MSGinconsistent(name) msginconsistent(name, __FILE__, __LINE__)
+#define SPX_MSG_INCONSISTENT(name) msginconsistent(name, __FILE__, __LINE__)
 
 #if defined(SOPLEX_DEBUG)
-// print output in any case, regardless of Param::verbose():
-#define MSG_DEBUG(x) { x; }
+// print output in any case, regardless of _tolerances->verbose():
+#define SPX_MSG_DEBUG(x) { x; }
 #else
-#define MSG_DEBUG(x) /**/
+#define SPX_MSG_DEBUG(x) /**/
 #endif //!SOPLEX_DEBUG
 
 
@@ -186,11 +186,11 @@ extern bool msginconsistent(const char* name, const char* file, int line);
  *-----------------------------------------------------------------------------
  */
 // enable the user to compile without thread_local by setting USRCXXFLAGS=-DTHREADLOCAL=""
-#if !defined(THREADLOCAL)
+#if !defined(SOPLEX_THREADLOCAL)
 #if defined(_MSC_VER) && _MSC_VER < 1900
-#define THREADLOCAL
+#define SOPLEX_THREADLOCAL
 #else
-#define THREADLOCAL thread_local
+#define SOPLEX_THREADLOCAL thread_local
 #endif
 #endif
 
@@ -205,31 +205,31 @@ extern bool msginconsistent(const char* name, const char* file, int line);
 
 typedef long double Real;
 
-#ifndef REAL
-#define REAL(x)  x##L
-#define REAL_FORMAT "Lf"
+#ifndef SOPLEX_REAL
+#define SOPLEX_REAL(x)  x##L
+#define SOPLEX_REAL_FORMAT "Lf"
 #endif
 /// default allowed bound violation
-#ifndef DEFAULT_BND_VIOL
-#define DEFAULT_BND_VIOL   1e-12L
+#ifndef SOPLEX_DEFAULT_BND_VIOL
+#define SOPLEX_DEFAULT_BND_VIOL   1e-12L
 #endif
 /// default allowed additive zero: 1.0 + EPS_ZERO == 1.0
-#ifndef DEFAULT_EPS_ZERO
-#define DEFAULT_EPS_ZERO   1e-28L
+#ifndef SOPLEX_DEFAULT_EPS_ZERO
+#define SOPLEX_DEFAULT_EPS_ZERO   1e-28L
 #endif
 /// epsilon for factorization
-#ifndef DEFAULT_EPS_FACTOR
-#define DEFAULT_EPS_FACTOR 1e-30L
+#ifndef SOPLEX_DEFAULT_EPS_FACTOR
+#define SOPLEX_DEFAULT_EPS_FACTOR 1e-30L
 #endif
 /// epsilon for factorization update
-#ifndef DEFAULT_EPS_UPDATE
-#define DEFAULT_EPS_UPDATE 1e-26L
+#ifndef SOPLEX_DEFAULT_EPS_UPDATE
+#define SOPLEX_DEFAULT_EPS_UPDATE 1e-26L
 #endif
-#ifndef DEFAULT_EPS_PIVOT
-#define DEFAULT_EPS_PIVOT 1e-20L
+#ifndef SOPLEX_DEFAULT_EPS_PIVOR
+#define SOPLEX_DEFAULT_EPS_PIVOR 1e-20L
 #endif
 ///
-#define DEFAULT_INFINITY   1e100L
+#define SOPLEX_DEFAULT_INFINITY   1e100L
 
 
 #else
@@ -238,67 +238,67 @@ typedef long double Real;
 
 typedef float Real;
 
-#ifndef REAL
-#define REAL(x)  x
-#define REAL_FORMAT "f"
+#ifndef SOPLEX_REAL
+#define SOPLEX_REAL(x)  x
+#define SOPLEX_REAL_FORMAT "f"
 #endif
 /// default allowed bound violation
-#ifndef DEFAULT_BND_VIOL
-#define DEFAULT_BND_VIOL   1e-1f
+#ifndef SOPLEX_DEFAULT_BND_VIOL
+#define SOPLEX_DEFAULT_BND_VIOL   1e-1f
 #endif
 /// default allowed additive zero: 1.0 + EPS_ZERO == 1.0
-#ifndef DEFAULT_EPS_ZERO
-#define DEFAULT_EPS_ZERO   1e-7f
+#ifndef SOPLEX_DEFAULT_EPS_ZERO
+#define SOPLEX_DEFAULT_EPS_ZERO   1e-7f
 #endif
-#ifndef DEFAULT_EPS_FACTOR
-#define DEFAULT_EPS_FACTOR 1e-7f
+#ifndef SOPLEX_DEFAULT_EPS_FACTOR
+#define SOPLEX_DEFAULT_EPS_FACTOR 1e-7f
 #endif
-#ifndef DEFAULT_EPS_UPDATE
-#define DEFAULT_EPS_UPDATE 1e-6f
+#ifndef SOPLEX_DEFAULT_EPS_UPDATE
+#define SOPLEX_DEFAULT_EPS_UPDATE 1e-6f
 #endif
-#ifndef DEFAULT_EPS_PIVOT
-#define DEFAULT_EPS_PIVOT 1e-6f
+#ifndef SOPLEX_DEFAULT_EPS_PIVOR
+#define SOPLEX_DEFAULT_EPS_PIVOR 1e-6f
 #endif
-#define DEFAULT_INFINITY   1e35f
+#define SOPLEX_DEFAULT_INFINITY   1e35f
 
 #else
 
 typedef double Real;
 
-#ifndef REAL
-#define REAL(x)  x
-#define REAL_FORMAT "lf"
+#ifndef SOPLEX_REAL
+#define SOPLEX_REAL(x)  x
+#define SOPLEX_REAL_FORMAT "lf"
 #endif
 /// default allowed bound violation
-#ifndef DEFAULT_BND_VIOL
-#define DEFAULT_BND_VIOL   1e-6
+#ifndef SOPLEX_DEFAULT_BND_VIOL
+#define SOPLEX_DEFAULT_BND_VIOL   1e-6
 #endif
 /// default allowed additive zero: 1.0 + EPS_ZERO == 1.0
-#ifndef DEFAULT_EPS_ZERO
-#define DEFAULT_EPS_ZERO   1e-16
+#ifndef SOPLEX_DEFAULT_EPS_ZERO
+#define SOPLEX_DEFAULT_EPS_ZERO   1e-16
 #endif
-#ifndef DEFAULT_EPS_FACTOR
-#define DEFAULT_EPS_FACTOR 1e-20
+#ifndef SOPLEX_DEFAULT_EPS_FACTOR
+#define SOPLEX_DEFAULT_EPS_FACTOR 1e-20
 #endif
-#ifndef DEFAULT_EPS_UPDATE
-#define DEFAULT_EPS_UPDATE 1e-16
+#ifndef SOPLEX_DEFAULT_EPS_UPDATE
+#define SOPLEX_DEFAULT_EPS_UPDATE 1e-16
 #endif
-#ifndef DEFAULT_EPS_PIVOT
-#define DEFAULT_EPS_PIVOT 1e-10
+#ifndef SOPLEX_DEFAULT_EPS_PIVOR
+#define SOPLEX_DEFAULT_EPS_PIVOR 1e-10
 #endif
-#define DEFAULT_INFINITY   1e100
+#define SOPLEX_DEFAULT_INFINITY   1e100
 
 #endif // !WITH_FLOAT
 #endif // !WITH_LONG_DOUBLE
 
-#define MAXIMUM(x,y)        ((x)>(y) ? (x) : (y))
-#define MINIMUM(x,y)        ((x)<(y) ? (x) : (y))
+#define SOPLEX_MAX(x,y)        ((x)>(y) ? (x) : (y))
+#define SOPLEX_MIN(x,y)        ((x)<(y) ? (x) : (y))
 
 #define SPX_MAXSTRLEN       1024 /**< maximum string length in SoPlex */
 
-THREADLOCAL extern const Real infinity;
+SOPLEX_THREADLOCAL extern const Real infinity;
 
-class Param
+class Tolerances
 {
 private:
 
@@ -306,36 +306,78 @@ private:
    /**@name Data */
    ///@{
    /// default allowed additive zero: 1.0 + EPS_ZERO == 1.0
-   THREADLOCAL static Real s_epsilon;
+   Real s_epsilon;
    /// epsilon for factorization
-   THREADLOCAL static Real s_epsilon_factorization;
+   Real s_epsilon_factorization;
    /// epsilon for factorization update
-   THREADLOCAL static Real s_epsilon_update;
+   Real s_epsilon_update;
    /// epsilon for pivot zero tolerance in factorization
-   THREADLOCAL static Real s_epsilon_pivot;
+   Real s_epsilon_pivot;
+   /// feasibility tolerance
+   Real s_feastol;
+   /// optimality tolerance
+   Real s_opttol;
+   /// floating point feasibility tolerance
+   Real s_floating_point_feastol;
+   /// floating point optimality tolerance
+   Real s_floating_point_opttol;
+   /// multiplier for fixed numbers that should change if s_epsilon changes
+   Real s_epsilon_multiplier;
    ///@}
 
 public:
 
+   // default constructor
+   explicit Tolerances()
+      : s_epsilon(SOPLEX_DEFAULT_EPS_ZERO), s_epsilon_factorization(SOPLEX_DEFAULT_EPS_FACTOR),
+        s_epsilon_update(SOPLEX_DEFAULT_EPS_UPDATE), s_epsilon_pivot(SOPLEX_DEFAULT_EPS_PIVOR),
+        s_feastol(SOPLEX_DEFAULT_BND_VIOL), s_opttol(SOPLEX_DEFAULT_BND_VIOL),
+        s_floating_point_feastol(SOPLEX_DEFAULT_BND_VIOL),
+        s_floating_point_opttol(SOPLEX_DEFAULT_BND_VIOL),
+        s_epsilon_multiplier(1.0)
+   {}
+
    //------------------------------------
    /**@name Access / modification */
    ///@{
-   ///
-   static Real epsilon();
-   ///
-   static void setEpsilon(Real eps);
-   ///
-   static Real epsilonFactorization();
-   ///
-   static void setEpsilonFactorization(Real eps);
-   ///
-   static Real epsilonUpdate();
-   ///
-   static void setEpsilonUpdate(Real eps);
-   ///
-   static Real epsilonPivot();
-   ///
-   static void setEpsilonPivot(Real eps);
+   /// global zero epsilon
+   Real epsilon();
+   /// set global zero epsilon
+   void setEpsilon(Real eps);
+   /// zero espilon used in factorization
+   Real epsilonFactorization();
+   /// set zero espilon used in factorization
+   void setEpsilonFactorization(Real eps);
+   /// zero espilon used in factorization update
+   Real epsilonUpdate();
+   /// set zero espilon used in factorization update
+   void setEpsilonUpdate(Real eps);
+   /// zero espilon used in pivot
+   Real epsilonPivot();
+   /// set zero espilon used in pivot
+   void setEpsilonPivot(Real eps);
+   /// global feasibility tolerance
+   Real feastol();
+   /// set global feasibility tolerance
+   void setFeastol(Real ftol);
+   /// global optimality tolerance
+   Real opttol();
+   /// set global optimality tolerance
+   void setOpttol(Real otol);
+   /// floating point feasibility tolerance used within the solver
+   Real floatingPointFeastol();
+   /// set floating point feasibility tolerance used within the solver
+   void setFloatingPointFeastol(Real ftol);
+   ///  floating point optimality tolerance used within the solver
+   Real floatingPointOpttol();
+   /// set floating point optimality tolerance used within the solver
+   void setFloatingPointOpttol(Real otol);
+   /// scale a value such that it remains unchanged at default epsilon, but is scaled withs smaller epsilon values
+   /// this is updated in setEpsilon()
+   inline Real scaleAccordingToEpsilon(Real a)
+   {
+      return s_epsilon_multiplier == 1.0 ? a : a * s_epsilon_multiplier;
+   }
    ///@}
 };
 
@@ -427,7 +469,7 @@ inline int spxSnprintf(
 
       if(n < 0)
       {
-         MSG_ERROR(std::cerr << "vsnprintf returned " << n << " while reading: " << s << std::endl;)
+         SPX_MSG_ERROR(std::cerr << "vsnprintf returned " << n << " while reading: " << s << std::endl;)
       }
 
 #endif

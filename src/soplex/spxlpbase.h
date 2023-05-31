@@ -163,6 +163,18 @@ public:
    /**@name Inquiry */
    ///@{
 
+   /// returns current tolerances
+   const std::shared_ptr<Tolerances> tolerances() const
+   {
+      return _tolerances;
+   }
+
+   /// set tolerances
+   virtual void setTolerances(std::shared_ptr<Tolerances> tolerances)
+   {
+      this->_tolerances = tolerances;
+   }
+
    /// Returns true if and only if the LP is scaled
    bool isScaled() const
    {
@@ -1319,7 +1331,7 @@ public:
 
          if(hasRhs && hasLhs)
          {
-            if(EQ(lhs(i), rhs(i)))
+            if(EQ(lhs(i), rhs(i), this->tolerances()->epsilon()))
                countEqual++;
             else
                countRanged++;
@@ -1832,7 +1844,7 @@ public:
       SVectorBase<R>& row = rowVector_w(i);
       SVectorBase<R>& col = colVector_w(j);
 
-      if(isNotZero(val))
+      if(isNotZero(val, this->tolerances()->epsilon()))
       {
          R newVal;
 
@@ -2016,6 +2028,9 @@ public:
    /// Consistency check.
    bool isConsistent() const
    {
+      if(this->_tolerances == nullptr && nCols() != 0)
+         return SPX_MSG_INCONSISTENT("SPxLPBase");
+
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
       for(int i = nCols() - 1; i >= 0; --i)
@@ -2028,10 +2043,10 @@ public:
             int n = w.pos(i);
 
             if(n < 0)
-               return MSGinconsistent("SPxLPBase");
+               return SPX_MSG_INCONSISTENT("SPxLPBase");
 
             if(v.value(j) != w.value(n))
-               return MSGinconsistent("SPxLPBase");
+               return SPX_MSG_INCONSISTENT("SPxLPBase");
          }
       }
 
@@ -2045,10 +2060,10 @@ public:
             int n = w.pos(i);
 
             if(n < 0)
-               return MSGinconsistent("SPxLPBase");
+               return SPX_MSG_INCONSISTENT("SPxLPBase");
 
             if(v.value(j) != w.value(n))
-               return MSGinconsistent("SPxLPBase");
+               return SPX_MSG_INCONSISTENT("SPxLPBase");
          }
       }
 
@@ -2061,6 +2076,8 @@ public:
    ///@}
 
 protected:
+
+   std::shared_ptr<Tolerances> _tolerances;
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Protected write access */
@@ -2827,6 +2844,7 @@ public:
       , lp_scaler(old.lp_scaler)
       , spxout(old.spxout)
    {
+      _tolerances = old._tolerances;
       assert(isConsistent());
    }
 
@@ -2841,6 +2859,7 @@ public:
       , spxout(old.spxout)
    {
       lp_scaler = nullptr;
+      _tolerances = old._tolerances;
       assert(isConsistent());
    }
 
@@ -2856,6 +2875,7 @@ public:
          _isScaled = old._isScaled;
          lp_scaler = old.lp_scaler;
          spxout = old.spxout;
+         _tolerances = old._tolerances;
 
          assert(isConsistent());
       }
@@ -2879,6 +2899,7 @@ public:
                     SPxLPBase<R>::MAXIMIZE;
          offset = R(old.offset);
          _isScaled = old._isScaled;
+         _tolerances = old._tolerances;
 
          // this may have un-intended consequences in the future
          lp_scaler = nullptr;

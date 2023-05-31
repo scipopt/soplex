@@ -358,28 +358,28 @@ void SPxSolverBase<R>::testBounds() const
          // warnings only with verbose level INFO2 and higher.
          if((*theFvec)[i] > theUBbound[i] + viol_max)   //@ &&  theUBbound[i] != theLBbound[i])
          {
-            MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND01 Invalid upper enter bound " << i
-                      << " Fvec: " << (*theFvec)[i]
-                      << " UBbound: " << theUBbound[i]
-                      << " tolerance: " << viol_max
-                      << " violation: " << (*theFvec)[i] - theUBbound[i] << std::endl;)
+            SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND01 Invalid upper enter bound " << i
+                          << " Fvec: " << (*theFvec)[i]
+                          << " UBbound: " << theUBbound[i]
+                          << " tolerance: " << viol_max
+                          << " violation: " << (*theFvec)[i] - theUBbound[i] << std::endl;)
             nlinesprinted++;
          }
 
          if((*theFvec)[i] < theLBbound[i] - viol_max)   //@ &&  theUBbound[i] != theLBbound[i])
          {
-            MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND02 Invalid lower enter bound " << i
-                      << " Fvec: " << (*theFvec)[i]
-                      << " LBbound: " << theLBbound[i]
-                      << " tolerance: " << viol_max
-                      << " violation: " << theLBbound[i] - (*theFvec)[i] << std::endl;)
+            SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND02 Invalid lower enter bound " << i
+                          << " Fvec: " << (*theFvec)[i]
+                          << " LBbound: " << theLBbound[i]
+                          << " tolerance: " << viol_max
+                          << " violation: " << theLBbound[i] - (*theFvec)[i] << std::endl;)
             nlinesprinted++;
          }
 
          if(nlinesprinted >= 3)
          {
-            MSG_INFO2((*this->spxout), (*this->spxout) <<
-                      "WBOUND10 suppressing further warnings of type WBOUND{01,02} in this round" << std::endl);
+            SPX_MSG_INFO2((*this->spxout), (*this->spxout) <<
+                          "WBOUND10 suppressing further warnings of type WBOUND{01,02} in this round" << std::endl);
             break;
          }
       }
@@ -395,28 +395,28 @@ void SPxSolverBase<R>::testBounds() const
       {
          if((*theCoPvec)[i] > (*theCoUbound)[i] + viol_max)  // && (*theCoUbound)[i] != (*theCoLbound)[i])
          {
-            MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND03 Invalid upper cobound " << i
-                      << " CoPvec: " << (*theCoPvec)[i]
-                      << " CoUbound: " << (*theCoUbound)[i]
-                      << " tolerance: " << viol_max
-                      << " violation: " << (*theCoPvec)[i] - (*theCoUbound)[i] << std::endl;)
+            SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND03 Invalid upper cobound " << i
+                          << " CoPvec: " << (*theCoPvec)[i]
+                          << " CoUbound: " << (*theCoUbound)[i]
+                          << " tolerance: " << viol_max
+                          << " violation: " << (*theCoPvec)[i] - (*theCoUbound)[i] << std::endl;)
             nlinesprinted++;
          }
 
          if((*theCoPvec)[i] < (*theCoLbound)[i] - viol_max)  // && (*theCoUbound)[i] != (*theCoLbound)[i])
          {
-            MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND04 Invalid lower cobound " << i
-                      << " CoPvec: " << (*theCoPvec)[i]
-                      << " CoLbound: " << (*theCoLbound)[i]
-                      << " tolerance: " << viol_max
-                      << " violation: " << (*theCoLbound)[i] - (*theCoPvec)[i] << std::endl;)
+            SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND04 Invalid lower cobound " << i
+                          << " CoPvec: " << (*theCoPvec)[i]
+                          << " CoLbound: " << (*theCoLbound)[i]
+                          << " tolerance: " << viol_max
+                          << " violation: " << (*theCoLbound)[i] - (*theCoPvec)[i] << std::endl;)
             nlinesprinted++;
          }
 
          if(nlinesprinted >= 3)
          {
-            MSG_INFO2((*this->spxout), (*this->spxout) <<
-                      "WBOUND11 suppressing further warnings of type WBOUND{03,04} in this round" << std::endl);
+            SPX_MSG_INFO2((*this->spxout), (*this->spxout) <<
+                          "WBOUND11 suppressing further warnings of type WBOUND{03,04} in this round" << std::endl);
             break;
          }
       }
@@ -427,28 +427,28 @@ void SPxSolverBase<R>::testBounds() const
       {
          if((*thePvec)[i] > (*theUbound)[i] + viol_max)   // &&  (*theUbound)[i] != (*theLbound)[i])
          {
-            MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND05 Invalid upper bound " << i
-                      << " Pvec: " << (*thePvec)[i]
-                      << " Ubound: " << (*theUbound)[i]
-                      << " tolerance: " << viol_max
-                      << " violation: " << (*thePvec)[i] - (*theUbound)[i] << std::endl;)
+            SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND05 Invalid upper bound " << i
+                          << " Pvec: " << (*thePvec)[i]
+                          << " Ubound: " << (*theUbound)[i]
+                          << " tolerance: " << viol_max
+                          << " violation: " << (*thePvec)[i] - (*theUbound)[i] << std::endl;)
             nlinesprinted++;
          }
 
          if((*thePvec)[i] < (*theLbound)[i] - viol_max)   // &&  (*theUbound)[i] != (*theLbound)[i])
          {
-            MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND06 Invalid lower bound " << i
-                      << " Pvec: " << (*thePvec)[i]
-                      << " Lbound: " << (*theLbound)[i]
-                      << " tolerance: " << viol_max
-                      << " violation: " << (*theLbound)[i] - (*thePvec)[i] << std::endl;)
+            SPX_MSG_INFO2((*this->spxout), (*this->spxout) << "WBOUND06 Invalid lower bound " << i
+                          << " Pvec: " << (*thePvec)[i]
+                          << " Lbound: " << (*theLbound)[i]
+                          << " tolerance: " << viol_max
+                          << " violation: " << (*theLbound)[i] - (*thePvec)[i] << std::endl;)
             nlinesprinted++;
          }
 
          if(nlinesprinted >= 3)
          {
-            MSG_INFO2((*this->spxout), (*this->spxout) <<
-                      "WBOUND12 suppressing further warnings of type WBOUND{05,06} in this round" << std::endl);
+            SPX_MSG_INFO2((*this->spxout), (*this->spxout) <<
+                          "WBOUND12 suppressing further warnings of type WBOUND{05,06} in this round" << std::endl);
             break;
          }
       }

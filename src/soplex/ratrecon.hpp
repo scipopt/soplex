@@ -57,8 +57,8 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
 
    Dbound = (Integer) sqrt(Dbound);
 
-   MSG_DEBUG(std::cout << "reconstructing " << dim << " dimensional vector with denominator bound " <<
-             Dbound << "\n");
+   SPX_MSG_DEBUG(std::cout << "reconstructing " << dim << " dimensional vector with denominator bound "
+                 << Dbound << "\n");
 
    /* if Dbound is below 2^24 increase it to this value, this avoids changing input vectors that have low denominator
     * because they are floating point representable
@@ -81,7 +81,7 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
       assert(j >= 0);
       assert(j < dim);
 
-      MSG_DEBUG(std::cout << "  --> component " << j << " = " << &xnum[j] << " / denom\n");
+      SPX_MSG_DEBUG(std::cout << "  --> component " << j << " = " << &xnum[j] << " / denom\n");
 
       /* if xnum =0 , then just leave x[j] as zero */
       if(xnum[j] != 0)
@@ -97,13 +97,13 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
 
          if(td <= Dbound)
          {
-            MSG_DEBUG(std::cout << "marker 1\n");
+            SPX_MSG_DEBUG(std::cout << "marker 1\n");
 
             resvec[j] = Rational(tn, td);
          }
          else
          {
-            MSG_DEBUG(std::cout << "marker 2\n");
+            SPX_MSG_DEBUG(std::cout << "marker 2\n");
 
             temp = 1;
 
@@ -128,7 +128,7 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
             /* if q is already big, skip loop */
             if(q[2] > Dbound)
             {
-               MSG_DEBUG(std::cout << "marker 3\n");
+               SPX_MSG_DEBUG(std::cout << "marker 3\n");
                done = 1;
             }
 
@@ -160,7 +160,7 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
 
                cfcnt++;
 
-               MSG_DEBUG(std::cout << "  --> convergent denominator = " << &q[2] << "\n");
+               SPX_MSG_DEBUG(std::cout << "  --> convergent denominator = " << &q[2] << "\n");
             }
 
             assert(q[1] != 0);
@@ -176,7 +176,8 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
 
             if(gcd > Dbound)
             {
-               MSG_DEBUG(std::cout << "terminating with gcd " << &gcd << " exceeding Dbound " << &Dbound << "\n");
+               SPX_MSG_DEBUG(std::cout << "terminating with gcd " << &gcd << " exceeding Dbound " << &Dbound <<
+                             "\n");
                rval = false;
                break;
             }
@@ -229,7 +230,7 @@ inline bool reconstructVector(VectorRational& input, const Rational& denomBoundS
       }
    }
 
-   MSG_DEBUG(std::cout << "LCM = " << mpz_get_str(0, 10, denom) << "\n");
+   SPX_MSG_DEBUG(std::cout << "LCM = " << mpz_get_str(0, 10, denom) << "\n");
 
    /* reconstruct */
    rval = Reconstruct(input, xnum.data(), denom, dim, denomBoundSquared, indexSet);

@@ -36,6 +36,8 @@
 namespace soplex
 {
 
+#define SOPLEX_FASTRT_EPSILON 1e-10
+
 /**@brief   Fast shifting ratio test.
    @ingroup Algo
 
@@ -56,7 +58,7 @@ protected:
    ///@{
    /// parameter for computing minimum stability requirement
    R minStab;
-   /// |value| < epsilon is considered 0.
+   /// zero tolerance used by the ratio tester
    R epsilon;
    /// currently allowed infeasibility.
    R fastDelta;
@@ -69,6 +71,11 @@ protected:
    ///@{
    /// resets tolerances (epsilon).
    void resetTols();
+   /// return epsilon
+   const R epsilonZero() const
+   {
+      return epsilon;
+   }
    /// relaxes stability requirements.
    void relax();
    /// tightens stability requirements.
@@ -181,9 +188,9 @@ public:
    /// default constructor
    SPxFastRT()
       : SPxRatioTester<R>("Fast")
-      , minStab(DEFAULT_BND_VIOL)
-      , epsilon(DEFAULT_EPS_ZERO)
-      , fastDelta(DEFAULT_BND_VIOL)
+      , minStab(SOPLEX_DEFAULT_BND_VIOL)
+      , epsilon(SOPLEX_DEFAULT_EPS_ZERO)
+      , fastDelta(SOPLEX_DEFAULT_BND_VIOL)
       , iscoid(false)
    {}
    /// copy constructor
@@ -211,9 +218,9 @@ public:
    /// bound flipping constructor
    SPxFastRT(const char* name)
       : SPxRatioTester<R>(name)
-      , minStab(DEFAULT_BND_VIOL)
-      , epsilon(DEFAULT_EPS_ZERO)
-      , fastDelta(DEFAULT_BND_VIOL)
+      , minStab(SOPLEX_DEFAULT_BND_VIOL)
+      , epsilon(SOPLEX_DEFAULT_EPS_ZERO)
+      , fastDelta(SOPLEX_DEFAULT_BND_VIOL)
       , iscoid(false)
    {}
    /// destructor
@@ -240,8 +247,8 @@ public:
    ///
    virtual void setDelta(R newDelta)
    {
-      if(newDelta <= DEFAULT_EPS_ZERO)
-         newDelta = DEFAULT_EPS_ZERO;
+      if(newDelta <= this->tolerances()->epsilon())
+         newDelta = this->tolerances()->epsilon();
 
       this->delta = newDelta;
       fastDelta = newDelta;

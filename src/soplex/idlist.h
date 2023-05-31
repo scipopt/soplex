@@ -340,10 +340,10 @@ public:
       for(const T* it = my_first; it; it = next(it))
       {
          if(it != my_first && it->prev()->next() != it)
-            return MSGinconsistent("IdList");
+            return SPX_MSG_INCONSISTENT("IdList");
 
          if(it != my_last && it->next()->prev() != it)
-            return MSGinconsistent("IdList");
+            return SPX_MSG_INCONSISTENT("IdList");
       }
 
       return IsList<T>::isConsistent();
