@@ -1360,6 +1360,7 @@ void SPxSolverBase<R>::setType(Type tp)
          {
             theratiotester = base.theratiotester->clone();
             freeRatioTester = true;
+            theratiotester->setTolerances(this->tolerances());
             theratiotester->load(this);
          }
 
