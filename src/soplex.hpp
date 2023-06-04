@@ -1488,7 +1488,12 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
 
       // set message handlers in members
       _solver.setOutstream(spxout);
-      _simplifier->setOutstream(spxout);
+
+      if(_simplifier != 0)
+      {
+         _simplifier->setOutstream(spxout);
+      }
+
       _scalerUniequi.setOutstream(spxout);
       _scalerBiequi.setOutstream(spxout);
       _scalerGeo1.setOutstream(spxout);
