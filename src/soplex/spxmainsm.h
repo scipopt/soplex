@@ -1624,17 +1624,17 @@ private:
    struct ElementCompare
    {
    public:
-      R epsilon;
+      R epsiloncompare;
 
-      ElementCompare(R epsilon)
+      ElementCompare(R eps)
       {
-         this->epsilon = epsilon;
+         this->epsiloncompare = eps;
       }
 
       int operator()(const typename SVectorBase<R>::Element& e1,
                      const typename SVectorBase<R>::Element& e2) const
       {
-         if(EQ(e1.val, e2.val, this->epsilon))
+         if(EQ(e1.val, e2.val, this->epsiloncompare))
             return 0;
 
          if(e1.val < e2.val)
