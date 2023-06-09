@@ -51,12 +51,12 @@ class CLUFactor
 public:
 
    /// set tolerances
-   virtual void setTolerances(std::shared_ptr<Tolerances> tolerances)
+   void setTolerances(std::shared_ptr<Tolerances> tolerances)
    {
       this->_tolerances = tolerances;
    }
    /// get tolerances
-   const virtual std::shared_ptr<Tolerances> tolerances() const
+   const std::shared_ptr<Tolerances> tolerances() const
    {
       return _tolerances;
    }

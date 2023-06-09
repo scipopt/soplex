@@ -171,7 +171,7 @@ public:
    }
 
    /// set tolerances
-   virtual void setTolerances(std::shared_ptr<Tolerances>& tolerances)
+   void setTolerances(std::shared_ptr<Tolerances>& tolerances)
    {
       thedelta.setTolerances(tolerances);
    }
