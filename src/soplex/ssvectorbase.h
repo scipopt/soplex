@@ -132,7 +132,7 @@ public:
    R getEpsilon() const
    {
       assert(this->_tolerances != nullptr);
-      return this->_tolerances == nullptr ? R(0) : this->tolerances()->epsilon();
+      return this->_tolerances == nullptr ? R(0) : R(this->tolerances()->epsilon());
    }
 
    /// Makes SSVectorBase not setup.
