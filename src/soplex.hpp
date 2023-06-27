@@ -1477,8 +1477,8 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
 
       _solver.setTolerances(_tolerances);
 
-     _simplifierMainSM.setTolerances(_tolerances);
-     _simplifierPaPILO.setTolerances(_tolerances);
+      _simplifierMainSM.setTolerances(_tolerances);
+      _simplifierPaPILO.setTolerances(_tolerances);
 
       // set tolerances for scalers
       _scalerUniequi.setTolerances(_tolerances);
