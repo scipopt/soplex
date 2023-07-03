@@ -7,6 +7,8 @@ function(setLibProperties targetname outputname)
         MACOSX_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 endfunction(setLibProperties)
 
+include(GNUInstallDirs)
+
 include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(sources
@@ -204,15 +206,15 @@ target_link_libraries(example libsoplex)
 set_target_properties(soplex PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 # install the header files of soplex
-install(FILES ${headers} ${PROJECT_BINARY_DIR}/soplex/config.h DESTINATION include/soplex)
-install(FILES soplex.h soplex.hpp soplex_interface.h DESTINATION include)
+install(FILES ${headers} ${PROJECT_BINARY_DIR}/soplex/config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/soplex)
+install(FILES soplex.h soplex.hpp soplex_interface.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # install the binary and the library to appropriate lcoations and add them to an export group
 install(TARGETS soplex libsoplex libsoplex-pic libsoplexshared EXPORT soplex-targets
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        RUNTIME DESTINATION bin
-        INCLUDES DESTINATION include)
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # Add library targets to the build-tree export set
 export(TARGETS libsoplex libsoplex-pic libsoplexshared
@@ -238,7 +240,7 @@ configure_file(${PROJECT_SOURCE_DIR}/soplex-config.cmake.in
 
 # install the targets of the soplex export group and the config file so that other projects
 # can link easily against soplex
-install(EXPORT soplex-targets FILE soplex-targets.cmake DESTINATION lib/cmake/soplex)
+install(EXPORT soplex-targets FILE soplex-targets.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/soplex)
 install(FILES "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/soplex-config.cmake"
 	           ${CMAKE_BINARY_DIR}/soplex-config-version.cmake
-	     DESTINATION lib/cmake/soplex)
+		   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/soplex)
