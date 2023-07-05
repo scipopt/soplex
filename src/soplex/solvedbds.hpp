@@ -3256,8 +3256,6 @@ void SoPlexBase<R>::_identifyComplementaryPrimalFixedPrimalVars(int* currFixedVa
 template <class R>
 void SoPlexBase<R>::_updateComplementaryPrimalFixedPrimalVars(int* currFixedVars)
 {
-   int numFixedVars = 0;
-
    // NOTE: this loop only goes over the primal columns that are included in the complementary problem, i.e. the
    // columns from the original problem.
    // 29.04.15 in the current implementation, all bound constraints are included in the reduced problem. So, all
@@ -3278,8 +3276,6 @@ void SoPlexBase<R>::_updateComplementaryPrimalFixedPrimalVars(int* currFixedVars
             else
                _compSolver.changeBounds(colNumber, _realLP->upper(SPxColId(_decompPrimalColIDs[i])),
                                         _realLP->upper(SPxColId(_decompPrimalColIDs[i])));
-
-            numFixedVars++;
          }
          else
          {

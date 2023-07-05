@@ -132,8 +132,6 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
                done = 1;
             }
 
-            int cfcnt = 2;
-
             while(!done && td != 0)
             {
                /* update everything: compute next ai, then update convergents */
@@ -157,8 +155,6 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
 
                if(q[2] > Dbound)
                   done = 1;
-
-               cfcnt++;
 
                MSG_DEBUG(std::cout << "  --> convergent denominator = " << &q[2] << "\n");
             }
