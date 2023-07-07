@@ -451,7 +451,11 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
    }
    while(!_isSolveStopped(stoppedTime, stoppedIter));
 
+   // reset old basis flags for future optimization runs
    _switchedToBoosted = false;
+   _hasOldBasis = false;
+   _hasOldFeasBasis = false;
+   _hasOldUnbdBasis = false;
 
    ///@todo set status to ABORT_VALUE if optimal solution exceeds objective limit
 
