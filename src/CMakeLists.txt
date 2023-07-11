@@ -4,7 +4,7 @@
 function(setLibProperties targetname outputname)
     set_target_properties(${targetname} PROPERTIES
         OUTPUT_NAME ${outputname}
-        MACOSX_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+	MACOSX_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endfunction(setLibProperties)
 
 include(GNUInstallDirs)
@@ -208,7 +208,7 @@ add_executable(example EXCLUDE_FROM_ALL example.cpp)
 target_link_libraries(example libsoplex)
 
 # set the install rpath to the installed destination
-set_target_properties(soplex PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+set_target_properties(soplex PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 
 # install the header files of soplex
 install(FILES ${headers} ${PROJECT_BINARY_DIR}/soplex/config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/soplex)
