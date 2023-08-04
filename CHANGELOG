@@ -4,6 +4,7 @@ Upcoming Bugfix Release 6.0.4
 features:
 
 performance:
+- avoid memory operations in SLUFactorRational::clear() if status is UNLOADED
 
 interface & parameters:
 
