@@ -3224,7 +3224,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
 
          R val;
 
-         if(GT(lp.maxObj(j), R(0.0), this->epsZero()))
+         if(lp.maxObj(j) > R(0.0))
          {
             if(lp.upper(j) >= R(infinity))
             {
@@ -3234,7 +3234,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
 
             val = lp.upper(j);
          }
-         else if(LT(lp.maxObj(j), R(0.0), this->epsZero()))
+         else if(lp.maxObj(j) < R(0.0))
          {
             if(lp.lower(j) <= R(-infinity))
             {
@@ -5190,12 +5190,18 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLPBase<R>& lp, R eps
 
 #endif
 
+      if(again)
+         continue;
+
 #if DUAL_SPXMAINSM
 
       if(m_result == this->OKAY)
          m_result = simplifyDual(lp, again);
 
 #endif
+
+      if(again)
+         continue;
 
 #if DUPLICATE_ROWS
 
