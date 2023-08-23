@@ -8,6 +8,7 @@ performance:
 interface & parameters:
 
 fixed bugs:
+- make sure fast presolvers are finished before starting dual presolving
 
 miscellaneous:
 
