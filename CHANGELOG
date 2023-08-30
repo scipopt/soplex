@@ -9,6 +9,8 @@ interface & parameters:
 
 fixed bugs:
 - make sure fast presolvers are finished before starting dual presolving
+- fix numerical issues in solution polishing by reoptimizing afterwards, 
+  if polishing affected the objective value
 
 miscellaneous:
 
