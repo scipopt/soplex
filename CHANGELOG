@@ -8,6 +8,8 @@ performance:
 interface & parameters:
 
 fixed bugs:
+- reoptimize without preprocessing and scaling if SoPlex terminates with ABORT_VALUE, 
+  but objective value does not exceed the limit for the original problem
 - make sure fast presolvers are finished before starting dual presolving
 - fix numerical issues in solution polishing by reoptimizing afterwards, 
   if polishing affected the objective value

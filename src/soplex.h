@@ -2278,6 +2278,9 @@ private:
    /// verify computed solution and resolve if necessary
    void _verifySolutionReal();
 
+   /// verify computed obj stop and resolve if necessary
+   void _verifyObjLimitReal();
+
    /// stores solution of the real LP; before calling this, the real LP must be loaded in the solver and solved (again)
    void _storeSolutionReal(bool verify = true);
 
