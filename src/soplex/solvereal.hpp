@@ -198,6 +198,15 @@ void SoPlexBase<R>::_evaluateSolutionReal(typename SPxSimplifier<R>::Result simp
       _hasBasis = false;
       break;
 
+   case SPxSolverBase<R>::ABORT_VALUE:
+
+      // If we aborted the solve for some reason and there is still a shift, ensure that the basis status is correct
+      if(_solver.shift() > _solver.epsilon())
+         _solver.setBasisStatus(SPxBasisBase<R>::REGULAR);
+
+      _storeSolutionReal(true);
+      break;
+
    case SPxSolverBase<R>::ABORT_CYCLING:
 
       // if preprocessing or scaling was applied, try to run again without to
@@ -217,7 +226,6 @@ void SoPlexBase<R>::_evaluateSolutionReal(typename SPxSimplifier<R>::Result simp
    // FALLTHROUGH
    case SPxSolverBase<R>::ABORT_TIME:
    case SPxSolverBase<R>::ABORT_ITER:
-   case SPxSolverBase<R>::ABORT_VALUE:
    case SPxSolverBase<R>::REGULAR:
    case SPxSolverBase<R>::RUNNING:
 
@@ -470,6 +478,46 @@ void SoPlexBase<R>::_verifySolutionReal()
    }
 }
 
+/// verify computed solution based on status and resolve if claimed primal or dual feasibility is not fulfilled
+template <class R>
+void SoPlexBase<R>::_verifyObjLimitReal()
+{
+   MSG_INFO1(spxout, spxout << " --- verifying objective limit" << std::endl;)
+
+   R sumviol = 0;
+   R dualviol = 0;
+   R redcostviol = 0;
+
+   bool dualfeasible = true;
+
+   if(!getDualViolation(dualviol, sumviol))
+      dualfeasible = false;
+
+   if(!getRedCostViolation(redcostviol, sumviol))
+      dualfeasible = false;
+
+   if(!dualfeasible || dualviol >= _solver.opttol()
+         || redcostviol >= _solver.opttol())
+   {
+      assert(&_solver == _realLP);
+      assert(_isRealLPLoaded);
+      MSG_INFO3(spxout, spxout << ", dual violation: " << dualviol
+                << ", redcost violation: " << redcostviol << std::endl;)
+      MSG_INFO1(spxout, spxout <<
+                " --- detected violations in original problem space -- solve again without presolving/scaling" <<
+                std::endl;)
+
+      if(_isRealLPScaled)
+      {
+         _solver.unscaleLPandReloadBasis();
+         _isRealLPScaled = false;
+         ++_unscaleCalls;
+      }
+
+      _preprocessAndSolveReal(false);
+   }
+}
+
 
 /// stores solution data from the solver, possibly after applying unscaling and unsimplifying
 template <class R>
@@ -645,7 +693,12 @@ void SoPlexBase<R>::_storeSolutionReal(bool verify)
 
    // check solution for violations and solve again if necessary
    if(verify)
-      _verifySolutionReal();
+   {
+      if(_status == SPxSolverBase<R>::ABORT_VALUE)
+         _verifyObjLimitReal();
+      else
+         _verifySolutionReal();
+   }
 
    assert(_solver.nCols() == this->numCols());
    assert(_solver.nRows() == numRows());
