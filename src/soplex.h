@@ -1763,7 +1763,7 @@ private:
 #ifdef SOPLEX_WITH_GMP
    using BP = number<gmp_float<50>, et_off>;
 #else
-   using BP = numer<cpp_float<50>, et_off>;
+   using BP = number<cpp_float<50>, et_off>;
 #endif
 #endif
 
