@@ -2435,6 +2435,8 @@ bool SoPlexBase<R>::_boostPrecision()
    assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
    assert(_switchedToBoosted);
 
+#ifdef SOPLEX_WITH_MPFR
+
    _statistics->boostingStepTime->start();
 
    _statistics->precBoosts++;
@@ -2479,8 +2481,12 @@ bool SoPlexBase<R>::_boostPrecision()
    }
 
    _statistics->boostingStepTime->stop();
-
    return !_boostingLimitReached;
+#else
+   SPX_MSG_ERROR(std::cerr <<
+                 "SoPlex was not compiled with MPFR, which is needed for precision changes \n");
+   return false
+#endif
 }
 
 /// increase the multiprecision, return false if maximum precision is reached, true otherwise
@@ -2737,6 +2743,8 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
    assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
    assert(!boolParam(SoPlexBase<R>::ITERATIVE_REFINEMENT));
 
+#ifdef SOPLEX_WITH_MPFR
+
    // start rational solving timing
    _statistics->rationalTime->start();
 
@@ -2966,6 +2974,11 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
       // stop rational solving time
       _statistics->rationalTime->stop();
    }
+
+#else
+   SPX_MSG_ERROR(std::cerr <<
+                 "SoPlex was not compiled with MPFR, which is needed for precision changes \n");
+#endif
 }
 
 
@@ -2990,6 +3003,8 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
 {
    assert(boolParam(SoPlexBase<R>::ITERATIVE_REFINEMENT));
    assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
+
+#ifdef SOPLEX_WITH_MPFR
 
    // start rational solving timing
    _statistics->rationalTime->start();
@@ -3328,6 +3343,11 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
       // stop rational solving time
       _statistics->rationalTime->stop();
    }
+
+#else
+   SPX_MSG_ERROR(std::cerr <<
+                 "SoPlex was not compiled with MPFR, which is needed for precision changes \n");
+#endif
 }
 
 
@@ -5836,6 +5856,8 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
    assert(primal.dim() == numColsRational());
    assert(dual.dim() == numRowsRational());
 
+#ifdef SOPLEX_WITH_MPFR
+
 #ifndef SOPLEX_MANUAL_ALT
 
    if(_isBoostedStartingFromSlack(initialSolve))
@@ -6216,6 +6238,10 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
          _boostedSolver.setBasis(_tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr());
       }
    }
+
+#else
+   SPX_MSG_ERROR(spxout, spxout << "No support for precision boosting without GMP/MPFR.\n");
+#endif
 }
 
 
