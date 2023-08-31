@@ -45,7 +45,7 @@ private:
    /**@name Private data */
    ///@{
    /// Exception message.
-   std::string SPX_MSG;
+   std::string msg;
    ///@}
 public:
    //----------------------------------------
@@ -54,7 +54,7 @@ public:
    /// constructor
    /** The constructor receives an optional string as an exception message.
     */
-   SPxException(const std::string& m = "") : SPX_MSG(m) {}
+   SPxException(const std::string& m = "") : msg(m) {}
    /// destructor
    virtual ~SPxException() {}
    ///@}
@@ -65,7 +65,7 @@ public:
    /// returns exception message
    virtual const std::string what() const
    {
-      return SPX_MSG;
+      return msg;
    }
    ///@}
 };

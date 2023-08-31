@@ -40,7 +40,7 @@ bool EQ(int a, int b)
 
 SOPLEX_THREADLOCAL const Real infinity                 = SOPLEX_DEFAULT_INFINITY;
 
-bool SPX_MSGinconsistent(const char* name, const char* file, int line)
+bool msginconsistent(const char* name, const char* file, int line)
 {
    assert(name != 0);
    assert(file != 0);

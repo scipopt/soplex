@@ -169,9 +169,9 @@ bool EQ(int a, int b);
 /// Prints out message \p x if the verbosity level is at least SPxOut::INFO3.
 #define SPX_MSG_INFO3(spxout, x)    { SOPLEX_DO_WITH_TMP_VERBOSITY( SPxOut::INFO3, spxout, x ) }
 
-extern bool SPX_MSGinconsistent(const char* name, const char* file, int line);
+extern bool msginconsistent(const char* name, const char* file, int line);
 
-#define SPX_MSG_INCONSISTENT(name) SPX_MSGinconsistent(name, __FILE__, __LINE__)
+#define SPX_MSG_INCONSISTENT(name) msginconsistent(name, __FILE__, __LINE__)
 
 #if defined(SOPLEX_DEBUG)
 // print output in any case, regardless of _tolerances->verbose():

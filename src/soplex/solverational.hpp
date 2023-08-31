@@ -518,8 +518,6 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
 #endif
 }
 
-
-
 /// perform iterative refinement using the right precision
 template <class R>
 void SoPlexBase<R>::_performOptIRWrapper(
@@ -539,6 +537,7 @@ void SoPlexBase<R>::_performOptIRWrapper(
 #ifdef SOPLEX_WITH_MPFR
    if(boolParam(SoPlexBase<R>::ITERATIVE_REFINEMENT))
    {
+      // no precision boosting or initial precision -> solve with plain iterative refinement
       if(!boolParam(SoPlexBase<R>::PRECISION_BOOSTING) || !_switchedToBoosted)
       {
          _performOptIRStable(sol, acceptUnbounded, acceptInfeasible, minRounds,
@@ -578,6 +577,7 @@ void SoPlexBase<R>::_performOptIRWrapper(
    {
       assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING)); // at least one option between IR and precision boosting must be activated
 
+      // initial precision solve
       if(!_switchedToBoosted)
       {
          _solveRealForRationalStable(sol, primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);

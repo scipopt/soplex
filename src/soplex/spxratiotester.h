@@ -99,17 +99,10 @@ public:
    /// set allowed bound violation
    virtual void setDelta(R newDelta)
    {
-#ifdef SOPLEX_DISABLED_CODE
-      // this old code block didn't allow setting values below the smallest positive double value
-      // with the implementation of precision boosting, template type R can be a multiprecision type
-      // therefore newDelta can very much be smaller than DEFAULT_EPS_ZERO
       if(newDelta <= this->tolerances()->epsilon())
          delta = this->tolerances()->epsilon();
       else
          delta = newDelta;
-#else
-      delta = newDelta;
-#endif
    }
 
    /// get allowed bound violation

@@ -344,8 +344,8 @@ private:
    DataArray<VarStatus> oldBasisStatusRows; ///< stored stable basis met before a simplex pivot (used to warm start the solver)
    DataArray<VarStatus> oldBasisStatusCols; // They don't have setters because only the internal simplex method is meant to fill them
 
-   bool store_basis_before_simplex_pivot; ///< do we store stable basis before simplex pivots
-   int store_basis_simplex_freq; ///< number of simplex pivots -1 to perform before storing stable basis
+   bool storeBasisBeforeSimplexPivot; ///< do we store stable basis before simplex pivots
+   int storeBasisSimplexFreq; ///< number of simplex pivots -1 to perform before storing stable basis
 
    bool
    fullPerturbation;       ///< whether to perturb the entire problem or just the bounds relevant for the current pivot
@@ -882,6 +882,7 @@ public:
       return SOPLEX_MAX(this->tolerances()->floatingPointFeastol(),
                         this->tolerances()->floatingPointOpttol());
    }
+
    /// set timing type
    void setTiming(Timer::TYPE ttype)
    {
@@ -942,24 +943,16 @@ public:
       return oldBasisStatusCols;
    }
 
-   void setStoreBasisDuringSimplexBefore(bool value)
+   // should the basis be stored for use in precision boosting?
+   void setStoreBasisForBoosting(bool value)
    {
-      store_basis_before_simplex_pivot = value;
+      storeBasisBeforeSimplexPivot = value;
    }
 
-   bool getStoreBasisDuringSimplexBefore()
+   // set frequency of storing the basis for use in precision boosting
+   void setStoreBasisFreqForBoosting(int freq)
    {
-      return store_basis_before_simplex_pivot;
-   }
-
-   void setStoreBasisSimplexFreq(int freq)
-   {
-      store_basis_simplex_freq = freq;
-   }
-
-   bool getStoreBasisSimplexFreq()
-   {
-      return store_basis_simplex_freq;
+      storeBasisSimplexFreq = freq;
    }
 
    /** SPxSolverBase considers a Simplex step as degenerate if the

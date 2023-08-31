@@ -524,8 +524,8 @@ void Presol<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
    num.setEpsilon(this->epsZero());
    num.setFeasTol(this->feastol());
    /* since PaPILO verbosity is quiet it's irrelevant what the messenger is */
-   papilo::Message SPX_MSG{};
-   SPX_MSG.setVerbosityLevel(verbosityLevel);
+   papilo::Message msg{};
+   msg.setVerbosityLevel(verbosityLevel);
 
    papilo::Postsolve<R> postsolve {msg, num};
    auto status = postsolve.undo(reducedSolution, originalSolution, postsolveStorage, isOptimal);

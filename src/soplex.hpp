@@ -225,7 +225,7 @@ SoPlexBase<R>::Settings::BoolParam::BoolParam()
       "enable recovery mechanism for when the solve fails";
    defaultValue[SoPlexBase<R>::RECOVERY_MECHANISM] = false;
 
-   name[SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT] = "store_basis_before_simplex_pivot";
+   name[SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT] = "storeBasisBeforeSimplexPivot";
    description[SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT] =
       "store advanced and stable basis met before each simplex iteration, to better warm start";
    defaultValue[SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT] = true;
@@ -478,7 +478,7 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
    // 300 is very close to the greatest int k such that (double)1e-k != 0
 
    // at max, after how many simplex pivots do we store the advanced and stable basis, 1 = every iterations
-   name[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] = "store_basis_simplex_freq";
+   name[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] = "storeBasisSimplexFreq";
    description[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] =
       "at max, after how many simplex pivots do we store the advanced and stable basis, 1 = every iterations";
    lower[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] = 1;
@@ -5973,8 +5973,8 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
 
    case STORE_BASIS_BEFORE_SIMPLEX_PIVOT:
       // attributes in solvers need to be updated
-      _solver.setStoreBasisDuringSimplexBefore(value);
-      _boostedSolver.setStoreBasisDuringSimplexBefore(value);
+      _solver.setStoreBasisForBoosting(value);
+      _boostedSolver.setStoreBasisForBoosting(value);
       break;
    default:
       return false;
@@ -6528,8 +6528,8 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
 
    case SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ:
       // attributes in solvers need to be updated
-      _solver.setStoreBasisSimplexFreq(value);
-      _boostedSolver.setStoreBasisSimplexFreq(value);
+      _solver.setStoreBasisFreqForBoosting(value);
+      _boostedSolver.setStoreBasisFreqForBoosting(value);
       break;
    default:
       return false;
@@ -10140,6 +10140,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::optimize(volatile bool* interru
       }
 
       _solver.setComputeDegenFlag(boolParam(COMPUTEDEGEN));
+      _solver.setStoreBasisForBoosting(false);
 
       _optimize(interrupt);
 #ifdef SOPLEX_DEBUG // this check will remove scaling of the realLP
