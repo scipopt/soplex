@@ -2485,7 +2485,7 @@ bool SoPlexBase<R>::_boostPrecision()
 #else
    SPX_MSG_ERROR(std::cerr <<
                  "SoPlex was not compiled with MPFR, which is needed for precision changes \n");
-   return false
+   return false;
 #endif
 }
 
@@ -6240,7 +6240,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
    }
 
 #else
-   SPX_MSG_ERROR(spxout, spxout << "No support for precision boosting without GMP/MPFR.\n");
+   SPX_MSG_ERROR(std::cerr << "No support for precision boosting without GMP/MPFR.\n");
 #endif
 }
 
