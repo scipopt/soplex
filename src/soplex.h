@@ -1754,9 +1754,9 @@ private:
    SPxScaler<R>* _scaler;
    SPxStarter<R>* _starter;
 
+#ifdef SOPLEX_WITH_BOOST
 #ifdef SOPLEX_WITH_MPFR
    //----------------------------- BOOSTED SOLVER -----------------------------
-
    // multiprecision type used for the boosted solver
    using BP = number<mpfr_float_backend<0>, et_off>;
 #else
@@ -1765,6 +1765,9 @@ private:
 #else
    using BP = number<cpp_dec_float<50>, et_off>;
 #endif
+#endif
+#else
+   using BP = double;
 #endif
 
    // boosted solver object

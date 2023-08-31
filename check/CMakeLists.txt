@@ -69,8 +69,12 @@ if(BOOST)
    #need boost to run exact
    set(settings
        ${settings}
-       exact
+       exact)
+if(MPFR_FOUND)
+   set(settings
+       ${settings}
        exact-pure-boosting)
+   endif()
 if(${Boost_VERSION_MACRO} GREATER "106999")
     set(settings
         ${settings}

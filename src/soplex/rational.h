@@ -946,6 +946,11 @@ inline Rational ratFromString(const char* desc)
 {
    return Rational();
 }
+inline int orderOfMagnitude(Rational& r)
+{
+   r.rationalErrorMessage();
+   return 0;
+}
 inline void SpxLcm(Integer& result, Integer a, Integer b) {}
 inline void SpxGcd(Integer& result, Integer a, Integer b) {}
 inline void divide_qr(Integer& result, Integer& result2, Integer a, Integer b) {}

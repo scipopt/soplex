@@ -654,6 +654,15 @@ void SoPlexBase<R>::_performOptIRWrapper(
    }
 
    // solve problem with iterative refinement and recovery mechanism
+   if(!boolParam(SoPlexBase<R>::ITERATIVE_REFINEMENT))
+   {
+      SPX_MSG_ERROR(std::cerr <<
+                    "ERROR: parameter iterative_refinement is set to false but SoPlex was compiled without MPFR support, so boosting is not possible"
+                    << std::endl;)
+      error = true;
+      return;
+   }
+
    _performOptIRStable(sol, acceptUnbounded, acceptInfeasible, minRounds,
                        primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
 #endif
