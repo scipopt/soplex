@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -1624,17 +1624,17 @@ private:
    struct ElementCompare
    {
    public:
-      R epsilon;
+      R epsiloncompare;
 
-      ElementCompare(R epsilon)
+      ElementCompare(R eps)
       {
-         this->epsilon = epsilon;
+         this->epsiloncompare = eps;
       }
 
       int operator()(const typename SVectorBase<R>::Element& e1,
                      const typename SVectorBase<R>::Element& e2) const
       {
-         if(EQ(e1.val, e2.val, this->epsilon))
+         if(EQ(e1.val, e2.val, this->epsiloncompare))
             return 0;
 
          if(e1.val < e2.val)

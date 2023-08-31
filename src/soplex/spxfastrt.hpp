@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -1074,7 +1074,7 @@ int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
    else
       return -1;
 
-   SPX_MSG_DEBUG(
+   SPX_DEBUG(
 
       if(leave >= 0)
       std::cout
@@ -1496,7 +1496,7 @@ SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
       while(cnt < SOPLEX_TRIES);
    }
 
-   SPX_MSG_DEBUG(
+   SPX_DEBUG(
 
       if(enterId.isValid())
 {

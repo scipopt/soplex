@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -132,7 +132,7 @@ public:
    R getEpsilon() const
    {
       assert(this->_tolerances != nullptr);
-      return this->_tolerances == nullptr ? R(0) : this->tolerances()->epsilon();
+      return this->_tolerances == nullptr ? R(0) : R(this->tolerances()->epsilon());
    }
 
    /// Makes SSVectorBase not setup.

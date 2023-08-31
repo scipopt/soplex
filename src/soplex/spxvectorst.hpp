@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -47,7 +47,7 @@ void SPxVectorST<R>::setupWeights(SPxSolverBase<R>& base)
       R x, y;
       int i;
 
-      SPX_MSG_DEBUG(std::cout << "DVECST01 colWeight[]: ";)
+      SPxOut::debug(this, "DVECST01 colWeight[]: ");
 
       for(i = base.nCols(); i--;)
       {
@@ -65,12 +65,12 @@ void SPxVectorST<R>::setupWeights(SPxSolverBase<R>& base)
             this->colUp[i] = 1;
          }
 
-         SPX_MSG_DEBUG(std::cout << this->colWeight[i] << " ";)
+         SPxOut::debug(this, "{} ", this->colWeight[i]);
       }
 
-      SPX_MSG_DEBUG(std::cout << std::endl << std::endl;)
+      SPxOut::debug(this, "\n \n");
 
-      SPX_MSG_DEBUG(std::cout << "DVECST02 rowWeight[]: ";)
+      SPxOut::debug(this, "DVECST02 rowWeight[]: ");
 
       for(i = base.nRows(); i--;)
       {
@@ -90,10 +90,10 @@ void SPxVectorST<R>::setupWeights(SPxSolverBase<R>& base)
             this->rowRight[i] = 1;
          }
 
-         SPX_MSG_DEBUG(std::cout << this->rowWeight[i] << " ";)
+         SPxOut::debug(this, "{} ", this->rowWeight[i]);
       }
 
-      SPX_MSG_DEBUG(std::cout << std::endl;)
+      SPxOut::debug(this, "\n");
    }
 
    else if(state == DVEC)

@@ -11,3 +11,7 @@ if(@SOPLEX_WITH_BOOST@)
   find_package(Boost 1.71.0)
   include_directories(${Boost_INCLUDE_DIRS})
 endif()
+
+if(@SOPLEX_WITH_PAPILO@)
+    set(SOPLEX_WITH_PAPILO TRUE)
+endif()

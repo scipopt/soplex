@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -37,10 +37,8 @@ void SPxBasisBase<R>::reDim()
 
    assert(theLP != 0);
 
-   SPX_MSG_DEBUG(std::cout << "DCHBAS01 SPxBasisBase<R>::reDim():"
-                 << " matrixIsSetup=" << matrixIsSetup
-                 << " fatorized=" << factorized
-                 << std::endl;)
+   SPxOut::debug(this, "DCHBAS01 SPxBasisBase<R>::reDim(): matrixIsSetup={}, factorized={}\n",
+                 matrixIsSetup, factorized);
 
    thedesc.reSize(theLP->nRows(), theLP->nCols());
 
@@ -56,10 +54,8 @@ void SPxBasisBase<R>::reDim()
       factorized    = false;
    }
 
-   SPX_MSG_DEBUG(std::cout << "DCHBAS03 SPxBasisBase<R>::reDim(): -->"
-                 << " matrixIsSetup=" << matrixIsSetup
-                 << " fatorized=" << factorized
-                 << std::endl;)
+   SPxOut::debug(this, "DCHBAS03 SPxBasisBase<R>::reDim(): --> matrixIsSetup={}, factorized={}\n",
+                 matrixIsSetup, factorized);
 
    assert(matrix.size()    >= theLP->dim());
    assert(theBaseId.size() >= theLP->dim());
@@ -144,7 +140,7 @@ void SPxBasisBase<R>::removedRow(int i)
          setStatus(NO_PROBLEM);
          factorized = false;
 
-         SPX_MSG_DEBUG(std::cout << "DCHBAS05 Warning: deleting basic row!\n";)
+         SPxOut::debug(this, "DCHBAS05 Warning: deleting basic row!\n");
       }
    }
    else
@@ -155,7 +151,7 @@ void SPxBasisBase<R>::removedRow(int i)
       if(!theLP->isBasic(thedesc.rowStatus(i)))
       {
          setStatus(NO_PROBLEM);
-         SPX_MSG_DEBUG(std::cout << "DCHBAS06 Warning: deleting nonbasic row!\n";)
+         SPxOut::debug(this, "DCHBAS06 Warning: deleting nonbasic row!\n");
       }
       else if(status() > NO_PROBLEM && matrixIsSetup)
       {
@@ -201,7 +197,7 @@ void SPxBasisBase<R>::removedRows(const int perm[])
                {
                   setStatus(NO_PROBLEM);
                   factorized = matrixIsSetup = false;
-                  SPX_MSG_DEBUG(std::cout << "DCHBAS07 Warning: deleting basic row!\n";)
+                  SPxOut::debug(this, "DCHBAS07 Warning: deleting basic row!\n");
                }
             }
             else                            // row was moved

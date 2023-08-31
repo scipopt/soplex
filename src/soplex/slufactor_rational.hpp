@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -421,8 +421,7 @@ inline SLUFactorRational::Status SLUFactorRational::change(
 
    usetup = false;
 
-   SPX_MSG_DEBUG(std::cout << "DSLUFA01\tupdated\t\tstability = " << stability()
-                 << std::endl;)
+   SPxOut::debug(this, "DSLUFA01\tupdated\t\tstability = {}\n", stability());
 
    return status();
 }
@@ -862,10 +861,10 @@ inline SLUFactorRational::Status SLUFactorRational::load(const SVectorRational* 
    stat = OK;
    factor(matrix, lastThreshold);
 
-   SPX_MSG_DEBUG(std::cout << "DSLUFA02 threshold = " << lastThreshold
-                 << "\tstability = " << stability()
-                 << "\tSOPLEX_MINSTABILITYRAT = " << SOPLEX_MINSTABILITYRAT << std::endl;)
-   SPX_MSG_DEBUG(
+
+   SPxOut::debug(this, "DSLUFA02 threshold = {}\tstability = {}\tSOPLEX_MINSTABILITYRAT = {}\n",
+                 lastThreshold, stability(), SOPLEX_MINSTABILITYRAT);
+   SPX_DEBUG(
       int i;
       FILE* fl = fopen("dump.lp", "w");
       std::cout << "DSLUFA03 Basis:\n";

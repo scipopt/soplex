@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -93,7 +93,7 @@ bool EQ(int a, int b);
 #define SOPLEX_VERSION         603
 #define SOPLEX_SUBVERSION        5
 #define SOPLEX_APIVERSION       14
-#define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2022 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)"
+#define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)"
 
 /*-----------------------------------------------------------------------------
  * Assertion Macros etc.
@@ -176,8 +176,10 @@ extern bool SPX_MSGinconsistent(const char* name, const char* file, int line);
 #if defined(SOPLEX_DEBUG)
 // print output in any case, regardless of _tolerances->verbose():
 #define SPX_MSG_DEBUG(x) { x; }
+#define SPX_DEBUG(x) { x; }
 #else
 #define SPX_MSG_DEBUG(x) /**/
+#define SPX_DEBUG(x) /**/
 #endif //!SOPLEX_DEBUG
 
 

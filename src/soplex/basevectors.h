@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -408,7 +408,7 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
             else
             {
                adjust = true;
-               v[j] = SOPLEX_VECTOR_MARKER * this->tolerances()->epsilon();
+               v[j] = SOPLEX_VECTOR_MARKER;
             }
          }
          else
@@ -722,7 +722,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A,
             // by setting a value which is nearly 0; otherwise, store
             // the value. Values below epsilon will be removed later.
             if(oldval == 0)
-               VectorBase<R>::val[elt.idx] = SOPLEX_VECTOR_MARKER * this->tolerances()->epsilon();
+               VectorBase<R>::val[elt.idx] = SOPLEX_VECTOR_MARKER;
             else
                VectorBase<R>::val[elt.idx] = oldval;
          }

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -299,11 +299,8 @@ void SPxSolverBase<R>::getLeaveVals(
          throw SPxInternalCodeException("XLEAVE02 This should never happen.");
       }
 
-      SPX_MSG_DEBUG(std::cout << "DLEAVE51 SPxSolverBase<R>::getLeaveVals() : row " << leaveNum
-                    << ": " << leaveStat
-                    << " -> " << ds.rowStatus(leaveNum)
-                    << " objChange: " << objChange
-                    << std::endl;)
+      SPxOut::debug(this, "DLEAVE51 SPxSolverBase<R>::getLeaveVals() : row {} : {} -> {} objChange: {}\n",
+                    leaveNum, leaveStat, ds.rowStatus(leaveNum), objChange);
    }
 
    else
@@ -403,11 +400,8 @@ void SPxSolverBase<R>::getLeaveVals(
          throw SPxInternalCodeException("XLEAVE03 This should never happen.");
       }
 
-      SPX_MSG_DEBUG(std::cout << "DLEAVE52 SPxSolverBase<R>::getLeaveVals() : col " << leaveNum
-                    << ": " << leaveStat
-                    << " -> " << ds.colStatus(leaveNum)
-                    << " objChange: " << objChange
-                    << std::endl;)
+      SPxOut::debug(this, "DLEAVE52 SPxSolverBase<R>::getLeaveVals() : col {} : {} -> {} objChange: {}\n",
+                    leaveNum, leaveStat, ds.colStatus(leaveNum), objChange);
    }
 }
 
@@ -538,11 +532,8 @@ void SPxSolverBase<R>::getLeaveVals2(
          throw SPxInternalCodeException("XLEAVE06 This should never happen.");
       }
 
-      SPX_MSG_DEBUG(std::cout << "DLEAVE55 SPxSolverBase<R>::getLeaveVals2(): row " << idx
-                    << ": " << enterStat
-                    << " -> " << ds.rowStatus(idx)
-                    << " objChange: " << objChange
-                    << std::endl;)
+      SPxOut::debug(this, "DLEAVE55 SPxSolverBase<R>::getLeaveVals2(): row {} : {} -> {} objChange: {}\n",
+                    idx, enterStat, ds.rowStatus(idx), objChange);
    }
 
    else
@@ -653,11 +644,8 @@ void SPxSolverBase<R>::getLeaveVals2(
          throw SPxInternalCodeException("XLEAVE08 This should never happen.");
       }
 
-      SPX_MSG_DEBUG(std::cout << "DLEAVE57 SPxSolverBase<R>::getLeaveVals2(): col " << idx
-                    << ": " << enterStat
-                    << " -> " << ds.colStatus(idx)
-                    << " objChange: " << objChange
-                    << std::endl;)
+      SPxOut::debug(this, "DLEAVE57 SPxSolverBase<R>::getLeaveVals2(): col {} : {} -> {} objChange: {}\n",
+                    idx, enterStat, ds.colStatus(idx), objChange);
    }
 
 }
@@ -674,9 +662,8 @@ void SPxSolverBase<R>::rejectLeave(
 
    if(leaveId.isSPxRowId())
    {
-      SPX_MSG_DEBUG(std::cout << "DLEAVE58 rejectLeave()  : row " << leaveNum
-                    << ": " << ds.rowStatus(leaveNum)
-                    << " -> " << leaveStat << std::endl;)
+      SPxOut::debug(this, "DLEAVE58 rejectLeave()  : row {}: {} -> {}\n", leaveNum,
+                    ds.rowStatus(leaveNum), leaveStat);
 
       if(leaveStat == SPxBasisBase<R>::Desc::D_ON_BOTH)
       {
@@ -690,9 +677,8 @@ void SPxSolverBase<R>::rejectLeave(
    }
    else
    {
-      SPX_MSG_DEBUG(std::cout << "DLEAVE59 rejectLeave()  : col " << leaveNum
-                    << ": " << ds.colStatus(leaveNum)
-                    << " -> " << leaveStat << std::endl;)
+      SPxOut::debug(this, "DLEAVE59 rejectLeave()  : col {}: {} -> {}\n", leaveNum,
+                    ds.colStatus(leaveNum), leaveStat);
 
       if(leaveStat == SPxBasisBase<R>::Desc::D_ON_BOTH)
       {
@@ -807,9 +793,8 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
 
    if(NE(theShift, oldShift, this->tolerances()->epsilon()))
    {
-      SPX_MSG_DEBUG(std::cout <<
-                    "DLEAVE71 trigger recomputation of nonbasic value due to shifts in ratiotest"
-                    << std::endl;)
+      SPxOut::debug(this,
+                    "DLEAVE71 trigger recomputation of nonbasic value due to shifts in ratiotest\n");
       forceRecompNonbasicValue();
    }
 
@@ -836,9 +821,8 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
 
       if(NE(enterVal, leaveMax, this->tolerances()->epsilon()))
       {
-         SPX_MSG_DEBUG(std::cout << "DLEAVE61 rejecting leave A (leaveIdx=" << leaveIdx
-                       << ", theCoTest=" << theCoTest[leaveIdx] << ")"
-                       << std::endl;)
+         SPxOut::debug(this, "DLEAVE61 rejecting leave A (leaveIdx={}, theCoTest={})\n", leaveIdx,
+                       theCoTest[leaveIdx]);
 
          /* In the LEAVE algorithm, when for a selected leaving variable we find only
             an instable entering variable, then the basis change is not conducted.
@@ -948,8 +932,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
 
             // perform update of basic solution
             primVec -= (*solveVector3);
-            SPX_MSG_DEBUG(std::cout << "ILBFRT02 breakpoints passed / bounds flipped = " << boundflips <<
-                          std::endl;)
+            SPxOut::debug(this, "ILBFRT02 breakpoints passed / bounds flipped = {}\n", boundflips);
             totalboundflips += boundflips;
          }
          else if(solveVector2 != NULL)
@@ -974,8 +957,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
 
             // perform update of basic solution
             primVec -= (*solveVector3);
-            SPX_MSG_DEBUG(std::cout << "ILBFRT02 breakpoints passed / bounds flipped = " << boundflips <<
-                          std::endl;)
+            SPxOut::debug(this, "ILBFRT02 breakpoints passed / bounds flipped = {}\n", boundflips);
             totalboundflips += boundflips;
          }
          else
@@ -1034,9 +1016,8 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
                this->change(-1, none, 0);
                objChange = R(0.0); // the nonbasicValue is not supposed to be updated in this case
 
-               SPX_MSG_DEBUG(std::cout << "DLEAVE63 rejecting leave B (leaveIdx=" << leaveIdx
-                             << ", theCoTest=" << theCoTest[leaveIdx]
-                             << ")" << std::endl;)
+               SPxOut::debug(this, "DLEAVE63 rejecting leave B (leaveIdx={}, theCoTest={})\n", leaveIdx,
+                             theCoTest[leaveIdx]);
 
                // Note: These changes do not survive a refactorization
                theCoTest[leaveIdx] *= 0.01;

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -622,11 +622,8 @@ void SPxSolverBase<R>::getEnterVals
          throw SPxInternalCodeException("XENTER01 This should never happen.");
       }
 
-      SPX_MSG_DEBUG(std::cout << "DENTER03 SPxSolverBase::getEnterVals() : col " << enterIdx
-                    << ": " << enterStat
-                    << " -> " << ds.colStatus(enterIdx)
-                    << " objChange: " << objChange
-                    << std::endl;)
+      SPxOut::debug(this, "DENTER03 SPxSolverBase::getEnterVals() : col {}: {} -> {} objChange: {}\n",
+                    enterIdx, enterStat, ds.colStatus(enterIdx), objChange);
    }
 
    else
@@ -773,11 +770,8 @@ void SPxSolverBase<R>::getEnterVals
          throw SPxInternalCodeException("XENTER03 This should never happen.");
       }
 
-      SPX_MSG_DEBUG(std::cout << "DENTER05 SPxSolverBase::getEnterVals() : row "
-                    << enterIdx << ": " << enterStat
-                    << " -> " << ds.rowStatus(enterIdx)
-                    << " objChange: " << objChange
-                    << std::endl;)
+      SPxOut::debug(this, "DENTER05 SPxSolverBase::getEnterVals() : row {}: {} -> {} objChange: {}\n",
+                    enterIdx, enterStat, ds.rowStatus(enterIdx), objChange);
    }
 }
 
@@ -946,11 +940,8 @@ void SPxSolverBase<R>::getEnterVals2
          throw SPxInternalCodeException("XENTER07 This should never happen.");
       }
 
-      SPX_MSG_DEBUG(std::cout << "DENTER06 SPxSolverBase::getEnterVals2(): row "
-                    << idx << ": " << leaveStat
-                    << " -> " << ds.rowStatus(idx)
-                    << " objChange: " << objChange
-                    << std::endl;)
+      SPxOut::debug(this, "DENTER06 SPxSolverBase::getEnterVals2(): row {}: {} -> {} objChange: {}\n",
+                    idx, leaveStat, ds.rowStatus(idx), objChange);
    }
 
    else
@@ -1094,11 +1085,8 @@ void SPxSolverBase<R>::getEnterVals2
          throw SPxInternalCodeException("XENTER09 This should never happen.");
       }
 
-      SPX_MSG_DEBUG(std::cout << "DENTER07 SPxSolverBase::getEnterVals2(): col "
-                    << idx << ": " << leaveStat
-                    << " -> " << ds.colStatus(idx)
-                    << " objChange: " << objChange
-                    << std::endl;)
+      SPxOut::debug(this, "DENTER07 SPxSolverBase::getEnterVals2(): col {}: {} -> {} objChange: {}\n",
+                    idx, leaveStat, ds.colStatus(idx), objChange);
    }
 }
 
@@ -1255,7 +1243,7 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
       rejectEnter(enterId, enterTest, enterStat);
       this->change(-1, none, 0);
 
-      SPX_MSG_DEBUG(std::cout << "DENTER08 rejecting false enter pivot" << std::endl;)
+      SPxOut::debug(this, "DENTER08 rejecting false enter pivot\n");
 
       return false;
    }
@@ -1377,8 +1365,7 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
          else
             enterPric = (*thePvec)[this->number(SPxRowId(enterId))];
 
-         SPX_MSG_DEBUG(std::cout << "IEBFRT02 breakpoints passed / bounds flipped = " << boundflips <<
-                       std::endl;)
+         SPxOut::debug(this, "IEBFRT02 breakpoints passed / bounds flipped = {}\n", boundflips);
          totalboundflips += boundflips;
       }
 
@@ -1470,15 +1457,14 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
          instableEnterId = enterId;
          instableEnterVal = enterTest;
 
-         SPX_MSG_DEBUG(std::cout << "DENTER09 rejecting enter pivot and looking for others" << std::endl;)
+         SPxOut::debug(this, "DENTER09 rejecting enter pivot and looking for others\n");
 
          rejectEnter(enterId, enterTest / 10.0, enterStat);
          this->change(-1, none, 0);
       }
       else
       {
-         SPX_MSG_DEBUG(std::cout << "DENTER10 rejecting enter pivot in instable state, resetting values" <<
-                       std::endl;)
+         SPxOut::debug(this, "DENTER10 rejecting enter pivot in instable state, resetting values\n");
          rejectEnter(enterId, enterTest, enterStat);
          this->change(-1, none, 0);
       }
@@ -1507,8 +1493,7 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
       // update objective funtion value
       updateNonbasicValue(objChange);
 
-      SPX_MSG_DEBUG(std::cout << "DENTER11 moving entering variable from one bound to the other" <<
-                    std::endl;)
+      SPxOut::debug(this, "DENTER11 moving entering variable from one bound to the other\n");
 
       return false;
    }

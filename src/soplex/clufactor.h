@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -51,12 +51,12 @@ class CLUFactor
 public:
 
    /// set tolerances
-   virtual void setTolerances(std::shared_ptr<Tolerances> tolerances)
+   void setTolerances(std::shared_ptr<Tolerances> tolerances)
    {
       this->_tolerances = tolerances;
    }
    /// get tolerances
-   const virtual std::shared_ptr<Tolerances> tolerances() const
+   const std::shared_ptr<Tolerances> tolerances() const
    {
       return _tolerances;
    }

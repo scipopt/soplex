@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -82,10 +82,10 @@ void printUsage(const char* const argv[], int idx)
       "\n"
       "display options:\n"
       "  -v<level>              set verbosity to <level> (0 - error, 3 - normal, 5 - high)\n"
-      "  -x                     print primal solution\n"
-      "  -y                     print dual multipliers\n"
-      "  -X                     print primal solution in rational numbers\n"
-      "  -Y                     print dual multipliers in rational numbers\n"
+      "  -x=<solfile>           print primal solution to file (or just -x to print to terminal)\n"
+      "  -y=<solfile>           print dual multipliers to file (or just -y to print to terminal)\n"
+      "  -X=<solfile>           print primal solution in rational numbers to file (or just -X to print to terminal)\n"
+      "  -Y=<solfile>           print dual multipliers in rational numbers to file (or just -Y to print to terminal)\n"
       "  -q                     display detailed statistics\n"
       "  -c                     perform final check of optimal solution in original problem\n"
       "\n";
@@ -272,6 +272,251 @@ void checkSolution(SoPlexBase<R>& soplex)
    }
 
    SPX_MSG_INFO1(soplex.spxout, soplex.spxout << "\n");
+}
+
+template <class R>
+static
+void writePrimalSolution(SoPlexBase<R>& soplex, const char* filename, NameSet& colnames,
+                         NameSet& rownames,
+                         bool real = true, bool rational = false, bool append = false)
+{
+   int printprec;
+   int printwidth;
+   printprec = (int) - log10(Real(soplex.tolerances()->epsilon()));
+   printwidth = printprec + 10;
+   std::ofstream outfile;
+
+   if(append)
+      outfile.open(filename, std::ios::app);
+   else
+      outfile.open(filename);
+
+   if(real)
+   {
+      VectorBase<R> primal(soplex.numCols());
+
+      if(soplex.getPrimalRay(primal))
+      {
+         outfile <<  "\nPrimal ray (name, value):\n";
+
+         for(int i = 0; i < soplex.numCols(); ++i)
+         {
+            if(isNotZero(primal[i], soplex.tolerances()->epsilon()))
+            {
+               outfile <<  colnames[i] << "\t"
+                       << std::setw(printwidth) << std::setprecision(printprec)
+                       << primal[i] << std::endl;
+            }
+         }
+
+         outfile <<  "All other entries are zero (within "
+                 << std::setprecision(1) << std::scientific << soplex.tolerances()->epsilon()
+                 << std::setprecision(8) << std::fixed
+                 << ")." << std::endl;
+      }
+      else if(soplex.isPrimalFeasible() && soplex.getPrimal(primal))
+      {
+         int nNonzeros = 0;
+         outfile <<  "\nPrimal solution (name, value):\n";
+
+         for(int i = 0; i < soplex.numCols(); ++i)
+         {
+            if(isNotZero(primal[i], soplex.tolerances()->epsilon()))
+            {
+               outfile <<  colnames[i] << "\t"
+                       << std::setw(printwidth) << std::setprecision(printprec)
+                       << primal[i] << std::endl;
+               ++nNonzeros;
+            }
+         }
+
+         outfile <<  "All other variables are zero (within "
+                 << std::setprecision(1) << std::scientific << soplex.tolerances()->epsilon()
+                 << std::setprecision(8) << std::fixed
+                 << "). Solution has " << nNonzeros << " nonzero entries." << std::endl;
+      }
+      else
+         outfile <<  "No primal information available.\n";
+   }
+
+   if(rational)
+   {
+      VectorRational primal(soplex.numCols());
+
+      if(soplex.getPrimalRayRational(primal))
+      {
+         outfile <<  "\nPrimal ray (name, value):\n";
+
+         for(int i = 0; i < soplex.numCols(); ++i)
+         {
+            if(primal[i] != (Rational) 0)
+            {
+               outfile <<  colnames[i] << "\t"
+                       << std::setw(printwidth) << std::setprecision(printprec)
+                       << primal[i] << std::endl;
+            }
+         }
+
+         outfile <<  "All other entries are zero." << std::endl;
+      }
+
+      if(soplex.isPrimalFeasible() && soplex.getPrimalRational(primal))
+      {
+         int nNonzeros = 0;
+         outfile <<  "\nPrimal solution (name, value):\n";
+
+         for(int i = 0; i < soplex.numColsRational(); ++i)
+         {
+            if(primal[i] != (Rational) 0)
+            {
+               outfile <<  colnames[i] << "\t" << primal[i] << std::endl;
+               ++nNonzeros;
+            }
+         }
+
+         outfile <<  "All other variables are zero. Solution has "
+                 << nNonzeros << " nonzero entries." << std::endl;
+      }
+      else
+         outfile <<  "No primal (rational) solution available.\n";
+   }
+}
+
+template <class R>
+static
+void writeDualSolution(SoPlexBase<R>& soplex, const char* filename, NameSet& colnames,
+                       NameSet& rownames,
+                       bool real = true, bool rational = false, bool append = false)
+{
+   int printprec;
+   int printwidth;
+   printprec = (int) - log10(Real(soplex.tolerances()->epsilon()));
+   printwidth = printprec + 10;
+
+   std::ofstream outfile;
+
+   if(append)
+      outfile.open(filename, std::ios::app);
+   else
+      outfile.open(filename);
+
+   if(real)
+   {
+      VectorBase<R> dual(soplex.numRows());
+
+      if(soplex.getDualFarkas(dual))
+      {
+         outfile << "\nDual ray (name, value):\n";
+
+         for(int i = 0; i < soplex.numRows(); ++i)
+         {
+            if(isNotZero(dual[i], soplex.tolerances()->epsilon()))
+            {
+               outfile << rownames[i] << "\t"
+                       << std::setw(printwidth) << std::setprecision(printprec)
+                       << dual[i] << std::endl;
+            }
+         }
+
+         outfile << "All other entries are zero (within "
+                 << std::setprecision(1) << std::scientific << soplex.tolerances()->epsilon()
+                 << std::setprecision(8) << std::fixed << ")." << std::endl;
+      }
+      else if(soplex.isDualFeasible() && soplex.getDual(dual))
+      {
+         outfile << "\nDual solution (name, value):\n";
+
+         for(int i = 0; i < soplex.numRows(); ++i)
+         {
+            if(isNotZero(dual[i], soplex.tolerances()->epsilon()))
+            {
+               outfile << rownames[i] << "\t"
+                       << std::setw(printwidth) << std::setprecision(printprec)
+                       << dual[i] << std::endl;
+            }
+         }
+
+         outfile << "All other dual values are zero (within "
+                 << std::setprecision(1) << std::scientific << soplex.tolerances()->epsilon()
+                 << std::setprecision(8) << std::fixed << ")." << std::endl;
+
+         VectorBase<R> redcost(soplex.numCols());
+
+         if(soplex.getRedCost(redcost))
+         {
+            outfile << "\nReduced costs (name, value):\n";
+
+            for(int i = 0; i < soplex.numCols(); ++i)
+            {
+               if(isNotZero(redcost[i], soplex.tolerances()->epsilon()))
+               {
+                  outfile << colnames[i] << "\t"
+                          << std::setw(printwidth) << std::setprecision(printprec)
+                          << redcost[i] << std::endl;
+               }
+            }
+
+            outfile << "All other reduced costs are zero (within "
+                    << std::setprecision(1) << std::scientific << soplex.tolerances()->epsilon()
+                    << std::setprecision(8) << std::fixed << ")." << std::endl;
+         }
+      }
+      else
+         outfile << "No dual information available.\n";
+   }
+
+   if(rational)
+   {
+      VectorRational dual(soplex.numRows());
+
+      if(soplex.getDualFarkasRational(dual))
+      {
+         outfile << "\nDual ray (name, value):\n";
+
+         for(int i = 0; i < soplex.numRows(); ++i)
+         {
+            if(dual[i] != (Rational) 0)
+            {
+               outfile << rownames[i] << "\t"
+                       << std::setw(printwidth)
+                       << std::setprecision(printprec)
+                       << dual[i] << std::endl;
+            }
+         }
+
+         outfile << "All other entries are zero." << std::endl;
+      }
+
+      if(soplex.isDualFeasible() && soplex.getDualRational(dual))
+      {
+         outfile << "\nDual solution (name, value):\n";
+
+         for(int i = 0; i < soplex.numRowsRational(); ++i)
+         {
+            if(dual[i] != (Rational) 0)
+               outfile << rownames[i] << "\t" << dual[i] << std::endl;
+         }
+
+         outfile << "All other dual values are zero." << std::endl;
+
+         VectorRational redcost(soplex.numCols());
+
+         if(soplex.getRedCostRational(redcost))
+         {
+            outfile << "\nReduced costs (name, value):\n";
+
+            for(int i = 0; i < soplex.numCols(); ++i)
+            {
+               if(redcost[i] != (Rational) 0)
+                  outfile << colnames[i] << "\t" << redcost[i] << std::endl;
+            }
+
+            outfile << "All other reduced costs are zero." << std::endl;
+         }
+      }
+      else
+         outfile << "No dual (rational) solution available.\n";
+   }
 }
 
 template <class R>
@@ -530,6 +775,13 @@ int runSoPlex(int argc, char* argv[])
    bool displayStatistics = false;
    bool checkSol = false;
 
+   char* primalSolName = nullptr;
+   char* dualSolName = nullptr;
+
+   // names for solutions with rational numbers
+   char* primalSolNameRational = nullptr;
+   char* dualSolNameRational = nullptr;
+
    int returnValue = 0;
 
    try
@@ -573,8 +825,7 @@ int runSoPlex(int argc, char* argv[])
          // option string must start with '-', must contain at least two characters, and exactly two characters if and
          // only if it is -x, -y, -q, or -c
          if(option[0] != '-' || option[1] == '\0'
-               || ((option[2] == '\0') != (option[1] == 'x' || option[1] == 'X' || option[1] == 'y'
-                                           || option[1] == 'Y' || option[1] == 'q' || option[1] == 'c')))
+               || ((option[2] == '\0') != (option[1] == 'q' || option[1] == 'c')))
          {
             printUsage(argv, optidx);
             returnValue = 1;
@@ -852,21 +1103,65 @@ int runSoPlex(int argc, char* argv[])
          case 'x' :
             // -x : print primal solution
             printPrimal = true;
+
+            if(strncmp(option, "-x=", 3) == 0)
+            {
+               if(primalSolName == nullptr)
+               {
+                  char* filename = &option[3];
+                  primalSolName = new char[strlen(filename) + 1];
+                  spxSnprintf(primalSolName, strlen(filename) + 1, "%s", filename);
+               }
+            }
+
             break;
 
          case 'X' :
             // -X : print primal solution with rationals
             printPrimalRational = true;
+
+            if(strncmp(option, "-X=", 3) == 0)
+            {
+               if(primalSolNameRational == nullptr)
+               {
+                  char* filename = &option[3];
+                  primalSolNameRational = new char[strlen(filename) + 1];
+                  spxSnprintf(primalSolNameRational, strlen(filename) + 1, "%s", filename);
+               }
+            }
+
             break;
 
          case 'y' :
             // -y : print dual multipliers
             printDual = true;
+
+            if(strncmp(option, "-y=", 3) == 0)
+            {
+               if(dualSolName == nullptr)
+               {
+                  char* filename = &option[3];
+                  dualSolName = new char[strlen(filename) + 1];
+                  spxSnprintf(dualSolName, strlen(filename) + 1, "%s", filename);
+               }
+            }
+
             break;
 
          case 'Y' :
             // -Y : print dual multipliers with rationals
             printDualRational = true;
+
+            if(strncmp(option, "-Y=", 3) == 0)
+            {
+               if(dualSolNameRational == nullptr)
+               {
+                  char* filename = &option[3];
+                  dualSolNameRational = new char[strlen(filename) + 1];
+                  spxSnprintf(dualSolNameRational, strlen(filename) + 1, "%s", filename);
+               }
+            }
+
             break;
 
          case 'q' :
@@ -1037,9 +1332,45 @@ int runSoPlex(int argc, char* argv[])
       // solve the LP
       soplex->optimize();
 
-      // print solution, check solution, and display statistics
-      printPrimalSolution(*soplex, colnames, rownames, printPrimal, printPrimalRational);
-      printDualSolution(*soplex, colnames, rownames, printDual, printDualRational);
+      // print solution to stdout, check solution, and display statistics
+      if(primalSolName == nullptr && primalSolNameRational == nullptr)
+         printPrimalSolution(*soplex, colnames, rownames, printPrimal, printPrimalRational);
+
+      // print fp solution to file primalSolName
+      if(primalSolName != nullptr)
+         writePrimalSolution(*soplex, primalSolName, colnames, rownames, true, false, false);
+
+      bool append;
+
+      // print rational solution to file primalSolNameRational
+      if(primalSolNameRational != nullptr)
+      {
+         append = primalSolName != nullptr && strcmp(primalSolName, primalSolNameRational) == 0;
+         writePrimalSolution(*soplex, primalSolNameRational, colnames, rownames, false, true, append);
+      }
+
+      // print dual solution to stdout, check solution, and display statistics
+      if(dualSolName == nullptr && dualSolNameRational == nullptr)
+         printDualSolution(*soplex, colnames, rownames, printDual, printDualRational);
+
+      // print fp solution to file dualSolName
+      if(dualSolName != nullptr)
+      {
+         append = primalSolName != nullptr && strcmp(dualSolName, primalSolName) == 0;
+         append = append || (primalSolNameRational != nullptr
+                             && strcmp(dualSolName, primalSolNameRational) == 0);
+         writeDualSolution(*soplex, dualSolName, colnames, rownames, true, false, append);
+      }
+
+      // print rational solution to file dualSolNameRational
+      if(dualSolNameRational != nullptr)
+      {
+         append = (primalSolName != nullptr && strcmp(dualSolNameRational, primalSolName) == 0);
+         append = append || (primalSolNameRational != nullptr
+                             && strcmp(dualSolNameRational, primalSolNameRational) == 0);
+         append = append || (dualSolName != nullptr && strcmp(dualSolNameRational, dualSolName) == 0);
+         writeDualSolution(*soplex, dualSolNameRational, colnames, rownames, false, true, append);
+      }
 
       if(checkSol)
          checkSolution<R>(*soplex); // The type needs to get fixed here
@@ -1084,6 +1415,7 @@ int runSoPlex(int argc, char* argv[])
 
 TERMINATE_FREESTRINGS:
    freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
+   freeStrings(primalSolName, dualSolName, primalSolName, primalSolName, primalSolName);
 
 TERMINATE:
 
@@ -1136,10 +1468,9 @@ int main(int argc, char* argv[])
          continue;
 
       // option string must start with '-', must contain at least two characters, and exactly two characters if and
-      // only if it is -x, -y, -q, or -c
+      // only if it is -q, or -c
       if(option[0] != '-' || option[1] == '\0'
-            || ((option[2] == '\0') != (option[1] == 'x' || option[1] == 'X' || option[1] == 'y'
-                                        || option[1] == 'Y' || option[1] == 'q' || option[1] == 'c')))
+            || ((option[2] == '\0') != (option[1] == 'q' || option[1] == 'c')))
       {
          printUsage(argv, optidx);
          return 1;

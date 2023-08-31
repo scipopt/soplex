@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -2759,7 +2759,7 @@ inline void CLUFactorRational::factor(
    const Rational& threshold            ///< pivoting threshold
 )
 {
-   SPX_MSG_DEBUG(std::cout << "CLUFactorRational::factor()\n");
+   SPxOut::debug(this, "CLUFactorRational::factor()\n");
 
    factorTime->start();
 
@@ -3308,7 +3308,7 @@ inline void CLUFactorRational::solveLright(Rational* vec)
          if(timeLimitReached())
             return;
 
-         SPX_MSG_DEBUG(std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl;)
+         SPxOut::debug(this, "y{}={}\n", lrow[i], vec[lrow[i]]);
 
          k = lbeg[i];
          idx = &(lidx[k]);
@@ -3316,8 +3316,8 @@ inline void CLUFactorRational::solveLright(Rational* vec)
 
          for(j = lbeg[i + 1]; j > k; --j)
          {
-            SPX_MSG_DEBUG(std::cout << "                         -> y" << *idx << " -= " << x << " * " << *val
-                          << " = " << x * (*val) << "    -> " << vec[*idx] - x * (*val) << std::endl;)
+            SPxOut::debug(this, "                         -> y{} -= {} * {} = {}    -> {}\n", *idx, x, *val,
+                          x * (*val), vec[*idx] - x * (*val));
             vec[*idx++] -= x * (*val++);
          }
       }
@@ -3325,7 +3325,7 @@ inline void CLUFactorRational::solveLright(Rational* vec)
 
    if(l.updateType)                      /* Forest-Tomlin Updates */
    {
-      SPX_MSG_DEBUG(std::cout << "performing FT updates..." << std::endl;)
+      SPxOut::debug(this, "performing FT updates...\n");
 
       end = l.firstUnused;
 
@@ -3341,10 +3341,10 @@ inline void CLUFactorRational::solveLright(Rational* vec)
 
          vec[lrow[i]] -= x;
 
-         SPX_MSG_DEBUG(std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl;)
+         SPxOut::debug(this, "y{}={}\n", lrow[i], vec[lrow[i]]);
       }
 
-      SPX_MSG_DEBUG(std::cout << "finished FT updates." << std::endl;)
+      SPxOut::debug(this, "finished FT updates.\n");
    }
 }
 

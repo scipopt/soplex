@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -31,6 +31,7 @@
 #include <iostream>
 #include <iomanip>
 #include <assert.h>
+#include "soplex/fmt.hpp"
 
 #include "soplex/spxdefines.h"
 
@@ -40,6 +41,10 @@
 
 namespace soplex
 {
+
+struct EnableDebugOutput
+{
+};
 
 /**@class SPxOut
    @ingroup Elementary
@@ -186,6 +191,26 @@ public:
    static inline void setFixed(std::ostream& stream, int precision = 8)
    {
       stream << std::setprecision(precision) << std::fixed;
+   }
+
+   // select with SFINAE to print debug output or depending on whether the class
+   // type of the pointer inherits from the marker struct EnableDebugOutput
+
+   template < typename T, typename... Args,
+              typename std::enable_if <
+                 !std::is_base_of<EnableDebugOutput, T>::value, int >::type = 0 >
+   static void
+   debug(const T*, Args && ... args)
+   {
+   }
+
+   template <typename T, typename... Args,
+             typename std::enable_if<
+                std::is_base_of<EnableDebugOutput, T>::value, int>::type = 0>
+   static void
+   debug(const T*, Args && ... args)
+   {
+      fmt::print(std::forward<Args>(args)...);
    }
    ///@}
 
@@ -338,6 +363,7 @@ inline SPxOut& operator<< (SPxOut& _spxout, T  t)
    _spxout.getCurrentStream() << t;
    return _spxout;
 }
+
 //@}
 
 }  // namespace soplex

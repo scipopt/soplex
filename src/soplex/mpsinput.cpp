@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -85,8 +85,7 @@ bool MPSInput::readLine()
 
          m_lineno++;
 
-         SPX_MSG_DEBUG(std::cout << "DMPSIN01 Line " << m_lineno
-                       << " " << m_buf << std::endl;)
+         SPxOut::debug(this, "DMPSIN01 Line {} {}\n", m_lineno, m_buf);
 
          /* check if comment line */
          is_comment = true;
@@ -248,18 +247,20 @@ bool MPSInput::readLine()
    }
    while(is_marker);
 
-   SPX_MSG_DEBUG(std::cerr
-                 << "DMPSIN02 -----------------------------------------------"
-                 << std::endl
-                 << "DMPSIN03 f0=" << ((m_f0 == 0) ? "nil" : m_f0) << std::endl
-                 << "DMPSIN04 f1=" << ((m_f1 == 0) ? "nil" : m_f1) << std::endl
-                 << "DMPSIN05 f2=" << ((m_f2 == 0) ? "nil" : m_f2) << std::endl
-                 << "DMPSIN06 f3=" << ((m_f3 == 0) ? "nil" : m_f3) << std::endl
-                 << "DMPSIN07 f4=" << ((m_f4 == 0) ? "nil" : m_f4) << std::endl
-                 << "DMPSIN08 f5=" << ((m_f5 == 0) ? "nil" : m_f5) << std::endl
-                 << "DMPSIN09 -----------------------------------------------"
-                 << std::endl;)
-
+   SPxOut::debug(this, "DMPSIN02 -----------------------------------------------\n"
+                 "DMPSIN03 f0={}\n"
+                 "DMPSIN04 f1={}\n"
+                 "DMPSIN05 f2={}\n"
+                 "DMPSIN07 f4={}\n"
+                 "DMPSIN06 f3={}\n"
+                 "DMPSIN08 f5={}\n"
+                 "DMPSIN09 -----------------------------------------------\n",
+                 ((m_f0 == 0) ? "nil" : m_f0),
+                 ((m_f1 == 0) ? "nil" : m_f1),
+                 ((m_f2 == 0) ? "nil" : m_f2),
+                 ((m_f3 == 0) ? "nil" : m_f3),
+                 ((m_f4 == 0) ? "nil" : m_f4),
+                 ((m_f5 == 0) ? "nil" : m_f5));
    return true;
 }
 

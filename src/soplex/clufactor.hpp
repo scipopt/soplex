@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -1059,7 +1059,7 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
 
                y -= x * rval[j];
 
-               p_work[jj] = y + ((y == 0) ? SOPLEX_FACTOR_MARKER * this->tolerances()->epsilon() : 0.0);
+               p_work[jj] = y + ((y == 0) ? SOPLEX_FACTOR_MARKER : 0.0);
             }
          }
 
@@ -3372,7 +3372,7 @@ void CLUFactor<R>::solveLright(R* vec)
    {
       if((x = vec[lrow[i]]) != 0.0)
       {
-         SPX_MSG_DEBUG(std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl;)
+         SPxOut::debug(this, "y{}={}\n", lrow[i], vec[lrow[i]]);
 
          k = lbeg[i];
          idx = &(lidx[k]);
@@ -3380,8 +3380,8 @@ void CLUFactor<R>::solveLright(R* vec)
 
          for(j = lbeg[i + 1]; j > k; --j)
          {
-            SPX_MSG_DEBUG(std::cout << "                         -> y" << *idx << " -= " << x << " * " << *val
-                          << " = " << x * (*val) << "    -> " << vec[*idx] - x * (*val) << std::endl;)
+            SPxOut::debug(this, "                         -> y{} -= {} * {} = {}    -> {}\n", *idx, x, *val,
+                          x * (*val), vec[*idx] - x * (*val));
             vec[*idx++] -= x * (*val++);
          }
       }
@@ -3389,7 +3389,7 @@ void CLUFactor<R>::solveLright(R* vec)
 
    if(l.updateType)                      /* Forest-Tomlin Updates */
    {
-      SPX_MSG_DEBUG(std::cout << "performing FT updates..." << std::endl;)
+      SPxOut::debug(this, "performing FT updates...\n");
 
       end = l.firstUnused;
 
@@ -3405,10 +3405,10 @@ void CLUFactor<R>::solveLright(R* vec)
 
          vec[lrow[i]] = -R(tmp);
 
-         SPX_MSG_DEBUG(std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl;)
+         SPxOut::debug(this, "y{}={}\n", lrow[i], vec[lrow[i]]);
       }
 
-      SPX_MSG_DEBUG(std::cout << "finished FT updates." << std::endl;)
+      SPxOut::debug(this, "finished FT updates.\n");
    }
 }
 
@@ -4234,7 +4234,7 @@ int CLUFactor<R>::solveUpdateLeft(R eps, R* vec, int* nonz, int n)
       else
       {
          y = -R(tmp);
-         vec[k] = (y != 0) ? y : SOPLEX_FACTOR_MARKER * this->tolerances()->epsilon();
+         vec[k] = (y != 0) ? y : SOPLEX_FACTOR_MARKER;
       }
    }
 
@@ -4375,7 +4375,7 @@ int CLUFactor<R>::solveUleft(R eps,
             else
             {
                y -= x * (*val++);
-               rhs[j] = (y != 0) ? y : SOPLEX_FACTOR_MARKER * this->tolerances()->epsilon();
+               rhs[j] = (y != 0) ? y : SOPLEX_FACTOR_MARKER;
             }
          }
       }
@@ -4452,7 +4452,7 @@ void CLUFactor<R>::solveUleftNoNZ(R eps, R* vec,
             else
             {
                y -= x * (*val++);
-               rhs[j] = (y != 0) ? y : SOPLEX_FACTOR_MARKER * this->tolerances()->epsilon();
+               rhs[j] = (y != 0) ? y : SOPLEX_FACTOR_MARKER;
             }
          }
       }
@@ -4504,7 +4504,7 @@ int CLUFactor<R>::solveLleftForest(R eps, R* vec, int* nonz, int n)
             else
             {
                y -= x * (*val++);
-               vec[m] = (y != 0) ? y : SOPLEX_FACTOR_MARKER * this->tolerances()->epsilon();
+               vec[m] = (y != 0) ? y : SOPLEX_FACTOR_MARKER;
             }
          }
       }
@@ -4631,7 +4631,7 @@ int CLUFactor<R>::solveLleft(R eps, R* vec, int* nonz, int rn)
             else
             {
                y -= x * *val++;
-               vec[m] = (y != 0) ? y : SOPLEX_FACTOR_MARKER * this->tolerances()->epsilon();
+               vec[m] = (y != 0) ? y : SOPLEX_FACTOR_MARKER;
             }
          }
       }
@@ -4730,7 +4730,7 @@ void inline CLUFactor<R>::updateSolutionVectorLright(R change, int j, R& vec, in
 
    // mark the entry where exact eliminiation occurred
    if(vec == 0.0)
-      vec = SOPLEX_FACTOR_MARKER * this->tolerances()->epsilon();
+      vec = SOPLEX_FACTOR_MARKER;
 }
 
 // solve Lz = b, inplace, using and preserving sparisity structure in the rhs and solution VectorBase<R>
@@ -5150,7 +5150,7 @@ int CLUFactor<R>::vSolveUright(R* vec, int* vidx,
             else
             {
                y -= x * (*val++);
-               y += (y == 0) ? SOPLEX_FACTOR_MARKER * this->tolerances()->epsilon() : 0;
+               y += (y == 0) ? SOPLEX_FACTOR_MARKER : 0;
                rhs[k] = y;
             }
          }
@@ -5287,7 +5287,7 @@ void CLUFactor<R>::vSolveUrightNoNZ(R* vec,
             else
             {
                y -= x * (*val++);
-               y += (y == 0) ? SOPLEX_FACTOR_MARKER * this->tolerances()->epsilon() : 0;
+               y += (y == 0) ? SOPLEX_FACTOR_MARKER : 0;
                rhs[k] = y;
             }
          }
@@ -5382,7 +5382,7 @@ int CLUFactor<R>::vSolveUright2(
                else
                {
                   y2 -= x2 * (*val);
-                  rhs2[k] = (y2 != 0) ? y2 : SOPLEX_FACTOR_MARKER * this->tolerances()->epsilon();
+                  rhs2[k] = (y2 != 0) ? y2 : SOPLEX_FACTOR_MARKER;
                }
 
                y = rhs[k];
@@ -5400,7 +5400,7 @@ int CLUFactor<R>::vSolveUright2(
                else
                {
                   y -= x * (*val++);
-                  y += (y == 0) ? SOPLEX_FACTOR_MARKER * this->tolerances()->epsilon() : 0;
+                  y += (y == 0) ? SOPLEX_FACTOR_MARKER : 0;
                   rhs[k] = y;
                }
             }
@@ -5426,7 +5426,7 @@ int CLUFactor<R>::vSolveUright2(
                else
                {
                   y -= x * (*val++);
-                  y += (y == 0) ? SOPLEX_FACTOR_MARKER * this->tolerances()->epsilon() : 0;
+                  y += (y == 0) ? SOPLEX_FACTOR_MARKER : 0;
                   rhs[k] = y;
                }
             }
@@ -5460,7 +5460,7 @@ int CLUFactor<R>::vSolveUright2(
             else
             {
                y2 -= x2 * (*val++);
-               rhs2[k] = (y2 != 0) ? y2 : SOPLEX_FACTOR_MARKER * this->tolerances()->epsilon();
+               rhs2[k] = (y2 != 0) ? y2 : SOPLEX_FACTOR_MARKER;
             }
          }
       }
@@ -5575,7 +5575,7 @@ int CLUFactor<R>::vSolveUpdateRight(R* vec, int* ridx, int n, R eps)
             y = vec[m];
             n += (y == 0) ? 1 : 0;
             y = y - x * (*val++);
-            vec[m] = (y != 0) ? y : SOPLEX_FACTOR_MARKER * this->tolerances()->epsilon();
+            vec[m] = (y != 0) ? y : SOPLEX_FACTOR_MARKER;
          }
       }
    }

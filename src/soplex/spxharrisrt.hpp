@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -481,7 +481,7 @@ SPxId SPxHarrisRT<R>::selectEnter(R& val, int, bool)
             }
             else
             {
-               SPX_MSG_DEBUG(std::cout << "DHARRI01 removing value " << pupd[i] << std::endl;)
+               SPxOut::debug(this, "DHARRI01 removing value {}\n", pupd[i]);
                pupd.clearNum(j);
             }
          }
@@ -531,7 +531,7 @@ SPxId SPxHarrisRT<R>::selectEnter(R& val, int, bool)
             }
             else
             {
-               SPX_MSG_DEBUG(std::cout << "DHARRI02 removing value " << cupd[i] << std::endl;)
+               SPxOut::debug(this, "DHARRI02 removing value {}\n", cupd[i]);
                cupd.clearNum(j);
             }
          }
@@ -692,7 +692,7 @@ SPxId SPxHarrisRT<R>::selectEnter(R& val, int, bool)
             }
             else
             {
-               SPX_MSG_DEBUG(std::cout << "DHARRI03 removing value " << pupd[i] << std::endl;)
+               SPxOut::debug(this, "DHARRI03 removing value {}\n", pupd[i]);
                pupd.clearNum(j);
             }
          }
@@ -742,7 +742,7 @@ SPxId SPxHarrisRT<R>::selectEnter(R& val, int, bool)
             }
             else
             {
-               SPX_MSG_DEBUG(std::cout << "DHARRI04 removing value " << x << std::endl;);
+               SPxOut::debug(this, "DHARRI04 removing value {}\n", x);
                cupd.clearNum(j);
             }
          }

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -1535,6 +1535,10 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
 
       _solver.setTolerances(_tolerances);
       _boostedSolver.setTolerances(_tolerances);
+
+      _simplifierMainSM.setTolerances(_tolerances);
+      _simplifierPaPILO.setTolerances(_tolerances);
+
       // set tolerances for scalers
       _scalerUniequi.setTolerances(_tolerances);
       _scalerBiequi.setTolerances(_tolerances);
@@ -1556,7 +1560,10 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
 
       // set message handlers in members
       _solver.setOutstream(spxout);
-      _simplifier->setOutstream(spxout);
+
+
+      _simplifierMainSM.setOutstream(spxout);
+      _simplifierPaPILO.setOutstream(spxout);
       _scalerUniequi.setOutstream(spxout);
       _scalerBiequi.setOutstream(spxout);
       _scalerGeo1.setOutstream(spxout);
@@ -4003,9 +4010,8 @@ bool SoPlexBase<R>::getBoundViolationRational(Rational& maxviol, Rational& sumvi
          if(viol > maxviol)
          {
             maxviol = viol;
-            SPX_MSG_DEBUG(std::cout << "increased bound violation for column " << i << ": " << viol.str()
-                          << " lower: " << lowerRational(i).str()
-                          << ", primal: " << primal[i].str() << "\n");
+            SPxOut::debug(this, "increased bound violation for column {}: {} lower: {}, primal {}\n", i,
+                          viol.str(), lowerRational(i).str(), primal[i].str());
          }
       }
 
@@ -4018,9 +4024,8 @@ bool SoPlexBase<R>::getBoundViolationRational(Rational& maxviol, Rational& sumvi
          if(viol > maxviol)
          {
             maxviol = viol;
-            SPX_MSG_DEBUG(std::cout << "increased bound violation for column " << i << ": " << viol.str()
-                          << " upper: " << upperRational(i).str()
-                          << ", primal: " << primal[i].str() << "\n");
+            SPxOut::debug(this, "increased bound violation for column {}: {} upper: {}, primal {}\n", i,
+                          viol.str(), upperRational(i).str(), primal[i].str());
          }
       }
    }
@@ -4061,9 +4066,8 @@ bool SoPlexBase<R>::getRowViolationRational(Rational& maxviol, Rational& sumviol
          if(viol > maxviol)
          {
             maxviol = viol;
-            SPX_MSG_DEBUG(std::cout << "increased constraint violation for row " << i << ": " << viol.str()
-                          << " lhs: " << lhsRational(i).str()
-                          << ", activity: " << activity[i].str() << "\n");
+            SPxOut::debug(this, "increased constraint violation for row {}: {} lhs: {}, activity: {}\n", i,
+                          viol.str(), lhsRational(i).str(), activity[i].str());
          }
       }
 
@@ -4076,9 +4080,8 @@ bool SoPlexBase<R>::getRowViolationRational(Rational& maxviol, Rational& sumviol
          if(viol > maxviol)
          {
             maxviol = viol;
-            SPX_MSG_DEBUG(std::cout << "increased constraint violation for row " << i << ": " << viol.str()
-                          << " rhs: " << rhsRational(i).str()
-                          << ", activity: " << activity[i].str() << "\n");
+            SPxOut::debug(this, "increased constraint violation for row {}: {} rhs: {}, activity: {}\n", i,
+                          viol.str(), rhsRational(i).str(), activity[i].str());
          }
       }
    }
@@ -4136,8 +4139,8 @@ bool SoPlexBase<R>::getRedCostViolationRational(Rational& maxviol, Rational& sum
 
             if(redcost[c] < -maxviol)
             {
-               SPX_MSG_DEBUG(std::cout << "increased reduced cost violation for column " << c <<
-                             " not on upper bound: " << -redcost[c].str() << "\n");
+               SPxOut::debug(this, "increased reduced cost violation for column {} not on upper bound: {}\n", c,
+                             (static_cast<Rational>(-redcost[c])).str());
                maxviol = -redcost[c];
             }
          }
@@ -4148,8 +4151,8 @@ bool SoPlexBase<R>::getRedCostViolationRational(Rational& maxviol, Rational& sum
 
             if(redcost[c] > maxviol)
             {
-               SPX_MSG_DEBUG(std::cout << "increased reduced cost violation for column " << c <<
-                             " not on lower bound: " << redcost[c].str() << "\n");
+               SPxOut::debug(this, "increased reduced cost violation for column {} not on lower bound: {}\n", c,
+                             (redcost[c]).str());
                maxviol = redcost[c];
             }
          }
@@ -4162,8 +4165,8 @@ bool SoPlexBase<R>::getRedCostViolationRational(Rational& maxviol, Rational& sum
 
             if(redcost[c] > maxviol)
             {
-               SPX_MSG_DEBUG(std::cout << "increased reduced cost violation for column " << c <<
-                             " not on upper bound: " << redcost[c].str() << "\n");
+               SPxOut::debug(this, "increased reduced cost violation for column {} not on upper bound: {}\n", c,
+                             (redcost[c]).str());
                maxviol = redcost[c];
             }
          }
@@ -4174,8 +4177,8 @@ bool SoPlexBase<R>::getRedCostViolationRational(Rational& maxviol, Rational& sum
 
             if(redcost[c] < -maxviol)
             {
-               SPX_MSG_DEBUG(std::cout << "increased reduced cost violation for column " << c <<
-                             " not on lower bound: " << -redcost[c].str() << "\n");
+               SPxOut::debug(this, "increased reduced cost violation for column {} not on lower bound: {}\n", c,
+                             (static_cast<Rational>(-redcost[c])).str());
                maxviol = -redcost[c];
             }
          }
@@ -4235,12 +4238,11 @@ bool SoPlexBase<R>::getDualViolationRational(Rational& maxviol, Rational& sumvio
 
             if(dual[r] < -maxviol)
             {
-               SPX_MSG_DEBUG(std::cout << "increased dual violation for row " << r << " not on upper bound: " <<
-                             -dual[r].str()
-                             << " (slack = " << _solRational._slacks[r].str()
-                             << ", status = " << basisRowStatus(r)
-                             << ", lhs = " << lhsRational(r).str()
-                             << ", rhs = " << rhsRational(r).str() << ")\n");
+               SPxOut::debug(this,
+                             "increased dual violation for row {} not on upper bound: {} (slack = {}, status = {}, lhs = {}, rhs = {})\n",
+                             r, (static_cast<Rational>(-dual[r])).str(), _solRational._slacks[r].str(), basisRowStatus(r),
+                             lhsRational(r).str(),
+                             rhsRational(r).str());
                maxviol = -dual[r];
             }
          }
@@ -4251,12 +4253,10 @@ bool SoPlexBase<R>::getDualViolationRational(Rational& maxviol, Rational& sumvio
 
             if(dual[r] > maxviol)
             {
-               SPX_MSG_DEBUG(std::cout << "increased dual violation for row " << r << " not on lower bound: " <<
-                             dual[r].str()
-                             << " (slack = " << _solRational._slacks[r].str()
-                             << ", status = " << basisRowStatus(r)
-                             << ", lhs = " << lhsRational(r).str()
-                             << ", rhs = " << rhsRational(r) << ")\n".str());
+               SPxOut::debug(this,
+                             "increased dual violation for row {} not on lower bound: {} (slack = {}, status = {}, lhs = {}, rhs = {})\n",
+                             r, dual[r].str(), _solRational._slacks[r].str(), basisRowStatus(r), lhsRational(r).str(),
+                             rhsRational(r));
                maxviol = dual[r];
             }
          }
@@ -4269,12 +4269,10 @@ bool SoPlexBase<R>::getDualViolationRational(Rational& maxviol, Rational& sumvio
 
             if(dual[r] > maxviol)
             {
-               SPX_MSG_DEBUG(std::cout << "increased dual violation for row " << r << " not on upper bound: " <<
-                             dual[r].str()
-                             << " (slack = " << _solRational._slacks[r].str()
-                             << ", status = " << basisRowStatus(r)
-                             << ", lhs = " << lhsRational(r).str()
-                             << ", rhs = " << rhsRational(r).str() << ")\n");
+               SPxOut::debug(this,
+                             "increased dual violation for row {} not on upper bound: {} (slack = {}, status = {}, lhs = {}, rhs = {})\n",
+                             r, dual[r].str(), _solRational._slacks[r].str(), basisRowStatus(r), lhsRational(r).str(),
+                             rhsRational(r));
                maxviol = dual[r];
             }
          }
@@ -4285,12 +4283,11 @@ bool SoPlexBase<R>::getDualViolationRational(Rational& maxviol, Rational& sumvio
 
             if(dual[r] < -maxviol)
             {
-               SPX_MSG_DEBUG(std::cout << "increased dual violation for row " << r << " not on lower bound: " <<
-                             -dual[r].str()
-                             << " (slack = " << _solRational._slacks[r].str()
-                             << ", status = " << basisRowStatus(r)
-                             << ", lhs = " << lhsRational(r).str()
-                             << ", rhs = " << rhsRational(r).str() << ")\n");
+               SPxOut::debug(this,
+                             "increased dual violation for row {} not on lower bound: {} (slack = {}, status = {}, lhs = {}, rhs = {})\n",
+                             r, (static_cast<Rational>(-dual[r])).str(), _solRational._slacks[r].str(), basisRowStatus(r),
+                             lhsRational(r).str(),
+                             rhsRational(r));
                maxviol = -dual[r];
             }
          }

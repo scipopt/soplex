@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -326,7 +326,7 @@ void SPxWeightST<R>::generate(SPxSolverBase<R>& base)
       // we found a valid index
       if(sel >= 0)
       {
-         SPX_MSG_DEBUG(
+         SPX_DEBUG(
 
             if(pref[i].type() == SPxId::ROW_ID)
             std::cout << "DWEIST01 r" << base.number(pref[i]);
@@ -688,7 +688,7 @@ void SPxWeightST<R>::setupWeights(SPxSolverBase<R>& base)
       }
    }
 
-   SPX_MSG_DEBUG(
+   SPX_DEBUG(
    {
       for(i = 0; i < base.nCols(); i++)
          std::cout << "C i= " << i
