@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -3249,8 +3249,6 @@ void SoPlexBase<R>::_identifyComplementaryPrimalFixedPrimalVars(int* currFixedVa
 template <class R>
 void SoPlexBase<R>::_updateComplementaryPrimalFixedPrimalVars(int* currFixedVars)
 {
-   int numFixedVars = 0;
-
    // NOTE: this loop only goes over the primal columns that are included in the complementary problem, i.e. the
    // columns from the original problem.
    // 29.04.15 in the current implementation, all bound constraints are included in the reduced problem. So, all
@@ -3271,8 +3269,6 @@ void SoPlexBase<R>::_updateComplementaryPrimalFixedPrimalVars(int* currFixedVars
             else
                _compSolver.changeBounds(colNumber, _realLP->upper(SPxColId(_decompPrimalColIDs[i])),
                                         _realLP->upper(SPxColId(_decompPrimalColIDs[i])));
-
-            numFixedVars++;
          }
          else
          {

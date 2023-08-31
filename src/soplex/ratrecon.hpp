@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -132,8 +132,6 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
                done = 1;
             }
 
-            int cfcnt = 2;
-
             while(!done && td != 0)
             {
                /* update everything: compute next ai, then update convergents */
@@ -157,8 +155,6 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
 
                if(q[2] > Dbound)
                   done = 1;
-
-               cfcnt++;
 
                SPxOut::debug(&resvec, "  --> convergent denominator = {}\n", &q[2]);
             }

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -93,7 +93,7 @@ bool EQ(int a, int b);
 #define SOPLEX_VERSION         603
 #define SOPLEX_SUBVERSION        5
 #define SOPLEX_APIVERSION       13
-#define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2022 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)"
+#define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)"
 
 /*-----------------------------------------------------------------------------
  * Assertion Macros etc.
