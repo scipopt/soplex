@@ -217,7 +217,7 @@ void SPxScaler<R>::applyScaling(SPxLPBase<R>& lp)
       if(lp.lhs(i) > R(-infinity))
          lp.lhs_w(i) = spxLdexp(lp.lhs_w(i), exp2);
 
-      SPX_MSG_DEBUG(std::cout << "DEBUG: rowscaleExp(" << i << "): " << exp2 << std::endl;)
+      SPxOut::debug(this, "DEBUG: rowscaleExp({}): {}\n", i, exp2);
    }
 
    for(int i = 0; i < lp.nCols(); ++i)
@@ -240,7 +240,7 @@ void SPxScaler<R>::applyScaling(SPxLPBase<R>& lp)
       if(lp.lower(i) > R(-infinity))
          lp.lower_w(i) = spxLdexp(lp.lower_w(i), -exp2);
 
-      SPX_MSG_DEBUG(std::cout << "DEBUG: colscaleExp(" << i << "): " << exp2 << std::endl;)
+      SPxOut::debug(this, "DEBUG: colscaleExp({}): {}\n", i, exp2);
    }
 
    lp.setScalingInfo(true);

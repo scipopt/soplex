@@ -311,8 +311,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                lastDelta *= 0.01;
                theratiotester->setDelta(lastDelta);
                assert(theratiotester->getDelta() > 0);
-               SPX_MSG_DEBUG(std::cout << "decreased delta for ratiotest to: " << theratiotester->getDelta() <<
-                             std::endl;)
+               SPxOut::debug(this, "decreased delta for ratiotest to: {}\n", theratiotester->getDelta());
             }
             else
             {
@@ -690,8 +689,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                lastDelta *= 0.01;
                theratiotester->setDelta(lastDelta);
                assert(theratiotester->getDelta() > 0);
-               SPX_MSG_DEBUG(std::cout << "decreased delta for ratiotest to: " << theratiotester->getDelta() <<
-                             std::endl;)
+               SPxOut::debug(this, "decreased delta for ratiotest to: {}\n", theratiotester->getDelta());
             }
             else
             {
@@ -1299,9 +1297,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
             for(int i = slackcandidates.size() - 1; i >= 0 && !stop; --i)
             {
                polishId = coId(slackcandidates.index(i));
-               SPX_MSG_DEBUG(std::cout << "try pivoting: " << polishId << " stat: " <<
-                             rowstatus[slackcandidates.index(
-                                          i)];)
+               SPxOut::debug(this, "try pivoting: {} stat: {}\n", polishId, rowstatus[slackcandidates.index(i)]);
                success = enter(polishId, true);
                clearUpdateVecs();
 #ifndef NDEBUG
@@ -1311,7 +1307,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
 
                if(success)
                {
-                  SPX_MSG_DEBUG(std::cout << " -> success!";)
+                  SPxOut::debug(this, " -> success!");
                   ++nSuccessfulPivots;
                   slackcandidates.remove(i);
 
@@ -1319,7 +1315,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
                      stop = true;
                }
 
-               SPX_MSG_DEBUG(std::cout << std::endl;)
+               SPxOut::debug(this, "\n");
 
                if(isTimeLimitReached())
                   stop = true;
@@ -1329,15 +1325,13 @@ void SPxSolverBase<R>::performSolutionPolishing()
             for(int i = continuousvars.size() - 1; i >= 0 && !stop; --i)
             {
                polishId = id(continuousvars.index(i));
-               SPX_MSG_DEBUG(std::cout << "try pivoting: " << polishId << " stat: " <<
-                             colstatus[continuousvars.index(
-                                          i)];)
+               SPxOut::debug(this, "try pivoting: {} stat: {}\n", polishId, colstatus[continuousvars.index(i)]);
                success = enter(polishId, true);
                clearUpdateVecs();
 
                if(success)
                {
-                  SPX_MSG_DEBUG(std::cout << " -> success!";)
+                  SPxOut::debug(this, " -> success!");
                   ++nSuccessfulPivots;
                   continuousvars.remove(i);
 
@@ -1345,7 +1339,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
                      stop = true;
                }
 
-               SPX_MSG_DEBUG(std::cout << std::endl;)
+               SPxOut::debug(this, "\n");
 
                if(isTimeLimitReached())
                   stop = true;
@@ -1382,8 +1376,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
             for(int i = candidates.size() - 1; i >= 0 && !stop; --i)
             {
                polishId = id(candidates.index(i));
-               SPX_MSG_DEBUG(std::cout << "try pivoting: " << polishId << " stat: " << colstatus[candidates.index(
-                                i)];)
+               SPxOut::debug(this, "try pivoting: {} stat: {}\n", polishId, colstatus[candidates.index(i)]);
                success = enter(polishId, true);
                clearUpdateVecs();
 #ifndef NDEBUG
@@ -1393,7 +1386,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
 
                if(success)
                {
-                  SPX_MSG_DEBUG(std::cout << " -> success!";)
+                  SPxOut::debug(this, " -> success!");
                   ++nSuccessfulPivots;
                   candidates.remove(i);
 
@@ -1401,7 +1394,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
                      stop = true;
                }
 
-               SPX_MSG_DEBUG(std::cout << std::endl;)
+               SPxOut::debug(this, "\n");
 
                if(isTimeLimitReached())
                   stop = true;
@@ -1468,7 +1461,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
             for(int i = basiccandidates.size() - 1; i >= 0 && !stop; --i)
             {
 
-               SPX_MSG_DEBUG(std::cout << "try pivoting: " << this->baseId(basiccandidates.index(i));)
+               SPxOut::debug(this, "try pivoting: {}", this->baseId(basiccandidates.index(i)));
                success = leave(basiccandidates.index(i), true);
                clearUpdateVecs();
 #ifndef NDEBUG
@@ -1478,7 +1471,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
 
                if(success)
                {
-                  SPX_MSG_DEBUG(std::cout << " -> success!";)
+                  SPxOut::debug(this, " -> success!");
                   ++nSuccessfulPivots;
                   basiccandidates.remove(i);
 
@@ -1486,7 +1479,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
                      stop = true;
                }
 
-               SPX_MSG_DEBUG(std::cout << std::endl;)
+               SPxOut::debug(this, "\n");
 
                if(isTimeLimitReached())
                   stop = true;
@@ -1532,7 +1525,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
 
             for(int i = basiccandidates.size() - 1; i >= 0 && !stop; --i)
             {
-               SPX_MSG_DEBUG(std::cout << "try pivoting: " << this->baseId(basiccandidates.index(i));)
+               SPxOut::debug(this, "try pivoting: {}", this->baseId(basiccandidates.index(i)));
                success = leave(basiccandidates.index(i), true);
                clearUpdateVecs();
 #ifndef NDEBUG
@@ -1542,7 +1535,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
 
                if(success)
                {
-                  SPX_MSG_DEBUG(std::cout << " -> success!";)
+                  SPxOut::debug(this, " -> success!");
                   ++nSuccessfulPivots;
                   basiccandidates.remove(i);
 
@@ -1550,7 +1543,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
                      stop = true;
                }
 
-               SPX_MSG_DEBUG(std::cout << std::endl;)
+               SPxOut::debug(this, "\n");
 
                if(isTimeLimitReached())
                   stop = true;
@@ -1810,14 +1803,10 @@ bool SPxSolverBase<R>::terminate()
          {
             SPX_MSG_INFO2((*this->spxout), (*this->spxout) << " --- objective value limit (" << objLimit
                           << ") reached" << std::endl;)
-            SPX_MSG_DEBUG(
-               (*this->spxout) << " --- objective value limit reached" << std::endl
-               << " (value: " << value()
-               << ", limit: " << objLimit << ")" << std::endl
-               << " (spxSense: " << int(this->spxSense())
-               << ", rep: " << int(rep())
-               << ", type: " << int(type()) << ")" << std::endl;
-            )
+            SPxOut::debug(this, " --- objective value limit reached\n (value:{} limit:{})\n", value(),
+                          objLimit);
+            SPxOut::debug(this, " (spxSense:{} rep:{} type:{})\n", int(this->spxSense()), int(rep()),
+                          int(type()));
 
             m_status = ABORT_VALUE;
             return true;

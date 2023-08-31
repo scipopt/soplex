@@ -159,7 +159,7 @@ CONFIGFILE = $(SRCDIR)/soplex/config.h
 GCCWARN		=	-pedantic -Wall -W -Wpointer-arith -Wcast-align -Wwrite-strings \
 			-Wconversion -Wsign-compare -Wshadow \
 			-Wredundant-decls -Wdisabled-optimization \
-			-Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder \
+			-Wnon-virtual-dtor -Wreorder \
 			-Woverloaded-virtual -Wsign-promo -Wsynth -Wundef \
 			-Wcast-qual \
 			-Wmissing-declarations \

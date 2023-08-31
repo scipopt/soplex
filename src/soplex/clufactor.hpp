@@ -3372,7 +3372,7 @@ void CLUFactor<R>::solveLright(R* vec)
    {
       if((x = vec[lrow[i]]) != 0.0)
       {
-         SPX_MSG_DEBUG(std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl;)
+         SPxOut::debug(this, "y{}={}\n", lrow[i], vec[lrow[i]]);
 
          k = lbeg[i];
          idx = &(lidx[k]);
@@ -3380,8 +3380,8 @@ void CLUFactor<R>::solveLright(R* vec)
 
          for(j = lbeg[i + 1]; j > k; --j)
          {
-            SPX_MSG_DEBUG(std::cout << "                         -> y" << *idx << " -= " << x << " * " << *val
-                          << " = " << x * (*val) << "    -> " << vec[*idx] - x * (*val) << std::endl;)
+            SPxOut::debug(this, "                         -> y{} -= {} * {} = {}    -> {}\n", *idx, x, *val,
+                          x * (*val), vec[*idx] - x * (*val));
             vec[*idx++] -= x * (*val++);
          }
       }
@@ -3389,7 +3389,7 @@ void CLUFactor<R>::solveLright(R* vec)
 
    if(l.updateType)                      /* Forest-Tomlin Updates */
    {
-      SPX_MSG_DEBUG(std::cout << "performing FT updates..." << std::endl;)
+      SPxOut::debug(this, "performing FT updates...\n");
 
       end = l.firstUnused;
 
@@ -3405,10 +3405,10 @@ void CLUFactor<R>::solveLright(R* vec)
 
          vec[lrow[i]] = -R(tmp);
 
-         SPX_MSG_DEBUG(std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl;)
+         SPxOut::debug(this, "y{}={}\n", lrow[i], vec[lrow[i]]);
       }
 
-      SPX_MSG_DEBUG(std::cout << "finished FT updates." << std::endl;)
+      SPxOut::debug(this, "finished FT updates.\n");
    }
 }
 

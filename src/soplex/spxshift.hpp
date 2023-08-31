@@ -49,8 +49,8 @@ void SPxSolverBase<R>::shiftFvec()
    {
       if(theUBbound[i] + allow < (*theFvec)[i])
       {
-         SPX_MSG_DEBUG(std::cout << "DSHIFT08 theUBbound[" << i << "] violated by " <<
-                       (*theFvec)[i] - theUBbound[i] - allow << std::endl);
+         SPxOut::debug(this, "DSHIFT08 theUBbound[{}] violated by {}", i,
+                       (*theFvec)[i] - theUBbound[i] - allow);
 
          if(theUBbound[i] != theLBbound[i])
          {
@@ -67,8 +67,8 @@ void SPxSolverBase<R>::shiftFvec()
       }
       else if((*theFvec)[i] < theLBbound[i] - allow)
       {
-         SPX_MSG_DEBUG(std::cout << "DSHIFT08 theLBbound[" << i << "] violated by " << theLBbound[i] -
-                       (*theFvec)[i] - allow << std::endl);
+         SPxOut::debug(this, "DSHIFT08 theLBbound[{}] violated by {}", i,
+                       theLBbound[i] - (*theFvec)[i] - allow);
 
          if(theUBbound[i] != theLBbound[i])
             shiftLBbound(i, (*theFvec)[i] - random.next((double)minrandom, (double)maxrandom));
@@ -82,7 +82,7 @@ void SPxSolverBase<R>::shiftFvec()
 
 #ifndef NDEBUG
    testBounds();
-   SPX_MSG_DEBUG(std::cout << "DSHIFT01 shiftFvec: OK" << std::endl;)
+   SPxOut::debug(this, "DSHIFT01 shiftFvec: OK\n");
 #endif
 }
 
@@ -163,7 +163,7 @@ void SPxSolverBase<R>::shiftPvec()
 
 #ifndef NDEBUG
    testBounds();
-   SPX_MSG_DEBUG(std::cout << "DSHIFT02 shiftPvec: OK" << std::endl;)
+   SPxOut::debug(this, "DSHIFT02 shiftPvec: OK\n");
 #endif
 }
 // -----------------------------------------------------------------
@@ -330,22 +330,20 @@ void SPxSolverBase<R>::perturbMax(
 template <class R>
 void SPxSolverBase<R>::perturbMinEnter(void)
 {
-   SPX_MSG_DEBUG(std::cout << "DSHIFT03 iteration= " << this->iteration() << ": perturbing " <<
-                 shift();)
+   SPxOut::debug(this, "DSHIFT03 iteration= {} perturbing {}", this->iteration(), shift());
    fVec().delta().setup();
    perturbMin(fVec(), lbBound(), ubBound(), epsilon(), entertol());
-   SPX_MSG_DEBUG(std::cout << "\t->" << shift() << std::endl;)
+   SPxOut::debug(this, "\t->{}\n", shift());
 }
 
 
 template <class R>
 void SPxSolverBase<R>::perturbMaxEnter(void)
 {
-   SPX_MSG_DEBUG(std::cout << "DSHIFT04 iteration= " << this->iteration() << ": perturbing " <<
-                 shift();)
+   SPxOut::debug(this, "DSHIFT04 iteration= {} perturbing {}", this->iteration(), shift());
    fVec().delta().setup();
    perturbMax(fVec(), lbBound(), ubBound(), epsilon(), entertol());
-   SPX_MSG_DEBUG(std::cout << "\t->" << shift() << std::endl;)
+   SPxOut::debug(this, "\t->{}\n", shift());
 }
 
 
@@ -509,30 +507,28 @@ R SPxSolverBase<R>::perturbMax(
 template <class R>
 void SPxSolverBase<R>::perturbMinLeave(void)
 {
-   SPX_MSG_DEBUG(std::cout << "DSHIFT05 iteration= " << this->iteration() << ": perturbing " <<
-                 shift();)
+   SPxOut::debug(this, "DSHIFT05 iteration= {} perturbing {}", this->iteration(), shift());
    pVec().delta().setup();
    coPvec().delta().setup();
    theShift += perturbMin(pVec(), lpBound(), upBound(), epsilon(), leavetol(),
                           this->desc().status(), 0, 1);
    theShift += perturbMin(coPvec(), lcBound(), ucBound(), epsilon(), leavetol(),
                           this->desc().coStatus(), 0, 1);
-   SPX_MSG_DEBUG(std::cout << "\t->" << shift() << std::endl;)
+   SPxOut::debug(this, "\t->{}\n", shift());
 }
 
 
 template <class R>
 void SPxSolverBase<R>::perturbMaxLeave(void)
 {
-   SPX_MSG_DEBUG(std::cout << "DSHIFT06 iteration= " << this->iteration() << ": perturbing " <<
-                 shift();)
+   SPxOut::debug(this, "DSHIFT06 iteration= {} perturbing {}", this->iteration(), shift());
    pVec().delta().setup();
    coPvec().delta().setup();
    theShift += perturbMax(pVec(), lpBound(), upBound(), epsilon(), leavetol(),
                           this->desc().status(), 0, 1);
    theShift += perturbMax(coPvec(), lcBound(), ucBound(), epsilon(), leavetol(),
                           this->desc().coStatus(), 0, 1);
-   SPX_MSG_DEBUG(std::cout << "\t->" << shift() << std::endl;)
+   SPxOut::debug(this, "\t->{}\n", shift());
 }
 
 
