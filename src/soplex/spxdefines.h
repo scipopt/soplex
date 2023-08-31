@@ -176,8 +176,10 @@ extern bool msginconsistent(const char* name, const char* file, int line);
 #if defined(SOPLEX_DEBUG)
 // print output in any case, regardless of _tolerances->verbose():
 #define SPX_MSG_DEBUG(x) { x; }
+#define SPX_DEBUG(x) { x; }
 #else
 #define SPX_MSG_DEBUG(x) /**/
+#define SPX_DEBUG(x) /**/
 #endif //!SOPLEX_DEBUG
 
 

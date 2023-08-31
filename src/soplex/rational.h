@@ -110,27 +110,16 @@ inline void powRound(Rational& r)
    Integer den;
    Integer num;
 
-   SPX_MSG_DEBUG(std::cout << "rounding " << str(r) <<
-                 " to power of two" << "\n");
-
    num = numerator(r);
    den = denominator(r);
    roundval = num / den;
 
-   SPX_MSG_DEBUG(std::cout << "   --> " << str(roundval) << "\n");
-
    size_t binlog = roundval == 0 ? 1 : msb(roundval) + 1;
    Integer base = 2;
 
-   SPX_MSG_DEBUG(std::cout << "   --> 2^" << binlog << "\n");
-
    roundval = boost::multiprecision::pow(base, (unsigned int)binlog);
 
-   SPX_MSG_DEBUG(std::cout << "   --> " << str(roundval) << "\n");
-
    r = roundval;
-
-   SPX_MSG_DEBUG(std::cout << "   --> " << str(r) << "\n");
 }
 
 /* find substring, ignore case */

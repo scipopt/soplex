@@ -117,6 +117,7 @@ set(headers
     soplex/vector.h
     soplex/dvector.h
     soplex/wallclocktimer.h
+    soplex/fmt.hpp
     )
 
 file(GLOB headers
@@ -211,6 +212,22 @@ set_target_properties(soplex PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/l
 # install the header files of soplex
 install(FILES ${headers} ${PROJECT_BINARY_DIR}/soplex/config.h DESTINATION include/soplex)
 install(FILES soplex.h soplex.hpp soplex_interface.h DESTINATION include)
+
+install(FILES
+     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/chrono.h
+     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/color.h
+     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/compile.h
+     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/core.h
+     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/format.h
+     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/format-inl.h
+     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/locale.h
+     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/ostream.h
+     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/posix.h
+     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/printf.h
+     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/ranges.h
+     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/format.cc
+     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/posix.cc
+ DESTINATION include/soplex/external/fmt)
 
 # install the binary and the library to appropriate lcoations and add them to an export group
 install(TARGETS soplex libsoplex libsoplex-pic libsoplexshared EXPORT soplex-targets

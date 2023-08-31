@@ -13,7 +13,7 @@ FILEPATTERNS="src/WILDCARD.h src/WILDCARD.hpp src/WILDCARD.cpp src/soplex/WILDCA
 GITFILES=$(echo "${FILEPATTERNS//WILDCARD/\*}")
 ASTYLEFILES=$(echo "${FILEPATTERNS//WILDCARD/\\*}")
 
-astyle --dry-run --options=astylecfg --recursive $ASTYLEFILES > astyleoutput.log
+astyle --dry-run --options=astylecfg $ASTYLEFILES > astyleoutput.log
 NFORMATTED=$(cat astyleoutput.log | grep ^Formatted | wc -l)
 
 if [ "$NFORMATTED" != "0" ]; then

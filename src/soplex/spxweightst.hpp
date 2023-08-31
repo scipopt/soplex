@@ -326,7 +326,7 @@ void SPxWeightST<R>::generate(SPxSolverBase<R>& base)
       // we found a valid index
       if(sel >= 0)
       {
-         SPX_MSG_DEBUG(
+         SPX_DEBUG(
 
             if(pref[i].type() == SPxId::ROW_ID)
             std::cout << "DWEIST01 r" << base.number(pref[i]);
@@ -688,7 +688,7 @@ void SPxWeightST<R>::setupWeights(SPxSolverBase<R>& base)
       }
    }
 
-   SPX_MSG_DEBUG(
+   SPX_DEBUG(
    {
       for(i = 0; i < base.nCols(); i++)
          std::cout << "C i= " << i

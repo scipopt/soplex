@@ -655,7 +655,7 @@ void SPxSolverBase<R>::setType(Type tp)
 
             if(ftmp.length() > SOPLEX_DEFAULT_BND_VIOL)
             {
-               SPX_MSG_DEBUG(std::cout << "DSOLVE21 fVec:   " << ftmp.length() << std::endl;)
+               SPxOut::debug(this, "DSOLVE21 fVec:   {}\n", ftmp.length());
                ftmp = fVec();
                this->multBaseWith(ftmp);
                ftmp -= fRhs();
@@ -668,7 +668,7 @@ void SPxSolverBase<R>::setType(Type tp)
 
             if(ctmp.length() > SOPLEX_DEFAULT_BND_VIOL)
             {
-               SPX_MSG_DEBUG(std::cout << "DSOLVE23 coPvec: " << ctmp.length() << std::endl;)
+               SPxOut::debug(this, "DSOLVE23 coPvec: {}\n", ctmp.length());
                ctmp = coPvec();
                this->multWithBase(ctmp);
                ctmp -= coPrhs();
@@ -681,7 +681,7 @@ void SPxSolverBase<R>::setType(Type tp)
 
             if(ptmp.length() > SOPLEX_DEFAULT_BND_VIOL)
             {
-               SPX_MSG_DEBUG(std::cout << "DSOLVE24 pVec:   " << ptmp.length() << std::endl;)
+               SPxOut::debug(this, "DSOLVE24 pVec:   {}\n", ptmp.length());
             }
 
 #endif  // NDEBUG
@@ -1026,13 +1026,8 @@ void SPxSolverBase<R>::setType(Type tp)
       if(m_nonbasicValueUpToDate)
          m_nonbasicValue += objChange;
 
-      SPX_MSG_DEBUG(std::cout
-                    << "Iteration: " << this->iteration()
-                    << ": updated objValue: " << objChange
-                    << ", new value: " << m_nonbasicValue
-                    << ", correct value: " << nonbasicValue()
-                    << std::endl;
-                   )
+      SPxOut::debug(this, "Iteration: {} updated objValue: {} new value: {} correct value: {}\n",
+                    this->iteration(), objChange, m_nonbasicValue, m_nonbasicValueUpToDate ? nonbasicValue() : -1e100);
 
       return m_nonbasicValueUpToDate;
    }

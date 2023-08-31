@@ -763,8 +763,7 @@ typename SLUFactor<R>::Status SLUFactor<R>::change(
 
    usetup = false;
 
-   SPX_MSG_DEBUG(std::cout << "DSLUFA01\tupdated\t\tstability = " << stability()
-                 << std::endl;)
+   SPxOut::debug(this, "DSLUFA01\tupdated\t\tstability = {}\n", stability());
 
    return status();
 }
@@ -1495,10 +1494,9 @@ typename SLUFactor<R>::Status SLUFactor<R>::load(const SVectorBase<R>* matrix[],
                     << lastThreshold << std::endl;)
    }
 
-   SPX_MSG_DEBUG(std::cout << "DSLUFA02 threshold = " << lastThreshold
-                 << "\tstability = " << stability()
-                 << "\tminStability = " << minStability << std::endl;)
-   SPX_MSG_DEBUG(
+   SPxOut::debug(this, "DSLUFA02 threshold = {} \tstability = {}\tminStability = {}\n", lastThreshold,
+                 stability(), minStability);
+   SPX_DEBUG(
    {
       int i;
       FILE* fl = fopen("dump.lp", "w");

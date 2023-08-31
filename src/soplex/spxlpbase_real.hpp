@@ -592,7 +592,7 @@ static R LPFreadValue(char*& pos, SPxOut* spxout)
 
    assert(pos == s);
 
-   SPX_MSG_DEBUG(std::cout << "DLPFRD01 LPFreadValue = " << value << std::endl;)
+   SPxOut::debug(spxout, "DLPFRD01 LPFreadValue = {}\n", value);
 
    if(LPFisSpace(*pos))
       pos++;
@@ -643,7 +643,7 @@ static int LPFreadColName(char*& pos, NameSet* colnames, LPColSetBase<R>& colset
       }
    }
 
-   SPX_MSG_DEBUG(std::cout << "DLPFRD03 LPFreadColName [" << name << "] = " << colidx << std::endl;)
+   SPxOut::debug(spxout, "DLPFRD03 LPFreadColName [{}] = {}\n", name, colidx);
 
    if(LPFisSpace(*pos))
       pos++;
@@ -664,8 +664,6 @@ static inline int LPFreadSense(char*& pos)
       sense = *pos++;
    else if(*pos == '=')
       pos++;
-
-   SPX_MSG_DEBUG(std::cout << "DLPFRD04 LPFreadSense = " << static_cast<char>(sense) << std::endl;)
 
    if(LPFisSpace(*pos))
       pos++;
@@ -715,8 +713,6 @@ static inline bool LPFhasKeyword(char*& pos, const char* keyword)
    if(keyword[i] == '\0' && (pos[k] == '\0' || LPFisSpace(pos[k]) || LPFisSense(&pos[k])))
    {
       pos += k;
-
-      SPX_MSG_DEBUG(std::cout << "DLPFRD05 LPFhasKeyword: " << keyword << std::endl;)
 
       return true;
    }
@@ -911,8 +907,7 @@ bool SPxLPBase<R>::readLPF(
       i   = 0;
       pos = buf;
 
-      SPX_MSG_DEBUG(std::cout << "DLPFRD08 Reading line " << lineno
-                    << " (pos=" << pos << ")" << std::endl;)
+      SPxOut::debug(spxout, "DLPFRD08 Reading line {} (pos={})\n", lineno, pos);
 
       // 1. Remove comments.
       if(0 != (s = strchr(buf, '\\')))
@@ -1035,7 +1030,7 @@ bool SPxLPBase<R>::readLPF(
       //-----------------------------------------------------------------------
       pos = line;
 
-      SPX_MSG_DEBUG(std::cout << "DLPFRD09 pos=" << pos << std::endl;)
+      SPxOut::debug(spxout, "DLPFRD09 pos={}\n", pos);
 
       // 7. We have something left to process.
       while((pos != 0) && (*pos != '\0'))

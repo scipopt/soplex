@@ -135,7 +135,7 @@ bool SPxBasisBase<R>::isDescValid(const Desc& ds)
 
    if(ds.nRows() != theLP->nRows() || ds.nCols() != theLP->nCols())
    {
-      SPX_MSG_DEBUG(std::cout << "IBASIS20 Dimension mismatch\n");
+      SPxOut::debug(this, "IBASIS20 Dimension mismatch\n");
       return false;
    }
 
@@ -147,8 +147,8 @@ bool SPxBasisBase<R>::isDescValid(const Desc& ds)
       {
          if(ds.rowstat[row] != dualRowStatus(row))
          {
-            SPX_MSG_DEBUG(std::cout << "IBASIS21 Basic row " << row << " with incorrect dual status " <<
-                          dualRowStatus(row) << "\n");
+            SPxOut::debug(this, "IBASIS21 Basic row {} with incorrect dual status {}\n", row,
+                          ds.rowstat[row]);
             return false;
          }
       }
@@ -161,9 +161,9 @@ bool SPxBasisBase<R>::isDescValid(const Desc& ds)
                || (ds.rowstat[row] == Desc::P_ON_UPPER && theLP->SPxLPBase<R>::rhs(row) >= R(infinity))
                || (ds.rowstat[row] == Desc::P_ON_LOWER && theLP->SPxLPBase<R>::lhs(row) <= R(-infinity)))
          {
-            SPX_MSG_DEBUG(std::cout << "IBASIS22 Nonbasic row with incorrect status: lhs=" <<
-                          theLP->SPxLPBase<R>::lhs(row) << ", rhs=" << theLP->SPxLPBase<R>::rhs(
-                             row) << ", stat=" << ds.rowstat[row] << "\n");
+            SPxOut::debug(this, "IBASIS22 Nonbasic row with incorrect status: lhs={}, rhs={}, stat={}\n",
+                          theLP->SPxLPBase<R>::lhs(row), theLP->SPxLPBase<R>::rhs(row),
+                          ds.rowstat[row]);
             return false;
          }
       }
@@ -175,8 +175,8 @@ bool SPxBasisBase<R>::isDescValid(const Desc& ds)
       {
          if(ds.colstat[col] !=  dualColStatus(col))
          {
-            SPX_MSG_DEBUG(std::cout << "IBASIS23 Basic column " << col << " with incorrect dual status " <<
-                          ds.colstat[col] << " != " << dualColStatus(col) << "\n");
+            SPxOut::debug(this, "IBASIS23 Basic column {} with incorrect dual status {}\n", col,
+                          ds.colstat[col]);
             return false;
          }
       }
@@ -189,9 +189,10 @@ bool SPxBasisBase<R>::isDescValid(const Desc& ds)
                || (ds.colstat[col] == Desc::P_ON_UPPER && theLP->SPxLPBase<R>::upper(col) >= R(infinity))
                || (ds.colstat[col] == Desc::P_ON_LOWER && theLP->SPxLPBase<R>::lower(col) <= R(-infinity)))
          {
-            SPX_MSG_DEBUG(std::cout << "IBASIS24 Nonbasic column " << col << " with incorrect status: lower=" <<
-                          theLP->SPxLPBase<R>::lower(col) << ", upper=" << theLP->SPxLPBase<R>::upper(
-                             col) << ", stat=" << ds.colstat[col] << "\n");
+            SPxOut::debug(this,
+                          "IBASIS24 Nonbasic column {} with incorrect status: lower={}, upper={}, stat={}\n",
+                          col, theLP->SPxLPBase<R>::lower(col), theLP->SPxLPBase<R>::upper(col),
+                          ds.colstat[col]);
             return false;
          }
       }
@@ -199,9 +200,7 @@ bool SPxBasisBase<R>::isDescValid(const Desc& ds)
 
    if(basisdim != theLP->nCols())
    {
-      SPX_MSG_DEBUG(std::cout << "IBASIS25 Incorrect basis dimension " << basisdim << " != " <<
-                    theLP->nCols()
-                    << "\n");
+      SPxOut::debug(this, "IBASIS25 Incorrect basis dimension {} != {}\n", basisdim, theLP->nCols());
       return false;
    }
 
@@ -595,7 +594,7 @@ bool SPxBasisBase<R>::readBasis(
    }
 
 #ifndef NDEBUG
-   SPX_MSG_DEBUG(thedesc.dump());
+   SPX_DEBUG(thedesc.dump());
 #endif
 
    return !mps.hasError();
@@ -736,7 +735,7 @@ void SPxBasisBase<R>::writeBasis(
    }
 
 #ifndef NDEBUG
-   SPX_MSG_DEBUG(thedesc.dump());
+   SPX_DEBUG(thedesc.dump());
 
    // Check that we covered all nonbasic rows - the remaining should be basic.
    for(; row < theLP->nRows(); row++)
@@ -827,14 +826,10 @@ void SPxBasisBase<R>::change(
       ++iterCount;
       ++updateCount;
 
-      SPX_MSG_DEBUG(std::cout << "factor_stats: iteration= " << this->iteration()
-                    << " update= " << updateCount
-                    << " total_update= " << totalUpdateCount
-                    << " nonzero_B= " << nzCount
-                    << " nonzero_LU= " << factor->memory()
-                    << " factor_fill= " << lastFill
-                    << " time= " << theLP->time()
-                    << std::endl;)
+      SPxOut::debug(this,
+                    "factor_stats: iteration= {}, update= {}, total_update= {}, nonzero_B= {}, nonzero_LU= {}, factor_fill= {}, time= {}\n",
+                    this->iteration(), updateCount, totalUpdateCount, nzCount, factor->memory(), lastFill,
+                    theLP->time());
 
       // never factorize? Just do it !
       if(!factorized)
