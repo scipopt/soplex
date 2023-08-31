@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright 1996-2022 Zuse Institute Berlin                                */
+/*  Copyright (c) 1996-2023 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -535,12 +535,7 @@ template <class R>
 void SPxSolverBase<R>::changeBounds(int i, const R& newLower, const R& newUpper, bool scale)
 {
    changeLower(i, newLower, scale);
-
-   if(EQ(newLower, newUpper, this->tolerances()->epsilon()))
-      changeUpper(i, newLower, scale);
-   else
-      changeUpper(i, newUpper, scale);
-
+   changeUpper(i, newUpper, scale);
 }
 
 template <class R>
