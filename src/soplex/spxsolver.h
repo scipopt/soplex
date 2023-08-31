@@ -344,7 +344,7 @@ private:
    DataArray<VarStatus> oldBasisStatusRows; ///< stored stable basis met before a simplex pivot (used to warm start the solver)
    DataArray<VarStatus> oldBasisStatusCols; // They don't have setters because only the internal simplex method is meant to fill them
 
-   bool storeBasisBeforeSimplexPivot; ///< do we store stable basis before simplex pivots
+   bool solvingForBoosted; ///< is this solver involved in a higher precision solving scheme?
    int storeBasisSimplexFreq; ///< number of simplex pivots -1 to perform before storing stable basis
 
    bool
@@ -944,9 +944,9 @@ public:
    }
 
    // should the basis be stored for use in precision boosting?
-   void setStoreBasisForBoosting(bool value)
+   void setSolvingForBoosted(bool value)
    {
-      storeBasisBeforeSimplexPivot = value;
+      solvingForBoosted = value;
    }
 
    // set frequency of storing the basis for use in precision boosting

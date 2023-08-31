@@ -334,7 +334,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                printDisplayLine();
 
                // if it is time to store the basis, store it (only used in rational solve)
-               if(storeBasisBeforeSimplexPivot)
+               if(solvingForBoosted)
                {
                   if((storeBasisFreqLog && iterations() == pow(2, timesBasisWasStored) - 1)
                      || (!storeBasisFreqLog && iterations() % storeBasisSimplexFreq == 0))
@@ -652,7 +652,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                      if(boundrange == 0.0 || siderange == 0.0 || objrange == 0.0)
                         calculateProblemRanges();
 
-                     if(SOPLEX_MAX(SOPLEX_MAX(boundrange, siderange), objrange) >= 1e9)
+                     if(SOPLEX_MAX(SOPLEX_MAX(boundrange, siderange), objrange) >= 1e9 && !solvingForBoosted)
                      {
                         SPxOut::setScientific(spxout->getCurrentStream(), 0);
                         SPX_MSG_INFO1((*this->spxout), (*this->spxout) <<
@@ -729,7 +729,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                printDisplayLine();
 
                // if it is time to store the basis, store it (only used in rational solve)
-               if(storeBasisBeforeSimplexPivot)
+               if(solvingForBoosted)
                {
                   if((storeBasisFreqLog && iterations() == pow(2, timesBasisWasStored) - 1)
                      || (!storeBasisFreqLog && iterations() % storeBasisSimplexFreq == 0))
@@ -1023,7 +1023,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                      if(boundrange == 0.0 || siderange == 0.0 || objrange == 0.0)
                         calculateProblemRanges();
 
-                     if(SOPLEX_MAX(SOPLEX_MAX(boundrange, siderange), objrange) >= 1e9)
+                     if(SOPLEX_MAX(SOPLEX_MAX(boundrange, siderange), objrange) >= 1e9 && !solvingForBoosted)
                      {
                         SPxOut::setScientific(spxout->getCurrentStream(), 0);
                         SPX_MSG_INFO1((*this->spxout), (*this->spxout) <<

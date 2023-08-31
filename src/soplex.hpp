@@ -224,11 +224,6 @@ SoPlexBase<R>::Settings::BoolParam::BoolParam()
    description[SoPlexBase<R>::RECOVERY_MECHANISM] =
       "enable recovery mechanism for when the solve fails";
    defaultValue[SoPlexBase<R>::RECOVERY_MECHANISM] = false;
-
-   name[SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT] = "storeBasisBeforeSimplexPivot";
-   description[SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT] =
-      "store advanced and stable basis met before each simplex iteration, to better warm start";
-   defaultValue[SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT] = true;
 }
 
 template <class R>
@@ -5971,11 +5966,6 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
    case RECOVERY_MECHANISM:
       break;
 
-   case STORE_BASIS_BEFORE_SIMPLEX_PIVOT:
-      // attributes in solvers need to be updated
-      _solver.setStoreBasisForBoosting(value);
-      _boostedSolver.setStoreBasisForBoosting(value);
-      break;
    default:
       return false;
    }
@@ -10140,7 +10130,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::optimize(volatile bool* interru
       }
 
       _solver.setComputeDegenFlag(boolParam(COMPUTEDEGEN));
-      _solver.setStoreBasisForBoosting(false);
+      _solver.setSolvingForBoosted(false);
 
       _optimize(interrupt);
 #ifdef SOPLEX_DEBUG // this check will remove scaling of the realLP

@@ -534,6 +534,9 @@ void SoPlexBase<R>::_performOptIRWrapper(
    bool& error
 )
 {
+   _solver.setSolvingForBoosted(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
+   _boostedSolver.setSolvingForBoosted(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
+
 #ifdef SOPLEX_WITH_MPFR
    if(boolParam(SoPlexBase<R>::ITERATIVE_REFINEMENT))
    {
