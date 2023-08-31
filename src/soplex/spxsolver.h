@@ -342,9 +342,9 @@ private:
    decompIterationLimit;   ///< the maximum number of iterations before the decomposition simplex is aborted.
 
    DataArray<VarStatus> oldBasisStatusRows;
-      ///< stored stable basis met before a simplex pivot (used to warm start the solver)
+   ///< stored stable basis met before a simplex pivot (used to warm start the solver)
    DataArray<VarStatus> oldBasisStatusCols;
-      ///< They don't have setters because only the internal simplex method is meant to fill them
+   ///< They don't have setters because only the internal simplex method is meant to fill them
 
    bool solvingForBoosted; ///< is this solver involved in a higher precision solving scheme?
    int storeBasisSimplexFreq; ///< number of simplex pivots -1 to perform before storing stable basis
