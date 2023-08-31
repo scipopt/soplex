@@ -3,6 +3,10 @@ Next major release
 
 features:
 
+- add option to print primal/dual solutions to a file using `-x=<filename>` or `-y=<filename>`, respectively
+  exact rational solutions can be written with `-X=<filename>` or `-Y=<filename>`. If `<filename>` is the
+  same for multiple options the different solutions are appended to the same file
+
 interface & parameters:
 
 performance:
