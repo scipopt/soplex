@@ -162,7 +162,8 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
    int   stallRefIter;
    int   stallNumRecovers;
 
-   int timesBasisWasStored = 0; /// number of times the current basis was stored in oldBasisStatusRows oldBasisStatusCols
+   int timesBasisWasStored = 0;
+   /// number of times the current basis was stored in oldBasisStatusRows oldBasisStatusCols
    /* storeBasisFreqLog : if true, store basis if iterations() == 2^timesBasisWasStored
                           else, store basis if iterations() % storeBasisSimplexFreq == 0 */
    bool storeBasisFreqLog = true;
@@ -337,7 +338,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                if(solvingForBoosted)
                {
                   if((storeBasisFreqLog && iterations() == pow(2, timesBasisWasStored) - 1)
-                     || (!storeBasisFreqLog && iterations() % storeBasisSimplexFreq == 0))
+                        || (!storeBasisFreqLog && iterations() % storeBasisSimplexFreq == 0))
                   {
                      // switch off storeBasisFreqLog if 2^timesBasisWasStored becomes too big
                      // in order to avoid computing enormous powers of 2
@@ -345,7 +346,8 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                         storeBasisFreqLog = false;
 
                      // store basis
-                     getBasis(oldBasisStatusRows.get_ptr(), oldBasisStatusCols.get_ptr(), oldBasisStatusRows.size(), oldBasisStatusCols.size());
+                     getBasis(oldBasisStatusRows.get_ptr(), oldBasisStatusCols.get_ptr(), oldBasisStatusRows.size(),
+                              oldBasisStatusCols.size());
                      timesBasisWasStored++;
                   }
                }
@@ -732,7 +734,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                if(solvingForBoosted)
                {
                   if((storeBasisFreqLog && iterations() == pow(2, timesBasisWasStored) - 1)
-                     || (!storeBasisFreqLog && iterations() % storeBasisSimplexFreq == 0))
+                        || (!storeBasisFreqLog && iterations() % storeBasisSimplexFreq == 0))
                   {
                      // switch off storeBasisFreqLog if 2^timesBasisWasStored becomes too big
                      // in order to avoid computing enormous powers of 2
@@ -740,7 +742,8 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                         storeBasisFreqLog = false;
 
                      // store basis
-                     getBasis(oldBasisStatusRows.get_ptr(), oldBasisStatusCols.get_ptr(), oldBasisStatusRows.size(), oldBasisStatusCols.size());
+                     getBasis(oldBasisStatusRows.get_ptr(), oldBasisStatusCols.get_ptr(), oldBasisStatusRows.size(),
+                              oldBasisStatusCols.size());
                      timesBasisWasStored++;
                   }
                }

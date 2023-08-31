@@ -2501,10 +2501,12 @@ private:
    bool _inUnbdMode();
 
    // stores given basis in old basis attributes: _oldBasisStatusRows, _oldFeasBasisStatusRows, _oldUnbdBasisStatusRows (and ...Cols)
-   void _storeBasisAsOldBasis(DataArray< typename SPxSolverBase<R>::VarStatus >& rows, DataArray< typename SPxSolverBase<R>::VarStatus >& cols);
+   void _storeBasisAsOldBasis(DataArray< typename SPxSolverBase<R>::VarStatus >& rows,
+                              DataArray< typename SPxSolverBase<R>::VarStatus >& cols);
 
    // stores given basis in old basis attributes: _oldBasisStatusRows, _oldFeasBasisStatusRows, _oldUnbdBasisStatusRows (and ...Cols)
-   void _storeBasisAsOldBasisBoosted(DataArray< typename SPxSolverBase<BP>::VarStatus >& rows, DataArray< typename SPxSolverBase<BP>::VarStatus >& cols);
+   void _storeBasisAsOldBasisBoosted(DataArray< typename SPxSolverBase<BP>::VarStatus >& rows,
+                                     DataArray< typename SPxSolverBase<BP>::VarStatus >& cols);
 
    // get the last advanced and stable basis stored by the initial solver and store it as old basis, unsimplify basis if simplifier activated
    void _storeLastStableBasis(bool vanished);
@@ -2676,10 +2678,10 @@ private:
 
    /// solves real LP during iterative refinement
    void _solveRealForRationalBoosted(
-         VectorBase<BP>& primal, VectorBase<BP>& dual,
-         DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
-         DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
-         typename SPxSolverBase<BP>::Status& boostedResult, bool initialSolve);
+      VectorBase<BP>& primal, VectorBase<BP>& dual,
+      DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
+      DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
+      typename SPxSolverBase<BP>::Status& boostedResult, bool initialSolve);
 
    /// computes rational inverse of basis matrix as defined by _rationalLUSolverBind
    void _computeBasisInverseRational();

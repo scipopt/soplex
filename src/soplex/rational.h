@@ -188,8 +188,9 @@ inline Rational ratFromString(const char* desc)
             s.insert(0, "0");
 
          size_t pos = s.find('.');
+
          // if s contains a ., convert it to a rational
-         if( pos != std::string::npos )
+         if(pos != std::string::npos)
          {
             size_t exp = s.length() - 1 - pos;
             std::string den("1");
@@ -209,6 +210,7 @@ inline Rational ratFromString(const char* desc)
             s.append("/");
             s.append(den);
          }
+
          res = Rational(s);
          res *= pow(10, mult);
       }

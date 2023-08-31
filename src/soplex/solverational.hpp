@@ -135,6 +135,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
                            primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
 
 #ifdef SOPLEX_WITH_MPFR
+
       // case: an unrecoverable error occured, and precision boosting has reached its limit
       if(error && _boostingLimitReached)
       {
@@ -144,12 +145,14 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
       // case: an error occured, boost precision
       else if(error)
 #else
+
       // case: an unrecoverable error occured, boost precision
       if(error)
 #endif
       {
          _status = SPxSolverBase<R>::ERROR;
 #ifdef SOPLEX_WITH_MPFR
+
          if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
          {
             if(_setupBoostedSolverAfterRecovery())
@@ -159,6 +162,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
          }
          else
             break;
+
 #else
          break;
 #endif
@@ -192,6 +196,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             SPX_MSG_INFO1(spxout, spxout << "Error while testing for unboundedness.\n");
             _status = SPxSolverBase<R>::ERROR;
 #ifdef SOPLEX_WITH_MPFR
+
             if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
             {
                if(_setupBoostedSolverAfterRecovery())
@@ -201,6 +206,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             }
             else
                break;
+
 #else
             break;
 #endif
@@ -245,6 +251,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             SPX_MSG_INFO1(spxout, spxout << "Error while testing for feasibility.\n");
             _status = SPxSolverBase<R>::ERROR;
 #ifdef SOPLEX_WITH_MPFR
+
             if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
             {
                if(_setupBoostedSolverAfterRecovery())
@@ -254,6 +261,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             }
             else
                break;
+
 #else
             break;
 #endif
@@ -284,6 +292,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
          {
             SPX_MSG_INFO1(spxout, spxout << "Primal feasible and bounded.\n");
 #ifdef SOPLEX_WITH_MPFR
+
             if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
             {
                if(_setupBoostedSolverAfterRecovery())
@@ -291,6 +300,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
                else // precision boosting has reached its limit
                   break;
             }
+
 #endif
             continue;
          }
@@ -311,6 +321,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             _status = SPxSolverBase<R>::ERROR;
             _restoreBasis();
 #ifdef SOPLEX_WITH_MPFR
+
             if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
             {
                if(_setupBoostedSolverAfterRecovery())
@@ -320,6 +331,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             }
             else
                break;
+
 #else
             break;
 #endif
@@ -359,6 +371,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
                _status = SPxSolverBase<R>::ERROR;
                _restoreBasis();
 #ifdef SOPLEX_WITH_MPFR
+
                if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
                {
                   if(_setupBoostedSolverAfterRecovery())
@@ -368,6 +381,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
                }
                else
                   break;
+
 #else
                break;
 #endif
@@ -411,6 +425,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
          {
             SPX_MSG_INFO1(spxout, spxout << "Primal feasible.  Optimizing again.\n");
 #ifdef SOPLEX_WITH_MPFR
+
             if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
             {
                if(_setupBoostedSolverAfterRecovery())
@@ -418,6 +433,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
                else // precision boosting has reached its limit
                   break;
             }
+
 #endif
             continue;
          }
@@ -431,6 +447,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
       else
       {
 #ifdef SOPLEX_WITH_MPFR
+
          if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
          {
             if(_setupBoostedSolverAfterRecovery())
@@ -443,6 +460,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             SPX_MSG_INFO1(spxout, spxout << "Terminating without success.\n");
             break;
          }
+
 #else
          SPX_MSG_INFO1(spxout, spxout << "Terminating without success.\n");
          break;
@@ -538,13 +556,14 @@ void SoPlexBase<R>::_performOptIRWrapper(
    _boostedSolver.setSolvingForBoosted(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
 
 #ifdef SOPLEX_WITH_MPFR
+
    if(boolParam(SoPlexBase<R>::ITERATIVE_REFINEMENT))
    {
       // no precision boosting or initial precision -> solve with plain iterative refinement
       if(!boolParam(SoPlexBase<R>::PRECISION_BOOSTING) || !_switchedToBoosted)
       {
          _performOptIRStable(sol, acceptUnbounded, acceptInfeasible, minRounds,
-                           primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
+                             primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
       }
       else
       {
@@ -556,7 +575,8 @@ void SoPlexBase<R>::_performOptIRWrapper(
             // return false if a new boosted iteration is needed, true otherwise
             bool needNewBoostedIt;
             _performOptIRStableBoosted(sol, acceptUnbounded, acceptInfeasible, minRounds,
-                                       primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error, needNewBoostedIt);
+                                       primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error,
+                                       needNewBoostedIt);
 
             // update statistics for precision boosting
             _updateBoostingStatistics();
@@ -573,17 +593,20 @@ void SoPlexBase<R>::_performOptIRWrapper(
             }
             else
                break;
-         } while (true);
+         }
+         while(true);
       }
    }
    else
    {
-      assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING)); // at least one option between IR and precision boosting must be activated
+      assert(boolParam(
+                SoPlexBase<R>::PRECISION_BOOSTING)); // at least one option between IR and precision boosting must be activated
 
       // initial precision solve
       if(!_switchedToBoosted)
       {
-         _solveRealForRationalStable(sol, primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
+         _solveRealForRationalStable(sol, primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime,
+                                     stoppedIter, error);
       }
       else
       {
@@ -594,10 +617,12 @@ void SoPlexBase<R>::_performOptIRWrapper(
             // solve problem with iterative refinement and recovery mechanism, using multiprecision
             // return false if a new boosted iteration is needed, true otherwise
             bool needNewBoostedIt;
-            _solveRealForRationalBoostedStable(sol, primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error, needNewBoostedIt);
+            _solveRealForRationalBoostedStable(sol, primalFeasible, dualFeasible, infeasible, unbounded,
+                                               stoppedTime, stoppedIter, error, needNewBoostedIt);
 
             // update statistics for precision boosting
-            if(_statistics->precBoosts > 1) // if == 1 statistics have already been updated in _solveRealForRationalBoostedStable
+            if(_statistics->precBoosts >
+                  1) // if == 1 statistics have already been updated in _solveRealForRationalBoostedStable
                _updateBoostingStatistics();
 
             // boost precision if no success
@@ -612,19 +637,25 @@ void SoPlexBase<R>::_performOptIRWrapper(
             }
             else
                break;
-         } while (true);
+         }
+         while(true);
       }
    }
+
 #else
-   if( boolParam(SoPlexBase<R>::PRECISION_BOOSTING) )
+
+   if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
    {
-      SPX_MSG_ERROR(std::cerr << "ERROR: parameter precision_boosting is set to true but SoPlex was compiled without MPFR support " << std::endl;)
+      SPX_MSG_ERROR(std::cerr <<
+                    "ERROR: parameter precision_boosting is set to true but SoPlex was compiled without MPFR support "
+                    << std::endl;)
       error = true;
       return;
    }
+
    // solve problem with iterative refinement and recovery mechanism
    _performOptIRStable(sol, acceptUnbounded, acceptInfeasible, minRounds,
-                     primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
+                       primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
 #endif
 }
 
@@ -1065,7 +1096,8 @@ void SoPlexBase<R>::_ratrecAndOrRatfac(
       }
 
       nextRatrec = int(numberOfIterations * realParam(SoPlexBase<R>::RATREC_FREQ)) + 1;
-      if (boolParam(SoPlexBase<R>::ITERATIVE_REFINEMENT))
+
+      if(boolParam(SoPlexBase<R>::ITERATIVE_REFINEMENT))
       {
          SPxOut::debug(this, "Next rational reconstruction after refinement {}.\n", nextRatrec);
       }
@@ -1367,13 +1399,14 @@ bool SoPlexBase<R>::_evaluateResult(
    bool& stoppedIter,
    bool& error)
 {
-   // we always evaluate the result after a solve so the first time is a good place to 
+   // we always evaluate the result after a solve so the first time is a good place to
    // set the fp Time
    if(_statistics->fpTime == 0)
       _statistics->fpTime = _statistics->solvingTime->time();
 
    if(_statistics->iterationsFP == 0)
       _statistics->iterationsFP = _statistics->iterations;
+
    switch(result)
    {
    case SPxSolverBase<R>::OPTIMAL:
@@ -1859,8 +1892,9 @@ void SoPlexBase<R>::_solveRealForRationalStable(
    result = _solveRealForRational(false, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
 
    // evalute result
-   if(_evaluateResult<R>(_solver, result, false, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
-                      error))
+   if(_evaluateResult<R>(_solver, result, false, sol, dualReal, infeasible, unbounded, stoppedTime,
+                         stoppedIter,
+                         error))
       return;
 
    _statistics->rationalTime->start();
@@ -1912,10 +1946,14 @@ void SoPlexBase<R>::_solveRealForRationalStable(
 
       // output violations; the reduced cost violations for artificially introduced slack columns are actually violations of the dual multipliers
       SPX_MSG_INFO1(spxout, spxout
-               << "Max. bound violation = " << boundsViolation.str() << ", ofm = 1e" << orderOfMagnitude(boundsViolation) << "\n"
-               << "Max. row violation = " << sideViolation.str() << ", ofm = 1e" << orderOfMagnitude(sideViolation) << "\n"
-               << "Max. reduced cost violation = " << redCostViolation.str() << ", ofm = 1e" << orderOfMagnitude(redCostViolation) << "\n"
-               << "Max. dual violation = " << dualViolation.str() << ", ofm = 1e" << orderOfMagnitude(dualViolation) << "\n");
+                    << "Max. bound violation = " << boundsViolation.str() << ", ofm = 1e" << orderOfMagnitude(
+                       boundsViolation) << "\n"
+                    << "Max. row violation = " << sideViolation.str() << ", ofm = 1e" << orderOfMagnitude(
+                       sideViolation) << "\n"
+                    << "Max. reduced cost violation = " << redCostViolation.str() << ", ofm = 1e" << orderOfMagnitude(
+                       redCostViolation) << "\n"
+                    << "Max. dual violation = " << dualViolation.str() << ", ofm = 1e" << orderOfMagnitude(
+                       dualViolation) << "\n");
 
       SPxOut::debug(this, "Progress table: {} & {} & {} & {} & {} & {}\n", _statistics->refinements,
                     _statistics->iterations, _statistics->solvingTime->time(), _statistics->rationalTime->time(),
@@ -1951,7 +1989,8 @@ void SoPlexBase<R>::_solveRealForRationalStable(
 
 
       // perform rational reconstruction and/or factorization
-      _ratrecAndOrRatfac(minRounds, _lastStallPrecBoosts, _statistics->precBoosts, _factorSolNewBasisPrecBoost, _nextRatrecPrecBoost,
+      _ratrecAndOrRatfac(minRounds, _lastStallPrecBoosts, _statistics->precBoosts,
+                         _factorSolNewBasisPrecBoost, _nextRatrecPrecBoost,
                          errorCorrectionFactor, errorCorrection, maxViolation,
                          sol, primalFeasible, dualFeasible,
                          stoppedTime, stoppedIter, error, breakAfter, continueAfter);
@@ -1959,7 +1998,8 @@ void SoPlexBase<R>::_solveRealForRationalStable(
       if(!continueAfter)
          break;
 
-   } while(true);
+   }
+   while(true);
 
    // correct basis status for restricted inequalities
    if(_hasBasis)
@@ -2064,11 +2104,12 @@ void SoPlexBase<R>::_performOptIRStable(
       result = _solveRealForRational(false, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
    else
       result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows,
-                             _basisStatusCols);
+                                _basisStatusCols);
 
    // evalute result
-   if(_evaluateResult<R>(_solver, result, false, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
-                      error))
+   if(_evaluateResult<R>(_solver, result, false, sol, dualReal, infeasible, unbounded, stoppedTime,
+                         stoppedIter,
+                         error))
       return;
 
    _statistics->rationalTime->start();
@@ -2129,10 +2170,14 @@ void SoPlexBase<R>::_performOptIRStable(
 
       // output violations; the reduced cost violations for artificially introduced slack columns are actually violations of the dual multipliers
       SPX_MSG_INFO1(spxout, spxout
-               << "Max. bound violation = " << boundsViolation.str() << ", ofm = 1e" << orderOfMagnitude(boundsViolation) << "\n"
-               << "Max. row violation = " << sideViolation.str() << ", ofm = 1e" << orderOfMagnitude(sideViolation) << "\n"
-               << "Max. reduced cost violation = " << redCostViolation.str() << ", ofm = 1e" << orderOfMagnitude(redCostViolation) << "\n"
-               << "Max. dual violation = " << dualViolation.str() << ", ofm = 1e" << orderOfMagnitude(dualViolation) << "\n");
+                    << "Max. bound violation = " << boundsViolation.str() << ", ofm = 1e" << orderOfMagnitude(
+                       boundsViolation) << "\n"
+                    << "Max. row violation = " << sideViolation.str() << ", ofm = 1e" << orderOfMagnitude(
+                       sideViolation) << "\n"
+                    << "Max. reduced cost violation = " << redCostViolation.str() << ", ofm = 1e" << orderOfMagnitude(
+                       redCostViolation) << "\n"
+                    << "Max. dual violation = " << dualViolation.str() << ", ofm = 1e" << orderOfMagnitude(
+                       dualViolation) << "\n");
 
 
       SPxOut::debug(this, "Progress table: {} & {} & {} & {} & {} & {}\n", _statistics->refinements,
@@ -2151,7 +2196,8 @@ void SoPlexBase<R>::_performOptIRStable(
                                maxViolation, bestViolation, violationImprovementFactor, numFailedRefinements);
 
       // perform rational reconstruction and/or factorization
-      _ratrecAndOrRatfac(minRounds, lastStallRefinements, _statistics->refinements, factorSolNewBasis, nextRatrecRefinement,
+      _ratrecAndOrRatfac(minRounds, lastStallRefinements, _statistics->refinements, factorSolNewBasis,
+                         nextRatrecRefinement,
                          errorCorrectionFactor, errorCorrection, maxViolation,
                          sol, primalFeasible, dualFeasible,
                          stoppedTime, stoppedIter, error, breakAfter, continueAfter);
@@ -2230,15 +2276,17 @@ void SoPlexBase<R>::_performOptIRStable(
       {
          // turn off simplifier if scaling factors are too high
          int simplifier = intParam(SoPlexBase<R>::SIMPLIFIER);
+
          if(primalScale > 1e20 || dualScale > 1e20)
             setIntParam(SoPlexBase<R>::SIMPLIFIER, SoPlexBase<R>::SIMPLIFIER_OFF);
+
          result = _solveRealForRational(false, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
          // reset simplifier param to previous value
          setIntParam(SoPlexBase<R>::SIMPLIFIER, simplifier);
       }
       else
          result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows,
-                                _basisStatusCols, primalScale > 1e20 || dualScale > 1e20);
+                                   _basisStatusCols, primalScale > 1e20 || dualScale > 1e20);
 
       // count refinements and remember whether we moved to a new basis
       _statistics->refinements++;
@@ -2256,8 +2304,9 @@ void SoPlexBase<R>::_performOptIRStable(
       }
 
       // evaluate result; if modified problem was not solved to optimality, stop refinement;
-      if(_evaluateResult<R>(_solver, result, true, sol, dualReal, infeasible, unbounded, stoppedTime, stoppedIter,
-                         error))
+      if(_evaluateResult<R>(_solver, result, true, sol, dualReal, infeasible, unbounded, stoppedTime,
+                            stoppedIter,
+                            error))
          return;
 
       _statistics->rationalTime->start();
@@ -2323,7 +2372,8 @@ void SoPlexBase<R>::_switchToBoosted()
 
    if(!_switchedToBoosted)
    {
-      SPX_MSG_INFO1(spxout, spxout << "Numerical troubles with initial precision solver. Disabling it and switching to multiprecision.\n");
+      SPX_MSG_INFO1(spxout, spxout <<
+                    "Numerical troubles with initial precision solver. Disabling it and switching to multiprecision.\n");
 
       // switch timer
       _statistics->initialPrecisionTime->stop();
@@ -2337,7 +2387,8 @@ void SoPlexBase<R>::_switchToBoosted()
    }
    else
    {
-      SPX_MSG_INFO1(spxout, spxout << "Numerical troubles with multiprecision solver. Increase precision.\n");
+      SPX_MSG_INFO1(spxout, spxout <<
+                    "Numerical troubles with multiprecision solver. Increase precision.\n");
    }
 }
 
@@ -2365,8 +2416,9 @@ void SoPlexBase<R>::_setupBoostedSolver()
       _tmpBasisStatusRows.reSize(_boostedSolver.nRows());
       _tmpBasisStatusCols.reSize(_boostedSolver.nCols());
 
-      _boostedSolver.getBasis(_tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr(), _tmpBasisStatusRows.size(),
-                        _tmpBasisStatusCols.size());
+      _boostedSolver.getBasis(_tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr(),
+                              _tmpBasisStatusRows.size(),
+                              _tmpBasisStatusCols.size());
       _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusRows, _basisStatusRows);
       _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusCols, _basisStatusCols);
    }
@@ -2392,7 +2444,8 @@ bool SoPlexBase<R>::_boostPrecision()
    // leave out quad precision and immediately go to 167 bits
    if(_statistics->precBoosts == 1)
    {
-      BP nbDigitsSecondBoost = boost::multiprecision::floor(boost::multiprecision::log10(boost::multiprecision::pow(BP(2), 192)));
+      BP nbDigitsSecondBoost = boost::multiprecision::floor(boost::multiprecision::log10(
+                                  boost::multiprecision::pow(BP(2), 192)));
 
       if(intParam(SoPlexBase<R>::MULTIPRECISION_LIMIT) >= nbDigitsSecondBoost)
       {
@@ -2401,15 +2454,16 @@ bool SoPlexBase<R>::_boostPrecision()
       else
       {
          SPX_MSG_INFO1(spxout, spxout << "Maximum number of digits for the multiprecision type reached.\n"
-                                 << "To increase this limit, modify the parameter multiprecision_limit.\n"
-                                 << "Giving up.\n");
+                       << "To increase this limit, modify the parameter multiprecision_limit.\n"
+                       << "Giving up.\n");
          _boostingLimitReached = true;
       }
    }
    else if(_statistics->precBoosts >= 2)
    {
       // general case: increase the number of decimal digits by 3/2,
-      int newNbDigits = (int)floor(BP::default_precision() * realParam(SoPlexBase<R>::PRECISION_BOOSTING_FACTOR));
+      int newNbDigits = (int)floor(BP::default_precision() * realParam(
+                                      SoPlexBase<R>::PRECISION_BOOSTING_FACTOR));
 
       if(intParam(SoPlexBase<R>::MULTIPRECISION_LIMIT) >= newNbDigits)
       {
@@ -2418,8 +2472,8 @@ bool SoPlexBase<R>::_boostPrecision()
       else
       {
          SPX_MSG_INFO1(spxout, spxout << "Maximum number of digits for the multiprecision type reached.\n"
-                                 << "To increase this limit, modify the parameter multiprecision_limit.\n"
-                                 << "Giving up.\n");
+                       << "To increase this limit, modify the parameter multiprecision_limit.\n"
+                       << "Giving up.\n");
          _boostingLimitReached = true;
       }
    }
@@ -2448,6 +2502,7 @@ bool SoPlexBase<R>::_setupBoostedSolverAfterRecovery()
    assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
 
    _switchToBoosted();
+
    if(!_boostPrecision())
       return false;
 
@@ -2467,7 +2522,8 @@ bool SoPlexBase<R>::_isBoostedStartingFromSlack(bool initialSolve)
 
 // store last basis met in double precision solver for a potential iteration with increased precision
 template <class R>
-void SoPlexBase<R>::_storeBasisAsOldBasis(DataArray< typename SPxSolverBase<R>::VarStatus >& rows, DataArray< typename SPxSolverBase<R>::VarStatus >& cols)
+void SoPlexBase<R>::_storeBasisAsOldBasis(DataArray< typename SPxSolverBase<R>::VarStatus >& rows,
+      DataArray< typename SPxSolverBase<R>::VarStatus >& cols)
 {
    if(_inStandardMode())
    {
@@ -2478,14 +2534,16 @@ void SoPlexBase<R>::_storeBasisAsOldBasis(DataArray< typename SPxSolverBase<R>::
    }
    else if(_inFeasMode())
    {
-      SPX_MSG_INFO1(spxout, spxout << "Store basis as old basis (from solver - testing feasibility)" << "\n");
+      SPX_MSG_INFO1(spxout, spxout << "Store basis as old basis (from solver - testing feasibility)" <<
+                    "\n");
       _oldFeasBasisStatusRows = rows;
       _oldFeasBasisStatusCols = cols;
       _hasOldFeasBasis = true;
    }
    else if(_inUnbdMode())
    {
-      SPX_MSG_INFO1(spxout, spxout << "Store basis as old basis (from solver - testing unboundedness)" << "\n");
+      SPX_MSG_INFO1(spxout, spxout << "Store basis as old basis (from solver - testing unboundedness)" <<
+                    "\n");
       _oldUnbdBasisStatusRows = rows;
       _oldUnbdBasisStatusCols = cols;
       _hasOldUnbdBasis = true;
@@ -2496,7 +2554,8 @@ void SoPlexBase<R>::_storeBasisAsOldBasis(DataArray< typename SPxSolverBase<R>::
 
 // store last basis met in boosted solver for a potential iteration with increased precision
 template <class R>
-void SoPlexBase<R>::_storeBasisAsOldBasisBoosted(DataArray< typename SPxSolverBase<BP>::VarStatus >& rows, DataArray< typename SPxSolverBase<BP>::VarStatus >& cols)
+void SoPlexBase<R>::_storeBasisAsOldBasisBoosted(DataArray< typename SPxSolverBase<BP>::VarStatus >&
+      rows, DataArray< typename SPxSolverBase<BP>::VarStatus >& cols)
 {
    if(_inStandardMode())
    {
@@ -2507,14 +2566,16 @@ void SoPlexBase<R>::_storeBasisAsOldBasisBoosted(DataArray< typename SPxSolverBa
    }
    else if(_inFeasMode())
    {
-      SPX_MSG_INFO1(spxout, spxout << "Store basis as old basis (from boosted solver - testing feasibility)" << "\n");
+      SPX_MSG_INFO1(spxout, spxout <<
+                    "Store basis as old basis (from boosted solver - testing feasibility)" << "\n");
       _convertDataArrayVarStatusToRPrecision(rows, _oldFeasBasisStatusRows);
       _convertDataArrayVarStatusToRPrecision(cols, _oldFeasBasisStatusCols);
       _hasOldFeasBasis = true;
    }
    else if(_inUnbdMode())
    {
-      SPX_MSG_INFO1(spxout, spxout << "Store basis as old basis (from boosted solver - testing unboundedness)" << "\n");
+      SPX_MSG_INFO1(spxout, spxout <<
+                    "Store basis as old basis (from boosted solver - testing unboundedness)" << "\n");
       _convertDataArrayVarStatusToRPrecision(rows, _oldUnbdBasisStatusRows);
       _convertDataArrayVarStatusToRPrecision(cols, _oldUnbdBasisStatusCols);
       _hasOldUnbdBasis = true;
@@ -2536,12 +2597,14 @@ bool SoPlexBase<R>::_loadBasisFromOldBasis(bool boosted)
       }
       else if(_inFeasMode() && _hasOldFeasBasis)
       {
-         SPX_MSG_INFO1(spxout, spxout << "Load basis from old basis (in solver - testing feasibility)" << "\n");
+         SPX_MSG_INFO1(spxout, spxout << "Load basis from old basis (in solver - testing feasibility)" <<
+                       "\n");
          _solver.setBasis(_oldFeasBasisStatusRows.get_const_ptr(), _oldFeasBasisStatusCols.get_const_ptr());
       }
       else if(_inUnbdMode() && _hasOldUnbdBasis)
       {
-         SPX_MSG_INFO1(spxout, spxout << "Load basis from old basis (in solver - testing unboundedness)" << "\n");
+         SPX_MSG_INFO1(spxout, spxout << "Load basis from old basis (in solver - testing unboundedness)" <<
+                       "\n");
          _solver.setBasis(_oldUnbdBasisStatusRows.get_const_ptr(), _oldUnbdBasisStatusCols.get_const_ptr());
       }
       else
@@ -2561,14 +2624,16 @@ bool SoPlexBase<R>::_loadBasisFromOldBasis(bool boosted)
       }
       else if(_inFeasMode() && _hasOldFeasBasis)
       {
-         SPX_MSG_INFO1(spxout, spxout << "Load basis from old basis (in boosted solver - testing feasibility)" << "\n");
+         SPX_MSG_INFO1(spxout, spxout <<
+                       "Load basis from old basis (in boosted solver - testing feasibility)" << "\n");
          _convertDataArrayVarStatusToBoosted(_oldFeasBasisStatusRows, _tmpBasisStatusRows);
          _convertDataArrayVarStatusToBoosted(_oldFeasBasisStatusCols, _tmpBasisStatusCols);
          _boostedSolver.setBasis(_tmpBasisStatusRows.get_const_ptr(), _tmpBasisStatusCols.get_const_ptr());
       }
       else if(_inUnbdMode() && _hasOldUnbdBasis)
       {
-         SPX_MSG_INFO1(spxout, spxout << "Load basis from old basis (in boosted solver - testing unboundedness)" << "\n");
+         SPX_MSG_INFO1(spxout, spxout <<
+                       "Load basis from old basis (in boosted solver - testing unboundedness)" << "\n");
          _convertDataArrayVarStatusToBoosted(_oldUnbdBasisStatusRows, _tmpBasisStatusRows);
          _convertDataArrayVarStatusToBoosted(_oldUnbdBasisStatusCols, _tmpBasisStatusCols);
          _boostedSolver.setBasis(_tmpBasisStatusRows.get_const_ptr(), _tmpBasisStatusCols.get_const_ptr());
@@ -2691,12 +2756,17 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
 
    _statistics->boostingStepTime->start();
 
-   BP tolerance = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_tolPrecisionRatio));
+   BP tolerance = boost::multiprecision::pow(BP(10),
+                  -(int)(BP::default_precision() * _tolPrecisionRatio));
 
-   BP epsilonZero   = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_epsZeroPrecisionRatio));
-   BP epsilonFactor = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_epsFactorPrecisionRatio));
-   BP epsilonUpdate = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_epsUpdatePrecisionRatio));
-   BP epsilonPivot  = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_epsPivotPrecisionRatio));
+   BP epsilonZero   = boost::multiprecision::pow(BP(10),
+                      -(int)(BP::default_precision() * _epsZeroPrecisionRatio));
+   BP epsilonFactor = boost::multiprecision::pow(BP(10),
+                      -(int)(BP::default_precision() * _epsFactorPrecisionRatio));
+   BP epsilonUpdate = boost::multiprecision::pow(BP(10),
+                      -(int)(BP::default_precision() * _epsUpdatePrecisionRatio));
+   BP epsilonPivot  = boost::multiprecision::pow(BP(10),
+                      -(int)(BP::default_precision() * _epsPivotPrecisionRatio));
 
    this->_tolerances->setEpsilon((Real) epsilonZero);
    this->_tolerances->setEpsilonFactorization((Real) epsilonFactor);
@@ -2739,7 +2809,8 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
 
    // solve original LP with boosted solver
    _statistics->rationalTime->stop();
-   _solveRealForRationalBoosted(boostedPrimalReal, boostedDualReal, _basisStatusRows, _basisStatusCols, boostedResult, true);
+   _solveRealForRationalBoosted(boostedPrimalReal, boostedDualReal, _basisStatusRows, _basisStatusCols,
+                                boostedResult, true);
 
    // special case on the first boosted iteration
    // otherwise attributs such as _factorSolNewBasisPrecBoost are not updated correctly
@@ -2747,8 +2818,9 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
       _updateBoostingStatistics();
 
    // evalute result
-   if(_evaluateResult<BP>(_boostedSolver, boostedResult, false, sol, boostedDualReal, infeasible, unbounded, stoppedTime, stoppedIter,
-                  error))
+   if(_evaluateResult<BP>(_boostedSolver, boostedResult, false, sol, boostedDualReal, infeasible,
+                          unbounded, stoppedTime, stoppedIter,
+                          error))
       return;
 
    // stop rational solving time
@@ -2797,10 +2869,14 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
 
       // output violations; the reduced cost violations for artificially introduced slack columns are actually violations of the dual multipliers
       SPX_MSG_INFO1(spxout, spxout
-            << "Max. bound violation = " << boundsViolation.str() << ", ofm = 1e" << orderOfMagnitude(boundsViolation) << "\n"
-            << "Max. row violation = " << sideViolation.str() << ", ofm = 1e" << orderOfMagnitude(sideViolation) << "\n"
-            << "Max. reduced cost violation = " << redCostViolation.str() << ", ofm = 1e" << orderOfMagnitude(redCostViolation) << "\n"
-            << "Max. dual violation = " << dualViolation.str() << ", ofm = 1e" << orderOfMagnitude(dualViolation) << "\n");
+                    << "Max. bound violation = " << boundsViolation.str() << ", ofm = 1e" << orderOfMagnitude(
+                       boundsViolation) << "\n"
+                    << "Max. row violation = " << sideViolation.str() << ", ofm = 1e" << orderOfMagnitude(
+                       sideViolation) << "\n"
+                    << "Max. reduced cost violation = " << redCostViolation.str() << ", ofm = 1e" << orderOfMagnitude(
+                       redCostViolation) << "\n"
+                    << "Max. dual violation = " << dualViolation.str() << ", ofm = 1e" << orderOfMagnitude(
+                       dualViolation) << "\n");
 
       SPxOut::debug(this, "Progress table: {} & {} & {} & {} & {} & {}\n", _statistics->refinements,
                     _statistics->iterations, _statistics->solvingTime->time(), _statistics->rationalTime->time(),
@@ -2835,7 +2911,8 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
 
 
       // perform rational reconstruction and/or factorization
-      _ratrecAndOrRatfac(minRounds, _lastStallPrecBoosts, _statistics->precBoosts, _factorSolNewBasisPrecBoost, _nextRatrecPrecBoost,
+      _ratrecAndOrRatfac(minRounds, _lastStallPrecBoosts, _statistics->precBoosts,
+                         _factorSolNewBasisPrecBoost, _nextRatrecPrecBoost,
                          errorCorrectionFactor, errorCorrection, maxViolation,
                          sol, primalFeasible, dualFeasible,
                          stoppedTime, stoppedIter, error, breakAfter, continueAfter);
@@ -2843,7 +2920,8 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
       if(!continueAfter)
          break;
 
-   } while (true);
+   }
+   while(true);
 
    if(primalFeasible && dualFeasible)
    {
@@ -2858,8 +2936,8 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
 
             if(_rowTypes[r] != RANGETYPE_FIXED && _basisStatusRows[r] == SPxSolverBase<R>::FIXED)
                _basisStatusRows[r] = (maximizing == (sol._dual[r] < 0))
-                                    ? SPxSolverBase<R>::ON_LOWER
-                                    : SPxSolverBase<R>::ON_UPPER;
+                                     ? SPxSolverBase<R>::ON_LOWER
+                                     : SPxSolverBase<R>::ON_UPPER;
          }
       }
 
@@ -2940,12 +3018,17 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
 
    _statistics->boostingStepTime->start();
 
-   BP tolerance = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_tolPrecisionRatio));
+   BP tolerance = boost::multiprecision::pow(BP(10),
+                  -(int)(BP::default_precision() * _tolPrecisionRatio));
 
-   BP epsilonZero   = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_epsZeroPrecisionRatio));
-   BP epsilonFactor = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_epsFactorPrecisionRatio));
-   BP epsilonUpdate = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_epsUpdatePrecisionRatio));
-   BP epsilonPivot  = boost::multiprecision::pow(BP(10),-(int)(BP::default_precision()*_epsPivotPrecisionRatio));
+   BP epsilonZero   = boost::multiprecision::pow(BP(10),
+                      -(int)(BP::default_precision() * _epsZeroPrecisionRatio));
+   BP epsilonFactor = boost::multiprecision::pow(BP(10),
+                      -(int)(BP::default_precision() * _epsFactorPrecisionRatio));
+   BP epsilonUpdate = boost::multiprecision::pow(BP(10),
+                      -(int)(BP::default_precision() * _epsUpdatePrecisionRatio));
+   BP epsilonPivot  = boost::multiprecision::pow(BP(10),
+                      -(int)(BP::default_precision() * _epsPivotPrecisionRatio));
 
    this->_tolerances->setEpsilon((Real) epsilonZero);
    this->_tolerances->setEpsilonFactorization((Real) epsilonFactor);
@@ -2983,11 +3066,13 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
 
    // solve original LP with boosted solver
    _statistics->rationalTime->stop();
-   _solveRealForRationalBoosted(boostedPrimalReal, boostedDualReal, _basisStatusRows, _basisStatusCols, boostedResult, true);
+   _solveRealForRationalBoosted(boostedPrimalReal, boostedDualReal, _basisStatusRows, _basisStatusCols,
+                                boostedResult, true);
 
    // evalute result
-   if(_evaluateResult<BP>(_boostedSolver, boostedResult, false, sol, boostedDualReal, infeasible, unbounded, stoppedTime, stoppedIter,
-                  error))
+   if(_evaluateResult<BP>(_boostedSolver, boostedResult, false, sol, boostedDualReal, infeasible,
+                          unbounded, stoppedTime, stoppedIter,
+                          error))
       return;
 
    _statistics->rationalTime->start();
@@ -3047,15 +3132,19 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
 
       // output violations; the reduced cost violations for artificially introduced slack columns are actually violations of the dual multipliers
       SPX_MSG_INFO1(spxout, spxout
-            << "Max. bound violation = " << boundsViolation.str() << ", ofm = 1e" << orderOfMagnitude(boundsViolation) << "\n"
-            << "Max. row violation = " << sideViolation.str() << ", ofm = 1e" << orderOfMagnitude(sideViolation) << "\n"
-            << "Max. reduced cost violation = " << redCostViolation.str() << ", ofm = 1e" << orderOfMagnitude(redCostViolation) << "\n"
-            << "Max. dual violation = " << dualViolation.str() << ", ofm = 1e" << orderOfMagnitude(dualViolation) << "\n");
+                    << "Max. bound violation = " << boundsViolation.str() << ", ofm = 1e" << orderOfMagnitude(
+                       boundsViolation) << "\n"
+                    << "Max. row violation = " << sideViolation.str() << ", ofm = 1e" << orderOfMagnitude(
+                       sideViolation) << "\n"
+                    << "Max. reduced cost violation = " << redCostViolation.str() << ", ofm = 1e" << orderOfMagnitude(
+                       redCostViolation) << "\n"
+                    << "Max. dual violation = " << dualViolation.str() << ", ofm = 1e" << orderOfMagnitude(
+                       dualViolation) << "\n");
 
       SPxOut::debug(this, "Progress table: {} & {} & {} & {} & {} & {}\n", _statistics->refinements,
-            _statistics->iterations, _statistics->solvingTime->time(), _statistics->rationalTime->time(),
-            boundsViolation > sideViolation ? boundsViolation : sideViolation,
-            redCostViolation > dualViolation ? redCostViolation : dualViolation);
+                    _statistics->iterations, _statistics->solvingTime->time(), _statistics->rationalTime->time(),
+                    boundsViolation > sideViolation ? boundsViolation : sideViolation,
+                    redCostViolation > dualViolation ? redCostViolation : dualViolation);
 
       // check termination criteria for refinement loop
       if(_isRefinementOver(primalFeasible, dualFeasible, boundsViolation, sideViolation, redCostViolation,
@@ -3064,13 +3153,14 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
 
       // check refinement progress
       _checkRefinementProgress(boundsViolation, sideViolation, redCostViolation, dualViolation,
-                              maxViolation, bestViolation, violationImprovementFactor, numFailedRefinements);
+                               maxViolation, bestViolation, violationImprovementFactor, numFailedRefinements);
 
       // perform rational reconstruction and/or factorization
-      _ratrecAndOrRatfac(minRounds, lastStallRefinements, _statistics->refinements, factorSolNewBasis, nextRatrecRefinement,
-                        errorCorrectionFactor, errorCorrection, maxViolation,
-                        sol, primalFeasible, dualFeasible,
-                        stoppedTime, stoppedIter, error, breakAfter, continueAfter);
+      _ratrecAndOrRatfac(minRounds, lastStallRefinements, _statistics->refinements, factorSolNewBasis,
+                         nextRatrecRefinement,
+                         errorCorrectionFactor, errorCorrection, maxViolation,
+                         sol, primalFeasible, dualFeasible,
+                         stoppedTime, stoppedIter, error, breakAfter, continueAfter);
 
       if(breakAfter)
          break;
@@ -3081,7 +3171,7 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
 
       // compute primal scaling factor; limit increase in scaling by tolerance used in floating point solve
       _computePrimalScalingFactor(maxScale, primalScale, boundsViolation, sideViolation,
-                                 redCostViolation);
+                                  redCostViolation);
 
       // apply scaled bounds and scaled sides
       _applyScaledBounds<BP>(_boostedSolver, primalScale);
@@ -3142,10 +3232,12 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
       _statistics->rationalTime->stop();
       // turn off simplifier if scaling factors are too high
       int simplifier = intParam(SoPlexBase<R>::SIMPLIFIER);
+
       if(primalScale > 1e20 || dualScale > 1e20)
          setIntParam(SoPlexBase<R>::SIMPLIFIER, SoPlexBase<R>::SIMPLIFIER_OFF);
 
-      _solveRealForRationalBoosted(boostedPrimalReal, boostedDualReal, _basisStatusRows, _basisStatusCols, boostedResult, false);
+      _solveRealForRationalBoosted(boostedPrimalReal, boostedDualReal, _basisStatusRows, _basisStatusCols,
+                                   boostedResult, false);
 
       // reset simplifier param to previous value
       setIntParam(SoPlexBase<R>::SIMPLIFIER, simplifier);
@@ -3166,8 +3258,9 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
       }
 
       // evaluate result; if modified problem was not solved to optimality, stop refinement;
-      if(_evaluateResult<BP>(_boostedSolver, boostedResult, true, sol, boostedDualReal, infeasible, unbounded, stoppedTime, stoppedIter,
-                        error))
+      if(_evaluateResult<BP>(_boostedSolver, boostedResult, true, sol, boostedDualReal, infeasible,
+                             unbounded, stoppedTime, stoppedIter,
+                             error))
          return;
 
       _statistics->rationalTime->start();
@@ -3183,7 +3276,8 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
       const int numCorrectedPrimals = _primalDualDiff.size();
 
       // correct dual solution and align with basis
-      _correctDualSolution<BP>(_boostedSolver, sol, maximizing, boostedDualReal, dualScale, dualSize, maxDimRational);
+      _correctDualSolution<BP>(_boostedSolver, sol, maximizing, boostedDualReal, dualScale, dualSize,
+                               maxDimRational);
 
       // update or recompute reduced cost values depending on which looks faster
       // adding one to the length of the dual vector accounts for the objective function vector
@@ -3204,8 +3298,8 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
 
             if(_rowTypes[r] != RANGETYPE_FIXED && _basisStatusRows[r] == SPxSolverBase<R>::FIXED)
                _basisStatusRows[r] = (maximizing == (sol._dual[r] < 0))
-                                    ? SPxSolverBase<R>::ON_LOWER
-                                    : SPxSolverBase<R>::ON_UPPER;
+                                     ? SPxSolverBase<R>::ON_LOWER
+                                     : SPxSolverBase<R>::ON_UPPER;
          }
       }
 
@@ -5031,13 +5125,15 @@ void SoPlexBase<R>::_storeLastStableBasisBoosted(bool vanished)
          // store basis for original problem
          _boostedSolver.getOldBasisStatusRows().reSize(numRowsRational());
          _boostedSolver.getOldBasisStatusCols().reSize(numColsRational());
-         _boostedSimplifier->getBasis(_boostedSolver.getOldBasisStatusRows().get_ptr(), _boostedSolver.getOldBasisStatusCols().get_ptr(),
+         _boostedSimplifier->getBasis(_boostedSolver.getOldBasisStatusRows().get_ptr(),
+                                      _boostedSolver.getOldBasisStatusCols().get_ptr(),
                                       _boostedSolver.getOldBasisStatusRows().size(),    _boostedSolver.getOldBasisStatusCols().size());
       }
    }
 
    // store last basis as old basis
-   _storeBasisAsOldBasisBoosted(_boostedSolver.getOldBasisStatusRows(), _boostedSolver.getOldBasisStatusCols());
+   _storeBasisAsOldBasisBoosted(_boostedSolver.getOldBasisStatusRows(),
+                                _boostedSolver.getOldBasisStatusCols());
 }
 
 // get the last stable basis from the initial solver and store it as old basis, unsimplify basis if simplifier activated
@@ -5068,7 +5164,9 @@ void SoPlexBase<R>::_storeLastStableBasis(bool vanished)
             _scaler->unscaleRedCost(_solver, tmpRedCost);
          }
 
-         _solver.getBasis(_solver.getOldBasisStatusRows().get_ptr(), _solver.getOldBasisStatusCols().get_ptr(), _solver.getOldBasisStatusRows().size(), _solver.getOldBasisStatusCols().size());
+         _solver.getBasis(_solver.getOldBasisStatusRows().get_ptr(),
+                          _solver.getOldBasisStatusCols().get_ptr(), _solver.getOldBasisStatusRows().size(),
+                          _solver.getOldBasisStatusCols().size());
 
          try
          {
@@ -5084,7 +5182,8 @@ void SoPlexBase<R>::_storeLastStableBasis(bool vanished)
          // store basis for original problem
          _solver.getOldBasisStatusRows().reSize(numRowsRational());
          _solver.getOldBasisStatusCols().reSize(numColsRational());
-         _simplifier->getBasis(_solver.getOldBasisStatusRows().get_ptr(), _solver.getOldBasisStatusCols().get_ptr(),
+         _simplifier->getBasis(_solver.getOldBasisStatusRows().get_ptr(),
+                               _solver.getOldBasisStatusCols().get_ptr(),
                                _solver.getOldBasisStatusRows().size(),    _solver.getOldBasisStatusCols().size());
       }
    }
@@ -5246,7 +5345,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                try
                {
                   _simplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost, basisStatusRows.get_ptr(),
-                                       basisStatusCols.get_ptr());
+                                          basisStatusCols.get_ptr());
                }
                catch(const SPxInternalCodeException& E)
                {
@@ -5284,7 +5383,8 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                _hasBasis = true;
             }
 
-            if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size() || _oldBasisStatusCols.size() != basisStatusCols.size())
+            if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size()
+                  || _oldBasisStatusCols.size() != basisStatusCols.size())
                _storeBasisAsOldBasis(basisStatusRows, basisStatusCols);
 
             break;
@@ -5308,13 +5408,14 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             {
                try
                {
-                  if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size() || _oldBasisStatusCols.size() != basisStatusCols.size())
+                  if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size()
+                        || _oldBasisStatusCols.size() != basisStatusCols.size())
                      _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
                }
                catch(const SPxInternalCodeException& E)
                {
                   SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                   "> while processing the result of the solve.\n");
+                                "> while processing the result of the solve.\n");
                   SPX_MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
                }
             }
@@ -5337,8 +5438,9 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(),
                                 basisStatusCols.size());
 
-            if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size() || _oldBasisStatusCols.size() != basisStatusCols.size())
-               _storeBasisAsOldBasis(basisStatusRows, basisStatusCols);
+               if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size()
+                     || _oldBasisStatusCols.size() != basisStatusCols.size())
+                  _storeBasisAsOldBasis(basisStatusRows, basisStatusCols);
             }
             else
             {
@@ -5351,13 +5453,14 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             {
                try
                {
-                  if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size() || _oldBasisStatusCols.size() != basisStatusCols.size())
+                  if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size()
+                        || _oldBasisStatusCols.size() != basisStatusCols.size())
                      _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
                }
                catch(const SPxInternalCodeException& E)
                {
                   SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                   "> while processing the result of the solve.\n");
+                                "> while processing the result of the solve.\n");
                   SPX_MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
                }
             }
@@ -5377,13 +5480,14 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                {
                   try
                   {
-                     if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size() || _oldBasisStatusCols.size() != basisStatusCols.size())
+                     if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size()
+                           || _oldBasisStatusCols.size() != basisStatusCols.size())
                         _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
                   }
                   catch(const SPxInternalCodeException& E)
                   {
                      SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                     "> while processing the result of the solve.\n");
+                                   "> while processing the result of the solve.\n");
                      SPX_MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
                   }
                }
@@ -5410,20 +5514,22 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             {
                try
                {
-                  if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size() || _oldBasisStatusCols.size() != basisStatusCols.size())
+                  if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size()
+                        || _oldBasisStatusCols.size() != basisStatusCols.size())
                      _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
                }
                catch(const SPxInternalCodeException& E)
                {
                   SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                   "> while processing the result of the solve.\n");
+                                "> while processing the result of the solve.\n");
                   SPX_MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
                }
             }
             else
             {
-            if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size() || _oldBasisStatusCols.size() != basisStatusCols.size())
-               _storeBasisAsOldBasis(basisStatusRows, basisStatusCols);
+               if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size()
+                     || _oldBasisStatusCols.size() != basisStatusCols.size())
+                  _storeBasisAsOldBasis(basisStatusRows, basisStatusCols);
             }
 
             break;
@@ -5439,13 +5545,14 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             {
                try
                {
-                  if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size() || _oldBasisStatusCols.size() != basisStatusCols.size())
+                  if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size()
+                        || _oldBasisStatusCols.size() != basisStatusCols.size())
                      _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
                }
                catch(const SPxInternalCodeException& E)
                {
                   SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                   "> while processing the result of the solve.\n");
+                                "> while processing the result of the solve.\n");
                   SPX_MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
                }
             }
@@ -5716,10 +5823,10 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
 ///@param boostedResult out
 template <class R>
 void SoPlexBase<R>::_solveRealForRationalBoosted(
-      VectorBase<BP>& primal, VectorBase<BP>& dual,
-      DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
-      DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
-      typename SPxSolverBase<BP>::Status& boostedResult, bool initialSolve)
+   VectorBase<BP>& primal, VectorBase<BP>& dual,
+   DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
+   DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
+   typename SPxSolverBase<BP>::Status& boostedResult, bool initialSolve)
 {
    assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
    assert(_isBoostedConsistent());
@@ -5772,7 +5879,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
          // do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used
          bool keepbounds = intParam(SoPlexBase<R>::RATIOTESTER) == SoPlexBase<R>::RATIOTESTER_BOUNDFLIPPING;
          Real remainingTime = _boostedSolver.getMaxTime() - _boostedSolver.time();
-         BP tol = pow(10,-(int)(BP::default_precision()*_tolPrecisionRatio));
+         BP tol = pow(10, -(int)(BP::default_precision() * _tolPrecisionRatio));
          simplificationStatus = _boostedSimplifier->simplify(_boostedSolver, remainingTime, keepbounds,
                                 _boostedSolver.random.getSeed());
       }
@@ -5802,7 +5909,8 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
       else if(simplificationStatus == SPxSimplifier<BP>::VANISHED
               || simplificationStatus == SPxSimplifier<BP>::OKAY)
       {
-         boostedResult = simplificationStatus == SPxSimplifier<BP>::VANISHED ? SPxSolverBase<BP>::OPTIMAL : _boostedSolver.status();
+         boostedResult = simplificationStatus == SPxSimplifier<BP>::VANISHED ? SPxSolverBase<BP>::OPTIMAL :
+                         _boostedSolver.status();
 
          ///@todo move to private helper methods
          // process boostedResult
@@ -5848,18 +5956,20 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
                   _tmpBasisStatusRows.reSize(_boostedSolver.nRows());
                   _tmpBasisStatusCols.reSize(_boostedSolver.nCols());
 
-                  _boostedSolver.getBasis(_tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr(), _tmpBasisStatusRows.size(),
-                                   _tmpBasisStatusCols.size());
+                  _boostedSolver.getBasis(_tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr(),
+                                          _tmpBasisStatusRows.size(),
+                                          _tmpBasisStatusCols.size());
                   _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusRows, basisStatusRows);
                   _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusCols, basisStatusCols);
                }
 
                _convertDataArrayVarStatusToBoosted(basisStatusRows, _tmpBasisStatusRows);
                _convertDataArrayVarStatusToBoosted(basisStatusCols, _tmpBasisStatusCols);
+
                try
                {
                   _boostedSimplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost,
-                                       _tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr());
+                                                 _tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr());
                }
                catch(const SPxInternalCodeException& E)
                {
@@ -5871,8 +5981,9 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
                _tmpBasisStatusRows.reSize(numRowsRational());
                _tmpBasisStatusCols.reSize(numColsRational());
 
-               _boostedSimplifier->getBasis(_tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr(), _tmpBasisStatusRows.size(),
-                                     _tmpBasisStatusCols.size());
+               _boostedSimplifier->getBasis(_tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr(),
+                                            _tmpBasisStatusRows.size(),
+                                            _tmpBasisStatusCols.size());
                _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusRows, basisStatusRows);
                _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusCols, basisStatusCols);
                _hasBasis = true;
@@ -5896,8 +6007,9 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
                _tmpBasisStatusRows.reSize(_boostedSolver.nRows());
                _tmpBasisStatusCols.reSize(_boostedSolver.nCols());
 
-               _boostedSolver.getBasis(_tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr(), _tmpBasisStatusRows.size(),
-                                     _tmpBasisStatusCols.size());
+               _boostedSolver.getBasis(_tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr(),
+                                       _tmpBasisStatusRows.size(),
+                                       _tmpBasisStatusCols.size());
                _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusRows, basisStatusRows);
                _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusCols, basisStatusCols);
                _hasBasis = true;
@@ -5933,7 +6045,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
                catch(const SPxInternalCodeException& E)
                {
                   SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                   "> while processing the result of the solve.\n");
+                                "> while processing the result of the solve.\n");
                   SPX_MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
                }
             }
@@ -5953,8 +6065,9 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
             {
                _tmpBasisStatusRows.reSize(_boostedSolver.nRows());
                _tmpBasisStatusCols.reSize(_boostedSolver.nCols());
-               _boostedSolver.getBasis(_tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr(), _tmpBasisStatusRows.size(),
-                                 _tmpBasisStatusCols.size());
+               _boostedSolver.getBasis(_tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr(),
+                                       _tmpBasisStatusRows.size(),
+                                       _tmpBasisStatusCols.size());
                _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusRows, basisStatusRows);
                _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusCols, basisStatusCols);
 
@@ -5978,7 +6091,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
                catch(const SPxInternalCodeException& E)
                {
                   SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                   "> while processing the result of the solve.\n");
+                                "> while processing the result of the solve.\n");
                   SPX_MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
                }
             }
@@ -6004,7 +6117,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
                   catch(const SPxInternalCodeException& E)
                   {
                      SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                     "> while processing the result of the solve.\n");
+                                   "> while processing the result of the solve.\n");
                      SPX_MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
                   }
                }
@@ -6022,8 +6135,9 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
             // get basis of transformed problem
             _tmpBasisStatusRows.reSize(_boostedSolver.nRows());
             _tmpBasisStatusCols.reSize(_boostedSolver.nCols());
-            _boostedSolver.getBasis(_tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr(), _tmpBasisStatusRows.size(),
-                              _tmpBasisStatusCols.size());
+            _boostedSolver.getBasis(_tmpBasisStatusRows.get_ptr(), _tmpBasisStatusCols.get_ptr(),
+                                    _tmpBasisStatusRows.size(),
+                                    _tmpBasisStatusCols.size());
             _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusRows, basisStatusRows);
             _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusCols, basisStatusCols);
             _hasBasis = true;
@@ -6039,7 +6153,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
                catch(const SPxInternalCodeException& E)
                {
                   SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                   "> while processing the result of the solve.\n");
+                                "> while processing the result of the solve.\n");
                   SPX_MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
                }
             }
@@ -6068,7 +6182,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
                catch(const SPxInternalCodeException& E)
                {
                   SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                   "> while processing the result of the solve.\n");
+                                "> while processing the result of the solve.\n");
                   SPX_MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
                }
             }

@@ -469,7 +469,8 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
       "maximum number of digits for the multiprecision type";
    lower[SoPlexBase<R>::MULTIPRECISION_LIMIT] = 50;
    upper[SoPlexBase<R>::MULTIPRECISION_LIMIT] = INT_MAX;
-   defaultValue[SoPlexBase<R>::MULTIPRECISION_LIMIT] = 300; // if precision is too high, double tolerances are rounded to zero
+   defaultValue[SoPlexBase<R>::MULTIPRECISION_LIMIT] = 300;
+   // if precision is too high, double tolerances are rounded to zero
    // 300 is very close to the greatest int k such that (double)1e-k != 0
 
    // at max, after how many simplex pivots do we store the advanced and stable basis, 1 = every iterations
@@ -687,7 +688,8 @@ SoPlexBase<R>::Settings::RealParam::RealParam()
 
    // factor by which the precision of the floating-point solver is multiplied
    name[SoPlexBase<R>::PRECISION_BOOSTING_FACTOR] = "precision_boosting_factor";
-   description[SoPlexBase<R>::PRECISION_BOOSTING_FACTOR] = "factor by which the precision of the floating-point solver is multiplied";
+   description[SoPlexBase<R>::PRECISION_BOOSTING_FACTOR] =
+      "factor by which the precision of the floating-point solver is multiplied";
    lower[SoPlexBase<R>::PRECISION_BOOSTING_FACTOR] = 1.0;
    upper[SoPlexBase<R>::PRECISION_BOOSTING_FACTOR] = 10.0;
    defaultValue[SoPlexBase<R>::PRECISION_BOOSTING_FACTOR] = 1.5;
@@ -5955,7 +5957,7 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
    case PRECISION_BOOSTING:
 #ifndef SOPLEX_WITH_MPFR
       SPX_MSG_INFO1(spxout, spxout <<
-                "Setting Parameter precision_boosting is only possible if SoPlex is build with MPFR\n");
+                    "Setting Parameter precision_boosting is only possible if SoPlex is build with MPFR\n");
       return false;
 #endif
       break;
@@ -6521,6 +6523,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       _solver.setStoreBasisFreqForBoosting(value);
       _boostedSolver.setStoreBasisFreqForBoosting(value);
       break;
+
    default:
       return false;
    }
@@ -8430,12 +8433,12 @@ void SoPlexBase<R>::_solveBoostedRealLPAndRecordStatistics(volatile bool* interr
 
    if(realParam(SoPlexBase<R>::TIMELIMIT) < realParam(SoPlexBase<R>::INFTY))
       _boostedSolver.setTerminationTime(Real(realParam(SoPlexBase<R>::TIMELIMIT)) -
-                                 _statistics->solvingTime->time());
+                                        _statistics->solvingTime->time());
    else
       _boostedSolver.setTerminationTime(Real(realParam(SoPlexBase<R>::INFTY)));
 
    // ensure that tolerances are not too small
-    R mintol = 1e4 * _solver.epsilon();
+   R mintol = 1e4 * _solver.epsilon();
 
    if(this->tolerances()->floatingPointFeastol() < mintol)
       this->tolerances()->setFloatingPointFeastol(Real(mintol));
@@ -8454,7 +8457,8 @@ void SoPlexBase<R>::_solveBoostedRealLPAndRecordStatistics(volatile bool* interr
    }
    else if((intParam(SoPlexBase<R>::REPRESENTATION) == SoPlexBase<R>::REPRESENTATION_ROW
             || (intParam(SoPlexBase<R>::REPRESENTATION) == SoPlexBase<R>::REPRESENTATION_AUTO
-                && (_boostedSolver.nCols() + 1) * realParam(SoPlexBase<R>::REPRESENTATION_SWITCH) < (_boostedSolver.nRows() + 1)))
+                && (_boostedSolver.nCols() + 1) * realParam(SoPlexBase<R>::REPRESENTATION_SWITCH) <
+                (_boostedSolver.nRows() + 1)))
            && _boostedSolver.rep() != SPxSolverBase<BP>::ROW)
    {
       _boostedSolver.setRep(SPxSolverBase<BP>::ROW);
@@ -8463,7 +8467,8 @@ void SoPlexBase<R>::_solveBoostedRealLPAndRecordStatistics(volatile bool* interr
    // set correct type
    if(((intParam(ALGORITHM) == SoPlexBase<R>::ALGORITHM_PRIMAL
          && _boostedSolver.rep() == SPxSolverBase<BP>::COLUMN)
-         || (intParam(ALGORITHM) == SoPlexBase<R>::ALGORITHM_DUAL && _boostedSolver.rep() == SPxSolverBase<BP>::ROW))
+         || (intParam(ALGORITHM) == SoPlexBase<R>::ALGORITHM_DUAL
+             && _boostedSolver.rep() == SPxSolverBase<BP>::ROW))
          && _boostedSolver.type() != SPxSolverBase<BP>::ENTER)
    {
       _boostedSolver.setType(SPxSolverBase<BP>::ENTER);

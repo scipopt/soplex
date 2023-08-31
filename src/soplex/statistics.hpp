@@ -318,7 +318,8 @@ void SoPlexBase<R>::Statistics::print(std::ostream& os)
       << "  From scratch      : " << int(boostedIterations - boostedIterationsFromBasis);
 
    if(boostedIterations > 0)
-      os << " (" << 100 * double((boostedIterations - boostedIterationsFromBasis)) / double(boostedIterations) << "%)";
+      os << " (" << 100 * double((boostedIterations - boostedIterationsFromBasis)) / double(
+            boostedIterations) << "%)";
 
    os << "\n  From basis        : " << boostedIterationsFromBasis;
 
@@ -330,10 +331,12 @@ void SoPlexBase<R>::Statistics::print(std::ostream& os)
    if(boostedIterations > 0)
       os << " (" << 100 * double(boostedIterationsPrimal) / double(boostedIterations) << "%)";
 
-   os << "\n  Dual              : " << boostedIterations - boostedIterationsPrimal - boostedIterationsPolish;
+   os << "\n  Dual              : " << boostedIterations - boostedIterationsPrimal -
+      boostedIterationsPolish;
 
    if(boostedIterations > 0)
-      os << " (" << 100 * double((boostedIterations - boostedIterationsPrimal)) / double(boostedIterations) << "%)";
+      os << " (" << 100 * double((boostedIterations - boostedIterationsPrimal)) / double(
+            boostedIterations) << "%)";
 
    os << "\n  Bound flips       : " << boostedBoundflips;
    os << "\n  Sol. polishing    : " << boostedIterationsPolish;
