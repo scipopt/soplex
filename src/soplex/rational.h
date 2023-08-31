@@ -128,7 +128,7 @@ inline int orderOfMagnitude(Rational& r)
    if(numerator(r) == 0 || (int) log10((double)numerator(r)) == log10((double)denominator(r)))
       return 0;
    else
-      return log10((double)numerator(r)) - (int) log10((double)denominator(r));
+      return (int) log10((double)numerator(r)) - (int) log10((double)denominator(r));
 }
 
 /* find substring, ignore case */

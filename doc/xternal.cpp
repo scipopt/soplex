@@ -373,7 +373,9 @@
  * Since version 1.7, SoPlex implements an \em iterative \em refinement procedure on the level of linear programs, which
  * allows for computing extended-precision solutions beyond the limits of standard floating-point arithmetic.  It may be
  * particularly helpful for numerically troublesome LPs and applications that require solutions within tight feasibility
- * tolerances.  Since version 2.1 this has been extended to compute exact rational solutions.
+ * tolerances.  Since version 2.1 this has been extended to compute exact rational solutions. Since version 7.0, SoPlex
+ * can also use \em incremental prevision boosting \em to compute exact rational solutions. By default, SoPlex uses
+ * a combination of an out iterative refinement loop, with precision boosting as a fallback incase of numerical problems.
  *
  * By default, SoPlex functions as a standard floating-point LP solver.  In order to use SoPlex as an exact LP solver,
  * you need to compile SoPlex with GMP support (default, see the \ref INSTALL "INSTALL" file) and change the following
