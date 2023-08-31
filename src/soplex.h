@@ -1042,10 +1042,10 @@ public:
       RECOVERY_MECHANISM = 29,
 
       /// store advanced and stable basis met before each simplex iteration, to better warm start
-      STORE_BASIS_BEFORE_SIMPLEX_PIVOT = 31,
+      STORE_BASIS_BEFORE_SIMPLEX_PIVOT = 30,
 
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 32
+      BOOLPARAM_COUNT = 31
    } BoolParam;
 
    /// integer parameters
