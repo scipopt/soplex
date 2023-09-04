@@ -2208,7 +2208,8 @@ void SoPlexBase<R>::_performOptIRStable(
                                maxViolation, bestViolation, violationImprovementFactor, numFailedRefinements);
 
       // perform rational reconstruction and/or factorization
-      _ratrecAndOrRatfac(minIRRoundsRemaining, lastStallRefinements, _statistics->refinements, factorSolNewBasis,
+      _ratrecAndOrRatfac(minIRRoundsRemaining, lastStallRefinements, _statistics->refinements,
+                         factorSolNewBasis,
                          nextRatrecRefinement,
                          errorCorrectionFactor, errorCorrection, maxViolation,
                          sol, primalFeasible, dualFeasible,
@@ -3183,7 +3184,8 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
                                maxViolation, bestViolation, violationImprovementFactor, numFailedRefinements);
 
       // perform rational reconstruction and/or factorization
-      _ratrecAndOrRatfac(minIRRoundsRemaining, lastStallRefinements, _statistics->refinements, factorSolNewBasis,
+      _ratrecAndOrRatfac(minIRRoundsRemaining, lastStallRefinements, _statistics->refinements,
+                         factorSolNewBasis,
                          nextRatrecRefinement,
                          errorCorrectionFactor, errorCorrection, maxViolation,
                          sol, primalFeasible, dualFeasible,
