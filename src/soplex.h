@@ -2356,7 +2356,7 @@ private:
       Rational& sideViolation,
       Rational& redCostViolation,
       Rational& dualViolation,
-      int minRounds,
+      int minIRRoundsRemaining,
       bool& stoppedTime,
       bool& stoppedIter,
       int numFailedRefinements);
@@ -2374,7 +2374,7 @@ private:
 
    /// performs rational reconstruction and/or factorizationd
    void _ratrecAndOrRatfac(
-      int& minRounds,
+      int& minIRRoundsRemaining,
       int& lastStallIterations,
       int& numberOfIterations,
       bool& factorSolNewBasis,
@@ -2545,7 +2545,7 @@ private:
       SolRational& sol,
       bool acceptUnbounded,
       bool acceptInfeasible,
-      int minRounds,
+      int minIRRoundsRemaining,
       bool& primalFeasible,
       bool& dualFeasible,
       bool& infeasible,
@@ -2560,7 +2560,7 @@ private:
       SolRational& sol,
       bool acceptUnbounded,
       bool acceptInfeasible,
-      int minRounds,
+      int minIRRoundsRemaining,
       bool& primalFeasible,
       bool& dualFeasible,
       bool& infeasible,
@@ -2585,7 +2585,7 @@ private:
    void _performOptIRStable(SolRational& sol,
                             bool acceptUnbounded,
                             bool acceptInfeasible,
-                            int minRounds,
+                            int minIRRoundsRemaining,
                             bool& primalFeasible,
                             bool& dualFeasible,
                             bool& infeasible,

@@ -542,7 +542,7 @@ void SoPlexBase<R>::_performOptIRWrapper(
    SolRational& sol,
    bool acceptUnbounded,
    bool acceptInfeasible,
-   int minRounds,
+   int minIRRoundsRemaining,
    bool& primalFeasible,
    bool& dualFeasible,
    bool& infeasible,
@@ -562,7 +562,7 @@ void SoPlexBase<R>::_performOptIRWrapper(
       // no precision boosting or initial precision -> solve with plain iterative refinement
       if(!boolParam(SoPlexBase<R>::PRECISION_BOOSTING) || !_switchedToBoosted)
       {
-         _performOptIRStable(sol, acceptUnbounded, acceptInfeasible, minRounds,
+         _performOptIRStable(sol, acceptUnbounded, acceptInfeasible, minIRRoundsRemaining,
                              primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
       }
       else
@@ -574,7 +574,7 @@ void SoPlexBase<R>::_performOptIRWrapper(
             // solve problem with iterative refinement and recovery mechanism, using multiprecision
             // return false if a new boosted iteration is needed, true otherwise
             bool needNewBoostedIt;
-            _performOptIRStableBoosted(sol, acceptUnbounded, acceptInfeasible, minRounds,
+            _performOptIRStableBoosted(sol, acceptUnbounded, acceptInfeasible, minIRRoundsRemaining,
                                        primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error,
                                        needNewBoostedIt);
 
@@ -663,7 +663,7 @@ void SoPlexBase<R>::_performOptIRWrapper(
       return;
    }
 
-   _performOptIRStable(sol, acceptUnbounded, acceptInfeasible, minRounds,
+   _performOptIRStable(sol, acceptUnbounded, acceptInfeasible, minIRRoundsRemaining,
                        primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
 #endif
 }
@@ -959,7 +959,7 @@ bool SoPlexBase<R>::_isRefinementOver(
    Rational& sideViolation,
    Rational& redCostViolation,
    Rational& dualViolation,
-   int minRounds,
+   int minIRRoundsRemaining,
    bool& stoppedTime,
    bool& stoppedIter,
    int numFailedRefinements)
@@ -970,7 +970,7 @@ bool SoPlexBase<R>::_isRefinementOver(
 
    if(primalFeasible && dualFeasible)
    {
-      if(minRounds < 0)
+      if(minIRRoundsRemaining < 0)
       {
          SPX_MSG_INFO1(spxout, spxout << "Tolerances reached.\n");
          return true;
@@ -978,7 +978,7 @@ bool SoPlexBase<R>::_isRefinementOver(
       else
       {
          SPX_MSG_INFO1(spxout, spxout <<
-                       "Tolerances reached but minRounds forcing additional refinement rounds.\n");
+                       "Tolerances reached but minIRRoundsRemaining forcing additional refinement rounds.\n");
       }
    }
 
@@ -1044,7 +1044,7 @@ void SoPlexBase<R>::_checkRefinementProgress(
 ///@param ... in & out
 template <class R>
 void SoPlexBase<R>::_ratrecAndOrRatfac(
-   int& minRounds,
+   int& minIRRoundsRemaining,
    int& lastStallIterations,
    int& numberOfIterations,
    bool& factorSolNewBasis,
@@ -1147,7 +1147,7 @@ void SoPlexBase<R>::_ratrecAndOrRatfac(
       else if(boolParam(SoPlexBase<R>::RATFACJUMP))
       {
          SPX_MSG_INFO1(spxout, spxout << "Jumping to exact basic solution.\n");
-         minRounds++;
+         minIRRoundsRemaining++;
          continueAfter = true;
          return;
       }
@@ -1928,12 +1928,12 @@ void SoPlexBase<R>::_solveRealForRationalStable(
    bool breakAfter;
    bool continueAfter;
 
-   int minRounds = 0;
+   int minIRRoundsRemaining = 0;
 
    do
    {
-      // decrement minRounds counter
-      minRounds--;
+      // decrement minIRRoundsRemaining counter
+      minIRRoundsRemaining--;
 
       SPxOut::debug(this, "Computing primal violations.\n");
 
@@ -1998,7 +1998,7 @@ void SoPlexBase<R>::_solveRealForRationalStable(
 
 
       // perform rational reconstruction and/or factorization
-      _ratrecAndOrRatfac(minRounds, _lastStallPrecBoosts, _statistics->precBoosts,
+      _ratrecAndOrRatfac(minIRRoundsRemaining, _lastStallPrecBoosts, _statistics->precBoosts,
                          _factorSolNewBasisPrecBoost, _nextRatrecPrecBoost,
                          errorCorrectionFactor, errorCorrection, maxViolation,
                          sol, primalFeasible, dualFeasible,
@@ -2048,7 +2048,7 @@ void SoPlexBase<R>::_performOptIRStable(
    SolRational& sol,
    bool acceptUnbounded,
    bool acceptInfeasible,
-   int minRounds,
+   int minIRRoundsRemaining,
    bool& primalFeasible,
    bool& dualFeasible,
    bool& infeasible,
@@ -2159,6 +2159,9 @@ void SoPlexBase<R>::_performOptIRStable(
 
    do
    {
+      // decrement minIRRoundsRemaining counter
+      minIRRoundsRemaining--;
+
       SPxOut::debug(this, "Computing primal violations.\n");
 
       // computes violation of bounds
@@ -2197,7 +2200,7 @@ void SoPlexBase<R>::_performOptIRStable(
       // check termination criteria for refinement loop
       if(_isRefinementOver(primalFeasible, dualFeasible, boundsViolation, sideViolation, redCostViolation,
                            dualViolation,
-                           minRounds, stoppedTime, stoppedIter, numFailedRefinements))
+                           minIRRoundsRemaining, stoppedTime, stoppedIter, numFailedRefinements))
          break;
 
       // check refinement progress
@@ -2205,7 +2208,7 @@ void SoPlexBase<R>::_performOptIRStable(
                                maxViolation, bestViolation, violationImprovementFactor, numFailedRefinements);
 
       // perform rational reconstruction and/or factorization
-      _ratrecAndOrRatfac(minRounds, lastStallRefinements, _statistics->refinements, factorSolNewBasis,
+      _ratrecAndOrRatfac(minIRRoundsRemaining, lastStallRefinements, _statistics->refinements, factorSolNewBasis,
                          nextRatrecRefinement,
                          errorCorrectionFactor, errorCorrection, maxViolation,
                          sol, primalFeasible, dualFeasible,
@@ -2862,7 +2865,7 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
    bool breakAfter;
    bool continueAfter;
 
-   int minRounds = 0;
+   int minIRRoundsRemaining = 0;
 
    do
    {
@@ -2928,7 +2931,7 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
 
 
       // perform rational reconstruction and/or factorization
-      _ratrecAndOrRatfac(minRounds, _lastStallPrecBoosts, _statistics->precBoosts,
+      _ratrecAndOrRatfac(minIRRoundsRemaining, _lastStallPrecBoosts, _statistics->precBoosts,
                          _factorSolNewBasisPrecBoost, _nextRatrecPrecBoost,
                          errorCorrectionFactor, errorCorrection, maxViolation,
                          sol, primalFeasible, dualFeasible,
@@ -2999,7 +3002,7 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
    SolRational& sol,
    bool acceptUnbounded,
    bool acceptInfeasible,
-   int minRounds,
+   int minIRRoundsRemaining,
    bool& primalFeasible,
    bool& dualFeasible,
    bool& infeasible,
@@ -3133,8 +3136,8 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
 
    do
    {
-      // decrement minRounds counter
-      minRounds--;
+      // decrement minIRRoundsRemaining counter
+      minIRRoundsRemaining--;
 
       SPxOut::debug(this, "Computing primal violations.\n");
 
@@ -3172,7 +3175,7 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
 
       // check termination criteria for refinement loop
       if(_isRefinementOver(primalFeasible, dualFeasible, boundsViolation, sideViolation, redCostViolation,
-                           dualViolation, minRounds, stoppedTime, stoppedIter, numFailedRefinements))
+                           dualViolation, minIRRoundsRemaining, stoppedTime, stoppedIter, numFailedRefinements))
          break;
 
       // check refinement progress
@@ -3180,7 +3183,7 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
                                maxViolation, bestViolation, violationImprovementFactor, numFailedRefinements);
 
       // perform rational reconstruction and/or factorization
-      _ratrecAndOrRatfac(minRounds, lastStallRefinements, _statistics->refinements, factorSolNewBasis,
+      _ratrecAndOrRatfac(minIRRoundsRemaining, lastStallRefinements, _statistics->refinements, factorSolNewBasis,
                          nextRatrecRefinement,
                          errorCorrectionFactor, errorCorrection, maxViolation,
                          sol, primalFeasible, dualFeasible,
