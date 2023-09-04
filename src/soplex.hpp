@@ -6090,6 +6090,10 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
 
    // type of simplifier
    case SoPlexBase<R>::SIMPLIFIER:
+#ifndef SOPLEX_WITH_MPFR
+      _boostedSimplifier = nullptr;
+#endif
+
       switch(value)
       {
       case SIMPLIFIER_OFF:
@@ -6135,10 +6139,17 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       if(_simplifier != nullptr)
          _simplifier->setTolerances(this->_tolerances);
 
+      if(_boostedSimplifier != nullptr)
+         _boostedSimplifier->setTolerances(this->_tolerances);
+
       break;
 
    // type of scaler
    case SoPlexBase<R>::SCALER:
+#ifndef SOPLEX_WITH_MPFR
+      _boostedScaler = nullptr;
+#endif
+
       switch(value)
       {
       case SCALER_OFF:
