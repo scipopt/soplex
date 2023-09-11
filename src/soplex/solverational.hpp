@@ -1418,11 +1418,11 @@ bool SoPlexBase<R>::_evaluateResult(
 
    switch(result)
    {
-   case SPxSolverBase<R>::OPTIMAL:
+   case SPxSolverBase<T>::OPTIMAL:
       SPX_MSG_INFO1(spxout, spxout << "Floating-point optimal.\n");
       return false;
 
-   case SPxSolverBase<R>::INFEASIBLE:
+   case SPxSolverBase<T>::INFEASIBLE:
       SPX_MSG_INFO1(spxout, spxout << "Floating-point infeasible.\n");
 
       // when not using refined LP
@@ -1442,7 +1442,7 @@ bool SoPlexBase<R>::_evaluateResult(
       infeasible = true;
       return true;
 
-   case SPxSolverBase<R>::UNBOUNDED:
+   case SPxSolverBase<T>::UNBOUNDED:
       SPX_MSG_INFO1(spxout, spxout << "Floating-point unbounded.\n");
 
       if(usingRefinedLP)
@@ -1451,11 +1451,11 @@ bool SoPlexBase<R>::_evaluateResult(
       unbounded = true;
       return true;
 
-   case SPxSolverBase<R>::ABORT_TIME:
+   case SPxSolverBase<T>::ABORT_TIME:
       stoppedTime = true;
       return true;
 
-   case SPxSolverBase<R>::ABORT_ITER:
+   case SPxSolverBase<T>::ABORT_ITER:
       if(usingRefinedLP)
          solver.clearRowObjs();
 
