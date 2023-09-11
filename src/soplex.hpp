@@ -1551,6 +1551,17 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
       _boostedScalerGeoequi.setTolerances(_tolerances);
       _boostedScalerLeastsq.setTolerances(_tolerances);
 
+      // set tolerances for ratio testers
+      _ratiotesterBoundFlipping.setTolerances(_tolerances);
+      _ratiotesterFast.setTolerances(_tolerances);
+      _ratiotesterHarris.setTolerances(_tolerances);
+      _ratiotesterTextbook.setTolerances(_tolerances);
+
+      _boostedRatiotesterBoundFlipping.setTolerances(_tolerances);
+      _boostedRatiotesterFast.setTolerances(_tolerances);
+      _boostedRatiotesterHarris.setTolerances(_tolerances);
+      _boostedRatiotesterTextbook.setTolerances(_tolerances);
+
       // set tolerances for slufactor
       _slufactor.setTolerances(_tolerances);
       _boostedSlufactor.setTolerances(_tolerances);
@@ -1598,6 +1609,10 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
          _rationalLP = 0;
          spx_alloc(_rationalLP);
          _rationalLP = new(_rationalLP) SPxLPRational(*rhs._rationalLP);
+         _rowTypes = rhs._rowTypes;
+         _colTypes = rhs._colTypes;
+         _rationalPosInfty = rhs._rationalPosInfty;
+         _rationalNegInfty = rhs._rationalNegInfty;
          _rationalLP->setTolerances(rhs._rationalLP->tolerances());
 
       }
@@ -9281,6 +9296,17 @@ SoPlexBase<R>::SoPlexBase()
    _boostedScalerGeo8.setTolerances(_tolerances);
    _boostedScalerGeoequi.setTolerances(_tolerances);
    _boostedScalerLeastsq.setTolerances(_tolerances);
+
+   // set tolerances for ratio testers
+   _ratiotesterBoundFlipping.setTolerances(_tolerances);
+   _ratiotesterFast.setTolerances(_tolerances);
+   _ratiotesterHarris.setTolerances(_tolerances);
+   _ratiotesterTextbook.setTolerances(_tolerances);
+
+   _boostedRatiotesterBoundFlipping.setTolerances(_tolerances);
+   _boostedRatiotesterFast.setTolerances(_tolerances);
+   _boostedRatiotesterHarris.setTolerances(_tolerances);
+   _boostedRatiotesterTextbook.setTolerances(_tolerances);
 
    // set tolerances for slufactor
    _slufactor.setTolerances(_tolerances);
