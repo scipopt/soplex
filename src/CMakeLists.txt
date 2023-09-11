@@ -195,6 +195,11 @@ set_target_properties(libsoplexshared PROPERTIES CXX_VISIBILITY_PRESET default)
 add_executable(soplex soplexmain.cpp)
 target_link_libraries(soplex LINK_PUBLIC libsoplex ${Boost_LIBRARIES})
 
+if(EMSCRIPTEN AND EMSCRIPTEN_HTML)
+    set_target_properties(soplex PROPERTIES LINK_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/soplex_webdemo_shell.html)
+    set(CMAKE_EXECUTABLE_SUFFIX ".html")
+endif()
+
 if(CMAKE_BUILD_TYPE EQUAL "Debug")
    find_package(Sanitizers)
    add_sanitizers(soplex)
