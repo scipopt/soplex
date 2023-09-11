@@ -427,9 +427,8 @@ inline SLUFactorRational::Status SLUFactorRational::change(
    return status();
 }
 
-inline void SLUFactorRational::clear()
+inline void SLUFactorRational::init()
 {
-
    rowMemMult    = 5;          /* factor of minimum Memory * #of nonzeros */
    colMemMult    = 5;          /* factor of minimum Memory * #of nonzeros */
    lMemMult      = 1;          /* factor of minimum Memory * #of nonzeros */
@@ -482,8 +481,8 @@ inline void SLUFactorRational::clear()
    if(l.row)
       spx_free(l.row);
 
-   // G clear() is used in constructor of SLUFactorRational so we have to
-   // G clean up if anything goes wrong here
+   // init() is used in constructor of SLUFactorRational so we have to
+   // clean up if anything goes wrong here
    try
    {
       u.row.val.reDim(100);
@@ -500,6 +499,12 @@ inline void SLUFactorRational::clear()
       freeAll();
       throw x;
    }
+}
+
+inline void SLUFactorRational::clear()
+{
+   if(stat != UNLOADED)
+      init();
 }
 
 /** assignment used to implement operator=() and copy constructor.
