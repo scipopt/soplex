@@ -1487,6 +1487,13 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
       _scalerGeo8.setTolerances(_tolerances);
       _scalerGeoequi.setTolerances(_tolerances);
       _scalerLeastsq.setTolerances(_tolerances);
+
+      // set tolerances for ratio testers
+      _ratiotesterBoundFlipping.setTolerances(_tolerances);
+      _ratiotesterFast.setTolerances(_tolerances);
+      _ratiotesterHarris.setTolerances(_tolerances);
+      _ratiotesterTextbook.setTolerances(_tolerances);
+
       // set tolerances for slufactor
       _slufactor.setTolerances(_tolerances);
 
@@ -1533,6 +1540,10 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
          _rationalLP = 0;
          spx_alloc(_rationalLP);
          _rationalLP = new(_rationalLP) SPxLPRational(*rhs._rationalLP);
+         _rowTypes = rhs._rowTypes;
+         _colTypes = rhs._colTypes;
+         _rationalPosInfty = rhs._rationalPosInfty;
+         _rationalNegInfty = rhs._rationalNegInfty;
          _rationalLP->setTolerances(rhs._rationalLP->tolerances());
 
       }
@@ -8856,6 +8867,11 @@ SoPlexBase<R>::SoPlexBase()
    _scalerGeo8.setTolerances(_tolerances);
    _scalerGeoequi.setTolerances(_tolerances);
    _scalerLeastsq.setTolerances(_tolerances);
+   // set tolerances for ratio testers
+   _ratiotesterBoundFlipping.setTolerances(_tolerances);
+   _ratiotesterFast.setTolerances(_tolerances);
+   _ratiotesterHarris.setTolerances(_tolerances);
+   _ratiotesterTextbook.setTolerances(_tolerances);
    // set tolerances for slufactor
    _slufactor.setTolerances(_tolerances);
    // transfer message handler
