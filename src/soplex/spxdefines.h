@@ -73,6 +73,7 @@
 #endif // NDEBUG
 #endif // SOPLEX_WITH_MPFR
 #ifdef SOPLEX_WITH_CPPMPF
+#include <boost/serialization/nvp.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #endif  // SOPLEX_WITH_CPPMPF
 
