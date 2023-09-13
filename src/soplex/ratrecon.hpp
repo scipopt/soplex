@@ -225,7 +225,7 @@ inline bool reconstructVector(VectorRational& input, const Rational& denomBoundS
       }
    }
 
-   SPxOut::debug(&input, "LCM = {}\n", denom.str());
+   SPxOut::debug(&input, "LCM = {}\n", denom);
 
    /* reconstruct */
    rval = Reconstruct(input, xnum.data(), denom, dim, denomBoundSquared, indexSet);
