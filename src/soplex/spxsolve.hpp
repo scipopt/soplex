@@ -142,9 +142,8 @@ void SPxSolverBase<R>::calculateProblemRanges()
 }
 
 template <class R>
-typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interrupt)
+typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interrupt, bool polish)
 {
-
    SPxId enterId;
    int   leaveNum;
    int   loopCount = 0;
@@ -1214,20 +1213,28 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                  : leaveCount;
 
    printDisplayLine(true);
-   performSolutionPolishing();
+
+   if(polish)
+   {
+      bool resolve;
+      resolve = performSolutionPolishing();
+
+      if(resolve)
+         solve(interrupt, false);
+   }
 
    return status();
 }
 
 template <class R>
-void SPxSolverBase<R>::performSolutionPolishing()
+bool SPxSolverBase<R>::performSolutionPolishing()
 {
    // catch rare case that the iteration limit is exactly reached at optimality
    bool stop = (maxIters >= 0 && iterations() >= maxIters && !isTimeLimitReached());
 
    // only polish an already optimal basis
    if(stop || polishObj == POLISH_OFF || status() != OPTIMAL)
-      return;
+      return false;
 
    int nSuccessfulPivots;
    const typename SPxBasisBase<R>::Desc& ds = this->desc();
@@ -1237,18 +1244,17 @@ void SPxSolverBase<R>::performSolutionPolishing()
    SPxId polishId;
    bool success = false;
 
+   R alloweddeviation;
+   R origval = value();
+
    SPX_MSG_INFO2((*this->spxout), (*this->spxout) << " --- perform solution polishing" << std::endl;)
 
    if(rep() == COLUMN)
    {
       setType(ENTER); // use primal simplex to preserve feasibility
       init();
-#ifndef NDEBUG
-      // allow a small relative deviation from the original values
-      R alloweddeviation = entertol();
-      R origval = value();
-      R origshift = shift();
-#endif
+      alloweddeviation = entertol();
+
       instableEnter = false;
       theratiotester->setType(type());
 
@@ -1300,10 +1306,6 @@ void SPxSolverBase<R>::performSolutionPolishing()
                SPxOut::debug(this, "try pivoting: {} stat: {}\n", polishId, rowstatus[slackcandidates.index(i)]);
                success = enter(polishId, true);
                clearUpdateVecs();
-#ifndef NDEBUG
-               assert(EQrel(value(), origval, alloweddeviation));
-               assert(LErel(shift(), origshift, alloweddeviation));
-#endif
 
                if(success)
                {
@@ -1379,10 +1381,6 @@ void SPxSolverBase<R>::performSolutionPolishing()
                SPxOut::debug(this, "try pivoting: {} stat: {}\n", polishId, colstatus[candidates.index(i)]);
                success = enter(polishId, true);
                clearUpdateVecs();
-#ifndef NDEBUG
-               assert(EQrel(value(), origval, alloweddeviation));
-               assert(LErel(shift(), origshift, alloweddeviation));
-#endif
 
                if(success)
                {
@@ -1412,12 +1410,7 @@ void SPxSolverBase<R>::performSolutionPolishing()
    {
       setType(LEAVE); // use primal simplex to preserve feasibility
       init();
-#ifndef NDEBUG
-      // allow a small relative deviation from the original values
-      R alloweddeviation = leavetol();
-      R origval = value();
-      R origshift = shift();
-#endif
+      alloweddeviation = leavetol();
       instableLeave = false;
       theratiotester->setType(type());
       bool useIntegrality = false;
@@ -1464,10 +1457,6 @@ void SPxSolverBase<R>::performSolutionPolishing()
                SPxOut::debug(this, "try pivoting: {}", this->baseId(basiccandidates.index(i)));
                success = leave(basiccandidates.index(i), true);
                clearUpdateVecs();
-#ifndef NDEBUG
-               assert(EQrel(value(), origval, alloweddeviation));
-               assert(LErel(shift(), origshift, alloweddeviation));
-#endif
 
                if(success)
                {
@@ -1528,10 +1517,6 @@ void SPxSolverBase<R>::performSolutionPolishing()
                SPxOut::debug(this, "try pivoting: {}", this->baseId(basiccandidates.index(i)));
                success = leave(basiccandidates.index(i), true);
                clearUpdateVecs();
-#ifndef NDEBUG
-               assert(EQrel(value(), origval, alloweddeviation));
-               assert(LErel(shift(), origshift, alloweddeviation));
-#endif
 
                if(success)
                {
@@ -1562,6 +1547,12 @@ void SPxSolverBase<R>::performSolutionPolishing()
                  (*this->spxout) << " --- finished solution polishing (" << polishCount << " pivots)" << std::endl;)
 
    this->setStatus(SPxBasisBase<R>::OPTIMAL);
+
+   // if the value() changed significantly (due to numerics) reoptimize after polishing
+   if(!EQrel(value(), origval, alloweddeviation))
+      return true;
+   else
+      return false;
 }
 
 

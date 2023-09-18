@@ -680,19 +680,22 @@ public:
    /** Solves the loaded LP by processing the Simplex iteration until
     *  the termination criteria is fullfilled (see #terminate()).
     *  The SPxStatus of the solver will indicate the reason for termination.
+    *  @param interrupt can be set externally to interrupt the solve
+    *  @param polish should solution polishing be considered
     *
     *  @throw SPxStatusException if either no problem, solver, pricer
     *  or ratiotester loaded or if solve is still running when it shouldn't be
     */
-   virtual Status solve(volatile bool* interrupt = NULL);
+   virtual Status solve(volatile bool* interrupt = NULL, bool polish = true);
 
    /** Identify primal basic variables that have zero reduced costs and
     * try to pivot them out of the basis to make them tight.
     * This is supposed to decrease the number of fractional variables
     * when solving LP relaxations of (mixed) integer programs.
     * The objective must not be modified during this procedure.
+    * @return true, if objective was modified (due to numerics) and resolving is necessary
     */
-   void performSolutionPolishing();
+   bool performSolutionPolishing();
 
    /// set objective of solution polishing (0: off, 1: max_basic_slack, 2: min_basic_slack)
    void setSolutionPolishing(SolutionPolish _polishObj)

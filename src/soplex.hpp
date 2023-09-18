@@ -1303,7 +1303,7 @@ bool SoPlexBase<R>::getRowViolation(R& maxviol, R& sumviol)
 template <class R>
 bool SoPlexBase<R>::getDualViolation(R& maxviol, R& sumviol)
 {
-   if(!isDualFeasible() || !hasBasis())
+   if(!hasBasis())
       return false;
 
    _syncRealSolution();
@@ -1362,7 +1362,7 @@ bool SoPlexBase<R>::getDualViolation(R& maxviol, R& sumviol)
 template <class R>
 bool SoPlexBase<R>::getRedCostViolation(R& maxviol, R& sumviol)
 {
-   if(!isDualFeasible() || !hasBasis())
+   if(!hasBasis())
       return false;
 
    _syncRealSolution();
