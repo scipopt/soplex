@@ -109,6 +109,8 @@ protected:
    void freeAll();
    ///
    void changeEta(int idx, SSVectorRational& eta);
+   ///
+   void init();
    ///@}
 
 
@@ -380,7 +382,7 @@ public:
       l.rorig = 0;
       l.rperm = 0;
 
-      SLUFactorRational::clear(); // clear() is virtual
+      SLUFactorRational::init();
 
       factorCount = 0;
       timeLimit = -1.0;
