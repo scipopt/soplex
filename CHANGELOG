@@ -1,4 +1,4 @@
-Upcoming Bugfix Release 6.0.4
+Upcoming Bugfix Release 6.0.5
 =============================
 
 features:
@@ -9,13 +9,16 @@ performance:
 interface & parameters:
 
 fixed bugs:
-- reoptimize without preprocessing and scaling if SoPlex terminates with ABORT_VALUE, 
+- reoptimize without preprocessing and scaling if SoPlex terminates with ABORT_VALUE,
   but objective value does not exceed the limit for the original problem
 - make sure fast presolvers are finished before starting dual presolving
-- fix numerical issues in solution polishing by reoptimizing afterwards, 
+- fix numerical issues in solution polishing by reoptimizing afterwards,
   if polishing affected the objective value
 
 miscellaneous:
+
+August Bugfix Release 6.0.4
+=============================
 
 December 2022 Release 6.0.3
 =============================
