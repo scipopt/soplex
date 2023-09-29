@@ -8,6 +8,7 @@ features:
   same for multiple options the different solutions are appended to the same file
 
 interface & parameters:
+- allow reading of files with arbitrarily long lines by reallocating buffers dynamically
 
 performance:
 

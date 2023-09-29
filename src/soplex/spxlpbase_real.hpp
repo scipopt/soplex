@@ -830,9 +830,6 @@ bool SPxLPBase<R>::readLPF(
    int colidx;
    int sense = 0;
 
-   char buf[SOPLEX_LPF_MAX_LINE_LEN];
-   char tmp[SOPLEX_LPF_MAX_LINE_LEN];
-   char line[SOPLEX_LPF_MAX_LINE_LEN];
    int lineno = 0;
    bool unnamed = true;
    bool finished = false;
@@ -840,6 +837,11 @@ bool SPxLPBase<R>::readLPF(
    bool have_value = true;
    int i;
    int k;
+   int buf_size;
+   int buf_pos;
+   char* buf;
+   char* tmp;
+   char* line;
    char* s;
    char* pos;
    char* pos_old = 0;
@@ -884,23 +886,47 @@ bool SPxLPBase<R>::readLPF(
    //--------------------------------------------------------------------------
    //--- Main Loop
    //--------------------------------------------------------------------------
+   buf_size = SOPLEX_LPF_MAX_LINE_LEN;
+   spx_alloc(buf, buf_size);
+   spx_alloc(tmp, buf_size);
+   spx_alloc(line, buf_size);
+   buf[0] = '\0';
+
    for(;;)
    {
       // 0. Read a line from the file.
-      if(!p_input.getline(buf, sizeof(buf)))
+      buf_pos = 0;
+
+      while(!p_input.getline(buf + buf_pos, buf_size - buf_pos))
       {
-         if(strlen(buf) == SOPLEX_LPF_MAX_LINE_LEN - 1)
+         p_input.clear();
+
+         if(strlen(buf) == (size_t) buf_size - 1)
          {
-            SPX_MSG_ERROR(std::cerr << "ELPFRD06 Line exceeds " << SOPLEX_LPF_MAX_LINE_LEN - 2
-                          << " characters" << std::endl;)
+            buf_pos = buf_size - 1;
+            buf_size = buf_size + SOPLEX_LPF_MAX_LINE_LEN;
+
+            if(buf_size >= INT_MAX)
+            {
+               SPX_MSG_ERROR(std::cerr << "ELPFRD16 Line longer than INT_MAX" << std::endl;)
+               finished = true;
+               break;
+            }
+
+            spx_realloc(buf, buf_size);
          }
          else
          {
             SPX_MSG_ERROR(std::cerr << "ELPFRD07 No 'End' marker found" << std::endl;)
             finished = true;
+            break;
          }
+      }
 
-         break;
+      if((size_t) buf_size > sizeof(tmp))
+      {
+         spx_realloc(tmp, buf_size);
+         spx_realloc(line, buf_size);
       }
 
       lineno++;
