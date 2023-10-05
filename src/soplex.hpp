@@ -1529,10 +1529,16 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
          _realLP = &_solver;
 
       // copy rational LP
-      if(rhs._rationalLP == 0)
+      if(rhs._rationalLP == nullptr)
       {
-         assert(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL);
-         _rationalLP = 0;
+         if(_rationalLP != nullptr)
+         {
+            clearLPRational();
+            _rationalLP->~SPxLPRational();
+            spx_free(_rationalLP);
+         }
+
+         _rationalLP = nullptr;
       }
       else
       {
@@ -1545,12 +1551,9 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
          _rationalPosInfty = rhs._rationalPosInfty;
          _rationalNegInfty = rhs._rationalNegInfty;
          _rationalLP->setTolerances(rhs._rationalLP->tolerances());
-
-      }
-
-      // copy rational factorization
-      if(rhs._rationalLUSolver.status() == SLinSolverRational::OK)
          _rationalLUSolver = rhs._rationalLUSolver;
+         _rationalLUSolverBind = rhs._rationalLUSolverBind;
+      }
 
       // copy boolean flags
       _isRealLPLoaded = rhs._isRealLPLoaded;
@@ -3664,9 +3667,6 @@ template <class R>
 void SoPlexBase<R>::clearLPRational()
 {
    assert(_rationalLP != 0);
-
-   if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
-      return;
 
    _rationalLP->clear();
    _rationalLUSolver.clear();
