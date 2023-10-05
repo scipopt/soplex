@@ -2680,7 +2680,7 @@ inline void CLUFactorRational::setupRowVals()
    if(l.rperm)
       spx_free(l.rperm);
 
-   l.rval.reDim(mem);
+   l.rval.reDim(mem + 1);
 
    spx_alloc(l.ridx, mem);
 

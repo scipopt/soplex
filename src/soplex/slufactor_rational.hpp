@@ -530,7 +530,8 @@ inline void SLUFactorRational::assign(const SLUFactorRational& old)
    colMemMult    = old.colMemMult;
    lMemMult      = old.lMemMult;
    factorCount   = old.factorCount;
-   factorTime    = old.factorTime;
+   factorTime    = TimerFactory::createTimer(old.factorTime->type());
+   solveTime     = TimerFactory::createTimer(old.solveTime->type());
    timeLimit     = old.timeLimit;
 
    spx_alloc(row.perm, thedim);
@@ -550,6 +551,7 @@ inline void SLUFactorRational::assign(const SLUFactorRational& old)
     */
    thediminc = (unsigned int)(thedim + 1);
    u.row.used = old.u.row.used;
+   u.row.val = old.u.row.val;
 
    spx_alloc(u.row.elem,  thedim);
    spx_alloc(u.row.idx,   u.row.val.dim());
@@ -558,7 +560,6 @@ inline void SLUFactorRational::assign(const SLUFactorRational& old)
    spx_alloc(u.row.max, thediminc);
 
    memcpy(u.row.elem,  old.u.row.elem, (unsigned int)thedim       * sizeof(*u.row.elem));
-   u.row.val = old.u.row.val;
    memcpy(u.row.idx,   old.u.row.idx, (unsigned int)u.row.val.dim()   * sizeof(*u.row.idx));
    memcpy(u.row.start, old.u.row.start, thediminc * sizeof(*u.row.start));
    memcpy(u.row.len,   old.u.row.len, thediminc * sizeof(*u.row.len));
@@ -636,7 +637,7 @@ inline void SLUFactorRational::assign(const SLUFactorRational& old)
    memcpy(l.start, old.l.start, (unsigned int)l.startSize * sizeof(*l.start));
    memcpy(l.row,   old.l.row, (unsigned int)l.startSize * sizeof(*l.row));
 
-   if(l.rval.dim() != 0)
+   if(old.l.rval.dim() != 0)
    {
       assert(old.l.ridx  != 0);
       assert(old.l.rbeg  != 0);
