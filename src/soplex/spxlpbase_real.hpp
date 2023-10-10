@@ -839,9 +839,9 @@ bool SPxLPBase<R>::readLPF(
    int k;
    int buf_size;
    int buf_pos;
-   char* buf;
-   char* tmp;
-   char* line;
+   char* buf = NULL;
+   char* tmp = NULL;
+   char* line = NULL;
    char* s;
    char* pos;
    char* pos_old = 0;
