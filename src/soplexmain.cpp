@@ -825,7 +825,8 @@ int runSoPlex(int argc, char* argv[])
          // option string must start with '-', must contain at least two characters, and exactly two characters if and
          // only if it is -x, -y, -q, or -c
          if(option[0] != '-' || option[1] == '\0'
-               || ((option[2] == '\0') != (option[1] == 'q' || option[1] == 'c')))
+               || ((option[2] == '\0') != (option[1] == 'x' || option[1] == 'X' || option[1] == 'y'
+                                           || option[1] == 'Y' || option[1] == 'q' || option[1] == 'c')))
          {
             printUsage(argv, optidx);
             returnValue = 1;
@@ -1470,7 +1471,8 @@ int main(int argc, char* argv[])
       // option string must start with '-', must contain at least two characters, and exactly two characters if and
       // only if it is -q, or -c
       if(option[0] != '-' || option[1] == '\0'
-            || ((option[2] == '\0') != (option[1] == 'q' || option[1] == 'c')))
+            || ((option[2] == '\0') != (option[1] == 'x' || option[1] == 'X' || option[1] == 'y'
+                                        || option[1] == 'Y' || option[1] == 'q' || option[1] == 'c')))
       {
          printUsage(argv, optidx);
          return 1;
