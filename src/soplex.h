@@ -856,6 +856,15 @@ public:
    /// number of iterations since last call to solve
    int numIterations() const;
 
+   /// number of precision boosts since last call to solve
+   int numPrecisionBoosts() const;
+
+   /// number of iterations in higher precision since last call to solve
+   int numIterationsBoosted() const;
+
+   /// time spen in higher precision since last call to solve
+   Real precisionBoostTime() const;
+
    /// time spent in last call to solve
    Real solveTime() const;
 
@@ -1017,8 +1026,26 @@ public:
       // enable presolver DominatedCols in PaPILO?
       SIMPLIFIER_DOMINATEDCOLS = 24,
 
+      // enable iterative refinement ?
+      ITERATIVE_REFINEMENT = 25,
+
+      /// adapt tolerances to the multiprecision used
+      ADAPT_TOLS_TO_MULTIPRECISION = 26,
+
+      /// enable precision boosting ?
+      PRECISION_BOOSTING = 27,
+
+      /// boosted solver start from last basis
+      BOOSTED_WARM_START = 28,
+
+      /// try different settings when solve fails
+      RECOVERY_MECHANISM = 29,
+
+      /// store advanced and stable basis met before each simplex iteration, to better warm start
+      STORE_BASIS_BEFORE_SIMPLEX_PIVOT = 30,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 25
+      BOOLPARAM_COUNT = 31
    } BoolParam;
 
    /// integer parameters
@@ -1114,8 +1141,15 @@ public:
       /// type of timer for statistics
       STATTIMER = 29,
 
+      // maximum number of digits for the multiprecision type
+      MULTIPRECISION_LIMIT = 30,
+
+      ///@todo precision-boosting find better parameter name
+      /// after how many simplex pivots do we store the advanced and stable basis, 1 = every iterations
+      STORE_BASIS_SIMPLEX_FREQ = 31,
+
       /// number of integer parameters
-      INTPARAM_COUNT = 30
+      INTPARAM_COUNT = 32
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -1447,8 +1481,11 @@ public:
       /// minimal modification threshold to apply presolve reductions
       SIMPLIFIER_MODIFYROWFAC = 25,
 
+      /// factor by which the precision of the floating-point solver is multiplied
+      PRECISION_BOOSTING_FACTOR = 26,
+
       /// number of real parameters
-      REALPARAM_COUNT = 26
+      REALPARAM_COUNT = 27
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
@@ -1717,6 +1754,88 @@ private:
    SPxScaler<R>* _scaler;
    SPxStarter<R>* _starter;
 
+#ifdef SOPLEX_WITH_BOOST
+#ifdef SOPLEX_WITH_MPFR
+   //----------------------------- BOOSTED SOLVER -----------------------------
+   // multiprecision type used for the boosted solver
+   using BP = number<mpfr_float_backend<0>, et_off>;
+#else
+#ifdef SOPLEX_WITH_GMP
+   using BP = number<gmp_float<50>, et_off>;
+#else
+   using BP = number<cpp_dec_float<50>, et_off>;
+#endif
+#endif
+#else
+   using BP = double;
+#endif
+
+   // boosted solver object
+   SPxSolverBase<BP> _boostedSolver;
+
+   // ------------- Main attributes for precision boosting
+
+   int _initialPrecision   = 50; // initial number of digits for multiprecision
+   bool _boostingLimitReached; // true if BP::default_precision() > max authorized number of digits
+   bool _switchedToBoosted; // true if _boostedSolver is used instead of _solver to cope with the numerical failure of _solver
+   // this attribute remembers wether we are testing feasibility (1), unboundedness (2) or neither (0)
+   // it is used when storing/loading the right basis in precision boosting.
+   // example: if _certificateMode == 1, it is the basis for the feasibility LP that should be stored/loaded.
+   int _certificateMode;
+
+   // ------------- Buffers for statistics of precision boosting
+
+   // ideally these four attributes would be local variables, however the precision boosting loop
+   // wraps the solve in a way that it is complicated to declare these variables locally.
+   int _lastStallPrecBoosts; // number of previous stalling precision boosts
+   bool _factorSolNewBasisPrecBoost; // false if the current basis has already been factorized (no new iterations have been done)
+   int _nextRatrecPrecBoost; // the iteration during or after which rational reconstruction can be performed
+   // buffer storing the number of iterations before a given precision boost
+   // used to detect stalling (_prevIterations < _statistics->iterations)
+   int _prevIterations;
+
+   // ------------- Tolerances Ratios
+
+   /// ratios for computing the tolerances for precision boosting
+   /// ratio denotes the proportion of precision used by the tolerance
+   /// e.g. ratio = 0.65, precision = 100 digits, new tol = 10^(0.65*100)
+   Real _tolPrecisionRatio = 0.65;
+   Real _epsZeroPrecisionRatio = 1.0;
+   Real _epsFactorPrecisionRatio = 1.25;
+   Real _epsUpdatePrecisionRatio = 1.0;
+   Real _epsPivotPrecisionRatio = 0.625;
+
+   // ------------- [Boosted] SLUFactor, Pricers, RatioTesters, Scalers, Simplifiers
+
+   SLUFactor<BP> _boostedSlufactor;
+
+   SPxAutoPR<BP> _boostedPricerAuto;
+   SPxDantzigPR<BP> _boostedPricerDantzig;
+   SPxParMultPR<BP> _boostedPricerParMult;
+   SPxDevexPR<BP> _boostedPricerDevex;
+   SPxSteepPR<BP> _boostedPricerQuickSteep;
+   SPxSteepExPR<BP> _boostedPricerSteep;
+
+   SPxDefaultRT<BP> _boostedRatiotesterTextbook;
+   SPxHarrisRT<BP> _boostedRatiotesterHarris;
+   SPxFastRT<BP> _boostedRatiotesterFast;
+   SPxBoundFlippingRT<BP> _boostedRatiotesterBoundFlipping;
+
+   SPxScaler<BP>* _boostedScaler;
+   SPxSimplifier<BP>* _boostedSimplifier;
+
+   SPxEquiliSC<BP> _boostedScalerUniequi;
+   SPxEquiliSC<BP> _boostedScalerBiequi;
+   SPxGeometSC<BP> _boostedScalerGeo1;
+   SPxGeometSC<BP> _boostedScalerGeo8;
+   SPxGeometSC<BP> _boostedScalerGeoequi;
+   SPxLeastSqSC<BP> _boostedScalerLeastsq;
+
+   SPxMainSM<BP> _boostedSimplifierMainSM;
+   Presol<BP> _boostedSimplifierPaPILO;
+
+   //--------------------------------------------------------------------------
+
    bool _isRealLPLoaded; // true indicates that the original LP is loaded in the _solver variable, hence all actions
    // are performed on the original LP.
    bool _isRealLPScaled;
@@ -1951,6 +2070,35 @@ private:
    DataArray<typename SPxSolverBase<R>::VarStatus > _basisStatusRows;
    DataArray<typename  SPxSolverBase<R>::VarStatus > _basisStatusCols;
 
+   // indicates wether an old basis is currently stored for warm start
+   bool _hasOldBasis;
+   bool _hasOldFeasBasis; // basis for testing feasibility
+   bool _hasOldUnbdBasis; // basis for testing unboundedness
+
+   // these vectors store the last basis met in precision boosting when not testing feasibility or unboundedness.
+   DataArray<typename SPxSolverBase<R>::VarStatus > _oldBasisStatusRows;
+   DataArray<typename  SPxSolverBase<R>::VarStatus > _oldBasisStatusCols;
+
+   // these vectors store the last basis met when testing feasibility in precision boosting.
+   DataArray<typename SPxSolverBase<R>::VarStatus > _oldFeasBasisStatusRows;
+   DataArray<typename  SPxSolverBase<R>::VarStatus > _oldFeasBasisStatusCols;
+
+   // these vectors store the last basis met when testing unboundedness in precision boosting.
+   DataArray<typename SPxSolverBase<R>::VarStatus > _oldUnbdBasisStatusRows;
+   DataArray<typename  SPxSolverBase<R>::VarStatus > _oldUnbdBasisStatusCols;
+
+   // these vectors don't replace _basisStatusRows and _basisStatusCols
+   // they aim to overcome the issue of having the enum VarStatus inside SPxSolverBase.
+   // When calling setBasis or getBasis (from SPxSolverBase class), a specific conversion is needed.
+   // Function: SPxSolverBase<BP>::setBasis(...)
+   // Usage: copy _basisStatusRows(Cols) to _tmpBasisStatusRows(Cols) before calling
+   // mysolver.setBasis(_tmpBasisStatusRows, _tmpBasisStatusCols)
+   // Function: SPxSolverBase<BP>::getBasis(...)
+   // Usage: copy _tmpBasisStatusRows(Cols) to _basisStatusRows(Cols) after calling
+   // mysolver.getBasis(_tmpBasisStatusRows, _tmpBasisStatusCols, _basisStatusRows.size(), _basisStatusCols.size())
+   DataArray<typename SPxSolverBase<BP>::VarStatus > _tmpBasisStatusRows;
+   DataArray<typename  SPxSolverBase<BP>::VarStatus > _tmpBasisStatusCols;
+
    SolBase<R> _solReal;
    SolRational _solRational;
    SolRational _workSol;
@@ -1984,6 +2132,9 @@ private:
 
    /// creates a permutation for removing rows/columns from a range of indices
    void _rangeToPerm(int start, int end, int* perm, int permSize) const;
+
+   /// checks consistency for the boosted solver
+   bool _isBoostedConsistent() const;
 
    /// checks consistency
    bool _isConsistent() const;
@@ -2123,6 +2274,9 @@ private:
    void _ensureRealLPLoaded();
 
    /// call floating-point solver and update statistics on iterations etc.
+   void _solveBoostedRealLPAndRecordStatistics(volatile bool* interrupt = NULL);
+
+   /// call floating-point solver and update statistics on iterations etc.
    void _solveRealLPAndRecordStatistics(volatile bool* interrupt = NULL);
 
    /// reads real LP in LP or MPS format from file and returns true on success; gets row names, column names, and
@@ -2169,10 +2323,11 @@ private:
    ///@{
 
    /// stores floating-point solution of original LP as current rational solution and ensure that solution vectors have right dimension; ensure that solution is aligned with basis
+   template <typename T>
    void _storeRealSolutionAsRational(
       SolRational& sol,
-      VectorBase<R>& primalReal,
-      VectorBase<R>& dualReal,
+      VectorBase<T>& primalReal,
+      VectorBase<T>& dualReal,
       int& dualSize);
 
    /// computes violation of bounds during the refinement loop
@@ -2201,7 +2356,7 @@ private:
       Rational& sideViolation,
       Rational& redCostViolation,
       Rational& dualViolation,
-      int minRounds,
+      int minIRRoundsRemaining,
       bool& stoppedTime,
       bool& stoppedIter,
       int numFailedRefinements);
@@ -2219,10 +2374,11 @@ private:
 
    /// performs rational reconstruction and/or factorizationd
    void _ratrecAndOrRatfac(
-      int& minRounds,
-      int lastStallRefinements,
+      int& minIRRoundsRemaining,
+      int& lastStallIterations,
+      int& numberOfIterations,
       bool& factorSolNewBasis,
-      int& nextRatrecRefinement,
+      int& nextRatrec,
       const Rational& errorCorrectionFactor,
       Rational& errorCorrection,
       Rational& maxViolation,
@@ -2259,20 +2415,25 @@ private:
       Rational& dualViolation);
 
    /// applies scaled bounds
-   void _applyScaledBounds(Rational& primalScale);
+   template <typename T>
+   void _applyScaledBounds(SPxSolverBase<T>& solver, Rational& primalScale);
 
    /// applies scaled sides
-   void _applyScaledSides(Rational& primalScale);
+   template <typename T>
+   void _applyScaledSides(SPxSolverBase<T>& solver, Rational& primalScale);
 
    /// applies scaled objective function
-   void _applyScaledObj(Rational& dualScale, SolRational& sol);
+   template <typename T>
+   void _applyScaledObj(SPxSolverBase<T>& solver, Rational& dualScale, SolRational& sol);
 
    /// evaluates result of solve. Return true if the algorithm must to stopped, false otherwise.
+   template <typename T>
    bool _evaluateResult(
-      typename SPxSolverBase<R>::Status result,
+      SPxSolverBase<T>& solver,
+      typename SPxSolverBase<T>::Status result,
       bool usingRefinedLP,
       SolRational& sol,
-      VectorBase<R>& dualReal,
+      VectorBase<T>& dualReal,
       bool& infeasible,
       bool& unbounded,
       bool& stoppedTime,
@@ -2280,21 +2441,24 @@ private:
       bool& error);
 
    /// corrects primal solution and aligns with basis
+   template <typename T>
    void _correctPrimalSolution(
       SolRational& sol,
       Rational& primalScale,
       int& primalSize,
       const int& maxDimRational,
-      VectorBase<R>& primalReal);
+      VectorBase<T>& primalReal);
 
    /// updates or recomputes slacks depending on which looks faster
    void _updateSlacks(SolRational& sol, int& primalSize);
 
    /// corrects dual solution and aligns with basis
+   template <typename T>
    void _correctDualSolution(
+      SPxSolverBase<T>& solver,
       SolRational& sol,
       const bool& maximizing,
-      VectorBase<R>& dualReal,
+      VectorBase<T>& dualReal,
       Rational& dualScale,
       int& dualSize,
       const int& maxDimRational);
@@ -2303,11 +2467,125 @@ private:
    /// dual vector accounts for the objective function vector
    void _updateReducedCosts(SolRational& sol, int& dualSize, const int& numCorrectedPrimals);
 
+   ///@todo precision-boosting move some place else
+   /// converts the given DataArray of VarStatus to boostedPrecision
+   void _convertDataArrayVarStatusToBoosted(
+      DataArray< typename SPxSolverBase<R>::VarStatus >& base,
+      DataArray< typename SPxSolverBase<BP>::VarStatus >& copy);
+
+   ///@todo precision-boosting move some place else
+   /// converts the given DataArray of VarStatus to R precision
+   void _convertDataArrayVarStatusToRPrecision(
+      DataArray< typename SPxSolverBase<BP>::VarStatus >& base,
+      DataArray< typename SPxSolverBase<R>::VarStatus >& copy);
+
+   /// disable initial precision solver and switch to boosted solver
+   void _switchToBoosted();
+
+   /// setup boosted solver before launching iteration
+   void _setupBoostedSolver();
+
+   /// increase the multiprecision, return false if maximum precision is reached, true otherwise
+   bool _boostPrecision();
+
+   /// reset the boosted precision to the default value
+   void _resetBoostedPrecision();
+
+   /// setup recovery mecanism using multiprecision, return false if maximum precision reached, true otherwise
+   bool _setupBoostedSolverAfterRecovery();
+
+   /// return true if slack basis has to be loaded for boosted solver
+   bool _isBoostedStartingFromSlack(bool initialSolve = true);
+
+   /// indicate if we are testing feasibility, unboundedness or neither
+   void _switchToStandardMode();
+   void _switchToFeasMode();
+   void _switchToUnbdMode();
+
+   /// check if we are testing feasibility, unboundedness or neither
+   bool _inStandardMode();
+   bool _inFeasMode();
+   bool _inUnbdMode();
+
+   // stores given basis in old basis attributes: _oldBasisStatusRows, _oldFeasBasisStatusRows, _oldUnbdBasisStatusRows (and ...Cols)
+   void _storeBasisAsOldBasis(DataArray< typename SPxSolverBase<R>::VarStatus >& rows,
+                              DataArray< typename SPxSolverBase<R>::VarStatus >& cols);
+
+   // stores given basis in old basis attributes: _oldBasisStatusRows, _oldFeasBasisStatusRows, _oldUnbdBasisStatusRows (and ...Cols)
+   void _storeBasisAsOldBasisBoosted(DataArray< typename SPxSolverBase<BP>::VarStatus >& rows,
+                                     DataArray< typename SPxSolverBase<BP>::VarStatus >& cols);
+
+   // get the last advanced and stable basis stored by the initial solver and store it as old basis, unsimplify basis if simplifier activated
+   void _storeLastStableBasis(bool vanished);
+
+   // get the last advanced and stable basis stored by the boosted solver and store it as old basis, unsimplify basis if simplifier activated
+   void _storeLastStableBasisBoosted(bool vanished);
+
+   // load old basis in solver. The old basis loaded depends on the certificate mode (feasibility, unboundedness, or neither)
+   bool _loadBasisFromOldBasis(bool boosted);
+
+   // update statistics for precision boosting
+   void _updateBoostingStatistics();
+
+   /// solves current problem using multiprecision floating-point solver
+   /// return false if a new boosted iteration is necessary, true otherwise
+   void _solveRealForRationalBoostedStable(
+      SolRational& sol,
+      bool& primalFeasible,
+      bool& dualFeasible,
+      bool& infeasible,
+      bool& unbounded,
+      bool& stoppedTime,
+      bool& stoppedIter,
+      bool& error,
+      bool& needNewBoostedIt);
+
+   /// solves current problem with iterative refinement and recovery mechanism using boosted solver
+   void _performOptIRStableBoosted(
+      SolRational& sol,
+      bool acceptUnbounded,
+      bool acceptInfeasible,
+      int minIRRoundsRemaining,
+      bool& primalFeasible,
+      bool& dualFeasible,
+      bool& infeasible,
+      bool& unbounded,
+      bool& stoppedTime,
+      bool& stoppedIter,
+      bool& error,
+      bool& needNewBoostedIt);
+
+   /// perform iterative refinement using the right precision
+   void _performOptIRWrapper(
+      SolRational& sol,
+      bool acceptUnbounded,
+      bool acceptInfeasible,
+      int minIRRoundsRemaining,
+      bool& primalFeasible,
+      bool& dualFeasible,
+      bool& infeasible,
+      bool& unbounded,
+      bool& stoppedTime,
+      bool& stoppedIter,
+      bool& error
+   );
+
+   /// solves current problem using double floating-point solver
+   void _solveRealForRationalStable(
+      SolRational& sol,
+      bool& primalFeasible,
+      bool& dualFeasible,
+      bool& infeasible,
+      bool& unbounded,
+      bool& stoppedTime,
+      bool& stoppedIter,
+      bool& error);
+
    /// solves current problem with iterative refinement and recovery mechanism
    void _performOptIRStable(SolRational& sol,
                             bool acceptUnbounded,
                             bool acceptInfeasible,
-                            int minRounds,
+                            int minIRRoundsRemaining,
                             bool& primalFeasible,
                             bool& dualFeasible,
                             bool& infeasible,
@@ -2404,6 +2682,13 @@ private:
          DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
          DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
          const bool forceNoSimplifier = false);
+
+   /// solves real LP during iterative refinement
+   void _solveRealForRationalBoosted(
+      VectorBase<BP>& primal, VectorBase<BP>& dual,
+      DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
+      DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols,
+      typename SPxSolverBase<BP>::Status& boostedResult, bool initialSolve);
 
    /// computes rational inverse of basis matrix as defined by _rationalLUSolverBind
    void _computeBasisInverseRational();

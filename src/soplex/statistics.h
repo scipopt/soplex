@@ -69,7 +69,10 @@ public:
       syncTime->~Timer();
       transformTime->~Timer();
       rationalTime->~Timer();
+      initialPrecisionTime->~Timer();
+      extendedPrecisionTime->~Timer();
       reconstructionTime->~Timer();
+      boostingStepTime->~Timer();
       spx_free(readingTime);
       spx_free(solvingTime);
       spx_free(preprocessingTime);
@@ -77,7 +80,10 @@ public:
       spx_free(syncTime);
       spx_free(transformTime);
       spx_free(rationalTime);
+      spx_free(initialPrecisionTime);
+      spx_free(extendedPrecisionTime);
       spx_free(reconstructionTime);
+      spx_free(boostingStepTime);
    }
 
    /// clears all statistics
@@ -103,7 +109,10 @@ public:
    Timer* syncTime; ///< time for synchronization between real and rational LP (included in solving time)
    Timer* transformTime; ///< time for transforming LPs (included in solving time)
    Timer* rationalTime; ///< time for rational LP solving (included in solving time)
+   Timer* initialPrecisionTime; ///< solving time with initial precision (included in solving time)
+   Timer* extendedPrecisionTime; ///< solving time with extended precision (included in solving time)
    Timer* reconstructionTime; ///< time for rational reconstructions
+   Timer* boostingStepTime; ///< time for the precision boosting step: boost, load LP, load basis, decrease tols (included in solving time)
    Timer::TYPE timerType; ///< type of timer (user or wallclock)
 
    Real multTimeSparse; ///< time for computing A*x exploiting sparsity (setupPupdate(), PRICE step)
@@ -119,11 +128,18 @@ public:
    Real luSolveTimeReal; ///< time for solving linear systems in real precision
    Real luFactorizationTimeRational; ///< time for factorizing bases matrices in rational precision
    Real luSolveTimeRational; ///< time for solving linear systems in rational precision
+   Real fpTime; ///< time for first floating-point LP solve
    int iterations; ///< number of iterations/pivots
    int iterationsPrimal; ///< number of iterations with Primal
    int iterationsFromBasis; ///< number of iterations from Basis
    int iterationsPolish; ///< number of iterations during solution polishing
+   int iterationsFP; ///< number of iterations/pivots in first floating-point solve
    int boundflips; ///< number of dual bound flips
+   int boostedIterations; ///< number of iterations/pivots in extended precision
+   int boostedIterationsPrimal; ///< number of iterations with Primal
+   int boostedIterationsFromBasis; ///< number of iterations from Basis
+   int boostedIterationsPolish; ///< number of iterations during solution polishing
+   int boostedBoundflips; ///< number of dual bound flips
    int luFactorizationsReal; ///< number of basis matrix factorizations in real precision
    int luSolvesReal; ///< number of (forward and backward) solves with basis matrix in real precision
    int luFactorizationsRational; ///< number of basis matrix factorizations in rational precision
@@ -133,6 +149,11 @@ public:
    int pivotRefinements; ///< number of refinement steps until final basis is reached
    int feasRefinements; ///< number of refinement steps during infeasibility test
    int unbdRefinements; ///< number of refinement steps during undboundedness test
+   int precBoosts; ///< number of precision boosts
+   int stallPrecBoosts; ///< number of precision boosts without pivots
+   int pivotPrecBoosts; ///< number of precision boosts until final basis is reached
+   int feasPrecBoosts; ///< number of precision boosts during infeasibility test
+   int unbdPrecBoosts; ///< number of precision boosts during undboundedness test
 
    // Improved dual simplex statistics
    int callsReducedProb;      ///< number of times the reduced problem is solved. This includes the initial solve.

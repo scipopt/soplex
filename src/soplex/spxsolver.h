@@ -341,6 +341,14 @@ private:
    int
    decompIterationLimit;   ///< the maximum number of iterations before the decomposition simplex is aborted.
 
+   DataArray<VarStatus> oldBasisStatusRows;
+   ///< stored stable basis met before a simplex pivot (used to warm start the solver)
+   DataArray<VarStatus> oldBasisStatusCols;
+   ///< They don't have setters because only the internal simplex method is meant to fill them
+
+   bool solvingForBoosted; ///< is this solver involved in a higher precision solving scheme?
+   int storeBasisSimplexFreq; ///< number of simplex pivots -1 to perform before storing stable basis
+
    bool
    fullPerturbation;       ///< whether to perturb the entire problem or just the bounds relevant for the current pivot
    int
@@ -927,6 +935,30 @@ public:
    }
    /// enable or disable hyper sparse pricing
    void hyperPricing(bool h);
+
+   // get old basis status rows
+   DataArray<VarStatus>& getOldBasisStatusRows()
+   {
+      return oldBasisStatusRows;
+   }
+
+   // get old basis status cols
+   DataArray<VarStatus>& getOldBasisStatusCols()
+   {
+      return oldBasisStatusCols;
+   }
+
+   // should the basis be stored for use in precision boosting?
+   void setSolvingForBoosted(bool value)
+   {
+      solvingForBoosted = value;
+   }
+
+   // set frequency of storing the basis for use in precision boosting
+   void setStoreBasisFreqForBoosting(int freq)
+   {
+      storeBasisSimplexFreq = freq;
+   }
 
    /** SPxSolverBase considers a Simplex step as degenerate if the
     *  steplength does not exceed #epsilon(). Cycling occurs if only

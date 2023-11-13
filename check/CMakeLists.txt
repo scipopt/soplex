@@ -70,6 +70,11 @@ if(BOOST)
    set(settings
        ${settings}
        exact)
+if(MPFR_FOUND)
+   set(settings
+       ${settings}
+       exact-pure-boosting)
+   endif()
 if(${Boost_VERSION_MACRO} GREATER "106999")
     set(settings
         ${settings}

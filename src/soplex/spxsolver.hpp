@@ -771,7 +771,7 @@ void SPxSolverBase<R>::setType(Type tp)
    template <class R>
    bool SPxSolverBase<R>::noViols(R tol) const
    {
-      assert(tol >= 0.0);
+      assert(tol >= R(0.0));
 
       if(type() == ENTER)
       {

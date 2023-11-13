@@ -122,6 +122,15 @@ inline void powRound(Rational& r)
    r = roundval;
 }
 
+/// returns the order of magnitude of the given rational
+inline int orderOfMagnitude(Rational& r)
+{
+   if(numerator(r) == 0 || (int) log10((double)numerator(r)) == log10((double)denominator(r)))
+      return 0;
+   else
+      return (int) log10((double)numerator(r)) - (int) log10((double)denominator(r));
+}
+
 /* find substring, ignore case */
 static
 std::string::const_iterator findSubStringIC(const std::string& substr, const std::string& str)
@@ -154,7 +163,7 @@ inline Rational ratFromString(const char* desc)
       std::string s(desc);
 
       /* case 1: string is given in nom/den format */
-      if(s.find('.') == std::string::npos)
+      if(s.find_first_of(".Ee") == std::string::npos)
       {
          if(s[0] == '+')
             res = Rational(desc + 1);
@@ -179,23 +188,29 @@ inline Rational ratFromString(const char* desc)
             s.insert(0, "0");
 
          size_t pos = s.find('.');
-         size_t exp = s.length() - 1 - pos;
-         std::string den("1");
 
-         for(size_t i = 0; i < exp; ++i)
-            den.append("0");
+         // if s contains a ., convert it to a rational
+         if(pos != std::string::npos)
+         {
+            size_t exp = s.length() - 1 - pos;
+            std::string den("1");
 
-         s.erase(pos, 1);
-         assert(std::all_of(s.begin() + 1, s.end(), ::isdigit));
+            for(size_t i = 0; i < exp; ++i)
+               den.append("0");
 
-         // remove padding 0s
-         if(s[0] == '-')
-            s.erase(1, SOPLEX_MIN(s.substr(1).find_first_not_of('0'), s.size() - 1));
-         else
-            s.erase(0, SOPLEX_MIN(s.find_first_not_of('0'), s.size() - 1));
+            s.erase(pos, 1);
+            assert(std::all_of(s.begin() + 1, s.end(), ::isdigit));
 
-         s.append("/");
-         s.append(den);
+            // remove padding 0s
+            if(s[0] == '-')
+               s.erase(1, SOPLEX_MIN(s.substr(1).find_first_not_of('0'), s.size() - 1));
+            else
+               s.erase(0, SOPLEX_MIN(s.find_first_not_of('0'), s.size() - 1));
+
+            s.append("/");
+            s.append(den);
+         }
+
          res = Rational(s);
          res *= pow(10, mult);
       }
@@ -930,6 +945,11 @@ inline Integer denominator(const Rational& r)
 inline Rational ratFromString(const char* desc)
 {
    return Rational();
+}
+inline int orderOfMagnitude(Rational& r)
+{
+   r.rationalErrorMessage();
+   return 0;
 }
 inline void SpxLcm(Integer& result, Integer a, Integer b) {}
 inline void SpxGcd(Integer& result, Integer a, Integer b) {}

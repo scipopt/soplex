@@ -270,7 +270,7 @@ int ChangeExerciser::calls_solve = 10;
 bool verbose = false;
 
 /// Prints message only if verbose mode is on.
-#define MSG( message ) { if ( verbose ) { message } }
+#define SPX_MSG( message ) { if ( verbose ) { message } }
 
 
 /**
@@ -426,7 +426,7 @@ int main( int argc,
 */
 void ChangeExerciser::test_add_delete_row()
 {
-   MSG( std::cout << "Testing addRow() / removeRow()" << std::endl; );
+   SPX_MSG( std::cout << "Testing addRow() / removeRow()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
@@ -517,7 +517,7 @@ void ChangeExerciser::test_add_delete_row()
 */
 void ChangeExerciser::test_add_delete_rows()
 {
-   MSG( std::cout << "Testing addRows() / removeRows()" << std::endl; );
+   SPX_MSG( std::cout << "Testing addRows() / removeRows()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
@@ -650,7 +650,7 @@ void ChangeExerciser::test_add_delete_rows()
 */
 void ChangeExerciser::test_add_delete_col()
 {
-   MSG( std::cout << "Testing addCol() / removeCol()" << std::endl; );
+   SPX_MSG( std::cout << "Testing addCol() / removeCol()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
@@ -782,7 +782,7 @@ void ChangeExerciser::test_add_delete_col()
 */
 void ChangeExerciser::test_add_delete_cols()
 {
-   MSG( std::cout << "Testing addCols() / removeCols()" << std::endl; );
+   SPX_MSG( std::cout << "Testing addCols() / removeCols()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
@@ -908,7 +908,7 @@ void ChangeExerciser::test_add_delete_cols()
 */
 void ChangeExerciser::test_change_obj()
 {
-   MSG( std::cout << "Testing changeObj()" << std::endl; );
+   SPX_MSG( std::cout << "Testing changeObj()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
@@ -971,7 +971,7 @@ void ChangeExerciser::test_change_obj()
 */
 void ChangeExerciser::test_change_lower()
 {
-   MSG( std::cout << "Testing changeLower()" << std::endl; );
+   SPX_MSG( std::cout << "Testing changeLower()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
@@ -1015,7 +1015,7 @@ void ChangeExerciser::test_change_lower()
 */
 void ChangeExerciser::test_change_upper()
 {
-   MSG( std::cout << "Testing changeUpper()" << std::endl; );
+   SPX_MSG( std::cout << "Testing changeUpper()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
@@ -1059,7 +1059,7 @@ void ChangeExerciser::test_change_upper()
 */
 void ChangeExerciser::test_change_bounds()
 {
-   MSG( std::cout << "Testing changeBounds()" << std::endl; );
+   SPX_MSG( std::cout << "Testing changeBounds()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
@@ -1110,7 +1110,7 @@ void ChangeExerciser::test_change_bounds()
 */
 void ChangeExerciser::test_change_lhs()
 {
-   MSG( std::cout << "Testing changeLhs()" << std::endl; );
+   SPX_MSG( std::cout << "Testing changeLhs()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
@@ -1166,7 +1166,7 @@ void ChangeExerciser::test_change_lhs()
 */
 void ChangeExerciser::test_change_rhs()
 {
-   MSG( std::cout << "Testing changeRhs()" << std::endl; );
+   SPX_MSG( std::cout << "Testing changeRhs()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
@@ -1222,7 +1222,7 @@ void ChangeExerciser::test_change_rhs()
 */
 void ChangeExerciser::test_change_range()
 {
-   MSG( std::cout << "Testing changeRange()" << std::endl; );
+   SPX_MSG( std::cout << "Testing changeRange()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
@@ -1323,7 +1323,7 @@ void ChangeExerciser::test_change_range()
 */
 void ChangeExerciser::test_change_row()
 {
-   MSG( std::cout << "Testing changeRow()" << std::endl; );
+   SPX_MSG( std::cout << "Testing changeRow()" << std::endl; );
 
    //
    // First test: Change rows to non-trivial multiples.
@@ -1424,7 +1424,7 @@ void ChangeExerciser::test_change_row()
 */
 void ChangeExerciser::test_change_col()
 {
-   MSG( std::cout << "Testing changeCol()" << std::endl; );
+   SPX_MSG( std::cout << "Testing changeCol()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
@@ -1515,7 +1515,7 @@ void ChangeExerciser::test_change_col()
 */
 void ChangeExerciser::test_change_element()
 {
-   MSG( std::cout << "Testing changeElement()" << std::endl; );
+   SPX_MSG( std::cout << "Testing changeElement()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
@@ -1579,7 +1579,7 @@ void ChangeExerciser::test_change_element()
 */
 void ChangeExerciser::test_change_sense()
 {
-   MSG( std::cout << "Testing changeSense()" << std::endl; );
+   SPX_MSG( std::cout << "Testing changeSense()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();

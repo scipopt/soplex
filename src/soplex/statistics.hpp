@@ -41,7 +41,10 @@ SoPlexBase<R>::Statistics::Statistics(Timer::TYPE ttype)
    syncTime = TimerFactory::createTimer(timerType);
    transformTime = TimerFactory::createTimer(timerType);
    rationalTime = TimerFactory::createTimer(timerType);
+   initialPrecisionTime = TimerFactory::createTimer(timerType);
+   extendedPrecisionTime = TimerFactory::createTimer(timerType);
    reconstructionTime = TimerFactory::createTimer(timerType);
+   boostingStepTime = TimerFactory::createTimer(timerType);
    clearAllData();
 }
 
@@ -57,7 +60,10 @@ SoPlexBase<R>::Statistics::Statistics(const Statistics& base)
    syncTime = TimerFactory::createTimer(timerType);
    transformTime = TimerFactory::createTimer(timerType);
    rationalTime = TimerFactory::createTimer(timerType);
+   initialPrecisionTime = TimerFactory::createTimer(timerType);
+   extendedPrecisionTime = TimerFactory::createTimer(timerType);
    reconstructionTime = TimerFactory::createTimer(timerType);
+   boostingStepTime = TimerFactory::createTimer(timerType);
    clearAllData();
 }
 
@@ -72,7 +78,10 @@ typename SoPlexBase<R>::Statistics& SoPlexBase<R>::Statistics::operator=(const S
    *syncTime = *(rhs.syncTime);
    *transformTime = *(rhs.transformTime);
    *rationalTime = *(rhs.rationalTime);
+   *initialPrecisionTime = *(rhs.initialPrecisionTime);
+   *extendedPrecisionTime = *(rhs.extendedPrecisionTime);
    *reconstructionTime = *(rhs.reconstructionTime);
+   *boostingStepTime = *(rhs.boostingStepTime);
    timerType = rhs.timerType;
    multTimeSparse = rhs.multTimeSparse;
    multTimeFull = rhs.multTimeFull;
@@ -86,10 +95,18 @@ typename SoPlexBase<R>::Statistics& SoPlexBase<R>::Statistics::operator=(const S
    luSolveTimeReal = rhs.luSolveTimeReal;
    luFactorizationTimeRational = rhs.luFactorizationTimeRational;
    luSolveTimeRational = rhs.luSolveTimeRational;
+   fpTime = rhs.fpTime;
    iterations = rhs.iterations;
    iterationsPrimal = rhs.iterationsPrimal;
    iterationsFromBasis = rhs.iterationsFromBasis;
+   iterationsPolish = rhs.iterationsPolish;
+   iterationsFP = rhs.iterationsFP;
    boundflips = rhs.boundflips;
+   boostedIterations = rhs.boostedIterations;
+   boostedIterationsPrimal = rhs.boostedIterationsPrimal;
+   boostedIterationsFromBasis = rhs.boostedIterationsFromBasis;
+   boostedIterationsPolish = rhs.boostedIterationsPolish;
+   boostedBoundflips = rhs.boostedBoundflips;
    luFactorizationsReal = rhs.luFactorizationsReal;
    luSolvesReal = rhs.luSolvesReal;
    luFactorizationsRational = rhs.luFactorizationsRational;
@@ -99,6 +116,11 @@ typename SoPlexBase<R>::Statistics& SoPlexBase<R>::Statistics::operator=(const S
    pivotRefinements = rhs.pivotRefinements;
    feasRefinements = rhs.feasRefinements;
    unbdRefinements = rhs.unbdRefinements;
+   precBoosts = rhs.precBoosts;
+   stallPrecBoosts = rhs.stallPrecBoosts;
+   pivotPrecBoosts = rhs.pivotPrecBoosts;
+   feasPrecBoosts = rhs.feasPrecBoosts;
+   unbdPrecBoosts = rhs.unbdPrecBoosts;
 
    return *this;
 }
@@ -121,7 +143,10 @@ void SoPlexBase<R>::Statistics::clearSolvingData()
    syncTime->reset();
    transformTime->reset();
    rationalTime->reset();
+   initialPrecisionTime->reset();
+   extendedPrecisionTime->reset();
    reconstructionTime->reset();
+   boostingStepTime->reset();
    multTimeSparse = 0.0;
    multTimeFull = 0.0;
    multTimeColwise = 0.0;
@@ -134,11 +159,18 @@ void SoPlexBase<R>::Statistics::clearSolvingData()
    luSolveTimeReal = 0.0;
    luFactorizationTimeRational = 0.0;
    luSolveTimeRational = 0.0;
+   fpTime = 0.0;
    iterations = 0;
    iterationsPrimal = 0;
    iterationsFromBasis = 0;
    iterationsPolish = 0;
+   iterationsFP = 0;
    boundflips = 0;
+   boostedIterations = 0;
+   boostedIterationsPrimal = 0;
+   boostedIterationsFromBasis = 0;
+   boostedIterationsPolish = 0;
+   boostedBoundflips = 0;
    luFactorizationsReal = 0;
    luSolvesReal = 0;
    luFactorizationsRational = 0;
@@ -148,6 +180,11 @@ void SoPlexBase<R>::Statistics::clearSolvingData()
    pivotRefinements = 0;
    feasRefinements = 0;
    unbdRefinements = 0;
+   precBoosts = 0;
+   stallPrecBoosts = 0;
+   pivotPrecBoosts = 0;
+   feasPrecBoosts = 0;
+   unbdPrecBoosts = 0;
 
    callsReducedProb = 0;
    iterationsInit = 0;
@@ -215,6 +252,26 @@ void SoPlexBase<R>::Statistics::print(std::ostream& os)
    if(solTime > 0)
       os << " (" << 100 * rationalTime->time() / solTime << "% of solving time)";
 
+   os << "\n  InitialPrecision  : " << initialPrecisionTime->time();
+
+   if(solTime > 0)
+      os << " (" << 100 * initialPrecisionTime->time() / solTime << "% of solving time)";
+
+   os << "\n  ExtendedPrecision : " << extendedPrecisionTime->time();
+
+   if(solTime > 0)
+      os << " (" << 100 * extendedPrecisionTime->time() / solTime << "% of solving time)";
+
+   os << "\n  BoostingStep      : " << boostingStepTime->time();
+
+   if(solTime > 0)
+      os << " (" << 100 * boostingStepTime->time() / solTime << "% of solving time)";
+
+   os << "\n  FpTime            : " << fpTime;
+
+   if(solTime > 0)
+      os << " (" << 100 * fpTime / solTime << "% of solving time)";
+
    os << "\n  Other             : " << otherTime;
 
    if(solTime > 0)
@@ -225,6 +282,12 @@ void SoPlexBase<R>::Statistics::print(std::ostream& os)
       << "  Pivoting          : " << pivotRefinements << "\n"
       << "  Feasibility       : " << feasRefinements << "\n"
       << "  Unboundedness     : " << unbdRefinements << "\n";
+
+   os << "Precision boosts    : " << precBoosts << "\n"
+      << "  Stalling          : " << stallPrecBoosts << "\n"
+      << "  Pivoting          : " << pivotPrecBoosts << "\n"
+      << "  Feasibility       : " << feasPrecBoosts << "\n"
+      << "  Unboundedness     : " << unbdPrecBoosts << "\n";
 
    os << "Iterations          : " << iterations << "\n"
       << "  From scratch      : " << iterations - iterationsFromBasis;
@@ -249,6 +312,34 @@ void SoPlexBase<R>::Statistics::print(std::ostream& os)
 
    os << "\n  Bound flips       : " << boundflips;
    os << "\n  Sol. polishing    : " << iterationsPolish;
+   os << "\n  First FP solve    : " << iterationsFP;
+
+   os << "\nIterationsBoosted   : " << boostedIterations << "\n"
+      << "  From scratch      : " << int(boostedIterations - boostedIterationsFromBasis);
+
+   if(boostedIterations > 0)
+      os << " (" << 100 * double((boostedIterations - boostedIterationsFromBasis)) / double(
+            boostedIterations) << "%)";
+
+   os << "\n  From basis        : " << boostedIterationsFromBasis;
+
+   if(boostedIterations > 0)
+      os << " (" << 100 * double(boostedIterationsFromBasis) / double(boostedIterations) << "%)";
+
+   os << "\n  Primal            : " << boostedIterationsPrimal;
+
+   if(boostedIterations > 0)
+      os << " (" << 100 * double(boostedIterationsPrimal) / double(boostedIterations) << "%)";
+
+   os << "\n  Dual              : " << boostedIterations - boostedIterationsPrimal -
+      boostedIterationsPolish;
+
+   if(boostedIterations > 0)
+      os << " (" << 100 * double((boostedIterations - boostedIterationsPrimal)) / double(
+            boostedIterations) << "%)";
+
+   os << "\n  Bound flips       : " << boostedBoundflips;
+   os << "\n  Sol. polishing    : " << boostedIterationsPolish;
 
    os << "\nLU factorizations   : " << luFactorizationsReal << "\n"
       << "  Factor. frequency : ";

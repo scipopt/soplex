@@ -161,6 +161,12 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
    int   stallRefIter;
    int   stallNumRecovers;
 
+   int timesBasisWasStored = 0;
+   /// number of times the current basis was stored in oldBasisStatusRows oldBasisStatusCols
+   /* storeBasisFreqLog : if true, store basis if iterations() == 2^timesBasisWasStored
+                          else, store basis if iterations() % storeBasisSimplexFreq == 0 */
+   bool storeBasisFreqLog = true;
+
    if(dim() <= 0 && coDim() <= 0)  // no problem loaded
    {
       m_status = NO_PROBLEM;
@@ -263,6 +269,9 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
    typename SPxSolverBase<R>::Type tightenedtype = type();
    bool tightened = false;
 
+   oldBasisStatusRows.reSize(this->nRows());
+   oldBasisStatusCols.reSize(this->nCols());
+
    while(!stop)
    {
       const typename SPxBasisBase<R>::Desc regulardesc = this->desc();
@@ -323,6 +332,24 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
             do
             {
                printDisplayLine();
+
+               // if it is time to store the basis, store it (only used in rational solve)
+               if(solvingForBoosted)
+               {
+                  if((storeBasisFreqLog && iterations() == pow(2, timesBasisWasStored) - 1)
+                        || (!storeBasisFreqLog && iterations() % storeBasisSimplexFreq == 0))
+                  {
+                     // switch off storeBasisFreqLog if 2^timesBasisWasStored becomes too big
+                     // in order to avoid computing enormous powers of 2
+                     if(storeBasisFreqLog && pow(2, timesBasisWasStored) > storeBasisSimplexFreq)
+                        storeBasisFreqLog = false;
+
+                     // store basis
+                     getBasis(oldBasisStatusRows.get_ptr(), oldBasisStatusCols.get_ptr(), oldBasisStatusRows.size(),
+                              oldBasisStatusCols.size());
+                     timesBasisWasStored++;
+                  }
+               }
 
                enterId = thepricer->selectEnter();
 
@@ -626,7 +653,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                      if(boundrange == 0.0 || siderange == 0.0 || objrange == 0.0)
                         calculateProblemRanges();
 
-                     if(SOPLEX_MAX(SOPLEX_MAX(boundrange, siderange), objrange) >= 1e9)
+                     if(SOPLEX_MAX(SOPLEX_MAX(boundrange, siderange), objrange) >= 1e9 && !solvingForBoosted)
                      {
                         SPxOut::setScientific(spxout->getCurrentStream(), 0);
                         SPX_MSG_INFO1((*this->spxout), (*this->spxout) <<
@@ -701,6 +728,24 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
             do
             {
                printDisplayLine();
+
+               // if it is time to store the basis, store it (only used in rational solve)
+               if(solvingForBoosted)
+               {
+                  if((storeBasisFreqLog && iterations() == pow(2, timesBasisWasStored) - 1)
+                        || (!storeBasisFreqLog && iterations() % storeBasisSimplexFreq == 0))
+                  {
+                     // switch off storeBasisFreqLog if 2^timesBasisWasStored becomes too big
+                     // in order to avoid computing enormous powers of 2
+                     if(storeBasisFreqLog && pow(2, timesBasisWasStored) > storeBasisSimplexFreq)
+                        storeBasisFreqLog = false;
+
+                     // store basis
+                     getBasis(oldBasisStatusRows.get_ptr(), oldBasisStatusCols.get_ptr(), oldBasisStatusRows.size(),
+                              oldBasisStatusCols.size());
+                     timesBasisWasStored++;
+                  }
+               }
 
                leaveNum = thepricer->selectLeave();
 
@@ -980,7 +1025,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                      if(boundrange == 0.0 || siderange == 0.0 || objrange == 0.0)
                         calculateProblemRanges();
 
-                     if(SOPLEX_MAX(SOPLEX_MAX(boundrange, siderange), objrange) >= 1e9)
+                     if(SOPLEX_MAX(SOPLEX_MAX(boundrange, siderange), objrange) >= 1e9 && !solvingForBoosted)
                      {
                         SPxOut::setScientific(spxout->getCurrentStream(), 0);
                         SPX_MSG_INFO1((*this->spxout), (*this->spxout) <<

@@ -194,6 +194,36 @@ SoPlexBase<R>::Settings::BoolParam::BoolParam()
    description[SoPlexBase<R>::SIMPLIFIER_DOMINATEDCOLS] =
       "enable presolver DominatedCols in PaPILO";
    defaultValue[SoPlexBase<R>::SIMPLIFIER_DOMINATEDCOLS] = true;
+
+   name[SoPlexBase<R>::ITERATIVE_REFINEMENT] = "iterative_refinement";
+   description[SoPlexBase<R>::ITERATIVE_REFINEMENT] =
+      "enable iterative refinement";
+   defaultValue[SoPlexBase<R>::ITERATIVE_REFINEMENT] = true;
+
+   // adapt tolerances to the multiprecision used
+   name[SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION] = "adapt_tols_to_multiprecision";
+   description[SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION] =
+      "adapt tolerances to the multiprecision used";
+   defaultValue[SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION] = false;
+
+   name[SoPlexBase<R>::PRECISION_BOOSTING] = "precision_boosting";
+   description[SoPlexBase<R>::PRECISION_BOOSTING] =
+      "enable precision boosting";
+#ifdef SOPLEX_WITH_MPFR
+   defaultValue[SoPlexBase<R>::PRECISION_BOOSTING] = true;
+#else
+   defaultValue[SoPlexBase<R>::PRECISION_BOOSTING] = false;
+#endif
+
+   name[SoPlexBase<R>::BOOSTED_WARM_START] = "boosted_warm_start";
+   description[SoPlexBase<R>::BOOSTED_WARM_START] =
+      "if true, boosted solver starts from last basis, otherwise from slack basis";
+   defaultValue[SoPlexBase<R>::BOOSTED_WARM_START] = true;
+
+   name[SoPlexBase<R>::RECOVERY_MECHANISM] = "recovery_mechanism";
+   description[SoPlexBase<R>::RECOVERY_MECHANISM] =
+      "enable recovery mechanism for when the solve fails";
+   defaultValue[SoPlexBase<R>::RECOVERY_MECHANISM] = false;
 }
 
 template <class R>
@@ -432,6 +462,24 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
    lower[SoPlexBase<R>::STATTIMER] = 0;
    upper[SoPlexBase<R>::STATTIMER] = 2;
    defaultValue[SoPlexBase<R>::STATTIMER] = 1;
+
+   // maximum number of digits for the multiprecision type
+   name[SoPlexBase<R>::MULTIPRECISION_LIMIT] = "multiprecision_limit";
+   description[SoPlexBase<R>::MULTIPRECISION_LIMIT] =
+      "maximum number of digits for the multiprecision type";
+   lower[SoPlexBase<R>::MULTIPRECISION_LIMIT] = 50;
+   upper[SoPlexBase<R>::MULTIPRECISION_LIMIT] = INT_MAX;
+   defaultValue[SoPlexBase<R>::MULTIPRECISION_LIMIT] = 300;
+   // if precision is too high, double tolerances are rounded to zero
+   // 300 is very close to the greatest int k such that (double)1e-k != 0
+
+   // at max, after how many simplex pivots do we store the advanced and stable basis, 1 = every iterations
+   name[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] = "storeBasisSimplexFreq";
+   description[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] =
+      "at max, after how many simplex pivots do we store the advanced and stable basis, 1 = every iterations";
+   lower[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] = 1;
+   upper[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] = INT_MAX;
+   defaultValue[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] = 10000;
 }
 
 template <class R>
@@ -638,6 +686,13 @@ SoPlexBase<R>::Settings::RealParam::RealParam()
    upper[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 1;
    defaultValue[SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC] = 1.0;
 
+   // factor by which the precision of the floating-point solver is multiplied
+   name[SoPlexBase<R>::PRECISION_BOOSTING_FACTOR] = "precision_boosting_factor";
+   description[SoPlexBase<R>::PRECISION_BOOSTING_FACTOR] =
+      "factor by which the precision of the floating-point solver is multiplied";
+   lower[SoPlexBase<R>::PRECISION_BOOSTING_FACTOR] = 1.0;
+   upper[SoPlexBase<R>::PRECISION_BOOSTING_FACTOR] = 10.0;
+   defaultValue[SoPlexBase<R>::PRECISION_BOOSTING_FACTOR] = 1.5;
 }
 
 template <class R>
@@ -1476,6 +1531,7 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
          _solRational = rhs._solRational;
 
       _solver.setTolerances(_tolerances);
+      _boostedSolver.setTolerances(_tolerances);
 
       _simplifierMainSM.setTolerances(_tolerances);
       _simplifierPaPILO.setTolerances(_tolerances);
@@ -1488,14 +1544,27 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
       _scalerGeoequi.setTolerances(_tolerances);
       _scalerLeastsq.setTolerances(_tolerances);
 
+      _boostedScalerUniequi.setTolerances(_tolerances);
+      _boostedScalerBiequi.setTolerances(_tolerances);
+      _boostedScalerGeo1.setTolerances(_tolerances);
+      _boostedScalerGeo8.setTolerances(_tolerances);
+      _boostedScalerGeoequi.setTolerances(_tolerances);
+      _boostedScalerLeastsq.setTolerances(_tolerances);
+
       // set tolerances for ratio testers
       _ratiotesterBoundFlipping.setTolerances(_tolerances);
       _ratiotesterFast.setTolerances(_tolerances);
       _ratiotesterHarris.setTolerances(_tolerances);
       _ratiotesterTextbook.setTolerances(_tolerances);
 
+      _boostedRatiotesterBoundFlipping.setTolerances(_tolerances);
+      _boostedRatiotesterFast.setTolerances(_tolerances);
+      _boostedRatiotesterHarris.setTolerances(_tolerances);
+      _boostedRatiotesterTextbook.setTolerances(_tolerances);
+
       // set tolerances for slufactor
       _slufactor.setTolerances(_tolerances);
+      _boostedSlufactor.setTolerances(_tolerances);
 
       // set message handlers in members
       _solver.setOutstream(spxout);
@@ -5592,7 +5661,26 @@ int SoPlexBase<R>::numIterations() const
    return _statistics->iterations;
 }
 
+/// number of precision boosts since last call to solve
+template <class R>
+int SoPlexBase<R>::numPrecisionBoosts() const
+{
+   return _statistics->precBoosts;
+}
 
+/// number of iterations in higher precision since last call to solve
+template <class R>
+int SoPlexBase<R>::numIterationsBoosted() const
+{
+   return _statistics->boostedIterations;
+}
+
+/// time spen in higher precision since last call to solve
+template <class R>
+Real SoPlexBase<R>::precisionBoostTime() const
+{
+   return _statistics->extendedPrecisionTime->time();
+}
 
 /// time spent in last call to solve
 template <class R>
@@ -5875,6 +5963,26 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
 #endif
       break;
 
+   case ITERATIVE_REFINEMENT:
+      break;
+
+   case ADAPT_TOLS_TO_MULTIPRECISION:
+      break;
+
+   case PRECISION_BOOSTING:
+#ifndef SOPLEX_WITH_MPFR
+      SPX_MSG_INFO1(spxout, spxout <<
+                    "Setting Parameter precision_boosting is only possible if SoPlex is build with MPFR\n");
+      return false;
+#endif
+      break;
+
+   case BOOSTED_WARM_START:
+      break;
+
+   case RECOVERY_MECHANISM:
+      break;
+
    default:
       return false;
    }
@@ -5997,26 +6105,45 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
 
    // type of simplifier
    case SoPlexBase<R>::SIMPLIFIER:
+#ifndef SOPLEX_WITH_MPFR
+      _boostedSimplifier = nullptr;
+#endif
+
       switch(value)
       {
       case SIMPLIFIER_OFF:
          _simplifier = nullptr;
+#ifdef SOPLEX_WITH_MPFR
+         _boostedSimplifier = nullptr;
+#endif
          break;
 
       case SIMPLIFIER_INTERNAL:
       case SIMPLIFIER_AUTO:
          _simplifier = &_simplifierMainSM;
          assert(_simplifier != 0);
+#ifdef SOPLEX_WITH_MPFR
+         _boostedSimplifier = &_boostedSimplifierMainSM;
+         assert(_boostedSimplifier != 0);
+#endif
          break;
 
       case SIMPLIFIER_PAPILO:
 #ifdef SOPLEX_WITH_PAPILO
          _simplifier = &_simplifierPaPILO;
          assert(_simplifier != 0);
+#ifdef SOPLEX_WITH_MPFR
+         _boostedSimplifier = &_boostedSimplifierPaPILO;
+         assert(_boostedSimplifier != 0);
+#endif
          break;
 #else
          _simplifier = &_simplifierMainSM;
          assert(_simplifier != 0);
+#ifdef SOPLEX_WITH_MPFR
+         _boostedSimplifier = &_boostedSimplifierMainSM;
+         assert(_boostedSimplifier != 0);
+#endif
          return false;
 #endif
 
@@ -6027,38 +6154,66 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       if(_simplifier != nullptr)
          _simplifier->setTolerances(this->_tolerances);
 
+      if(_boostedSimplifier != nullptr)
+         _boostedSimplifier->setTolerances(this->_tolerances);
+
       break;
 
    // type of scaler
    case SoPlexBase<R>::SCALER:
+#ifndef SOPLEX_WITH_MPFR
+      _boostedScaler = nullptr;
+#endif
+
       switch(value)
       {
       case SCALER_OFF:
          _scaler = nullptr;
+#ifdef SOPLEX_WITH_MPFR
+         _boostedScaler = nullptr;
+#endif
          break;
 
       case SCALER_UNIEQUI:
          _scaler = &_scalerUniequi;
+#ifdef SOPLEX_WITH_MPFR
+         _boostedScaler = &_boostedScalerUniequi;
+#endif
          break;
 
       case SCALER_BIEQUI:
          _scaler = &_scalerBiequi;
+#ifdef SOPLEX_WITH_MPFR
+         _boostedScaler = &_boostedScalerBiequi;
+#endif
          break;
 
       case SCALER_GEO1:
          _scaler = &_scalerGeo1;
+#ifdef SOPLEX_WITH_MPFR
+         _boostedScaler = &_boostedScalerGeo1;
+#endif
          break;
 
       case SCALER_GEO8:
          _scaler = &_scalerGeo8;
+#ifdef SOPLEX_WITH_MPFR
+         _boostedScaler = &_boostedScalerGeo8;
+#endif
          break;
 
       case SCALER_LEASTSQ:
          _scaler = &_scalerLeastsq;
+#ifdef SOPLEX_WITH_MPFR
+         _boostedScaler = &_boostedScalerLeastsq;
+#endif
          break;
 
       case SCALER_GEOEQUI:
          _scaler = &_scalerGeoequi;
+#ifdef SOPLEX_WITH_MPFR
+         _boostedScaler = &_boostedScalerGeoequi;
+#endif
          break;
 
       default:
@@ -6067,6 +6222,9 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
 
       if(_scaler != nullptr)
          _scaler->setTolerances(this->_tolerances);
+
+      if(_boostedScaler != nullptr)
+         _boostedScaler->setTolerances(this->_tolerances);
 
       break;
 
@@ -6106,26 +6264,44 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       {
       case PRICER_AUTO:
          _solver.setPricer(&_pricerAuto);
+#ifdef SOPLEX_WITH_MPFR
+         _boostedSolver.setPricer(&_boostedPricerAuto);
+#endif
          break;
 
       case PRICER_DANTZIG:
          _solver.setPricer(&_pricerDantzig);
+#ifdef SOPLEX_WITH_MPFR
+         _boostedSolver.setPricer(&_boostedPricerDantzig);
+#endif
          break;
 
       case PRICER_PARMULT:
          _solver.setPricer(&_pricerParMult);
+#ifdef SOPLEX_WITH_MPFR
+         _boostedSolver.setPricer(&_boostedPricerParMult);
+#endif
          break;
 
       case PRICER_DEVEX:
          _solver.setPricer(&_pricerDevex);
+#ifdef SOPLEX_WITH_MPFR
+         _boostedSolver.setPricer(&_boostedPricerDevex);
+#endif
          break;
 
       case PRICER_QUICKSTEEP:
          _solver.setPricer(&_pricerQuickSteep);
+#ifdef SOPLEX_WITH_MPFR
+         _boostedSolver.setPricer(&_boostedPricerQuickSteep);
+#endif
          break;
 
       case PRICER_STEEP:
          _solver.setPricer(&_pricerSteep);
+#ifdef SOPLEX_WITH_MPFR
+         _boostedSolver.setPricer(&_boostedPricerSteep);
+#endif
          break;
 
       default:
@@ -6240,18 +6416,30 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       {
       case RATIOTESTER_TEXTBOOK:
          _solver.setTester(&_ratiotesterTextbook);
+#ifdef SOPLEX_WITH_MPFR
+         _boostedSolver.setTester(&_boostedRatiotesterTextbook);
+#endif
          break;
 
       case RATIOTESTER_HARRIS:
          _solver.setTester(&_ratiotesterHarris);
+#ifdef SOPLEX_WITH_MPFR
+         _boostedSolver.setTester(&_boostedRatiotesterHarris);
+#endif
          break;
 
       case RATIOTESTER_FAST:
          _solver.setTester(&_ratiotesterFast);
+#ifdef SOPLEX_WITH_MPFR
+         _boostedSolver.setTester(&_boostedRatiotesterFast);
+#endif
          break;
 
       case RATIOTESTER_BOUNDFLIPPING:
          _solver.setTester(&_ratiotesterBoundFlipping);
+#ifdef SOPLEX_WITH_MPFR
+         _boostedSolver.setTester(&_boostedRatiotesterBoundFlipping);
+#endif
          break;
 
       default:
@@ -6350,6 +6538,16 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
 
    case STATTIMER:
       setTimings((Timer::TYPE) value);
+      break;
+
+   // maximum number of digits for the multiprecision type
+   case SoPlexBase<R>::MULTIPRECISION_LIMIT:
+      break;
+
+   case SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ:
+      // attributes in solvers need to be updated
+      _solver.setStoreBasisFreqForBoosting(value);
+      _boostedSolver.setStoreBasisFreqForBoosting(value);
       break;
 
    default:
@@ -6547,6 +6745,10 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
 
       return false;
 #endif
+      break;
+
+   // factor by which the precision of the floating-point solver is multiplied
+   case SoPlexBase<R>::PRECISION_BOOSTING_FACTOR:
       break;
 
    default:
@@ -7208,6 +7410,41 @@ void SoPlexBase<R>::_rangeToPerm(int start, int end, int* perm, int permSize) co
       perm[i] = (i < start || i > end) ? i : -1;
 }
 
+
+/// checks consistency
+template <class R>
+bool SoPlexBase<R>::_isBoostedConsistent() const
+{
+   assert(_statistics != 0);
+   assert(_currentSettings != 0);
+
+   assert(_rationalLP != 0 || intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL);
+
+   ///@todo precision-boosting _realLP not used in _boostedSolver
+#ifdef SOPLEX_DISABLED_CODE
+   assert(_realLP != 0);
+
+   assert(_realLP != &_boostedSolver || _isRealLPLoaded);
+   assert(_realLP == &_boostedSolver || !_isRealLPLoaded);
+
+   assert(!_hasBasis || _isRealLPLoaded || _basisStatusRows.size() == numRows());
+   assert(!_hasBasis || _isRealLPLoaded || _basisStatusCols.size() == numCols());
+#endif
+
+   assert(!_hasBasis || _basisStatusRows.size() == numRows());
+   assert(!_hasBasis || _basisStatusCols.size() == numCols());
+
+   assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED || _hasBasis);
+   assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED
+          || _rationalLUSolver.dim() == _rationalLUSolverBind.size());
+   assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED
+          || _rationalLUSolver.dim() == numRowsRational());
+
+   assert(_rationalLP == 0 || _colTypes.size() == numColsRational());
+   assert(_rationalLP == 0 || _rowTypes.size() == numRowsRational());
+
+   return true;
+}
 
 
 /// checks consistency
@@ -8040,6 +8277,9 @@ void SoPlexBase<R>::_enableSimplifierAndScaler()
    {
    case SIMPLIFIER_OFF:
       _simplifier = 0;
+#ifdef SOPLEX_WITH_MPFR
+      _boostedSimplifier = 0;
+#endif
       break;
 
    case SIMPLIFIER_AUTO:
@@ -8047,17 +8287,31 @@ void SoPlexBase<R>::_enableSimplifierAndScaler()
       _simplifier = &_simplifierMainSM;
       assert(_simplifier != 0);
       _simplifier->setMinReduction(realParam(MINRED));
+#ifdef SOPLEX_WITH_MPFR
+      _boostedSimplifier = &_boostedSimplifierMainSM;
+      assert(_boostedSimplifier != 0);
+      _boostedSimplifier->setMinReduction(realParam(MINRED));
+#endif
       break;
 
    case SIMPLIFIER_PAPILO:
 #ifdef SOPLEX_WITH_PAPILO
       _simplifier = &_simplifierPaPILO;
       assert(_simplifier != 0);
+#ifdef SOPLEX_WITH_MPFR
+      _boostedSimplifier = &_boostedSimplifierPaPILO;
+      assert(_boostedSimplifier != 0);
+#endif
 #else
       _simplifier = &_simplifierMainSM;
       assert(_simplifier != 0);
       _simplifier->setMinReduction(realParam(MINRED));
-#endif
+#ifdef SOPLEX_WITH_MPFR
+      _boostedSimplifier = &_boostedSimplifierMainSM;
+      assert(_boostedSimplifier != 0);
+      _boostedSimplifier->setMinReduction(realParam(MINRED));
+#endif // !SOPLEX_WITH_MPFR
+#endif // SOPLEX_WITH_PAPILO
       break;
 
    default:
@@ -8069,30 +8323,51 @@ void SoPlexBase<R>::_enableSimplifierAndScaler()
    {
    case SCALER_OFF:
       _scaler = 0;
+#ifdef SOPLEX_WITH_MPFR
+      _boostedScaler = 0;
+#endif
       break;
 
    case SCALER_UNIEQUI:
       _scaler = &_scalerUniequi;
+#ifdef SOPLEX_WITH_MPFR
+      _boostedScaler = &_boostedScalerUniequi;
+#endif
       break;
 
    case SCALER_BIEQUI:
       _scaler = &_scalerBiequi;
+#ifdef SOPLEX_WITH_MPFR
+      _boostedScaler = &_boostedScalerBiequi;
+#endif
       break;
 
    case SCALER_GEO1:
       _scaler = &_scalerGeo1;
+#ifdef SOPLEX_WITH_MPFR
+      _boostedScaler = &_boostedScalerGeo1;
+#endif
       break;
 
    case SCALER_GEO8:
       _scaler = &_scalerGeo8;
+#ifdef SOPLEX_WITH_MPFR
+      _boostedScaler = &_boostedScalerGeo8;
+#endif
       break;
 
    case SCALER_LEASTSQ:
       _scaler = &_scalerLeastsq;
+#ifdef SOPLEX_WITH_MPFR
+      _boostedScaler = &_boostedScalerLeastsq;
+#endif
       break;
 
    case SCALER_GEOEQUI:
       _scaler = &_scalerGeoequi;
+#ifdef SOPLEX_WITH_MPFR
+      _boostedScaler = &_boostedScalerGeoequi;
+#endif
       break;
 
    default:
@@ -8107,10 +8382,18 @@ template <class R>
 void SoPlexBase<R>::_disableSimplifierAndScaler()
 {
    _simplifier = 0;
+#ifdef SOPLEX_WITH_MPFR
+   _boostedSimplifier = 0;
+#endif
 
    // preserve scaler when persistent scaling is used
    if(!_isRealLPScaled)
+   {
       _scaler = 0;
+#ifdef SOPLEX_WITH_MPFR
+      _boostedScaler = 0;
+#endif
+   }
    else
       assert(boolParam(SoPlexBase<R>::PERSISTENTSCALING));
 }
@@ -8158,6 +8441,142 @@ void SoPlexBase<R>::_ensureRealLPLoaded()
    }
 }
 
+
+
+/// call floating-point solver and update statistics on iterations etc.
+template <class R>
+void SoPlexBase<R>::_solveBoostedRealLPAndRecordStatistics(volatile bool* interrupt)
+{
+
+   ///@todo precision-boosting add arg SPxSolverBase<S> solver (idea for the future)
+   bool _hadBasis = _hasBasis;
+
+   // set time and iteration limit
+   if(intParam(SoPlexBase<R>::ITERLIMIT) < realParam(SoPlexBase<R>::INFTY))
+      _boostedSolver.setTerminationIter(intParam(SoPlexBase<R>::ITERLIMIT) - _statistics->iterations);
+   else
+      _boostedSolver.setTerminationIter(-1);
+
+   if(realParam(SoPlexBase<R>::TIMELIMIT) < realParam(SoPlexBase<R>::INFTY))
+      _boostedSolver.setTerminationTime(Real(realParam(SoPlexBase<R>::TIMELIMIT)) -
+                                        _statistics->solvingTime->time());
+   else
+      _boostedSolver.setTerminationTime(Real(realParam(SoPlexBase<R>::INFTY)));
+
+   // ensure that tolerances are not too small
+   R mintol = 1e4 * _solver.epsilon();
+
+   if(this->tolerances()->floatingPointFeastol() < mintol)
+      this->tolerances()->setFloatingPointFeastol(Real(mintol));
+
+   if(this->tolerances()->floatingPointOpttol() < mintol)
+      this->tolerances()->setFloatingPointOpttol(Real(mintol));
+
+   // set correct representation
+   if((intParam(SoPlexBase<R>::REPRESENTATION) == SoPlexBase<R>::REPRESENTATION_COLUMN
+         || (intParam(SoPlexBase<R>::REPRESENTATION) == SoPlexBase<R>::REPRESENTATION_AUTO
+             && (_boostedSolver.nCols() + 1) * realParam(SoPlexBase<R>::REPRESENTATION_SWITCH) >=
+             (_boostedSolver.nRows() + 1)))
+         && _boostedSolver.rep() != SPxSolverBase<BP>::COLUMN)
+   {
+      _boostedSolver.setRep(SPxSolverBase<BP>::COLUMN);
+   }
+   else if((intParam(SoPlexBase<R>::REPRESENTATION) == SoPlexBase<R>::REPRESENTATION_ROW
+            || (intParam(SoPlexBase<R>::REPRESENTATION) == SoPlexBase<R>::REPRESENTATION_AUTO
+                && (_boostedSolver.nCols() + 1) * realParam(SoPlexBase<R>::REPRESENTATION_SWITCH) <
+                (_boostedSolver.nRows() + 1)))
+           && _boostedSolver.rep() != SPxSolverBase<BP>::ROW)
+   {
+      _boostedSolver.setRep(SPxSolverBase<BP>::ROW);
+   }
+
+   // set correct type
+   if(((intParam(ALGORITHM) == SoPlexBase<R>::ALGORITHM_PRIMAL
+         && _boostedSolver.rep() == SPxSolverBase<BP>::COLUMN)
+         || (intParam(ALGORITHM) == SoPlexBase<R>::ALGORITHM_DUAL
+             && _boostedSolver.rep() == SPxSolverBase<BP>::ROW))
+         && _boostedSolver.type() != SPxSolverBase<BP>::ENTER)
+   {
+      _boostedSolver.setType(SPxSolverBase<BP>::ENTER);
+   }
+   else if(((intParam(ALGORITHM) == SoPlexBase<R>::ALGORITHM_DUAL
+             && _boostedSolver.rep() == SPxSolverBase<BP>::COLUMN)
+            || (intParam(ALGORITHM) == SoPlexBase<R>::ALGORITHM_PRIMAL
+                && _boostedSolver.rep() == SPxSolverBase<BP>::ROW))
+           && _boostedSolver.type() != SPxSolverBase<BP>::LEAVE)
+   {
+      _boostedSolver.setType(SPxSolverBase<BP>::LEAVE);
+   }
+
+   // set pricing modes
+   _boostedSolver.setSparsePricingFactor(realParam(SoPlexBase<R>::SPARSITY_THRESHOLD));
+
+   if((intParam(SoPlexBase<R>::HYPER_PRICING) == SoPlexBase<R>::HYPER_PRICING_ON)
+         || ((intParam(SoPlexBase<R>::HYPER_PRICING) == SoPlexBase<R>::HYPER_PRICING_AUTO)
+             && (_boostedSolver.nRows() + _boostedSolver.nCols() > SOPLEX_HYPERPRICINGTHRESHOLD)))
+      _boostedSolver.hyperPricing(true);
+   else if(intParam(SoPlexBase<R>::HYPER_PRICING) == SoPlexBase<R>::HYPER_PRICING_OFF)
+      _boostedSolver.hyperPricing(false);
+
+   _boostedSolver.setNonzeroFactor(realParam(SoPlexBase<R>::REFAC_BASIS_NNZ));
+   _boostedSolver.setFillFactor(realParam(SoPlexBase<R>::REFAC_UPDATE_FILL));
+   _boostedSolver.setMemFactor(realParam(SoPlexBase<R>::REFAC_MEM_FACTOR));
+
+   // call floating-point solver and catch exceptions
+   _statistics->simplexTime->start();
+
+   try
+   {
+      _boostedSolver.solve(interrupt);
+   }
+   catch(const SPxException& E)
+   {
+      SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() << "> while solving Real LP.\n");
+      _status = SPxSolverBase<R>::ERROR;
+   }
+   catch(...)
+   {
+      SPX_MSG_INFO1(spxout, spxout << "Caught unknown exception while solving Real LP.\n");
+      _status = SPxSolverBase<R>::ERROR;
+   }
+
+   _statistics->simplexTime->stop();
+
+   // invalidate rational factorization of basis if pivots have been performed
+   if(_boostedSolver.iterations() > 0)
+      _rationalLUSolver.clear();
+
+   ///@todo precision-boosting currently no need to record statistics for the boosted solver
+   // record statistics
+   _statistics->iterations += _boostedSolver.iterations();
+   _statistics->iterationsPrimal += _boostedSolver.primalIterations();
+   _statistics->iterationsFromBasis += _hadBasis ? _boostedSolver.iterations() : 0;
+   _statistics->iterationsPolish += _boostedSolver.polishIterations();
+   _statistics->boundflips += _boostedSolver.boundFlips();
+   _statistics->boostedIterations += _boostedSolver.iterations();
+   _statistics->boostedIterationsPrimal += _boostedSolver.primalIterations();
+   _statistics->boostedIterationsFromBasis += _hadBasis ? _boostedSolver.iterations() : 0;
+   _statistics->boostedIterationsPolish += _boostedSolver.polishIterations();
+   _statistics->boostedBoundflips += _boostedSolver.boundFlips();
+   _statistics->multTimeSparse += _boostedSolver.multTimeSparse->time();
+   _statistics->multTimeFull += _boostedSolver.multTimeFull->time();
+   _statistics->multTimeColwise += _boostedSolver.multTimeColwise->time();
+   _statistics->multTimeUnsetup += _boostedSolver.multTimeUnsetup->time();
+   _statistics->multSparseCalls += _boostedSolver.multSparseCalls;
+   _statistics->multFullCalls += _boostedSolver.multFullCalls;
+   _statistics->multColwiseCalls += _boostedSolver.multColwiseCalls;
+   _statistics->multUnsetupCalls += _boostedSolver.multUnsetupCalls;
+   _statistics->luFactorizationTimeReal += _slufactor.getFactorTime();
+   _statistics->luSolveTimeReal += _slufactor.getSolveTime();
+   _statistics->luFactorizationsReal += _slufactor.getFactorCount();
+   _statistics->luSolvesReal += _slufactor.getSolveCount();
+   _slufactor.resetCounters();
+
+   _statistics->degenPivotsPrimal += _boostedSolver.primalDegeneratePivots();
+   _statistics->degenPivotsDual += _boostedSolver.dualDegeneratePivots();
+   _statistics->sumDualDegen += R(_boostedSolver.sumDualDegeneracy());
+   _statistics->sumPrimalDegen += R(_boostedSolver.sumPrimalDegeneracy());
+}
 
 
 /// call floating-point solver and update statistics on iterations etc.
@@ -8536,6 +8955,8 @@ bool SoPlexBase<R>::_parseSettingsLine(char* line, const int lineNumber)
 {
    assert(line != 0);
 
+   bool success = true;
+
    // find the start of the parameter type
    while(*line == ' ' || *line == '\t' || *line == '\r')
       line++;
@@ -8672,7 +9093,7 @@ bool SoPlexBase<R>::_parseSettingsLine(char* line, const int lineNumber)
                   || strncasecmp(paramValueString, "T", 4) == 0
                   || strtol(paramValueString, NULL, 4) == 1)
             {
-               setBoolParam((SoPlexBase<R>::BoolParam)param, true);
+               success = setBoolParam((SoPlexBase<R>::BoolParam)param, true);
                break;
             }
             else if(strncasecmp(paramValueString, "false", 5) == 0
@@ -8681,7 +9102,7 @@ bool SoPlexBase<R>::_parseSettingsLine(char* line, const int lineNumber)
                     || strncasecmp(paramValueString, "F", 5) == 0
                     || strtol(paramValueString, NULL, 5) == 0)
             {
-               setBoolParam((SoPlexBase<R>::BoolParam)param, false);
+               success = setBoolParam((SoPlexBase<R>::BoolParam)param, false);
                break;
             }
             else
@@ -8693,7 +9114,7 @@ bool SoPlexBase<R>::_parseSettingsLine(char* line, const int lineNumber)
          }
       }
 
-      return true;
+      return success;
    }
 
    // check whether we have an integer parameter
@@ -8860,6 +9281,7 @@ SoPlexBase<R>::SoPlexBase()
 {
    _tolerances = std::make_shared<Tolerances>();
    _solver.setTolerances(_tolerances);
+   _boostedSolver.setTolerances(_tolerances);
    // set tolerances for scalers
    _scalerUniequi.setTolerances(_tolerances);
    _scalerBiequi.setTolerances(_tolerances);
@@ -8867,13 +9289,28 @@ SoPlexBase<R>::SoPlexBase()
    _scalerGeo8.setTolerances(_tolerances);
    _scalerGeoequi.setTolerances(_tolerances);
    _scalerLeastsq.setTolerances(_tolerances);
+
+   _boostedScalerUniequi.setTolerances(_tolerances);
+   _boostedScalerBiequi.setTolerances(_tolerances);
+   _boostedScalerGeo1.setTolerances(_tolerances);
+   _boostedScalerGeo8.setTolerances(_tolerances);
+   _boostedScalerGeoequi.setTolerances(_tolerances);
+   _boostedScalerLeastsq.setTolerances(_tolerances);
+
    // set tolerances for ratio testers
    _ratiotesterBoundFlipping.setTolerances(_tolerances);
    _ratiotesterFast.setTolerances(_tolerances);
    _ratiotesterHarris.setTolerances(_tolerances);
    _ratiotesterTextbook.setTolerances(_tolerances);
+
+   _boostedRatiotesterBoundFlipping.setTolerances(_tolerances);
+   _boostedRatiotesterFast.setTolerances(_tolerances);
+   _boostedRatiotesterHarris.setTolerances(_tolerances);
+   _boostedRatiotesterTextbook.setTolerances(_tolerances);
+
    // set tolerances for slufactor
    _slufactor.setTolerances(_tolerances);
+   _boostedSlufactor.setTolerances(_tolerances);
    // transfer message handler
    _solver.setOutstream(spxout);
    _scalerUniequi.setOutstream(spxout);
@@ -8885,6 +9322,35 @@ SoPlexBase<R>::SoPlexBase()
 
    // give lu factorization to solver
    _solver.setBasisSolver(&_slufactor);
+
+#ifdef SOPLEX_WITH_MPFR
+   // set initial precision
+   BP::default_precision(_initialPrecision);
+
+   _boostedSolver.setOutstream(spxout);
+   _boostedScalerUniequi.setOutstream(spxout);
+   _boostedScalerBiequi.setOutstream(spxout);
+   _boostedScalerGeo1.setOutstream(spxout);
+   _boostedScalerGeo8.setOutstream(spxout);
+   _boostedScalerGeoequi.setOutstream(spxout);
+   _boostedScalerLeastsq.setOutstream(spxout);
+
+   _boostedSolver.setBasisSolver(&_boostedSlufactor);
+
+   _lastStallPrecBoosts = 0;
+   _factorSolNewBasisPrecBoost = true;
+   _nextRatrecPrecBoost = 0;
+   _prevIterations = 0;
+
+   _switchedToBoosted = false;
+
+   _certificateMode = 0;
+   _hasOldBasis     = false;
+   _hasOldFeasBasis = false;
+   _hasOldUnbdBasis = false;
+
+   _boostingLimitReached = false;
+#endif
 
    // the R LP is initially stored in the solver; the rational LP is constructed, when the parameter SYNCMODE is
    // initialized in setSettings() below
@@ -8974,6 +9440,8 @@ template <class R>
 bool SoPlexBase<R>::parseSettingsString(char* string)
 {
    assert(string != 0);
+
+   bool success = true;
 
    if(string == 0)
       return false;
@@ -9115,7 +9583,7 @@ bool SoPlexBase<R>::parseSettingsString(char* string)
                   || strncasecmp(paramValueString, "T", 4) == 0
                   || strtol(paramValueString, NULL, 4) == 1)
             {
-               setBoolParam((SoPlexBase<R>::BoolParam)param, true);
+               success = setBoolParam((SoPlexBase<R>::BoolParam)param, true);
                break;
             }
             else if(strncasecmp(paramValueString, "false", 5) == 0
@@ -9124,7 +9592,7 @@ bool SoPlexBase<R>::parseSettingsString(char* string)
                     || strncasecmp(paramValueString, "F", 5) == 0
                     || strtol(paramValueString, NULL, 5) == 0)
             {
-               setBoolParam((SoPlexBase<R>::BoolParam)param, false);
+               success = setBoolParam((SoPlexBase<R>::BoolParam)param, false);
                break;
             }
             else
@@ -9136,7 +9604,7 @@ bool SoPlexBase<R>::parseSettingsString(char* string)
          }
       }
 
-      return true;
+      return success;
    }
 
    // check whether we have an integer parameter
@@ -9704,6 +10172,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::optimize(volatile bool* interru
       }
 
       _solver.setComputeDegenFlag(boolParam(COMPUTEDEGEN));
+      _solver.setSolvingForBoosted(false);
 
       _optimize(interrupt);
 #ifdef SOPLEX_DEBUG // this check will remove scaling of the realLP
@@ -9910,6 +10379,7 @@ void SoPlexBase<R>::setTimings(const Timer::TYPE ttype)
    _statistics->rationalTime = TimerFactory::switchTimer(_statistics->rationalTime, ttype);
    _statistics->transformTime = TimerFactory::switchTimer(_statistics->transformTime, ttype);
    _statistics->reconstructionTime = TimerFactory::switchTimer(_statistics->reconstructionTime, ttype);
+   _statistics->boostingStepTime = TimerFactory::switchTimer(_statistics->boostingStepTime, ttype);
 }
 
 /// prints solution statistics

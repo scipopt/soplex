@@ -6,6 +6,8 @@ features:
 - add option to print primal/dual solutions to a file using `-x=<filename>` or `-y=<filename>`, respectively
   exact rational solutions can be written with `-X=<filename>` or `-Y=<filename>`. If `<filename>` is the
   same for multiple options the different solutions are appended to the same file
+- new option to use incremental precision boosting for rational LP solving. If MPFR is linked (requirement for boosting)
+  the new default configuration is precision boosting an outer iterative refinement loop. Can be changed with `bool:precision_boosting`
 
 interface & parameters:
 - allow reading of files with arbitrarily long lines by reallocating buffers dynamically
