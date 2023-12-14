@@ -155,7 +155,7 @@ void checkSolutionReal(SoPlexBase<R>& soplex)
       if(soplex.getBoundViolation(boundviol, sumviol) && soplex.getRowViolation(rowviol, sumviol))
       {
          SPX_MSG_INFO1(soplex.spxout,
-                       R maxviol = boundviol > rowviol ? boundviol : rowviol;
+                       const R &maxviol = boundviol > rowviol ? boundviol : rowviol;
                        bool feasible = (maxviol <= soplex.realParam(SoPlexBase<R>::FEASTOL));
                        soplex.spxout << "Primal solution " << (feasible ? "feasible" : "infeasible")
                        << " in original problem (max. violation = " << std::scientific << maxviol
@@ -180,7 +180,7 @@ void checkSolutionReal(SoPlexBase<R>& soplex)
       if(soplex.getRedCostViolation(redcostviol, sumviol) && soplex.getDualViolation(dualviol, sumviol))
       {
          SPX_MSG_INFO1(soplex.spxout,
-                       R maxviol = redcostviol > dualviol ? redcostviol : dualviol;
+                       const R &maxviol = redcostviol > dualviol ? redcostviol : dualviol;
                        bool feasible = (maxviol <= soplex.realParam(SoPlexBase<R>::OPTTOL));
                        soplex.spxout << "Dual solution " << (feasible ? "feasible" : "infeasible")
                        << " in original problem (max. violation = " << std::scientific << maxviol
@@ -213,7 +213,7 @@ static void checkSolutionRational(SoPlexBase<R>& soplex)
             && soplex.getRowViolationRational(rowviol, sumviol))
       {
          SPX_MSG_INFO1(soplex.spxout,
-                       Rational maxviol = boundviol > rowviol ? boundviol : rowviol;
+                       const Rational &maxviol = boundviol > rowviol ? boundviol : rowviol;
                        bool feasible = (maxviol <= soplex.realParam(SoPlexBase<R>::FEASTOL));
                        soplex.spxout << "Primal solution " << (feasible ? "feasible" : "infeasible") <<
                        " in original problem (max. violation = " << maxviol << ").\n"
@@ -239,7 +239,7 @@ static void checkSolutionRational(SoPlexBase<R>& soplex)
             && soplex.getDualViolationRational(dualviol, sumviol))
       {
          SPX_MSG_INFO1(soplex.spxout,
-                       Rational maxviol = redcostviol > dualviol ? redcostviol : dualviol;
+                       const Rational &maxviol = redcostviol > dualviol ? redcostviol : dualviol;
                        bool feasible = (maxviol <= soplex.realParam(SoPlexBase<R>::OPTTOL));
                        soplex.spxout << "Dual solution " << (feasible ? "feasible" : "infeasible") <<
                        " in original problem (max. violation = " << maxviol << ").\n"
