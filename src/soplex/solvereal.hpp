@@ -520,7 +520,6 @@ void SoPlexBase<R>::_verifyObjLimitReal()
    }
 }
 
-
 /// stores solution data from the solver, possibly after applying unscaling and unsimplifying
 template <class R>
 void SoPlexBase<R>::_storeSolutionReal(bool verify)
