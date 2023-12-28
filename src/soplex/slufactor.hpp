@@ -1374,7 +1374,7 @@ static R betterThreshold(R th, Real epsilon)
 {
    assert(th < R(1.0));
 
-   if(LT(th, R(0.1), epsilon))
+   if(LT(th, R(0.1), 1e-15))
       th *= R(10.0);
    else if(LT(th, R(0.9), epsilon))
       th = (th + R(1.0)) / R(2.0);
