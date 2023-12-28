@@ -3,6 +3,8 @@
 #include <assert.h>
 #include <string.h>
 
+#define UNUSED(x) ((void)(x))
+
 void test_real(void)
 {
    /* create LP via columns */
@@ -29,6 +31,7 @@ void test_real(void)
    /* optimize and get solution and objective value */
    int result = SoPlex_optimize(soplex);
    assert(result == 1);
+   UNUSED(result); /* add this to avoid unused variable warining */
    SoPlex_getPrimalReal(soplex, primal, 2);
    assert(primal[0] == 0.0 && primal[1] == -10.0);
    assert(SoPlex_objValueReal(soplex) == -10.0);
@@ -93,6 +96,7 @@ void test_rational(void)
    /* optimize and check rational solution and objective value */
    int result = SoPlex_optimize(soplex);
    assert(result == 1);
+   UNUSED(result); /* add this to avoid unused variable warining */
    assert(strcmp(SoPlex_getPrimalRationalString(soplex, 2), "0 1/5 ") == 0);
    assert(strcmp(SoPlex_objValueRationalString(soplex), "1/5") == 0);
 
