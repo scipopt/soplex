@@ -11,6 +11,12 @@ features:
 
 interface & parameters:
 - allow reading of files with arbitrarily long lines by reallocating buffers dynamically
+- add new functions to soplex_interface.cpp: SoPlex_readInstanceFile(), SoPlex_readBasisFile(),
+  SoPlex_readSettingsFile(), SoPlex_setBoolParam(), SoPlex_setRealParam(), SoPlex_removeColReal(),
+  SoPlex_removeRowReal(), SoPlex_getRedCostReal(), SoPlex_getStatus(), SoPlex_getSolvingTime(),
+  SoPlex_getNumIterations(), SoPlex_changeRowLhsReal(), SoPlex_changeRowRhsReal(), SoPlex_changeRangeReal(),
+  SoPlex_changeRowRangeReal(), SoPlex_changeLowerReal(), SoPlex_changeVarLowerReal(), SoPlex_getLowerReal(),
+  SoPlex_getObjReal(), SoPlex_changeUpperReal()
 
 performance:
 
@@ -25,6 +31,7 @@ code quality:
 fixed bugs:
 - fix unset tolerances for simplifier and ratio tester plugins in soplex' copy constructor
 - fix unset outstream pointer in soplex' copy constructor
+- fix bugs in function definitions in soplex_interface.cpp: SoPlex_changeVarUpperReal(), SoPlex_getUpperReal()
 
 Upcoming Bugfix Release 6.0.4
 =============================
