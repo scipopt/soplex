@@ -117,6 +117,19 @@ public:
 
       return *this;
    }
+   /// move assignment
+   UnitVectorBase<R>& operator=(UnitVectorBase<R>&& rhs)
+   {
+      if(this != &rhs)
+      {
+         themem = std::move(rhs.themem);
+         this->set_size(1);
+
+         assert(isConsistent());
+      }
+
+      return *this;
+   }
    /// destructor
    ~UnitVectorBase()
    {}

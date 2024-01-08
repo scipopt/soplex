@@ -1306,6 +1306,9 @@ bool SPxSolverBase<R>::performSolutionPolishing()
       int nrows = this->nRows();
       int ncols = this->nCols();
 
+      assert(nrows >= 0);
+      assert(ncols >= 0);
+
       if(polishObj == POLISH_INTEGRALITY)
       {
          DIdxSet slackcandidates(nrows);
@@ -1347,6 +1350,7 @@ bool SPxSolverBase<R>::performSolutionPolishing()
             // identify nonbasic slack variables, i.e. rows, that may be moved into the basis
             for(int i = slackcandidates.size() - 1; i >= 0 && !stop; --i)
             {
+               // coverity[forward_null]
                polishId = coId(slackcandidates.index(i));
                SPxOut::debug(this, "try pivoting: {} stat: {}\n", polishId, rowstatus[slackcandidates.index(i)]);
                success = enter(polishId, true);
@@ -1402,6 +1406,7 @@ bool SPxSolverBase<R>::performSolutionPolishing()
       else
       {
          assert(polishObj == POLISH_FRACTIONALITY);
+         assert(dim() >= 0);
          DIdxSet candidates(dim());
 
          // identify nonbasic variables, i.e. columns, that may be moved into the basis
@@ -1422,6 +1427,7 @@ bool SPxSolverBase<R>::performSolutionPolishing()
 
             for(int i = candidates.size() - 1; i >= 0 && !stop; --i)
             {
+               // coverity[forward_null]
                polishId = id(candidates.index(i));
                SPxOut::debug(this, "try pivoting: {} stat: {}\n", polishId, colstatus[candidates.index(i)]);
                success = enter(polishId, true);
@@ -1467,6 +1473,7 @@ bool SPxSolverBase<R>::performSolutionPolishing()
       // in ROW rep: pivot slack out of the basis
       if(polishObj == POLISH_INTEGRALITY)
       {
+         assert(dim() >= 0);
          DIdxSet basiccandidates(dim());
 
          // collect basic candidates that may be moved out of the basis
@@ -1498,7 +1505,7 @@ bool SPxSolverBase<R>::performSolutionPolishing()
 
             for(int i = basiccandidates.size() - 1; i >= 0 && !stop; --i)
             {
-
+               // coverity[forward_null]
                SPxOut::debug(this, "try pivoting: {}", this->baseId(basiccandidates.index(i)));
                success = leave(basiccandidates.index(i), true);
                clearUpdateVecs();
@@ -1529,6 +1536,7 @@ bool SPxSolverBase<R>::performSolutionPolishing()
       else
       {
          assert(polishObj == POLISH_FRACTIONALITY);
+         assert(dim() >= 0);
          DIdxSet basiccandidates(dim());
 
          // collect basic (integer) variables, that may be moved out of the basis
@@ -1559,6 +1567,7 @@ bool SPxSolverBase<R>::performSolutionPolishing()
 
             for(int i = basiccandidates.size() - 1; i >= 0 && !stop; --i)
             {
+               // coverity[forward_null]
                SPxOut::debug(this, "try pivoting: {}", this->baseId(basiccandidates.index(i)));
                success = leave(basiccandidates.index(i), true);
                clearUpdateVecs();

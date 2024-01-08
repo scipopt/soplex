@@ -600,7 +600,7 @@ void SoPlex_getRowVectorRational(void* soplex, int i, int* nnonzeros, long* indi
 {
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
-#endif
+#else
    SoPlex* so = (SoPlex*)(soplex);
    LPRowRational lprow;
    SVectorRational row;
@@ -616,6 +616,8 @@ void SoPlex_getRowVectorRational(void* soplex, int i, int* nnonzeros, long* indi
       coefsdenom[j] = (long int) denominator(row.value(j));
       indices[j] = row.index(j);
    }
+
+#endif
 }
 
 /** get lower and upper bounds of row i **/
@@ -633,11 +635,12 @@ void SoPlex_getRowBoundsRational(void* soplex, int i, long* lbnum, long* lbdenom
 {
 #ifndef SOPLEX_WITH_BOOST
    throw SPxException("Rational functions cannot be used when built without Boost.");
-#endif
+#else
    SoPlex* so = (SoPlex*)(soplex);
 
    *lbnum = (long int) numerator(so->lhsRational(i));
    *lbdenom = (long int) denominator(so->lhsRational(i));
    *ubnum = (long int) numerator(so->rhsRational(i));
    *ubdenom = (long int) denominator(so->rhsRational(i));
+#endif
 }
