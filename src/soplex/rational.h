@@ -228,6 +228,7 @@ using mpq_t = char;
 
 using Integer = int;
 // this is a placeholder class to ensure compilation when boost ist not linked. Rationals need BOOST in order to function.
+// coverity[missing_move_assign]
 class Rational
 {
 

@@ -110,17 +110,22 @@ private:
       /// Default constructor.
       DLPSV()
          : SVectorBase<R>()
-      {}
+      {
+         thenext = nullptr;
+         theprev = nullptr;
+      }
 
       /// Copy constructor.
       DLPSV(const DLPSV& copy)
          : SVectorBase<R>(copy)
       {}
 
+      /// move constructor.
       DLPSV(DLPSV&& copy)
          : SVectorBase<R>(copy)
       {}
 
+      /// move assignment operator.
       DLPSV& operator=(DLPSV&& rhs)
       {
          SVectorBase<R>::operator=(std::move(rhs));
@@ -131,6 +136,13 @@ private:
             this->theprev = rhs.theprev;
          }
 
+         return *this;
+      }
+
+      /// Assignment operator.
+      DLPSV& operator=(const DLPSV& rhs)
+      {
+         SVectorBase<R>::operator=(rhs);
          return *this;
       }
       ///@}

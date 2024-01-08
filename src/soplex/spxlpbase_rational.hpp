@@ -922,6 +922,10 @@ syntax_error:
    if(p_rnames == 0)
       spx_free(rnames);
 
+   spx_free(buf);
+   spx_free(tmp);
+   spx_free(line);
+
    return finished;
 }
 

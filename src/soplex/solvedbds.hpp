@@ -1962,6 +1962,9 @@ void SoPlexBase<R>::_getCompatibleBoundCons(LPRowSetBase<R>& boundcons, int* com
 
    bool compatible;
    int ncols = numCols();
+
+   assert(ncols >= 0);
+
    SSVectorBase<R>  y(ncols, _solver.tolerances());
    y.unSetup();
 
