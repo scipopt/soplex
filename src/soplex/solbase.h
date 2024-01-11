@@ -307,6 +307,8 @@ private:
       return *this;
    }
 
+   ~SolBase() = default;
+
 };
 } // namespace soplex
 

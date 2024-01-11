@@ -145,6 +145,7 @@ public:
 
          return *this;
       }
+      ~Name() = default;
       ///@}
    };
 

@@ -381,6 +381,8 @@ public:
    }
    ///@}
 
+   ~DataHashTable() = default;
+
 private:
 
    //-----------------------------------

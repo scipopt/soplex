@@ -150,6 +150,8 @@ public:
    {
    }
 
+   ~VectorBase() = default;
+
 
    /// Assignment operator.
    // Supports assignment from a Rational vector to Real and vice versa

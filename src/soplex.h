@@ -1524,6 +1524,8 @@ public:
 
       /// assignment operator
       Settings& operator=(const Settings& settings);
+
+      ~Settings() = default;
    };
 
    mutable SPxOut spxout;
