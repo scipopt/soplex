@@ -198,7 +198,6 @@ void SoPlexBase<R>::Statistics::clearSolvingData()
    degenPivotCandDual = 0;
    sumDualDegen = 0;
    sumPrimalDegen = 0;
-   decompBasisCondNum = 0;
    totalBoundViol = 0;
    totalRowViol = 0;
    maxBoundViol = 0;
@@ -410,7 +409,6 @@ void SoPlexBase<R>::Statistics::print(std::ostream& os)
    if(iterationsInit > 0)
    {
       os << "Algorithm Iterations: " << callsReducedProb << "\n";
-      os << "Decomp. Iterations  : \n";
       os << "  Total             : " << iterationsInit + iterationsRedProb << "\n";
       os << "  Initial           : " << iterationsInit << "\n";
       os << "  Reduced Problem   : " << iterationsRedProb << "\n";
@@ -420,13 +418,6 @@ void SoPlexBase<R>::Statistics::print(std::ostream& os)
       os << "  Columns           : " << numRedProbCols << "\n";
 
       SPxOut::setScientific(os, 16);
-
-      os << "Decomp. Basis Cond. : " << decompBasisCondNum << "\n";
-      os << "Decomp Violations   : \n";
-      os << "  Sum Bound         : " << totalBoundViol << "\n";
-      os << "  Sum Row           : " << totalRowViol << "\n";
-      os << "  Max Bound         : " << maxBoundViol << "\n";
-      os << "  Max Row           : " << maxRowViol << "\n";
 
       SPxOut::setFixed(os, 2);
 

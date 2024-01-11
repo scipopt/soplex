@@ -168,7 +168,6 @@ public:
    int degenPivotCandDual;    ///< number of pivoting candidates that will produce a degenerate step in the dual
    R sumDualDegen;         ///< the sum of the rate of dual degeneracy at each iteration
    R sumPrimalDegen;       ///< the sum of the rate of primal degeneracy at each iteration
-   R decompBasisCondNum;   ///< the condition number for the basis used to perform the decomposition
    R totalBoundViol;       ///< the sum of the bound violations in the original problem using the red prob sol
    R totalRowViol;         ///< the sum of the row violations in the original problem using the red prob sol
    R maxBoundViol;         ///< the max bound violation in the original problem using the red prob sol

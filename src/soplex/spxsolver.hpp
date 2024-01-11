@@ -491,15 +491,6 @@ void SPxSolverBase<R>::setType(Type tp)
       }
    }
 
-   template <class R>
-   void SPxSolverBase<R>::setDecompStatus(DecompStatus decomp_stat)
-   {
-      if(decomp_stat == FINDSTARTBASIS)
-         getStartingDecompBasis = true;
-      else
-         getStartingDecompBasis = false;
-   }
-
    /*
      The following method resizes all vectors and arrays of |SoPlex|
      (excluding inherited vectors).
@@ -1088,9 +1079,6 @@ void SPxSolverBase<R>::setType(Type tp)
       , displayLine(0)
       , displayFreq(200)
       , sparsePricingFactor(SOPLEX_SPARSITYFACTOR)
-      , getStartingDecompBasis(false)
-      , computeDegeneracy(false)
-      , degenCompIterOffset(0)
       , fullPerturbation(false)
       , printBasisMetric(0)
       , unitVecs(0)
@@ -1221,10 +1209,6 @@ void SPxSolverBase<R>::setType(Type tp)
          displayLine = base.displayLine;
          displayFreq = base.displayFreq;
          sparsePricingFactor = base.sparsePricingFactor;
-         getStartingDecompBasis = base.getStartingDecompBasis;
-         computeDegeneracy = base.computeDegeneracy;
-         degenCompIterOffset = base.degenCompIterOffset;
-         decompIterationLimit = base.decompIterationLimit;
          fullPerturbation = base.fullPerturbation;
          printBasisMetric = base.printBasisMetric;
          unitVecs = base.unitVecs;
@@ -1433,10 +1417,6 @@ void SPxSolverBase<R>::setType(Type tp)
       , displayLine(base.displayLine)
       , displayFreq(base.displayFreq)
       , sparsePricingFactor(base.sparsePricingFactor)
-      , getStartingDecompBasis(base.getStartingDecompBasis)
-      , computeDegeneracy(base.computeDegeneracy)
-      , degenCompIterOffset(base.degenCompIterOffset)
-      , decompIterationLimit(base.decompIterationLimit)
       , fullPerturbation(base.fullPerturbation)
       , printBasisMetric(base.printBasisMetric)
       , unitVecs(base.unitVecs)
