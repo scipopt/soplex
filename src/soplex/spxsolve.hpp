@@ -1715,9 +1715,6 @@ void SPxSolverBase<R>::printDisplayLine(const bool force, const bool forceHead)
                       << std::setw(8) << SOPLEX_MAX(0, m_numViol) << " | "
                       << std::setprecision(8) << value();
 
-      if(getStartingDecompBasis && rep() == SPxSolverBase<R>::ROW)
-         (*this->spxout) << " (" << std::fixed << std::setprecision(2) << getDegeneracyLevel(fVec()) << ")";
-
       if(printBasisMetric == 0)
          (*this->spxout) << " | " << std::scientific << std::setprecision(2) << getBasisMetric(0);
 
@@ -1856,85 +1853,6 @@ bool SPxSolverBase<R>::terminate()
             m_status = ABORT_VALUE;
             return true;
          }
-      }
-   }
-
-
-
-   if(getComputeDegeneracy() && this->iteration() > this->prevIteration())
-   {
-      VectorBase<R> degenvec(this->nCols());
-
-      if(rep() == ROW)
-      {
-         if(type() == ENTER)     // dual simplex
-            dualDegenSum += getDegeneracyLevel(fVec());
-         else                    // primal simplex
-         {
-            getPrimalSol(degenvec);
-            primalDegenSum += getDegeneracyLevel(degenvec);
-         }
-      }
-      else
-      {
-         assert(rep() == COLUMN);
-
-         if(type() == LEAVE)     // dual simplex
-            dualDegenSum += getDegeneracyLevel(pVec());
-         else
-         {
-            getPrimalSol(degenvec);
-            primalDegenSum += getDegeneracyLevel(degenvec);
-         }
-      }
-   }
-
-
-   // the improved dual simplex requires a starting basis
-   // if the flag getStartingDecompBasis is set to true the simplex will terminate when a dual basis is found
-   if(getStartingDecompBasis)
-   {
-      R iterationFrac = 0.6;
-
-      if(type() == ENTER && SPxBasisBase<R>::status() == SPxBasisBase<R>::DUAL &&
-            this->iteration() - this->lastDegenCheck() > getDegenCompOffset()/*iteration() % 10 == 0*/)
-      {
-         this->iterDegenCheck = this->iterCount;
-
-         if(SPxBasisBase<R>::status() >= SPxBasisBase<R>::OPTIMAL)
-         {
-            m_status = RUNNING;
-            return true;
-         }
-
-         R degeneracyLevel = 0;
-         R degeneracyLB = 0.1;
-         R degeneracyUB = 0.9;
-         degeneracyLevel = getDegeneracyLevel(fVec());
-
-         if((degeneracyLevel < degeneracyUB && degeneracyLevel > degeneracyLB)
-               && this->iteration() > this->nRows() * 0.2)
-         {
-            m_status = ABORT_DECOMP;
-            return true;
-         }
-
-         if(degeneracyLevel < degeneracyLB
-               && this->iteration() > SOPLEX_MIN(getDecompIterationLimit(), int(this->nCols()*iterationFrac)))
-         {
-            setDecompIterationLimit(0);
-            setDegenCompOffset(0);
-            m_status = ABORT_EXDECOMP;
-            return true;
-         }
-      }
-      else if(type() == LEAVE
-              && this->iteration() > SOPLEX_MIN(getDecompIterationLimit(), int(this->nCols()*iterationFrac)))
-      {
-         setDecompIterationLimit(0);
-         setDegenCompOffset(0);
-         m_status = ABORT_EXDECOMP;
-         return true;
       }
    }
 
@@ -2363,8 +2281,6 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::status() const
       assert(SPxBasisBase<R>::status() == SPxBasisBase<R>::OPTIMAL);
 
    /*lint -fallthrough*/
-   case ABORT_EXDECOMP :
-   case ABORT_DECOMP :
    case ABORT_CYCLING :
    case ABORT_TIME :
    case ABORT_ITER :
