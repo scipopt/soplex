@@ -80,6 +80,7 @@ public:
          pos = -1;
       }
 
+      ~Pring() = default;
    private:
       Pring(const Pring&);             ///< blocked copy constructor
       Pring& operator= (const Pring&); ///< blocked assignment operator

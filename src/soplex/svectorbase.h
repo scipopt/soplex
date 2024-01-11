@@ -783,6 +783,12 @@ public:
    template < class S >
    SVectorBase<R>& operator=(const SSVectorBase<S>& sv);
 
+   /// copy constructor
+   template < class S >
+   SVectorBase<R>(const SVectorBase<S>& old);
+
+   ~SVectorBase() = default;
+
    ///@}
 
    // ------------------------------------------------------------------------------------------------------------------

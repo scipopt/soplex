@@ -232,6 +232,8 @@ public:
       return *this;
    }
 
+   ~Array() = default;
+
    /// default constructor.
    /** The constructor allocates an Array of \p n uninitialized elements.
     */
@@ -245,12 +247,6 @@ public:
    Array(const Array& old)
    {
       data = old.data;
-   }
-
-   /// destructor
-   ~Array()
-   {
-      ;
    }
 
    void push_back(const T& val)

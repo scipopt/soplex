@@ -80,6 +80,8 @@ public:
          , mkwtz(0)
       {}
 
+      ~Pring() = default;
+
    private:
       Pring(const Pring&);             ///< blocked copy constructor
       Pring& operator= (const Pring&); ///< blocked assignment operator

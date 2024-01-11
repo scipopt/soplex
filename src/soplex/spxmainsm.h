@@ -174,6 +174,7 @@ private:
 
          return *this;
       }
+      ~RowObjPS() = default;
       ///
       virtual void execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                            DataArray<typename SPxSolverBase<R>::VarStatus>& cBasis,
@@ -226,6 +227,7 @@ private:
 
          return *this;
       }
+      ~FreeConstraintPS() = default;
       ///
       virtual void execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                            DataArray<typename SPxSolverBase<R>::VarStatus>& cBasis,
@@ -274,6 +276,7 @@ private:
 
          return *this;
       }
+      ~EmptyConstraintPS() = default;
       ///
       virtual void execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                            DataArray<typename SPxSolverBase<R>::VarStatus>& cBasis,
@@ -358,6 +361,7 @@ private:
 
          return *this;
       }
+      ~RowSingletonPS() = default;
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
@@ -451,6 +455,7 @@ private:
 
          return *this;
       }
+      ~ForceConstraintPS() = default;
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
@@ -516,6 +521,7 @@ private:
 
          return *this;
       }
+      ~FixVariablePS() = default;
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
@@ -572,6 +578,7 @@ private:
 
          return *this;
       }
+      ~FixBoundsPS() = default;
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
@@ -657,6 +664,7 @@ private:
 
          return *this;
       }
+      ~FreeZeroObjVariablePS() = default;
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
@@ -721,6 +729,7 @@ private:
 
          return *this;
       }
+      ~ZeroObjColSingletonPS() = default;
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
@@ -791,6 +800,7 @@ private:
 
          return *this;
       }
+      ~FreeColSingletonPS() = default;
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
@@ -888,6 +898,7 @@ private:
 
          return *this;
       }
+      ~DoubletonEquationPS() = default;
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
@@ -985,6 +996,7 @@ private:
 
          return *this;
       }
+      ~DuplicateRowsPS() = default;
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
@@ -1053,6 +1065,7 @@ private:
 
          return *this;
       }
+      ~DuplicateColsPS() = default;
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
@@ -1131,6 +1144,7 @@ private:
 
          return *this;
       }
+      ~AggregationPS() = default;
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
@@ -1211,6 +1225,7 @@ private:
 
          return *this;
       }
+      ~MultiAggregationPS() = default;
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
@@ -1255,6 +1270,7 @@ private:
       {
          return *this;
       }
+      ~TightenBoundsPS() = default;
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {

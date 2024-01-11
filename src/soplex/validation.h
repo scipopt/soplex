@@ -55,11 +55,29 @@ public:
       validatetolerance = 1e-5;
    }
 
-   /// default destructor
-   ~Validation()
+   /// copy constructor
+   Validation(const Validation& old)
+      : validate(old.validate)
+      , validatesolution(old.validatesolution)
+      , validatetolerance(old.validatetolerance)
+   {}
+
+   /// assignment operator
+   Validation& operator=(const Validation& val)
    {
-      ;
+      if(this != &val)
+      {
+         validate = val.m_scale;
+         validatesolution = val.validatesolution;
+         validatetolerance = val.validatetolerance;
+      }
+
+      return *this;
    }
+
+   /// default destructor
+   ~Validation() = default;
+
 
    /// updates the external solution used for validation
    bool updateExternalSolution(const std::string& solution);

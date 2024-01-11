@@ -336,6 +336,7 @@ public:
       /// assignment operator
       Desc& operator=(const Desc& rhs);
       ///@}
+      ~Desc() = default;
    };
 
 protected:

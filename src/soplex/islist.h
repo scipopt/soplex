@@ -118,6 +118,7 @@ public:
    modifying a list in a save way. See the method list for a description.
  */
 template < class T >
+/* coverity[rule_of_three_violation] */
 class IsList
 {
 protected:
@@ -474,7 +475,6 @@ public:
 
       assert(isConsistent());
    }
-
    /// Assignment operator and copy constructor should be deleted to avoid memory problems
    IsList<T> (const IsList<T>&) = delete;
    IsList<T>& operator=(const IsList<T>& old) = delete;
