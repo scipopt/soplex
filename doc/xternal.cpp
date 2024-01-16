@@ -96,7 +96,7 @@
  *
  * The initial implementation of SoPlex has been developed by Roland Wunderling
  * as part of his Ph.D. thesis <a
- * href="http://www.zib.de/PaperWeb/abstracts/TR-96-09">"Paralleler und
+ * href="https://opus4.kobv.de/opus4-zib/files/538/TR-96-09.pdf">"Paralleler und
  * Objektorientierter Simplex-Algorithmus"</a> from 1996.  Since then many
  * developers have maintained and improved the underlying algorithms.  See the
  * <a href="http://soplex.zib.de">SoPlex</a> web page for a comprehensive list
