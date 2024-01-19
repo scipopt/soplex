@@ -396,11 +396,11 @@ bool SPxLPBase<Rational>::readLPF(
    int k;
    int buf_size;
    int buf_pos;
-   char* buf;
-   char* tmp;
-   char* line;
-   char* s;
-   char* pos;
+   char* buf = 0;
+   char* tmp = 0;
+   char* line = 0;
+   char* s = 0;
+   char* pos = 0;
    char* pos_old = 0;
 
    if(p_cnames)
