@@ -1141,7 +1141,10 @@ R SPxBasisBase<R>::condition(int maxiters, R tolerance)
    norm1 = 1.0 / (R) dimension;
 
    for(i = 0; i < dimension; i++)
+   {
+      // coverity[forward_null]
       x.add(i, norm1);
+   }
 
    y = x;
 

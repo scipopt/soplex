@@ -103,6 +103,29 @@ public:
            buffer + 4);    // end position
       // ASSERT: both input & output capabilities will not be used together
    }
+
+   /// copy constructor
+   gzstreambuf(const gzstreambuf& sb)
+      : std::streambuf()
+   {
+      operator=(sb);
+   }
+   /// copy assignment operator
+   gzstreambuf& operator=(const gzstreambuf& sb)
+   {
+      std::streambuf::operator=(sb);
+
+      if(this != &sb)
+      {
+         opened = sb.opened;
+         mode   = sb.mode;
+         file  = sb.file;
+         std::strncpy(buffer, sb.buffer, bufferSize);
+      }
+
+      return *this;
+   }
+
    /// destructor
    ~gzstreambuf()
    {

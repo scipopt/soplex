@@ -131,6 +131,7 @@ void SPxSolverBase<R>::computeFrhs()
             {
                R x;
 
+               // coverity[switch_selector_expr_is_constant]
                switch(stat)
                {
                case SPxBasisBase<R>::Desc::D_FREE :

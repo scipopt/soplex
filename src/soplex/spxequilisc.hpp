@@ -30,7 +30,6 @@
 #include "soplex/spxout.h"
 #include "soplex/spxlpbase.h"
 #include "soplex/spxlp.h"
-#include "soplex.h"
 
 namespace soplex
 {

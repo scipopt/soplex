@@ -147,7 +147,9 @@ void SPxSolverBase<R>::setPricer(SPxPricer<R>* x, const bool destroy)
       thepricer->clear();
 
    thepricer = x;
-   thepricer->setTolerances(this->tolerances());
+
+   if(thepricer != nullptr)
+      thepricer->setTolerances(this->tolerances());
 
    freePricer = destroy;
 }
@@ -172,9 +174,9 @@ void SPxSolverBase<R>::setTester(SPxRatioTester<R>* x, const bool destroy)
          theratiotester->load(this);
       else
          theratiotester->clear();
-   }
 
-   theratiotester->setTolerances(this->tolerances());
+      theratiotester->setTolerances(this->tolerances());
+   }
 
    freeRatioTester = destroy;
 }
