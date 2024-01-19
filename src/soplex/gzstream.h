@@ -37,6 +37,7 @@
 // standard C++ with new header file names and std:: namespace
 #include <iostream>
 #include <fstream>
+#include <cstring>
 #include <zlib.h>
 
 #define SOPLEX_GZSTREAM_NAMESPACE gzstream
