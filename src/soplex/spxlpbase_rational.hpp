@@ -464,8 +464,7 @@ bool SPxLPBase<Rational>::readLPF(
             if(buf_size >= INT_MAX)
             {
                SPX_MSG_ERROR(std::cerr << "ELPFRD16 Line longer than INT_MAX" << std::endl;)
-               finished = true;
-               break;
+               goto syntax_error;
             }
 
             spx_realloc(buf, buf_size);
@@ -477,6 +476,9 @@ bool SPxLPBase<Rational>::readLPF(
             break;
          }
       }
+
+      if(finished)
+         break;
 
       if((size_t) buf_size > sizeof(tmp))
       {
