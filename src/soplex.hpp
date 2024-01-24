@@ -78,31 +78,6 @@ SoPlexBase<R>::Settings::BoolParam::BoolParam()
       "should a rational factorization be performed after iterative refinement?";
    defaultValue[SoPlexBase<R>::RATFAC] = true;
 
-   // should the decomposition based dual simplex be used to solve the LP? Setting this to true forces the solve mode to
-   // SOLVEMODE_REAL and the basis representation to REPRESENTATION_ROW
-   name[SoPlexBase<R>::USEDECOMPDUALSIMPLEX] = "decompositiondualsimplex";
-   description[SoPlexBase<R>::USEDECOMPDUALSIMPLEX] =
-      "should the decomposition based dual simplex be used to solve the LP?";
-   defaultValue[SoPlexBase<R>::USEDECOMPDUALSIMPLEX] = false;
-
-   // should the degeneracy be computed for each basis?
-   name[SoPlexBase<R>::COMPUTEDEGEN] = "computedegen";
-   description[SoPlexBase<R>::COMPUTEDEGEN] = "should the degeneracy be computed for each basis?";
-   defaultValue[SoPlexBase<R>::COMPUTEDEGEN] = false;
-
-   // should the dual of the complementary problem be used in the decomposition simplex?
-   name[SoPlexBase<R>::USECOMPDUAL] = "usecompdual";
-   description[SoPlexBase<R>::USECOMPDUAL] =
-      "should the dual of the complementary problem be used in the decomposition simplex?";
-   defaultValue[SoPlexBase<R>::USECOMPDUAL] = false;
-
-   /// should row and bound violations be computed explicitly in the update of reduced problem in the decomposition
-   // simplex
-   name[SoPlexBase<R>::EXPLICITVIOL] = "explicitviol";
-   description[SoPlexBase<R>::EXPLICITVIOL] =
-      "Should violations of the original problem be explicitly computed in the decomposition simplex?";
-   defaultValue[SoPlexBase<R>::EXPLICITVIOL] = false;
-
    // should cycling solutions be accepted during iterative refinement?
    name[SoPlexBase<R>::ACCEPTCYCLING] = "acceptcycling";
    description[SoPlexBase<R>::ACCEPTCYCLING] =
@@ -414,38 +389,6 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
    lower[SoPlexBase<R>::SOLUTION_POLISHING] = 0;
    upper[SoPlexBase<R>::SOLUTION_POLISHING] = 2;
    defaultValue[SoPlexBase<R>::SOLUTION_POLISHING] = SoPlexBase<R>::POLISHING_OFF;
-
-   // the number of iterations before the decomposition simplex initialisation is terminated.
-   name[SoPlexBase<R>::DECOMP_ITERLIMIT] = "decomp_iterlimit";
-   description[SoPlexBase<R>::DECOMP_ITERLIMIT] =
-      "the number of iterations before the decomposition simplex initialisation solve is terminated";
-   lower[SoPlexBase<R>::DECOMP_ITERLIMIT] = 1;
-   upper[SoPlexBase<R>::DECOMP_ITERLIMIT] = INT_MAX;
-   defaultValue[SoPlexBase<R>::DECOMP_ITERLIMIT] = 100;
-
-   // maximum number of violated rows added in each iteration of the decomposition simplex
-   name[SoPlexBase<R>::DECOMP_MAXADDEDROWS] = "decomp_maxaddedrows";
-   description[SoPlexBase<R>::DECOMP_MAXADDEDROWS] =
-      "maximum number of rows that are added to the reduced problem when using the decomposition based simplex";
-   lower[SoPlexBase<R>::DECOMP_MAXADDEDROWS] = 1;
-   upper[SoPlexBase<R>::DECOMP_MAXADDEDROWS] = INT_MAX;
-   defaultValue[SoPlexBase<R>::DECOMP_MAXADDEDROWS] = 500;
-
-   // maximum number of violated rows added in each iteration of the decomposition simplex
-   name[SoPlexBase<R>::DECOMP_DISPLAYFREQ] = "decomp_displayfreq";
-   description[SoPlexBase<R>::DECOMP_DISPLAYFREQ] =
-      "the frequency that the decomposition based simplex status output is displayed.";
-   lower[SoPlexBase<R>::DECOMP_DISPLAYFREQ] = 1;
-   upper[SoPlexBase<R>::DECOMP_DISPLAYFREQ] = INT_MAX;
-   defaultValue[SoPlexBase<R>::DECOMP_DISPLAYFREQ] = 50;
-
-   // the verbosity of the decomposition based simplex
-   name[SoPlexBase<R>::DECOMP_VERBOSITY] = "decomp_verbosity";
-   description[SoPlexBase<R>::DECOMP_VERBOSITY] =
-      "the verbosity of decomposition based simplex (0 - error, 1 - warning, 2 - debug, 3 - normal, 4 - high, 5 - full).";
-   lower[SoPlexBase<R>::DECOMP_VERBOSITY] = 1;
-   upper[SoPlexBase<R>::DECOMP_VERBOSITY] = 5;
-   defaultValue[SoPlexBase<R>::DECOMP_VERBOSITY] = VERBOSITY_ERROR;
 
    // printing condition number during the solve
    name[SoPlexBase<R>::PRINTBASISMETRIC] = "printbasismetric";
@@ -5842,18 +5785,6 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
    case RATFAC:
       break;
 
-   case USEDECOMPDUALSIMPLEX:
-      break;
-
-   case COMPUTEDEGEN:
-      break;
-
-   case USECOMPDUAL:
-      break;
-
-   case EXPLICITVIOL:
-      break;
-
    case ACCEPTCYCLING:
       break;
 
@@ -6516,19 +6447,6 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
          return false;
       }
 
-      break;
-
-   // the decomposition based simplex parameter settings
-   case DECOMP_ITERLIMIT:
-      break;
-
-   case DECOMP_MAXADDEDROWS:
-      break;
-
-   case DECOMP_DISPLAYFREQ:
-      break;
-
-   case DECOMP_VERBOSITY:
       break;
 
    // printing of condition n
@@ -9361,7 +9279,6 @@ SoPlexBase<R>::SoPlexBase()
    _optimizeCalls = 0;
    _unscaleCalls = 0;
    _realLP->setOutstream(spxout);
-   _currentProb = DECOMP_ORIG;
 
    // initialize statistics
    spx_alloc(_statistics);
@@ -9860,10 +9777,6 @@ bool SoPlexBase<R>::readFile(const char* filename, NameSet* rowNames, NameSet* c
    else
       success = _readFileRational(filename, rowNames, colNames, intVars);
 
-   // storing the row and column names for use in the DBDS print basis methods
-   _rowNames = rowNames;
-   _colNames = colNames;
-
    return success;
 }
 
@@ -10128,22 +10041,10 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::optimize(volatile bool* interru
    // the solution is no longer valid
    _invalidateSolution();
 
-   // if the decomposition based dual simplex flag is set to true
-   if(boolParam(SoPlexBase<R>::USEDECOMPDUALSIMPLEX))
-   {
-      setIntParam(SoPlexBase<R>::SOLVEMODE, SOLVEMODE_REAL);
-      setIntParam(SoPlexBase<R>::REPRESENTATION, REPRESENTATION_ROW);
-      setIntParam(SoPlexBase<R>::ALGORITHM, ALGORITHM_DUAL);
-      //setBoolParam(SoPlexBase<R>::PERSISTENTSCALING, false);
-
-      _solver.setComputeDegenFlag(boolParam(COMPUTEDEGEN));
-
-      _solveDecompositionDualSimplex();
-   }
    // decide whether to solve the rational LP with iterative refinement or call the standard floating-point solver
-   else if(intParam(SoPlexBase<R>::SOLVEMODE) == SOLVEMODE_REAL
-           || (intParam(SoPlexBase<R>::SOLVEMODE) == SOLVEMODE_AUTO
-               && realParam(SoPlexBase<R>::FEASTOL) >= 1e-9 && realParam(SoPlexBase<R>::OPTTOL) >= 1e-9))
+   if(intParam(SoPlexBase<R>::SOLVEMODE) == SOLVEMODE_REAL
+         || (intParam(SoPlexBase<R>::SOLVEMODE) == SOLVEMODE_AUTO
+             && realParam(SoPlexBase<R>::FEASTOL) >= 1e-9 && realParam(SoPlexBase<R>::OPTTOL) >= 1e-9))
    {
       // the only tolerances used are the ones for the floating-point solver, so set them to the global tolerances
       this->tolerances()->setFloatingPointFeastol(realParam(SoPlexBase<R>::FEASTOL));
@@ -10171,7 +10072,6 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::optimize(volatile bool* interru
             _currentSettings->realParam.lower[SoPlexBase<R>::FPOPTTOL]);
       }
 
-      _solver.setComputeDegenFlag(boolParam(COMPUTEDEGEN));
       _solver.setSolvingForBoosted(false);
 
       _optimize(interrupt);
@@ -10231,15 +10131,10 @@ void SoPlexBase<R>::printStatistics(std::ostream& os)
 
    os << "Original problem    : \n";
 
-   if(boolParam(SoPlexBase<R>::USEDECOMPDUALSIMPLEX))
-      printOriginalProblemStatistics(os);
+   if(intParam(SoPlexBase<R>::READMODE) == READMODE_REAL)
+      _realLP->printProblemStatistics(os);
    else
-   {
-      if(intParam(SoPlexBase<R>::READMODE) == READMODE_REAL)
-         _realLP->printProblemStatistics(os);
-      else
-         _rationalLP->printProblemStatistics(os);
-   }
+      _rationalLP->printProblemStatistics(os);
 
    os << "Objective sense     : " << (intParam(SoPlexBase<R>::OBJSENSE) ==
                                       SoPlexBase<R>::OBJSENSE_MINIMIZE ? "minimize\n" : "maximize\n");

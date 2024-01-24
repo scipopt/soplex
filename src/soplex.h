@@ -962,90 +962,77 @@ public:
       /// should a rational factorization be performed after iterative refinement?
       RATFAC = 3,
 
-      /// should the decomposition based dual simplex be used to solve the LP? Setting this to true forces the solve mode to
-      /// SOLVEMODE_REAL and the basis representation to REPRESENTATION_ROW
-      USEDECOMPDUALSIMPLEX = 4,
-
-      /// should the degeneracy be computed for each basis?
-      COMPUTEDEGEN = 5,
-
-      /// should the dual of the complementary problem be used in the decomposition simplex?
-      USECOMPDUAL = 6,
-
-      /// should row and bound violations be computed explicitly in the update of reduced problem in the decomposition simplex
-      EXPLICITVIOL = 7,
-
       /// should cycling solutions be accepted during iterative refinement?
-      ACCEPTCYCLING = 8,
+      ACCEPTCYCLING = 4,
 
       /// apply rational reconstruction after each iterative refinement?
-      RATREC = 9,
+      RATREC = 5,
 
       /// round scaling factors for iterative refinement to powers of two?
-      POWERSCALING = 10,
+      POWERSCALING = 6,
 
       /// continue iterative refinement with exact basic solution if not optimal?
-      RATFACJUMP = 11,
+      RATFACJUMP = 7,
 
       /// use bound flipping also for row representation?
-      ROWBOUNDFLIPS = 12,
+      ROWBOUNDFLIPS = 8,
 
       /// use persistent scaling?
-      PERSISTENTSCALING = 13,
+      PERSISTENTSCALING = 9,
 
       /// perturb the entire problem or only the relevant bounds of s single pivot?
-      FULLPERTURBATION = 14,
+      FULLPERTURBATION = 10,
 
       /// re-optimize the original problem to get a proof (ray) of infeasibility/unboundedness?
-      ENSURERAY = 15,
+      ENSURERAY = 11,
 
       /// try to enforce that the optimal solution is a basic solution
-      FORCEBASIC = 16,
+      FORCEBASIC = 12,
 
       // enable presolver SingletonCols in PaPILO?
-      SIMPLIFIER_SINGLETONCOLS = 17,
+      SIMPLIFIER_SINGLETONCOLS = 13,
 
       // enable presolver ConstraintPropagation in PaPILO?
-      SIMPLIFIER_CONSTRAINTPROPAGATION = 18,
+      SIMPLIFIER_CONSTRAINTPROPAGATION = 14,
 
       // enable presolver ParallelRowDetection in PaPILO?
-      SIMPLIFIER_PARALLELROWDETECTION = 19,
+      SIMPLIFIER_PARALLELROWDETECTION = 15,
 
       // enable presolver ParallelColDetection in PaPILO?
-      SIMPLIFIER_PARALLELCOLDETECTION = 20,
+      SIMPLIFIER_PARALLELCOLDETECTION = 16,
 
       // enable presolver SingletonStuffing in PaPILO?
-      SIMPLIFIER_SINGLETONSTUFFING = 21,
+      SIMPLIFIER_SINGLETONSTUFFING = 17,
 
       // enable presolver DualFix in PaPILO?
-      SIMPLIFIER_DUALFIX = 22,
+      SIMPLIFIER_DUALFIX = 18,
 
       // enable presolver FixContinuous in PaPILO?
-      SIMPLIFIER_FIXCONTINUOUS = 23,
+      SIMPLIFIER_FIXCONTINUOUS = 19,
 
       // enable presolver DominatedCols in PaPILO?
-      SIMPLIFIER_DOMINATEDCOLS = 24,
+      SIMPLIFIER_DOMINATEDCOLS = 20,
 
       // enable iterative refinement ?
-      ITERATIVE_REFINEMENT = 25,
+      ITERATIVE_REFINEMENT = 21,
 
       /// adapt tolerances to the multiprecision used
-      ADAPT_TOLS_TO_MULTIPRECISION = 26,
+      ADAPT_TOLS_TO_MULTIPRECISION = 22,
 
       /// enable precision boosting ?
-      PRECISION_BOOSTING = 27,
+      PRECISION_BOOSTING = 23,
 
       /// boosted solver start from last basis
-      BOOSTED_WARM_START = 28,
+      BOOSTED_WARM_START = 24,
 
       /// try different settings when solve fails
-      RECOVERY_MECHANISM = 29,
+      RECOVERY_MECHANISM = 25,
 
       /// store advanced and stable basis met before each simplex iteration, to better warm start
-      STORE_BASIS_BEFORE_SIMPLEX_PIVOT = 30,
+      STORE_BASIS_BEFORE_SIMPLEX_PIVOT = 26,
 
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 31
+      BOOLPARAM_COUNT = 27
    } BoolParam;
 
    /// integer parameters
@@ -1123,33 +1110,21 @@ public:
       /// mode for solution polishing
       SOLUTION_POLISHING = 23,
 
-      /// the number of iterations before the decomposition simplex initialisation is terminated.
-      DECOMP_ITERLIMIT = 24,
-
-      /// the maximum number of rows that are added in each iteration of the decomposition based simplex
-      DECOMP_MAXADDEDROWS = 25,
-
-      /// the iteration frequency at which the decomposition solve output is displayed.
-      DECOMP_DISPLAYFREQ = 26,
-
-      /// the verbosity of the decomposition based simplex
-      DECOMP_VERBOSITY = 27,
-
       /// print condition number during the solve
-      PRINTBASISMETRIC = 28,
+      PRINTBASISMETRIC = 24,
 
       /// type of timer for statistics
-      STATTIMER = 29,
+      STATTIMER = 25,
 
       // maximum number of digits for the multiprecision type
-      MULTIPRECISION_LIMIT = 30,
+      MULTIPRECISION_LIMIT = 26,
 
       ///@todo precision-boosting find better parameter name
       /// after how many simplex pivots do we store the advanced and stable basis, 1 = every iterations
-      STORE_BASIS_SIMPLEX_FREQ = 31,
+      STORE_BASIS_SIMPLEX_FREQ = 27,
 
       /// number of integer parameters
-      INTPARAM_COUNT = 32
+      INTPARAM_COUNT = 28
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -1747,9 +1722,7 @@ private:
    SPxFastRT<R> _ratiotesterFast;
    SPxBoundFlippingRT<R> _ratiotesterBoundFlipping;
 
-   SPxLPBase<R>*
-   _realLP; // the real LP is also used as the original LP for the decomposition dual simplex
-   SPxLPBase<R>* _decompLP; // used to store the original LP for the decomposition dual simplex
+   SPxLPBase<R>* _realLP;
    SPxSimplifier<R>* _simplifier;
    SPxScaler<R>* _scaler;
    SPxStarter<R>* _starter;
@@ -1903,160 +1876,6 @@ private:
 
    DataArray< RangeType > _colTypes;
    DataArray< RangeType > _rowTypes;
-
-   ///@}
-
-
-   ///@name Data for the Decomposition Based Dual Simplex
-   ///@{
-
-   /** row violation structure
-    */
-   struct RowViolation
-   {
-      R               violation;          /**< the violation of the row */
-      int                idx;                /**< index of corresponding row */
-   };
-
-   /** Compare class for row violations
-    */
-   struct RowViolationCompare
-   {
-   public:
-      /** constructor
-       */
-      RowViolationCompare()
-         : entry(0)
-      {
-      }
-
-      const RowViolation*  entry;
-
-      R operator()(
-         RowViolation      i,
-         RowViolation      j
-      ) const
-      {
-         return i.violation - j.violation;
-      }
-   };
-
-
-   typedef enum
-   {
-      // is the original problem currently being solved.
-      DECOMP_ORIG = 0,
-
-      // is the reduced problem currently being solved.
-      DECOMP_RED = 1,
-
-      // is the complementary problem currently being solved.
-      DECOMP_COMP = 2
-   } decompStatus;
-
-   // the expected sign of the dual variables.
-   enum DualSign
-   {
-      IS_POS = 0,
-      IS_NEG = 1,
-      IS_FREE = 2
-   };
-
-   SPxSolverBase<R>
-   _compSolver; // adding a solver to contain the complementary problem. It is too confusing to switch
-   // the LP for the reduced and complementary problem in the one solver variable. The reduced
-   // problem will be stored in _solver and the complementary problem will be stored in
-   // _compSolver.
-   SLUFactor<R> _compSlufactor;
-
-   SPxBasisBase<R>
-   _decompTransBasis;   // the basis required for the transformation to form the reduced problem
-
-   VectorBase<R> _transformedObj;       // the objective coefficients of the transformed problem
-   VectorBase<R> _decompFeasVector;       // feasibility vector calculated using unshifted bounds.
-   LPRowSetBase<R>
-   _transformedRows;    // a set of the original rows that have been transformed using the original basis.
-   SPxColId _compSlackColId;     // column id of the primal complementary problem slack column.
-   SPxRowId _compSlackDualRowId; // row id in the dual of complementary problem related to the slack column.
-   bool* _decompReducedProbRows;    // flag to indicate the inclusion of a row in the reduced problem.
-   bool* _decompReducedProbCols;    // flag to indicate the inclusion of a col in the reduced problem.
-   int* _decompRowStatus;
-   int* _decompColStatus;
-   int* _decompCompProbColIDsIdx;   // the index to _decompPrimalColIDs for a given original col.
-   DataArray < SPxRowId >
-   _decompReducedProbRowIDs;   // the row IDs for the related rows in the reduced problem
-   DataArray < SPxRowId >
-   _decompReducedProbColRowIDs;// the row IDs for the related cols in the reduced problem
-   DataArray < SPxColId >
-   _decompReducedProbColIDs;   // the col IDs for the related cols in the reduced problem
-   DataArray < SPxRowId > _decompPrimalRowIDs;        // the primal row IDs from the original problem
-   DataArray < SPxColId > _decompPrimalColIDs;        // the primal col IDs from the original problem
-   DataArray < SPxRowId >
-   _decompElimPrimalRowIDs;    // the primal row IDs eliminated in the complementary problem
-   DataArray < SPxRowId >
-   _decompDualRowIDs;          // the dual row IDs from the complementary problem
-   DataArray < SPxColId >
-   _decompDualColIDs;          // the dual col IDs from the complementary problem
-   DataArray < SPxColId > _decompFixedVarDualIDs;     // the column ids related to the fixed variables.
-   DataArray < SPxColId >
-   _decompVarBoundDualIDs;     // the column ids related to the variable bound constraints.
-
-   DataArray < SPxColId >
-   _decompCompPrimalFixedVarIDs;  // the column ids related to the fixed variables in the complementary primal.
-   DataArray < SPxColId >
-   _decompCompPrimalVarBoundIDs;  // the column ids related to the variable bound constraints in the complementary primal.
-
-   DataArray < SPxRowId >
-   _decompCompPrimalRowIDs;        // the primal row IDs from the complementary problem
-   DataArray < SPxColId >
-   _decompCompPrimalColIDs;        // the primal col IDs from the complementary problem
-
-   int _nDecompViolBounds;       // the number of violated bound constraints
-   int _nDecompViolRows;         // the number of violated rows
-   int* _decompViolatedBounds;   // the violated bounds given by the solution to the IDS reduced problem
-   int* _decompViolatedRows;     // the violated rows given by the solution to the IDS reduced problem
-
-
-   int* _fixedOrigVars;    // the original variables that are at their bounds in the reduced problem.
-   // 1: fixed to upper, -1: fixed to lower, 0: unfixed.
-   int _nPrimalRows;       // the number of original problem rows included in the complementary problem
-   int _nPrimalCols;       // the number of original problem columns included in the complementary problem
-   int _nElimPrimalRows;   // the number of primal rows from the original problem eliminated from the complementary prob
-   int _nDualRows;         // the number of dual rows in the complementary problem. NOTE: _nPrimalRows = _nDualCols
-   int _nDualCols;         // the number of dual columns in the complementary problem. NOTE: _nPrimalRows = _nDualCols
-   int _nCompPrimalRows;   // the number of rows in the complementary primal problem. NOTE: _nPrimalRows = _nCompPrimalRows
-   int _nCompPrimalCols;   // the number of dual columns in the complementary problem. NOTE: _nPrimalCols = _nCompPrimalCols
-
-   int _decompDisplayLine;     // the count for the display line
-
-   NameSet* _rowNames;      // the row names from the input file
-   NameSet* _colNames;      // the col names from the input file
-
-   // Statistic information
-   int numIncludedRows;    // the number of rows currently included in the reduced problem.
-   int numDecompIter;         // the number of iterations of the decomposition dual simplex algorithm.
-   int numRedProbIter;     // the number of simplex iterations performed in the reduced problem.
-   int numCompProbIter;    // the number of iterations of the complementary problem.
-
-   // problem statistics
-   int numProbRows;
-   int numProbCols;
-   int nNonzeros;
-   R minAbsNonzero;
-   R maxAbsNonzero;
-
-   int origCountLower;
-   int origCountUpper;
-   int origCountBoxed;
-   int origCountFreeCol;
-
-   int origCountEqual;
-   int origCountLhs;
-   int origCountRhs;
-   int origCountRanged;
-   int origCountFreeRow;
-
-   decompStatus _currentProb;
 
    ///@}
 
@@ -2751,151 +2570,8 @@ private:
    /// check whether persistent scaling is supposed to be reapplied again after unscaling
    bool _reapplyPersistentScaling() const;
 
-   /// solves LP using the decomposition based dual simplex
-   void _solveDecompositionDualSimplex();
-
-   /// creating copies of the original problem that will be manipulated to form the reduced and complementary problems
-   void _createDecompReducedAndComplementaryProblems();
-
-   /// forms the reduced problem
-   void _formDecompReducedProblem(bool& stop);
-
-   /// solves the reduced problem
-   void _solveDecompReducedProblem();
-
-   /// forms the complementary problem
-   void _formDecompComplementaryProblem();
-
-   /// simplifies the problem and solves
-   void _decompSimplifyAndSolve(SPxSolverBase<R>& solver, SLUFactor<R>& sluFactor, bool fromScratch,
-                                bool applyPreprocessing);
-
-   /// loads original problem into solver and solves again after it has been solved to optimality with preprocessing
-   void _decompResolveWithoutPreprocessing(SPxSolverBase<R>& solver, SLUFactor<R>& sluFactor,
-                                           typename SPxSimplifier<R>::Result result);
-
-   /// identifies the columns of the row-form basis that correspond to rows with zero dual multipliers.
-   void _getZeroDualMultiplierIndices(VectorBase<R> feasVector, int* nonposind, int* colsforremoval,
-                                      int* nnonposind, bool& stop);
-
-   /// retrieves the compatible columns from the constraint matrix
-   void _getCompatibleColumns(VectorBase<R> feasVector, int* nonposind, int* compatind,
-                              int* rowsforremoval, int* colsforremoval,
-                              int nnonposind, int* ncompatind, bool formRedProb, bool& stop);
-
-   /// computes the reduced problem objective coefficients
-   void _computeReducedProbObjCoeff(bool& stop);
-
-   /// computes the compatible bound constraints and adds them to the reduced problem
-   void _getCompatibleBoundCons(LPRowSetBase<R>& boundcons, int* compatboundcons, int* nonposind,
-                                int* ncompatboundcons,
-                                int nnonposind, bool& stop);
-
-   /// computes the rows to remove from the complementary problem
-   void _getRowsForRemovalComplementaryProblem(int* nonposind, int* bind, int* rowsforremoval,
-         int* nrowsforremoval,
-         int nnonposind);
-
-   /// removing rows from the complementary problem.
-   void _deleteAndUpdateRowsComplementaryProblem(SPxRowId rangedRowIds[], int& naddedrows);
-
-   /// evaluates the solution of the reduced problem for the DBDS
-   void _evaluateSolutionDecomp(SPxSolverBase<R>& solver, SLUFactor<R>& sluFactor,
-                                typename SPxSimplifier<R>::Result result);
-
-   /// update the reduced problem with additional columns and rows
-   void _updateDecompReducedProblem(R objVal, VectorBase<R> dualVector, VectorBase<R> redcostVector,
-                                    VectorBase<R> compPrimalVector,
-                                    VectorBase<R> compDualVector);
-
-   /// update the reduced problem with additional columns and rows based upon the violated original bounds and rows
-   void _updateDecompReducedProblemViol(bool allrows);
-
-   /// builds the update rows with those violated in the complmentary problem
-   void _findViolatedRows(R compObjValue, Array<RowViolation>& violatedrows, int& nviolatedrows);
-
-   /// update the dual complementary problem with additional columns and rows
-   void _updateDecompComplementaryDualProblem(bool origObj);
-
-   /// update the primal complementary problem with additional columns and rows
-   void _updateDecompComplementaryPrimalProblem(bool origObj);
-
-   /// checking the optimality of the original problem.
-   void _checkOriginalProblemOptimality(VectorBase<R> primalVector, bool printViol);
-
-   /// updating the slack column coefficients to adjust for equality constraints
-   void _updateComplementaryDualSlackColCoeff();
-
-   /// updating the slack column coefficients to adjust for equality constraints
-   void _updateComplementaryPrimalSlackColCoeff();
-
-   /// removing the dual columns related to the fixed variables
-   void _removeComplementaryDualFixedPrimalVars(int* currFixedVars);
-
-   /// removing the dual columns related to the fixed variables
-   void _identifyComplementaryDualFixedPrimalVars(int* currFixedVars);
-
-   /// updating the dual columns related to the fixed primal variables.
-   void _updateComplementaryDualFixedPrimalVars(int* currFixedVars);
-
-   /// removing the dual columns related to the fixed variables
-   void _identifyComplementaryPrimalFixedPrimalVars(int* currFixedVars);
-
-   /// updating the dual columns related to the fixed primal variables.
-   void _updateComplementaryPrimalFixedPrimalVars(int* currFixedVars);
-
-   /// updating the complementary dual problem with the original objective function
-   void _setComplementaryDualOriginalObjective();
-
-   /// updating the complementary primal problem with the original objective function
-   void _setComplementaryPrimalOriginalObjective();
-
-   /// determining which bound the primal variables will be fixed to.
-   int getOrigVarFixedDirection(int colNum);
-
    /// checks the dual feasibility of the current basis
    bool checkBasisDualFeasibility(VectorBase<R> feasVec);
-
-   /// returns the expected sign of the dual variables for the reduced problem
-   DualSign getExpectedDualVariableSign(int rowNumber);
-
-   /// returns the expected sign of the dual variables for the original problem
-   DualSign getOrigProbDualVariableSign(int rowNumber);
-
-   /// prints a display line of the flying table for the DBDS
-   void printDecompDisplayLine(SPxSolverBase<R>& solver, const SPxOut::Verbosity origVerb, bool force,
-                               bool forceHead);
-
-   /// stores the problem statistics of the original problem
-   void getOriginalProblemStatistics();
-
-   /// stores the problem statistics of the original problem
-   void printOriginalProblemStatistics(std::ostream& os);
-
-   /// gets the coefficient of the slack variable in the primal complementary problem
-   R getCompSlackVarCoeff(int primalRowNum);
-
-   /// gets violation of bounds; returns true on success
-   bool getDecompBoundViolation(R& maxviol, R& sumviol);
-
-   /// gets violation of constraints; returns true on success
-   bool getDecompRowViolation(R& maxviol, R& sumviol);
-
-   /// function call to terminate the decomposition simplex
-   bool decompTerminate(R timeLimit);
-
-   /// function to build a basis for the original problem as given by the solution to the reduced problem
-   void _writeOriginalProblemBasis(const char* filename, NameSet* rowNames, NameSet* colNames,
-                                   bool cpxFormat);
-
-   /// function to retrieve the original problem row basis status from the reduced and complementary problems
-   void getOriginalProblemBasisRowStatus(DataArray< int >& degenerateRowNums,
-                                         DataArray< typename SPxSolverBase<R>::VarStatus >& degenerateRowStatus, int& nDegenerateRows,
-                                         int& nNonBasicRows);
-
-   /// function to retrieve the column status for the original problem basis from the reduced and complementary problems
-   void getOriginalProblemBasisColStatus(int& nNonBasicCols);
-
    ///@}
 };
 
@@ -2906,7 +2582,6 @@ typedef SoPlexBase<Real> SoPlex;
 } // namespace soplex
 
 // General templated function
-#include "soplex/solvedbds.hpp"
 #include "soplex.hpp"
 #include "soplex/solverational.hpp"
 #include "soplex/testsoplex.hpp"

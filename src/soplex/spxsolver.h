@@ -192,18 +192,6 @@ public:
       PARTIAL
    };
 
-   /// Improved dual simplex status
-   /** The improved dual simplex requires a starting basis to perform the problem partitioning. This flag sets the
-    * status of the improved dual simplex to indicate whether the starting basis must be found or not.
-    */
-   enum DecompStatus
-   {
-      /// Starting basis has not been found yet
-      FINDSTARTBASIS = 0,
-      /// Starting basis has been found and the simplex can be executed as normal
-      DONTFINDSTARTBASIS = 1
-   };
-
    enum VarStatus
    {
       ON_UPPER,      ///< variable set to its upper bound.
@@ -224,8 +212,6 @@ public:
       NO_PRICER      = -13, ///< No pricer loaded
       NO_SOLVER      = -12, ///< No linear solver loaded
       NOT_INIT       = -11, ///< not initialised error
-      ABORT_EXDECOMP = -10, ///< solve() aborted to exit decomposition simplex
-      ABORT_DECOMP   = -9,  ///< solve() aborted due to commence decomposition simplex
       ABORT_CYCLING  = -8,  ///< solve() aborted due to detection of cycling.
       ABORT_TIME     = -7,  ///< solve() aborted due to time limit.
       ABORT_ITER     = -6,  ///< solve() aborted due to iteration limit.
@@ -332,14 +318,6 @@ private:
    int            displayLine;
    int            displayFreq;
    R           sparsePricingFactor;    ///< enable sparse pricing when viols < factor * dim()
-
-   bool
-   getStartingDecompBasis; ///< flag to indicate whether the simplex is solved to get the starting improved dual simplex basis
-   bool           computeDegeneracy;
-   int
-   degenCompIterOffset;    ///< the number of iterations performed before the degeneracy level is computed
-   int
-   decompIterationLimit;   ///< the maximum number of iterations before the decomposition simplex is aborted.
 
    DataArray<VarStatus> oldBasisStatusRows;
    ///< stored stable basis met before a simplex pivot (used to warm start the solver)
@@ -643,8 +621,6 @@ public:
    void setType(Type tp);
    /// set \ref soplex::SPxSolverBase<R>::FULL "FULL" or \ref soplex::SPxSolverBase<R>::PARTIAL "PARTIAL" pricing.
    void setPricing(Pricing pr);
-   /// turn on or off the improved dual simplex.
-   void setDecompStatus(DecompStatus decomp_stat);
 
    /// reload LP.
    virtual void reLoad();
@@ -2326,53 +2302,6 @@ public:
       return s.str();
    }
 
-   /// returns whether a basis needs to be found for the improved dual simplex
-   DecompStatus getDecompStatus() const
-   {
-      if(getStartingDecompBasis)
-         return FINDSTARTBASIS;
-      else
-         return DONTFINDSTARTBASIS;
-   }
-
-   /// sets whether the degeneracy is computed at each iteration
-   void setComputeDegenFlag(bool computeDegen)
-   {
-      computeDegeneracy = computeDegen;
-   }
-
-
-   /// returns whether the degeneracy is computed in each iteration
-   bool getComputeDegeneracy() const
-   {
-      return computeDegeneracy;
-   }
-
-
-   /// sets the offset for the number of iterations before the degeneracy is computed
-   void setDegenCompOffset(int iterOffset)
-   {
-      degenCompIterOffset = iterOffset;
-   }
-
-
-   /// gets the offset for the number of iterations before the degeneracy is computed
-   int getDegenCompOffset() const
-   {
-      return degenCompIterOffset;
-   }
-
-   /// sets the iteration limit for the decomposition simplex initialisation
-   void setDecompIterationLimit(int iterationLimit)
-   {
-      decompIterationLimit = iterationLimit;
-   }
-
-   /// returns the iteration limit for the decomposition simplex initialisation
-   int getDecompIterationLimit() const
-   {
-      return decompIterationLimit;
-   }
    ///@}
 
    //------------------------------------

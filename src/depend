@@ -65,7 +65,7 @@ $(BINOBJDIR)/soplexmain.o: src/soplexmain.cpp src/soplex.h src/soplex/spxgithash
  src/soplex/solbase.h src/soplex/spxlpbase.h src/soplex.hpp \
  src/soplex/solverational.hpp src/soplex/statistics.h \
  src/soplex/statistics.hpp src/soplex/slufactor_rational.h \
- src/soplex/ratrecon.h src/soplex/ratrecon.hpp src/soplex/sol.h src/soplex/solvedbds.hpp \
+ src/soplex/ratrecon.h src/soplex/ratrecon.hpp src/soplex/sol.h \
  src/soplex/testsoplex.hpp src/soplex/solvereal.hpp \
  src/soplex/validation.h src/soplex/validation.hpp \
  src/soplex/statistics.h
@@ -136,7 +136,7 @@ $(BINOBJDIR)/example.o: src/example.cpp src/soplex.h src/soplex/spxgithash.h \
  src/soplex/solbase.h src/soplex/spxlpbase.h src/soplex.hpp \
  src/soplex/solverational.hpp src/soplex/statistics.h \
  src/soplex/statistics.hpp src/soplex/slufactor_rational.h \
- src/soplex/ratrecon.h src/soplex/ratrecon.hpp src/soplex/sol.h src/soplex/solvedbds.hpp \
+ src/soplex/ratrecon.h src/soplex/ratrecon.hpp src/soplex/sol.h \
  src/soplex/testsoplex.hpp src/soplex/solvereal.hpp
 $(LIBOBJDIR)/didxset.o: src/soplex/didxset.cpp src/soplex/didxset.h \
  src/soplex/idxset.h src/soplex/spxdefines.h src/soplex/spxdefines.hpp \
