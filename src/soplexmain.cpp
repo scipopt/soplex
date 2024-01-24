@@ -822,10 +822,12 @@ int runSoPlex(int argc, char* argv[])
             continue;
          }
 
-         // option string must start with '-', must contain at least two characters, and exactly two characters if and
-         // only if it is -x, -y, -q, or -c
-         if(option[0] != '-' || option[1] == '\0'
-               || ((option[2] == '\0') != (option[1] == 'q' || option[1] == 'c')))
+         // option string must start with '-', followed by at least one character;
+         // allowed two-character options are -x, -y, -X, -Y, -q, and -c,
+         // but -x, -y, -X and -Y may also have parameters, e.g., -x=<filename>.
+         if(option[1] == '\0'
+               || (option[2] == '\0' && strchr("xyXYqc", option[1]) == nullptr)
+               || (option[3] == '\0' && strchr("xyXY", option[1]) != nullptr))
          {
             printUsage(argv, optidx);
             returnValue = 1;
@@ -1467,10 +1469,12 @@ int main(int argc, char* argv[])
       if(option[0] != '-')
          continue;
 
-      // option string must start with '-', must contain at least two characters, and exactly two characters if and
-      // only if it is -q, or -c
-      if(option[0] != '-' || option[1] == '\0'
-            || ((option[2] == '\0') != (option[1] == 'q' || option[1] == 'c')))
+      // option string must start with '-', followed by at least one character;
+      // allowed two-character options are -x, -y, -X, -Y, -q, and -c,
+      // but -x, -y, -X and -Y may have also parameters.
+      if(option[1] == '\0'
+            || (option[2] == '\0' && strchr("xyXYqc", option[1]) == nullptr)
+            || (option[3] == '\0' && strchr("xyXY", option[1]) != nullptr))
       {
          printUsage(argv, optidx);
          return 1;

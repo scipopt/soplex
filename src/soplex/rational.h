@@ -211,7 +211,11 @@ inline Rational ratFromString(const char* desc)
             s.append(den);
          }
 
-         res = Rational(s);
+         if(s[0] == '+')
+            res = Rational(s.substr(1));
+         else
+            res = Rational(s);
+
          res *= pow(10, mult);
       }
    }

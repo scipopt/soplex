@@ -909,8 +909,7 @@ bool SPxLPBase<R>::readLPF(
             if(buf_size >= INT_MAX)
             {
                SPX_MSG_ERROR(std::cerr << "ELPFRD16 Line longer than INT_MAX" << std::endl;)
-               finished = true;
-               break;
+               goto syntax_error;
             }
 
             spx_realloc(buf, buf_size);
@@ -919,9 +918,11 @@ bool SPxLPBase<R>::readLPF(
          {
             SPX_MSG_ERROR(std::cerr << "ELPFRD07 No 'End' marker found" << std::endl;)
             finished = true;
-            break;
          }
       }
+
+      if(finished)
+         break;
 
       if((size_t) buf_size > sizeof(tmp))
       {

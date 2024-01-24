@@ -27,11 +27,14 @@ code quality:
   this is especially necessary for higher-precision solves with precision-boosting
 - rewrite all preprocessor-defines to be unambiguous by prepending a `SPX`, e.g., `MSG_ERROR` is now `SPX_MSG_ERROR`.
 - rework soplex debug messages to use SFINAE, since they no longer worked properly after switching to header-only
+- add .lp instances to ctest
 
 fixed bugs:
 - fix unset tolerances for simplifier and ratio tester plugins in soplex' copy constructor
 - fix unset outstream pointer in soplex' copy constructor
 - fix bugs in function definitions in soplex_interface.cpp: SoPlex_changeVarUpperReal(), SoPlex_getUpperReal()
+- fix bugs in LP file reader, concerning rational numbers as well as dynamic line length
+- fix bug printing solutions and statistics when running from the command line
 
 Upcoming Bugfix Release 6.0.4
 =============================
