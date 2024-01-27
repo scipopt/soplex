@@ -35,6 +35,7 @@ fixed bugs:
 - fix bugs in function definitions in soplex_interface.cpp: SoPlex_changeVarUpperReal(), SoPlex_getUpperReal()
 - fix bugs in LP file reader, concerning rational numbers as well as dynamic line length
 - fix bug printing solutions and statistics when running from the command line
+- fix bug in cmake build system when MPFR is available but boost is not
 
 Upcoming Bugfix Release 6.0.4
 =============================
