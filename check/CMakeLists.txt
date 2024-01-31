@@ -43,10 +43,9 @@ set(successInstances
     "gas11\;-infinity"
     )
 
-set(failInstances
-    "share2b\;0.123456789e5"
-    "shell\;+infinity"
-    "vtp-base\;-infinity"
+set(lpInstances
+    "afiro\;-0.46475314285714285714285714285714e3"
+    "scagr25\;-0.14753433060768523167790925075974e8"
     )
 
 #
@@ -93,7 +92,7 @@ endif()
 # add_instancetests takes an instance group and a status
 # that SoPlex should report as arguments
 #
-macro(add_instancetests instances solutionstatus)
+macro(add_instancetests instances solutionstatus fileending)
 #
 # loop over the instances
 #
@@ -110,7 +109,7 @@ foreach(instance ${${instances}})
         #
         # specify the instance and the settings load command for soplex
         #
-        set(inst "${PROJECT_SOURCE_DIR}/check/instances/${name}.mps")
+        set(inst "${PROJECT_SOURCE_DIR}/check/instances/${name}.${fileending}")
         set(optvalCommand "--extsol=${optval}")
         if(${setting} STREQUAL "default")
             set(loadCommand "")
@@ -121,8 +120,8 @@ foreach(instance ${${instances}})
         #
         # add a test and test properties
         #
-        add_test(NAME ${name}-${setting} COMMAND $<TARGET_FILE:soplex> ${optvalCommand} ${loadCommand} ${inst})
-        set_tests_properties (${name}-${setting} PROPERTIES PASS_REGULAR_EXPRESSION "Validation          : ${solutionstatus}")
+        add_test(NAME ${name}-${fileending}-${setting} COMMAND $<TARGET_FILE:soplex> ${optvalCommand} ${loadCommand} ${inst})
+        set_tests_properties (${name}-${fileending}-${setting} PROPERTIES PASS_REGULAR_EXPRESSION "Validation          : ${solutionstatus}")
     endforeach(setting)
 endforeach(instance)
 endmacro(add_instancetests)
@@ -130,5 +129,6 @@ endmacro(add_instancetests)
 #
 # add tests for success and fail instances
 #
-add_instancetests( successInstances "Success" )
-add_instancetests( failInstances "Fail" )
+add_instancetests( successInstances "Success" "mps" )
+add_instancetests( failInstances "Fail" "mps")
+add_instancetests( lpInstances "Success" "lp")
