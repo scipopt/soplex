@@ -28,7 +28,9 @@
 #ifndef _DATAHASHTABLE_H_
 #define _DATAHASHTABLE_H_
 
+#include <algorithm>
 #include <iostream>
+#include <iterator>
 #include <assert.h>
 #include <limits.h>
 
@@ -358,7 +360,7 @@ public:
       m_memfactor = base.m_memfactor;
       m_used = base.m_used;
       m_hashsize = base.m_hashsize;
-      primes = base.primes;
+      std::copy(std::begin(base.primes), std::end(base.primes), std::begin(primes));
       nprimes = base.nprimes;
 
       assert(m_memfactor > 1.0);
@@ -373,9 +375,9 @@ public:
       , m_memfactor(base.m_memfactor)
       , m_used(base.m_used)
       , m_hashsize(base.m_hashsize)
-      , primes(base.primes)
       , nprimes(base.nprimes)
    {
+      std::copy(std::begin(base.primes), std::end(base.primes), std::begin(primes));
       assert(m_memfactor > 1.0);
       assert(isConsistent());
    }
