@@ -10,8 +10,8 @@ programs via a C++ class library. The main features of SoPlex are:
 - presolving, scaling, exploitation of sparsity, hot-starting from any regular basis,
 - column- and row-oriented form of the simplex algorithm,
 - an object-oriented software design written in C++,
-- a compile-time option to use 80bit extended ("quad") precision for numerically difficult LPs,
-- an LP iterative refinement procedure to compute high-precision solution, and
+- a compile-time option to use 80bit extended ("long double") precision for numerically difficult LPs,
+- an LP iterative refinement as well as a precision boosting procedure, to compute high-precision solutions, and
 - routines for an exact rational LU factorization and continued fraction approximations in order to compute exact solutions.
 
 SoPlex has been used in numerous research and industry projects and is the standard LP solver linked to the mixed-integer
