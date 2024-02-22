@@ -8,10 +8,10 @@ set(SOPLEX_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
 set(SOPLEX_FOUND TRUE)
 
 if(@SOPLEX_WITH_BOOST@)
-  find_package(Boost 1.71.0)
+  find_package(Boost @BOOST_MINIMUM_VERSION@)
   include_directories(${Boost_INCLUDE_DIRS})
 endif()
 
 if(@SOPLEX_WITH_PAPILO@)
-    set(SOPLEX_WITH_PAPILO TRUE)
+  set(SOPLEX_WITH_PAPILO TRUE)
 endif()
