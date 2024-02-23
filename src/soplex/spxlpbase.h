@@ -37,6 +37,7 @@
 #include <assert.h>
 #include <iostream>
 #include <iomanip>
+#include <set>
 #include <typeinfo>
 
 #include "soplex/spxdefines.h"
