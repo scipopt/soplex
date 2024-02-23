@@ -3860,6 +3860,114 @@ bool SoPlexBase<R>::getPrimalRational(VectorBase<Rational>& vector)
       return false;
 }
 
+template <class R>
+bool SoPlexBase<R>::getRowPrimalValue(R& value, int i) {
+  if(_realLP != 0 && hasSol())
+  {
+    _syncRealSolution();
+    value = _realLP->computePrimalActivity(i, _solReal._primal, true);
+    return true;
+  }
+  else
+    return false;
+}
+
+template <class R>
+bool SoPlexBase<R>::getRowPrimalValueRational(Rational& value, int i) {
+  if(_rationalLP != 0 && hasSol())
+  {
+    _syncRationalSolution();
+    value = _rationalLP->computePrimalActivity(i, _solRational._primal);
+    return true;
+  }
+  else
+    return false;
+}
+
+template <class R>
+bool SoPlexBase<R>::getRowsPrimalValue(const std::set<int>& indices, VectorBase<R>& vector) {
+  if(_realLP != 0 && hasSol())
+  {
+    assert(vector.dim() >= static_cast<int>(indices.size()));
+    _syncRealSolution();
+    _realLP->computePrimalActivity(indices, _solReal._primal, vector, true);
+    return true;
+  }
+  else
+    return false;
+}
+
+
+template <class R>
+bool SoPlexBase<R>::getRowsPrimalValueReal(const std::set<int>& indices, R* p_vector, int i) {
+  if(_realLP != 0 && hasSol())
+  {
+    assert(i >= static_cast<int>(indices.size()));
+    _syncRealSolution();
+    VectorBase<R> vector(i);
+    _realLP->computePrimalActivity(indices, _solReal._primal, vector, true);
+    std::copy(vector.begin(), vector.end(), p_vector);
+    return true;
+  }
+  else
+    return false;
+}
+
+
+template <class R>
+bool SoPlexBase<R>::getRowsPrimalValueRational(const std::set<int>& indices, VectorRational& vector) {
+  if(_rationalLP != 0 && hasSol())
+  {
+    assert(vector.dim() >= static_cast<int>(indices.size()));
+    _syncRationalSolution();
+    _rationalLP->computePrimalActivity(indices, _solRational._primal, vector);
+    return true;
+  }
+  else
+    return false;
+}
+
+template <class R>
+bool SoPlexBase<R>::getRowsPrimalValue(VectorBase<R>& vector) {
+  if(_realLP != 0 && hasSol())
+  {
+    assert(vector.dim() >= numRows());
+    _syncRealSolution();
+    _realLP->computePrimalActivity(_solReal._primal, vector, true);
+    return true;
+  }
+  else
+    return false;
+}
+
+
+template <class R>
+bool SoPlexBase<R>::getRowsPrimalValueReal(R* p_vector, int i) {
+  if(_realLP != 0 && hasSol())
+  {
+    assert(i >= numRows());
+    _syncRealSolution();
+    VectorBase<R> vector(i);
+    _realLP->computePrimalActivity(_solReal._primal, vector, true);
+    std::copy(vector.begin(), vector.end(), p_vector);
+    return true;
+  }
+  else
+    return false;
+}
+
+template <class R>
+bool SoPlexBase<R>::getRowsPrimalValueRational(VectorRational& vector) {
+  if(_rationalLP != 0 && hasSol())
+  {
+    assert(vector.dim() >= numRows());
+    _syncRationalSolution();
+    _rationalLP->computePrimalActivity(_solRational._primal, vector);
+    return true;
+  }
+  else
+    return false;
+}
 
 /// gets the vector of slack values if available; returns true on success
 template <class R>
