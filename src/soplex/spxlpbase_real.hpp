@@ -918,6 +918,7 @@ bool SPxLPBase<R>::readLPF(
          {
             SPX_MSG_ERROR(std::cerr << "ELPFRD07 No 'End' marker found" << std::endl;)
             finished = true;
+            break;
          }
       }
 
