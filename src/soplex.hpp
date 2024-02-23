@@ -3861,7 +3861,7 @@ bool SoPlexBase<R>::getPrimalRational(VectorBase<Rational>& vector)
 }
 
 template <class R>
-bool SoPlexBase<R>::getRowPrimalValue(R& value, int i) {
+bool SoPlexBase<R>::getRowPrimalValue(int i, R& value) {
   if(_realLP != 0 && hasSol())
   {
     _syncRealSolution();
@@ -3873,7 +3873,7 @@ bool SoPlexBase<R>::getRowPrimalValue(R& value, int i) {
 }
 
 template <class R>
-bool SoPlexBase<R>::getRowPrimalValueRational(Rational& value, int i) {
+bool SoPlexBase<R>::getRowPrimalValueRational(int i, Rational& value) {
   if(_rationalLP != 0 && hasSol())
   {
     _syncRationalSolution();
