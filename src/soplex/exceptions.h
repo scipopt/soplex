@@ -55,6 +55,8 @@ public:
    /** The constructor receives an optional string as an exception message.
     */
    SPxException(const std::string& m = "") : msg(m) {}
+   SPxException(SPxException&) = default;
+   SPxException(SPxException&&) = default;
    /// destructor
    virtual ~SPxException() = default;
    ///@}
