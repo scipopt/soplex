@@ -56,14 +56,14 @@ public:
     */
    SPxException(const std::string& m = "") : msg(m) {}
    /// destructor
-   virtual ~SPxException() {}
+   virtual ~SPxException() = default;
    ///@}
 
    //----------------------------------------
    /**@name Access / modification */
    ///@{
    /// returns exception message
-   virtual const std::string what() const
+   virtual const std::string& what() const
    {
       return msg;
    }
