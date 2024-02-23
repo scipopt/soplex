@@ -663,6 +663,20 @@ public:
    bool getPrimalReal(R* p_vector, int size);      // For SCIP compatibility
    bool getPrimalRational(VectorRational& vector);
 
+   /// gets the value for the \p i 'th row given the current primal solution
+   bool getRowActivity(R& value, int i);
+   bool getRowActivityRational(Rational& value, int i);
+
+   /// gets the value for the row with indices in \p indices given the current primal solution
+   bool getRowsActivity(const std::vector<int>& indices, VectorBase<R>& vector);
+   bool getRowsActivityReal(const std::vector<int>& indices, R* p_vector, int dim);
+   bool getRowsActivityRational(const std::vector<int>& indices, VectorRational& vector);
+
+   /// gets the value for all rows given the current primal solution
+   bool getRowsActivity(VectorBase<R>& vector);
+   bool getRowsActivityReal(R* p_vector, int dim);
+   bool getRowsActivityRational(VectorRational& vector);
+
    /// gets the vector of slack values if available; returns true on success
    bool getSlacksReal(VectorBase<R>& vector);
    bool getSlacksReal(R* p_vector, int dim);
