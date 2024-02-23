@@ -81,6 +81,78 @@ void SPxLPBase<Rational>::computePrimalActivity(const VectorBase<Rational>& prim
 }
 
 template<> inline
+Rational SPxLPBase<Rational>::computePrimalActivity(int i, const VectorBase<Rational>& primal, const bool unscaled) const
+{
+   if(primal.dim() != nCols())
+   {
+      throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
+   }
+
+   int c;
+
+   for(c = 0; c < nCols() && primal[c] == 0; c++)
+      ;
+
+   if (c >= nCols())
+      return 0;
+
+   Rational rowActivity = colVector(c).value(i) * primal[c];
+   c++;
+
+   for(; c < nCols(); c++)
+   {
+      if(primal[c] != 0)
+      {
+        rowActivity += colVector(c).value(i) * primal[c];
+      }
+   }
+   return rowActivity;
+}
+
+template<> inline
+    void SPxLPBase<Rational>::computePrimalActivity(const std::set<int>& ids, const VectorBase<Rational>& primal,
+                                               VectorBase<Rational>& activity, const bool unscaled) const
+{
+  if(primal.dim() != nCols())
+  {
+    throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
+  }
+
+  if(activity.dim() != static_cast<int>(ids.size()))
+  {
+    throw SPxInternalCodeException("XSPXLP03 Activity vector computing row activity has wrong dimension");
+  }
+
+  int c;
+
+  for(c = 0; c < nCols() && primal[c] == 0; c++)
+    ;
+
+  if(c >= nCols())
+  {
+    activity.clear();
+    return;
+  }
+
+  for (const int i : ids)
+  {
+    activity[i] = colVector(c).value(i) * primal[c];
+  }
+  c++;
+
+  for(; c < nCols(); c++)
+  {
+    if(primal[c] != 0)
+    {
+      for (const int i : ids)
+      {
+        activity[i] += colVector(c).value(i) * primal[c];
+      }
+    }
+  }
+}
+
+template<> inline
 void SPxLPBase<Rational>::computeDualActivity(const VectorBase<Rational>& dual,
       VectorBase<Rational>& activity, const bool unscaled) const
 {

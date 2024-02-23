@@ -1941,6 +1941,18 @@ public:
    virtual void computePrimalActivity(const VectorBase<R>& primal, VectorBase<R>& activity,
                                       const bool unscaled = true) const;
 
+   /// Computes activity of the \p i 'th row for a given primal vector;
+   /// @throw SPxInternalCodeException if the dimension of primal vector does not match number of columns
+   /// \p unscaled determines whether the returned data should be unscaled (if scaling was applied prior)
+   virtual R computePrimalActivity(int i, const VectorBase<R>& primal, const bool unscaled = true) const;
+
+   /// Computes activity of the selected set of rows for a given primal vector; activity does not need to be zero
+   /// @throw SPxInternalCodeException if the dimension of primal vector does not match number of columns or if the
+   ///        dimension of the activity vector does not match the number of rows in the set
+   /// \p unscaled determines whether the returned data should be unscaled (if scaling was applied prior)
+   virtual void computePrimalActivity(const std::set<int>& ids, const VectorBase<R>& primal, VectorBase<R>& activity,
+                                      const bool unscaled = true) const;
+
    /// Updates activity of the rows for a given primal vector; activity does not need to be zero
    /// @throw SPxInternalCodeException if the dimension of primal vector does not match number of columns or if the
    ///        dimension of the activity vector does not match the number of rows

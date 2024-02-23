@@ -123,6 +123,106 @@ void SPxLPBase<R>::computePrimalActivity(const VectorBase<R>& primal, VectorBase
 }
 
 template <class R> inline
+R SPxLPBase<R>::computePrimalActivity(int i, const VectorBase<R>& primal, const bool unscaled) const
+{
+   if(primal.dim() != nCols())
+      throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
+
+   int c;
+
+   for(c = 0; c < nCols() && primal[c] == 0; c++)
+      ;
+
+   if(c >= nCols())
+      return 0;
+
+   R rowActivity;
+
+   DSVectorBase<R> tmp(nRows());
+   if(unscaled && _isScaled)
+   {
+      lp_scaler->getColUnscaled(*this, c, tmp);
+      rowActivity = tmp[i];
+   }
+   else
+     rowActivity = colVector(c)[i];
+
+   rowActivity *= primal[c];
+   c++;
+
+   for(; c < nCols(); c++)
+   {
+      if(primal[c] != 0)
+      {
+         if(unscaled && _isScaled)
+         {
+            lp_scaler->getColUnscaled(*this, c, tmp);
+            rowActivity += primal[c] * tmp[i];
+         }
+         else
+           rowActivity += primal[c] * colVector(c)[i];
+      }
+   }
+   return rowActivity;
+}
+
+template <class R> inline
+void SPxLPBase<R>::computePrimalActivity(const std::set<int> &ids, const VectorBase<R>& primal, VectorBase<R>& activity,
+                                        const bool unscaled) const
+{
+  if(primal.dim() != nCols())
+    throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
+
+  if(activity.dim() != static_cast<int>(ids.size()))
+    throw SPxInternalCodeException("XSPXLP03 Activity vector computing row activity has wrong dimension");
+
+  int c;
+
+  for(c = 0; c < nCols() && primal[c] == 0; c++)
+    ;
+
+  if(c >= nCols())
+  {
+    activity.clear();
+    return;
+  }
+
+  DSVectorBase<R> tmp(nRows());
+  if(unscaled && _isScaled)
+  {
+    lp_scaler->getColUnscaled(*this, c, tmp);
+    activity = tmp;
+  }
+  else
+    tmp = colVector(c);
+
+  for (const int i : ids)
+  {
+    activity[i] = primal[c] *  tmp.value(i);
+  }
+  c++;
+
+  for(; c < nCols(); c++)
+  {
+    if(primal[c] != 0)
+    {
+      if(unscaled && _isScaled)
+      {
+        lp_scaler->getColUnscaled(*this, c, tmp);
+        activity.multAdd(primal[c], tmp);
+      }
+      else
+        tmp = colVector(c);
+
+      for (const int i : ids)
+      {
+        activity[i] += primal[c] * tmp.value(i);
+      }
+    }
+  }
+}
+
+template <class R> inline
 void SPxLPBase<R>::computeDualActivity(const VectorBase<R>& dual, VectorBase<R>& activity,
                                        const bool unscaled) const
 {
