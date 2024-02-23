@@ -96,14 +96,14 @@ Rational SPxLPBase<Rational>::computePrimalActivity(int i, const VectorBase<Rati
    if (c >= nCols())
       return 0;
 
-   Rational rowActivity = colVector(c).value(i) * primal[c];
+   Rational rowActivity = colVector(c)[i] * primal[c];
    c++;
 
    for(; c < nCols(); c++)
    {
       if(primal[c] != 0)
       {
-        rowActivity += colVector(c).value(i) * primal[c];
+        rowActivity += colVector(c)[i] * primal[c];
       }
    }
    return rowActivity;
@@ -136,7 +136,7 @@ template<> inline
 
   for (const int i : ids)
   {
-    activity[i] = colVector(c).value(i) * primal[c];
+    activity[i] = colVector(c)[i] * primal[c];
   }
   c++;
 
@@ -146,7 +146,7 @@ template<> inline
     {
       for (const int i : ids)
       {
-        activity[i] += colVector(c).value(i) * primal[c];
+        activity[i] += colVector(c)[i] * primal[c];
       }
     }
   }

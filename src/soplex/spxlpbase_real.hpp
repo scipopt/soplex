@@ -198,7 +198,7 @@ void SPxLPBase<R>::computePrimalActivity(const std::set<int> &ids, const VectorB
 
   for (const int i : ids)
   {
-    activity[i] = primal[c] *  tmp.value(i);
+    activity[i] = primal[c] *  tmp[i];
   }
   c++;
 
@@ -216,7 +216,7 @@ void SPxLPBase<R>::computePrimalActivity(const std::set<int> &ids, const VectorB
 
       for (const int i : ids)
       {
-        activity[i] += primal[c] * tmp.value(i);
+        activity[i] += primal[c] * tmp[i];
       }
     }
   }
