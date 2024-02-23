@@ -31,12 +31,6 @@
 namespace soplex
 {
 template <class R>
-void SPxWeightPR<R>::computeLeavePenalty(int start, int end);
-
-template <class R>
-bool SPxWeightPR<R>::isConsistent() const;
-
-template <class R>
 void SPxWeightPR<R>::setRep(typename SPxSolverBase<R>::Representation rep)
 {
    if(rep == SPxSolverBase<R>::ROW)
