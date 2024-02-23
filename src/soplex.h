@@ -664,8 +664,8 @@ public:
    bool getPrimalRational(VectorRational& vector);
 
    /// gets the value for the \p i 'th row given the current primal solution
-   bool getRowActivity(R& value, int i);
-   bool getRowActivityRational(Rational& value, int i);
+   bool getRowActivity(int i, R& value);
+   bool getRowActivityRational(int i, Rational& value);
 
    /// gets the value for the row with indices in \p indices given the current primal solution
    bool getRowsActivity(const std::vector<int>& indices, VectorBase<R>& vector);
