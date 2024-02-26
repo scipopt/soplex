@@ -3885,7 +3885,7 @@ bool SoPlexBase<R>::getRowPrimalValueRational(int i, Rational& value) {
 }
 
 template <class R>
-bool SoPlexBase<R>::getRowsPrimalValue(const std::set<int>& indices, VectorBase<R>& vector) {
+bool SoPlexBase<R>::getRowsPrimalValue(const std::vector<int>& indices, VectorBase<R>& vector) {
   if(_realLP != 0 && hasSol())
   {
     assert(vector.dim() >= static_cast<int>(indices.size()));
@@ -3899,7 +3899,7 @@ bool SoPlexBase<R>::getRowsPrimalValue(const std::set<int>& indices, VectorBase<
 
 
 template <class R>
-bool SoPlexBase<R>::getRowsPrimalValueReal(const std::set<int>& indices, R* p_vector, int i) {
+bool SoPlexBase<R>::getRowsPrimalValueReal(const std::vector<int>& indices, R* p_vector, int i) {
   if(_realLP != 0 && hasSol())
   {
     assert(i >= static_cast<int>(indices.size()));
@@ -3915,7 +3915,7 @@ bool SoPlexBase<R>::getRowsPrimalValueReal(const std::set<int>& indices, R* p_ve
 
 
 template <class R>
-bool SoPlexBase<R>::getRowsPrimalValueRational(const std::set<int>& indices, VectorRational& vector) {
+bool SoPlexBase<R>::getRowsPrimalValueRational(const std::vector<int>& indices, VectorRational& vector) {
   if(_rationalLP != 0 && hasSol())
   {
     assert(vector.dim() >= static_cast<int>(indices.size()));

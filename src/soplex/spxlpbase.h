@@ -37,7 +37,6 @@
 #include <assert.h>
 #include <iostream>
 #include <iomanip>
-#include <set>
 #include <typeinfo>
 
 #include "soplex/spxdefines.h"
@@ -1951,7 +1950,7 @@ public:
    /// @throw SPxInternalCodeException if the dimension of primal vector does not match number of columns or if the
    ///        dimension of the activity vector does not match the number of rows in the set
    /// \p unscaled determines whether the returned data should be unscaled (if scaling was applied prior)
-   virtual void computePrimalActivity(const std::set<int>& ids, const VectorBase<R>& primal, VectorBase<R>& activity,
+   virtual void computePrimalActivity(const std::vector<int>& ids, const VectorBase<R>& primal, VectorBase<R>& activity,
                                       const bool unscaled = true) const;
 
    /// Updates activity of the rows for a given primal vector; activity does not need to be zero

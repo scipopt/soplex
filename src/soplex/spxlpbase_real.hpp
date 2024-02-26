@@ -167,7 +167,7 @@ R SPxLPBase<R>::computePrimalActivity(int i, const VectorBase<R>& primal, const 
 }
 
 template <class R> inline
-void SPxLPBase<R>::computePrimalActivity(const std::set<int> &ids, const VectorBase<R>& primal, VectorBase<R>& activity,
+void SPxLPBase<R>::computePrimalActivity(const std::vector<int> &ids, const VectorBase<R>& primal, VectorBase<R>& activity,
                                         const bool unscaled) const
 {
   if(primal.dim() != nCols())

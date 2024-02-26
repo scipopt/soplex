@@ -668,9 +668,9 @@ public:
    bool getRowPrimalValueRational(int i, Rational& value);
 
    /// Get the value for the row with indices in \p indices given the current primal solution
-   bool getRowsPrimalValue(const std::set<int>& indices, VectorBase<R>& vector);
-   bool getRowsPrimalValueReal(const std::set<int>& indices, R* p_vector, int i);
-   bool getRowsPrimalValueRational(const std::set<int>& indices, VectorRational& vector);
+   bool getRowsPrimalValue(const std::vector<int>& indices, VectorBase<R>& vector);
+   bool getRowsPrimalValueReal(const std::vector<int>& indices, R* p_vector, int i);
+   bool getRowsPrimalValueRational(const std::vector<int>& indices, VectorRational& vector);
 
    /// Get the value for all rows given the current primal solution
    bool getRowsPrimalValue(VectorBase<R>& vector);
