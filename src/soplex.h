@@ -667,12 +667,15 @@ public:
    bool getRowActivity(int i, R& value);
    bool getRowActivityRational(int i, Rational& value);
 
-   /// gets the value for the row with indices in \p indices given the current primal solution
+   /// gets the value for the row with indices in \p indices given the current primal solution;
+   /// all other elements of \p vector are left unchanged;
+   /// \p vector must have the same size as the total number of rows
    bool getRowsActivity(const std::vector<int>& indices, VectorBase<R>& vector);
    bool getRowsActivityReal(const std::vector<int>& indices, R* p_vector, int dim);
    bool getRowsActivityRational(const std::vector<int>& indices, VectorRational& vector);
 
-   /// gets the value for all rows given the current primal solution
+   /// gets the value for all rows given the current primal solution;
+   /// \p vector must have the same size as the total number of rows
    bool getRowsActivity(VectorBase<R>& vector);
    bool getRowsActivityReal(R* p_vector, int dim);
    bool getRowsActivityRational(VectorRational& vector);
