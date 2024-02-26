@@ -50,7 +50,7 @@ questiontag = "QUESTION:"
 answertag = "ANSWER:"
 labeltag = "LABEL:"
 
-def formatitem((question, answer, label)):
+def formatitem(item):
    '''
    returns a fully formatted php array containing all item information
    '''
@@ -59,9 +59,9 @@ def formatitem((question, answer, label)):
               'question'=>'%s',
               'answer'=>'%s',
               'label'=>'%s'
-             )""" % (question, answer, label)
+             )""" % item
 
-def formatsection((section, items)):
+def formatsection(section, items):
    '''
    returns a fully formatted array to represent an entire section together with its items
    '''
@@ -78,7 +78,7 @@ def formatallsections(sections, sectionitems):
    return """
    $faq = array(
         %s
-        );""" % (",\n".join([formatsection((section, sectionitems[section])) for section in sections]))
+        );""" % (",\n".join([formatsection(section, sectionitems[section]) for section in sections]))
 
 if __name__ == '__main__':
    '''
