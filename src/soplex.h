@@ -663,16 +663,19 @@ public:
    bool getPrimalReal(R* p_vector, int size);      // For SCIP compatibility
    bool getPrimalRational(VectorRational& vector);
 
-   /// Get the value for the \p i 'th row given the current primal solution
+   /// gets the value for the \p i 'th row given the current primal solution
    bool getRowPrimalValue(int i, R& value);
    bool getRowPrimalValueRational(int i, Rational& value);
 
-   /// Get the value for the row with indices in \p indices given the current primal solution
+   /// gets the value for the row with indices in \p indices given the current primal solution.
+   /// \p vector must have the same size as the total number of rows.
+   /// Al other elements of \p vector are left unchanged
    bool getRowsPrimalValue(const std::vector<int>& indices, VectorBase<R>& vector);
    bool getRowsPrimalValueReal(const std::vector<int>& indices, R* p_vector, int i);
    bool getRowsPrimalValueRational(const std::vector<int>& indices, VectorRational& vector);
 
-   /// Get the value for all rows given the current primal solution
+   /// gets the value for all rows given the current primal solution.
+   /// \p vector must have the same size as the total number of rows
    bool getRowsPrimalValue(VectorBase<R>& vector);
    bool getRowsPrimalValueReal(R* p_vector, int i);
    bool getRowsPrimalValueRational(VectorRational& vector);
