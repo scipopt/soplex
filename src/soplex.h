@@ -664,21 +664,21 @@ public:
    bool getPrimalRational(VectorRational& vector);
 
    /// gets the value for the \p i 'th row given the current primal solution
-   bool getRowPrimalValue(int i, R& value);
-   bool getRowPrimalValueRational(int i, Rational& value);
+   bool getRowActivity(int i, R& value);
+   bool getRowActivityRational(int i, Rational& value);
 
    /// gets the value for the row with indices in \p indices given the current primal solution.
    /// \p vector must have the same size as the total number of rows.
    /// Al other elements of \p vector are left unchanged
-   bool getRowsPrimalValue(const std::vector<int>& indices, VectorBase<R>& vector);
-   bool getRowsPrimalValueReal(const std::vector<int>& indices, R* p_vector, int i);
-   bool getRowsPrimalValueRational(const std::vector<int>& indices, VectorRational& vector);
+   bool getRowsActivity(const std::vector<int>& indices, VectorBase<R>& vector);
+   bool getRowsActivityReal(const std::vector<int>& indices, R* p_vector, int dim);
+   bool getRowsActivityRational(const std::vector<int>& indices, VectorRational& vector);
 
    /// gets the value for all rows given the current primal solution.
    /// \p vector must have the same size as the total number of rows
-   bool getRowsPrimalValue(VectorBase<R>& vector);
-   bool getRowsPrimalValueReal(R* p_vector, int i);
-   bool getRowsPrimalValueRational(VectorRational& vector);
+   bool getRowsActivity(VectorBase<R>& vector);
+   bool getRowsActivityReal(R* p_vector, int dim);
+   bool getRowsActivityRational(VectorRational& vector);
 
    /// gets the vector of slack values if available; returns true on success
    bool getSlacksReal(VectorBase<R>& vector);

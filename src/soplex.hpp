@@ -3861,11 +3861,11 @@ bool SoPlexBase<R>::getPrimalRational(VectorBase<Rational>& vector)
 }
 
 template <class R>
-bool SoPlexBase<R>::getRowPrimalValue(int i, R& value) {
+bool SoPlexBase<R>::getRowActivity(int i, R& value) {
   if(_realLP != 0 && hasSol())
   {
     _syncRealSolution();
-    value = _realLP->computePrimalActivity(i, _solReal._primal, true);
+    value = _realLP->computePrimalActivity(i, _solReal._primal);
     return true;
   }
   else
@@ -3873,7 +3873,7 @@ bool SoPlexBase<R>::getRowPrimalValue(int i, R& value) {
 }
 
 template <class R>
-bool SoPlexBase<R>::getRowPrimalValueRational(int i, Rational& value) {
+bool SoPlexBase<R>::getRowActivityRational(int i, Rational& value) {
   if(_rationalLP != 0 && hasSol())
   {
     _syncRationalSolution();
@@ -3885,12 +3885,12 @@ bool SoPlexBase<R>::getRowPrimalValueRational(int i, Rational& value) {
 }
 
 template <class R>
-bool SoPlexBase<R>::getRowsPrimalValue(const std::vector<int>& indices, VectorBase<R>& vector) {
+bool SoPlexBase<R>::getRowsActivity(const std::vector<int>& indices, VectorBase<R>& vector) {
   if(_realLP != 0 && hasSol())
   {
     assert(vector.dim() >= static_cast<int>(indices.size()));
     _syncRealSolution();
-    _realLP->computePrimalActivity(indices, _solReal._primal, vector, true);
+    _realLP->computePrimalActivity(indices, _solReal._primal, vector);
     return true;
   }
   else
@@ -3899,13 +3899,13 @@ bool SoPlexBase<R>::getRowsPrimalValue(const std::vector<int>& indices, VectorBa
 
 
 template <class R>
-bool SoPlexBase<R>::getRowsPrimalValueReal(const std::vector<int>& indices, R* p_vector, int i) {
+bool SoPlexBase<R>::getRowsActivityReal(const std::vector<int>& indices, R* p_vector, int dim) {
   if(_realLP != 0 && hasSol())
   {
-    assert(i >= static_cast<int>(indices.size()));
+    assert(dim >= numRows());
     _syncRealSolution();
-    VectorBase<R> vector(i);
-    _realLP->computePrimalActivity(indices, _solReal._primal, vector, true);
+    VectorBase<R> vector(dim);
+    _realLP->computePrimalActivity(indices, _solReal._primal, vector);
     std::copy(vector.begin(), vector.end(), p_vector);
     return true;
   }
@@ -3915,7 +3915,7 @@ bool SoPlexBase<R>::getRowsPrimalValueReal(const std::vector<int>& indices, R* p
 
 
 template <class R>
-bool SoPlexBase<R>::getRowsPrimalValueRational(const std::vector<int>& indices, VectorRational& vector) {
+bool SoPlexBase<R>::getRowsActivityRational(const std::vector<int>& indices, VectorRational& vector) {
   if(_rationalLP != 0 && hasSol())
   {
     assert(vector.dim() >= static_cast<int>(indices.size()));
@@ -3928,12 +3928,12 @@ bool SoPlexBase<R>::getRowsPrimalValueRational(const std::vector<int>& indices, 
 }
 
 template <class R>
-bool SoPlexBase<R>::getRowsPrimalValue(VectorBase<R>& vector) {
+bool SoPlexBase<R>::getRowsActivity(VectorBase<R>& vector) {
   if(_realLP != 0 && hasSol())
   {
     assert(vector.dim() >= numRows());
     _syncRealSolution();
-    _realLP->computePrimalActivity(_solReal._primal, vector, true);
+    _realLP->computePrimalActivity(_solReal._primal, vector);
     return true;
   }
   else
@@ -3942,13 +3942,13 @@ bool SoPlexBase<R>::getRowsPrimalValue(VectorBase<R>& vector) {
 
 
 template <class R>
-bool SoPlexBase<R>::getRowsPrimalValueReal(R* p_vector, int i) {
+bool SoPlexBase<R>::getRowsActivityReal(R* p_vector, int dim) {
   if(_realLP != 0 && hasSol())
   {
-    assert(i >= numRows());
+    assert(dim >= numRows());
     _syncRealSolution();
-    VectorBase<R> vector(i);
-    _realLP->computePrimalActivity(_solReal._primal, vector, true);
+    VectorBase<R> vector(dim);
+    _realLP->computePrimalActivity(_solReal._primal, vector);
     std::copy(vector.begin(), vector.end(), p_vector);
     return true;
   }
@@ -3957,7 +3957,7 @@ bool SoPlexBase<R>::getRowsPrimalValueReal(R* p_vector, int i) {
 }
 
 template <class R>
-bool SoPlexBase<R>::getRowsPrimalValueRational(VectorRational& vector) {
+bool SoPlexBase<R>::getRowsActivityRational(VectorRational& vector) {
   if(_rationalLP != 0 && hasSol())
   {
     assert(vector.dim() >= numRows());
