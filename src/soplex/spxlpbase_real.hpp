@@ -173,7 +173,7 @@ void SPxLPBase<R>::computePrimalActivity(const std::vector<int> &ids, const Vect
   if(primal.dim() != nCols())
     throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
 
-  if(activity.dim() != static_cast<int>(ids.size()))
+  if(activity.dim() != nRows())
     throw SPxInternalCodeException("XSPXLP03 Activity vector computing row activity has wrong dimension");
 
   int c;
@@ -183,7 +183,10 @@ void SPxLPBase<R>::computePrimalActivity(const std::vector<int> &ids, const Vect
 
   if(c >= nCols())
   {
-    activity.clear();
+    for (const int i : ids)
+    {
+      activity[i] = 0;
+    }
     return;
   }
 
@@ -207,10 +210,7 @@ void SPxLPBase<R>::computePrimalActivity(const std::vector<int> &ids, const Vect
     if(primal[c] != 0)
     {
       if(unscaled && _isScaled)
-      {
         lp_scaler->getColUnscaled(*this, c, tmp);
-        activity.multAdd(primal[c], tmp);
-      }
       else
         tmp = colVector(c);
 
