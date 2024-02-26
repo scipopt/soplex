@@ -118,7 +118,7 @@ template<> inline
     throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
   }
 
-  if(activity.dim() != static_cast<int>(ids.size()))
+  if(activity.dim() != nRows())
   {
     throw SPxInternalCodeException("XSPXLP03 Activity vector computing row activity has wrong dimension");
   }
@@ -130,7 +130,10 @@ template<> inline
 
   if(c >= nCols())
   {
-    activity.clear();
+    for (const int i : ids)
+    {
+      activity[i] = 0;
+    }
     return;
   }
 
