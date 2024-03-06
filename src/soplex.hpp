@@ -713,6 +713,8 @@ SoPlexBase<R>::SoPlexBase(const SoPlexBase<R>& rhs)
    spx_alloc(_currentSettings);
    _currentSettings = new(_currentSettings) Settings();
 
+   _rationalLP = nullptr;
+
    // call assignment operator
    *this = rhs;
 }
