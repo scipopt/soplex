@@ -17,6 +17,8 @@ interface & parameters:
   SoPlex_getNumIterations(), SoPlex_changeRowLhsReal(), SoPlex_changeRowRhsReal(), SoPlex_changeRangeReal(),
   SoPlex_changeRowRangeReal(), SoPlex_changeLowerReal(), SoPlex_changeVarLowerReal(), SoPlex_getLowerReal(),
   SoPlex_getObjReal(), SoPlex_changeUpperReal()
+- add new functions to soplex.h: getRowActivity(), getRowActivityRational(), getRowsActivity(), getRowsActivityReal(),
+  getRowsActivityRational() supported by the addition of computePrimalActivity() in spxlpbase.h
 
 performance:
 
@@ -28,6 +30,7 @@ code quality:
 - rewrite all preprocessor-defines to be unambiguous by prepending a `SPX`, e.g., `MSG_ERROR` is now `SPX_MSG_ERROR`.
 - rework soplex debug messages to use SFINAE, since they no longer worked properly after switching to header-only
 - add .lp instances to ctest
+- avoid deprecated definition of implicit copy constructor for 'SPxException', 'SLinSolver', 'SLinSolverRational'
 
 fixed bugs:
 - fix unset tolerances for simplifier and ratio tester plugins in soplex' copy constructor
