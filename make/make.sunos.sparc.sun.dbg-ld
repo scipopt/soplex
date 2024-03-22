@@ -1,6 +1,6 @@
 CXX	=	CC
 CPPFLAGS=	-Isrc -DWITH_LONG_DOUBLE
-CXXFLAGS=	-std=c++11 -g +w
+CXXFLAGS=	-std=c++14 -g +w
 LDFLAGS	=	-lm
 RANLIB	=	true
 AR	=	CC

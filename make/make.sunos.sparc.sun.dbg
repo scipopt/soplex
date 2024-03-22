@@ -1,7 +1,7 @@
 CXX	=	CC
 LINKCXX	=	CC
 CPPFLAGS=	-Isrc
-CXXFLAGS=	-std=c++11 -g +w2
+CXXFLAGS=	-std=c++14 -g +w2
 LDFLAGS	=	-lm
 RANLIB	=	true
 AR	=	CC

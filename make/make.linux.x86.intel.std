@@ -2,7 +2,7 @@ CXX	=	icpc
 LINKCXX	=	icpc
 DCXX	=	icpc
 CPPFLAGS=	-Isrc -DNDEBUG
-CXXFLAGS=	-O -wd1572 -std=c++11
+CXXFLAGS=	-O -wd1572 -std=c++14
 LDFLAGS	=	-lm -lstdc++
 ARFLAGS	=	crs
 ZLIB_FLAGS	=
