@@ -13,4 +13,4 @@ GMP_LDFLAGS     =       -lgmp
 READLINE_FLAGS  =
 READLINE_LDFLAGS=       -lreadline -lncurses
 CFLAGS		=	-h std=c99
-CXXFLAGS        =	-h std=c++11
+CXXFLAGS        =	-h std=c++14

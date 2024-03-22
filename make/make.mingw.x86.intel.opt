@@ -6,7 +6,7 @@ LINKCXX		=	link
 LINKCXX_L	=	-LIBPATH:
 LINKCXX_l	=	lib
 LINKCXX_o	=	-out:
-CXXFLAGS	=	-O3 -Oi -EHsc -fp:extended -Qstd=c++11 -D_CRT_SECURE_NO_WARNINGS -DNDEBUG
+CXXFLAGS	=	-O3 -Oi -EHsc -fp:extended -Qstd=c++14 -D_CRT_SECURE_NO_WARNINGS -DNDEBUG
 LDFLAGS		=	
 EXEEXTENSION	=	.exe
 AR		=	lib
