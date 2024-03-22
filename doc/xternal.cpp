@@ -400,7 +400,7 @@
  * <code>\-\-loadset=settings/exact.set</code>.
  *
  * If you have questions on particularly this feature you can contact <a href="http://www.zib.de/gleixner/">Ambros
- * Gleixner</a> or post them on the SoPlex mailing list.
+ * Gleixner</a> or post them on the <a href="https://listserv.zib.de/mailman/listinfo/soplex/">SoPlex mailing list</a>.
  *
  *
  *@section EXACT4 References
