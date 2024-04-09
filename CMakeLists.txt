@@ -6,14 +6,6 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_DEBUG} ${CMAKE_CXX_FLAGS_R
 project(SOPLEX
   LANGUAGES CXX)
 
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi")
-   # require at least gcc 5
-   if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5)
-     message(WARNING "GCC version not supported, should be at least 5!")
-   endif()
-endif()
-
 set(SOPLEX_VERSION_MAJOR 7)
 set(SOPLEX_VERSION_MINOR 0)
 set(SOPLEX_VERSION_PATCH 0)
@@ -201,30 +193,37 @@ if(BOOST)
     endif()
 endif()
 
+# disable fused floating point contraction to enhance reproducibility across compilers and architectures
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    add_compile_options(/fp:precise /bigobj)
+    add_definitions(/wd4100)
+    add_definitions(/wd4661)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+    add_definitions(-DBOOST_ALL_NO_LIB)
+    # set MT or MTd flag when using the static VS runtime libraries
+    if(MT)
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+    endif()
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+    add_compile_options(-fp-model=precise)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    # require at least gcc 5
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5)
+        message(WARNING "GCC version not supported, should be at least 5!")
+    endif()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi")
+    add_compile_options(-ffp-contract=off)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    add_compile_options(-ffp-contract=off)
+endif()
+
 # enable all warnings and explicitly switch on colored output for ninja
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wno-strict-overflow")
     if(CMAKE_GENERATOR STREQUAL "Ninja")
         set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always")
     endif()
-endif()
-if(MSVC)
-#    add_definitions(/W4)
-    add_definitions(/wd4100)
-    add_definitions(/wd4661)
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-    add_compile_options(/bigobj)
-    add_definitions(-DBOOST_ALL_NO_LIB)
-
-    # set MT or MTd flag when using the static VS runtime libraries
-    if(MT)
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
-        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
-    endif()
-endif()
-
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi")
 endif()
 
 # export compilation settings to header file
