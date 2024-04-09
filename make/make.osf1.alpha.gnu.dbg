@@ -1,6 +1,6 @@
 CXX	=	g++
 CPPFLAGS=	-Isrc
-CXXFLAGS=	-O -g -Wall -W -Wpointer-arith -Wbad-function-cast \
+CXXFLAGS=	-O -ffp-contract=off -g -Wall -W -Wpointer-arith -Wbad-function-cast \
 		-Wcast-align -Wwrite-strings -Wconversion \
 		-Wstrict-prototypes -Wmissing-prototypes \
 		-Wmissing-declarations -Wno-unknown-pragmas \

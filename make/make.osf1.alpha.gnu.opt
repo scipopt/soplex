@@ -1,6 +1,6 @@
 CXX	=	g++
 CPPFLAGS=	-Isrc -DNDEBUG 
-CXXFLAGS=	-O3 -mcpu=ev6  \
+CXXFLAGS=	-O3 -ffp-contract=off -mcpu=ev6  \
 		-ffast-math -funroll-loops
 LDFLAGS	=	-lm
 ARFLAGS	=	crs

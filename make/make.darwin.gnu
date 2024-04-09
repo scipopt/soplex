@@ -2,4 +2,4 @@ LDFLAGS		+=	-lm
 ARFLAGS		=	crs
 ZLIB_FLAGS	=
 ZLIB_LDFLAGS 	=	-lz
-CXXFLAGS        +=      -std=c++14
+CXXFLAGS        +=      -ffp-contract=off -std=c++14
