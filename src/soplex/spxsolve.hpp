@@ -537,6 +537,16 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                enter(enterId);
                assert((testBounds(), 1));
                thepricer->entered4(this->lastEntered(), this->lastIndex());
+
+               /* we cannot detect unboundedness in primal simplex while there is a shift (phase 1) */
+               if(rep() == COLUMN && basis().status() == SPxBasisBase<R>::UNBOUNDED && shift() > epsilon())
+               {
+                  SPX_MSG_INFO2((*this->spxout), (*this->spxout) << " --- cannot detect unboundedness while shift > 0"
+                                << std::endl;);
+                  setBasisStatus(SPxBasisBase<R>::REGULAR);
+                  break;
+               }
+
                stop = terminate();
                clearUpdateVecs();
 
@@ -882,6 +892,16 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                leave(leaveNum);
                assert((testBounds(), 1));
                thepricer->left4(this->lastIndex(), this->lastLeft());
+
+               /* we cannot detect unboundedness in primal simplex while there is a shift (phase 1) */
+               if(rep() == ROW && basis().status() == SPxBasisBase<R>::UNBOUNDED && shift() > epsilon())
+               {
+                  SPX_MSG_INFO2((*this->spxout), (*this->spxout) << " --- cannot detect unboundedness while shift > 0"
+                                << std::endl;);
+                  setBasisStatus(SPxBasisBase<R>::REGULAR);
+                  break;
+               }
+
                stop = terminate();
                clearUpdateVecs();
 
