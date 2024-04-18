@@ -18,6 +18,7 @@ code quality:
 fixed bugs:
 
 - set the c++ standard consistently to c++14 for all build systems
+- fix wrong detection of unboundedness for infeasible instance in primal simplex
 
 
 February 2024 - Release 7.0.0
