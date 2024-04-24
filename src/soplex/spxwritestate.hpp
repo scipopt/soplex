@@ -42,7 +42,8 @@ bool SPxSolverBase<R>::writeState(
    const char*    filename,
    const NameSet* rowNames,
    const NameSet* colNames,
-   const bool cpxFormat
+   const bool     cpxFormat,
+   const bool     writeZeroObjective
 ) const
 {
 
@@ -104,7 +105,7 @@ bool SPxSolverBase<R>::writeState(
    if(!ofs)
       return false;
 
-   this->writeMPS(ofs, rowNames, colNames, NULL);
+   this->writeMPS(ofs, rowNames, colNames, NULL, writeZeroObjective);
    ofs.close();
 
    // write basis

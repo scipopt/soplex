@@ -653,8 +653,9 @@ public:
     *  are written to "\p filename".set. If \p rowNames and \p colNames are \c NULL, default names are used for
     *  the constraints and variables.
     */
-   virtual bool writeState(const char* filename,
-                           const NameSet* rowNames = NULL, const NameSet* colNames = NULL, const bool cpxFormat = false) const;
+   virtual bool writeState(const char* filename, const NameSet* rowNames = NULL,
+                           const NameSet* colNames = NULL, const bool cpxFormat = false,
+                           const bool writeZeroObjective = false) const;
 
    ///@}
 
