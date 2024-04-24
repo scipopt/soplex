@@ -1244,16 +1244,19 @@ public:
     *  constraints and variables. If \p intVars is not \c NULL, the variables contained in it are marked as integer in
     *  the output.
     */
-   virtual void writeLPF(std::ostream&  out, const NameSet* rowNames, const NameSet* colNames,
-                         const DIdxSet* p_intvars = 0) const;
+   virtual void writeLPF(std::ostream& out, const NameSet* rowNames, const NameSet* colNames,
+                         const DIdxSet* p_intvars = 0,
+                         const bool writeZeroObjective = false) const;
 
    /// Writes a file in MPS format to \p out.
-   virtual void writeMPS(std::ostream&  out, const NameSet* rowNames, const NameSet* colNames,
-                         const DIdxSet* p_intvars = 0) const;
+   virtual void writeMPS(std::ostream& out, const NameSet* rowNames, const NameSet* colNames,
+                         const DIdxSet* p_intvars = 0,
+                         const bool writeZeroObjective = false) const;
 
    /// Write loaded LP to \p filename.
    virtual void writeFileLPBase(const char* filename, const NameSet* rowNames = 0,
-                                const NameSet* colNames = 0, const DIdxSet* p_intvars = 0) const
+                                const NameSet* colNames = 0, const DIdxSet* p_intvars = 0,
+                                const bool writeZeroObjective = false) const
    {
 
       std::ofstream tmp(filename);
@@ -1262,11 +1265,11 @@ public:
       if(len_f > 4 && filename[len_f - 1] == 's' && filename[len_f - 2] == 'p'
             && filename[len_f - 3] == 'm' && filename[len_f - 4] == '.')
       {
-         writeMPS(tmp, rowNames, colNames, p_intvars);
+         writeMPS(tmp, rowNames, colNames, p_intvars, writeZeroObjective);
       }
       else
       {
-         writeLPF(tmp, rowNames, colNames, p_intvars);
+         writeLPF(tmp, rowNames, colNames, p_intvars, writeZeroObjective);
       }
    }
 
