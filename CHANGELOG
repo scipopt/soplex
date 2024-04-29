@@ -11,14 +11,17 @@ performance:
 
 
 code quality:
-- update version of fmt from 6.1.2 to 7.1.3 due to deprecation
 
+- update version of fmt from 6.1.2 to 7.1.3 due to deprecation
 - add compile option -ffp-contract=off or /fp:precise to enhance reproducibility across different systems
 
 fixed bugs:
 
 - set the c++ standard consistently to c++14 for all build systems
 - fix wrong detection of unboundedness for infeasible instance in primal simplex
+- remove unnamed boolean setting STORE_BASIS_BEFORE_SIMPLEX_PIVOT
+- continue parsing settings after errors and print them consistently
+- find PaPILO installation by default
 
 
 February 2024 - Release 7.0.0
