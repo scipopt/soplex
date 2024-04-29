@@ -6656,13 +6656,8 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
 #ifdef SOPLEX_WITH_PAPILO
       _simplifierPaPILO.setModifyConsFrac(value);
 #else
-
-      if(!init)
-      {
-         SPX_MSG_INFO1(spxout, spxout <<
-                       "Setting Parameter modifyrowfrac is only possible if SoPlex is build with PaPILO\n");
-      }
-
+      SPX_MSG_INFO1(spxout, spxout <<
+                    "Setting Parameter simplifier_modifyrowfac is only possible if SoPlex is build with PaPILO\n");
       return false;
 #endif
       break;
@@ -9012,19 +9007,18 @@ bool SoPlexBase<R>::_parseSettingsLine(char* line, const int lineNumber)
                   || strncasecmp(paramValueString, "t", 4) == 0
                   || strncasecmp(paramValueString, "T", 4) == 0
                   || strtol(paramValueString, NULL, 4) == 1)
-            {
                success = setBoolParam((SoPlexBase<R>::BoolParam)param, true);
-               break;
-            }
             else if(strncasecmp(paramValueString, "false", 5) == 0
                     || strncasecmp(paramValueString, "FALSE", 5) == 0
                     || strncasecmp(paramValueString, "f", 5) == 0
                     || strncasecmp(paramValueString, "F", 5) == 0
                     || strtol(paramValueString, NULL, 5) == 0)
-            {
                success = setBoolParam((SoPlexBase<R>::BoolParam)param, false);
+            else
+               success = false;
+
+            if(success)
                break;
-            }
             else
             {
                SPX_MSG_INFO1(spxout, spxout << "Error parsing settings file: invalid value <" << paramValueString
@@ -9034,7 +9028,7 @@ bool SoPlexBase<R>::_parseSettingsLine(char* line, const int lineNumber)
          }
       }
 
-      return success;
+      return true;
    }
 
    // check whether we have an integer parameter
@@ -9324,15 +9318,16 @@ bool SoPlexBase<R>::loadSettingsFile(const char* filename)
    char line[SPX_SET_MAX_LINE_LEN];
    int lineNumber = 0;
    bool readError = false;
-   bool parseError = false;
 
-   while(!readError && !parseError)
+   while(true)
    {
       lineNumber++;
       readError = !file.getline(line, sizeof(line));
 
-      if(!readError)
-         parseError = !_parseSettingsLine(line, lineNumber);
+      if(readError)
+         break;
+
+      (void)_parseSettingsLine(line, lineNumber);
    }
 
    readError = readError && !file.eof();
@@ -9501,19 +9496,18 @@ bool SoPlexBase<R>::parseSettingsString(char* string)
                   || strncasecmp(paramValueString, "t", 4) == 0
                   || strncasecmp(paramValueString, "T", 4) == 0
                   || strtol(paramValueString, NULL, 4) == 1)
-            {
                success = setBoolParam((SoPlexBase<R>::BoolParam)param, true);
-               break;
-            }
             else if(strncasecmp(paramValueString, "false", 5) == 0
                     || strncasecmp(paramValueString, "FALSE", 5) == 0
                     || strncasecmp(paramValueString, "f", 5) == 0
                     || strncasecmp(paramValueString, "F", 5) == 0
                     || strtol(paramValueString, NULL, 5) == 0)
-            {
                success = setBoolParam((SoPlexBase<R>::BoolParam)param, false);
+            else
+               success = false;
+
+            if(success)
                break;
-            }
             else
             {
                SPX_MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << paramValueString
@@ -9523,7 +9517,7 @@ bool SoPlexBase<R>::parseSettingsString(char* string)
          }
       }
 
-      return success;
+      return true;
    }
 
    // check whether we have an integer parameter
