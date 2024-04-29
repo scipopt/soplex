@@ -1,7 +1,7 @@
 CXX	=	CC
 CPPFLAGS=	-Isrc -DNDEBUG  \
                 -DWITH_LONG_DOUBLE
-CXXFLAGS=	-std=c++11 -fast -xprefetch=auto
+CXXFLAGS=	-std=c++14 -fast -xprefetch=auto
 LDFLAGS	=	-lm
 RANLIB	=	true
 AR	=	CC

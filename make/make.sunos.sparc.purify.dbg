@@ -1,6 +1,6 @@
 CXX	=	purify  -best-effort CC
 CPPFLAGS=	-Isrc 
-CXXFLAGS=	-std=c++11 -g
+CXXFLAGS=	-std=c++14 -g
 LDFLAGS	=	-lm
 RANLIB	=	true
 AR	=	CC
