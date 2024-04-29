@@ -1,1 +1,1 @@
-CXXFLAGS        +=      -std=c++11
+CXXFLAGS        +=      -ffp-contract=off -std=c++14

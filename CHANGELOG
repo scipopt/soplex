@@ -1,4 +1,27 @@
-Next major release
+Upcoming Release - 7.0.1
+==================
+
+features:
+
+
+interface & parameters:
+
+
+performance:
+
+
+code quality:
+- update version of fmt from 6.1.2 to 7.1.3 due to deprecation
+
+- add compile option -ffp-contract=off or /fp:precise to enhance reproducibility across different systems
+
+fixed bugs:
+
+- set the c++ standard consistently to c++14 for all build systems
+- fix wrong detection of unboundedness for infeasible instance in primal simplex
+
+
+February 2024 - Release 7.0.0
 ==================
 
 features:
@@ -17,6 +40,25 @@ interface & parameters:
   SoPlex_getNumIterations(), SoPlex_changeRowLhsReal(), SoPlex_changeRowRhsReal(), SoPlex_changeRangeReal(),
   SoPlex_changeRowRangeReal(), SoPlex_changeLowerReal(), SoPlex_changeVarLowerReal(), SoPlex_getLowerReal(),
   SoPlex_getObjReal(), SoPlex_changeUpperReal()
+- removed parameters related to removed legacy code:
+  `bool:computedegen`, `bool:decompositiondualsimplex`,
+  `bool:explicitviol`, `bool:usecompdual`, `int:decomp_displayfreq`, `int:decomp_iterlimit`,
+  `int:decomp_maxaddedrows`, `int:decomp_verbosity`
+- added parameters related to exact solving and precision boosting:
+  `bool:adapt_tols_to_multiprecision` -> should tolerances be scaled down when precision is increased
+  `bool:boosted_warm_start` -> should high-precision solve start from advanced basis
+  `bool:iterative_refinement` -> should iterative refinement be used
+  `bool:precision_boosting` -> should precision boosting be used
+  `bool:recovery_mechanism` -> should the old recovery mechanism be used when iterative refinement fails
+  `int:multiprecision_limit` -> maximal precision in decimal digits
+  `int:storeBasisSimplexFreq` -> frequency to store basis in high precision solve
+  `real:precision_boosting_factor` -> factor by which precision is increased in each boosting iteration
+- changed minimum values for parameters `real:fpfeastol` and `real:fpopttol` from 1e-12 to 0
+- new parameters to enable/disable individual presolving techniques:
+  `bool:simplifier_enable_domcol`, `bool:simplifier_enable_dualfix`, `bool:simplifier_enable_fixcontinuous`,
+  `bool:simplifier_enable_parallelcols`, `bool:simplifier_enable_parallelrows`, `bool:simplifier_enable_propagation`,
+  `bool:simplifier_enable_singletoncols`, `bool:simplifier_enable_stuffing`
+
 
 performance:
 
@@ -29,6 +71,7 @@ code quality:
 - rework soplex debug messages to use SFINAE, since they no longer worked properly after switching to header-only
 - add .lp instances to ctest
 - add option to write dense objective to mps/lp files (including variables with zero objective coefficients)
+- remove unmaintained legacy code for decomposition based dual simplex
 
 fixed bugs:
 - fix unset tolerances for simplifier and ratio tester plugins in soplex' copy constructor
@@ -39,7 +82,7 @@ fixed bugs:
 - fix bug in cmake build system when MPFR is available but boost is not
 - fix bug when writing bounds for unused variables in MPS file format
 
-Upcoming Bugfix Release 6.0.4
+August 2023 Bugfix Release 6.0.4
 =============================
 
 features:
@@ -59,8 +102,6 @@ fixed bugs:
 
 miscellaneous:
 
-August Bugfix Release 6.0.4
-=============================
 
 December 2022 Release 6.0.3
 =============================

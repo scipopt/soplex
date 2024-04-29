@@ -220,15 +220,14 @@ install(FILES
      ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/color.h
      ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/compile.h
      ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/core.h
-     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/format.h
      ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/format-inl.h
+     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/format.h
      ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/locale.h
+     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/os.h
      ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/ostream.h
      ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/posix.h
      ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/printf.h
      ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/ranges.h
-     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/format.cc
-     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/posix.cc
  DESTINATION include/soplex/external/fmt)
 
 # install the binary and the library to appropriate lcoations and add them to an export group

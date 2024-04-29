@@ -1,6 +1,6 @@
 CXX	=	g++
 CPPFLAGS=	-Isrc
-CXXFLAGS=	-std=c++11 -O0 -g $(GCCWARN) -m64
+CXXFLAGS=	-std=c++14 -O0 -g $(GCCWARN) -m64
 LDFLAGS	=	-lm -m64
 ARFLAGS	=	crs
 ZLIB_FLAGS	=

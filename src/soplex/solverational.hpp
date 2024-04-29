@@ -5437,23 +5437,6 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                }
             }
 
-            // get the last stable basis. The hope is that precision boosting will get rid of cycling.
-            if(boolParam(SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT))
-            {
-               try
-               {
-                  if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size()
-                        || _oldBasisStatusCols.size() != basisStatusCols.size())
-                     _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
-               }
-               catch(const SPxInternalCodeException& E)
-               {
-                  SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                                "> while processing the result of the solve.\n");
-                  SPX_MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
-               }
-            }
-
             break;
 
          // intentional fallthrough
@@ -5482,23 +5465,6 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                _rationalLUSolver.clear();
             }
 
-            // get the last stable basis.
-            if(boolParam(SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT))
-            {
-               try
-               {
-                  if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size()
-                        || _oldBasisStatusCols.size() != basisStatusCols.size())
-                     _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
-               }
-               catch(const SPxInternalCodeException& E)
-               {
-                  SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                                "> while processing the result of the solve.\n");
-                  SPX_MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
-               }
-            }
-
             break;
 
          case SPxSolverBase<R>::INFEASIBLE:
@@ -5508,24 +5474,6 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             {
                _hasBasis = false;
                _rationalLUSolver.clear();
-
-               // get the last stable basis.
-               if(boolParam(SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT))
-               {
-                  try
-                  {
-                     if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size()
-                           || _oldBasisStatusCols.size() != basisStatusCols.size())
-                        _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
-                  }
-                  catch(const SPxInternalCodeException& E)
-                  {
-                     SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                                   "> while processing the result of the solve.\n");
-                     SPX_MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
-                  }
-               }
-
                break;
             }
 
@@ -5543,28 +5491,10 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                              basisStatusCols.size());
             _hasBasis = true;
 
-            // if possible, get the last stable basis, otherwise store the infeasible basis.
-            if(boolParam(SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT))
-            {
-               try
-               {
-                  if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size()
-                        || _oldBasisStatusCols.size() != basisStatusCols.size())
-                     _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
-               }
-               catch(const SPxInternalCodeException& E)
-               {
-                  SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                                "> while processing the result of the solve.\n");
-                  SPX_MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
-               }
-            }
-            else
-            {
-               if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size()
-                     || _oldBasisStatusCols.size() != basisStatusCols.size())
-                  _storeBasisAsOldBasis(basisStatusRows, basisStatusCols);
-            }
+
+            if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size()
+                  || _oldBasisStatusCols.size() != basisStatusCols.size())
+               _storeBasisAsOldBasis(basisStatusRows, basisStatusCols);
 
             break;
 
@@ -5573,24 +5503,6 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
          default:
             _hasBasis = false;
             _rationalLUSolver.clear();
-
-            // get the last stable basis.
-            if(boolParam(SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT))
-            {
-               try
-               {
-                  if(oldIterations < _statistics->iterations || _oldBasisStatusRows.size() != basisStatusRows.size()
-                        || _oldBasisStatusCols.size() != basisStatusCols.size())
-                     _storeLastStableBasis(simplificationStatus == SPxSimplifier<R>::VANISHED);
-               }
-               catch(const SPxInternalCodeException& E)
-               {
-                  SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                                "> while processing the result of the solve.\n");
-                  SPX_MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
-               }
-            }
-
             break;
          }
       }
@@ -6070,22 +5982,6 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
                }
             }
 
-            // get the last stable basis. The hope is that precision boosting will get rid of cycling.
-            if(boolParam(SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT))
-            {
-               try
-               {
-                  if(oldIterations < _statistics->iterations)
-                     _storeLastStableBasisBoosted(simplificationStatus == SPxSimplifier<BP>::VANISHED);
-               }
-               catch(const SPxInternalCodeException& E)
-               {
-                  SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                                "> while processing the result of the solve.\n");
-                  SPX_MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
-               }
-            }
-
             break;
 
          // intentional fallthrough
@@ -6116,22 +6012,6 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
                _rationalLUSolver.clear();
             }
 
-            // get the last stable basis.
-            if(boolParam(SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT))
-            {
-               try
-               {
-                  if(oldIterations < _statistics->iterations)
-                     _storeLastStableBasisBoosted(simplificationStatus == SPxSimplifier<BP>::VANISHED);
-               }
-               catch(const SPxInternalCodeException& E)
-               {
-                  SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                                "> while processing the result of the solve.\n");
-                  SPX_MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
-               }
-            }
-
             break;
 
          case SPxSolverBase<BP>::INFEASIBLE:
@@ -6141,23 +6021,6 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
             {
                _hasBasis = false;
                _rationalLUSolver.clear();
-
-               // get the last stable basis.
-               if(boolParam(SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT))
-               {
-                  try
-                  {
-                     if(oldIterations < _statistics->iterations)
-                        _storeLastStableBasisBoosted(simplificationStatus == SPxSimplifier<BP>::VANISHED);
-                  }
-                  catch(const SPxInternalCodeException& E)
-                  {
-                     SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                                   "> while processing the result of the solve.\n");
-                     SPX_MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
-                  }
-               }
-
                break;
             }
 
@@ -6178,26 +6041,8 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
             _convertDataArrayVarStatusToRPrecision(_tmpBasisStatusCols, basisStatusCols);
             _hasBasis = true;
 
-            // if possible, get the last stable basis, otherwise store the infeasible basis.
-            if(boolParam(SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT))
-            {
-               try
-               {
-                  if(oldIterations < _statistics->iterations)
-                     _storeLastStableBasisBoosted(simplificationStatus == SPxSimplifier<BP>::VANISHED);
-               }
-               catch(const SPxInternalCodeException& E)
-               {
-                  SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                                "> while processing the result of the solve.\n");
-                  SPX_MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
-               }
-            }
-            else
-            {
-               if(oldIterations < _statistics->iterations)
-                  _storeBasisAsOldBasisBoosted(_tmpBasisStatusRows, _tmpBasisStatusCols);
-            }
+            if(oldIterations < _statistics->iterations)
+               _storeBasisAsOldBasisBoosted(_tmpBasisStatusRows, _tmpBasisStatusCols);
 
             break;
 
@@ -6206,24 +6051,6 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
          default:
             _hasBasis = false;
             _rationalLUSolver.clear();
-
-            // get the last stable basis.
-            if(boolParam(SoPlexBase<R>::STORE_BASIS_BEFORE_SIMPLEX_PIVOT))
-            {
-               try
-               {
-                  if(oldIterations < _statistics->iterations)
-                     _storeLastStableBasisBoosted(simplificationStatus == SPxSimplifier<BP>::VANISHED);
-               }
-               catch(const SPxInternalCodeException& E)
-               {
-                  SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                                "> while processing the result of the solve.\n");
-                  SPX_MSG_INFO1(spxout, spxout << "Storage of last basis failed. Keep going.\n");
-               }
-            }
-
-
             break;
          }
       }
