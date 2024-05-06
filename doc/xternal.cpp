@@ -374,7 +374,7 @@
  * allows for computing extended-precision solutions beyond the limits of standard floating-point arithmetic.  It may be
  * particularly helpful for numerically troublesome LPs and applications that require solutions within tight feasibility
  * tolerances.  Since version 2.1 this has been extended to compute exact rational solutions. Since version 7.0, SoPlex
- * can also use \em incremental prevision boosting \em to compute exact rational solutions. By default, SoPlex uses
+ * can also use \em incremental precision boosting \em to compute exact rational solutions. By default, SoPlex uses
  * a combination of an out iterative refinement loop, with precision boosting as a fallback incase of numerical problems.
  *
  * By default, SoPlex functions as a standard floating-point LP solver.  In order to use SoPlex as an exact LP solver,
@@ -400,7 +400,7 @@
  * <code>\-\-loadset=settings/exact.set</code>.
  *
  * If you have questions on particularly this feature you can contact <a href="http://www.zib.de/gleixner/">Ambros
- * Gleixner</a> or post them on the SoPlex mailing list.
+ * Gleixner</a> or post them on the <a href="https://listserv.zib.de/mailman/listinfo/soplex/">SoPlex mailing list</a>.
  *
  *
  *@section EXACT4 References
