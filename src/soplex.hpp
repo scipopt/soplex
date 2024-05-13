@@ -1021,9 +1021,10 @@ bool SoPlexBase<R>::getDualFarkasRational(mpq_t* vector, const int size)
 // Alias for writeFile; SCIP
 template <class R>
 bool SoPlexBase<R>::writeFileReal(const char* filename, const NameSet* rowNames,
-                                  const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
+                                  const NameSet* colNames, const DIdxSet* intVars, const bool unscale,
+                                  const bool writeZeroObjective) const
 {
-   return writeFile(filename, rowNames, colNames, intVars, unscale);
+   return writeFile(filename, rowNames, colNames, intVars, unscale, writeZeroObjective);
 }
 
 /// writes rational LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
@@ -1032,14 +1033,14 @@ bool SoPlexBase<R>::writeFileReal(const char* filename, const NameSet* rowNames,
 /// Here unscale is just a junk variable that is used to match the type with the real write function
 template <class R>
 bool SoPlexBase<R>::writeFileRational(const char* filename, const NameSet* rowNames,
-                                      const NameSet* colNames, const DIdxSet* intVars) const
+                                      const NameSet* colNames, const DIdxSet* intVars, const bool writeZeroObjective) const
 {
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return false;
    else
    {
       assert(_rationalLP != 0);
-      _rationalLP->writeFileLPBase(filename, rowNames, colNames, intVars);
+      _rationalLP->writeFileLPBase(filename, rowNames, colNames, intVars, writeZeroObjective);
 
       ///@todo implement return value
       return true;
@@ -1055,7 +1056,8 @@ bool SoPlexBase<R>::writeFileRational(const char* filename, const NameSet* rowNa
 /// default names are used
 template <class R>
 void SoPlexBase<R>::writeStateReal(const char* filename, const NameSet* rowNames,
-                                   const NameSet* colNames, const bool cpxFormat) const
+                                   const NameSet* colNames, const bool cpxFormat,
+                                   const bool writeZeroObjective) const
 {
    std::string ofname;
 
@@ -1065,7 +1067,7 @@ void SoPlexBase<R>::writeStateReal(const char* filename, const NameSet* rowNames
 
    // write problem in MPS/LP format
    ofname = std::string(filename) + ((cpxFormat) ? ".lp" : ".mps");
-   writeFile(ofname.c_str(), rowNames, colNames, 0);
+   writeFileReal(ofname.c_str(), rowNames, colNames, nullptr, true, writeZeroObjective);
 
    // write basis
    ofname = std::string(filename) + ".bas";
@@ -1078,7 +1080,8 @@ void SoPlexBase<R>::writeStateReal(const char* filename, const NameSet* rowNames
 /// default names are used
 template <class R>
 void SoPlexBase<R>::writeStateRational(const char* filename, const NameSet* rowNames,
-                                       const NameSet* colNames, const bool cpxFormat) const
+                                       const NameSet* colNames, const bool cpxFormat,
+                                       const bool writeZeroObjective) const
 {
    std::string ofname;
 
@@ -1088,7 +1091,7 @@ void SoPlexBase<R>::writeStateRational(const char* filename, const NameSet* rowN
 
    // write problem in MPS/LP format
    ofname = std::string(filename) + ((cpxFormat) ? ".lp" : ".mps");
-   writeFileRational(ofname.c_str(), rowNames, colNames, 0);
+   writeFileRational(ofname.c_str(), rowNames, colNames, nullptr, writeZeroObjective);
 
    // write basis
    ofname = std::string(filename) + ".bas";
@@ -9759,7 +9762,8 @@ bool SoPlexBase<R>::readFile(const char* filename, NameSet* rowNames, NameSet* c
 /// marked as integer; returns true on success
 template <class R>
 bool SoPlexBase<R>::writeFile(const char* filename, const NameSet* rowNames,
-                              const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
+                              const NameSet* colNames, const DIdxSet* intVars, const bool unscale,
+                              const bool writeZeroObjective) const
 {
    ///@todo implement return value
    if(unscale && _realLP->isScaled())
@@ -9770,12 +9774,12 @@ bool SoPlexBase<R>::writeFile(const char* filename, const NameSet* rowNames,
       spx_alloc(origLP);
       origLP = new(origLP) SPxLPBase<R>(*_realLP);
       origLP->unscaleLP();
-      origLP->writeFileLPBase(filename, rowNames, colNames, intVars);
+      origLP->writeFileLPBase(filename, rowNames, colNames, intVars, writeZeroObjective);
       origLP->~SPxLPBase<R>();
       spx_free(origLP);
    }
    else
-      _realLP->writeFileLPBase(filename, rowNames, colNames, intVars);
+      _realLP->writeFileLPBase(filename, rowNames, colNames, intVars, writeZeroObjective);
 
    return true;
 }
@@ -9786,14 +9790,14 @@ bool SoPlexBase<R>::writeFile(const char* filename, const NameSet* rowNames,
 /// the variables contained in it are marked as integer; returns true on success
 template <class R>
 bool SoPlexBase<R>::writeDualFileReal(const char* filename, const NameSet* rowNames,
-                                      const NameSet* colNames, const DIdxSet* intVars) const
+                                      const NameSet* colNames, const DIdxSet* intVars, const bool writeZeroObjective) const
 {
    SPxLPBase<R> dualLP;
    _realLP->buildDualProblem(dualLP);
    dualLP.setOutstream(spxout);
 
    // swap colnames and rownames
-   dualLP.writeFileLPBase(filename, colNames, rowNames);
+   dualLP.writeFileLPBase(filename, colNames, rowNames, nullptr, writeZeroObjective);
    return true;
 }
 

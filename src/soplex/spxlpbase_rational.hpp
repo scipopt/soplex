@@ -1699,11 +1699,12 @@ static const char* getColName(
 // write an SVector
 #define SOPLEX_NUM_ENTRIES_PER_LINE 5
 static void LPFwriteSVector(
-   const SPxLPBase<Rational>&   p_lp,       ///< the LP
-   std::ostream&            p_output,   ///< output stream
-   const NameSet*           p_cnames,   ///< column names
-   const SVectorBase<Rational>& p_svec,     ///< vector to write
-   SPxOut*                  spxout      ///< out stream
+   const SPxLPBase<Rational>&   p_lp,                         ///< the LP
+   std::ostream&                p_output,                     ///< output stream
+   const NameSet*               p_cnames,                     ///< column names
+   const SVectorBase<Rational>& p_svec,                       ///< vector to write
+   SPxOut*                      spxout,                       ///< out stream
+   const bool                   writeZeroCoefficients = false ///< write zero objective coefficients
 )
 {
 
@@ -1717,7 +1718,7 @@ static void LPFwriteSVector(
    {
       const Rational coeff = p_svec[j];
 
-      if(coeff == 0)
+      if(coeff == 0 && !writeZeroCoefficients)
          continue;
 
       if(num_coeffs == 0)
@@ -1757,10 +1758,11 @@ static void LPFwriteSVector(
 
 // write the objective
 static void LPFwriteObjective(
-   const SPxLPBase<Rational>& p_lp,       ///< the LP
-   std::ostream&          p_output,   ///< output stream
-   const NameSet*         p_cnames,   ///< column names
-   SPxOut*                spxout      ///< out stream
+   const SPxLPBase<Rational>& p_lp,                      ///< the LP
+   std::ostream&              p_output,                  ///< output stream
+   const NameSet*             p_cnames,                  ///< column names
+   SPxOut*                    spxout,                    ///< out stream
+   const bool                 writeZeroObjective = false ///< write zero objective coefficients
 )
 {
 
@@ -1773,7 +1775,7 @@ static void LPFwriteObjective(
    DSVectorBase<Rational> svec(obj.dim());
    svec.operator = (obj);
    svec *= Rational(sense);
-   LPFwriteSVector(p_lp, p_output, p_cnames, svec, spxout);
+   LPFwriteSVector(p_lp, p_output, p_cnames, svec, spxout, writeZeroObjective);
    p_output << "\n";
 }
 
@@ -1968,10 +1970,11 @@ void SPxLPBase<Rational>::writeLPF(
    std::ostream&  p_output,          ///< output stream
    const NameSet* p_rnames,          ///< row names
    const NameSet* p_cnames,          ///< column names
-   const DIdxSet* p_intvars          ///< integer variables
+   const DIdxSet* p_intvars,         ///< integer variables
+   const bool     writeZeroObjective ///< write zero objective coefficients
 ) const
 {
-   LPFwriteObjective(*this, p_output, p_cnames, spxout);
+   LPFwriteObjective(*this, p_output, p_cnames, spxout, writeZeroObjective);
    LPFwriteRows(*this, p_output, p_rnames, p_cnames, spxout);
    LPFwriteBounds(*this, p_output, p_cnames, spxout);
    LPFwriteGenerals(*this, p_output, p_cnames, p_intvars);
@@ -2079,7 +2082,8 @@ void SPxLPBase<Rational>::writeMPS(
    std::ostream&  p_output,          ///< output stream.
    const NameSet* p_rnames,          ///< row names.
    const NameSet* p_cnames,          ///< column names.
-   const DIdxSet* p_intvars          ///< integer variables.
+   const DIdxSet* p_intvars,         ///< integer variables.
+   const bool     writeZeroObjective ///< write zero objective coefficients
 ) const
 {
 
@@ -2151,7 +2155,7 @@ void SPxLPBase<Rational>::writeMPS(
             MPSwriteRecord(p_output, 0, getColName(*this, i, p_cnames, name), spxout,
                            MPSgetRowName(*this, col.index(k), p_rnames, name1), col.value(k));
 
-         if(maxObj(i) != 0)
+         if(maxObj(i) != 0 || writeZeroObjective)
             MPSwriteRecord(p_output, 0, getColName(*this, i, p_cnames, name), spxout, "MINIMIZE", -maxObj(i));
       }
 
@@ -2214,12 +2218,6 @@ void SPxLPBase<Rational>::writeMPS(
 
    for(i = 0; i < nCols(); i++)
    {
-      // skip variables that do not appear in the objective function or any constraint
-      const SVectorBase<Rational>& col = colVector(i);
-
-      if(col.size() == 0 && maxObj(i) == 0)
-         continue;
-
       if(lower(i) == upper(i))
       {
          MPSwriteRecord(p_output, "FX", "BOUND", spxout, getColName(*this, i, p_cnames, name1), lower(i));
