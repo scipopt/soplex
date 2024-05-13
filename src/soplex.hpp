@@ -5819,85 +5819,59 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
    case FORCEBASIC:
       break;
 
-   case SIMPLIFIER_SINGLETONCOLS:
 #ifdef SOPLEX_WITH_PAPILO
+
+   case SIMPLIFIER_SINGLETONCOLS:
       _simplifierPaPILO.setEnableSingletonCols(value);
-#else
-      SPX_MSG_INFO1(spxout, spxout <<
-                    "Setting Parameter simplifier_enable_singleton_cols is only possible if SoPlex is build with PaPILO\n");
-      return false;
-#endif
       break;
 
    case SIMPLIFIER_CONSTRAINTPROPAGATION:
-#ifdef SOPLEX_WITH_PAPILO
       _simplifierPaPILO.setEnablePropagation(value);
-#else
-      SPX_MSG_INFO1(spxout, spxout <<
-                    "Setting Parameter simplifier_enable_propagation is only possible if SoPlex is build with PaPILO\n");
-      return false;
-#endif
       break;
 
    case SIMPLIFIER_PARALLELROWDETECTION:
-#ifdef SOPLEX_WITH_PAPILO
       _simplifierPaPILO.setEnableParallelRows(value);
-#else
-      SPX_MSG_INFO1(spxout, spxout <<
-                    "Setting Parameter simplifier_enable_parallelrows is only possible if SoPlex is build with PaPILO\n");
-      return false;
-#endif
       break;
 
    case SIMPLIFIER_PARALLELCOLDETECTION:
-#ifdef SOPLEX_WITH_PAPILO
       _simplifierPaPILO.setEnableParallelCols(value);
-#else
-      SPX_MSG_INFO1(spxout, spxout <<
-                    "Setting Parameter simplifier_enable_parallelcols is only possible if SoPlex is build with PaPILO\n");
-      return false;
-#endif
       break;
 
    case SIMPLIFIER_SINGLETONSTUFFING:
-#ifdef SOPLEX_WITH_PAPILO
       _simplifierPaPILO.setEnableStuffing(value);
-#else
-      SPX_MSG_INFO1(spxout, spxout <<
-                    "Setting Parameter simplifier_enable_stuffing is only possible if SoPlex is build with PaPILO\n");
-      return false;
-#endif
       break;
 
    case SIMPLIFIER_DUALFIX:
-#ifdef SOPLEX_WITH_PAPILO
       _simplifierPaPILO.setEnableDualFix(value);
-#else
-      SPX_MSG_INFO1(spxout, spxout <<
-                    "Setting Parameter simplifier_enable_dualfix is only possible if SoPlex is build with PaPILO\n");
-      return false;
-#endif
       break;
 
    case SIMPLIFIER_FIXCONTINUOUS:
-#ifdef SOPLEX_WITH_PAPILO
       _simplifierPaPILO.setEnableFixContinuous(value);
-#else
-      SPX_MSG_INFO1(spxout, spxout <<
-                    "Setting Parameter simplifier_enable_fixcontinuous is only possible if SoPlex is build with PaPILO\n");
-      return false;
-#endif
       break;
 
    case SIMPLIFIER_DOMINATEDCOLS:
-#ifdef SOPLEX_WITH_PAPILO
       _simplifierPaPILO.setEnableDomCols(value);
-#else
-      SPX_MSG_INFO1(spxout, spxout <<
-                    "Setting Parameter simplifier_enable_domcol is only possible if SoPlex is build with PaPILO\n");
-      return false;
-#endif
       break;
+#else
+
+   case SIMPLIFIER_SINGLETONCOLS:
+   case SIMPLIFIER_CONSTRAINTPROPAGATION:
+   case SIMPLIFIER_PARALLELROWDETECTION:
+   case SIMPLIFIER_PARALLELCOLDETECTION:
+   case SIMPLIFIER_SINGLETONSTUFFING:
+   case SIMPLIFIER_DUALFIX:
+   case SIMPLIFIER_FIXCONTINUOUS:
+   case SIMPLIFIER_DOMINATEDCOLS:
+      if(_currentSettings->_boolParamValues[param] != value)
+      {
+         SPX_MSG_INFO1(spxout, spxout <<
+                       "Changing Parameter " << _currentSettings->boolParam.name[param] <<
+                       " is only possible if SoPlex is build with PaPILO\n");
+         return false;
+      }
+
+      break;
+#endif
 
    case ITERATIVE_REFINEMENT:
       break;
@@ -5907,9 +5881,13 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
 
    case PRECISION_BOOSTING:
 #ifndef SOPLEX_WITH_MPFR
-      SPX_MSG_INFO1(spxout, spxout <<
-                    "Setting Parameter precision_boosting is only possible if SoPlex is build with MPFR\n");
-      return false;
+      if(_currentSettings->_boolParamValues[param] != value)
+      {
+         SPX_MSG_INFO1(spxout, spxout <<
+                       "Changing Parameter precision_boosting is only possible if SoPlex is build with MPFR\n");
+         return false;
+      }
+
 #endif
       break;
 
@@ -6660,13 +6638,13 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
       _simplifierPaPILO.setModifyConsFrac(value);
 #else
 
-      if(!init)
+      if(_currentSettings->_realParamValues[param] != value)
       {
          SPX_MSG_INFO1(spxout, spxout <<
-                       "Setting Parameter modifyrowfrac is only possible if SoPlex is build with PaPILO\n");
+                       "Setting Parameter simplifier_modifyrowfac is only possible if SoPlex is build with PaPILO\n");
+         return false;
       }
 
-      return false;
 #endif
       break;
 
@@ -9015,19 +8993,18 @@ bool SoPlexBase<R>::_parseSettingsLine(char* line, const int lineNumber)
                   || strncasecmp(paramValueString, "t", 4) == 0
                   || strncasecmp(paramValueString, "T", 4) == 0
                   || strtol(paramValueString, NULL, 4) == 1)
-            {
                success = setBoolParam((SoPlexBase<R>::BoolParam)param, true);
-               break;
-            }
             else if(strncasecmp(paramValueString, "false", 5) == 0
                     || strncasecmp(paramValueString, "FALSE", 5) == 0
                     || strncasecmp(paramValueString, "f", 5) == 0
                     || strncasecmp(paramValueString, "F", 5) == 0
                     || strtol(paramValueString, NULL, 5) == 0)
-            {
                success = setBoolParam((SoPlexBase<R>::BoolParam)param, false);
+            else
+               success = false;
+
+            if(success)
                break;
-            }
             else
             {
                SPX_MSG_INFO1(spxout, spxout << "Error parsing settings file: invalid value <" << paramValueString
@@ -9037,7 +9014,7 @@ bool SoPlexBase<R>::_parseSettingsLine(char* line, const int lineNumber)
          }
       }
 
-      return success;
+      return true;
    }
 
    // check whether we have an integer parameter
@@ -9327,15 +9304,16 @@ bool SoPlexBase<R>::loadSettingsFile(const char* filename)
    char line[SPX_SET_MAX_LINE_LEN];
    int lineNumber = 0;
    bool readError = false;
-   bool parseError = false;
 
-   while(!readError && !parseError)
+   while(true)
    {
       lineNumber++;
       readError = !file.getline(line, sizeof(line));
 
-      if(!readError)
-         parseError = !_parseSettingsLine(line, lineNumber);
+      if(readError)
+         break;
+
+      (void)_parseSettingsLine(line, lineNumber);
    }
 
    readError = readError && !file.eof();
@@ -9504,19 +9482,18 @@ bool SoPlexBase<R>::parseSettingsString(char* string)
                   || strncasecmp(paramValueString, "t", 4) == 0
                   || strncasecmp(paramValueString, "T", 4) == 0
                   || strtol(paramValueString, NULL, 4) == 1)
-            {
                success = setBoolParam((SoPlexBase<R>::BoolParam)param, true);
-               break;
-            }
             else if(strncasecmp(paramValueString, "false", 5) == 0
                     || strncasecmp(paramValueString, "FALSE", 5) == 0
                     || strncasecmp(paramValueString, "f", 5) == 0
                     || strncasecmp(paramValueString, "F", 5) == 0
                     || strtol(paramValueString, NULL, 5) == 0)
-            {
                success = setBoolParam((SoPlexBase<R>::BoolParam)param, false);
+            else
+               success = false;
+
+            if(success)
                break;
-            }
             else
             {
                SPX_MSG_INFO1(spxout, spxout << "Error parsing setting string: invalid value <" << paramValueString
@@ -9526,7 +9503,7 @@ bool SoPlexBase<R>::parseSettingsString(char* string)
          }
       }
 
-      return success;
+      return true;
    }
 
    // check whether we have an integer parameter

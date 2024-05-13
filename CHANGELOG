@@ -1,4 +1,4 @@
-Upcoming Release - 7.0.1
+April 2024 - Release 7.0.1
 ==================
 
 features:
@@ -19,6 +19,10 @@ fixed bugs:
 
 - set the c++ standard consistently to c++14 for all build systems
 - fix wrong detection of unboundedness for infeasible instance in primal simplex
+- remove unnamed boolean setting STORE_BASIS_BEFORE_SIMPLEX_PIVOT
+- continue parsing settings after errors and print them consistently
+- find PaPILO installation by default
+
 
 
 February 2024 - Release 7.0.0
@@ -70,7 +74,6 @@ code quality:
 - rewrite all preprocessor-defines to be unambiguous by prepending a `SPX`, e.g., `MSG_ERROR` is now `SPX_MSG_ERROR`.
 - rework soplex debug messages to use SFINAE, since they no longer worked properly after switching to header-only
 - add .lp instances to ctest
-- add option to write dense objective to mps/lp files (including variables with zero objective coefficients)
 - remove unmaintained legacy code for decomposition based dual simplex
 
 fixed bugs:

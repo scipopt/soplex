@@ -42,7 +42,7 @@ option(SANITIZE_MEMORY "should the memory sanitizer be enabled in debug mode if 
 option(SANITIZE_UNDEFINED "should the undefined behavior sanitizer be enabled in debug mode if available" ON)
 option(SANITIZE_THREAD "should the thread sanitizer be enabled in debug mode if available" OFF)
 option(COVERAGE "enable coverage support" OFF)
-option(PAPILO "should papilo library be linked" OFF)
+option(PAPILO "should papilo library be linked" ON)
 
 SET(COVERAGE_CTEST_ARGS "" CACHE STRING "additional ctest arguments for coverage")
 
@@ -154,11 +154,13 @@ endif()
 
 # look for presolvelib PaPILO
 if(PAPILO)
-    set(PAPILO_MIN_VERSION 2.0.0.0)
     message(STATUS "Finding PAPILO")
-    find_package(PAPILO CONFIG ${PAPILO_MIN_VERSION} REQUIRED HINTS ${PAPILO_DIR})
-    set(libs ${libs} ${PAPILO_IMPORTED_TARGETS})
+    set(PAPILO_MIN_VERSION 2.0.0.0)
+    find_package(PAPILO CONFIG ${PAPILO_MIN_VERSION} HINTS ${PAPILO_DIR})
+endif()
+if(PAPILO_FOUND)
     message(STATUS "Finding PAPILO - found")
+    set(libs ${libs} ${PAPILO_IMPORTED_TARGETS})
     set(SOPLEX_WITH_PAPILO on)
 else()
     message(STATUS "Support PAPILO: OFF")
