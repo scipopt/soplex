@@ -13,9 +13,6 @@ fixed bugs:
 - remove unnamed boolean setting STORE_BASIS_BEFORE_SIMPLEX_PIVOT
 - continue parsing settings after errors and print them consistently
 - find PaPILO installation by default
-- remove unnamed boolean setting STORE_BASIS_BEFORE_SIMPLEX_PIVOT
-- continue parsing settings after errors and print them consistently
-- find PaPILO installation by default
 
 
 
