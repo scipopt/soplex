@@ -13,7 +13,6 @@ include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(sources
     soplex/didxset.cpp
-    soplex/gzstream.cpp
     soplex/idxset.cpp
     soplex/mpsinput.cpp
     soplex/nameset.cpp
@@ -40,7 +39,6 @@ set(headers
     soplex/dsvectorbase.h
     soplex/dsvector.h
     soplex/exceptions.h
-    soplex/gzstream.h
     soplex/idlist.h
     soplex/idxset.h
     soplex/islist.h
@@ -229,6 +227,11 @@ install(FILES
      ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/printf.h
      ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/ranges.h
  DESTINATION include/soplex/external/fmt)
+
+ install(FILES
+     ${PROJECT_SOURCE_DIR}/src/soplex/external/zstr/zstr.hpp
+     ${PROJECT_SOURCE_DIR}/src/soplex/external/zstr/strict_fstream.hpp
+  DESTINATION include/soplex/external/zstr)
 
 # install the binary and the library to appropriate lcoations and add them to an export group
 install(TARGETS soplex libsoplex libsoplex-pic libsoplexshared EXPORT soplex-targets

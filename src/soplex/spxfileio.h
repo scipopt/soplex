@@ -41,13 +41,13 @@
  *-----------------------------------------------------------------------------
  */
 #ifdef SOPLEX_WITH_ZLIB
-#include "soplex/gzstream.h"
+#include "soplex/external/zstr/zstr.hpp"
 #endif // WITH_GSZSTREAM
 
 namespace soplex
 {
 #ifdef SOPLEX_WITH_ZLIB
-typedef gzstream::igzstream spxifstream;
+typedef zstr::ifstream spxifstream;
 #else
 typedef std::ifstream spxifstream;
 #endif // SOPLEX_WITH_ZLIB

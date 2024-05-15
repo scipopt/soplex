@@ -1,5 +1,18 @@
-April 2024 - Release 7.0.1
-==================
+Upcoming Release - 7.1.0
+
+features:
+
+
+interface & parameters:
+
+
+performance:
+
+miscellaneous:
+
+- remove `gzstream.h/hpp` (L-GPL) and replace it with `zstr` (MIT License) for `.gz` file handling
+
+Upcoming Release - 7.0.1
 
 features:
 
