@@ -128,7 +128,6 @@ INCLUDEDIR	=	include
 NAME		   =	soplex
 
 LIBOBJ = 	soplex/didxset.o \
-				soplex/gzstream.o \
 				soplex/idxset.o \
 				soplex/mpsinput.o \
 				soplex/nameset.o \
