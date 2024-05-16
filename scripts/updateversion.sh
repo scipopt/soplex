@@ -8,10 +8,8 @@
 if [[ $1 == "-a" ]]
 then
     perl -i -pe 's/#define SOPLEX_APIVERSION        \K(\d+)/$1 + 1/e' src/soplex/spxdefines.h
-    perl -i -pe 's/set\(SOPLEX_VERSION_API \K(\d+)/$1 + 1/e' CMakeLists.txt
     echo "updated API version:"
     grep SOPLEX_APIVERSION src/soplex/spxdefines.h
-    grep SOPLEX_VERSION_API CMakeLists.txt
 
 elif [[ $# -eq 4 ]]
 then

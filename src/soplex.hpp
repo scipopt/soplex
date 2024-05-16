@@ -5817,6 +5817,7 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
       break;
 
 #ifdef SOPLEX_WITH_PAPILO
+
    case SIMPLIFIER_SINGLETONCOLS:
       _simplifierPaPILO.setEnableSingletonCols(value);
       break;
@@ -5849,6 +5850,7 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
       _simplifierPaPILO.setEnableDomCols(value);
       break;
 #else
+
    case SIMPLIFIER_SINGLETONCOLS:
    case SIMPLIFIER_CONSTRAINTPROPAGATION:
    case SIMPLIFIER_PARALLELROWDETECTION:
@@ -5857,12 +5859,14 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
    case SIMPLIFIER_DUALFIX:
    case SIMPLIFIER_FIXCONTINUOUS:
    case SIMPLIFIER_DOMINATEDCOLS:
-      if( _currentSettings->_boolParamValues[param] != value )
+      if(_currentSettings->_boolParamValues[param] != value)
       {
          SPX_MSG_INFO1(spxout, spxout <<
-                     "Changing Parameter " << _currentSettings->boolParam.name[param] << " is only possible if SoPlex is build with PaPILO\n");
+                       "Changing Parameter " << _currentSettings->boolParam.name[param] <<
+                       " is only possible if SoPlex is build with PaPILO\n");
          return false;
       }
+
       break;
 #endif
 
@@ -5874,12 +5878,13 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
 
    case PRECISION_BOOSTING:
 #ifndef SOPLEX_WITH_MPFR
-      if( _currentSettings->_boolParamValues[param] != value )
+      if(_currentSettings->_boolParamValues[param] != value)
       {
          SPX_MSG_INFO1(spxout, spxout <<
-                        "Changing Parameter precision_boosting is only possible if SoPlex is build with MPFR\n");
+                       "Changing Parameter precision_boosting is only possible if SoPlex is build with MPFR\n");
          return false;
       }
+
 #endif
       break;
 
@@ -6629,12 +6634,14 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
 #ifdef SOPLEX_WITH_PAPILO
       _simplifierPaPILO.setModifyConsFrac(value);
 #else
-      if( _currentSettings->_realParamValues[param] != value )
+
+      if(_currentSettings->_realParamValues[param] != value)
       {
          SPX_MSG_INFO1(spxout, spxout <<
-                     "Setting Parameter simplifier_modifyrowfac is only possible if SoPlex is build with PaPILO\n");
+                       "Setting Parameter simplifier_modifyrowfac is only possible if SoPlex is build with PaPILO\n");
          return false;
       }
+
 #endif
       break;
 
