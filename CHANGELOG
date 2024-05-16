@@ -10,6 +10,7 @@ fixed bugs:
 
 - set the c++ standard consistently to c++14 for all build systems
 - fix wrong detection of unboundedness for infeasible instance in primal simplex
+- remove unused and incorrect SOPLEX_VERSION_API in cmake, SOPLEX_APIVERSION now always set in `spxdefines.h`
 - remove unnamed boolean setting STORE_BASIS_BEFORE_SIMPLEX_PIVOT
 - continue parsing settings after errors and print them consistently
 - find PaPILO installation by default
