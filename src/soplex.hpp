@@ -5609,6 +5609,13 @@ int SoPlexBase<R>::numIterations() const
    return _statistics->iterations;
 }
 
+/// number of iterative refinements
+template <class R>
+int SoPlexBase<R>::numRefinements() const
+{
+   return _statistics->refinements;
+}
+
 /// number of precision boosts since last call to solve
 template <class R>
 int SoPlexBase<R>::numPrecisionBoosts() const
