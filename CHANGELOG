@@ -4,7 +4,7 @@ features:
 
 
 interface & parameters:
-
+- add method `numRefinements()` to return number of iterative refinements
 
 performance:
 
@@ -12,21 +12,20 @@ miscellaneous:
 
 - remove `gzstream.h/hpp` (L-GPL) and replace it with `zstr` (MIT License) for `.gz` file handling
 
+
 Upcoming Release - 7.0.1
+==================
 
 features:
 
-
 interface & parameters:
-
 
 performance:
 
-
 code quality:
 - update version of fmt from 6.1.2 to 7.1.3 due to deprecation
-
 - add compile option -ffp-contract=off or /fp:precise to enhance reproducibility across different systems
+- add option to write dense objective to mps/lp files (including variables with zero objective coefficients)
 
 fixed bugs:
 

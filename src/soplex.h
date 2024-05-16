@@ -856,6 +856,9 @@ public:
    /// number of iterations since last call to solve
    int numIterations() const;
 
+   /// number of iterative refinements
+   int numRefinements() const;
+
    /// number of precision boosts since last call to solve
    int numPrecisionBoosts() const;
 
