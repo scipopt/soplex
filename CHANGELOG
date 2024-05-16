@@ -1,19 +1,23 @@
 Upcoming Release - 7.1.0
+==================
 
 features:
-
 
 interface & parameters:
 - add method `numRefinements()` to return number of iterative refinements
 
 performance:
 
-miscellaneous:
+code quality:
+- add option to write dense objective to mps/lp files (including variables with zero objective coefficients)
 
+fixed bugs:
+
+miscellaneous:
 - remove `gzstream.h/hpp` (L-GPL) and replace it with `zstr` (MIT License) for `.gz` file handling
 
 
-Upcoming Release - 7.0.1
+Upcoming Release - 7.0.2
 ==================
 
 features:
@@ -23,18 +27,28 @@ interface & parameters:
 performance:
 
 code quality:
+
+fixed bugs:
+
+miscellaneous:
+
+
+April 2024 - Release 7.0.1
+==================
+
+code quality:
+
 - update version of fmt from 6.1.2 to 7.1.3 due to deprecation
 - add compile option -ffp-contract=off or /fp:precise to enhance reproducibility across different systems
-- add option to write dense objective to mps/lp files (including variables with zero objective coefficients)
 
 fixed bugs:
 
 - set the c++ standard consistently to c++14 for all build systems
 - fix wrong detection of unboundedness for infeasible instance in primal simplex
+- remove unused and incorrect SOPLEX_VERSION_API in cmake, SOPLEX_APIVERSION now always set in `spxdefines.h`
 - remove unnamed boolean setting STORE_BASIS_BEFORE_SIMPLEX_PIVOT
 - continue parsing settings after errors and print them consistently
 - find PaPILO installation by default
-
 
 
 February 2024 - Release 7.0.0
