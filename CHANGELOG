@@ -12,27 +12,10 @@ code quality:
 - add option to write dense objective to mps/lp files (including variables with zero objective coefficients)
 
 fixed bugs:
-
-miscellaneous:
-- remove `gzstream.h/hpp` (L-GPL) and replace it with `zstr` (MIT License) for `.gz` file handling
-
-
-Upcoming Release - 7.0.2
-==================
-
-features:
-
-interface & parameters:
-
-performance:
-
-code quality:
-
-fixed bugs:
 - remove unused and incorrect SOPLEX_VERSION_API in cmake, SOPLEX_APIVERSION now always set in `spxdefines.h`
 
 miscellaneous:
-
+- remove `gzstream.h/hpp` (L-GPL) and replace it with `zstr` (MIT License) for `.gz` file handling
 
 April 2024 - Release 7.0.1
 ==================
@@ -49,7 +32,6 @@ fixed bugs:
 - remove unnamed boolean setting STORE_BASIS_BEFORE_SIMPLEX_PIVOT
 - continue parsing settings after errors and print them consistently
 - find PaPILO installation by default
-
 
 February 2024 - Release 7.0.0
 ==================
