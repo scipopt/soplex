@@ -77,7 +77,7 @@ public:
    ///@{
    /// default constructor.
    explicit
-   UpdateVector<R>(int p_dim /*=0*/, std::shared_ptr<Tolerances> tols = nullptr)
+   UpdateVector(int p_dim /*=0*/, std::shared_ptr<Tolerances> tols = nullptr)
       : VectorBase<R> (p_dim)
       , theval(0)
       , thedelta(p_dim, tols)
