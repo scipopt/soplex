@@ -276,6 +276,7 @@ private:
    int            m_maxCycle;    ///< maximum steps before cycling is detected.
    int            m_numCycle;    ///< actual number of degenerate steps so far.
    bool           initialized;   ///< true, if all vectors are setup.
+   bool           useTerminationValue; /// true, if objective limit should be used in the next solve.
 
    SSVectorBase<R>*
    solveVector2;      ///< when 2 systems are to be solved at a time; typically for speepest edge weights
@@ -691,6 +692,18 @@ public:
    SolutionPolish getSolutionPolishing()
    {
       return polishObj;
+   }
+
+   /// true if objective limit should be used in the next solve
+   bool isTerminationValueEnabled() const
+   {
+      return useTerminationValue;
+   }
+
+   /// toggle objective limit for next solve
+   void toggleTerminationValue(bool enable)
+   {
+      useTerminationValue = enable;
    }
 
    /// Status of solution process.
