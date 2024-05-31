@@ -262,8 +262,18 @@ void SoPlexBase<R>::_preprocessAndSolveReal(bool applySimplifier, volatile bool*
    // create a copy of the LP when simplifying or when using internal scaling, i.e. w/o persistent scaling
    bool copyLP = (_simplifier != 0 || (_scaler && !_isRealLPScaled));
 
-   _solver.setTerminationValue(intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MINIMIZE
-                               ? realParam(SoPlexBase<R>::OBJLIMIT_UPPER) : realParam(SoPlexBase<R>::OBJLIMIT_LOWER));
+   // set the objective limit if it was not explicitly disabled for this particular solving call
+   if(_solver.isTerminationValueEnabled())
+   {
+      _solver.setTerminationValue(intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MINIMIZE
+                                  ? realParam(SoPlexBase<R>::OBJLIMIT_UPPER) : realParam(SoPlexBase<R>::OBJLIMIT_LOWER));
+   }
+   // reset the objective limit and reenabled it for the next solve
+   else
+   {
+      _solver.setTerminationValue();
+      _solver.toggleTerminationValue(true);
+   }
 
    if(_isRealLPLoaded)
    {
@@ -509,7 +519,12 @@ void SoPlexBase<R>::_verifyObjLimitReal()
                     " --- detected violations in original problem space -- solve again without presolving/scaling" <<
                     std::endl;)
 
-      if(_isRealLPScaled)
+      // if we already disabled simplifier and scaler, next disable the objective limit
+      if(_scaler == nullptr && _simplifier == nullptr)
+      {
+         _solver.toggleTerminationValue(false);
+      }
+      else if(_isRealLPScaled)
       {
          _solver.unscaleLPandReloadBasis();
          _isRealLPScaled = false;
