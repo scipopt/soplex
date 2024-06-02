@@ -671,7 +671,7 @@ public:
    ///@{
 
    /// Default constructor.
-   explicit SSVectorBase<R>(int p_dim, std::shared_ptr<Tolerances> tol = nullptr)
+   explicit SSVectorBase(int p_dim, std::shared_ptr<Tolerances> tol = nullptr)
       : VectorBase<R>(p_dim)
       , IdxSet()
       , setupStatus(true)
@@ -718,7 +718,7 @@ public:
 
    /// Constructs nonsetup copy of \p vec.
    template < class S >
-   explicit SSVectorBase<R>(const VectorBase<S>& vec)
+   explicit SSVectorBase(const VectorBase<S>& vec)
       : VectorBase<R>(vec)
       , IdxSet()
       , setupStatus(false)
