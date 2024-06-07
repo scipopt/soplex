@@ -531,8 +531,10 @@ void Presol<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
    auto status = postsolve.undo(reducedSolution, originalSolution, postsolveStorage, isOptimal);
 
    if(status ==
-#if defined(PAPILO_API_VERSION) && PAPILO_API_VERSION >= 1
+#ifdef PAPILO_API_VERSION
+#if PAPILO_API_VERSION >= 1
          papilo::
+#endif
 #endif
          PostsolveStatus::kFailed && isOptimal)
    {
