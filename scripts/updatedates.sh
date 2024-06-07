@@ -45,8 +45,8 @@ do
                 fi
 
       # check if the file has already the new copyright
-      COUNT1=`grep -c "1996\-$NEWYEAR" $FILE`
-      COUNT2=`grep -c "1996\-$LASTYEAR" $FILE`
+      COUNT1=`grep -c "1996-$NEWYEAR" $FILE`
+      COUNT2=`grep -c "1996-$LASTYEAR" $FILE`
 
       if test "$COUNT2" != 0
       then
@@ -86,8 +86,8 @@ do
         fi
 
       # check if the file has already the new copyright
-      COUNT1=`grep -c "1996\-$NEWYEAR" $FILE`
-      COUNT2=`grep -c "1996\-$LASTYEAR" $FILE`
+      COUNT1=`grep -c "1996-$NEWYEAR" $FILE`
+      COUNT2=`grep -c "1996-$LASTYEAR" $FILE`
 
       if test "$COUNT2" != 0
       then
