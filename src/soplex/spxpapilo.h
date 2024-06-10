@@ -530,13 +530,7 @@ void Presol<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
    papilo::Postsolve<R> postsolve {msg, num};
    auto status = postsolve.undo(reducedSolution, originalSolution, postsolveStorage, isOptimal);
 
-   if(status ==
-#ifdef PAPILO_API_VERSION
-#if PAPILO_API_VERSION >= 1
-         papilo::
-#endif
-#endif
-         PostsolveStatus::kFailed && isOptimal)
+   if(status == PostsolveStatus::kFailed && isOptimal)
    {
       SPX_MSG_ERROR(std::cerr << "PaPILO did not pass validation" << std::endl;)
       assert(false);
