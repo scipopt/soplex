@@ -887,7 +887,7 @@ bool SPxFastRT<R>::maxReLeave(R& sel, int leave, R maxabs, bool polish)
    {
       R x = vec.delta()[leave];
 
-      if(sel < -fastDelta / maxabs)
+      if(sel < -this->delta / maxabs)
       {
          sel = 0.0;
 
@@ -931,7 +931,7 @@ bool SPxFastRT<R>::minReLeave(R& sel, int leave, R maxabs, bool polish)
    {
       R x = vec.delta()[leave];
 
-      if(sel > fastDelta / maxabs)
+      if(sel > this->delta / maxabs)
       {
          sel = 0.0;
 
@@ -1202,7 +1202,7 @@ bool SPxFastRT<R>::maxReEnter(R& sel,
 
    if((*up)[nr] != (*low)[nr])
    {
-      if(sel < -fastDelta / maxabs)
+      if(sel < -this->delta / maxabs)
       {
          sel = 0.0;
 
@@ -1309,7 +1309,7 @@ bool SPxFastRT<R>::minReEnter(
 
    if((*up)[nr] != (*low)[nr])
    {
-      if(sel > fastDelta / maxabs)
+      if(sel > this->delta / maxabs)
       {
          sel = 0.0;
 

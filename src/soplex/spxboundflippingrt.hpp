@@ -847,7 +847,7 @@ SPxId SPxBoundFlippingRT<R>::selectEnter(
          break;
    }
 
-   degeneps = this->fastDelta / moststable;  /* as in SPxFastRT */
+   degeneps = this->delta / moststable;  /* as in SPxFastRT */
    // get stability requirements
    instable = this->thesolver->instableLeave;
    assert(!instable || this->thesolver->instableLeaveNum >= 0);
@@ -1149,7 +1149,7 @@ int SPxBoundFlippingRT<R>::selectLeave(
          break;
    }
 
-   degeneps = this->fastDelta / moststable;  /* as in SPxFastRT */
+   degeneps = this->delta / moststable;  /* as in SPxFastRT */
    // get stability requirements
    instable = this->thesolver->instableEnter;
    assert(!instable || this->thesolver->instableEnterId.isValid());
