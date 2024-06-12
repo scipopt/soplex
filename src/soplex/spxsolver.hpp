@@ -1055,6 +1055,7 @@ void SPxSolverBase<R>::setType(Type tp)
       , nClckSkipsLeft(0)
       , nCallsToTimelim(0)
       , objLimit(R(infinity))
+      , useTerminationValue(true)
       , m_status(UNKNOWN)
       , m_nonbasicValue(0.0)
       , m_nonbasicValueUpToDate(false)
@@ -1185,6 +1186,7 @@ void SPxSolverBase<R>::setType(Type tp)
          maxIters = base.maxIters;
          maxTime = base.maxTime;
          objLimit = base.objLimit;
+         useTerminationValue = base.useTerminationValue;
          m_status = base.m_status;
          m_nonbasicValue = base.m_nonbasicValue;
          m_nonbasicValueUpToDate = base.m_nonbasicValueUpToDate;
@@ -1385,6 +1387,7 @@ void SPxSolverBase<R>::setType(Type tp)
       , nClckSkipsLeft(base.nClckSkipsLeft)
       , nCallsToTimelim(base.nCallsToTimelim)
       , objLimit(base.objLimit)
+      , useTerminationValue(base.useTerminationValue)
       , m_status(base.m_status)
       , m_nonbasicValue(base.m_nonbasicValue)
       , m_nonbasicValueUpToDate(base.m_nonbasicValueUpToDate)

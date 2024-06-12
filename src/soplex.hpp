@@ -6555,10 +6555,12 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
 
    // lower limit on objective value is set in solveReal()
    case SoPlexBase<R>::OBJLIMIT_LOWER:
+      this->_solver.toggleTerminationValue(true);
       break;
 
    // upper limit on objective value is set in solveReal()
    case SoPlexBase<R>::OBJLIMIT_UPPER:
+      this->_solver.toggleTerminationValue(true);
       break;
 
    // working tolerance for feasibility in floating-point solver
