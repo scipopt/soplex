@@ -255,7 +255,7 @@ private:
    Real           maxTime;     ///< maximum allowed time.
    int            nClckSkipsLeft; ///< remaining number of times the clock can be safely skipped
    long           nCallsToTimelim; /// < the number of calls to the method isTimeLimitReached()
-   R           objLimit;       ///< objective value limit.
+   R              objLimit;    ///< objective value limit.
    bool           useTerminationValue; ///< true, if objective limit should be used in the next solve.
    Status         m_status;    ///< status of algorithm.
 
