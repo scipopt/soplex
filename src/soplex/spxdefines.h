@@ -93,7 +93,7 @@ bool EQ(int a, int b);
 
 #define SOPLEX_VERSION         710
 #define SOPLEX_SUBVERSION        0
-#define SOPLEX_APIVERSION       16
+#define SOPLEX_APIVERSION       17
 #define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2024 Zuse Institute Berlin (ZIB)"
 
 /*-----------------------------------------------------------------------------
