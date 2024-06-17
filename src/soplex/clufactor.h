@@ -485,7 +485,8 @@ protected:
    ///
    void factor(const SVectorBase<R>** vec,   ///< Array of column VectorBase<R> pointers
                R threshold,    ///< pivoting threshold
-               R eps);         ///< epsilon for zero detection
+               R eps           ///< epsilon for zero detection
+              );
    ///@}
 
    //----------------------------------------

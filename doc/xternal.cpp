@@ -299,7 +299,7 @@
  * <TR><TD>coVector</TD><TD>colVector</TD><TD>rowVector</TD></TR>
  * </TABLE>
  *
- * Whether the \ref soplex::SPxBasis::Desc::Status "SPxBasis::Desc::Status" of a
+ * Whether the \ref soplex::SPxBasisBase::Desc::Status "SPxBasisBase::Desc::Status" of a
  * variable indicates that the corresponding vector is in the basis matrix or
  * not also depends on the chosen representation. Hence, methods \c isBasic()
  * are provided to get the correct answer for both representations.

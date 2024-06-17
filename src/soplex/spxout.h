@@ -235,8 +235,8 @@ private:
 /**@name Verbosity manipulator
     Manipulators are implemented in a similar way as done for @c setw(),
     @c setprecision(), etc. in the standard library file iomanip. For
-    instance, the non-member function \ref verb() "verb(v)" returns a
-    struct struct_Severity which contains only the verbosity level.
+    instance, the non-member function \ref soplex::verb() "verb(v)"
+    returns a struct struct_Verbosity which contains only the verbosity level.
     Calling
     @code
          SPxOut spxout;
@@ -246,7 +246,7 @@ private:
     extracts the verbosity level from the struct and passes it to the
     member function SPxOut::setVerbosity().
 */
-//@{
+///@{
 /// manipulator to be used in an output statement
 inline SPxOut::struct_Verbosity
 verb(const SPxOut::Verbosity&  v)
@@ -274,7 +274,7 @@ operator<< (SPxOut& stream,
  * other. When using only a template type, it is not clear what the
  * compiler makes out of it (according to lint).
  */
-//@{
+///@{
 ///
 /// Passes instances of type \p Type to the current stream.
 inline SPxOut& operator<< (SPxOut& _spxout, long t)
@@ -364,7 +364,7 @@ inline SPxOut& operator<< (SPxOut& _spxout, T  t)
    return _spxout;
 }
 
-//@}
+///@}
 
 }  // namespace soplex
 

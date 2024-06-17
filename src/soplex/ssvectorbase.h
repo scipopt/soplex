@@ -46,7 +46,7 @@ template < class R > class SVSetBase;
  * @ingroup Algebra
  *
  *  This class implements semi-sparse vectors.  Such are #VectorBase%s where the indices of its nonzero elements can be
- *  stored in an extra IdxSet.  Only elements with absolute value > #epsilon are considered to be nonzero.  Since really
+ *  stored in an extra IdxSet.  Only elements with absolute value > #getEpsilon() are considered to be nonzero.  Since really
  *  storing the nonzeros is not always convenient, an SSVectorBase provides two different stati: setup and not setup.
  *  An SSVectorBase being setup means that the nonzero indices are available, otherwise an SSVectorBase is just an
  *  ordinary VectorBase with an empty IdxSet.  Note that due to arithmetic operation, zeros can slip in, i.e., it is
@@ -141,7 +141,7 @@ public:
       setupStatus = false;
    }
 
-   /// Initializes nonzero indices for elements with absolute values above #epsilon and sets all other elements to 0.
+   /// Initializes nonzero indices for elements with absolute values above epsilon and sets all other elements to 0.
    void setup()
    {
       if(!isSetup())

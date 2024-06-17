@@ -255,7 +255,8 @@ private:
    Real           maxTime;     ///< maximum allowed time.
    int            nClckSkipsLeft; ///< remaining number of times the clock can be safely skipped
    long           nCallsToTimelim; /// < the number of calls to the method isTimeLimitReached()
-   R           objLimit;    ///< objective value limit.
+   R              objLimit;    ///< objective value limit.
+   bool           useTerminationValue; ///< true, if objective limit should be used in the next solve.
    Status         m_status;    ///< status of algorithm.
 
    R           m_nonbasicValue;         ///< nonbasic part of current objective value
@@ -276,7 +277,6 @@ private:
    int            m_maxCycle;    ///< maximum steps before cycling is detected.
    int            m_numCycle;    ///< actual number of degenerate steps so far.
    bool           initialized;   ///< true, if all vectors are setup.
-   bool           useTerminationValue; /// true, if objective limit should be used in the next solve.
 
    SSVectorBase<R>*
    solveVector2;      ///< when 2 systems are to be solved at a time; typically for speepest edge weights
