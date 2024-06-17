@@ -137,8 +137,6 @@ public:
       *newelem = item;
    }
    /// adds element \p item.
-   /**@return 0 on success and non-zero, if an error occured.
-    */
    void add(const T& item)
    {
       T* newelem = create();

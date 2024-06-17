@@ -59,26 +59,26 @@ private:
 
    ///
    int maxDelta(
-      R* /*max*/,        ///< max abs value in \p upd
+      R* /*max*/,        ///< max abs value in upd
       R* val,            ///< initial and chosen value
-      int num,              ///< number of indices in \p idx
-      const int* idx,       ///< nonzero indices in \p upd
-      const R* upd,      ///< update VectorBase<R> for \p vec
+      int num,              ///< number of indices in idx
+      const int* idx,       ///< nonzero indices in upd
+      const R* upd,      ///< update VectorBase<R> for vec
       const R* vec,      ///< current vector
-      const R* low,      ///< lower bounds for \p vec
-      const R* up        ///< upper bounds for \p vec
+      const R* low,      ///< lower bounds for vec
+      const R* up        ///< upper bounds for vec
    ) const;
 
    ///
    int minDelta(
-      R* /*max*/,        ///< max abs value in \p upd
+      R* /*max*/,        ///< max abs value in upd
       R* val,            ///< initial and chosen value
-      int num,              ///< of indices in \p idx
-      const int* idx,       ///< nonzero indices in \p upd
-      const R* upd,      ///< update VectorBase<R> for \p vec
+      int num,              ///< of indices in idx
+      const int* idx,       ///< nonzero indices in upd
+      const R* upd,      ///< update VectorBase<R> for vec
       const R* vec,      ///< current vector
-      const R* low,      ///< lower bounds for \p vec
-      const R* up        ///< upper bounds for \p vec
+      const R* low,      ///< lower bounds for vec
+      const R* up        ///< upper bounds for vec
    ) const;
    ///@}
 

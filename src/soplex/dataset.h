@@ -141,8 +141,6 @@ public:
       *data = item;
    }
    /// adds element \p item.
-   /**@return 0 on success and non-zero, if an error occured.
-    */
    void add(const DATA& item)
    {
       DATA* data = create();

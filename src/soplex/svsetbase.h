@@ -363,7 +363,7 @@ public:
    /** Adds SVectorBase \p svec to the %set. This includes copying its nonzeros to the sets nonzero memory and creating
     *  an additional SVectorBase entry in vector memory. If neccessary, the memory blocks are enlarged appropriately.
     *
-    *  @return \p nkey contains the DataKey, that the SVSetBase has assosicated to the new SVectorBase.
+    *  At return, \p nkey contains the DataKey, that the SVSetBase has assosicated to the new SVectorBase.
     */
    void add(DataKey& nkey, const SVectorBase<R>& svec)
    {
@@ -379,7 +379,7 @@ public:
    /** Adds SVectorBase \p svec to the %set. This includes copying its nonzeros to the sets nonzero memory and creating
     *  an additional SVectorBase entry in vector memory. If neccessary, the memory blocks are enlarged appropriately.
     *
-    *  @return \p nkey contains the DataKey, that the SVSetBase has assosicated to the new SVectorBase.
+    *  At return, \p nkey contains the DataKey, that the SVSetBase has assosicated to the new SVectorBase.
     */
    template < class S >
    void add(DataKey& nkey, const S* rowValues, const int* rowIndices, int rowSize)
@@ -419,7 +419,7 @@ public:
    /// Adds n SVectorBase%s to SVSetBase.
    /** Adds all \p n SVectorBase%s in the array \p svec to the %set.
     *
-    *  @return \p nkey contains the DataKey%s, that the SVSetBase has assosicated to the new SVectorBase%s.
+    *  At return, nkey contains the DataKey%s, that the SVSetBase has assosicated to the new SVectorBase%s.
     *
     *  @pre \p nkey must be large enough to fit \p n DataKey%s.
     */
@@ -454,7 +454,7 @@ public:
    /// Adds all SVectorBase%s of \p pset to SVSetBase.
    /** Adds all \p n SVectorBase%s in the \p pset to an SVSetBase.
     *
-    * @return \p nkey contains the DataKey%s, that the SVSetBase has assosicated to the new SVectorBase%s.
+    * At return, \p nkey contains the DataKey%s, that the SVSetBase has assosicated to the new SVectorBase%s.
     *
     * @pre \p nkey must be large enough to fit \p pset.num() DataKey%s.
     */
@@ -721,7 +721,7 @@ public:
    /** Removes \p n SVectorBase%s from %set.
     * @pre    \p nums must be at least of size \p n
     * @pre    \p perm must be at least of size num()
-    * @return \p perm is the permutations resulting from this removal: \p perm[i] < 0 indicates
+    * At return, \p perm is the permutations resulting from this removal: \p perm[i] < 0 indicates
     *   that the element to index \p i has been removed. Otherwise, \p perm[i] is the new
     *   index of the element with index \p i before the removal.
     */

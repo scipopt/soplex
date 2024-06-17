@@ -45,8 +45,8 @@ namespace soplex
 
    Class SLinSolver provides a class for solving sparse linear systems with
    a matrix \f$A\f$ and arbitrary right-hand side vectors. For doing so, the
-   matrix must be first #load%ed to an #SLinSolver object as an array of
-   pointers to the \em column \ref SVectorBase<R> "SVectors" of this matrix.
+   matrix must be first #load%ed to an SLinSolver object as an array of
+   pointers to the \em column \ref soplex::SVectorBase<R> "SVectors" of this matrix.
 */
 template <class R>
 class SLinSolver

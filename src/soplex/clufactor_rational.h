@@ -449,7 +449,8 @@ protected:
 
    ///
    void factor(const SVectorRational** vec,   ///< Array of column vector pointers
-               const Rational& threshold);           ///< pivoting threshold
+               const Rational& threshold      ///< pivoting threshold
+              );
    ///@}
 
    //----------------------------------------

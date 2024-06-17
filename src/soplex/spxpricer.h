@@ -188,7 +188,7 @@ public:
    /// returns selected index to leave basis.
    /** Selects the index of a vector to leave the basis. The selected index
        i, say, must be in the range 0 <= i < solver()->dim() and its
-       tested value must fullfill solver()->test()[i] < -#tolerance().
+       tested value must fullfill solver()->test()[i] < -#pricingTolerance().
    */
    virtual int selectLeave() = 0;
 
@@ -209,7 +209,7 @@ public:
    /** Selects the SPxId of a vector to enter the basis. The selected
        id, must not represent a basic index (i.e. solver()->isBasic(id) must
        be false). However, the corresponding test value needs not to be less
-       than -#tolerance(). If not, SoPlex will discard the pivot.
+       than -#pricingTolerance(). If not, SoPlex will discard the pivot.
 
        Note:
        When method #selectEnter() is called by the loaded SoPlex

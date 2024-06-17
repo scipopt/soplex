@@ -40,7 +40,7 @@ namespace soplex
  *
  *  Class LPRowBase provides constraints for linear programs in the form \f[ l \le a^Tx \le r, \f] where \em a is a
  *  DSVector. \em l is referred to as %left hand side, \em r as %right hand side and \em a as \em row \em vector or the
- *  constraint vector. \em l and \em r may also take values \f$\pm\f$ #R(infinity).  This static member is predefined, but
+ *  constraint vector. \em l and \em r may also take values \f$\pm\f$ R(infinity).  This static member is predefined, but
  *  may be overridden to meet the needs of the LP solver to be used.
  *
  *  LPRowBases allow to specify regular inequalities of the form \f[ a^Tx \sim \alpha, \f] where \f$\sim\f$ can take any
