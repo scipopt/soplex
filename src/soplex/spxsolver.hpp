@@ -1026,6 +1026,33 @@ void SPxSolverBase<R>::setType(Type tp)
    }
 
    template <class R>
+   void SPxSolverBase<R>::factorizeAndRecompute()
+   {
+      // refactorize to eliminate accumulated errors from LU updates
+      if(this->lastUpdate() > 0)
+         factorize();
+
+      computeFrhs();
+      SPxBasisBase<R>::solve(*theFvec, *theFrhs);
+      type() == LEAVE ? computeLeaveCoPrhs() : computeEnterCoPrhs();
+
+      SPxBasisBase<R>::coSolve(*theCoPvec, *theCoPrhs);
+      computePvec();
+
+      forceRecompNonbasicValue();
+
+      SPX_MSG_INFO2((*this->spxout), (*this->spxout) << " --- checking feasibility and optimality\n")
+
+      if(type() == LEAVE)
+         computeFtest();
+      else
+      {
+         computeCoTest();
+         computeTest();
+      }
+   }
+
+   template <class R>
    void SPxSolverBase<R>::hyperPricing(bool h)
    {
       hyperPricingEnter = h;

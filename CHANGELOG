@@ -12,6 +12,7 @@ code quality:
 fixed bugs:
 - remove unused and incorrect SOPLEX_VERSION_API in cmake, SOPLEX_APIVERSION now always set in `spxdefines.h`
 - disable objective limits once if exceeding unscaled and unsimplified solution is not dual feasible
+- recompute solution from fresh factorization if objective limit is reached to avoid incorrect terminations
 
 miscellaneous:
 
