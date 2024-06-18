@@ -445,23 +445,8 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                   {
                      R newpricertol = minpricertol;
 
-                     // refactorize to eliminate accumulated errors from LU updates
-                     if(this->lastUpdate() > 0)
-                        factorize();
-
-                     // recompute Fvec, Pvec and CoPvec to get a more precise solution and obj value
-                     computeFrhs();
-                     SPxBasisBase<R>::solve(*theFvec, *theFrhs);
-
-                     computeEnterCoPrhs();
-                     SPxBasisBase<R>::coSolve(*theCoPvec, *theCoPrhs);
-                     computePvec();
-
-                     forceRecompNonbasicValue();
-
-                     SPX_MSG_INFO2((*this->spxout), (*this->spxout) << " --- checking feasibility and optimality\n")
-                     computeCoTest();
-                     computeTest();
+                     // ensure that solution is accurate
+                     factorizeAndRecompute();
 
                      // is the solution good enough ?
                      // max three times reduced
@@ -802,22 +787,8 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                   {
                      R newpricertol = minpricertol;
 
-                     // refactorize to eliminate accumulated errors from LU updates
-                     if(this->lastUpdate() > 0)
-                        factorize();
-
-                     // recompute Fvec, Pvec and CoPvec to get a more precise solution and obj value
-                     computeFrhs();
-                     SPxBasisBase<R>::solve(*theFvec, *theFrhs);
-
-                     computeLeaveCoPrhs();
-                     SPxBasisBase<R>::coSolve(*theCoPvec, *theCoPrhs);
-                     computePvec();
-
-                     forceRecompNonbasicValue();
-
-                     SPX_MSG_INFO2((*this->spxout), (*this->spxout) << " --- checking feasibility and optimality\n")
-                     computeFtest();
+                     // ensure that solution is accurate
+                     factorizeAndRecompute();
 
                      // is the solution good enough ?
                      // max three times reduced
@@ -1863,15 +1834,23 @@ bool SPxSolverBase<R>::terminate()
          // SPxSense::MINIMIZE == -1, so we have sign = 1 on minimizing
          if(int(this->spxSense()) * value() <= int(this->spxSense()) * objLimit)
          {
-            SPX_MSG_INFO2((*this->spxout), (*this->spxout) << " --- objective value limit (" << objLimit
-                          << ") reached" << std::endl;)
-            SPxOut::debug(this, " --- objective value limit reached\n (value:{} limit:{})\n", value(),
-                          objLimit);
-            SPxOut::debug(this, " (spxSense:{} rep:{} type:{})\n", int(this->spxSense()), int(rep()),
-                          int(type()));
+            // ensure that solution is accurate
+            factorizeAndRecompute();
 
-            m_status = ABORT_VALUE;
-            return true;
+            // check no violations and objective limit again
+            if(shift() < epsilon() && noViols(tolerances()->floatingPointOpttol() - shift())
+                  && int(this->spxSense()) * value() <= int(this->spxSense()) * objLimit)
+            {
+               SPX_MSG_INFO2((*this->spxout), (*this->spxout) << " --- objective value limit (" << objLimit
+                             << ") reached" << std::endl;)
+               SPxOut::debug(this, " --- objective value limit reached\n (value:{} limit:{})\n", value(),
+                             objLimit);
+               SPxOut::debug(this, " (spxSense:{} rep:{} type:{})\n", int(this->spxSense()), int(rep()),
+                             int(type()));
+
+               m_status = ABORT_VALUE;
+               return true;
+            }
          }
       }
    }

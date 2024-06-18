@@ -727,6 +727,17 @@ public:
       m_nonbasicValueUpToDate = false;
    }
 
+   /** helper method that computes a fresh factorization of the basis matrix
+    *  (if at least one update has been performed)
+    *  and recomputes Frhs, Fvec, CoPrhs, Pvec, and the nonbasic values.
+    *  In LEAVE the Ftest is recomputed, in ENTER the CoTest and Test are recomputed.
+    *
+    *  This method is called to eliminate accumulated errors from LU updates
+    *  especially required before checking if the solver can terminate
+    *  (optimality or objective limit)
+    */
+   virtual void factorizeAndRecompute();
+
    /// get solution vector for primal variables.
    /** This method returns the Status of the basis.
     *  If it is #REGULAR or better,
