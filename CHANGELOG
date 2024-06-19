@@ -1,12 +1,11 @@
-Upcoming Release - 7.1.0
+June 2024 - Release 7.1.0
 ==================
 
-features:
-
 interface & parameters:
-- add method `numRefinements()` to return number of iterative refinements
-
-performance:
+- add method `SoPlexBase::numRefinements()` to return number of iterative refinements
+- new optional argument `writeZeroObjective` to write functions of `SoPlexBase`
+- new functions `SPxSolverBase::isTerminationValueEnabled()`, `SPxSolverBase::toggleTerminationValue()`, and
+  `SPxSolverBase::factorizeAndRecompute()`
 
 code quality:
 - add option to write dense objective to mps/lp files (including variables with zero objective coefficients)
@@ -15,9 +14,10 @@ fixed bugs:
 - remove unused and incorrect SOPLEX_VERSION_API in cmake, SOPLEX_APIVERSION now always set in `spxdefines.h`
 - disable objective limits once if exceeding unscaled and unsimplified solution is not dual feasible
 - recompute solution from fresh factorization if objective limit is reached to avoid incorrect terminations
+- fix bug when writing bounds for unused variables in MPS file format
 
 miscellaneous:
-- remove `gzstream.h/hpp` (L-GPL) and replace it with `zstr` (MIT License) for `.gz` file handling
+- removed `gzstream.h/hpp` (L-GPL) and replaced it with `zstr` (MIT License) for `.gz` file handling
 
 April 2024 - Release 7.0.1
 ==================
@@ -93,7 +93,6 @@ fixed bugs:
 - fix bugs in LP file reader, concerning rational numbers as well as dynamic line length
 - fix bug printing solutions and statistics when running from the command line
 - fix bug in cmake build system when MPFR is available but boost is not
-- fix bug when writing bounds for unused variables in MPS file format
 
 August 2023 Bugfix Release 6.0.4
 =============================
