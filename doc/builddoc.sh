@@ -2,7 +2,7 @@
 
 ### START SHELL TUTORIAL
 
-if [ $1 != "" ]
+if [ -n "$1" ]
 then
     DOXYFILE=$1
 else
@@ -17,13 +17,13 @@ make -j -C ../
 
 ../bin/soplex --saveset=parameters.set
 
-if [ "$HTML_FILE_EXTENSION" = "" ]
+if [ -z "$HTML_FILE_EXTENSION" ]
 then
     HTML_FILE_EXTENSION=html
 fi
 
 cd inc
-python parser.py --linkext $HTML_FILE_EXTENSION  && php localfaq.php > faq.inc
+python3 parser.py --linkext $HTML_FILE_EXTENSION  && php localfaq.php > faq.inc
 cd ../
 
 ### FINISHED FAQ GENERATION
