@@ -9,6 +9,8 @@ else
     DOXYFILE=soplex.dxy
 fi
 
+set -e
+
 # build a fresh version of SoPlex
 make -j clean -C ../
 make -j -C ../
