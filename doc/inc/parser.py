@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 helptext='''
 Created on 06.01.2014
 
