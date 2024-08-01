@@ -104,7 +104,7 @@ public:
     *  nonzeros are added to the DSVectorBase.
     */
    explicit DSVectorBase(int n = 8)
-      : theelem(0)
+      : theelem(nullptr)
    {
       allocMem((n < 1) ? 2 : n);
 
@@ -114,7 +114,7 @@ public:
    /// Copy constructor.
    template < class S >
    explicit DSVectorBase(const SVectorBase<S>& old)
-      : theelem(0)
+      : theelem(nullptr)
    {
       allocMem(old.size());
       SVectorBase<R>::operator=(old);
@@ -128,7 +128,7 @@ public:
     */
    DSVectorBase(const DSVectorBase<R>& old)
       : SVectorBase<R>()
-      , theelem(0)
+      , theelem(nullptr)
    {
       allocMem(old.size());
       SVectorBase<R>::operator=(old);
@@ -140,7 +140,7 @@ public:
    template < class S >
    DSVectorBase(const DSVectorBase<S>& old)
       : SVectorBase<R>()
-      , theelem(0)
+      , theelem(nullptr)
    {
       allocMem(old.size());
       SVectorBase<R>::operator=(old);
@@ -265,7 +265,7 @@ public:
       if(len == SVectorBase<R>::max())
          return;
 
-      Nonzero<R>* newmem = 0;
+      Nonzero<R>* newmem = nullptr;
 
       /* allocate new memory */
       spx_alloc(newmem, len);
@@ -284,7 +284,7 @@ public:
       for(i = SVectorBase<R>::max() - 1; i >= 0; i--)
          theelem[i].~Nonzero<R>();
 
-      if(theelem != 0)
+      if(theelem != nullptr)
          spx_free(theelem);
 
       /* assign new memory */
@@ -304,7 +304,7 @@ public:
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
-      if(theelem != 0 && SVectorBase<R>::mem() != theelem)
+      if(theelem != nullptr && SVectorBase<R>::mem() != theelem)
          return SPX_MSG_INCONSISTENT("DSVectorBase");
 
 #endif

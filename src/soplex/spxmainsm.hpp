@@ -4211,7 +4211,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLPBase<R>& lp, 
    DataArray<int>    pClass(lp.nRows());           // class of parallel rows
    DataArray<int>    classSize(lp.nRows());        // size of each class
    Array<R>   scale(lp.nRows());            // scaling factor for each row
-   int*              idxMem = 0;
+   int*              idxMem = nullptr;
 
    try
    {
@@ -4309,7 +4309,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLPBase<R>& lp, 
    }
 
    const int nRowsOld_tmp = lp.nRows();
-   int* perm_tmp = 0;
+   int* perm_tmp = nullptr;
    spx_alloc(perm_tmp, nRowsOld_tmp);
 
    for(int j = 0; j < nRowsOld_tmp; ++j)
@@ -4481,7 +4481,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLPBase<R>& lp, 
 
    // remove all rows by one single method call (more efficient)
    const int nRowsOld = lp.nRows();
-   int* perm = 0;
+   int* perm = nullptr;
    spx_alloc(perm, nRowsOld);
 
    for(int i = 0; i < nRowsOld; ++i)
@@ -4551,7 +4551,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
    DataArray<int>    pClass(lp.nCols());          // class of parallel columns
    DataArray<int>    classSize(lp.nCols());       // size of each class
    Array<R>   scale(lp.nCols());           // scaling factor for each column
-   int*              idxMem = 0;
+   int*              idxMem = nullptr;
 
    try
    {
@@ -4846,7 +4846,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
 
    // remove all columns by one single method call (more efficient)
    const int nColsOld = lp.nCols();
-   int* perm = 0;
+   int* perm = nullptr;
    spx_alloc(perm, nColsOld);
 
    for(int j = 0; j < nColsOld; ++j)
@@ -4986,7 +4986,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLPBase<R>& lp, Real 
 {
    // transfer message handler
    this->spxout = lp.spxout;
-   assert(this->spxout != 0);
+   assert(this->spxout != nullptr);
 
    m_thesense = lp.spxSense();
    this->m_timeUsed->reset();

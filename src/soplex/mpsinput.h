@@ -126,7 +126,7 @@ public:
       , m_is_new_format(false)
       , m_ignored(0)
    {
-      m_f0 = m_f1 = m_f2 = m_f3 = m_f4 = m_f5 = 0;
+      m_f0 = m_f1 = m_f2 = m_f3 = m_f4 = m_f5 = nullptr;
 
       m_buf     [0] = '\0';
       m_probname[0] = '\0';
@@ -138,7 +138,7 @@ public:
    {
       // only to signal to flexelint that the pointers do
       // not point to anything that has to be freed.
-      m_f0 = m_f1 = m_f2 = m_f3 = m_f4 = m_f5 = 0;
+      m_f0 = m_f1 = m_f2 = m_f3 = m_f4 = m_f5 = nullptr;
    }
    ///@}
 

@@ -120,8 +120,8 @@ public:
    SPxWeightST()
       : SPxStarter<R>("Weight")
    {
-      weight = 0;
-      coWeight = 0;
+      weight = nullptr;
+      coWeight = nullptr;
       assert(isConsistent());
    }
    /// copy constructor
@@ -145,8 +145,8 @@ public:
       }
       else  // old.weight and old.coWeight are not set correctly, do nothing.
       {
-         weight = 0;
-         coWeight = 0;
+         weight = nullptr;
+         coWeight = nullptr;
       }
 
       assert(isConsistent());
@@ -184,8 +184,8 @@ public:
    /// destructor.
    virtual ~SPxWeightST()
    {
-      weight   = 0;
-      coWeight = 0;
+      weight   = nullptr;
+      coWeight = nullptr;
    }
    /// clone function for polymorphism
    inline virtual SPxStarter<R>* clone() const

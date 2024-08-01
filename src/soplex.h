@@ -397,11 +397,11 @@ public:
 
    /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRows() may be passed
    /// as buffer memory
-   void removeRowsReal(int idx[], int n, int perm[] = 0);
+   void removeRowsReal(int idx[], int n, int perm[] = nullptr);
 
    /// removes rows \p start to \p end including both; an array \p perm of size #numRows() may be passed as buffer
    /// memory
-   void removeRowRangeReal(int start, int end, int perm[] = 0);
+   void removeRowRangeReal(int start, int end, int perm[] = nullptr);
 
    /// removes column i
    void removeColReal(int i);
@@ -413,11 +413,11 @@ public:
 
    /// remove all columns with indices in array \p idx of size \p n; an array \p perm of size #numColsReal() may be
    /// passed as buffer memory
-   void removeColsReal(int idx[], int n, int perm[] = 0);
+   void removeColsReal(int idx[], int n, int perm[] = nullptr);
 
    /// removes columns \p start to \p end including both; an array \p perm of size #numColsReal() may be passed as
    /// buffer memory
-   void removeColRangeReal(int start, int end, int perm[] = 0);
+   void removeColRangeReal(int start, int end, int perm[] = nullptr);
 
    /// clears the LP
    void clearLPReal();
@@ -566,11 +566,11 @@ public:
 
    /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsRational() may be
    /// passed as buffer memory
-   void removeRowsRational(int idx[], int n, int perm[] = 0);
+   void removeRowsRational(int idx[], int n, int perm[] = nullptr);
 
    /// removes rows \p start to \p end including both; an array \p perm of size #numRowsRational() may be passed as
    /// buffer memory
-   void removeRowRangeRational(int start, int end, int perm[] = 0);
+   void removeRowRangeRational(int start, int end, int perm[] = nullptr);
 
    /// removes column i
    void removeColRational(int i);
@@ -582,11 +582,11 @@ public:
 
    /// remove all columns with indices in array \p idx of size \p n; an array \p perm of size #numColsRational() may be
    /// passed as buffer memory
-   void removeColsRational(int idx[], int n, int perm[] = 0);
+   void removeColsRational(int idx[], int n, int perm[] = nullptr);
 
    /// removes columns \p start to \p end including both; an array \p perm of size #numColsRational() may be passed as
    /// buffer memory
-   void removeColRangeRational(int start, int end, int perm[] = 0);
+   void removeColRangeRational(int start, int end, int perm[] = nullptr);
 
    /// clears the LP
    void clearLPRational();
@@ -897,8 +897,8 @@ public:
 
    /// reads LP file in LP or MPS format according to READMODE parameter; gets row names, column names, and
    /// integer variables if desired; returns true on success
-   bool readFile(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0,
-                 DIdxSet* intVars = 0);
+   bool readFile(const char* filename, NameSet* rowNames = nullptr, NameSet* colNames = nullptr,
+                 DIdxSet* intVars = nullptr);
 
    /// Templated write function
    /// Real
@@ -909,42 +909,42 @@ public:
    /// writes rational LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
    /// marked as integer; returns true on success
-   bool writeFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0,
-                  const DIdxSet* intvars = 0, const bool unscale = true, const bool writeZeroObjective = false) const;
+   bool writeFile(const char* filename, const NameSet* rowNames = nullptr, const NameSet* colNames = nullptr,
+                  const DIdxSet* intvars = nullptr, const bool unscale = true, const bool writeZeroObjective = false) const;
 
-   bool writeFileRational(const char* filename, const NameSet* rowNames = 0,
-                          const NameSet* colNames = 0, const DIdxSet* intvars = 0,
+   bool writeFileRational(const char* filename, const NameSet* rowNames = nullptr,
+                          const NameSet* colNames = nullptr, const DIdxSet* intvars = nullptr,
                           const bool writeZeroObjective = false) const;
 
    /* For SCIP compatibility */
-   bool writeFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0,
-                      const DIdxSet* intvars = 0, const bool unscale = true, const bool writeZeroObjective = false) const;
+   bool writeFileReal(const char* filename, const NameSet* rowNames = nullptr, const NameSet* colNames = nullptr,
+                      const DIdxSet* intvars = nullptr, const bool unscale = true, const bool writeZeroObjective = false) const;
 
    /// writes the dual of the real LP to file; LP or MPS format is chosen from the extension in \p filename;
    /// if \p rowNames and \p colNames are \c NULL, default names are used; if \p intVars is not \c NULL,
    /// the variables contained in it are marked as integer; returns true on success
-   bool writeDualFileReal(const char* filename, const NameSet* rowNames = 0,
-                          const NameSet* colNames = 0, const DIdxSet* intvars = 0,
+   bool writeDualFileReal(const char* filename, const NameSet* rowNames = nullptr,
+                          const NameSet* colNames = nullptr, const DIdxSet* intvars = nullptr,
                           const bool writeZeroObjective = false) const;
 
    /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c NULL,
    /// default names are assumed; returns true on success
-   bool readBasisFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0);
+   bool readBasisFile(const char* filename, const NameSet* rowNames = nullptr, const NameSet* colNames = nullptr);
 
    /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used;
    /// returns true on success
-   bool writeBasisFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0,
+   bool writeBasisFile(const char* filename, const NameSet* rowNames = nullptr, const NameSet* colNames = nullptr,
                        const bool cpxFormat = false) const;
 
    /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
    /// default names are used
-   void writeStateReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0,
+   void writeStateReal(const char* filename, const NameSet* rowNames = nullptr, const NameSet* colNames = nullptr,
                        const bool cpxFormat = false, const bool writeZeroObjective = false) const;
 
    /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
    /// default names are used
-   void writeStateRational(const char* filename, const NameSet* rowNames = 0,
-                           const NameSet* colNames = 0, const bool cpxFormat = false,
+   void writeStateRational(const char* filename, const NameSet* rowNames = nullptr,
+                           const NameSet* colNames = nullptr, const bool cpxFormat = false,
                            const bool writeZeroObjective = false) const;
 
    ///@}
@@ -2103,13 +2103,13 @@ private:
 
    /// reads real LP in LP or MPS format from file and returns true on success; gets row names, column names, and
    /// integer variables if desired
-   bool _readFileReal(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0,
-                      DIdxSet* intVars = 0);
+   bool _readFileReal(const char* filename, NameSet* rowNames = nullptr, NameSet* colNames = nullptr,
+                      DIdxSet* intVars = nullptr);
 
    /// reads rational LP in LP or MPS format from file and returns true on success; gets row names, column names, and
    /// integer variables if desired
-   bool _readFileRational(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0,
-                          DIdxSet* intVars = 0);
+   bool _readFileRational(const char* filename, NameSet* rowNames = nullptr, NameSet* colNames = nullptr,
+                          DIdxSet* intVars = nullptr);
 
    /// completes range type arrays after adding columns and/or rows
    void _completeRangeTypesRational();

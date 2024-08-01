@@ -147,7 +147,7 @@ struct Compare
 {
    public:
    /// constructor
-   Compare() : weight(0) {}
+   Compare() : weight(nullptr) {}
    //   const SPxSolverBase* base;     ///< the solver
    const T*      weight;   ///< the weights to compare
 

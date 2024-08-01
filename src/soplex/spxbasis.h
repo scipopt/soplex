@@ -326,8 +326,8 @@ public:
       ///@{
       /// default constructor
       Desc()
-         : stat(0)
-         , costat(0)
+         : stat(nullptr)
+         , costat(nullptr)
       {}
       explicit Desc(const SPxSolverBase<R>& base);
 
@@ -860,7 +860,7 @@ public:
        SLinSolver implementation class.
    */
    virtual void change(int i, SPxId& id,
-                       const SVectorBase<R>* enterVec, const SSVectorBase<R>* eta = 0);
+                       const SVectorBase<R>* enterVec, const SSVectorBase<R>* eta = nullptr);
 
    /** Load basis from \p in in MPS format. If \p rowNames and \p colNames
     *  are \c NULL, default names are used for the constraints and variables.
@@ -906,7 +906,7 @@ public:
    /// unloads the LP from the basis.
    virtual void unLoad()
    {
-      theLP = 0;
+      theLP = nullptr;
       setStatus(NO_PROBLEM);
    }
 

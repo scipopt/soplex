@@ -43,7 +43,7 @@ bool SPxDevexPR<R>::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
-   if(this->thesolver != 0)
+   if(this->thesolver != nullptr)
       if(this->thesolver->weights.dim() != this->thesolver->coDim()
             || this->thesolver->coWeights.dim() != this->thesolver->dim())
          return SPX_MSG_INCONSISTENT("SPxDevexPR");
@@ -112,7 +112,7 @@ void SPxDevexPR<R>::setType(typename SPxSolverBase<R>::Type tp)
 template <class R>
 void SPxDevexPR<R>::setRep(typename SPxSolverBase<R>::Representation)
 {
-   if(this->thesolver != 0)
+   if(this->thesolver != nullptr)
    {
       // resize weights and initialize new entries
       addedVecs(this->thesolver->coDim());
@@ -511,7 +511,7 @@ SPxId SPxDevexPR<R>::buildBestPriceVectorEnterCoDim(R& best, R feastol)
 template <class R>
 SPxId SPxDevexPR<R>::selectEnter()
 {
-   assert(this->thesolver != 0);
+   assert(this->thesolver != nullptr);
 
    SPxId enterId;
 

@@ -598,8 +598,8 @@ public:
     */
    ///@{
    /// read LP from input stream.
-   virtual bool read(std::istream& in, NameSet* rowNames = 0,
-                     NameSet* colNames = 0, DIdxSet* intVars = 0);
+   virtual bool read(std::istream& in, NameSet* rowNames = nullptr,
+                     NameSet* colNames = nullptr, DIdxSet* intVars = nullptr);
 
    /// copy LP.
    virtual void loadLP(const SPxLPBase<R>& LP, bool initSlackBasis = true);
@@ -2029,7 +2029,7 @@ protected:
                             R enterTest, typename SPxBasisBase<R>::Desc::Status enterStat);
    ///
    virtual void rejectLeave(int leaveNum, SPxId leaveId,
-                            typename SPxBasisBase<R>::Desc::Status leaveStat, const SVectorBase<R>* newVec = 0);
+                            typename SPxBasisBase<R>::Desc::Status leaveStat, const SVectorBase<R>* newVec = nullptr);
    ///
    virtual void setupPupdate(void);
    ///

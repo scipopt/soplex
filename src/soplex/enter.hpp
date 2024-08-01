@@ -1241,7 +1241,7 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
    if(!polish && enterTest > -epsilon())
    {
       rejectEnter(enterId, enterTest, enterStat);
-      this->change(-1, none, 0);
+      this->change(-1, none, nullptr);
 
       SPxOut::debug(this, "DENTER08 rejecting false enter pivot\n");
 
@@ -1402,7 +1402,7 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
       catch(const SPxException& F)
       {
          rejectEnter(enterId, enterTest, enterStat);
-         this->change(-1, none, 0);
+         this->change(-1, none, nullptr);
          throw F;
       }
 
@@ -1460,13 +1460,13 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
          SPxOut::debug(this, "DENTER09 rejecting enter pivot and looking for others\n");
 
          rejectEnter(enterId, enterTest / 10.0, enterStat);
-         this->change(-1, none, 0);
+         this->change(-1, none, nullptr);
       }
       else
       {
          SPxOut::debug(this, "DENTER10 rejecting enter pivot in instable state, resetting values\n");
          rejectEnter(enterId, enterTest, enterStat);
-         this->change(-1, none, 0);
+         this->change(-1, none, nullptr);
       }
 
       return false;
@@ -1507,7 +1507,7 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
          basis descriptor at the correct size.
       */
       rejectEnter(enterId, enterTest, enterStat);
-      this->change(-1, none, 0);
+      this->change(-1, none, nullptr);
 
       if(polish)
          return false;

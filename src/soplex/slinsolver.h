@@ -210,7 +210,7 @@ public:
    ///@{
    /// default constructor
    SLinSolver()
-      : spxout(0)
+      : spxout(nullptr)
    {}
    /// destructor
    virtual ~SLinSolver()

@@ -68,7 +68,7 @@ SPxId SPxParMultPR<R>::selectEnter()
    int best = -1;
    //    const SPxBasisBase<R>::Desc& ds   = this->thesolver->basis().desc();
 
-   assert(this->thesolver != 0);
+   assert(this->thesolver != nullptr);
    int lastlast = -1;
 
    if(this->thesolver->pricing() == SPxSolverBase<R>::PARTIAL)
@@ -209,7 +209,7 @@ int SPxParMultPR<R>::selectLeave()
    //    const R* up  = this->thesolver->ubBound();
    //    const R* low = this->thesolver->lbBound();
 
-   assert(this->thesolver != 0);
+   assert(this->thesolver != nullptr);
    n = -1;
 
    for(i = this->thesolver->dim() - 1; i >= 0; --i)

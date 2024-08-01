@@ -88,7 +88,7 @@ private:
       /** constructor
        */
       BreakpointCompare()
-         : entry(0)
+         : entry(nullptr)
       {
       }
 

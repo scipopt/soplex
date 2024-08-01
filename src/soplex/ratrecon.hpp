@@ -37,7 +37,7 @@ namespace soplex
  *  produce such a vector
  */
 static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int dim,
-                       const Rational& denomBoundSquared, const DIdxSet* indexSet = 0)
+                       const Rational& denomBoundSquared, const DIdxSet* indexSet = nullptr)
 {
    bool rval = true;
    int done = 0;
@@ -74,9 +74,9 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
    Integer p[3];
    Integer q[3];
 
-   for(int c = 0; (indexSet == 0 && c < dim) || (indexSet != 0 && c < indexSet->size()); c++)
+   for(int c = 0; (indexSet == nullptr && c < dim) || (indexSet != nullptr && c < indexSet->size()); c++)
    {
-      int j = (indexSet == 0 ? c : indexSet->index(c));
+      int j = (indexSet == nullptr ? c : indexSet->index(c));
 
       assert(j >= 0);
       assert(j < dim);
@@ -195,7 +195,7 @@ inline bool reconstructVector(VectorRational& input, const Rational& denomBoundS
    dim = input.dim();
 
    /* find common denominator */
-   if(indexSet == 0)
+   if(indexSet == nullptr)
    {
       for(int i = 0; i < dim; i++)
          SpxLcm(denom, denom, denominator(input[i]));

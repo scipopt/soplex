@@ -274,7 +274,7 @@ public:
       }
 
       /* allocate new memory */
-      T* newMem = 0;
+      T* newMem = nullptr;
       spx_alloc(newMem, newMax);
 
       /* call copy constructor for first elements */
@@ -368,7 +368,7 @@ public:
     *  @param p_fac  value for memFactor.
     */
    explicit ClassArray(int p_size = 0, int p_max = 0, double p_fac = 1.2)
-      : data(0)
+      : data(nullptr)
       , memFactor(p_fac)
    {
       thesize = (p_size < 0) ? 0 : p_size;

@@ -30,7 +30,7 @@ namespace soplex
 
 void DIdxSet::setMax(int newmax)
 {
-   assert(idx   != 0);
+   assert(idx   != nullptr);
    assert(max() >  0);
 
    len = (newmax < size()) ? size() : newmax;

@@ -57,7 +57,7 @@ namespace soplex
 template <class T>
 inline void spx_alloc(T& p, int n = 1)
 {
-   assert(p == 0);
+   assert(p == nullptr);
    assert(n >= 0);
 
    if(n == 0)
@@ -106,7 +106,7 @@ inline void spx_realloc(T& p, int n)
       throw(SPxMemoryException("Error reallocating memory"));
    }
 
-   if(0 == pp)
+   if(nullptr == pp)
    {
       std::cerr << "EMALLC02 realloc: Out of memory - cannot allocate "
                 << sizeof(*p) * (unsigned int) n << " bytes" << std::endl;
@@ -120,10 +120,10 @@ inline void spx_realloc(T& p, int n)
 template <class T>
 inline void spx_free(T& p)
 {
-   assert(p != 0);
+   assert(p != nullptr);
    free(p);
 
-   p = 0;
+   p = nullptr;
 }
 
 ///@}

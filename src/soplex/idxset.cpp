@@ -81,15 +81,15 @@ IdxSet& IdxSet::operator=(const IdxSet& rhs)
 {
    if(this != &rhs)
    {
-      if(idx != 0 && max() < rhs.size())
+      if(idx != nullptr && max() < rhs.size())
       {
          if(freeArray)
             spx_free(idx);
 
-         idx = 0;
+         idx = nullptr;
       }
 
-      if(idx == 0)
+      if(idx == nullptr)
       {
          len = rhs.size();
          spx_alloc(idx, len);
@@ -109,7 +109,7 @@ IdxSet& IdxSet::operator=(const IdxSet& rhs)
 
 IdxSet::IdxSet(const IdxSet& old)
    : len(old.len)
-   , idx(0)
+   , idx(nullptr)
 {
    spx_alloc(idx, len);
 
@@ -128,7 +128,7 @@ bool IdxSet::isConsistent() const
 #ifdef ENABLE_CONSISTENCY_CHECKS
    int i, j;
 
-   if(len > 0 && idx == 0)
+   if(len > 0 && idx == nullptr)
       return SPX_MSG_INCONSISTENT("IdxSet");
 
    for(i = 0; i < size(); ++i)

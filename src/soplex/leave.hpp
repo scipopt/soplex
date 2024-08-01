@@ -813,7 +813,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
          we need it in the unbounded/infeasible case, too, to have the
          correct basis size */
       rejectLeave(leaveNum, leaveId, leaveStat);
-      this->change(-1, none, 0);
+      this->change(-1, none, nullptr);
       objChange = R(0.0); // the nonbasicValue is not supposed to be updated in this case
 
       if(polish)
@@ -992,7 +992,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
                              << "in leave()" << std::endl;)
 
                rejectLeave(leaveNum, leaveId, leaveStat);
-               this->change(-1, none, 0);
+               this->change(-1, none, nullptr);
                objChange = R(0.0); // the nonbasicValue is not supposed to be updated in this case
 
                /**@todo if shift() is not zero we must not conclude unboundedness */
@@ -1013,7 +1013,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
             {
                theFvec->delta().clear();
                rejectLeave(leaveNum, leaveId, leaveStat, &newVector);
-               this->change(-1, none, 0);
+               this->change(-1, none, nullptr);
                objChange = R(0.0); // the nonbasicValue is not supposed to be updated in this case
 
                SPxOut::debug(this, "DLEAVE63 rejecting leave B (leaveIdx={}, theCoTest={})\n", leaveIdx,
@@ -1043,7 +1043,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
          catch(const SPxException& F)
          {
             rejectLeave(leaveNum, leaveId, leaveStat);
-            this->change(-1, none, 0);
+            this->change(-1, none, nullptr);
             objChange = R(0.0); // the nonbasicValue is not supposed to be updated in this case
             throw F;
          }
@@ -1090,7 +1090,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
          assert(rep() == ROW);
          typename SPxBasisBase<R>::Desc& ds = this->desc();
 
-         this->change(leaveIdx, none, 0);
+         this->change(leaveIdx, none, nullptr);
 
          if(leaveStat == SPxBasisBase<R>::Desc::P_ON_UPPER)
          {

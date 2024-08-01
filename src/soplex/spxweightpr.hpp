@@ -302,7 +302,7 @@ void SPxWeightPR<R>::addedCoVecs(int)
 template <class R>
 void SPxWeightPR<R>::removedVec(int i)
 {
-   assert(this->solver() != 0);
+   assert(this->solver() != nullptr);
 
    if(this->solver()->rep() == SPxSolverBase<R>::ROW)
    {
@@ -319,7 +319,7 @@ void SPxWeightPR<R>::removedVec(int i)
 template <class R>
 void SPxWeightPR<R>::removedVecs(const int perm[])
 {
-   assert(this->solver() != 0);
+   assert(this->solver() != nullptr);
 
    if(this->solver()->rep() == SPxSolverBase<R>::ROW)
    {
@@ -350,7 +350,7 @@ void SPxWeightPR<R>::removedVecs(const int perm[])
 template <class R>
 void SPxWeightPR<R>::removedCoVec(int i)
 {
-   assert(this->solver() != 0);
+   assert(this->solver() != nullptr);
 
    if(this->solver()->rep() == SPxSolverBase<R>::COLUMN)
    {
@@ -367,7 +367,7 @@ void SPxWeightPR<R>::removedCoVec(int i)
 template <class R>
 void SPxWeightPR<R>::removedCoVecs(const int perm[])
 {
-   assert(this->solver() != 0);
+   assert(this->solver() != nullptr);
 
    if(this->solver()->rep() == SPxSolverBase<R>::COLUMN)
    {
@@ -403,7 +403,7 @@ bool SPxWeightPR<R>::isConsistent() const
    if(this->_tolerances == nullptr)
       return SPX_MSG_INCONSISTENT("SPxWeightPR");
 
-   if(this->solver() != 0)
+   if(this->solver() != nullptr)
    {
       if(rPenalty.dim() != this->solver()->nRows())
          return SPX_MSG_INCONSISTENT("SPxWeightPR");

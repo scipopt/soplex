@@ -132,7 +132,7 @@ public:
    {
       T* newelem = create(newkey);
 
-      assert(newelem != 0);
+      assert(newelem != nullptr);
 
       *newelem = item;
    }
@@ -141,8 +141,7 @@ public:
    {
       T* newelem = create();
 
-
-      assert(newelem != 0);
+      assert(newelem != nullptr);
 
       *newelem = item;
    }
@@ -308,7 +307,7 @@ public:
    /// remove \p n elements given by \p keys and \p perm.
    void remove(const DataKey* keys, int n, int* perm)
    {
-      assert(perm != 0);
+      assert(perm != nullptr);
 
       for(int i = num() - 1; i >= 0; --i)
          perm[i] = i;
@@ -327,7 +326,7 @@ public:
    /// remove \p n elements given by \p nums and \p perm.
    void remove(const int* nums, int n, int* perm)
    {
-      assert(perm != 0);
+      assert(perm != nullptr);
 
       for(int i = num() - 1; i >= 0; --i)
          perm[i] = i;
@@ -490,7 +489,7 @@ public:
    ptrdiff_t reMax(int newmax = 0)
    {
       int i;
-      Item* newMem = 0;
+      Item* newMem = nullptr;
       newmax = (newmax < size()) ? size() : newmax;
 
       int* lastfree = &firstfree;
@@ -559,8 +558,8 @@ public:
    /// default constructor.
    explicit
    ClassSet(int pmax = 8)
-      : theitem(0)
-      , thekey(0)
+      : theitem(nullptr)
+      , thekey(nullptr)
       , themax(pmax < 1 ? 8 : pmax)
       , thesize(0)
       , thenum(0)
@@ -590,7 +589,7 @@ public:
    /// copy constructor.
    ClassSet(const ClassSet& old)
       : theitem(0)
-      , thekey(0)
+      , thekey(nullptr)
       , themax(old.themax)
       , thesize(old.thesize)
       , thenum(old.thenum)

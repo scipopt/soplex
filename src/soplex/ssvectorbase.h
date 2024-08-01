@@ -70,7 +70,7 @@ private:
    /// Allocates enough space to accommodate \p newmax values.
    void setMax(int newmax)
    {
-      assert(idx != 0);
+      assert(idx != nullptr);
       assert(newmax != 0);
       assert(newmax >= IdxSet::size());
 

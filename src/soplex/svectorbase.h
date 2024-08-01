@@ -163,14 +163,14 @@ public:
    /// Number of used indices.
    int size() const
    {
-      assert(m_elem != 0 || memused == 0);
+      assert(m_elem != nullptr || memused == 0);
       return memused;
    }
 
    /// Maximal number of indices.
    int max() const
    {
-      assert(m_elem != 0 || memused == 0);
+      assert(m_elem != nullptr || memused == 0);
       return memsize;
    }
 
@@ -196,7 +196,7 @@ public:
     */
    int pos(int i) const
    {
-      if(m_elem != 0)
+      if(m_elem != nullptr)
       {
          int n = size();
 
@@ -281,7 +281,7 @@ public:
    /// Append one nonzero \p (i,v).
    void add(int i, const R& v)
    {
-      assert(m_elem != 0);
+      assert(m_elem != nullptr);
       assert(size() < max());
 
       if(v != 0.0)
@@ -299,7 +299,7 @@ public:
    /// Append one uninitialized nonzero.
    void add(int i)
    {
-      assert(m_elem != 0);
+      assert(m_elem != nullptr);
       assert(size() < max());
 
       int n = size();
@@ -448,7 +448,7 @@ public:
    /// Sort nonzeros to increasing indices.
    void sort()
    {
-      if(m_elem != 0)
+      if(m_elem != nullptr)
       {
          Nonzero<R> dummy;
          Nonzero<R>* w;
@@ -622,7 +622,7 @@ public:
     *  beginning of the memory block. Once this memory has been passed, it shall not be modified until the SVectorBase
     *  is no longer used.
     */
-   explicit SVectorBase(int n = 0, Nonzero<R>* p_mem = 0)
+   explicit SVectorBase(int n = 0, Nonzero<R>* p_mem = nullptr)
    {
       setMem(n, p_mem);
    }
@@ -647,7 +647,7 @@ public:
 
          while(i--)
          {
-            assert(e != 0);
+            assert(e != nullptr);
 
             if(s->val != 0.0)
             {
@@ -692,7 +692,7 @@ public:
 
          while(i--)
          {
-            assert(e != 0);
+            assert(e != nullptr);
 
             if(s->val != 0.0)
             {
@@ -798,14 +798,14 @@ public:
    /// Set size of the vector.
    void set_size(int s)
    {
-      assert(m_elem != 0 || s == 0);
+      assert(m_elem != nullptr || s == 0);
       memused = s;
    }
 
    /// Set the maximum number of nonzeros in the vector.
    void set_max(int m)
    {
-      assert(m_elem != 0 || m == 0);
+      assert(m_elem != nullptr || m == 0);
       memsize = m;
    }
 
@@ -813,7 +813,7 @@ public:
    void setMem(int n, Nonzero<R>* elmem)
    {
       assert(n >= 0);
-      assert(n == 0 || elmem != 0);
+      assert(n == 0 || elmem != nullptr);
 
       m_elem = elmem;
       set_size(0);
@@ -831,7 +831,7 @@ public:
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
-      if(m_elem != 0)
+      if(m_elem != nullptr)
       {
          const int my_size = size();
          const int my_max = max();

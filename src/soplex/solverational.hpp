@@ -4910,7 +4910,7 @@ void SoPlexBase<R>::_computeInfeasBox(SolRational& sol, bool transformed)
 
    // prepare ytransA and ytransb; since we want exact arithmetic, we set the zero threshold of the semi-sparse
    // vector to zero
-   ytransA.setTolerances(0);
+   ytransA.setTolerances(nullptr);
    ytransA.clear();
    ytransb = 0;
 
@@ -5130,7 +5130,7 @@ void SoPlexBase<R>::_computeInfeasBox(SolRational& sol, bool transformed)
 template <class R>
 void SoPlexBase<R>::_storeLastStableBasisBoosted(bool vanished)
 {
-   if(_boostedSimplifier != 0)
+   if(_boostedSimplifier != nullptr)
    {
       // get solution vectors for transformed problem
       VectorBase<BP> tmpPrimal(vanished ? 0 : _boostedSolver.nCols());
@@ -5174,7 +5174,7 @@ void SoPlexBase<R>::_storeLastStableBasisBoosted(bool vanished)
 template <class R>
 void SoPlexBase<R>::_storeLastStableBasis(bool vanished)
 {
-   if(_simplifier != 0)
+   if(_simplifier != nullptr)
    {
       // get solution vectors for transformed problem
       VectorBase<R> tmpPrimal(vanished ? 0 : _solver.nCols());
@@ -5269,9 +5269,9 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
    _statistics->syncTime->start();
 
    // if preprocessing is applied, we need to restore the original LP at the end
-   SPxLPRational* rationalLP = 0;
+   SPxLPRational* rationalLP = nullptr;
 
-   if(_simplifier != 0 || _scaler != nullptr)
+   if(_simplifier != nullptr || _scaler != nullptr)
    {
       spx_alloc(rationalLP);
       rationalLP = new(rationalLP) SPxLPRational(_solver);
@@ -5292,7 +5292,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
 
       int oldIterations = _statistics->iterations; // save previous number of iterations
 
-      if(_simplifier != 0)
+      if(_simplifier != nullptr)
       {
          // do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used
          bool keepbounds = intParam(SoPlexBase<R>::RATIOTESTER) == SoPlexBase<R>::RATIOTESTER_BOUNDFLIPPING;
@@ -5337,7 +5337,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
 
             // unsimplify if simplifier is active and LP is solved to optimality; this must be done here and not at solution
             // query, because we want to have the basis for the original problem
-            if(_simplifier != 0)
+            if(_simplifier != nullptr)
             {
                assert(!_simplifier->isUnsimplified());
                assert(simplificationStatus == SPxSimplifier<R>::VANISHED
@@ -5424,7 +5424,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
             break;
 
          case SPxSolverBase<R>::ABORT_CYCLING:
-            if(_simplifier == 0 && boolParam(SoPlexBase<R>::ACCEPTCYCLING))
+            if(_simplifier == nullptr && boolParam(SoPlexBase<R>::ACCEPTCYCLING))
             {
                _solver.getPrimalSol(primal);
                _solver.getDualSol(dual);
@@ -5448,7 +5448,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
          case SPxSolverBase<R>::UNBOUNDED:
             _hasBasis = (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
 
-            if(_hasBasis && _simplifier == 0)
+            if(_hasBasis && _simplifier == nullptr)
             {
                basisStatusRows.reSize(_solver.nRows());
                basisStatusCols.reSize(_solver.nCols());
@@ -5470,7 +5470,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
          case SPxSolverBase<R>::INFEASIBLE:
 
             // if simplifier is active we can currently not return a Farkas ray or basis
-            if(_simplifier != 0)
+            if(_simplifier != nullptr)
             {
                _hasBasis = false;
                _rationalLUSolver.clear();
@@ -5517,9 +5517,9 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
    }
 
    // restore original LP if necessary
-   if(_simplifier != 0 || _scaler != nullptr)
+   if(_simplifier != nullptr || _scaler != nullptr)
    {
-      assert(rationalLP != 0);
+      assert(rationalLP != nullptr);
       _solver.loadLP((SPxLPBase<R>)(*rationalLP));
       rationalLP->~SPxLPRational();
       spx_free(rationalLP);
@@ -5801,7 +5801,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
    // if preprocessing is applied, we need to restore the original LP at the end
    SPxLPRational* rationalLP = 0;
 
-   if(_boostedSimplifier != 0 || _boostedScaler != nullptr)
+   if(_boostedSimplifier != nullptr || _boostedScaler != nullptr)
    {
       spx_alloc(rationalLP);
       rationalLP = new(rationalLP) SPxLPRational(_boostedSolver);
@@ -5822,7 +5822,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
 
       int oldIterations = _statistics->iterations; // save previous number of iterations
 
-      if(_boostedSimplifier != 0)
+      if(_boostedSimplifier != nullptr)
       {
          // do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used
          bool keepbounds = intParam(SoPlexBase<R>::RATIOTESTER) == SoPlexBase<R>::RATIOTESTER_BOUNDFLIPPING;
@@ -5868,7 +5868,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
 
             // unsimplify if simplifier is active and LP is solved to optimality; this must be done here and not at solution
             // query, because we want to have the basis for the original problem
-            if(_boostedSimplifier != 0)
+            if(_boostedSimplifier != nullptr)
             {
                assert(!_boostedSimplifier->isUnsimplified());
                assert(simplificationStatus == SPxSimplifier<BP>::VANISHED
@@ -6017,7 +6017,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
          case SPxSolverBase<BP>::INFEASIBLE:
 
             // if simplifier is active we can currently not return a Farkas ray or basis
-            if(_boostedSimplifier != 0)
+            if(_boostedSimplifier != nullptr)
             {
                _hasBasis = false;
                _rationalLUSolver.clear();
@@ -6065,9 +6065,9 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
    }
 
    // restore original LP if necessary
-   if(_boostedSimplifier != 0 || _boostedScaler != nullptr)
+   if(_boostedSimplifier != nullptr || _boostedScaler != nullptr)
    {
-      assert(rationalLP != 0);
+      assert(rationalLP != nullptr);
       _boostedSolver.loadLP((SPxLPBase<BP>)(*rationalLP));
       rationalLP->~SPxLPRational();
       spx_free(rationalLP);

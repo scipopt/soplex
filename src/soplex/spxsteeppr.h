@@ -129,8 +129,8 @@ public:
    ///
    SPxSteepPR(const char* name = "Steep", Setup mode = DEFAULT)
       : SPxPricer<R>(name)
-      , workVec(0, 0)
-      , workRhs(0, 0)
+      , workVec(0, nullptr)
+      , workRhs(0, nullptr)
       , pi_p(1.0)
       , setup(mode)
       , refined(false)

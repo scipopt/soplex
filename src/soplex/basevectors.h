@@ -559,13 +559,13 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product4setup(const SVSetBase<S>& A,
 
    if(x.size() == 1)
    {
-      if(timeSparse != 0)
+      if(timeSparse != nullptr)
          timeSparse->start();
 
       assign2product1(A, x);
       setupStatus = true;
 
-      if(timeSparse != 0)
+      if(timeSparse != nullptr)
          timeSparse->stop();
 
       ++nCallsSparse;
@@ -573,26 +573,26 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product4setup(const SVSetBase<S>& A,
    else if(isSetup()
            && (double(x.size()) * A.memSize() <= SOPLEX_SHORTPRODUCT_FACTOR * dim() * A.num()))
    {
-      if(timeSparse != 0)
+      if(timeSparse != nullptr)
          timeSparse->start();
 
       assign2productShort(A, x);
       setupStatus = true;
 
-      if(timeSparse != 0)
+      if(timeSparse != nullptr)
          timeSparse->stop();
 
       ++nCallsSparse;
    }
    else
    {
-      if(timeFull != 0)
+      if(timeFull != nullptr)
          timeFull->start();
 
       assign2productFull(A, x);
       setupStatus = false;
 
-      if(timeFull != 0)
+      if(timeFull != nullptr)
          timeFull->stop();
 
       ++nCallsFull;

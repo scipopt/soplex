@@ -227,13 +227,13 @@ static inline int deQueueMin(int* heap, int* size)
 /************************************************************/
 template <class R>
 CLUFactor<R>::Temp::Temp()
-   : s_mark(0)
-   , s_cact(0)
+   : s_mark(nullptr)
+   , s_cact(nullptr)
    , stage(0)
-   , pivot_col(0)
-   , pivot_colNZ(0)
-   , pivot_row(0)
-   , pivot_rowNZ(0)
+   , pivot_col(nullptr)
+   , pivot_colNZ(nullptr)
+   , pivot_row(nullptr)
+   , pivot_rowNZ(nullptr)
 {}
 
 template <class R>
@@ -801,7 +801,7 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
    if(num)
    {
       // Optimized call.
-      assert(nonz != 0);
+      assert(nonz != nullptr);
 
       clen[p_col] = 0;
 
@@ -859,7 +859,7 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
    else
    {
       // Non-optimized call: We have to access all elements of p_work.
-      assert(nonz == 0);
+      assert(nonz == nullptr);
 
       /*
        *      clen[col] = 0;
@@ -979,7 +979,7 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
           *                sort the nonzeros or something, for which it only needs
           *                some empty VectorBase<R> of size num.
           */
-         assert(nonz != 0);
+         assert(nonz != nullptr);
 
          /*  move row r from U to p_work
           */
@@ -1009,7 +1009,7 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
 
          lidx = l.idx;
 
-         assert((num == 0) || (nonz != 0));
+         assert((num == 0) || (nonz != nullptr));
 
          /* for(i = c; i < r; ++i)       */
          while(num)
@@ -4255,7 +4255,7 @@ void CLUFactor<R>::solveLeft(R* vec, R* rhs)
    {
       solveUleft(vec, rhs);
       //@todo is 0.0 the right value for eps here ?
-      solveLleftForest(vec, 0, 0.0);
+      solveLleftForest(vec, nullptr, 0.0);
       solveLleft(vec);
    }
 }

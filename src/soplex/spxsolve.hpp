@@ -173,19 +173,19 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
       throw SPxStatusException("XSOLVE01 No Problem loaded");
    }
 
-   if(slinSolver() == 0)  // linear system solver is required.
+   if(slinSolver() == nullptr)  // linear system solver is required.
    {
       m_status = NO_SOLVER;
       throw SPxStatusException("XSOLVE02 No Solver loaded");
    }
 
-   if(thepricer == 0)  // pricer is required.
+   if(thepricer == nullptr)  // pricer is required.
    {
       m_status = NO_PRICER;
       throw SPxStatusException("XSOLVE03 No Pricer loaded");
    }
 
-   if(theratiotester == 0)  // ratiotester is required.
+   if(theratiotester == nullptr)  // ratiotester is required.
    {
       m_status = NO_RATIOTESTER;
       throw SPxStatusException("XSOLVE04 No RatioTester loaded");
@@ -208,7 +208,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
       /**@todo != REGULAR is not enough. Also OPTIMAL/DUAL/PRIMAL should
        * be tested and acted accordingly.
        */
-      if(thestarter != 0 && status() != REGULAR
+      if(thestarter != nullptr && status() != REGULAR
             && this->theLP->status() == NO_PROBLEM)   // no basis and no starter.
          thestarter->generate(*this);              // generate start basis.
 
@@ -277,10 +277,10 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
       const typename SPxBasisBase<R>::Desc regulardesc = this->desc();
 
       // we need to reset these pointers to avoid unnecessary/wrong solves in leave() or enter()
-      solveVector2 = 0;
-      solveVector3 = 0;
-      coSolveVector2 = 0;
-      coSolveVector3 = 0;
+      solveVector2 = nullptr;
+      solveVector3 = nullptr;
+      coSolveVector2 = nullptr;
+      coSolveVector3 = nullptr;
 
       updateViols.clear();
       updateViolsCo.clear();

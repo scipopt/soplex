@@ -37,7 +37,7 @@ namespace soplex
 template <class R>
 void SoPlexBase<R>::_optimize(volatile bool* interrupt)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
    assert(_realLP == &_solver);
 
    _solReal.invalidate();
@@ -260,7 +260,7 @@ void SoPlexBase<R>::_preprocessAndSolveReal(bool applySimplifier, volatile bool*
       _disableSimplifierAndScaler();
 
    // create a copy of the LP when simplifying or when using internal scaling, i.e. w/o persistent scaling
-   bool copyLP = (_simplifier != 0 || (_scaler && !_isRealLPScaled));
+   bool copyLP = (_simplifier != nullptr || (_scaler && !_isRealLPScaled));
 
    // set the objective limit if it was not explicitly disabled for this particular solving call
    if(_solver.isTerminationValueEnabled())
@@ -370,7 +370,7 @@ void SoPlexBase<R>::_resolveWithoutPreprocessing(typename SPxSimplifier<R>::Resu
       simplificationStatus)
 {
    assert(!_isRealLPLoaded || _scaler != nullptr);
-   assert(_simplifier != 0 || _scaler != nullptr);
+   assert(_simplifier != nullptr || _scaler != nullptr);
    assert(_status == SPxSolverBase<R>::INFEASIBLE || _status == SPxSolverBase<R>::INForUNBD
           || _status == SPxSolverBase<R>::UNBOUNDED);
 

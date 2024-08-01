@@ -136,7 +136,7 @@ public:
    {
       DATA* data = create(newkey);
 
-      assert(data != 0);
+      assert(data != nullptr);
 
       *data = item;
    }
@@ -145,7 +145,7 @@ public:
    {
       DATA* data = create();
 
-      assert(data != 0);
+      assert(data != nullptr);
 
       *data = item;
    }
@@ -311,7 +311,7 @@ public:
    /// remove \p n elements given by \p keys and \p perm.
    void remove(const DataKey* keys, int n, int* perm)
    {
-      assert(perm != 0);
+      assert(perm != nullptr);
 
       for(int i = num() - 1; i >= 0; --i)
          perm[i] = i;
@@ -330,7 +330,7 @@ public:
    /// remove \p n elements given by \p nums and \p perm.
    void remove(const int* nums, int n, int* perm)
    {
-      assert(perm != 0);
+      assert(perm != nullptr);
 
       for(int i = num() - 1; i >= 0; --i)
          perm[i] = i;
@@ -543,8 +543,8 @@ public:
    /// default constructor.
    explicit
    DataSet(int pmax = 8)
-      : theitem(0)
-      , thekey(0)
+      : theitem(nullptr)
+      , thekey(nullptr)
       , themax(pmax < 1 ? 8 : pmax)
       , thesize(0)
       , thenum(0)
@@ -570,7 +570,7 @@ public:
    /// copy constructor.
    DataSet(const DataSet& old)
       : theitem(0)
-      , thekey(0)
+      , thekey(nullptr)
       , themax(old.themax)
       , thesize(old.thesize)
       , thenum(old.thenum)

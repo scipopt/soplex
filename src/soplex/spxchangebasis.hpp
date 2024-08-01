@@ -35,7 +35,7 @@ template <class R>
 void SPxBasisBase<R>::reDim()
 {
 
-   assert(theLP != 0);
+   assert(theLP != nullptr);
 
    SPxOut::debug(this, "DCHBAS01 SPxBasisBase<R>::reDim(): matrixIsSetup={}, factorized={}\n",
                  matrixIsSetup, factorized);
@@ -65,7 +65,7 @@ void SPxBasisBase<R>::reDim()
 template <class R>
 void SPxBasisBase<R>::addedRows(int n)
 {
-   assert(theLP != 0);
+   assert(theLP != nullptr);
 
    if(n > 0)
    {
@@ -131,7 +131,7 @@ void SPxBasisBase<R>::removedRow(int i)
 {
 
    assert(status() >  NO_PROBLEM);
-   assert(theLP    != 0);
+   assert(theLP    != nullptr);
 
    if(theLP->rep() == SPxSolverBase<R>::ROW)
    {
@@ -180,7 +180,7 @@ template <class R>
 void SPxBasisBase<R>::removedRows(const int perm[])
 {
    assert(status() > NO_PROBLEM);
-   assert(theLP != 0);
+   assert(theLP != nullptr);
 
    int i;
    int n = thedesc.nRows();
@@ -234,7 +234,7 @@ template <class R>
 static typename SPxBasisBase<R>::Desc::Status
 primalColStatus(int i, const SPxLPBase<R>* theLP)
 {
-   assert(theLP != 0);
+   assert(theLP != nullptr);
 
    if(theLP->upper(i) < R(infinity))
    {
@@ -271,7 +271,7 @@ primalColStatus(int i, const SPxLPBase<R>* theLP)
 template <class R>
 void SPxBasisBase<R>::addedCols(int n)
 {
-   assert(theLP != 0);
+   assert(theLP != nullptr);
 
    if(n > 0)
    {
@@ -335,7 +335,7 @@ template <class R>
 void SPxBasisBase<R>::removedCol(int i)
 {
    assert(status() > NO_PROBLEM);
-   assert(theLP != 0);
+   assert(theLP != nullptr);
 
    if(theLP->rep() == SPxSolverBase<R>::COLUMN)
    {
@@ -377,7 +377,7 @@ template <class R>
 void SPxBasisBase<R>::removedCols(const int perm[])
 {
    assert(status() > NO_PROBLEM);
-   assert(theLP != 0);
+   assert(theLP != nullptr);
 
    int i;
    int n = thedesc.nCols();

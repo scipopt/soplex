@@ -83,7 +83,7 @@ inline void SLUFactorRational::solveRight4update(SSVectorRational& x, const SVec
    if(l.updateType == ETA)
    {
       m = vSolveRight4update(x.altValues(), x.altIndexMem(),
-                             ssvec.altValues(), ssvec.altIndexMem(), n, 0, 0, 0);
+                             ssvec.altValues(), ssvec.altIndexMem(), n, nullptr, nullptr, nullptr);
       x.setSize(m);
       //x.forceSetup();
       x.unSetup();
@@ -133,7 +133,7 @@ inline void SLUFactorRational::solve2right4update(
       n = ssvec.size();
       m = vSolveRight4update2(x.altValues(), x.altIndexMem(),
                               ssvec.get_ptr(), sidx, n, y.get_ptr(),
-                              rhs.altValues(), ridx, rsize, 0, 0, 0);
+                              rhs.altValues(), ridx, rsize, nullptr, nullptr, nullptr);
       x.setSize(m);
       //      x.forceSetup();
       x.unSetup();
@@ -189,7 +189,7 @@ inline void SLUFactorRational::solve3right4update(
       m = vSolveRight4update3(x.altValues(), x.altIndexMem(), ssvec.get_ptr(), sidx, n,
                               y.get_ptr(), rhs.altValues(), ridx, rsize,
                               y2.get_ptr(), rhs2.altValues(), ridx2, rsize2,
-                              0, 0, 0);
+                              nullptr, nullptr, nullptr);
       x.setSize(m);
       //      x.forceSetup();
       x.unSetup();
@@ -394,7 +394,7 @@ inline SLUFactorRational::Status SLUFactorRational::change(
          changeEta(idx, eta);
       }
    }
-   else if(e != 0)                                    // ETA updates
+   else if(e != nullptr)                                    // ETA updates
    {
       l.updateType = ETA;
       updateNoClear(idx, e->values(), e->indexMem(), e->size());
@@ -639,10 +639,10 @@ inline void SLUFactorRational::assign(const SLUFactorRational& old)
 
    if(old.l.rval.dim() != 0)
    {
-      assert(old.l.ridx  != 0);
-      assert(old.l.rbeg  != 0);
-      assert(old.l.rorig != 0);
-      assert(old.l.rperm != 0);
+      assert(old.l.ridx  != nullptr);
+      assert(old.l.rbeg  != nullptr);
+      assert(old.l.rorig != nullptr);
+      assert(old.l.rperm != nullptr);
 
       int memsize = l.start[l.firstUpdate];
 
@@ -659,38 +659,38 @@ inline void SLUFactorRational::assign(const SLUFactorRational& old)
    }
    else
    {
-      assert(old.l.ridx  == 0);
-      assert(old.l.rbeg  == 0);
-      assert(old.l.rorig == 0);
-      assert(old.l.rperm == 0);
+      assert(old.l.ridx  == nullptr);
+      assert(old.l.rbeg  == nullptr);
+      assert(old.l.rorig == nullptr);
+      assert(old.l.rperm == nullptr);
 
       l.rval.reDim(0);
-      l.ridx  = 0;
-      l.rbeg  = 0;
-      l.rorig = 0;
-      l.rperm = 0;
+      l.ridx  = nullptr;
+      l.rbeg  = nullptr;
+      l.rorig = nullptr;
+      l.rperm = nullptr;
    }
 
-   assert(row.perm != 0);
-   assert(row.orig != 0);
-   assert(col.perm != 0);
-   assert(col.orig != 0);
+   assert(row.perm != nullptr);
+   assert(row.orig != nullptr);
+   assert(col.perm != nullptr);
+   assert(col.orig != nullptr);
 
-   assert(u.row.elem  != 0);
-   assert(u.row.idx   != 0);
-   assert(u.row.start != 0);
-   assert(u.row.len   != 0);
-   assert(u.row.max   != 0);
+   assert(u.row.elem  != nullptr);
+   assert(u.row.idx   != nullptr);
+   assert(u.row.start != nullptr);
+   assert(u.row.len   != nullptr);
+   assert(u.row.max   != nullptr);
 
-   assert(u.col.elem  != 0);
-   assert(u.col.idx   != 0);
-   assert(u.col.start != 0);
-   assert(u.col.len   != 0);
-   assert(u.col.max   != 0);
+   assert(u.col.elem  != nullptr);
+   assert(u.col.idx   != nullptr);
+   assert(u.col.start != nullptr);
+   assert(u.col.len   != nullptr);
+   assert(u.col.max   != nullptr);
 
-   assert(l.idx   != 0);
-   assert(l.start != 0);
-   assert(l.row   != 0);
+   assert(l.idx   != nullptr);
+   assert(l.start != nullptr);
+   assert(l.row   != nullptr);
 
 }
 
@@ -788,7 +788,7 @@ static Rational betterThreshold(Rational th)
 inline SLUFactorRational::Status SLUFactorRational::load(const SVectorRational* matrix[], int dm)
 {
    assert(dm     >= 0);
-   assert(matrix != 0);
+   assert(matrix != nullptr);
 
    Rational lastStability = stability();
 
