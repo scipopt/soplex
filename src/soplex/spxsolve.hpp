@@ -510,7 +510,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                   break;
                }
 
-               if(interrupt != NULL && *interrupt)
+               if(interrupt != nullptr && *interrupt)
                {
                   SPX_MSG_INFO2((*this->spxout),
                                 (*this->spxout) << " --- aborted due to interrupt signal" << std::endl;)
@@ -851,7 +851,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                   break;
                }
 
-               if(interrupt != NULL && *interrupt)
+               if(interrupt != nullptr && *interrupt)
                {
                   SPX_MSG_INFO2((*this->spxout),
                                 (*this->spxout) << " --- aborted due to interrupt signal" << std::endl;)

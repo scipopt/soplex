@@ -916,7 +916,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
          const SVectorBase<R>& newVector = *enterVector(enterId);
 
          // update feasibility vectors
-         if(solveVector2 != NULL && solveVector3 != NULL)
+         if(solveVector2 != nullptr && solveVector3 != nullptr)
          {
             assert(solveVector2->isConsistent());
             assert(solveVector2rhs->isSetup());
@@ -935,7 +935,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
             SPxOut::debug(this, "ILBFRT02 breakpoints passed / bounds flipped = {}\n", boundflips);
             totalboundflips += boundflips;
          }
-         else if(solveVector2 != NULL)
+         else if(solveVector2 != nullptr)
          {
             assert(solveVector2->isConsistent());
             assert(solveVector2rhs->isSetup());
@@ -945,7 +945,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
                                           newVector,
                                           *solveVector2rhs);
          }
-         else if(solveVector3 != NULL)
+         else if(solveVector3 != nullptr)
          {
             assert(solveVector3->isConsistent());
             assert(solveVector3rhs->isSetup());

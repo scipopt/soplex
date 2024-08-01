@@ -636,14 +636,14 @@ public:
    void invalidateBasis();
 
    /** Load basis from \p filename in MPS format. If \p rowNames and \p
-    *  colNames are \c NULL, default names are used for the constraints and
+    *  colNames are \c nullptr, default names are used for the constraints and
     *  variables.
     */
    virtual bool readBasisFile(const char* filename,
                               const NameSet* rowNames, const NameSet* colNames);
 
    /** Write basis to \p filename in MPS format. If \p rowNames and \p
-    *  colNames are \c NULL, default names are used for the constraints and
+    *  colNames are \c nullptr, default names are used for the constraints and
     *  variables.
     */
    virtual bool writeBasisFile(const char* filename,
@@ -651,11 +651,11 @@ public:
 
    /** Write current LP, basis, and parameter settings.
     *  LP is written in MPS format to "\p filename".mps, basis is written in "\p filename".bas, and parameters
-    *  are written to "\p filename".set. If \p rowNames and \p colNames are \c NULL, default names are used for
+    *  are written to "\p filename".set. If \p rowNames and \p colNames are \c nullptr, default names are used for
     *  the constraints and variables.
     */
-   virtual bool writeState(const char* filename, const NameSet* rowNames = NULL,
-                           const NameSet* colNames = NULL, const bool cpxFormat = false,
+   virtual bool writeState(const char* filename, const NameSet* rowNames = nullptr,
+                           const NameSet* colNames = nullptr, const bool cpxFormat = false,
                            const bool writeZeroObjective = false) const;
 
    ///@}
@@ -672,7 +672,7 @@ public:
     *  @throw SPxStatusException if either no problem, solver, pricer
     *  or ratiotester loaded or if solve is still running when it shouldn't be
     */
-   virtual Status solve(volatile bool* interrupt = NULL, bool polish = true);
+   virtual Status solve(volatile bool* interrupt = nullptr, bool polish = true);
 
    /** Identify primal basic variables that have zero reduced costs and
     * try to pivot them out of the basis to make them tight.

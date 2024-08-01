@@ -52,8 +52,8 @@ static void updateScale(
    R eprev2,
    R epsilon)
 {
-   assert(psccurr != NULL);
-   assert(pscprev != NULL);
+   assert(psccurr != nullptr);
+   assert(pscprev != nullptr);
    assert(qcurr * qprev != 0.0);
 
    R fac = -(eprev1 * eprev2);
@@ -92,8 +92,8 @@ static void updateScaleFinal(
    R epsilon)
 {
    assert(q != 0);
-   assert(psccurr != NULL);
-   assert(pscprev != NULL);
+   assert(psccurr != nullptr);
+   assert(pscprev != nullptr);
 
    R fac = -(eprev1 * eprev2);
 
@@ -149,7 +149,7 @@ static void initConstVecs(
    SSVectorBase<R>& vecnnzinv,
    R epsilon)
 {
-   assert(vecset != NULL);
+   assert(vecset != nullptr);
 
    const int nvec = vecset->num();
 

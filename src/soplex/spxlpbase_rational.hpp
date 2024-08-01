@@ -1948,12 +1948,11 @@ static void LPFwriteGenerals(
    std::ostream&            p_output,     ///< output stream
    const NameSet*           p_cnames,     ///< column names
    const DIdxSet*           p_intvars     ///< integer variables
-)
+   )
 {
-
    char name[16];
 
-   if(p_intvars == NULL || p_intvars->size() <= 0)
+   if(p_intvars == nullptr || p_intvars->size() <= 0)
       return;  // no integer variables
 
    p_output << "Generals\n";

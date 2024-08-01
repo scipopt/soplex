@@ -600,10 +600,10 @@ public:
    ///@{
 
    /// optimize the given LP
-   typename SPxSolverBase<R>::Status optimize(volatile bool* interrupt = NULL);
+   typename SPxSolverBase<R>::Status optimize(volatile bool* interrupt = nullptr);
 
    // old name for backwards compatibility
-   typename SPxSolverBase<R>::Status solve(volatile bool* interrupt = NULL)
+   typename SPxSolverBase<R>::Status solve(volatile bool* interrupt = nullptr)
    {
       return optimize(interrupt);
    }
@@ -794,19 +794,19 @@ public:
    /// computes row \p r of basis inverse; returns true on success
    /// @param r which row of the basis inverse is computed
    /// @param coef values of result vector (not packed but scattered)
-   /// @param inds indices of result vector (NULL if not to be used)
+   /// @param inds indices of result vector (nullptr if not to be used)
    /// @param ninds number of nonzeros in result vector
    /// @param unscale determines whether the result should be unscaled according to the original LP data
-   bool getBasisInverseRowReal(int r, R* coef, int* inds = NULL, int* ninds = NULL,
+   bool getBasisInverseRowReal(int r, R* coef, int* inds = nullptr, int* ninds = nullptr,
                                bool unscale = true);
 
    /// computes column \p c of basis inverse; returns true on success
    /// @param c which column of the basis inverse is computed
    /// @param coef values of result vector (not packed but scattered)
-   /// @param inds indices of result vector (NULL if not to be used)
+   /// @param inds indices of result vector (nullptr if not to be used)
    /// @param ninds number of nonzeros in result vector
    /// @param unscale determines whether the result should be unscaled according to the original LP data
-   bool getBasisInverseColReal(int c, R* coef, int* inds = NULL, int* ninds = NULL,
+   bool getBasisInverseColReal(int c, R* coef, int* inds = nullptr, int* ninds = nullptr,
                                bool unscale = true);
 
    /// computes dense solution of basis matrix B * \p sol = \p rhs; returns true on success
@@ -903,11 +903,11 @@ public:
    /// Templated write function
    /// Real
    /// writes real LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
-   /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
+   /// colNames are \c nullptr, default names are used; if \p intVars is not \c nullptr, the variables contained in it are
    /// marked as integer; returns true on success
    /// Rational
    /// writes rational LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
-   /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
+   /// colNames are \c nullptr, default names are used; if \p intVars is not \c nullptr, the variables contained in it are
    /// marked as integer; returns true on success
    bool writeFile(const char* filename, const NameSet* rowNames = nullptr, const NameSet* colNames = nullptr,
                   const DIdxSet* intvars = nullptr, const bool unscale = true, const bool writeZeroObjective = false) const;
@@ -921,27 +921,27 @@ public:
                       const DIdxSet* intvars = nullptr, const bool unscale = true, const bool writeZeroObjective = false) const;
 
    /// writes the dual of the real LP to file; LP or MPS format is chosen from the extension in \p filename;
-   /// if \p rowNames and \p colNames are \c NULL, default names are used; if \p intVars is not \c NULL,
+   /// if \p rowNames and \p colNames are \c nullptr, default names are used; if \p intVars is not \c nullptr,
    /// the variables contained in it are marked as integer; returns true on success
    bool writeDualFileReal(const char* filename, const NameSet* rowNames = nullptr,
                           const NameSet* colNames = nullptr, const DIdxSet* intvars = nullptr,
                           const bool writeZeroObjective = false) const;
 
-   /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c NULL,
+   /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c nullptr,
    /// default names are assumed; returns true on success
    bool readBasisFile(const char* filename, const NameSet* rowNames = nullptr, const NameSet* colNames = nullptr);
 
-   /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used;
+   /// writes basis information to \p filename; if \p rowNames and \p colNames are \c nullptr, default names are used;
    /// returns true on success
    bool writeBasisFile(const char* filename, const NameSet* rowNames = nullptr, const NameSet* colNames = nullptr,
                        const bool cpxFormat = false) const;
 
-   /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
+   /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c nullptr,
    /// default names are used
    void writeStateReal(const char* filename, const NameSet* rowNames = nullptr, const NameSet* colNames = nullptr,
                        const bool cpxFormat = false, const bool writeZeroObjective = false) const;
 
-   /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
+   /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c nullptr,
    /// default names are used
    void writeStateRational(const char* filename, const NameSet* rowNames = nullptr,
                            const NameSet* colNames = nullptr, const bool cpxFormat = false,
@@ -2096,10 +2096,10 @@ private:
    void _ensureRealLPLoaded();
 
    /// call floating-point solver and update statistics on iterations etc.
-   void _solveBoostedRealLPAndRecordStatistics(volatile bool* interrupt = NULL);
+   void _solveBoostedRealLPAndRecordStatistics(volatile bool* interrupt = nullptr);
 
    /// call floating-point solver and update statistics on iterations etc.
-   void _solveRealLPAndRecordStatistics(volatile bool* interrupt = NULL);
+   void _solveRealLPAndRecordStatistics(volatile bool* interrupt = nullptr);
 
    /// reads real LP in LP or MPS format from file and returns true on success; gets row names, column names, and
    /// integer variables if desired
@@ -2532,16 +2532,16 @@ private:
    ///@{
 
    /// solves the templated LP
-   void _optimize(volatile bool* interrupt = NULL);
+   void _optimize(volatile bool* interrupt = nullptr);
 
    /// temporary fix for Rational
-   void _optimizeRational(volatile bool* interrupt = NULL);
+   void _optimizeRational(volatile bool* interrupt = nullptr);
 
    /// checks result of the solving process and solves again without preprocessing if necessary
    void _evaluateSolutionReal(typename SPxSimplifier<R>::Result simplificationStatus);
 
    /// solves real LP with/without preprocessing
-   void _preprocessAndSolveReal(bool applyPreprocessing, volatile bool* interrupt = NULL);
+   void _preprocessAndSolveReal(bool applyPreprocessing, volatile bool* interrupt = nullptr);
 
    /// loads original problem into solver and solves again after it has been solved to optimality with preprocessing
    void _resolveWithoutPreprocessing(typename SPxSimplifier<R>::Result simplificationStatus);

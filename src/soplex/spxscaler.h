@@ -127,7 +127,7 @@ public:
    ///@{
    /// constructor
    explicit SPxScaler(const char* name, bool colFirst = false, bool doBoth = true,
-                      SPxOut* spxout = NULL);
+                      SPxOut* spxout = nullptr);
    /// copy constructor
    SPxScaler(const SPxScaler&);
    /// assignment operator

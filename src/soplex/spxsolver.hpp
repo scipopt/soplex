@@ -2216,7 +2216,7 @@ void SPxSolverBase<R>::setType(Type tp)
    template <class R>
    void SPxSolverBase<R>::setIntegralityInformation(int ncols, int* intInfo)
    {
-      assert(ncols == this->nCols() || (ncols == 0 && intInfo == NULL));
+      assert(ncols == this->nCols() || (ncols == 0 && intInfo == nullptr));
 
       integerVariables.reSize(ncols);
 
