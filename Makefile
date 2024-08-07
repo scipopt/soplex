@@ -163,9 +163,13 @@ GCCWARN		=	-pedantic -Wall -W -Wpointer-arith -Wcast-align -Wwrite-strings \
 			-Wcast-qual \
 			-Wmissing-declarations \
 			-Wno-unused-parameter -Wno-strict-overflow -Wno-long-long \
-		        -Wno-sign-conversion
+			-Wno-sign-conversion -Wno-enum-enum-conversion
 #			-Wold-style-cast
 #			-Weffc++
+
+ifeq ($(COMP),gnu)
+GCCWARN += -Wno-use-after-free -Wno-stringop-overflow
+endif
 
 
 #-----------------------------------------------------------------------------

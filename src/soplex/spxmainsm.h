@@ -1623,7 +1623,7 @@ private:
    /// comparator for class SVectorBase<R>::Element: compare nonzeros according to value
    struct ElementCompare
    {
-   public:
+      public:
       R epsiloncompare;
 
       ElementCompare(R eps)
@@ -1646,7 +1646,7 @@ private:
    /// comparator for class SVectorBase<R>::Element: compare nonzeros according to index
    struct IdxCompare
    {
-   public:
+      public:
       IdxCompare() {}
 
       int operator()(const typename SVectorBase<R>::Element& e1,
