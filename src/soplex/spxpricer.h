@@ -82,7 +82,7 @@ protected:
    /// Compare class to sort idx/val pairs, used for hypersparse pricing leaving
    struct IdxCompare
    {
-   public:
+      public:
       /// constructor
       IdxCompare()
          : elements(0)

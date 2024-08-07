@@ -145,7 +145,7 @@ static void setDualStatus(
 template <typename T>
 struct Compare
 {
-public:
+   public:
    /// constructor
    Compare() : weight(0) {}
    //   const SPxSolverBase* base;     ///< the solver
