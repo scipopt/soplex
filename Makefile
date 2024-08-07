@@ -167,6 +167,10 @@ GCCWARN		=	-pedantic -Wall -W -Wpointer-arith -Wcast-align -Wwrite-strings \
 #			-Wold-style-cast
 #			-Weffc++
 
+ifeq ($(COMP),gnu)
+GCCWARN += -Wno-use-after-free
+endif
+
 
 #-----------------------------------------------------------------------------
 include make/make.$(BASE)
