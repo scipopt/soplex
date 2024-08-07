@@ -101,7 +101,7 @@ void NameSet::remove(const char* str)
    if(hashtab.has(nam))
    {
       const DataKey* hkey = hashtab.get(nam);
-      assert(hkey != 0);
+      assert(hkey != nullptr);
       hashtab.remove(nam);
       set.remove(*hkey);
    }
@@ -169,7 +169,7 @@ void NameSet::memRemax(int newmax)
 
 void NameSet::memPack()
 {
-   char* newmem = 0;
+   char* newmem = nullptr;
    int   newlast = 0;
    int   i;
 
@@ -215,7 +215,7 @@ static int NameSetNameHashFunction(const NameSet::Name* str)
 
 NameSet::NameSet(int p_max, int mmax, Real fac, Real memFac)
    : set(p_max)
-   , mem(0)
+   , mem(nullptr)
    , hashtab(NameSetNameHashFunction, set.max(), 0, fac)
    , factor(fac)
    , memFactor(memFac)

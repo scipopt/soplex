@@ -210,13 +210,13 @@ static int deQueueMinRat(int* heap, int* size)
 
 /************************************************************/
 inline CLUFactorRational::Temp::Temp()
-   : s_mark(0)
-   , s_cact(0)
+   : s_mark(nullptr)
+   , s_cact(nullptr)
    , stage(0)
-   , pivot_col(0)
-   , pivot_colNZ(0)
-   , pivot_row(0)
-   , pivot_rowNZ(0)
+   , pivot_col(nullptr)
+   , pivot_colNZ(nullptr)
+   , pivot_row(nullptr)
+   , pivot_rowNZ(nullptr)
 {}
 
 inline void CLUFactorRational::Temp::init(int p_dim)
@@ -229,22 +229,22 @@ inline void CLUFactorRational::Temp::init(int p_dim)
 
 inline void CLUFactorRational::Temp::clear()
 {
-   if(s_mark != 0)
+   if(s_mark != nullptr)
       spx_free(s_mark);
 
-   if(s_cact != 0)
+   if(s_cact != nullptr)
       spx_free(s_cact);
 
-   if(pivot_col != 0)
+   if(pivot_col != nullptr)
       spx_free(pivot_col);
 
-   if(pivot_colNZ != 0)
+   if(pivot_colNZ != nullptr)
       spx_free(pivot_colNZ);
 
-   if(pivot_row != 0)
+   if(pivot_row != nullptr)
       spx_free(pivot_row);
 
-   if(pivot_rowNZ != 0)
+   if(pivot_rowNZ != nullptr)
       spx_free(pivot_rowNZ);
 
    s_max.reDim(0);
@@ -752,7 +752,7 @@ inline void CLUFactorRational::forestUpdate(int p_col, Rational* p_work, int num
    if(num)
    {
       // Optimized call.
-      assert(nonz != 0);
+      assert(nonz != nullptr);
 
       clen[p_col] = 0;
 
@@ -810,7 +810,7 @@ inline void CLUFactorRational::forestUpdate(int p_col, Rational* p_work, int num
    else
    {
       // Non-optimized call: We have to access all elements of p_work.
-      assert(nonz == 0);
+      assert(nonz == nullptr);
 
       /*
        *      clen[col] = 0;
@@ -930,7 +930,7 @@ inline void CLUFactorRational::forestUpdate(int p_col, Rational* p_work, int num
           *                sort the nonzeros or something, for which it only needs
           *                some empty vector of size num.
           */
-         assert(nonz != 0);
+         assert(nonz != nullptr);
 
          /*  move row r from U to p_work
           */
@@ -959,7 +959,7 @@ inline void CLUFactorRational::forestUpdate(int p_col, Rational* p_work, int num
          VectorRational& lval = l.val;
          int* lidx = l.idx;
 
-         assert((num == 0) || (nonz != 0));
+         assert((num == 0) || (nonz != nullptr));
 
          /* for(i = c; i < r; ++i)       */
          while(num)
@@ -4149,7 +4149,7 @@ inline void CLUFactorRational::solveLeft(Rational* vec, Rational* rhs)
    else
    {
       solveUleft(vec, rhs);
-      solveLleftForest(vec, 0);
+      solveLleftForest(vec, nullptr);
       solveLleft(vec);
    }
 }

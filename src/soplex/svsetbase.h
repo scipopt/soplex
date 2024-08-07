@@ -384,8 +384,8 @@ public:
    template < class S >
    void add(DataKey& nkey, const S* rowValues, const int* rowIndices, int rowSize)
    {
-      assert(rowSize <= 0 || rowIndices != 0);
-      assert(rowSize <= 0 || rowValues != 0);
+      assert(rowSize <= 0 || rowIndices != nullptr);
+      assert(rowSize <= 0 || rowValues != nullptr);
 
       // create empty vector
       ensurePSVec(1);
@@ -555,7 +555,7 @@ public:
          else
          {
             ensureMem(newmax);
-            SVectorBase<R> newps(0, 0);
+            SVectorBase<R> newps(0, nullptr);
 
             if(SVSetBaseArray::size() > 0)
                newps.setMem(newmax, &SVSetBaseArray::last() + 1);

@@ -110,7 +110,7 @@ void SoPlexBase<R>::_checkBasisScaling()
    assert(&_solver == _realLP);
    VectorBase<R>** binvcol = 0;
    VectorBase<R>** binvrow = 0;
-   int* inds = 0;
+   int* inds = nullptr;
    int basisdim = _solver.nRows(); // do all operations with regard to the column basis
    bool colrep = (_solver.rep() == SPxSolverBase<R>::COLUMN);
    spx_alloc(binvcol, basisdim);

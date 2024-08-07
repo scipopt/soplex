@@ -108,34 +108,34 @@ void printUsage(const char* const argv[], int idx)
 static
 void freeStrings(char*& s1, char*& s2, char*& s3, char*& s4, char*& s5)
 {
-   if(s1 != 0)
+   if(s1 != nullptr)
    {
       delete [] s1;
-      s1 = 0;
+      s1 = nullptr;
    }
 
-   if(s2 != 0)
+   if(s2 != nullptr)
    {
       delete [] s2;
-      s2 = 0;
+      s2 = nullptr;
    }
 
-   if(s3 != 0)
+   if(s3 != nullptr)
    {
       delete [] s3;
-      s3 = 0;
+      s3 = nullptr;
    }
 
-   if(s4 != 0)
+   if(s4 != nullptr)
    {
       delete [] s4;
-      s4 = 0;
+      s4 = nullptr;
    }
 
-   if(s5 != 0)
+   if(s5 != nullptr)
    {
       delete [] s5;
-      s5 = 0;
+      s5 = nullptr;
    }
 }
 
@@ -1179,7 +1179,7 @@ int runSoPlex(int argc, char* argv[])
          case 'h' :
 
             // -h : display all parameters
-            if(!soplex->saveSettingsFile(0, false))
+            if(!soplex->saveSettingsFile(nullptr, false))
             {
                SPX_MSG_ERROR(std::cerr << "Error printing parameters\n");
             }

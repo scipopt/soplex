@@ -162,6 +162,7 @@ GCCWARN		=	-pedantic -Wall -W -Wpointer-arith -Wcast-align -Wwrite-strings \
 			-Woverloaded-virtual -Wsign-promo -Wsynth -Wundef \
 			-Wcast-qual \
 			-Wmissing-declarations \
+			-Wzero-as-null-pointer-constant \
 			-Wno-unused-parameter -Wno-strict-overflow -Wno-long-long \
 			-Wno-sign-conversion -Wno-enum-enum-conversion
 #			-Wold-style-cast

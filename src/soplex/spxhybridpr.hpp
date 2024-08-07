@@ -37,7 +37,7 @@ bool SPxHybridPR<R>::isConsistent() const
    if(this->_tolerances == nullptr)
       return SPX_MSG_INCONSISTENT("SPxHybridPR");
 
-   if(this->thesolver != 0 &&
+   if(this->thesolver != nullptr &&
          (this->thesolver != steep.solver() ||
           this->thesolver != devex.solver() ||
           this->thesolver != parmult.solver()))

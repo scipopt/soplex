@@ -40,7 +40,7 @@ namespace soplex
 template <class R>
 void SPxSteepPR<R>::clear()
 {
-   this->thesolver = 0;
+   this->thesolver = nullptr;
 }
 
 template <class R>
@@ -659,7 +659,7 @@ SPxId SPxSteepPR<R>::buildBestPriceVectorEnterCoDim(R& best, R feastol)
 template <class R>
 SPxId SPxSteepPR<R>::selectEnter()
 {
-   assert(this->thesolver != 0);
+   assert(this->thesolver != nullptr);
    SPxId enterId;
 
    enterId = selectEnterX(this->thetolerance);
@@ -1052,7 +1052,7 @@ void SPxSteepPR<R>::addedCoVecs(int n)
 template <class R>
 void SPxSteepPR<R>::removedVec(int i)
 {
-   assert(this->thesolver != 0);
+   assert(this->thesolver != nullptr);
    VectorBase<R>& weights = this->thesolver->weights;
    weights[i] = weights[weights.dim()];
    weights.reDim(this->thesolver->coDim());
@@ -1061,7 +1061,7 @@ void SPxSteepPR<R>::removedVec(int i)
 template <class R>
 void SPxSteepPR<R>::removedVecs(const int perm[])
 {
-   assert(this->thesolver != 0);
+   assert(this->thesolver != nullptr);
    VectorBase<R>& weights = this->thesolver->weights;
 
    if(this->thesolver->type() == SPxSolverBase<R>::ENTER)
@@ -1082,7 +1082,7 @@ void SPxSteepPR<R>::removedVecs(const int perm[])
 template <class R>
 void SPxSteepPR<R>::removedCoVec(int i)
 {
-   assert(this->thesolver != 0);
+   assert(this->thesolver != nullptr);
    VectorBase<R>& coWeights = this->thesolver->coWeights;
    coWeights[i] = coWeights[coWeights.dim()];
    coWeights.reDim(this->thesolver->dim());
@@ -1091,7 +1091,7 @@ void SPxSteepPR<R>::removedCoVec(int i)
 template <class R>
 void SPxSteepPR<R>::removedCoVecs(const int perm[])
 {
-   assert(this->thesolver != 0);
+   assert(this->thesolver != nullptr);
    VectorBase<R>& coWeights = this->thesolver->coWeights;
    int i;
    int j = coWeights.dim();
@@ -1112,7 +1112,8 @@ bool SPxSteepPR<R>::isConsistent() const
    VectorBase<R>& w = this->thesolver->weights;
    VectorBase<R>& coW = this->thesolver->coWeights;
 
-   if(this->thesolver != 0 && this->thesolver->type() == SPxSolverBase<R>::LEAVE && setup == EXACT)
+   if(this->thesolver != nullptr && this->thesolver->type() == SPxSolverBase<R>::LEAVE
+         && setup == EXACT)
    {
       int i;
       SSVectorBase<R>  tmp(this->thesolver->dim(), this->thesolver->tolerances());
@@ -1130,7 +1131,7 @@ bool SPxSteepPR<R>::isConsistent() const
       }
    }
 
-   if(this->thesolver != 0 && this->thesolver->type() == SPxSolverBase<R>::ENTER)
+   if(this->thesolver != nullptr && this->thesolver->type() == SPxSolverBase<R>::ENTER)
    {
       int i;
 

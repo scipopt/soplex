@@ -88,7 +88,7 @@ void SLUFactor<R>::solveRight4update(SSVectorBase<R>& x, const SVectorBase<R>& b
    if(this->l.updateType == ETA)
    {
       m = this->vSolveRight4update(epsilon, x.altValues(), x.altIndexMem(),
-                                   ssvec.altValues(), ssvec.altIndexMem(), n, 0, 0, 0);
+                                   ssvec.altValues(), ssvec.altIndexMem(), n, nullptr, nullptr, nullptr);
       x.setSize(m);
       //x.forceSetup();
       x.unSetup();
@@ -144,7 +144,7 @@ void SLUFactor<R>::solve2right4update(
       n = ssvec.size();
       m = this->vSolveRight4update2(epsilon, x.altValues(), x.altIndexMem(),
                                     ssvec.get_ptr(), sidx, n, y.get_ptr(),
-                                    epsilon, rhs.altValues(), ridx, rsize, 0, 0, 0);
+                                    epsilon, rhs.altValues(), ridx, rsize, nullptr, nullptr, nullptr);
       x.setSize(m);
       //      x.forceSetup();
       x.unSetup();
@@ -203,7 +203,7 @@ void SLUFactor<R>::solve2right4update(
                                       ssvec.get_ptr(), sidx, n,
                                       epsilon, y.altValues(), y.altIndexMem(),
                                       rhs.altValues(), ridx, rsize,
-                                      0, 0, 0);
+                                      nullptr, nullptr, nullptr);
       x.setSize(n);
       //      x.forceSetup();
       x.unSetup();
@@ -274,7 +274,7 @@ void SLUFactor<R>::solve3right4update(
                                     x.altValues(), x.altIndexMem(), ssvec.get_ptr(), sidx, n,
                                     y.get_ptr(), epsilon, rhs.altValues(), ridx, rsize,
                                     y2.get_ptr(), epsilon, rhs2.altValues(), ridx2, rsize2,
-                                    0, 0, 0);
+                                    nullptr, nullptr, nullptr);
       x.setSize(m);
       //      x.forceSetup();
       x.unSetup();
@@ -341,7 +341,7 @@ void SLUFactor<R>::solve3right4update(
                                       rhs.altValues(), ridx, rsize,
                                       epsilon, y2.altValues(), y2.altIndexMem(),
                                       rhs2.altValues(), ridx2, rsize2,
-                                      0, 0, 0);
+                                      nullptr, nullptr, nullptr);
       x.setSize(n);
       //      x.forceSetup();
       x.unSetup();
@@ -736,7 +736,7 @@ typename SLUFactor<R>::Status SLUFactor<R>::change(
          changeEta(idx, eta);
       }
    }
-   else if(e != 0)                                    // ETA updates
+   else if(e != nullptr)                                    // ETA updates
    {
       this->l.updateType = ETA;
       this->updateNoClear(idx, e->values(), e->indexMem(), e->size());
@@ -1008,10 +1008,10 @@ void SLUFactor<R>::assign(const SLUFactor<R>& old)
 
    if(!this->l.rval.empty())
    {
-      assert(old.l.ridx  != 0);
-      assert(old.l.rbeg  != 0);
-      assert(old.l.rorig != 0);
-      assert(old.l.rperm != 0);
+      assert(old.l.ridx  != nullptr);
+      assert(old.l.rbeg  != nullptr);
+      assert(old.l.rorig != nullptr);
+      assert(old.l.rperm != nullptr);
 
       int memsize = this->l.start[this->l.firstUpdate];
 
@@ -1029,37 +1029,37 @@ void SLUFactor<R>::assign(const SLUFactor<R>& old)
    }
    else
    {
-      assert(old.l.ridx  == 0);
-      assert(old.l.rbeg  == 0);
-      assert(old.l.rorig == 0);
-      assert(old.l.rperm == 0);
+      assert(old.l.ridx  == nullptr);
+      assert(old.l.rbeg  == nullptr);
+      assert(old.l.rorig == nullptr);
+      assert(old.l.rperm == nullptr);
 
-      this->l.ridx  = 0;
-      this->l.rbeg  = 0;
-      this->l.rorig = 0;
-      this->l.rperm = 0;
+      this->l.ridx  = nullptr;
+      this->l.rbeg  = nullptr;
+      this->l.rorig = nullptr;
+      this->l.rperm = nullptr;
    }
 
-   assert(this->row.perm != 0);
-   assert(this->row.orig != 0);
-   assert(this->col.perm != 0);
-   assert(this->col.orig != 0);
+   assert(this->row.perm != nullptr);
+   assert(this->row.orig != nullptr);
+   assert(this->col.perm != nullptr);
+   assert(this->col.orig != nullptr);
 
-   assert(this->u.row.elem  != 0);
-   assert(this->u.row.idx   != 0);
-   assert(this->u.row.start != 0);
-   assert(this->u.row.len   != 0);
-   assert(this->u.row.max   != 0);
+   assert(this->u.row.elem  != nullptr);
+   assert(this->u.row.idx   != nullptr);
+   assert(this->u.row.start != nullptr);
+   assert(this->u.row.len   != nullptr);
+   assert(this->u.row.max   != nullptr);
 
-   assert(this->u.col.elem  != 0);
-   assert(this->u.col.idx   != 0);
-   assert(this->u.col.start != 0);
-   assert(this->u.col.len   != 0);
-   assert(this->u.col.max   != 0);
+   assert(this->u.col.elem  != nullptr);
+   assert(this->u.col.idx   != nullptr);
+   assert(this->u.col.start != nullptr);
+   assert(this->u.col.len   != nullptr);
+   assert(this->u.col.max   != nullptr);
 
-   assert(this->l.idx   != 0);
-   assert(this->l.start != 0);
-   assert(this->l.row   != 0);
+   assert(this->l.idx   != nullptr);
+   assert(this->l.start != nullptr);
+   assert(this->l.row   != nullptr);
 
 }
 
@@ -1107,27 +1107,27 @@ SLUFactor<R>::SLUFactor()
    , minThreshold(0.01)
    , timerType(Timer::USER_TIME)
 {
-   this->row.perm    = 0;
-   this->row.orig    = 0;
-   this->col.perm    = 0;
-   this->col.orig    = 0;
-   this->u.row.elem  = 0;
-   this->u.row.idx   = 0;
-   this->u.row.start = 0;
-   this->u.row.len   = 0;
-   this->u.row.max   = 0;
-   this->u.col.elem  = 0;
-   this->u.col.idx   = 0;
-   this->u.col.start = 0;
-   this->u.col.len   = 0;
-   this->u.col.max   = 0;
-   this->l.idx       = 0;
-   this->l.start     = 0;
-   this->l.row       = 0;
-   this->l.ridx      = 0;
-   this->l.rbeg      = 0;
-   this->l.rorig     = 0;
-   this->l.rperm     = 0;
+   this->row.perm    = nullptr;
+   this->row.orig    = nullptr;
+   this->col.perm    = nullptr;
+   this->col.orig    = nullptr;
+   this->u.row.elem  = nullptr;
+   this->u.row.idx   = nullptr;
+   this->u.row.start = nullptr;
+   this->u.row.len   = nullptr;
+   this->u.row.max   = nullptr;
+   this->u.col.elem  = nullptr;
+   this->u.col.idx   = nullptr;
+   this->u.col.start = nullptr;
+   this->u.col.len   = nullptr;
+   this->u.col.max   = nullptr;
+   this->l.idx       = nullptr;
+   this->l.start     = nullptr;
+   this->l.row       = nullptr;
+   this->l.ridx      = nullptr;
+   this->l.rbeg      = nullptr;
+   this->l.rorig     = nullptr;
+   this->l.rperm     = nullptr;
 
    this->nzCnt  = 0;
    this->thedim = 0;
@@ -1190,37 +1190,37 @@ SLUFactor<R>::SLUFactor()
       throw x;
    }
 
-   this->l.ridx  = 0;
-   this->l.rbeg  = 0;
-   this->l.rorig = 0;
-   this->l.rperm = 0;
+   this->l.ridx  = nullptr;
+   this->l.rbeg  = nullptr;
+   this->l.rorig = nullptr;
+   this->l.rperm = nullptr;
 
    SLUFactor<R>::clear(); // clear() is virtual
 
    this->factorCount = 0;
    this->hugeValues = 0;
    solveCount  = 0;
-   assert(this->row.perm != 0);
+   assert(this->row.perm != nullptr);
 
-   assert(this->row.orig != 0);
-   assert(this->col.perm != 0);
-   assert(this->col.orig != 0);
+   assert(this->row.orig != nullptr);
+   assert(this->col.perm != nullptr);
+   assert(this->col.orig != nullptr);
 
-   assert(this->u.row.elem  != 0);
-   assert(this->u.row.idx   != 0);
-   assert(this->u.row.start != 0);
-   assert(this->u.row.len   != 0);
-   assert(this->u.row.max   != 0);
+   assert(this->u.row.elem  != nullptr);
+   assert(this->u.row.idx   != nullptr);
+   assert(this->u.row.start != nullptr);
+   assert(this->u.row.len   != nullptr);
+   assert(this->u.row.max   != nullptr);
 
-   assert(this->u.col.elem  != 0);
-   assert(this->u.col.idx   != 0);
-   assert(this->u.col.start != 0);
-   assert(this->u.col.len   != 0);
-   assert(this->u.col.max   != 0);
+   assert(this->u.col.elem  != nullptr);
+   assert(this->u.col.idx   != nullptr);
+   assert(this->u.col.start != nullptr);
+   assert(this->u.col.len   != nullptr);
+   assert(this->u.col.max   != nullptr);
 
-   assert(this->l.idx   != 0);
-   assert(this->l.start != 0);
-   assert(this->l.row   != 0);
+   assert(this->l.idx   != nullptr);
+   assert(this->l.start != nullptr);
+   assert(this->l.row   != nullptr);
 
    assert(SLUFactor<R>::isConsistent());
 }
@@ -1235,28 +1235,28 @@ SLUFactor<R>::SLUFactor(const SLUFactor<R>& old)
    , forest(old.forest)
    , timerType(old.timerType)
 {
-   this->row.perm    = 0;
-   this->row.orig    = 0;
-   this->col.perm    = 0;
-   this->col.orig    = 0;
-   this->u.row.elem  = 0;
+   this->row.perm    = nullptr;
+   this->row.orig    = nullptr;
+   this->col.perm    = nullptr;
+   this->col.orig    = nullptr;
+   this->u.row.elem  = nullptr;
    this->u.row.val.clear();
-   this->u.row.idx   = 0;
-   this->u.row.start = 0;
-   this->u.row.len   = 0;
-   this->u.row.max   = 0;
-   this->u.col.elem  = 0;
-   this->u.col.idx   = 0;
-   this->u.col.start = 0;
-   this->u.col.len   = 0;
-   this->u.col.max   = 0;
-   this->l.idx       = 0;
-   this->l.start     = 0;
-   this->l.row       = 0;
-   this->l.ridx      = 0;
-   this->l.rbeg      = 0;
-   this->l.rorig     = 0;
-   this->l.rperm     = 0;
+   this->u.row.idx   = nullptr;
+   this->u.row.start = nullptr;
+   this->u.row.len   = nullptr;
+   this->u.row.max   = nullptr;
+   this->u.col.elem  = nullptr;
+   this->u.col.idx   = nullptr;
+   this->u.col.start = nullptr;
+   this->u.col.len   = nullptr;
+   this->u.col.max   = nullptr;
+   this->l.idx       = nullptr;
+   this->l.start     = nullptr;
+   this->l.row       = nullptr;
+   this->l.ridx      = nullptr;
+   this->l.rbeg      = nullptr;
+   this->l.rorig     = nullptr;
+   this->l.rperm     = nullptr;
 
    solveCount = 0;
 
@@ -1390,7 +1390,7 @@ template <class R>
 typename SLUFactor<R>::Status SLUFactor<R>::load(const SVectorBase<R>* matrix[], int dm)
 {
    assert(dm     >= 0);
-   assert(matrix != 0);
+   assert(matrix != nullptr);
 
    R lastStability = stability();
 

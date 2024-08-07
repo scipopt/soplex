@@ -85,7 +85,7 @@ protected:
       public:
       /// constructor
       IdxCompare()
-         : elements(0)
+         : elements(nullptr)
       {}
 
       const IdxElement*  elements;
@@ -132,7 +132,7 @@ public:
    /// unloads LP.
    virtual void clear()
    {
-      thesolver = 0;
+      thesolver = nullptr;
    }
 
    /// returns loaded SPxSolverBase object.
@@ -270,7 +270,7 @@ public:
    virtual bool isConsistent() const
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-      return thesolver != 0;
+      return thesolver != nullptr;
 #else
       return true;
 #endif
@@ -283,7 +283,7 @@ public:
    /// constructor
    explicit SPxPricer(const char* p_name)
       : m_name(p_name)
-      , thesolver(0)
+      , thesolver(nullptr)
       , thetolerance(0.0)
    {}
 
@@ -311,8 +311,8 @@ public:
    /// destructor.
    virtual ~SPxPricer()
    {
-      m_name    = 0;
-      thesolver = 0;
+      m_name    = nullptr;
+      thesolver = nullptr;
    }
 
    /// clone function for polymorphism

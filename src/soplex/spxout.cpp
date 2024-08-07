@@ -31,7 +31,7 @@ namespace soplex
 /// constructor
 SPxOut::SPxOut()
    : m_verbosity(ERROR)
-   , m_streams(0)
+   , m_streams(nullptr)
 {
    spx_alloc(m_streams, INFO3 + 1);
    m_streams = new(m_streams) std::ostream*[INFO3 + 1];
@@ -63,7 +63,7 @@ SPxOut& SPxOut::operator=(const SPxOut& base)
 SPxOut::SPxOut(const SPxOut& rhs)
 {
    m_verbosity = rhs.m_verbosity;
-   m_streams = 0;
+   m_streams = nullptr;
    spx_alloc(m_streams, INFO3 + 1);
    m_streams = new(m_streams) std::ostream*[INFO3 + 1];
    m_streams[ ERROR ] = m_streams[ WARNING ] = rhs.m_streams[ERROR];
