@@ -168,7 +168,7 @@ GCCWARN		=	-pedantic -Wall -W -Wpointer-arith -Wcast-align -Wwrite-strings \
 #			-Weffc++
 
 ifeq ($(COMP),gnu)
-GCCWARN += -Wno-use-after-free
+GCCWARN += -Wno-use-after-free -Wno-stringop-overflow
 endif
 
 
