@@ -88,7 +88,7 @@ void SLUFactor<R>::solveRight4update(SSVectorBase<R>& x, const SVectorBase<R>& b
    if(this->l.updateType == ETA)
    {
       m = this->vSolveRight4update(epsilon, x.altValues(), x.altIndexMem(),
-         ssvec.altValues(), ssvec.altIndexMem(), n, nullptr, nullptr, nullptr);
+                                   ssvec.altValues(), ssvec.altIndexMem(), n, nullptr, nullptr, nullptr);
       x.setSize(m);
       //x.forceSetup();
       x.unSetup();

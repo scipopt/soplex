@@ -1228,7 +1228,8 @@ public:
    }
 
    /// Reads LP from a file.
-   virtual bool readFile(const char* filename, NameSet* rowNames = nullptr, NameSet* colNames = nullptr,
+   virtual bool readFile(const char* filename, NameSet* rowNames = nullptr,
+                         NameSet* colNames = nullptr,
                          DIdxSet* intVars = nullptr)
    {
 
@@ -2019,7 +2020,8 @@ public:
    ///       dualCols must have the identical size to the primal rows.
    virtual void buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[] = nullptr,
                                  SPxColId primalColIds[] = nullptr,
-                                 SPxRowId dualRowIds[] = nullptr, SPxColId dualColIds[] = nullptr, int* nprimalrows = nullptr, int* nprimalcols = nullptr,
+                                 SPxRowId dualRowIds[] = nullptr, SPxColId dualColIds[] = nullptr, int* nprimalrows = nullptr,
+                                 int* nprimalcols = nullptr,
                                  int* ndualrows = nullptr, int* ndualcols = nullptr);
 
    ///@}

@@ -909,16 +909,20 @@ public:
    /// writes rational LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
    /// colNames are \c nullptr, default names are used; if \p intVars is not \c nullptr, the variables contained in it are
    /// marked as integer; returns true on success
-   bool writeFile(const char* filename, const NameSet* rowNames = nullptr, const NameSet* colNames = nullptr,
-                  const DIdxSet* intvars = nullptr, const bool unscale = true, const bool writeZeroObjective = false) const;
+   bool writeFile(const char* filename, const NameSet* rowNames = nullptr,
+                  const NameSet* colNames = nullptr,
+                  const DIdxSet* intvars = nullptr, const bool unscale = true,
+                  const bool writeZeroObjective = false) const;
 
    bool writeFileRational(const char* filename, const NameSet* rowNames = nullptr,
                           const NameSet* colNames = nullptr, const DIdxSet* intvars = nullptr,
                           const bool writeZeroObjective = false) const;
 
    /* For SCIP compatibility */
-   bool writeFileReal(const char* filename, const NameSet* rowNames = nullptr, const NameSet* colNames = nullptr,
-                      const DIdxSet* intvars = nullptr, const bool unscale = true, const bool writeZeroObjective = false) const;
+   bool writeFileReal(const char* filename, const NameSet* rowNames = nullptr,
+                      const NameSet* colNames = nullptr,
+                      const DIdxSet* intvars = nullptr, const bool unscale = true,
+                      const bool writeZeroObjective = false) const;
 
    /// writes the dual of the real LP to file; LP or MPS format is chosen from the extension in \p filename;
    /// if \p rowNames and \p colNames are \c nullptr, default names are used; if \p intVars is not \c nullptr,
@@ -929,16 +933,19 @@ public:
 
    /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c nullptr,
    /// default names are assumed; returns true on success
-   bool readBasisFile(const char* filename, const NameSet* rowNames = nullptr, const NameSet* colNames = nullptr);
+   bool readBasisFile(const char* filename, const NameSet* rowNames = nullptr,
+                      const NameSet* colNames = nullptr);
 
    /// writes basis information to \p filename; if \p rowNames and \p colNames are \c nullptr, default names are used;
    /// returns true on success
-   bool writeBasisFile(const char* filename, const NameSet* rowNames = nullptr, const NameSet* colNames = nullptr,
+   bool writeBasisFile(const char* filename, const NameSet* rowNames = nullptr,
+                       const NameSet* colNames = nullptr,
                        const bool cpxFormat = false) const;
 
    /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c nullptr,
    /// default names are used
-   void writeStateReal(const char* filename, const NameSet* rowNames = nullptr, const NameSet* colNames = nullptr,
+   void writeStateReal(const char* filename, const NameSet* rowNames = nullptr,
+                       const NameSet* colNames = nullptr,
                        const bool cpxFormat = false, const bool writeZeroObjective = false) const;
 
    /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c nullptr,
@@ -2108,7 +2115,8 @@ private:
 
    /// reads rational LP in LP or MPS format from file and returns true on success; gets row names, column names, and
    /// integer variables if desired
-   bool _readFileRational(const char* filename, NameSet* rowNames = nullptr, NameSet* colNames = nullptr,
+   bool _readFileRational(const char* filename, NameSet* rowNames = nullptr,
+                          NameSet* colNames = nullptr,
                           DIdxSet* intVars = nullptr);
 
    /// completes range type arrays after adding columns and/or rows

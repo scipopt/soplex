@@ -1150,7 +1150,8 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
          return;
       }
 
-      if(((mps.field2() != nullptr) && (mps.field3() == nullptr)) || ((mps.field4() != nullptr) && (mps.field5() == nullptr)))
+      if(((mps.field2() != nullptr) && (mps.field3() == nullptr)) || ((mps.field4() != nullptr)
+            && (mps.field5() == nullptr)))
          mps.insertName("_RHS_");
 
       if((mps.field1() == nullptr) || (mps.field2() == nullptr) || (mps.field3() == nullptr))
@@ -1250,7 +1251,8 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
          return;
       }
 
-      if(((mps.field2() != nullptr) && (mps.field3() == nullptr)) || ((mps.field4() != nullptr) && (mps.field5() == nullptr)))
+      if(((mps.field2() != nullptr) && (mps.field3() == nullptr)) || ((mps.field4() != nullptr)
+            && (mps.field5() == nullptr)))
          mps.insertName("_RNG_");
 
       if((mps.field1() == nullptr) || (mps.field2() == nullptr) || (mps.field3() == nullptr))
@@ -1948,7 +1950,7 @@ static void LPFwriteGenerals(
    std::ostream&            p_output,     ///< output stream
    const NameSet*           p_cnames,     ///< column names
    const DIdxSet*           p_intvars     ///< integer variables
-   )
+)
 {
    char name[16];
 
@@ -2155,7 +2157,8 @@ void SPxLPBase<Rational>::writeMPS(
                            MPSgetRowName(*this, col.index(k), p_rnames, name1), col.value(k));
 
          if(maxObj(i) != 0 || writeZeroObjective)
-            MPSwriteRecord(p_output, nullptr, getColName(*this, i, p_cnames, name), spxout, "MINIMIZE", -maxObj(i));
+            MPSwriteRecord(p_output, nullptr, getColName(*this, i, p_cnames, name), spxout, "MINIMIZE",
+                           -maxObj(i));
       }
 
       if(is_intrun)

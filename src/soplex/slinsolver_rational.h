@@ -115,7 +115,8 @@ public:
        optional parameter \p eta to the solution of #solveRight() if
        readily  availabble. This may improve on the performance of the update.
    */
-   virtual Status change(int idx, const SVectorRational& subst, const SSVectorRational* eta = nullptr) = 0;
+   virtual Status change(int idx, const SVectorRational& subst,
+                         const SSVectorRational* eta = nullptr) = 0;
 
    /// consistency check.
    virtual bool isConsistent() const = 0;

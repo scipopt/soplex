@@ -1112,7 +1112,8 @@ bool SPxSteepPR<R>::isConsistent() const
    VectorBase<R>& w = this->thesolver->weights;
    VectorBase<R>& coW = this->thesolver->coWeights;
 
-   if(this->thesolver != nullptr && this->thesolver->type() == SPxSolverBase<R>::LEAVE && setup == EXACT)
+   if(this->thesolver != nullptr && this->thesolver->type() == SPxSolverBase<R>::LEAVE
+         && setup == EXACT)
    {
       int i;
       SSVectorBase<R>  tmp(this->thesolver->dim(), this->thesolver->tolerances());

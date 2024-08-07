@@ -1702,7 +1702,8 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<R>& rset, const NameSet& rnam
          return;
       }
 
-      if(((mps.field2() != nullptr) && (mps.field3() == nullptr)) || ((mps.field4() != nullptr) && (mps.field5() == nullptr)))
+      if(((mps.field2() != nullptr) && (mps.field3() == nullptr)) || ((mps.field4() != nullptr)
+            && (mps.field5() == nullptr)))
          mps.insertName("_RHS_");
 
       if((mps.field1() == nullptr) || (mps.field2() == nullptr) || (mps.field3() == nullptr))
@@ -1787,7 +1788,8 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<R>& rset, const NameSet& 
          return;
       }
 
-      if(((mps.field2() != nullptr) && (mps.field3() == nullptr)) || ((mps.field4() != nullptr) && (mps.field5() == nullptr)))
+      if(((mps.field2() != nullptr) && (mps.field3() == nullptr)) || ((mps.field4() != nullptr)
+            && (mps.field5() == nullptr)))
          mps.insertName("_RNG_");
 
       if((mps.field1() == nullptr) || (mps.field2() == nullptr) || (mps.field3() == nullptr))
@@ -2397,7 +2399,7 @@ static void LPFwriteGenerals(
    std::ostream&            p_output,     ///< output stream
    const NameSet*           p_cnames,     ///< column names
    const DIdxSet*           p_intvars     ///< integer variables
-   )
+)
 {
    char name[16];
 
@@ -2714,7 +2716,8 @@ void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[
                                     int* ndualcols)
 {
    // Setting up the primalrowids and dualcolids arrays if not given as parameters
-   if(primalRowIds == nullptr || primalColIds == nullptr || dualRowIds == nullptr || dualColIds == nullptr)
+   if(primalRowIds == nullptr || primalColIds == nullptr || dualRowIds == nullptr
+         || dualColIds == nullptr)
    {
       DataArray < SPxRowId > primalrowids(2 * nRows());
       DataArray < SPxColId > primalcolids(2 * nCols());

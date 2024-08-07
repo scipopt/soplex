@@ -340,7 +340,8 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    // compute first residual vector r0
    int dummy1 = 0;
    int dummy2 = 0;
-   resncols = collogs - tmpcols.assign2product4setup(facnrows, rowlogs, nullptr, nullptr, dummy1, dummy2);
+   resncols = collogs - tmpcols.assign2product4setup(facnrows, rowlogs, nullptr, nullptr, dummy1,
+              dummy2);
 
    resncols.setup();
    resnrows.setup();

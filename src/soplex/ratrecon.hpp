@@ -74,7 +74,8 @@ static int Reconstruct(VectorRational& resvec, Integer* xnum, Integer denom, int
    Integer p[3];
    Integer q[3];
 
-   for(int c = 0; (indexSet == nullptr && c < dim) || (indexSet != nullptr && c < indexSet->size()); c++)
+   for(int c = 0; (indexSet == nullptr && c < dim) || (indexSet != nullptr
+         && c < indexSet->size()); c++)
    {
       int j = (indexSet == nullptr ? c : indexSet->index(c));
 
