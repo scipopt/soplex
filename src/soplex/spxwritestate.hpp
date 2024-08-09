@@ -105,7 +105,7 @@ bool SPxSolverBase<R>::writeState(
    if(!ofs)
       return false;
 
-   this->writeMPS(ofs, rowNames, colNames, NULL, writeZeroObjective);
+   this->writeMPS(ofs, rowNames, colNames, nullptr, writeZeroObjective);
    ofs.close();
 
    // write basis

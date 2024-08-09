@@ -359,10 +359,10 @@ public:
    void add(const S* lhsValue, const S* rowValues, const int* rowIndices, int rowSize,
             const S* rhsValue, const S* objValue = 0)
    {
-      assert(lhsValue != 0);
-      assert(rowSize <= 0 || rowValues != 0);
-      assert(rowSize <= 0 || rowIndices != 0);
-      assert(rhsValue != 0);
+      assert(lhsValue != nullptr);
+      assert(rowSize <= 0 || rowValues != nullptr);
+      assert(rowSize <= 0 || rowIndices != nullptr);
+      assert(rhsValue != nullptr);
 
       DataKey k;
       add(k, lhsValue, rowValues, rowIndices, rowSize, rhsValue, objValue);
@@ -372,12 +372,12 @@ public:
    /// LPRowSetBase, with DataKey \p key.
    template < class S >
    void add(DataKey& newkey, const S* lhsValue, const S* rowValues, const int* rowIndices, int rowSize,
-            const S* rhsValue, const S* objValue = 0)
+            const S* rhsValue, const S* objValue = nullptr)
    {
-      assert(lhsValue != 0);
-      assert(rowSize <= 0 || rowValues != 0);
-      assert(rowSize <= 0 || rowIndices != 0);
-      assert(rhsValue != 0);
+      assert(lhsValue != nullptr);
+      assert(rowSize <= 0 || rowValues != nullptr);
+      assert(rowSize <= 0 || rowIndices != nullptr);
+      assert(rhsValue != nullptr);
 
       SVSetBase<R>::add(newkey, rowValues, rowIndices, rowSize);
 
@@ -391,7 +391,7 @@ public:
       left[num() - 1] = *lhsValue;
       right[num() - 1] = *rhsValue;
 
-      if(objValue != 0)
+      if(objValue != nullptr)
          object[num() - 1] = *objValue;
       else
          object[num() - 1] = 0;

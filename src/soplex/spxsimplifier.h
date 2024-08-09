@@ -105,7 +105,7 @@ public:
    /// constructor
    explicit SPxSimplifier(const char* p_name, Timer::TYPE ttype = Timer::USER_TIME)
       : m_name(p_name)
-      , m_timeUsed(0)
+      , m_timeUsed(nullptr)
       , m_timerType(ttype)
       , m_remRows(0)
       , m_remCols(0)
@@ -116,7 +116,7 @@ public:
       , m_keptLRhs(0)
       , m_objoffset(0.0)
       , m_minReduction(1e-4)
-      , spxout(0)
+      , spxout(nullptr)
    {
       assert(isConsistent());
 

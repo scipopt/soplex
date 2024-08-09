@@ -42,8 +42,8 @@ SOPLEX_THREADLOCAL const Real infinity                 = SOPLEX_DEFAULT_INFINITY
 
 bool msginconsistent(const char* name, const char* file, int line)
 {
-   assert(name != 0);
-   assert(file != 0);
+   assert(name != nullptr);
+   assert(file != nullptr);
    assert(line >= 0);
 
    SPX_MSG_ERROR(std::cerr << file << "(" << line << ") "

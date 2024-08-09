@@ -87,7 +87,7 @@ public:
    /// destructor.
    virtual ~SPxStarter()
    {
-      m_name = 0;
+      m_name = nullptr;
    }
    /// clone function for polymorphism
    virtual SPxStarter* clone()const = 0;

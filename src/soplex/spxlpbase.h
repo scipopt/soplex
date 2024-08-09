@@ -638,10 +638,10 @@ public:
    void addRow(const S* lhsValue, const S* rowValues, const int* rowIndices, int rowSize,
                const S* rhsValue)
    {
-      assert(lhsValue != 0);
-      assert(rowSize <= 0 || rowValues != 0);
-      assert(rowSize <= 0 || rowIndices != 0);
-      assert(rhsValue != 0);
+      assert(lhsValue != nullptr);
+      assert(rowSize <= 0 || rowValues != nullptr);
+      assert(rowSize <= 0 || rowIndices != nullptr);
+      assert(rhsValue != nullptr);
 
       int idx = nRows();
       int oldColNumber = nCols();
@@ -689,12 +689,12 @@ public:
    void addRows(const S* lhsValues, const S* rowValues, const int* rowIndices, const int* rowStarts,
                 const int* rowLengths, const int numRows, const int numValues, const S* rhsValues)
    {
-      assert(lhsValues != 0);
-      assert(numValues <= 0 || rowValues != 0);
-      assert(numValues <= 0 || rowIndices != 0);
-      assert(numValues <= 0 || rowStarts != 0);
-      assert(numValues <= 0 || rowLengths != 0);
-      assert(rhsValues != 0);
+      assert(lhsValues != nullptr);
+      assert(numValues <= 0 || rowValues != nullptr);
+      assert(numValues <= 0 || rowIndices != nullptr);
+      assert(numValues <= 0 || rowStarts != nullptr);
+      assert(numValues <= 0 || rowLengths != nullptr);
+      assert(rhsValues != nullptr);
 
       int i, j, k, idx;
       SVectorBase<R>* col;
@@ -709,7 +709,7 @@ public:
          assert(numValues <= 0 || rowStarts[i] + rowLengths[i] <= numValues);
 
          if(numValues <= 0)
-            LPRowSetBase<R>::add(&(lhsValues[i]), (S*)0, (int*)0, 0, &(rhsValues[i]));
+            LPRowSetBase<R>::add(&(lhsValues[i]), (S*)0, (int*)nullptr, 0, &(rhsValues[i]));
          else
             LPRowSetBase<R>::add(&(lhsValues[i]), &(rowValues[rowStarts[i]]), &(rowIndices[rowStarts[i]]),
                                  rowLengths[i], &(rhsValues[i]));
@@ -860,12 +860,12 @@ public:
                 const int* colStarts, const int* colLengths, const int numCols, const int numValues,
                 const S* upperValues)
    {
-      assert(lowerValues != 0);
-      assert(numValues <= 0 || colValues != 0);
-      assert(numValues <= 0 || colIndices != 0);
-      assert(numValues <= 0 || colStarts != 0);
-      assert(numValues <= 0 || colLengths != 0);
-      assert(upperValues != 0);
+      assert(lowerValues != nullptr);
+      assert(numValues <= 0 || colValues != nullptr);
+      assert(numValues <= 0 || colIndices != nullptr);
+      assert(numValues <= 0 || colStarts != nullptr);
+      assert(numValues <= 0 || colLengths != nullptr);
+      assert(upperValues != nullptr);
 
       int i, j, k, idx;
       SVectorBase<R>* row;
@@ -881,7 +881,7 @@ public:
          assert(numValues <= 0 || colStarts[i] + colLengths[i] <= numValues);
 
          if(numValues <= 0)
-            LPColSetBase<R>::add(&(objValue[i]), &(lowerValues[i]), (S*)0, (int*)0, 0, &(upperValues[i]));
+            LPColSetBase<R>::add(&(objValue[i]), &(lowerValues[i]), (S*)0, (int*)nullptr, 0, &(upperValues[i]));
          else
             LPColSetBase<R>::add(&(objValue[i]), &(lowerValues[i]), &(colValues[colStarts[i]]),
                                  &(colIndices[colStarts[i]]), colLengths[i], &(upperValues[i]));
@@ -994,10 +994,10 @@ public:
    }
 
    ///
-   virtual void removeRows(SPxRowId id[], int n, int perm[] = 0)
+   virtual void removeRows(SPxRowId id[], int n, int perm[] = nullptr)
    {
 
-      if(perm == 0)
+      if(perm == nullptr)
       {
          DataArray < int > p(nRows());
          removeRows(id, n, p.get_ptr());
@@ -1019,10 +1019,10 @@ public:
     *  permutations resulting from this removal: \p perm[i] < 0 indicates, that the element to index \p i has been
     *  removed.  Otherwise, \p perm[i] is the new index of the element with index \p i before the removal.
     */
-   virtual void removeRows(int nums[], int n, int perm[] = 0)
+   virtual void removeRows(int nums[], int n, int perm[] = nullptr)
    {
 
-      if(perm == 0)
+      if(perm == nullptr)
       {
          DataArray < int > p(nRows());
          removeRows(nums, n, p.get_ptr());
@@ -1039,10 +1039,10 @@ public:
    }
 
    /// Removes rows from \p start to \p end (including both).
-   virtual void removeRowRange(int start, int end, int perm[] = 0)
+   virtual void removeRowRange(int start, int end, int perm[] = nullptr)
    {
 
-      if(perm == 0)
+      if(perm == nullptr)
       {
          int i = end - start + 1;
          DataArray < int > p(i);
@@ -1094,10 +1094,10 @@ public:
    }
 
    ///
-   virtual void removeCols(SPxColId id[], int n, int perm[] = 0)
+   virtual void removeCols(SPxColId id[], int n, int perm[] = nullptr)
    {
 
-      if(perm == 0)
+      if(perm == nullptr)
       {
          DataArray < int > p(nCols());
          removeCols(id, n, p.get_ptr());
@@ -1119,10 +1119,10 @@ public:
     *  permutations resulting from this removal: \p perm[i] < 0 indicates, that the element to index \p i has been
     *  removed.  Otherwise, \p perm[i] is the new index of the element with index \p i before the removal.
     */
-   virtual void removeCols(int nums[], int n, int perm[] = 0)
+   virtual void removeCols(int nums[], int n, int perm[] = nullptr)
    {
 
-      if(perm == 0)
+      if(perm == nullptr)
       {
          DataArray < int > p(nCols());
          removeCols(nums, n, p.get_ptr());
@@ -1139,10 +1139,10 @@ public:
    }
 
    /// Removes columns from \p start to \p end (including both).
-   virtual void removeColRange(int start, int end, int perm[] = 0)
+   virtual void removeColRange(int start, int end, int perm[] = nullptr)
    {
 
-      if(perm == 0)
+      if(perm == nullptr)
       {
          int i = end - start + 1;
          DataArray < int > p(i);
@@ -1189,12 +1189,12 @@ public:
    ///@{
 
    /// Reads LP in LP format from input stream \p in.
-   virtual bool readLPF(std::istream& in, NameSet* rowNames = 0, NameSet* colNames = 0,
-                        DIdxSet* intVars = 0);
+   virtual bool readLPF(std::istream& in, NameSet* rowNames = nullptr, NameSet* colNames = nullptr,
+                        DIdxSet* intVars = nullptr);
 
    /// Reads an LP in MPS format from input stream \p in.
-   virtual bool readMPS(std::istream& in, NameSet* rowNames = 0, NameSet* colNames = 0,
-                        DIdxSet* intVars = 0);
+   virtual bool readMPS(std::istream& in, NameSet* rowNames = nullptr, NameSet* colNames = nullptr,
+                        DIdxSet* intVars = nullptr);
 
    /// Reads LP in LP or MPS format from input stream \p in.
    /**@param in       input stream.
@@ -1207,8 +1207,8 @@ public:
     *                 file.  Maybe 0 if the information is not needed.
     * @todo Make sure the Id's in the NameSet%s are the same as in the LP.
     */
-   virtual bool read(std::istream& in, NameSet* rowNames = 0, NameSet* colNames = 0,
-                     DIdxSet* intVars  = 0)
+   virtual bool read(std::istream& in, NameSet* rowNames = nullptr, NameSet* colNames = nullptr,
+                     DIdxSet* intVars  = nullptr)
    {
       bool ok;
       char c;
@@ -1228,8 +1228,9 @@ public:
    }
 
    /// Reads LP from a file.
-   virtual bool readFile(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0,
-                         DIdxSet* intVars = 0)
+   virtual bool readFile(const char* filename, NameSet* rowNames = nullptr,
+                         NameSet* colNames = nullptr,
+                         DIdxSet* intVars = nullptr)
    {
 
       spxifstream file(filename);
@@ -1245,17 +1246,17 @@ public:
     *  the output.
     */
    virtual void writeLPF(std::ostream& out, const NameSet* rowNames, const NameSet* colNames,
-                         const DIdxSet* p_intvars = 0,
+                         const DIdxSet* p_intvars = nullptr,
                          const bool writeZeroObjective = false) const;
 
    /// Writes a file in MPS format to \p out.
    virtual void writeMPS(std::ostream& out, const NameSet* rowNames, const NameSet* colNames,
-                         const DIdxSet* p_intvars = 0,
+                         const DIdxSet* p_intvars = nullptr,
                          const bool writeZeroObjective = false) const;
 
    /// Write loaded LP to \p filename.
-   virtual void writeFileLPBase(const char* filename, const NameSet* rowNames = 0,
-                                const NameSet* colNames = 0, const DIdxSet* p_intvars = 0,
+   virtual void writeFileLPBase(const char* filename, const NameSet* rowNames = nullptr,
+                                const NameSet* colNames = nullptr, const DIdxSet* p_intvars = nullptr,
                                 const bool writeZeroObjective = false) const
    {
 
@@ -2017,10 +2018,11 @@ public:
    /// Building the dual problem from a given LP
    /// @note primalRows must be as large as the number of unranged primal rows + 2 * the number of ranged primal rows.
    ///       dualCols must have the identical size to the primal rows.
-   virtual void buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[] = 0,
-                                 SPxColId primalColIds[] = 0,
-                                 SPxRowId dualRowIds[] = 0, SPxColId dualColIds[] = 0, int* nprimalrows = 0, int* nprimalcols = 0,
-                                 int* ndualrows = 0, int* ndualcols = 0);
+   virtual void buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[] = nullptr,
+                                 SPxColId primalColIds[] = nullptr,
+                                 SPxRowId dualRowIds[] = nullptr, SPxColId dualColIds[] = nullptr, int* nprimalrows = nullptr,
+                                 int* nprimalcols = nullptr,
+                                 int* ndualrows = nullptr, int* ndualcols = nullptr);
 
    ///@}
 

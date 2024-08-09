@@ -70,8 +70,8 @@ SPxScaler<R>::SPxScaler(
    bool        doBoth,
    SPxOut*     outstream)
    : m_name(name)
-   , m_activeColscaleExp(0)
-   , m_activeRowscaleExp(0)
+   , m_activeColscaleExp(nullptr)
+   , m_activeRowscaleExp(nullptr)
    , m_colFirst(colFirst)
    , m_doBoth(doBoth)
    , spxout(outstream)
@@ -92,7 +92,7 @@ SPxScaler<R>::SPxScaler(const SPxScaler<R>& old)
 template <class R>
 SPxScaler<R>::~SPxScaler()
 {
-   m_name = 0;
+   m_name = nullptr;
 }
 
 template <class R>

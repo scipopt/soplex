@@ -89,7 +89,7 @@ public:
    explicit
    IsElement(const T& old)
       : T(old)
-      , the_next(0)
+      , the_next(nullptr)
    {}
 
    /// copy constructor.
@@ -98,7 +98,7 @@ public:
    */
    IsElement(const IsElement<T>& old)
       : T(old)
-      , the_next(0)
+      , the_next(nullptr)
    {}
 };
 
@@ -248,8 +248,8 @@ public:
          {
             the_first = next(elem);
 
-            if(the_first == 0)
-               the_last = 0;
+            if(the_first == nullptr)
+               the_last = nullptr;
          }
          else
          {
@@ -273,7 +273,7 @@ public:
    */
    void remove(IsList<T>& list)
    {
-      if(the_first != 0 && list.the_first != 0)
+      if(the_first != nullptr && list.the_first != nullptr)
       {
          assert(find(list.first()));
          assert(find(list.last()));
@@ -281,7 +281,7 @@ public:
          if(the_first == list.the_first)
          {
             if(the_last == list.the_last)
-               the_first = the_last = 0;
+               the_first = the_last = nullptr;
             else
                the_first = list.the_last->next();
          }
@@ -315,7 +315,7 @@ public:
          }
       }
 
-      the_first = the_last = 0;
+      the_first = the_last = nullptr;
    }
    ///@}
 
@@ -345,7 +345,7 @@ public:
     */
    T* next(const T* elem) const
    {
-      return (elem == the_last) ? 0 : elem->next();
+      return (elem == the_last) ? nullptr : elem->next();
    }
 
    /// returns the number of elements in IsList.
@@ -371,9 +371,9 @@ public:
    {
       const T* test;
 
-      assert(elem != 0);
+      assert(elem != nullptr);
 
-      for(test = the_first; test != 0; test = next(test))
+      for(test = the_first; test != nullptr; test = next(test))
          if(test == elem)
             return 1;
 
@@ -386,7 +386,7 @@ public:
        members of the IsList or 0, in which case the first and last
        element are used, respectively.
     */
-   IsList<T>sublist(const T* start = 0, const T* end = 0) const
+   IsList<T>sublist(const T* start = nullptr, const T* end = nullptr) const
    {
       IsList<T>part = *this;
 
@@ -437,13 +437,13 @@ public:
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
-      if(first() != 0 && last() == 0)
+      if(first() != nullptr && last() == nullptr)
          return SPX_MSG_INCONSISTENT("IsList");
 
-      if(first() == 0 && last() != 0)
+      if(first() == nullptr && last() != nullptr)
          return SPX_MSG_INCONSISTENT("IsList");
 
-      if(first() && find(last()) == 0)
+      if(first() && find(last()) == nullptr)
          return SPX_MSG_INCONSISTENT("IsList");
 
 #endif
@@ -461,14 +461,14 @@ public:
        successor of \p first.
    */
    explicit
-   IsList(T* pfirst = 0, T* plast = 0, bool pDestroyElements = false)
+   IsList(T* pfirst = nullptr, T* plast = nullptr, bool pDestroyElements = false)
       : the_first(pfirst)
       , the_last(plast)
       , destroyElements(pDestroyElements)
    {
       if(pfirst)
       {
-         assert(plast != 0);
+         assert(plast != nullptr);
          assert(find(plast));
       }
 

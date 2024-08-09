@@ -190,7 +190,7 @@ public:
    ///@{
    /// default constructor
    explicit SPxRatioTester(const char* name)
-      : thesolver(0)
+      : thesolver(nullptr)
       , m_name(name)
       , m_type(SPxSolverBase<R>::LEAVE)
       , delta(1e-6)

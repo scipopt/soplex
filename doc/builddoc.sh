@@ -1,13 +1,8 @@
-#!/bin/bash
+#!/bin/bash -e
 
 ### START SHELL TUTORIAL
 
-if [ $1 != "" ]
-then
-    DOXYFILE=$1
-else
-    DOXYFILE=soplex.dxy
-fi
+DOXYFILE=${1:-soplex.dxy}
 
 # build a fresh version of SoPlex
 make -j clean -C ../
@@ -17,14 +12,11 @@ make -j -C ../
 
 ../bin/soplex --saveset=parameters.set
 
-if [ "$HTML_FILE_EXTENSION" = "" ]
-then
-    HTML_FILE_EXTENSION=html
-fi
-
 cd inc
-python parser.py --linkext $HTML_FILE_EXTENSION  && php localfaq.php > faq.inc
-cd ../
+#parser.py now generated faq.inc as well
+#python3 parser.py --linkext $HTML_FILE_EXTENSION  && php localfaq.php > faq.inc
+./parser.py --linkext ${HTML_FILE_EXTENSION:=html}
+cd ..
 
 ### FINISHED FAQ GENERATION
 

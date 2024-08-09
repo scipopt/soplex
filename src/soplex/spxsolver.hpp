@@ -102,7 +102,7 @@ void SPxSolverBase<R>::setBasisSolver(SLinSolver<R>* slu, const bool destroy)
 {
    // we need to set the outstream before we load the solver to ensure that the basis
    // can be initialized with this pointer in loadSolver()
-   assert(spxout != 0);
+   assert(spxout != nullptr);
    slu->spxout = spxout;
    SPxBasisBase<R>::loadBasisSolver(slu, destroy);
 }
@@ -125,15 +125,15 @@ template <class R>
 void SPxSolverBase<R>::setPricer(SPxPricer<R>* x, const bool destroy)
 {
 
-   assert(!freePricer || thepricer != 0);
+   assert(!freePricer || thepricer != nullptr);
 
    if(freePricer)
    {
       delete thepricer;
-      thepricer = 0;
+      thepricer = nullptr;
    }
 
-   if(x != 0 && x != thepricer)
+   if(x != nullptr && x != thepricer)
    {
       setPricing(FULL);
 
@@ -157,18 +157,18 @@ void SPxSolverBase<R>::setPricer(SPxPricer<R>* x, const bool destroy)
 template <class R>
 void SPxSolverBase<R>::setTester(SPxRatioTester<R>* x, const bool destroy)
 {
-   assert(!freeRatioTester || theratiotester != 0);
+   assert(!freeRatioTester || theratiotester != nullptr);
 
    if(freeRatioTester)
    {
       delete theratiotester;
-      theratiotester = 0;
+      theratiotester = nullptr;
    }
 
    theratiotester = x;
 
    // set the solver pointer inside the ratiotester
-   if(theratiotester != 0)
+   if(theratiotester != nullptr)
    {
       if(isInitialized())
          theratiotester->load(this);
@@ -185,7 +185,7 @@ template <class R>
 void SPxSolverBase<R>::setStarter(SPxStarter<R>* x, const bool destroy)
 {
 
-   assert(!freeStarter || thestarter != 0);
+   assert(!freeStarter || thestarter != nullptr);
 
    if(freeStarter)
    {
@@ -355,8 +355,8 @@ void SPxSolverBase<R>::setType(Type tp)
    void SPxSolverBase<R>::init()
    {
 
-      assert(thepricer      != 0);
-      assert(theratiotester != 0);
+      assert(thepricer      != nullptr);
+      assert(theratiotester != nullptr);
 
       if(!initialized)
       {
@@ -554,7 +554,7 @@ void SPxSolverBase<R>::setType(Type tp)
       setBasisStatus(SPxBasisBase<R>::NO_PROBLEM);
 
       // clear the basis only when theLP is present, because LP data (nrows, ncols) is used in reDim()
-      if(this->theLP != 0)
+      if(this->theLP != nullptr)
          SPxBasisBase<R>::reDim();
 
       infeasibilities.clear();
@@ -586,10 +586,10 @@ void SPxSolverBase<R>::setType(Type tp)
       theFvec->clearUpdate();
       thePvec->clearUpdate();
       theCoPvec->clearUpdate();
-      solveVector2 = 0;
-      solveVector3 = 0;
-      coSolveVector2 = 0;
-      coSolveVector3 = 0;
+      solveVector2 = nullptr;
+      solveVector3 = nullptr;
+      coSolveVector2 = nullptr;
+      coSolveVector3 = nullptr;
    }
 
    /*
@@ -1097,10 +1097,10 @@ void SPxSolverBase<R>::setType(Type tp)
       , m_maxCycle(100)
       , m_numCycle(0)
       , initialized(false)
-      , solveVector2(0)
-      , solveVector3(0)
-      , coSolveVector2(0)
-      , coSolveVector3(0)
+      , solveVector2(nullptr)
+      , solveVector3(nullptr)
+      , coSolveVector2(nullptr)
+      , coSolveVector3(nullptr)
       , freePricer(false)
       , freeRatioTester(false)
       , freeStarter(false)
@@ -1113,9 +1113,9 @@ void SPxSolverBase<R>::setType(Type tp)
       , primVec(0)
       , dualVec(0)
       , addVec(0)
-      , thepricer(0)
-      , theratiotester(0)
-      , thestarter(0)
+      , thepricer(nullptr)
+      , theratiotester(nullptr)
+      , thestarter(nullptr)
       , boundrange(0.0)
       , siderange(0.0)
       , objrange(0.0)
@@ -1157,26 +1157,26 @@ void SPxSolverBase<R>::setType(Type tp)
    template <class R>
    SPxSolverBase<R>::~SPxSolverBase()
    {
-      assert(!freePricer || thepricer != 0);
-      assert(!freeRatioTester || theratiotester != 0);
-      assert(!freeStarter || thestarter != 0);
+      assert(!freePricer || thepricer != nullptr);
+      assert(!freeRatioTester || theratiotester != nullptr);
+      assert(!freeStarter || thestarter != nullptr);
 
       if(freePricer)
       {
          delete thepricer;
-         thepricer = 0;
+         thepricer = nullptr;
       }
 
       if(freeRatioTester)
       {
          delete theratiotester;
-         theratiotester = 0;
+         theratiotester = nullptr;
       }
 
       if(freeStarter)
       {
          delete thestarter;
-         thestarter = 0;
+         thestarter = nullptr;
       }
 
       // free the timers
@@ -1331,20 +1331,20 @@ void SPxSolverBase<R>::setType(Type tp)
 
          SPxBasisBase<R>::theLP = this;
 
-         assert(!freePricer || thepricer != 0);
-         assert(!freeRatioTester || theratiotester != 0);
-         assert(!freeStarter || thestarter != 0);
+         assert(!freePricer || thepricer != nullptr);
+         assert(!freeRatioTester || theratiotester != nullptr);
+         assert(!freeStarter || thestarter != nullptr);
 
          // thepricer
          if(freePricer)
          {
             delete thepricer;
-            thepricer = 0;
+            thepricer = nullptr;
          }
 
-         if(base.thepricer == 0)
+         if(base.thepricer == nullptr)
          {
-            thepricer = 0;
+            thepricer = nullptr;
             freePricer = false;
          }
          else
@@ -1358,12 +1358,12 @@ void SPxSolverBase<R>::setType(Type tp)
          if(freeRatioTester)
          {
             delete theratiotester;
-            theratiotester = 0;
+            theratiotester = nullptr;
          }
 
-         if(base.theratiotester == 0)
+         if(base.theratiotester == nullptr)
          {
-            theratiotester = 0;
+            theratiotester = nullptr;
             freeRatioTester = false;
          }
          else
@@ -1378,12 +1378,12 @@ void SPxSolverBase<R>::setType(Type tp)
          if(freeStarter)
          {
             delete thestarter;
-            thestarter = 0;
+            thestarter = nullptr;
          }
 
-         if(base.thestarter == 0)
+         if(base.thestarter == nullptr)
          {
-            thestarter = 0;
+            thestarter = nullptr;
             freeStarter = false;
          }
          else
@@ -1430,13 +1430,13 @@ void SPxSolverBase<R>::setType(Type tp)
       , m_maxCycle(base.m_maxCycle)
       , m_numCycle(base.m_numCycle)
       , initialized(base.initialized)
-      , solveVector2(0)
+      , solveVector2(nullptr)
       , solveVector2rhs(base.solveVector2rhs)
-      , solveVector3(0)
+      , solveVector3(nullptr)
       , solveVector3rhs(base.solveVector3rhs)
-      , coSolveVector2(0)
+      , coSolveVector2(nullptr)
       , coSolveVector2rhs(base.coSolveVector2rhs)
-      , coSolveVector3(0)
+      , coSolveVector3(nullptr)
       , coSolveVector3rhs(base.coSolveVector3rhs)
       , instableLeaveNum(base.instableLeaveNum)
       , instableLeave(base.instableLeave)
@@ -1545,9 +1545,9 @@ void SPxSolverBase<R>::setType(Type tp)
 
       SPxBasisBase<R>::theLP = this;
 
-      if(base.thepricer == 0)
+      if(base.thepricer == nullptr)
       {
-         thepricer = 0;
+         thepricer = nullptr;
          freePricer = false;
       }
       else
@@ -1558,9 +1558,9 @@ void SPxSolverBase<R>::setType(Type tp)
          thepricer->load(this);
       }
 
-      if(base.theratiotester == 0)
+      if(base.theratiotester == nullptr)
       {
-         theratiotester = 0;
+         theratiotester = nullptr;
          freeRatioTester = false;
       }
       else
@@ -1571,9 +1571,9 @@ void SPxSolverBase<R>::setType(Type tp)
          theratiotester->load(this);
       }
 
-      if(base.thestarter == 0)
+      if(base.thestarter == nullptr)
       {
-         thestarter = 0;
+         thestarter = nullptr;
          freeStarter = false;
       }
       else
@@ -2216,7 +2216,7 @@ void SPxSolverBase<R>::setType(Type tp)
    template <class R>
    void SPxSolverBase<R>::setIntegralityInformation(int ncols, int* intInfo)
    {
-      assert(ncols == this->nCols() || (ncols == 0 && intInfo == NULL));
+      assert(ncols == this->nCols() || (ncols == 0 && intInfo == nullptr));
 
       integerVariables.reSize(ncols);
 

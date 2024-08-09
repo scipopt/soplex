@@ -73,8 +73,8 @@ public:
       int    mkwtz;               ///< markowitz number of pivot
 
       Pring()                     ///< constructor
-         : next(0)
-         , prev(0)
+         : next(nullptr)
+         , prev(nullptr)
          , idx(0)
          , pos(0)
          , mkwtz(0)

@@ -328,7 +328,7 @@ public:
    DataArray(const DataArray& old)
       : thesize(old.thesize)
       , themax(old.themax)
-      , data(0)
+      , data(nullptr)
       , memFactor(old.memFactor)
    {
       spx_alloc(data, max());
@@ -351,7 +351,7 @@ public:
        @param p_fac  value for memFactor.
     */
    explicit DataArray(int p_size = 0, int p_max = 0, Real p_fac = 1.2)
-      : data(0)
+      : data(nullptr)
       , memFactor(p_fac)
    {
       thesize = (p_size < 0) ? 0 : p_size;

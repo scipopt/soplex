@@ -54,7 +54,7 @@ template <class R>
 typename SPxBasisBase<R>::Desc::Status
 SPxBasisBase<R>::dualRowStatus(int i) const
 {
-   assert(theLP != 0);
+   assert(theLP != nullptr);
 
    if(theLP->rhs(i) < R(infinity))
    {
@@ -78,7 +78,7 @@ template <class R>
 typename SPxBasisBase<R>::Desc::Status
 SPxBasisBase<R>::dualColStatus(int i) const
 {
-   assert(theLP != 0);
+   assert(theLP != nullptr);
 
    if(theLP->SPxLPBase<R>::upper(i) < R(infinity))
    {
@@ -101,7 +101,7 @@ SPxBasisBase<R>::dualColStatus(int i) const
 template <class R>
 void SPxBasisBase<R>::loadMatrixVecs()
 {
-   assert(theLP != 0);
+   assert(theLP != nullptr);
    assert(theLP->dim() == matrix.size());
 
    SPX_MSG_INFO3((*this->spxout),
@@ -120,7 +120,7 @@ void SPxBasisBase<R>::loadMatrixVecs()
    matrixIsSetup = true;
    factorized = false;
 
-   if(factor != 0)
+   if(factor != nullptr)
       factor->clear();
 }
 
@@ -129,7 +129,7 @@ bool SPxBasisBase<R>::isDescValid(const Desc& ds)
 {
 
    assert(status() > NO_PROBLEM);
-   assert(theLP != 0);
+   assert(theLP != nullptr);
 
    int basisdim;
 
@@ -219,7 +219,7 @@ template <class R>
 void SPxBasisBase<R>::loadDesc(const Desc& ds)
 {
    assert(status() > NO_PROBLEM);
-   assert(theLP != 0);
+   assert(theLP != nullptr);
    assert(ds.nRows() == theLP->nRows());
    assert(ds.nCols() == theLP->nCols());
 
@@ -338,14 +338,14 @@ void SPxBasisBase<R>::loadDesc(const Desc& ds)
 
    factorized = false;
 
-   if(factor != 0)
+   if(factor != nullptr)
       factor->clear();
 }
 
 template <class R>
 void SPxBasisBase<R>::setRep()
 {
-   assert(theLP != 0);
+   assert(theLP != nullptr);
 
    reDim();
    minStab = 0.0;
@@ -365,7 +365,7 @@ void SPxBasisBase<R>::setRep()
 template <class R>
 void SPxBasisBase<R>::load(SPxSolverBase<R>* lp, bool initSlackBasis)
 {
-   assert(lp != 0);
+   assert(lp != nullptr);
    theLP = lp;
 
    setOutstream(*theLP->spxout);
@@ -382,7 +382,7 @@ void SPxBasisBase<R>::load(SPxSolverBase<R>* lp, bool initSlackBasis)
 template <class R>
 void SPxBasisBase<R>::loadBasisSolver(SLinSolver<R>* p_solver, const bool destroy)
 {
-   assert(!freeSlinSolver || factor != 0);
+   assert(!freeSlinSolver || factor != nullptr);
 
    setOutstream(*p_solver->spxout);
 
@@ -393,7 +393,7 @@ void SPxBasisBase<R>::loadBasisSolver(SLinSolver<R>* p_solver, const bool destro
    if(freeSlinSolver)
    {
       delete factor;
-      factor = 0;
+      factor = nullptr;
    }
 
    factor = p_solver;
@@ -435,16 +435,16 @@ bool SPxBasisBase<R>::readBasis(
    const NameSet* rowNames,
    const NameSet* colNames)
 {
-   assert(theLP != 0);
+   assert(theLP != nullptr);
 
    /* prepare names */
    const NameSet* rNames = rowNames;
    const NameSet* cNames = colNames;
 
-   NameSet* p_colNames = 0;
-   NameSet* p_rowNames = 0;
+   NameSet* p_colNames = nullptr;
+   NameSet* p_rowNames = nullptr;
 
-   if(colNames == 0)
+   if(colNames == nullptr)
    {
       int nCols = theLP->nCols();
       std::stringstream name;
@@ -463,7 +463,7 @@ bool SPxBasisBase<R>::readBasis(
       cNames = p_colNames;
    }
 
-   if(rNames == 0)
+   if(rNames == nullptr)
    {
       int nRows = theLP->nRows();
       std::stringstream name;
@@ -507,27 +507,27 @@ bool SPxBasisBase<R>::readBasis(
 
    MPSInput mps(is);
 
-   if(mps.readLine() && (mps.field0() != 0) && !strcmp(mps.field0(), "NAME"))
+   if(mps.readLine() && (mps.field0() != nullptr) && !strcmp(mps.field0(), "NAME"))
    {
       while(mps.readLine())
       {
          int c = -1;
          int r = -1;
 
-         if((mps.field0() != 0) && !strcmp(mps.field0(), "ENDATA"))
+         if((mps.field0() != nullptr) && !strcmp(mps.field0(), "ENDATA"))
          {
             mps.setSection(MPSInput::ENDATA);
             break;
          }
 
-         if((mps.field1() == 0) || (mps.field2() == 0))
+         if((mps.field1() == nullptr) || (mps.field2() == nullptr))
             break;
 
          if((c = cNames->number(mps.field2())) < 0)
             break;
 
          if(*mps.field1() == 'X')
-            if(mps.field3() == 0 || (r = rNames->number(mps.field3())) < 0)
+            if(mps.field3() == nullptr || (r = rNames->number(mps.field3())) < 0)
                break;
 
          if(!strcmp(mps.field1(), "XU"))
@@ -581,13 +581,13 @@ bool SPxBasisBase<R>::readBasis(
          mps.syntaxError();
    }
 
-   if(rowNames == 0)
+   if(rowNames == nullptr)
    {
       p_rowNames->~NameSet();
       spx_free(p_rowNames);
    }
 
-   if(colNames == 0)
+   if(colNames == nullptr)
    {
       p_colNames->~NameSet();
       spx_free(p_colNames);
@@ -612,11 +612,11 @@ static const char* getRowName(
    const NameSet* rnames,
    char*          buf)
 {
-   assert(buf != 0);
+   assert(buf != nullptr);
    assert(idx >= 0);
    assert(idx < lp->nRows());
 
-   if(rnames != 0)
+   if(rnames != nullptr)
    {
       DataKey key = lp->rId(idx);
 
@@ -640,11 +640,11 @@ static const char* getColName(
    const NameSet* cnames,
    char*          buf)
 {
-   assert(buf != 0);
+   assert(buf != nullptr);
    assert(idx >= 0);
    assert(idx < lp->nCols());
 
-   if(cnames != 0)
+   if(cnames != nullptr)
    {
       DataKey key = lp->cId(idx);
 
@@ -669,7 +669,7 @@ void SPxBasisBase<R>::writeBasis(
    const bool cpxFormat
 ) const
 {
-   assert(theLP != 0);
+   assert(theLP != nullptr);
 
    os.setf(std::ios::left);
    os << "NAME  soplex.bas\n";
@@ -806,15 +806,15 @@ void SPxBasisBase<R>::change(
 {
 
    assert(matrixIsSetup);
-   assert(!id.isValid() || (enterVec != 0));
-   assert(factor != 0);
+   assert(!id.isValid() || (enterVec != nullptr));
+   assert(factor != nullptr);
 
    lastidx = i;
    lastin  = id;
 
    if(id.isValid() && i >= 0)
    {
-      assert(enterVec != 0);
+      assert(enterVec != nullptr);
 
       // update the counter for nonzeros in the basis matrix
       nzCount      = nzCount - matrix[i]->size() + enterVec->size();
@@ -955,7 +955,7 @@ template <class R>
 void SPxBasisBase<R>::factorize()
 {
 
-   assert(factor != 0);
+   assert(factor != nullptr);
 
    if(!matrixIsSetup)
       loadDesc(thedesc);
@@ -1221,7 +1221,7 @@ template <class R>
 void SPxBasisBase<R>::dump()
 {
    assert(status() > NO_PROBLEM);
-   assert(theLP != 0);
+   assert(theLP != nullptr);
    assert(thedesc.nRows() == theLP->nRows());
    assert(thedesc.nCols() == theLP->nCols());
    assert(theLP->dim() == matrix.size());
@@ -1274,7 +1274,7 @@ bool SPxBasisBase<R>::isConsistent() const
 
    if(status() > NO_PROBLEM)
    {
-      if(theLP == 0)
+      if(theLP == nullptr)
          return SPX_MSG_INCONSISTENT("SPxBasisBase<R>");
 
       if(theBaseId.size() != theLP->dim() || matrix.size() != theLP->dim())
@@ -1318,9 +1318,9 @@ bool SPxBasisBase<R>::isConsistent() const
 
 template <class R>
 SPxBasisBase<R>::SPxBasisBase(Timer::TYPE ttype)
-   : theLP(0)
+   : theLP(nullptr)
    , matrixIsSetup(false)
-   , factor(0)
+   , factor(nullptr)
    , factorized(false)
    , maxUpdates(200)
    , nonzeroFactor(10.0)
@@ -1335,13 +1335,13 @@ SPxBasisBase<R>::SPxBasisBase(Timer::TYPE ttype)
    , lastMem(0)
    , lastFill(0)
    , lastNzCount(0)
-   , theTime(0)
+   , theTime(nullptr)
    , timerType(ttype)
    , lastidx(0)
    , minStab(0.0)
    , thestatus(NO_PROBLEM)
    , freeSlinSolver(false)
-   , spxout(0)
+   , spxout(nullptr)
 {
    // info: is not consistent at this moment, e.g. because theLP == 0
 
@@ -1396,12 +1396,12 @@ template <class R>
 SPxBasisBase<R>::~SPxBasisBase()
 {
 
-   assert(!freeSlinSolver || factor != 0);
+   assert(!freeSlinSolver || factor != nullptr);
 
    if(freeSlinSolver)
    {
       delete factor;
-      factor = 0;
+      factor = nullptr;
    }
 
    theTime->~Timer();
@@ -1416,7 +1416,7 @@ template <class R>
 SPxBasisBase<R>& SPxBasisBase<R>::operator=(const SPxBasisBase<R>& rhs)
 {
 
-   assert(!freeSlinSolver || factor != 0);
+   assert(!freeSlinSolver || factor != nullptr);
 
    if(this != &rhs)
    {
@@ -1428,7 +1428,7 @@ SPxBasisBase<R>& SPxBasisBase<R>::operator=(const SPxBasisBase<R>& rhs)
       if(freeSlinSolver)
       {
          delete factor;
-         factor = 0;
+         factor = nullptr;
       }
 
       factor = rhs.factor->clone();

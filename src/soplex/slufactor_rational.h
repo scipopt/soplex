@@ -225,7 +225,7 @@ public:
    void solveLeft(SSVectorRational& x, VectorRational& y, VectorRational& z,
                   const SVectorRational& b, SSVectorRational& d, SSVectorRational& e);
    ///
-   Status change(int idx, const SVectorRational& subst, const SSVectorRational* eta = 0);
+   Status change(int idx, const SVectorRational& subst, const SSVectorRational* eta = nullptr);
    ///@}
 
    //--------------------------------
@@ -296,27 +296,27 @@ public:
       , minThreshold(0.01)
       , timerType(Timer::USER_TIME)
    {
-      row.perm    = 0;
-      row.orig    = 0;
-      col.perm    = 0;
-      col.orig    = 0;
-      u.row.elem  = 0;
-      u.row.idx   = 0;
-      u.row.start = 0;
-      u.row.len   = 0;
-      u.row.max   = 0;
-      u.col.elem  = 0;
-      u.col.idx   = 0;
-      u.col.start = 0;
-      u.col.len   = 0;
-      u.col.max   = 0;
-      l.idx       = 0;
-      l.start     = 0;
-      l.row       = 0;
-      l.ridx      = 0;
-      l.rbeg      = 0;
-      l.rorig     = 0;
-      l.rperm     = 0;
+      row.perm    = nullptr;
+      row.orig    = nullptr;
+      col.perm    = nullptr;
+      col.orig    = nullptr;
+      u.row.elem  = nullptr;
+      u.row.idx   = nullptr;
+      u.row.start = nullptr;
+      u.row.len   = nullptr;
+      u.row.max   = nullptr;
+      u.col.elem  = nullptr;
+      u.col.idx   = nullptr;
+      u.col.start = nullptr;
+      u.col.len   = nullptr;
+      u.col.max   = nullptr;
+      l.idx       = nullptr;
+      l.start     = nullptr;
+      l.row       = nullptr;
+      l.ridx      = nullptr;
+      l.rbeg      = nullptr;
+      l.rorig     = nullptr;
+      l.rperm     = nullptr;
 
       nzCnt  = 0;
       thedim = 0;
@@ -377,10 +377,10 @@ public:
       }
 
       l.rval.reDim(0);
-      l.ridx  = 0;
-      l.rbeg  = 0;
-      l.rorig = 0;
-      l.rperm = 0;
+      l.ridx  = nullptr;
+      l.rbeg  = nullptr;
+      l.rorig = nullptr;
+      l.rperm = nullptr;
 
       SLUFactorRational::init();
 
@@ -388,26 +388,26 @@ public:
       timeLimit = -1.0;
       solveCount  = 0;
 
-      assert(row.perm != 0);
-      assert(row.orig != 0);
-      assert(col.perm != 0);
-      assert(col.orig != 0);
+      assert(row.perm != nullptr);
+      assert(row.orig != nullptr);
+      assert(col.perm != nullptr);
+      assert(col.orig != nullptr);
 
-      assert(u.row.elem  != 0);
-      assert(u.row.idx   != 0);
-      assert(u.row.start != 0);
-      assert(u.row.len   != 0);
-      assert(u.row.max   != 0);
+      assert(u.row.elem  != nullptr);
+      assert(u.row.idx   != nullptr);
+      assert(u.row.start != nullptr);
+      assert(u.row.len   != nullptr);
+      assert(u.row.max   != nullptr);
 
-      assert(u.col.elem  != 0);
-      assert(u.col.idx   != 0);
-      assert(u.col.start != 0);
-      assert(u.col.len   != 0);
-      assert(u.col.max   != 0);
+      assert(u.col.elem  != nullptr);
+      assert(u.col.idx   != nullptr);
+      assert(u.col.start != nullptr);
+      assert(u.col.len   != nullptr);
+      assert(u.col.max   != nullptr);
 
-      assert(l.idx   != 0);
-      assert(l.start != 0);
-      assert(l.row   != 0);
+      assert(l.idx   != nullptr);
+      assert(l.start != nullptr);
+      assert(l.row   != nullptr);
 
       assert(SLUFactorRational::isConsistent());
    }
@@ -453,27 +453,27 @@ public:
       , forest(old.forest)
       , timerType(old.timerType)
    {
-      row.perm    = 0;
-      row.orig    = 0;
-      col.perm    = 0;
-      col.orig    = 0;
-      u.row.elem  = 0;
-      u.row.idx   = 0;
-      u.row.start = 0;
-      u.row.len   = 0;
-      u.row.max   = 0;
-      u.col.elem  = 0;
-      u.col.idx   = 0;
-      u.col.start = 0;
-      u.col.len   = 0;
-      u.col.max   = 0;
-      l.idx       = 0;
-      l.start     = 0;
-      l.row       = 0;
-      l.ridx      = 0;
-      l.rbeg      = 0;
-      l.rorig     = 0;
-      l.rperm     = 0;
+      row.perm    = nullptr;
+      row.orig    = nullptr;
+      col.perm    = nullptr;
+      col.orig    = nullptr;
+      u.row.elem  = nullptr;
+      u.row.idx   = nullptr;
+      u.row.start = nullptr;
+      u.row.len   = nullptr;
+      u.row.max   = nullptr;
+      u.col.elem  = nullptr;
+      u.col.idx   = nullptr;
+      u.col.start = nullptr;
+      u.col.len   = nullptr;
+      u.col.max   = nullptr;
+      l.idx       = nullptr;
+      l.start     = nullptr;
+      l.row       = nullptr;
+      l.ridx      = nullptr;
+      l.rbeg      = nullptr;
+      l.rorig     = nullptr;
+      l.rperm     = nullptr;
 
       solveCount = 0;
       solveTime = TimerFactory::createTimer(timerType);

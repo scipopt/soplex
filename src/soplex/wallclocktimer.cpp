@@ -48,9 +48,9 @@ void WallclockTimer::start()
       struct timeval tp; /*lint !e86*/
 #endif
 #if defined(_WIN32) || defined(_WIN64)
-      sec = -::time(NULL);
+      sec = -::time(nullptr);
 #else
-      gettimeofday(&tp, NULL);
+      gettimeofday(&tp, nullptr);
 
       if(tp.tv_usec > usec)   /*lint !e115 !e40*/
       {
@@ -82,9 +82,9 @@ Real WallclockTimer::stop()
 
 #if defined(_WIN32) || defined(_WIN64)
       // we need the blank specifier to distiguish this method from WallclockTimer::time
-      sec += ::time(NULL);
+      sec += ::time(nullptr);
 #else
-      gettimeofday(&tp, NULL);
+      gettimeofday(&tp, nullptr);
 
       if(tp.tv_usec + usec > 1000000)   /*lint !e115 !e40*/
       {
@@ -117,9 +117,9 @@ Real WallclockTimer::time() const
    {
 #if defined(_WIN32) || defined(_WIN64)
       // we need the blank specifier to distiguish this method from WallclockTimer::time
-      lasttime = wall2sec(sec + ::time(NULL), 0);
+      lasttime = wall2sec(sec + ::time(nullptr), 0);
 #else
-      gettimeofday(&tp, NULL);
+      gettimeofday(&tp, nullptr);
 
       // check whether the microseconds add up to more than a second
       if(tp.tv_usec + usec > 1000000)   /*lint !e115 !e40*/

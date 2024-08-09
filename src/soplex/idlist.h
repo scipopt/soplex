@@ -100,8 +100,8 @@ public:
    ///@{
    /// default constructor.
    IdElement()
-      : theprev(0)
-      , thenext(0)
+      : theprev(nullptr)
+      , thenext(nullptr)
    {}
 
    /// copy constructor.
@@ -110,8 +110,8 @@ public:
    */
    IdElement(const T& old)
       : T(old)
-      , theprev(0)
-      , thenext(0)
+      , theprev(nullptr)
+      , thenext(nullptr)
    {}
 };
 
@@ -148,16 +148,16 @@ public:
       return static_cast<T*>(this->the_last);
    }
 
-   /// returns successor of \p elem or 0, if \p elem is the last element.
+   /// returns successor of \p elem or nullptr, if \p elem is the last element.
    T* next(const T* elem) const
    {
-      return (elem == last()) ? 0 : elem->next();
+      return (elem == last()) ? nullptr : elem->next();
    }
 
-   /// returns predecessor of \p elem or 0, if \p elem is the first element.
+   /// returns predecessor of \p elem or nullptr, if \p elem is the first element.
    T* prev(const T* elem) const
    {
-      return (elem == first()) ? 0 : elem->prev();
+      return (elem == first()) ? nullptr : elem->prev();
    }
    ///@}
 
@@ -263,8 +263,8 @@ public:
       {
          this->the_first = next(elem);
 
-         if(first() == 0)
-            this->the_last = 0;
+         if(first() == nullptr)
+            this->the_last = nullptr;
       }
       else if(elem == last())
          this->the_last = elem->prev();
@@ -278,7 +278,7 @@ public:
    /// removes sublist \p list.
    void remove(IdList<T>& list)
    {
-      if(first() != 0 && list.first() != 0)
+      if(first() != nullptr && list.first() != nullptr)
       {
          assert(find(list.first()));
          assert(find(list.last()));
@@ -286,7 +286,7 @@ public:
          if(first() == list.first())
          {
             if(last() == list.last())
-               this->the_first = this->the_last = 0;
+               this->the_first = this->the_last = nullptr;
             else
                this->the_first = list.last()->next();
          }
@@ -362,7 +362,7 @@ public:
        successor of \p first.
     */
    explicit
-   IdList(T* pfirst = 0, T* plast = 0, bool pDestroyElements = false)
+   IdList(T* pfirst = nullptr, T* plast = nullptr, bool pDestroyElements = false)
       : IsList<T>(pfirst, plast, pDestroyElements)
    {
       assert(isConsistent());

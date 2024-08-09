@@ -1039,7 +1039,7 @@ bool SoPlexBase<R>::writeFileRational(const char* filename, const NameSet* rowNa
       return false;
    else
    {
-      assert(_rationalLP != 0);
+      assert(_rationalLP != nullptr);
       _rationalLP->writeFileLPBase(filename, rowNames, colNames, intVars, writeZeroObjective);
 
       ///@todo implement return value
@@ -1118,7 +1118,7 @@ int SoPlexBase<R>::numRows() const
 template <class R>
 int SoPlexBase<R>::numNonzeros() const
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
    return _realLP->nNzos();
 }
 
@@ -1560,7 +1560,7 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
       else
       {
          assert(intParam(SoPlexBase<R>::SYNCMODE) != SYNCMODE_ONLYREAL);
-         _rationalLP = 0;
+         _rationalLP = nullptr;
          spx_alloc(_rationalLP);
          _rationalLP = new(_rationalLP) SPxLPRational(*rhs._rationalLP);
          _rowTypes = rhs._rowTypes;
@@ -1597,7 +1597,7 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
 template <class R>
 R SoPlexBase<R>::minAbsNonzeroReal() const
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
    return _realLP->minAbsNzo();
 }
 
@@ -1606,7 +1606,7 @@ R SoPlexBase<R>::minAbsNonzeroReal() const
 template <class R>
 R SoPlexBase<R>::maxAbsNonzeroReal() const
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
    return _realLP->maxAbsNzo();
 }
 
@@ -1628,7 +1628,7 @@ R SoPlexBase<R>::coefReal(int row, int col) const
 template <class R>
 const SVectorBase<R>& SoPlexBase<R>::rowVectorRealInternal(int i) const
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
    return _realLP->rowVector(i);
 }
 
@@ -1653,7 +1653,7 @@ void SoPlexBase<R>::getRowVectorReal(int i, DSVectorBase<R>& row) const
 template <class R>
 const VectorBase<R>& SoPlexBase<R>::rhsRealInternal() const
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
    return _realLP->rhs();
 }
 
@@ -1673,7 +1673,7 @@ void SoPlexBase<R>::getRhsReal(VectorBase<R>& rhs) const
 template <class R>
 R SoPlexBase<R>::rhsReal(int i) const
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
    return _realLP->rhsUnscaled(i);
 }
 
@@ -1681,7 +1681,7 @@ R SoPlexBase<R>::rhsReal(int i) const
 template <class R>
 const VectorBase<R>& SoPlexBase<R>::lhsRealInternal() const
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
    return _realLP->lhs();
 }
 
@@ -1697,7 +1697,7 @@ void SoPlexBase<R>::getLhsReal(VectorBase<R>& lhs) const
 template <class R>
 R SoPlexBase<R>::lhsReal(int i) const
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
    return _realLP->lhsUnscaled(i);
 }
 
@@ -1706,7 +1706,7 @@ R SoPlexBase<R>::lhsReal(int i) const
 template <class R>
 typename LPRowBase<R>::Type SoPlexBase<R>::rowTypeReal(int i) const
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
    return _realLP->rowType(i);
 }
 
@@ -1714,7 +1714,7 @@ typename LPRowBase<R>::Type SoPlexBase<R>::rowTypeReal(int i) const
 template <class R>
 const SVectorBase<R>& SoPlexBase<R>::colVectorRealInternal(int i) const
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
    return _realLP->colVector(i);
 }
 
@@ -1731,7 +1731,7 @@ void SoPlexBase<R>::getColVectorReal(int i, DSVectorBase<R>& col) const
 template <class R>
 const VectorBase<R>& SoPlexBase<R>::upperRealInternal() const
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
    return _realLP->upper();
 }
 
@@ -1740,7 +1740,7 @@ const VectorBase<R>& SoPlexBase<R>::upperRealInternal() const
 template <class R>
 R SoPlexBase<R>::upperReal(int i) const
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
    return _realLP->upperUnscaled(i);
 }
 
@@ -1749,7 +1749,7 @@ R SoPlexBase<R>::upperReal(int i) const
 template <class R>
 void SoPlexBase<R>::getUpperReal(VectorBase<R>& upper) const
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
    _realLP->getUpperUnscaled(upper);
 }
 
@@ -1758,7 +1758,7 @@ void SoPlexBase<R>::getUpperReal(VectorBase<R>& upper) const
 template <class R>
 const VectorBase<R>& SoPlexBase<R>::lowerRealInternal() const
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
    return _realLP->lower();
 }
 
@@ -1768,7 +1768,7 @@ const VectorBase<R>& SoPlexBase<R>::lowerRealInternal() const
 template <class R>
 R SoPlexBase<R>::lowerReal(int i) const
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
    return _realLP->lowerUnscaled(i);
 }
 
@@ -1777,7 +1777,7 @@ R SoPlexBase<R>::lowerReal(int i) const
 template <class R>
 void SoPlexBase<R>::getLowerReal(VectorBase<R>& lower) const
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
    _realLP->getLowerUnscaled(lower);
 }
 
@@ -1786,7 +1786,7 @@ void SoPlexBase<R>::getLowerReal(VectorBase<R>& lower) const
 template <class R>
 void SoPlexBase<R>::getObjReal(VectorBase<R>& obj) const
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
    _realLP->getObjUnscaled(obj);
 }
 
@@ -1795,7 +1795,7 @@ void SoPlexBase<R>::getObjReal(VectorBase<R>& obj) const
 template <class R>
 R SoPlexBase<R>::objReal(int i) const
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
    return _realLP->objUnscaled(i);
 }
 
@@ -1805,7 +1805,7 @@ R SoPlexBase<R>::objReal(int i) const
 template <class R>
 const VectorBase<R>& SoPlexBase<R>::maxObjRealInternal() const
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
    return _realLP->maxObj();
 }
 
@@ -1815,7 +1815,7 @@ const VectorBase<R>& SoPlexBase<R>::maxObjRealInternal() const
 template <class R>
 R SoPlexBase<R>::maxObjReal(int i) const
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
    return _realLP->maxObjUnscaled(i);
 }
 
@@ -1848,7 +1848,7 @@ bool SoPlexBase<R>::setDualNorms(int nnormsRow, int nnormsCol, R* norms)
 template <class R>
 void SoPlexBase<R>::setIntegralityInformation(int ncols, int* intInfo)
 {
-   assert(ncols == _solver.nCols() || (ncols == 0 && intInfo == NULL));
+   assert(ncols == _solver.nCols() || (ncols == 0 && intInfo == nullptr));
    _solver.setIntegralityInformation(ncols, intInfo);
 }
 
@@ -1856,7 +1856,7 @@ void SoPlexBase<R>::setIntegralityInformation(int ncols, int* intInfo)
 template <class R>
 int SoPlexBase<R>::numRowsRational() const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    return _rationalLP->nRows();
 }
 
@@ -1864,7 +1864,7 @@ int SoPlexBase<R>::numRowsRational() const
 template <class R>
 int SoPlexBase<R>::numColsRational() const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    return _rationalLP->nCols();
 }
 
@@ -1872,7 +1872,7 @@ int SoPlexBase<R>::numColsRational() const
 template <class R>
 int SoPlexBase<R>::numNonzerosRational() const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    return _rationalLP->nNzos();
 }
 
@@ -1880,7 +1880,7 @@ int SoPlexBase<R>::numNonzerosRational() const
 template <class R>
 Rational SoPlexBase<R>::minAbsNonzeroRational() const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    return _rationalLP->minAbsNzo();
 }
 
@@ -1888,7 +1888,7 @@ Rational SoPlexBase<R>::minAbsNonzeroRational() const
 template <class R>
 Rational SoPlexBase<R>::maxAbsNonzeroRational() const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    return _rationalLP->maxAbsNzo();
 }
 
@@ -1896,7 +1896,7 @@ Rational SoPlexBase<R>::maxAbsNonzeroRational() const
 template <class R>
 void SoPlexBase<R>::getRowRational(int i, LPRowRational& lprow) const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    _rationalLP->getRow(i, lprow);
 }
 
@@ -1905,7 +1905,7 @@ void SoPlexBase<R>::getRowRational(int i, LPRowRational& lprow) const
 template <class R>
 void SoPlexBase<R>::getRowsRational(int start, int end, LPRowSetRational& lprowset) const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    _rationalLP->getRows(start, end, lprowset);
 }
 
@@ -1915,7 +1915,7 @@ void SoPlexBase<R>::getRowsRational(int start, int end, LPRowSetRational& lprows
 template <class R>
 const SVectorRational& SoPlexBase<R>::rowVectorRational(int i) const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    return _rationalLP->rowVector(i);
 }
 
@@ -1923,7 +1923,7 @@ const SVectorRational& SoPlexBase<R>::rowVectorRational(int i) const
 template <class R>
 const VectorRational& SoPlexBase<R>::rhsRational() const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    return _rationalLP->rhs();
 }
 
@@ -1933,7 +1933,7 @@ const VectorRational& SoPlexBase<R>::rhsRational() const
 template <class R>
 const Rational& SoPlexBase<R>::rhsRational(int i) const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    return _rationalLP->rhs(i);
 }
 
@@ -1942,7 +1942,7 @@ const Rational& SoPlexBase<R>::rhsRational(int i) const
 template <class R>
 const VectorRational& SoPlexBase<R>::lhsRational() const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    return _rationalLP->lhs();
 }
 
@@ -1952,7 +1952,7 @@ const VectorRational& SoPlexBase<R>::lhsRational() const
 template <class R>
 const Rational& SoPlexBase<R>::lhsRational(int i) const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    return _rationalLP->lhs(i);
 }
 
@@ -1962,7 +1962,7 @@ const Rational& SoPlexBase<R>::lhsRational(int i) const
 template <class R>
 LPRowRational::Type SoPlexBase<R>::rowTypeRational(int i) const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    return _rationalLP->rowType(i);
 }
 
@@ -1972,7 +1972,7 @@ LPRowRational::Type SoPlexBase<R>::rowTypeRational(int i) const
 template <class R>
 void SoPlexBase<R>::getColRational(int i, LPColRational& lpcol) const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    return _rationalLP->getCol(i, lpcol);
 }
 
@@ -1982,7 +1982,7 @@ void SoPlexBase<R>::getColRational(int i, LPColRational& lpcol) const
 template <class R>
 void SoPlexBase<R>::getColsRational(int start, int end, LPColSetRational& lpcolset) const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    return _rationalLP->getCols(start, end, lpcolset);
 }
 
@@ -1991,7 +1991,7 @@ void SoPlexBase<R>::getColsRational(int start, int end, LPColSetRational& lpcols
 template <class R>
 const SVectorRational& SoPlexBase<R>::colVectorRational(int i) const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    return _rationalLP->colVector(i);
 }
 
@@ -2001,7 +2001,7 @@ const SVectorRational& SoPlexBase<R>::colVectorRational(int i) const
 template <class R>
 const VectorRational& SoPlexBase<R>::upperRational() const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    return _rationalLP->upper();
 }
 
@@ -2011,7 +2011,7 @@ const VectorRational& SoPlexBase<R>::upperRational() const
 template <class R>
 const Rational& SoPlexBase<R>::upperRational(int i) const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    return _rationalLP->upper(i);
 }
 
@@ -2021,7 +2021,7 @@ const Rational& SoPlexBase<R>::upperRational(int i) const
 template <class R>
 const VectorRational& SoPlexBase<R>::lowerRational() const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    return _rationalLP->lower();
 }
 
@@ -2029,7 +2029,7 @@ const VectorRational& SoPlexBase<R>::lowerRational() const
 template <class R>
 const Rational& SoPlexBase<R>::lowerRational(int i) const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    return _rationalLP->lower(i);
 }
 
@@ -2039,7 +2039,7 @@ const Rational& SoPlexBase<R>::lowerRational(int i) const
 template <class R>
 void SoPlexBase<R>::getObjRational(VectorRational& obj) const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    _rationalLP->getObj(obj);
 }
 
@@ -2061,7 +2061,7 @@ void SoPlexBase<R>::getObjRational(int i, Rational& obj) const
 template <class R>
 Rational SoPlexBase<R>::objRational(int i) const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    return _rationalLP->obj(i);
 }
 
@@ -2072,7 +2072,7 @@ Rational SoPlexBase<R>::objRational(int i) const
 template <class R>
 const VectorRational& SoPlexBase<R>::maxObjRational() const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    return _rationalLP->maxObj();
 }
 
@@ -2083,7 +2083,7 @@ const VectorRational& SoPlexBase<R>::maxObjRational() const
 template <class R>
 const Rational& SoPlexBase<R>::maxObjRational(int i) const
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
    return _rationalLP->maxObj(i);
 }
 
@@ -2093,7 +2093,7 @@ const Rational& SoPlexBase<R>::maxObjRational(int i) const
 template <class R>
 void SoPlexBase<R>::addRowReal(const LPRowBase<R>& lprow)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _addRowReal(lprow);
 
@@ -2112,7 +2112,7 @@ void SoPlexBase<R>::addRowReal(const LPRowBase<R>& lprow)
 template <class R>
 void SoPlexBase<R>::addRowsReal(const LPRowSetBase<R>& lprowset)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _addRowsReal(lprowset);
 
@@ -2131,7 +2131,7 @@ void SoPlexBase<R>::addRowsReal(const LPRowSetBase<R>& lprowset)
 template <class R>
 void SoPlexBase<R>::addColReal(const LPColBase<R>& lpcol)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _addColReal(lpcol);
 
@@ -2150,7 +2150,7 @@ void SoPlexBase<R>::addColReal(const LPColBase<R>& lpcol)
 template <class R>
 void SoPlexBase<R>::addColsReal(const LPColSetBase<R>& lpcolset)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _addColsReal(lpcolset);
 
@@ -2169,7 +2169,7 @@ void SoPlexBase<R>::addColsReal(const LPColSetBase<R>& lpcolset)
 template <class R>
 void SoPlexBase<R>::changeRowReal(int i, const LPRowBase<R>& lprow)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _changeRowReal(i, lprow);
 
@@ -2188,7 +2188,7 @@ template <class R>
 void SoPlexBase<R>::addColRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues,
                                    const int* colIndices, const int colSize, const mpq_t* upper)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -2213,7 +2213,7 @@ void SoPlexBase<R>::addColsRational(const mpq_t* obj, const mpq_t* lower, const 
                                     const int* colIndices, const int* colStarts, const int* colLengths, const int numCols,
                                     const int numValues, const mpq_t* upper)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -2243,7 +2243,7 @@ void SoPlexBase<R>::addColsRational(const mpq_t* obj, const mpq_t* lower, const 
 template <class R>
 void SoPlexBase<R>::changeLhsReal(const VectorBase<R>& lhs)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _changeLhsReal(lhs);
 
@@ -2264,7 +2264,7 @@ void SoPlexBase<R>::changeLhsReal(const VectorBase<R>& lhs)
 template <class R>
 void SoPlexBase<R>::changeLhsReal(int i, const R& lhs)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _changeLhsReal(i, lhs);
 
@@ -2283,7 +2283,7 @@ void SoPlexBase<R>::changeLhsReal(int i, const R& lhs)
 template <class R>
 void SoPlexBase<R>::changeRhsReal(const VectorBase<R>& rhs)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _changeRhsReal(rhs);
 
@@ -2304,7 +2304,7 @@ void SoPlexBase<R>::changeRhsReal(const VectorBase<R>& rhs)
 template <class R>
 void SoPlexBase<R>::changeRhsReal(int i, const R& rhs)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _changeRhsReal(i, rhs);
 
@@ -2322,7 +2322,7 @@ void SoPlexBase<R>::changeRhsReal(int i, const R& rhs)
 template <class R>
 void SoPlexBase<R>::changeRangeReal(const VectorBase<R>& lhs, const VectorBase<R>& rhs)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _changeRangeReal(lhs, rhs);
 
@@ -2343,7 +2343,7 @@ void SoPlexBase<R>::changeRangeReal(const VectorBase<R>& lhs, const VectorBase<R
 template <class R>
 void SoPlexBase<R>::changeRangeReal(int i, const R& lhs, const R& rhs)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _changeRangeReal(i, lhs, rhs);
 
@@ -2362,7 +2362,7 @@ void SoPlexBase<R>::changeRangeReal(int i, const R& lhs, const R& rhs)
 template <class R>
 void SoPlexBase<R>::changeColReal(int i, const LPColReal& lpcol)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _changeColReal(i, lpcol);
 
@@ -2382,7 +2382,7 @@ void SoPlexBase<R>::changeColReal(int i, const LPColReal& lpcol)
 template <class R>
 void SoPlexBase<R>::changeLowerReal(const VectorBase<R>& lower)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _changeLowerReal(lower);
 
@@ -2404,7 +2404,7 @@ void SoPlexBase<R>::changeLowerReal(const VectorBase<R>& lower)
 template <class R>
 void SoPlexBase<R>::changeLowerReal(int i, const R& lower)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _changeLowerReal(i, lower);
 
@@ -2423,7 +2423,7 @@ void SoPlexBase<R>::changeLowerReal(int i, const R& lower)
 template <class R>
 void SoPlexBase<R>::changeUpperReal(const VectorBase<R>& upper)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _changeUpperReal(upper);
 
@@ -2444,7 +2444,7 @@ void SoPlexBase<R>::changeUpperReal(const VectorBase<R>& upper)
 template <class R>
 void SoPlexBase<R>::changeUpperReal(int i, const R& upper)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _changeUpperReal(i, upper);
 
@@ -2463,7 +2463,7 @@ void SoPlexBase<R>::changeUpperReal(int i, const R& upper)
 template <class R>
 void SoPlexBase<R>::changeBoundsReal(const VectorBase<R>& lower, const VectorBase<R>& upper)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _changeBoundsReal(lower, upper);
 
@@ -2484,7 +2484,7 @@ void SoPlexBase<R>::changeBoundsReal(const VectorBase<R>& lower, const VectorBas
 template <class R>
 void SoPlexBase<R>::changeBoundsReal(int i, const R& lower, const R& upper)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _changeBoundsReal(i, lower, upper);
 
@@ -2502,7 +2502,7 @@ void SoPlexBase<R>::changeBoundsReal(int i, const R& lower, const R& upper)
 template <class R>
 void SoPlexBase<R>::changeObjReal(const VectorBase<R>& obj)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->changeObj(obj, scale);
@@ -2519,7 +2519,7 @@ void SoPlexBase<R>::changeObjReal(const VectorBase<R>& obj)
 template <class R>
 void SoPlexBase<R>::changeObjReal(int i, const R& obj)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->changeObj(i, obj, scale);
@@ -2536,7 +2536,7 @@ void SoPlexBase<R>::changeObjReal(int i, const R& obj)
 template <class R>
 void SoPlexBase<R>::changeElementReal(int i, int j, const R& val)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _changeElementReal(i, j, val);
 
@@ -2552,7 +2552,7 @@ void SoPlexBase<R>::changeElementReal(int i, int j, const R& val)
 template <class R>
 void SoPlexBase<R>::removeRowReal(int i)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _removeRowReal(i);
 
@@ -2581,7 +2581,7 @@ void SoPlexBase<R>::removeRowReal(int i)
 template <class R>
 void SoPlexBase<R>::removeRowsReal(int perm[])
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    const int oldsize = numRows();
    _removeRowsReal(perm);
@@ -2614,7 +2614,7 @@ void SoPlexBase<R>::removeRowsReal(int perm[])
 template <class R>
 void SoPlexBase<R>::removeRowsReal(int idx[], int n, int perm[])
 {
-   if(perm == 0)
+   if(perm == nullptr)
    {
       DataArray< int > p(numRows());
       _idxToPerm(idx, n, p.get_ptr(), numRows());
@@ -2634,7 +2634,7 @@ void SoPlexBase<R>::removeRowsReal(int idx[], int n, int perm[])
 template <class R>
 void SoPlexBase<R>::removeRowRangeReal(int start, int end, int perm[])
 {
-   if(perm == 0)
+   if(perm == nullptr)
    {
       DataArray< int > p(numRows());
       _rangeToPerm(start, end, p.get_ptr(), numRows());
@@ -2653,7 +2653,7 @@ void SoPlexBase<R>::removeRowRangeReal(int start, int end, int perm[])
 template <class R>
 void SoPlexBase<R>::removeColReal(int i)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _removeColReal(i);
 
@@ -2682,7 +2682,7 @@ void SoPlexBase<R>::removeColReal(int i)
 template <class R>
 void SoPlexBase<R>::removeColsReal(int perm[])
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    const int oldsize = numCols();
    _removeColsReal(perm);
@@ -2715,7 +2715,7 @@ void SoPlexBase<R>::removeColsReal(int perm[])
 template <class R>
 void SoPlexBase<R>::removeColsReal(int idx[], int n, int perm[])
 {
-   if(perm == 0)
+   if(perm == nullptr)
    {
       DataArray< int > p(numCols());
       _idxToPerm(idx, n, p.get_ptr(), numCols());
@@ -2735,7 +2735,7 @@ void SoPlexBase<R>::removeColsReal(int idx[], int n, int perm[])
 template <class R>
 void SoPlexBase<R>::removeColRangeReal(int start, int end, int perm[])
 {
-   if(perm == 0)
+   if(perm == nullptr)
    {
       DataArray< int > p(numCols());
       _rangeToPerm(start, end, p.get_ptr(), numCols());
@@ -2754,7 +2754,7 @@ void SoPlexBase<R>::removeColRangeReal(int start, int end, int perm[])
 template <class R>
 void SoPlexBase<R>::clearLPReal()
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _realLP->clear();
    _hasBasis = false;
@@ -2788,7 +2788,7 @@ void SoPlexBase<R>::syncLPReal()
 template <class R>
 void SoPlexBase<R>::addRowRational(const LPRowRational& lprow)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -2810,7 +2810,7 @@ template <class R>
 void SoPlexBase<R>::addRowRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices,
                                    const int rowSize, const mpq_t* rhs)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -2834,7 +2834,7 @@ void SoPlexBase<R>::addRowsRational(const mpq_t* lhs, const mpq_t* rowValues, co
                                     const int* rowStarts, const int* rowLengths, const int numRows, const int numValues,
                                     const mpq_t* rhs)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -2862,7 +2862,7 @@ void SoPlexBase<R>::addRowsRational(const mpq_t* lhs, const mpq_t* rowValues, co
 template <class R>
 void SoPlexBase<R>::addRowsRational(const LPRowSetRational& lprowset)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -2881,7 +2881,7 @@ void SoPlexBase<R>::addRowsRational(const LPRowSetRational& lprowset)
 template <class R>
 void SoPlexBase<R>::addColRational(const LPColRational& lpcol)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -2903,7 +2903,7 @@ void SoPlexBase<R>::addColRational(const LPColRational& lpcol)
 template <class R>
 void SoPlexBase<R>::addColsRational(const LPColSetRational& lpcolset)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -2923,7 +2923,7 @@ void SoPlexBase<R>::addColsRational(const LPColSetRational& lpcolset)
 template <class R>
 void SoPlexBase<R>::changeRowRational(int i, const LPRowRational& lprow)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -2944,7 +2944,7 @@ void SoPlexBase<R>::changeRowRational(int i, const LPRowRational& lprow)
 template <class R>
 void SoPlexBase<R>::changeLhsRational(const VectorRational& lhs)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -2966,7 +2966,7 @@ void SoPlexBase<R>::changeLhsRational(const VectorRational& lhs)
 template <class R>
 void SoPlexBase<R>::changeLhsRational(int i, const Rational& lhs)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -2987,7 +2987,7 @@ void SoPlexBase<R>::changeLhsRational(int i, const Rational& lhs)
 template <class R>
 void SoPlexBase<R>::changeLhsRational(int i, const mpq_t* lhs)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3012,7 +3012,7 @@ void SoPlexBase<R>::changeLhsRational(int i, const mpq_t* lhs)
 template <class R>
 void SoPlexBase<R>::changeRhsRational(const VectorRational& rhs)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3035,7 +3035,7 @@ void SoPlexBase<R>::changeRhsRational(const VectorRational& rhs)
 template <class R>
 void SoPlexBase<R>::changeRhsRational(const mpq_t* rhs, int rhsSize)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3063,7 +3063,7 @@ void SoPlexBase<R>::changeRhsRational(const mpq_t* rhs, int rhsSize)
 template <class R>
 void SoPlexBase<R>::changeRhsRational(int i, const Rational& rhs)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3083,7 +3083,7 @@ void SoPlexBase<R>::changeRhsRational(int i, const Rational& rhs)
 template <class R>
 void SoPlexBase<R>::changeRangeRational(const VectorRational& lhs, const VectorRational& rhs)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3105,7 +3105,7 @@ void SoPlexBase<R>::changeRangeRational(const VectorRational& lhs, const VectorR
 template <class R>
 void SoPlexBase<R>::changeRangeRational(int i, const Rational& lhs, const Rational& rhs)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3126,7 +3126,7 @@ void SoPlexBase<R>::changeRangeRational(int i, const Rational& lhs, const Ration
 template <class R>
 void SoPlexBase<R>::changeRangeRational(int i, const mpq_t* lhs, const mpq_t* rhs)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3150,7 +3150,7 @@ void SoPlexBase<R>::changeRangeRational(int i, const mpq_t* lhs, const mpq_t* rh
 template <class R>
 void SoPlexBase<R>::changeColRational(int i, const LPColRational& lpcol)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3171,7 +3171,7 @@ void SoPlexBase<R>::changeColRational(int i, const LPColRational& lpcol)
 template <class R>
 void SoPlexBase<R>::changeLowerRational(const VectorRational& lower)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3193,7 +3193,7 @@ void SoPlexBase<R>::changeLowerRational(const VectorRational& lower)
 template <class R>
 void SoPlexBase<R>::changeLowerRational(int i, const Rational& lower)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3214,7 +3214,7 @@ void SoPlexBase<R>::changeLowerRational(int i, const Rational& lower)
 template <class R>
 void SoPlexBase<R>::changeLowerRational(int i, const mpq_t* lower)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3238,7 +3238,7 @@ void SoPlexBase<R>::changeLowerRational(int i, const mpq_t* lower)
 template <class R>
 void SoPlexBase<R>::changeUpperRational(const VectorRational& upper)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3261,7 +3261,7 @@ void SoPlexBase<R>::changeUpperRational(const VectorRational& upper)
 template <class R>
 void SoPlexBase<R>::changeUpperRational(int i, const Rational& upper)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3282,7 +3282,7 @@ void SoPlexBase<R>::changeUpperRational(int i, const Rational& upper)
 template <class R>
 void SoPlexBase<R>::changeUpperRational(int i, const mpq_t* upper)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3306,7 +3306,7 @@ void SoPlexBase<R>::changeUpperRational(int i, const mpq_t* upper)
 template <class R>
 void SoPlexBase<R>::changeBoundsRational(const VectorRational& lower, const VectorRational& upper)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3328,7 +3328,7 @@ void SoPlexBase<R>::changeBoundsRational(const VectorRational& lower, const Vect
 template <class R>
 void SoPlexBase<R>::changeBoundsRational(int i, const Rational& lower, const Rational& upper)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3349,7 +3349,7 @@ void SoPlexBase<R>::changeBoundsRational(int i, const Rational& lower, const Rat
 template <class R>
 void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t* upper)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3373,7 +3373,7 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
 template <class R>
 void SoPlexBase<R>::changeObjRational(const VectorRational& obj)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3392,7 +3392,7 @@ void SoPlexBase<R>::changeObjRational(const VectorRational& obj)
 template <class R>
 void SoPlexBase<R>::changeObjRational(int i, const Rational& obj)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3412,7 +3412,7 @@ void SoPlexBase<R>::changeObjRational(int i, const Rational& obj)
 template <class R>
 void SoPlexBase<R>::changeObjRational(int i, const mpq_t* obj)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3435,7 +3435,7 @@ void SoPlexBase<R>::changeObjRational(int i, const mpq_t* obj)
 template <class R>
 void SoPlexBase<R>::changeElementRational(int i, int j, const Rational& val)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3454,7 +3454,7 @@ void SoPlexBase<R>::changeElementRational(int i, int j, const Rational& val)
 template <class R>
 void SoPlexBase<R>::changeElementRational(int i, int j, const mpq_t* val)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3476,7 +3476,7 @@ void SoPlexBase<R>::changeElementRational(int i, int j, const mpq_t* val)
 template <class R>
 void SoPlexBase<R>::removeRowRational(int i)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3506,7 +3506,7 @@ void SoPlexBase<R>::removeRowRational(int i)
 template <class R>
 void SoPlexBase<R>::removeRowsRational(int perm[])
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3541,7 +3541,7 @@ void SoPlexBase<R>::removeRowsRational(int perm[])
 template <class R>
 void SoPlexBase<R>::removeRowsRational(int idx[], int n, int perm[])
 {
-   if(perm == 0)
+   if(perm == nullptr)
    {
       DataArray< int > p(numRowsRational());
       _idxToPerm(idx, n, p.get_ptr(), numRowsRational());
@@ -3561,7 +3561,7 @@ void SoPlexBase<R>::removeRowsRational(int idx[], int n, int perm[])
 template <class R>
 void SoPlexBase<R>::removeRowRangeRational(int start, int end, int perm[])
 {
-   if(perm == 0)
+   if(perm == nullptr)
    {
       DataArray< int > p(numRowsRational());
       _rangeToPerm(start, end, p.get_ptr(), numRowsRational());
@@ -3580,7 +3580,7 @@ void SoPlexBase<R>::removeRowRangeRational(int start, int end, int perm[])
 template <class R>
 void SoPlexBase<R>::removeColRational(int i)
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3610,7 +3610,7 @@ void SoPlexBase<R>::removeColRational(int i)
 template <class R>
 void SoPlexBase<R>::removeColsRational(int perm[])
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
@@ -3644,7 +3644,7 @@ void SoPlexBase<R>::removeColsRational(int perm[])
 template <class R>
 void SoPlexBase<R>::removeColsRational(int idx[], int n, int perm[])
 {
-   if(perm == 0)
+   if(perm == nullptr)
    {
       DataArray< int > p(numColsRational());
       _idxToPerm(idx, n, p.get_ptr(), numColsRational());
@@ -3664,7 +3664,7 @@ void SoPlexBase<R>::removeColsRational(int idx[], int n, int perm[])
 template <class R>
 void SoPlexBase<R>::removeColRangeRational(int start, int end, int perm[])
 {
-   if(perm == 0)
+   if(perm == nullptr)
    {
       DataArray< int > p(numColsRational());
       _rangeToPerm(start, end, p.get_ptr(), numColsRational());
@@ -3683,7 +3683,7 @@ void SoPlexBase<R>::removeColRangeRational(int start, int end, int perm[])
 template <class R>
 void SoPlexBase<R>::clearLPRational()
 {
-   assert(_rationalLP != 0);
+   assert(_rationalLP != nullptr);
 
    _rationalLP->clear();
    _rationalLUSolver.clear();
@@ -3855,7 +3855,7 @@ bool SoPlexBase<R>::getSlacksReal(R* p_vector, int dim)
 template <class R>
 bool SoPlexBase<R>::getPrimalRational(VectorBase<Rational>& vector)
 {
-   if(_rationalLP != 0 && hasSol() && vector.dim() >= numColsRational())
+   if(_rationalLP != nullptr && hasSol() && vector.dim() >= numColsRational())
    {
       _syncRationalSolution();
       _solRational.getPrimalSol(vector);
@@ -3870,7 +3870,7 @@ bool SoPlexBase<R>::getPrimalRational(VectorBase<Rational>& vector)
 template <class R>
 bool SoPlexBase<R>::getSlacksRational(VectorRational& vector)
 {
-   if(_rationalLP != 0 && hasSol() && vector.dim() >= numRowsRational())
+   if(_rationalLP != nullptr && hasSol() && vector.dim() >= numRowsRational())
    {
       _syncRationalSolution();
       _solRational.getSlacks(vector);
@@ -3883,7 +3883,7 @@ bool SoPlexBase<R>::getSlacksRational(VectorRational& vector)
 template <class R>
 bool SoPlexBase<R>::getPrimalRayRational(VectorBase<Rational>& vector)
 {
-   if(_rationalLP != 0 && hasPrimalRay() && vector.dim() >= numColsRational())
+   if(_rationalLP != nullptr && hasPrimalRay() && vector.dim() >= numColsRational())
    {
       _syncRationalSolution();
       _solRational.getPrimalRaySol(vector);
@@ -3899,7 +3899,7 @@ bool SoPlexBase<R>::getPrimalRayRational(VectorBase<Rational>& vector)
 template <class R>
 bool SoPlexBase<R>::getDualRational(VectorBase<Rational>& vector)
 {
-   if(_rationalLP != 0 && hasSol() && vector.dim() >= numRowsRational())
+   if(_rationalLP != nullptr && hasSol() && vector.dim() >= numRowsRational())
    {
       _syncRationalSolution();
       _solRational.getDualSol(vector);
@@ -3915,7 +3915,7 @@ bool SoPlexBase<R>::getDualRational(VectorBase<Rational>& vector)
 template <class R>
 bool SoPlexBase<R>::getRedCostRational(VectorRational& vector)
 {
-   if(_rationalLP != 0 && hasSol() && vector.dim() >= numColsRational())
+   if(_rationalLP != nullptr && hasSol() && vector.dim() >= numColsRational())
    {
       _syncRationalSolution();
       _solRational.getRedCostSol(vector);
@@ -3929,7 +3929,7 @@ bool SoPlexBase<R>::getRedCostRational(VectorRational& vector)
 template <class R>
 bool SoPlexBase<R>::getDualFarkasRational(VectorBase<Rational>& vector)
 {
-   if(_rationalLP != 0 && hasDualFarkas() && vector.dim() >= numRowsRational())
+   if(_rationalLP != nullptr && hasDualFarkas() && vector.dim() >= numRowsRational())
    {
       _syncRationalSolution();
       _solRational.getDualFarkasSol(vector);
@@ -4662,7 +4662,7 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
       }
 
       // copy sparse data to dense result vector based on coef array
-      if(ninds != 0 && inds != 0)
+      if(ninds != nullptr && inds != nullptr)
       {
          // during solving SoPlexBase may have destroyed the sparsity structure so we need to restore it
          x.setup();
@@ -4680,7 +4680,7 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
       {
          std::copy(x.vec().begin(), x.vec().end(), coef);
 
-         if(ninds != NULL)
+         if(ninds != nullptr)
             *ninds = -1;
       }
    }
@@ -4691,7 +4691,7 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
       // @todo should rhs be a reference?
       DSVectorBase<R> rhs(numCols());
       SSVectorBase<R>  y(numCols(), this->tolerances());
-      int* bind = 0;
+      int* bind = nullptr;
       int index;
 
       // get ordering of column basis matrix
@@ -4778,7 +4778,7 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
       }
 
       // @todo implement returning of sparsity information like in column wise case
-      if(ninds != NULL)
+      if(ninds != nullptr)
          *ninds = -1;
 
       // free memory
@@ -4859,7 +4859,7 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
       }
 
       // copy sparse data to dense result vector based on coef array
-      if(ninds != 0 && inds != 0)
+      if(ninds != nullptr && inds != nullptr)
       {
          // SoPlexBase may have destroyed the sparsity structure so we need to restore it
          x.setup();
@@ -4877,7 +4877,7 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
       {
          std::copy(x.vec().begin(), x.vec().end(), coef);
 
-         if(ninds != 0)
+         if(ninds != nullptr)
             *ninds = -1;
       }
    }
@@ -4886,7 +4886,7 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
       assert(_solver.rep() == SPxSolverBase<R>::ROW);
 
       // @todo should rhs be a reference?
-      int* bind = 0;
+      int* bind = nullptr;
       int index;
 
       // get indices of column basis matrix (not in correct order!)
@@ -5002,7 +5002,7 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
       }
 
       // @todo implement returning of sparsity information like in column wise case
-      if(ninds != NULL)
+      if(ninds != nullptr)
          *ninds = -1;
 
       // free memory
@@ -5088,7 +5088,7 @@ bool SoPlexBase<R>::getBasisInverseTimesVecReal(R* rhs, R* sol, bool unscale)
 
       DSVectorBase<R> rowrhs(numCols());
       SSVectorBase<R> y(numCols(), this->tolerances());
-      int* bind = 0;
+      int* bind = nullptr;
 
       bool adaptScaling = unscale && _realLP->isScaled();
       int scaleExp;
@@ -5254,7 +5254,7 @@ bool SoPlexBase<R>::multBasis(R* vec, bool unscale)
       // create VectorBase<R> from input values
       VectorBase<R> x(colbasisdim, vec);
 
-      int* bind = 0;
+      int* bind = nullptr;
       int index;
 
       // get ordering of column basis matrix
@@ -5377,7 +5377,7 @@ bool SoPlexBase<R>::multBasisTranspose(R* vec, bool unscale)
       // create VectorBase<R> from input values
       VectorBase<R> x(colbasisdim, vec);
 
-      int* bind = 0;
+      int* bind = nullptr;
       int index;
 
       // get ordering of column basis matrix
@@ -5938,7 +5938,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       _realLP->changeSense(value == SoPlexBase<R>::OBJSENSE_MAXIMIZE ? SPxLPBase<R>::MAXIMIZE :
                            SPxLPBase<R>::MINIMIZE);
 
-      if(_rationalLP != 0)
+      if(_rationalLP != nullptr)
          _rationalLP->changeSense(value == SoPlexBase<R>::OBJSENSE_MAXIMIZE ? SPxLPRational::MAXIMIZE :
                                   SPxLPRational::MINIMIZE);
 
@@ -6042,28 +6042,28 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       case SIMPLIFIER_INTERNAL:
       case SIMPLIFIER_AUTO:
          _simplifier = &_simplifierMainSM;
-         assert(_simplifier != 0);
+         assert(_simplifier != nullptr);
 #ifdef SOPLEX_WITH_MPFR
          _boostedSimplifier = &_boostedSimplifierMainSM;
-         assert(_boostedSimplifier != 0);
+         assert(_boostedSimplifier != nullptr);
 #endif
          break;
 
       case SIMPLIFIER_PAPILO:
 #ifdef SOPLEX_WITH_PAPILO
          _simplifier = &_simplifierPaPILO;
-         assert(_simplifier != 0);
+         assert(_simplifier != nullptr);
 #ifdef SOPLEX_WITH_MPFR
          _boostedSimplifier = &_boostedSimplifierPaPILO;
-         assert(_boostedSimplifier != 0);
+         assert(_boostedSimplifier != nullptr);
 #endif
          break;
 #else
          _simplifier = &_simplifierMainSM;
-         assert(_simplifier != 0);
+         assert(_simplifier != nullptr);
 #ifdef SOPLEX_WITH_MPFR
          _boostedSimplifier = &_boostedSimplifierMainSM;
-         assert(_boostedSimplifier != 0);
+         assert(_boostedSimplifier != nullptr);
 #endif
          return false;
 #endif
@@ -6236,7 +6236,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       switch(value)
       {
       case SYNCMODE_ONLYREAL:
-         if(_rationalLP != 0)
+         if(_rationalLP != nullptr)
          {
             _rationalLP->~SPxLPRational();
             spx_free(_rationalLP);
@@ -6252,7 +6252,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
 
       case SYNCMODE_MANUAL:
          _ensureRationalLP();
-         assert(_realLP != 0);
+         assert(_realLP != nullptr);
          _rationalLP->changeSense(_realLP->spxSense() == SPxLPBase<R>::MINIMIZE ? SPxLPRational::MINIMIZE :
                                   SPxLPRational::MAXIMIZE);
          break;
@@ -7291,9 +7291,9 @@ void SoPlexBase<R>::_ensureDSVectorRationalMemory(DSVectorRational& vec, const i
 template <class R>
 void SoPlexBase<R>::_idxToPerm(int* idx, int idxSize, int* perm, int permSize) const
 {
-   assert(idx != 0);
+   assert(idx != nullptr);
    assert(idxSize >= 0);
-   assert(perm != 0);
+   assert(perm != nullptr);
    assert(permSize >= 0);
 
    for(int i = 0; i < permSize; i++)
@@ -7313,7 +7313,7 @@ void SoPlexBase<R>::_idxToPerm(int* idx, int idxSize, int* perm, int permSize) c
 template <class R>
 void SoPlexBase<R>::_rangeToPerm(int start, int end, int* perm, int permSize) const
 {
-   assert(perm != 0);
+   assert(perm != nullptr);
    assert(permSize >= 0);
 
    for(int i = 0; i < permSize; i++)
@@ -7325,14 +7325,14 @@ void SoPlexBase<R>::_rangeToPerm(int start, int end, int* perm, int permSize) co
 template <class R>
 bool SoPlexBase<R>::_isBoostedConsistent() const
 {
-   assert(_statistics != 0);
-   assert(_currentSettings != 0);
+   assert(_statistics != nullptr);
+   assert(_currentSettings != nullptr);
 
-   assert(_rationalLP != 0 || intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL);
+   assert(_rationalLP != nullptr || intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL);
 
    ///@todo precision-boosting _realLP not used in _boostedSolver
 #ifdef SOPLEX_DISABLED_CODE
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    assert(_realLP != &_boostedSolver || _isRealLPLoaded);
    assert(_realLP == &_boostedSolver || !_isRealLPLoaded);
@@ -7350,8 +7350,8 @@ bool SoPlexBase<R>::_isBoostedConsistent() const
    assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED
           || _rationalLUSolver.dim() == numRowsRational());
 
-   assert(_rationalLP == 0 || _colTypes.size() == numColsRational());
-   assert(_rationalLP == 0 || _rowTypes.size() == numRowsRational());
+   assert(_rationalLP == nullptr || _colTypes.size() == numColsRational());
+   assert(_rationalLP == nullptr || _rowTypes.size() == numRowsRational());
 
    return true;
 }
@@ -7361,11 +7361,11 @@ bool SoPlexBase<R>::_isBoostedConsistent() const
 template <class R>
 bool SoPlexBase<R>::_isConsistent() const
 {
-   assert(_statistics != 0);
-   assert(_currentSettings != 0);
+   assert(_statistics != nullptr);
+   assert(_currentSettings != nullptr);
 
-   assert(_realLP != 0);
-   assert(_rationalLP != 0 || intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL);
+   assert(_realLP != nullptr);
+   assert(_rationalLP != nullptr || intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL);
 
    assert(_realLP != &_solver || _isRealLPLoaded);
    assert(_realLP == &_solver || !_isRealLPLoaded);
@@ -7378,8 +7378,8 @@ bool SoPlexBase<R>::_isConsistent() const
    assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED
           || _rationalLUSolver.dim() == numRowsRational());
 
-   assert(_rationalLP == 0 || _colTypes.size() == numColsRational());
-   assert(_rationalLP == 0 || _rowTypes.size() == numRowsRational());
+   assert(_rationalLP == nullptr || _colTypes.size() == numColsRational());
+   assert(_rationalLP == nullptr || _rowTypes.size() == numRowsRational());
 
    return true;
 }
@@ -7390,7 +7390,7 @@ bool SoPlexBase<R>::_isConsistent() const
 template <class R>
 bool SoPlexBase<R>::_isSolveStopped(bool& stoppedTime, bool& stoppedIter) const
 {
-   assert(_statistics != 0);
+   assert(_statistics != nullptr);
 
    stoppedTime = (realParam(TIMELIMIT) < realParam(INFTY)
                   && _statistics->solvingTime->time() >= realParam(TIMELIMIT));
@@ -7497,7 +7497,7 @@ bool SoPlexBase<R>::_upperFinite(const RangeType& rangeType) const
 template <class R>
 void SoPlexBase<R>::_addRowReal(const LPRowBase<R>& lprow)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->addRow(lprow, scale);
@@ -7516,7 +7516,7 @@ void SoPlexBase<R>::_addRowReal(const LPRowBase<R>& lprow)
 template <class R>
 void SoPlexBase<R>::_addRowReal(R lhs, const SVectorBase<R>& lprow, R rhs)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->addRow(lhs, lprow, rhs, scale);
@@ -7535,7 +7535,7 @@ void SoPlexBase<R>::_addRowReal(R lhs, const SVectorBase<R>& lprow, R rhs)
 template <class R>
 void SoPlexBase<R>::_addRowsReal(const LPRowSetBase<R>& lprowset)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->addRows(lprowset, scale);
@@ -7553,7 +7553,7 @@ void SoPlexBase<R>::_addRowsReal(const LPRowSetBase<R>& lprowset)
 template <class R>
 void SoPlexBase<R>::_addColReal(const LPColReal& lpcol)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->addCol(lpcol, scale);
@@ -7579,7 +7579,7 @@ void SoPlexBase<R>::_addColReal(const LPColReal& lpcol)
 template <class R>
 void SoPlexBase<R>::_addColReal(R obj, R lower, const SVectorBase<R>& lpcol, R upper)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->addCol(obj, lower, lpcol, upper, scale);
@@ -7597,7 +7597,7 @@ void SoPlexBase<R>::_addColReal(R obj, R lower, const SVectorBase<R>& lpcol, R u
 template <class R>
 void SoPlexBase<R>::_addColsReal(const LPColSetReal& lpcolset)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->addCols(lpcolset, scale);
@@ -7625,7 +7625,7 @@ void SoPlexBase<R>::_addColsReal(const LPColSetReal& lpcolset)
 template <class R>
 void SoPlexBase<R>::_changeRowReal(int i, const LPRowBase<R>& lprow)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->changeRow(i, lprow, scale);
@@ -7655,7 +7655,7 @@ void SoPlexBase<R>::_changeRowReal(int i, const LPRowBase<R>& lprow)
 template <class R>
 void SoPlexBase<R>::_changeLhsReal(const VectorBase<R>& lhs)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->changeLhs(lhs, scale);
@@ -7679,7 +7679,7 @@ void SoPlexBase<R>::_changeLhsReal(const VectorBase<R>& lhs)
 template <class R>
 void SoPlexBase<R>::_changeLhsReal(int i, const R& lhs)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->changeLhs(i, lhs, scale);
@@ -7702,7 +7702,7 @@ void SoPlexBase<R>::_changeLhsReal(int i, const R& lhs)
 template <class R>
 void SoPlexBase<R>::_changeRhsReal(const VectorBase<R>& rhs)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->changeRhs(rhs, scale);
@@ -7730,7 +7730,7 @@ void SoPlexBase<R>::_changeRhsReal(const VectorBase<R>& rhs)
 template <class R>
 void SoPlexBase<R>::_changeRhsReal(int i, const R& rhs)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->changeRhs(i, rhs, scale);
@@ -7753,7 +7753,7 @@ void SoPlexBase<R>::_changeRhsReal(int i, const R& rhs)
 template <class R>
 void SoPlexBase<R>::_changeRangeReal(const VectorBase<R>& lhs, const VectorBase<R>& rhs)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->changeRange(lhs, rhs, scale);
@@ -7785,7 +7785,7 @@ void SoPlexBase<R>::_changeRangeReal(const VectorBase<R>& lhs, const VectorBase<
 template <class R>
 void SoPlexBase<R>::_changeRangeReal(int i, const R& lhs, const R& rhs)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->changeRange(i, lhs, rhs, scale);
@@ -7813,7 +7813,7 @@ void SoPlexBase<R>::_changeRangeReal(int i, const R& lhs, const R& rhs)
 template <class R>
 void SoPlexBase<R>::_changeColReal(int i, const LPColReal& lpcol)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->changeCol(i, lpcol, scale);
@@ -7845,7 +7845,7 @@ void SoPlexBase<R>::_changeColReal(int i, const LPColReal& lpcol)
 template <class R>
 void SoPlexBase<R>::_changeLowerReal(const VectorBase<R>& lower)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->changeLower(lower, scale);
@@ -7874,7 +7874,7 @@ void SoPlexBase<R>::_changeLowerReal(const VectorBase<R>& lower)
 template <class R>
 void SoPlexBase<R>::_changeLowerReal(int i, const R& lower)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->changeLower(i, lower, scale);
@@ -7897,7 +7897,7 @@ void SoPlexBase<R>::_changeLowerReal(int i, const R& lower)
 template <class R>
 void SoPlexBase<R>::_changeUpperReal(const VectorBase<R>& upper)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->changeUpper(upper, scale);
@@ -7925,7 +7925,7 @@ void SoPlexBase<R>::_changeUpperReal(const VectorBase<R>& upper)
 template <class R>
 void SoPlexBase<R>::_changeUpperReal(int i, const R& upper)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->changeUpper(i, upper, scale);
@@ -7948,7 +7948,7 @@ void SoPlexBase<R>::_changeUpperReal(int i, const R& upper)
 template <class R>
 void SoPlexBase<R>::_changeBoundsReal(const VectorBase<R>& lower, const VectorBase<R>& upper)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->changeBounds(lower, upper, scale);
@@ -7981,7 +7981,7 @@ void SoPlexBase<R>::_changeBoundsReal(const VectorBase<R>& lower, const VectorBa
 template <class R>
 void SoPlexBase<R>::_changeBoundsReal(int i, const R& lower, const R& upper)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->changeBounds(i, lower, upper, scale);
@@ -8010,7 +8010,7 @@ void SoPlexBase<R>::_changeBoundsReal(int i, const R& lower, const R& upper)
 template <class R>
 void SoPlexBase<R>::_changeElementReal(int i, int j, const R& val)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    bool scale = _realLP->isScaled();
    _realLP->changeElement(i, j, val, scale);
@@ -8034,7 +8034,7 @@ void SoPlexBase<R>::_changeElementReal(int i, int j, const R& val)
 template <class R>
 void SoPlexBase<R>::_removeRowReal(int i)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _realLP->removeRow(i);
 
@@ -8064,7 +8064,7 @@ void SoPlexBase<R>::_removeRowReal(int i)
 template <class R>
 void SoPlexBase<R>::_removeRowsReal(int perm[])
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _realLP->removeRows(perm);
 
@@ -8100,7 +8100,7 @@ void SoPlexBase<R>::_removeRowsReal(int perm[])
 template <class R>
 void SoPlexBase<R>::_removeColReal(int i)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _realLP->removeCol(i);
 
@@ -8130,7 +8130,7 @@ void SoPlexBase<R>::_removeColReal(int i)
 template <class R>
 void SoPlexBase<R>::_removeColsReal(int perm[])
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    _realLP->removeCols(perm);
 
@@ -8186,7 +8186,7 @@ void SoPlexBase<R>::_enableSimplifierAndScaler()
    switch(intParam(SoPlexBase<R>::SIMPLIFIER))
    {
    case SIMPLIFIER_OFF:
-      _simplifier = 0;
+      _simplifier = nullptr;
 #ifdef SOPLEX_WITH_MPFR
       _boostedSimplifier = 0;
 #endif
@@ -8195,11 +8195,11 @@ void SoPlexBase<R>::_enableSimplifierAndScaler()
    case SIMPLIFIER_AUTO:
    case SIMPLIFIER_INTERNAL:
       _simplifier = &_simplifierMainSM;
-      assert(_simplifier != 0);
+      assert(_simplifier != nullptr);
       _simplifier->setMinReduction(realParam(MINRED));
 #ifdef SOPLEX_WITH_MPFR
       _boostedSimplifier = &_boostedSimplifierMainSM;
-      assert(_boostedSimplifier != 0);
+      assert(_boostedSimplifier != nullptr);
       _boostedSimplifier->setMinReduction(realParam(MINRED));
 #endif
       break;
@@ -8207,18 +8207,18 @@ void SoPlexBase<R>::_enableSimplifierAndScaler()
    case SIMPLIFIER_PAPILO:
 #ifdef SOPLEX_WITH_PAPILO
       _simplifier = &_simplifierPaPILO;
-      assert(_simplifier != 0);
+      assert(_simplifier != nullptr);
 #ifdef SOPLEX_WITH_MPFR
       _boostedSimplifier = &_boostedSimplifierPaPILO;
-      assert(_boostedSimplifier != 0);
+      assert(_boostedSimplifier != nullptr);
 #endif
 #else
       _simplifier = &_simplifierMainSM;
-      assert(_simplifier != 0);
+      assert(_simplifier != nullptr);
       _simplifier->setMinReduction(realParam(MINRED));
 #ifdef SOPLEX_WITH_MPFR
       _boostedSimplifier = &_boostedSimplifierMainSM;
-      assert(_boostedSimplifier != 0);
+      assert(_boostedSimplifier != nullptr);
       _boostedSimplifier->setMinReduction(realParam(MINRED));
 #endif // !SOPLEX_WITH_MPFR
 #endif // SOPLEX_WITH_PAPILO
@@ -8232,9 +8232,9 @@ void SoPlexBase<R>::_enableSimplifierAndScaler()
    switch(intParam(SoPlexBase<R>::SCALER))
    {
    case SCALER_OFF:
-      _scaler = 0;
+      _scaler = nullptr;
 #ifdef SOPLEX_WITH_MPFR
-      _boostedScaler = 0;
+      _boostedScaler = nullptr;
 #endif
       break;
 
@@ -8291,17 +8291,17 @@ void SoPlexBase<R>::_enableSimplifierAndScaler()
 template <class R>
 void SoPlexBase<R>::_disableSimplifierAndScaler()
 {
-   _simplifier = 0;
+   _simplifier = nullptr;
 #ifdef SOPLEX_WITH_MPFR
-   _boostedSimplifier = 0;
+   _boostedSimplifier = nullptr;
 #endif
 
    // preserve scaler when persistent scaling is used
    if(!_isRealLPScaled)
    {
-      _scaler = 0;
+      _scaler = nullptr;
 #ifdef SOPLEX_WITH_MPFR
-      _boostedScaler = 0;
+      _boostedScaler = nullptr;
 #endif
    }
    else
@@ -8314,7 +8314,7 @@ void SoPlexBase<R>::_disableSimplifierAndScaler()
 template <class R>
 void SoPlexBase<R>::_ensureRationalLP()
 {
-   if(_rationalLP == 0)
+   if(_rationalLP == nullptr)
    {
       spx_alloc(_rationalLP);
       _rationalLP = new(_rationalLP) SPxLPRational();
@@ -8622,7 +8622,7 @@ template <class R>
 bool SoPlexBase<R>::_readFileReal(const char* filename, NameSet* rowNames, NameSet* colNames,
                                   DIdxSet* intVars)
 {
-   assert(_realLP != 0);
+   assert(_realLP != nullptr);
 
    // clear statistics
    _statistics->clearAllData();
@@ -8840,19 +8840,19 @@ const UnitVectorRational* SoPlexBase<R>::_unitVectorRational(const int i)
    assert(i >= 0);
 
    if(i < 0)
-      return 0;
+      return nullptr;
    else if(i >= _unitMatrixRational.size())
-      _unitMatrixRational.append(i + 1 - _unitMatrixRational.size(), (UnitVectorRational*)0);
+      _unitMatrixRational.append(i + 1 - _unitMatrixRational.size(), (UnitVectorRational*)nullptr);
 
    assert(i < _unitMatrixRational.size());
 
-   if(_unitMatrixRational[i] == 0)
+   if(_unitMatrixRational[i] == nullptr)
    {
       spx_alloc(_unitMatrixRational[i]);
       new(_unitMatrixRational[i]) UnitVectorRational(i);
    }
 
-   assert(_unitMatrixRational[i] != 0);
+   assert(_unitMatrixRational[i] != nullptr);
 
    return _unitMatrixRational[i];
 }
@@ -8863,7 +8863,7 @@ const UnitVectorRational* SoPlexBase<R>::_unitVectorRational(const int i)
 template <class R>
 bool SoPlexBase<R>::_parseSettingsLine(char* line, const int lineNumber)
 {
-   assert(line != 0);
+   assert(line != nullptr);
 
    bool success = true;
 
@@ -9001,13 +9001,13 @@ bool SoPlexBase<R>::_parseSettingsLine(char* line, const int lineNumber)
                   || strncasecmp(paramValueString, "TRUE", 4) == 0
                   || strncasecmp(paramValueString, "t", 4) == 0
                   || strncasecmp(paramValueString, "T", 4) == 0
-                  || strtol(paramValueString, NULL, 4) == 1)
+                  || strtol(paramValueString, nullptr, 4) == 1)
                success = setBoolParam((SoPlexBase<R>::BoolParam)param, true);
             else if(strncasecmp(paramValueString, "false", 5) == 0
                     || strncasecmp(paramValueString, "FALSE", 5) == 0
                     || strncasecmp(paramValueString, "f", 5) == 0
                     || strncasecmp(paramValueString, "F", 5) == 0
-                    || strtol(paramValueString, NULL, 5) == 0)
+                    || strtol(paramValueString, nullptr, 5) == 0)
                success = setBoolParam((SoPlexBase<R>::BoolParam)param, false);
             else
                success = false;
@@ -9167,18 +9167,18 @@ bool SoPlexBase<R>::_parseSettingsLine(char* line, const int lineNumber)
 /// default constructor
 template <class R>
 SoPlexBase<R>::SoPlexBase()
-   : _statistics(0)
-   , _currentSettings(0)
+   : _statistics(nullptr)
+   , _currentSettings(nullptr)
    , _scalerUniequi(false)
    , _scalerBiequi(true)
    , _scalerGeo1(false, 1)
    , _scalerGeo8(false, 8)
    , _scalerGeoequi(true)
    , _scalerLeastsq()
-   , _simplifier(0)
+   , _simplifier(nullptr)
    , _scaler(nullptr)
-   , _starter(0)
-   , _rationalLP(0)
+   , _starter(nullptr)
+   , _rationalLP(nullptr)
    , _unitMatrixRational(0)
    , _status(SPxSolverBase<R>::UNKNOWN)
    , _hasBasis(false)
@@ -9293,7 +9293,7 @@ SoPlexBase<R>::SoPlexBase()
 template <class R>
 bool SoPlexBase<R>::loadSettingsFile(const char* filename)
 {
-   assert(filename != 0);
+   assert(filename != nullptr);
 
    // start timing
    _statistics->readingTime->start();
@@ -9348,11 +9348,11 @@ bool SoPlexBase<R>::loadSettingsFile(const char* filename)
 template <class R>
 bool SoPlexBase<R>::parseSettingsString(char* string)
 {
-   assert(string != 0);
+   assert(string != nullptr);
 
    bool success = true;
 
-   if(string == 0)
+   if(string == nullptr)
       return false;
 
    char parseString[SPX_SET_MAX_LINE_LEN];
@@ -9490,13 +9490,13 @@ bool SoPlexBase<R>::parseSettingsString(char* string)
                   || strncasecmp(paramValueString, "TRUE", 4) == 0
                   || strncasecmp(paramValueString, "t", 4) == 0
                   || strncasecmp(paramValueString, "T", 4) == 0
-                  || strtol(paramValueString, NULL, 4) == 1)
+                  || strtol(paramValueString, nullptr, 4) == 1)
                success = setBoolParam((SoPlexBase<R>::BoolParam)param, true);
             else if(strncasecmp(paramValueString, "false", 5) == 0
                     || strncasecmp(paramValueString, "FALSE", 5) == 0
                     || strncasecmp(paramValueString, "f", 5) == 0
                     || strncasecmp(paramValueString, "F", 5) == 0
-                    || strtol(paramValueString, NULL, 5) == 0)
+                    || strtol(paramValueString, nullptr, 5) == 0)
                success = setBoolParam((SoPlexBase<R>::BoolParam)param, false);
             else
                success = false;
@@ -9657,7 +9657,7 @@ template <class R>
 bool SoPlexBase<R>::saveSettingsFile(const char* filename, const bool onlyChanged,
                                      int solvemode) const
 {
-   assert(filename != 0);
+   assert(filename != nullptr);
 
    std::ofstream file(filename);
    SPxOut::setScientific(file, 16);
@@ -9828,8 +9828,8 @@ bool SoPlexBase<R>::readBasisFile(const char* filename, const NameSet* rowNames,
    clearBasis();
    /// @todo can't we just remove the else code?
 #if 1
-   assert(filename != 0);
-   assert(_realLP != 0);
+   assert(filename != nullptr);
+   assert(_realLP != nullptr);
 
    // start timing
    _statistics->readingTime->start();
@@ -9855,7 +9855,7 @@ bool SoPlexBase<R>::readBasisFile(const char* filename, const NameSet* rowNames,
    return _hasBasis;
 #else
    // this is alternative code for reading bases without the SPxSolverBase class
-   assert(filename != 0);
+   assert(filename != nullptr);
 
    // start timing
    _statistics->readingTime->start();
@@ -9935,14 +9935,14 @@ bool SoPlexBase<R>::readBasisFile(const char* filename, const NameSet* rowNames,
    // read basis
    MPSInput mps(file);
 
-   if(mps.readLine() && (mps.field0() != 0) && !strcmp(mps.field0(), "NAME"))
+   if(mps.readLine() && (mps.field0() != nullptr) && !strcmp(mps.field0(), "NAME"))
    {
       while(mps.readLine())
       {
          int c = -1;
          int r = -1;
 
-         if(mps.field0() != 0 && !strcmp(mps.field0(), "ENDATA"))
+         if(mps.field0() != nullptr && !strcmp(mps.field0(), "ENDATA"))
          {
             mps.setSection(MPSInput::ENDATA);
             break;
@@ -10153,7 +10153,7 @@ template <class R>
 bool SoPlexBase<R>::writeBasisFile(const char* filename, const NameSet* rowNames,
                                    const NameSet* colNames, const bool cpxFormat) const
 {
-   assert(filename != 0);
+   assert(filename != nullptr);
 
    if(_isRealLPLoaded)
       return _solver.writeBasisFile(filename, rowNames, colNames, cpxFormat);
@@ -10204,14 +10204,14 @@ bool SoPlexBase<R>::writeBasisFile(const char* filename, const NameSet* rowNames
 
             file << std::setw(8);
 
-            if(colNames != 0 && colNames->has(col))
+            if(colNames != nullptr && colNames->has(col))
                file << (*colNames)[col];
             else
                file << "x" << col;
 
             file << "       ";
 
-            if(rowNames != 0 && rowNames->has(row))
+            if(rowNames != nullptr && rowNames->has(row))
                file << (*rowNames)[row];
             else
                file << "C" << row;
@@ -10227,7 +10227,7 @@ bool SoPlexBase<R>::writeBasisFile(const char* filename, const NameSet* rowNames
 
                file << std::setw(8);
 
-               if(colNames != 0 && colNames->has(col))
+               if(colNames != nullptr && colNames->has(col))
                   file << (*colNames)[col];
                else
                   file << "x" << col;
@@ -10363,7 +10363,7 @@ void SoPlexBase<R>::printSolutionStatistics(std::ostream& os)
 template <class R>
 void SoPlexBase<R>::printSolvingStatistics(std::ostream& os)
 {
-   assert(_statistics != 0);
+   assert(_statistics != nullptr);
    _statistics->print(os);
 }
 

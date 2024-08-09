@@ -397,11 +397,11 @@ public:
 
    /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRows() may be passed
    /// as buffer memory
-   void removeRowsReal(int idx[], int n, int perm[] = 0);
+   void removeRowsReal(int idx[], int n, int perm[] = nullptr);
 
    /// removes rows \p start to \p end including both; an array \p perm of size #numRows() may be passed as buffer
    /// memory
-   void removeRowRangeReal(int start, int end, int perm[] = 0);
+   void removeRowRangeReal(int start, int end, int perm[] = nullptr);
 
    /// removes column i
    void removeColReal(int i);
@@ -413,11 +413,11 @@ public:
 
    /// remove all columns with indices in array \p idx of size \p n; an array \p perm of size #numColsReal() may be
    /// passed as buffer memory
-   void removeColsReal(int idx[], int n, int perm[] = 0);
+   void removeColsReal(int idx[], int n, int perm[] = nullptr);
 
    /// removes columns \p start to \p end including both; an array \p perm of size #numColsReal() may be passed as
    /// buffer memory
-   void removeColRangeReal(int start, int end, int perm[] = 0);
+   void removeColRangeReal(int start, int end, int perm[] = nullptr);
 
    /// clears the LP
    void clearLPReal();
@@ -566,11 +566,11 @@ public:
 
    /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsRational() may be
    /// passed as buffer memory
-   void removeRowsRational(int idx[], int n, int perm[] = 0);
+   void removeRowsRational(int idx[], int n, int perm[] = nullptr);
 
    /// removes rows \p start to \p end including both; an array \p perm of size #numRowsRational() may be passed as
    /// buffer memory
-   void removeRowRangeRational(int start, int end, int perm[] = 0);
+   void removeRowRangeRational(int start, int end, int perm[] = nullptr);
 
    /// removes column i
    void removeColRational(int i);
@@ -582,11 +582,11 @@ public:
 
    /// remove all columns with indices in array \p idx of size \p n; an array \p perm of size #numColsRational() may be
    /// passed as buffer memory
-   void removeColsRational(int idx[], int n, int perm[] = 0);
+   void removeColsRational(int idx[], int n, int perm[] = nullptr);
 
    /// removes columns \p start to \p end including both; an array \p perm of size #numColsRational() may be passed as
    /// buffer memory
-   void removeColRangeRational(int start, int end, int perm[] = 0);
+   void removeColRangeRational(int start, int end, int perm[] = nullptr);
 
    /// clears the LP
    void clearLPRational();
@@ -600,10 +600,10 @@ public:
    ///@{
 
    /// optimize the given LP
-   typename SPxSolverBase<R>::Status optimize(volatile bool* interrupt = NULL);
+   typename SPxSolverBase<R>::Status optimize(volatile bool* interrupt = nullptr);
 
    // old name for backwards compatibility
-   typename SPxSolverBase<R>::Status solve(volatile bool* interrupt = NULL)
+   typename SPxSolverBase<R>::Status solve(volatile bool* interrupt = nullptr)
    {
       return optimize(interrupt);
    }
@@ -794,19 +794,19 @@ public:
    /// computes row \p r of basis inverse; returns true on success
    /// @param r which row of the basis inverse is computed
    /// @param coef values of result vector (not packed but scattered)
-   /// @param inds indices of result vector (NULL if not to be used)
+   /// @param inds indices of result vector (nullptr if not to be used)
    /// @param ninds number of nonzeros in result vector
    /// @param unscale determines whether the result should be unscaled according to the original LP data
-   bool getBasisInverseRowReal(int r, R* coef, int* inds = NULL, int* ninds = NULL,
+   bool getBasisInverseRowReal(int r, R* coef, int* inds = nullptr, int* ninds = nullptr,
                                bool unscale = true);
 
    /// computes column \p c of basis inverse; returns true on success
    /// @param c which column of the basis inverse is computed
    /// @param coef values of result vector (not packed but scattered)
-   /// @param inds indices of result vector (NULL if not to be used)
+   /// @param inds indices of result vector (nullptr if not to be used)
    /// @param ninds number of nonzeros in result vector
    /// @param unscale determines whether the result should be unscaled according to the original LP data
-   bool getBasisInverseColReal(int c, R* coef, int* inds = NULL, int* ninds = NULL,
+   bool getBasisInverseColReal(int c, R* coef, int* inds = nullptr, int* ninds = nullptr,
                                bool unscale = true);
 
    /// computes dense solution of basis matrix B * \p sol = \p rhs; returns true on success
@@ -897,54 +897,61 @@ public:
 
    /// reads LP file in LP or MPS format according to READMODE parameter; gets row names, column names, and
    /// integer variables if desired; returns true on success
-   bool readFile(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0,
-                 DIdxSet* intVars = 0);
+   bool readFile(const char* filename, NameSet* rowNames = nullptr, NameSet* colNames = nullptr,
+                 DIdxSet* intVars = nullptr);
 
    /// Templated write function
    /// Real
    /// writes real LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
-   /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
+   /// colNames are \c nullptr, default names are used; if \p intVars is not \c nullptr, the variables contained in it are
    /// marked as integer; returns true on success
    /// Rational
    /// writes rational LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
-   /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
+   /// colNames are \c nullptr, default names are used; if \p intVars is not \c nullptr, the variables contained in it are
    /// marked as integer; returns true on success
-   bool writeFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0,
-                  const DIdxSet* intvars = 0, const bool unscale = true, const bool writeZeroObjective = false) const;
+   bool writeFile(const char* filename, const NameSet* rowNames = nullptr,
+                  const NameSet* colNames = nullptr,
+                  const DIdxSet* intvars = nullptr, const bool unscale = true,
+                  const bool writeZeroObjective = false) const;
 
-   bool writeFileRational(const char* filename, const NameSet* rowNames = 0,
-                          const NameSet* colNames = 0, const DIdxSet* intvars = 0,
+   bool writeFileRational(const char* filename, const NameSet* rowNames = nullptr,
+                          const NameSet* colNames = nullptr, const DIdxSet* intvars = nullptr,
                           const bool writeZeroObjective = false) const;
 
    /* For SCIP compatibility */
-   bool writeFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0,
-                      const DIdxSet* intvars = 0, const bool unscale = true, const bool writeZeroObjective = false) const;
+   bool writeFileReal(const char* filename, const NameSet* rowNames = nullptr,
+                      const NameSet* colNames = nullptr,
+                      const DIdxSet* intvars = nullptr, const bool unscale = true,
+                      const bool writeZeroObjective = false) const;
 
    /// writes the dual of the real LP to file; LP or MPS format is chosen from the extension in \p filename;
-   /// if \p rowNames and \p colNames are \c NULL, default names are used; if \p intVars is not \c NULL,
+   /// if \p rowNames and \p colNames are \c nullptr, default names are used; if \p intVars is not \c nullptr,
    /// the variables contained in it are marked as integer; returns true on success
-   bool writeDualFileReal(const char* filename, const NameSet* rowNames = 0,
-                          const NameSet* colNames = 0, const DIdxSet* intvars = 0,
+   bool writeDualFileReal(const char* filename, const NameSet* rowNames = nullptr,
+                          const NameSet* colNames = nullptr, const DIdxSet* intvars = nullptr,
                           const bool writeZeroObjective = false) const;
 
-   /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c NULL,
+   /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c nullptr,
    /// default names are assumed; returns true on success
-   bool readBasisFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0);
+   bool readBasisFile(const char* filename, const NameSet* rowNames = nullptr,
+                      const NameSet* colNames = nullptr);
 
-   /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used;
+   /// writes basis information to \p filename; if \p rowNames and \p colNames are \c nullptr, default names are used;
    /// returns true on success
-   bool writeBasisFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0,
+   bool writeBasisFile(const char* filename, const NameSet* rowNames = nullptr,
+                       const NameSet* colNames = nullptr,
                        const bool cpxFormat = false) const;
 
-   /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
+   /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c nullptr,
    /// default names are used
-   void writeStateReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0,
+   void writeStateReal(const char* filename, const NameSet* rowNames = nullptr,
+                       const NameSet* colNames = nullptr,
                        const bool cpxFormat = false, const bool writeZeroObjective = false) const;
 
-   /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
+   /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c nullptr,
    /// default names are used
-   void writeStateRational(const char* filename, const NameSet* rowNames = 0,
-                           const NameSet* colNames = 0, const bool cpxFormat = false,
+   void writeStateRational(const char* filename, const NameSet* rowNames = nullptr,
+                           const NameSet* colNames = nullptr, const bool cpxFormat = false,
                            const bool writeZeroObjective = false) const;
 
    ///@}
@@ -2096,20 +2103,21 @@ private:
    void _ensureRealLPLoaded();
 
    /// call floating-point solver and update statistics on iterations etc.
-   void _solveBoostedRealLPAndRecordStatistics(volatile bool* interrupt = NULL);
+   void _solveBoostedRealLPAndRecordStatistics(volatile bool* interrupt = nullptr);
 
    /// call floating-point solver and update statistics on iterations etc.
-   void _solveRealLPAndRecordStatistics(volatile bool* interrupt = NULL);
+   void _solveRealLPAndRecordStatistics(volatile bool* interrupt = nullptr);
 
    /// reads real LP in LP or MPS format from file and returns true on success; gets row names, column names, and
    /// integer variables if desired
-   bool _readFileReal(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0,
-                      DIdxSet* intVars = 0);
+   bool _readFileReal(const char* filename, NameSet* rowNames = nullptr, NameSet* colNames = nullptr,
+                      DIdxSet* intVars = nullptr);
 
    /// reads rational LP in LP or MPS format from file and returns true on success; gets row names, column names, and
    /// integer variables if desired
-   bool _readFileRational(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0,
-                          DIdxSet* intVars = 0);
+   bool _readFileRational(const char* filename, NameSet* rowNames = nullptr,
+                          NameSet* colNames = nullptr,
+                          DIdxSet* intVars = nullptr);
 
    /// completes range type arrays after adding columns and/or rows
    void _completeRangeTypesRational();
@@ -2532,16 +2540,16 @@ private:
    ///@{
 
    /// solves the templated LP
-   void _optimize(volatile bool* interrupt = NULL);
+   void _optimize(volatile bool* interrupt = nullptr);
 
    /// temporary fix for Rational
-   void _optimizeRational(volatile bool* interrupt = NULL);
+   void _optimizeRational(volatile bool* interrupt = nullptr);
 
    /// checks result of the solving process and solves again without preprocessing if necessary
    void _evaluateSolutionReal(typename SPxSimplifier<R>::Result simplificationStatus);
 
    /// solves real LP with/without preprocessing
-   void _preprocessAndSolveReal(bool applyPreprocessing, volatile bool* interrupt = NULL);
+   void _preprocessAndSolveReal(bool applyPreprocessing, volatile bool* interrupt = nullptr);
 
    /// loads original problem into solver and solves again after it has been solved to optimality with preprocessing
    void _resolveWithoutPreprocessing(typename SPxSimplifier<R>::Result simplificationStatus);

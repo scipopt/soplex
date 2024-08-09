@@ -74,7 +74,7 @@ bool MPSInput::readLine()
 
    do
    {
-      m_f0 = m_f1 = m_f2 = m_f3 = m_f4 = m_f5 = 0;
+      m_f0 = m_f1 = m_f2 = m_f3 = m_f4 = m_f5 = nullptr;
       is_marker = false;
 
       // Read until we have a non-empty, non-comment line.
@@ -119,9 +119,9 @@ bool MPSInput::readLine()
       {
          m_f0 = strtok(&m_buf[0], " ");
 
-         assert(m_f0 != 0);
+         assert(m_f0 != nullptr);
 
-         m_f1 = strtok(0, " ");
+         m_f1 = strtok(nullptr, " ");
 
          return true;
       }
@@ -193,21 +193,21 @@ bool MPSInput::readLine()
        */
       do
       {
-         if(0 == (m_f1 = strtok(s, " ")))
+         if(nullptr == (m_f1 = strtok(s, " ")))
             break;
 
-         if((0 == (m_f2 = strtok(0, " "))) || (*m_f2 == '$'))
+         if((nullptr == (m_f2 = strtok(nullptr, " "))) || (*m_f2 == '$'))
          {
-            m_f2 = 0;
+            m_f2 = nullptr;
             break;
          }
 
          if(!strcmp(m_f2, "'MARKER'"))
             is_marker = true;
 
-         if((0 == (m_f3 = strtok(0, " "))) || (*m_f3 == '$'))
+         if((nullptr == (m_f3 = strtok(nullptr, " "))) || (*m_f3 == '$'))
          {
-            m_f3 = 0;
+            m_f3 = nullptr;
             break;
          }
 
@@ -224,9 +224,9 @@ bool MPSInput::readLine()
          if(!strcmp(m_f3, "'MARKER'"))
             is_marker = true;
 
-         if((0 == (m_f4 = strtok(0, " "))) || (*m_f4 == '$'))
+         if((nullptr == (m_f4 = strtok(nullptr, " "))) || (*m_f4 == '$'))
          {
-            m_f4 = 0;
+            m_f4 = nullptr;
             break;
          }
 
@@ -240,8 +240,8 @@ bool MPSInput::readLine()
                break; // unknown marker
          }
 
-         if((0 == (m_f5 = strtok(0, " "))) || (*m_f5 == '$'))
-            m_f5 = 0;
+         if((nullptr == (m_f5 = strtok(nullptr, " "))) || (*m_f5 == '$'))
+            m_f5 = nullptr;
       }
       while(false);
    }
@@ -255,12 +255,12 @@ bool MPSInput::readLine()
                  "DMPSIN06 f3={}\n"
                  "DMPSIN08 f5={}\n"
                  "DMPSIN09 -----------------------------------------------\n",
-                 ((m_f0 == 0) ? "nil" : m_f0),
-                 ((m_f1 == 0) ? "nil" : m_f1),
-                 ((m_f2 == 0) ? "nil" : m_f2),
-                 ((m_f3 == 0) ? "nil" : m_f3),
-                 ((m_f4 == 0) ? "nil" : m_f4),
-                 ((m_f5 == 0) ? "nil" : m_f5));
+                 ((m_f0 == nullptr) ? "nil" : m_f0),
+                 ((m_f1 == nullptr) ? "nil" : m_f1),
+                 ((m_f2 == nullptr) ? "nil" : m_f2),
+                 ((m_f3 == nullptr) ? "nil" : m_f3),
+                 ((m_f4 == nullptr) ? "nil" : m_f4),
+                 ((m_f5 == nullptr) ? "nil" : m_f5));
    return true;
 }
 

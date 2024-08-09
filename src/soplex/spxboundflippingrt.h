@@ -84,11 +84,11 @@ private:
     */
    struct BreakpointCompare
    {
-   public:
+      public:
       /** constructor
        */
       BreakpointCompare()
-         : entry(0)
+         : entry(nullptr)
       {
       }
 

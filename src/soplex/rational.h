@@ -1011,7 +1011,7 @@ inline int sizeInBase(const Rational R, const int base)
 /// Total size of rational vector.
 inline int totalSizeRational(const Rational* vector, const int length, const int base)
 {
-   assert(vector != 0);
+   assert(vector != nullptr);
    assert(length >= 0);
    assert(base >= 0);
 
@@ -1026,7 +1026,7 @@ inline int totalSizeRational(const Rational* vector, const int length, const int
 /// Size of least common multiple of denominators in rational vector.
 inline int dlcmSizeRational(const Rational* vector, const int length, const int base)
 {
-   assert(vector != 0);
+   assert(vector != nullptr);
    assert(length >= 0);
 
 #ifndef SOPLEX_WITH_BOOST
@@ -1048,7 +1048,7 @@ inline int dlcmSizeRational(const Rational* vector, const int length, const int 
 /// Size of largest denominator in rational vector.
 inline int dmaxSizeRational(const Rational* vector, const int length, const int base)
 {
-   assert(vector != 0);
+   assert(vector != nullptr);
    assert(length >= 0);
 #ifndef SOPLEX_WITH_BOOST
    SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)

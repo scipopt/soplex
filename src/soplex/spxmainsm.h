@@ -118,7 +118,7 @@ private:
       /// destructor.
       virtual ~PostStep()
       {
-         m_name = 0;
+         m_name = nullptr;
       }
       /// get name of simplifying step.
       virtual const char* getName() const
@@ -587,7 +587,7 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         FixBoundsPS* FixBoundsPSptr = 0;
+         FixBoundsPS* FixBoundsPSptr = nullptr;
          spx_alloc(FixBoundsPSptr);
          return new(FixBoundsPSptr) FixBoundsPS(*this);
       }
@@ -673,7 +673,7 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         FreeZeroObjVariablePS* FreeZeroObjVariablePSptr = 0;
+         FreeZeroObjVariablePS* FreeZeroObjVariablePSptr = nullptr;
          spx_alloc(FreeZeroObjVariablePSptr);
          return new(FreeZeroObjVariablePSptr) FreeZeroObjVariablePS(*this);
       }
@@ -738,7 +738,7 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         ZeroObjColSingletonPS* ZeroObjColSingletonPSptr = 0;
+         ZeroObjColSingletonPS* ZeroObjColSingletonPSptr = nullptr;
          spx_alloc(ZeroObjColSingletonPSptr);
          return new(ZeroObjColSingletonPSptr) ZeroObjColSingletonPS(*this);
       }
@@ -809,7 +809,7 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         FreeColSingletonPS* FreeColSingletonPSptr = 0;
+         FreeColSingletonPS* FreeColSingletonPSptr = nullptr;
          spx_alloc(FreeColSingletonPSptr);
          return new(FreeColSingletonPSptr) FreeColSingletonPS(*this);
       }
@@ -907,7 +907,7 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         DoubletonEquationPS* DoubletonEquationPSptr = 0;
+         DoubletonEquationPS* DoubletonEquationPSptr = nullptr;
          spx_alloc(DoubletonEquationPSptr);
          return new(DoubletonEquationPSptr) DoubletonEquationPS(*this);
       }
@@ -1004,7 +1004,7 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         DuplicateRowsPS* DuplicateRowsPSptr = 0;
+         DuplicateRowsPS* DuplicateRowsPSptr = nullptr;
          spx_alloc(DuplicateRowsPSptr);
          return new(DuplicateRowsPSptr) DuplicateRowsPS(*this);
       }
@@ -1072,7 +1072,7 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         DuplicateColsPS* DuplicateColsPSptr = 0;
+         DuplicateColsPS* DuplicateColsPSptr = nullptr;
          spx_alloc(DuplicateColsPSptr);
          return new(DuplicateColsPSptr) DuplicateColsPS(*this);
       }
@@ -1151,7 +1151,7 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         AggregationPS* AggregationPSptr = 0;
+         AggregationPS* AggregationPSptr = nullptr;
          spx_alloc(AggregationPSptr);
          return new(AggregationPSptr) AggregationPS(*this);
       }
@@ -1232,7 +1232,7 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         MultiAggregationPS* MultiAggregationPSptr = 0;
+         MultiAggregationPS* MultiAggregationPSptr = nullptr;
          spx_alloc(MultiAggregationPSptr);
          return new(MultiAggregationPSptr) MultiAggregationPS(*this);
       }
@@ -1277,7 +1277,7 @@ private:
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
-         TightenBoundsPS* TightenBoundsPSptr = 0;
+         TightenBoundsPS* TightenBoundsPSptr = nullptr;
          spx_alloc(TightenBoundsPSptr);
          return new(TightenBoundsPSptr) TightenBoundsPS(*this);
       }
@@ -1623,7 +1623,7 @@ private:
    /// comparator for class SVectorBase<R>::Element: compare nonzeros according to value
    struct ElementCompare
    {
-   public:
+      public:
       R epsiloncompare;
 
       ElementCompare(R eps)
@@ -1646,7 +1646,7 @@ private:
    /// comparator for class SVectorBase<R>::Element: compare nonzeros according to index
    struct IdxCompare
    {
-   public:
+      public:
       IdxCompare() {}
 
       int operator()(const typename SVectorBase<R>::Element& e1,

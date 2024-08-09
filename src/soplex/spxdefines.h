@@ -145,7 +145,7 @@ bool EQ(int a, int b);
 #else
 #define SOPLEX_DO_WITH_TMP_VERBOSITY( verbosity, spxout, do_something ) \
    {                                                             \
-     if( &spxout != NULL )                                       \
+     if( &spxout != nullptr )                                    \
      {                                                           \
         if( verbosity <= spxout.getVerbosity() )                 \
         {                                                        \
@@ -454,7 +454,7 @@ inline int spxSnprintf(
    va_list ap;
    int n;
 
-   assert(t != NULL);
+   assert(t != nullptr);
    assert(len > 0);
 
    va_start(ap, s); /*lint !e826*/

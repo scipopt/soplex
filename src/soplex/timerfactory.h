@@ -52,7 +52,7 @@ public:
    /// create timers and allocate memory for them
    static Timer* createTimer(Timer::TYPE ttype)
    {
-      Timer* timer = 0;
+      Timer* timer = nullptr;
 
       switch(ttype)
       {

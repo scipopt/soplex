@@ -84,7 +84,7 @@ public:
       int    pos;                 ///< position of pivot column in row
       int    mkwtz;               ///< markowitz number of pivot
 
-      Pring() : next(0), prev(0)  ///< constructor
+      Pring() : next(nullptr), prev(nullptr)  ///< constructor
       {
          mkwtz = -1;
          idx = -1;

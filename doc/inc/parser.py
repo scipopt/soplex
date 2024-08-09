@@ -1,7 +1,9 @@
+#!/usr/bin/env python3
+
 helptext='''
 Created on 06.01.2014
 
-this parser generates php-readable data out of faqtext.txt.
+this parser generates php-readable data and static html out of faqtext.txt.
 
 The format is strict, but very easy: The FAQ is separated into SECTIONs,
 each of which may contain an arbitrary number of items, which consist (in this order)
@@ -32,9 +34,12 @@ relative locations to the documentation and file extensions:
    - use PATHTODOC to denote relative paths to the documentation.
    - use LINKEXT to denote file-extensions.
 
-The parser automatically interpretes this.
+The parser automatically interprets this.
 
-@author: Gregor Hendel
+The written faqdata.php can be transformed with php into static HTML by use of localfaq.php.
+The written faq.inc produces the same output (without the need for php).
+
+@author Gregor Hendel
 @author Matthias Miltenberger
 '''
 import re
@@ -49,6 +54,21 @@ sectiontag = "SECTION:"
 questiontag = "QUESTION:"
 answertag = "ANSWER:"
 labeltag = "LABEL:"
+
+faqinc_header='''<!-- this file is used to generate the local doxygen documentation -->
+<!-- using make doc from within scip or soplex -->
+
+<style>
+.reveal:hover {
+    text-shadow: 1px 1px 1px #777;
+}
+.answer {
+    background-color: #fff;
+    padding-left:   1em;
+}
+</style>
+
+'''
 
 def formatitem(item):
    '''
@@ -79,6 +99,34 @@ def formatallsections(sections, sectionitems):
    $faq = array(
         %s
         );""" % (",\n".join([formatsection(section, sectionitems[section]) for section in sections]))
+
+def write_faqinc(f, sections, sectiontimes):
+   '''
+   write main part of faq.inc
+   '''
+   for section in sections :
+      f.write('<h3>%s</h3><ol>' % section)
+      for item in sectionitems[section] :
+         question = item[0]
+         answer = item[1]
+         # this undoes the replacement done in notagline = re.sub(r"'", r"\'", notagline) below
+         # if the PHP output is dropped, then we could clean this up
+         question = re.sub(r"\\'", r"'", question)
+         answer = re.sub(r"\\'", r"'", answer)
+         label = item[2]
+         f.write('  <li>\n')
+         f.write('    <div id="%s" class="targetpadding">\n' % label)
+         f.write('      <div class="reveal_faq">\n')
+         f.write('        <a href="#%s">\n' % label)
+         f.write('            <h4>%s</h4>        </a>\n' % question)
+         f.write('        </div>\n')
+         f.write('    </div>\n')
+         f.write('    <div id="%s_ans" class="answer">\n' % label)
+         f.write('       %s' % answer)
+         f.write('    </div>\n')
+         f.write('  </li>\n  ')
+      f.write('</ol><br/>\n')
+
 
 if __name__ == '__main__':
    '''
@@ -146,4 +194,8 @@ if __name__ == '__main__':
             # print "Keys:" , sectionitems.keys()
             f = open("faqdata.php", 'w')
             f.write("<?php \n%s\n ?>" % formatallsections(sections, sectionitems))
+            f.close()
+            f = open("faq.inc", 'w')
+            f.write(faqinc_header)
+            write_faqinc(f, sections, sectionitems)
             f.close()

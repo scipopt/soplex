@@ -52,8 +52,8 @@ static void updateScale(
    R eprev2,
    R epsilon)
 {
-   assert(psccurr != NULL);
-   assert(pscprev != NULL);
+   assert(psccurr != nullptr);
+   assert(pscprev != nullptr);
    assert(qcurr * qprev != 0.0);
 
    R fac = -(eprev1 * eprev2);
@@ -92,8 +92,8 @@ static void updateScaleFinal(
    R epsilon)
 {
    assert(q != 0);
-   assert(psccurr != NULL);
-   assert(pscprev != NULL);
+   assert(psccurr != nullptr);
+   assert(pscprev != nullptr);
 
    R fac = -(eprev1 * eprev2);
 
@@ -131,7 +131,7 @@ static inline void updateRes(
 
    int dummy1 = 0;
    int dummy2 = 0;
-   tmpvec.assign2product4setup(facset, resvecprev, 0, 0, dummy1, dummy2);
+   tmpvec.assign2product4setup(facset, resvecprev, nullptr, nullptr, dummy1, dummy2);
    tmpvec.setup();
    resvec += tmpvec;
 
@@ -149,7 +149,7 @@ static void initConstVecs(
    SSVectorBase<R>& vecnnzinv,
    R epsilon)
 {
-   assert(vecset != NULL);
+   assert(vecset != nullptr);
 
    const int nvec = vecset->num();
 
@@ -340,7 +340,8 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    // compute first residual vector r0
    int dummy1 = 0;
    int dummy2 = 0;
-   resncols = collogs - tmpcols.assign2product4setup(facnrows, rowlogs, 0, 0, dummy1, dummy2);
+   resncols = collogs - tmpcols.assign2product4setup(facnrows, rowlogs, nullptr, nullptr, dummy1,
+              dummy2);
 
    resncols.setup();
    resnrows.setup();

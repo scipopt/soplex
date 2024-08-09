@@ -98,7 +98,7 @@ public:
        the default constructor.
    */
    IdxSet()
-      : num(0), len(0), idx(0), freeArray(false)
+      : num(0), len(0), idx(nullptr), freeArray(false)
    {
       assert(isConsistent());
    }
@@ -126,7 +126,7 @@ public:
    /// access \p n 'th index.
    int index(int n) const
    {
-      assert(n >= 0 && n < size() && idx != 0);
+      assert(n >= 0 && n < size() && idx != nullptr);
       return idx[n];
    }
    /// returns the number of used indices.

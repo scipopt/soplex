@@ -486,7 +486,7 @@ static inline bool LPFisColName(const char* s)
 
    return ((*s >= 'A') && (*s <= 'Z'))
           || ((*s >= 'a') && (*s <= 'z'))
-          || (strchr("!\"#$%&()/,;?@_'`{}|~", *s) != 0);
+          || (strchr("!\"#$%&()/,;?@_'`{}|~", *s) != nullptr);
 }
 
 
@@ -612,7 +612,7 @@ static int LPFreadColName(char*& pos, NameSet* colnames, LPColSetBase<R>& colset
                           const LPColBase<R>* emptycol, SPxOut* spxout)
 {
    assert(LPFisColName(pos));
-   assert(colnames != 0);
+   assert(colnames != nullptr);
 
    char        name[SOPLEX_LPF_MAX_LINE_LEN];
    const char* s = pos;
@@ -620,7 +620,7 @@ static int LPFreadColName(char*& pos, NameSet* colnames, LPColSetBase<R>& colset
    int         colidx;
 
    // These are the characters that are not allowed in a column name.
-   while((strchr("+-.<>= ", *s) == 0) && (*s != '\0'))
+   while((strchr("+-.<>= ", *s) == nullptr) && (*s != '\0'))
       s++;
 
    for(i = 0; pos != s; i++, pos++)
@@ -681,7 +681,7 @@ static inline bool LPFhasKeyword(char*& pos, const char* keyword)
    int i;
    int k;
 
-   assert(keyword != 0);
+   assert(keyword != nullptr);
 
    for(i = 0, k = 0; keyword[i] != '\0'; i++, k++)
    {
@@ -727,7 +727,7 @@ static inline bool LPFhasRowName(char*& pos, NameSet* rownames)
 {
    const char* s = strchr(pos, ':');
 
-   if(s == 0)
+   if(s == nullptr)
       return false;
 
    int dcolpos = int(s - pos);
@@ -766,7 +766,7 @@ static inline bool LPFhasRowName(char*& pos, NameSet* rownames)
 
    name[k] = '\0';
 
-   if(rownames != 0)
+   if(rownames != nullptr)
       rownames->add(name);
 
    pos = &(pos[dcolpos + 1]);
@@ -839,18 +839,18 @@ bool SPxLPBase<R>::readLPF(
    int k;
    int buf_size;
    int buf_pos;
-   char* buf = NULL;
-   char* tmp = NULL;
-   char* line = NULL;
+   char* buf = nullptr;
+   char* tmp = nullptr;
+   char* line = nullptr;
    char* s;
    char* pos;
-   char* pos_old = 0;
+   char* pos_old = nullptr;
 
    if(p_cnames)
       cnames = p_cnames;
    else
    {
-      cnames = 0;
+      cnames = nullptr;
       spx_alloc(cnames);
       cnames = new(cnames) NameSet();
    }
@@ -863,7 +863,7 @@ bool SPxLPBase<R>::readLPF(
    {
       try
       {
-         rnames = 0;
+         rnames = nullptr;
          spx_alloc(rnames);
          rnames = new(rnames) NameSet();
       }
@@ -938,7 +938,7 @@ bool SPxLPBase<R>::readLPF(
       SPxOut::debug(spxout, "DLPFRD08 Reading line {} (pos={})\n", lineno, pos);
 
       // 1. Remove comments.
-      if(0 != (s = strchr(buf, '\\')))
+      if(nullptr != (s = strchr(buf, '\\')))
          * s = '\0';
 
       // 2. Look for keywords.
@@ -1017,7 +1017,7 @@ bool SPxLPBase<R>::readLPF(
 
       // 3a. Look for row names in objective and drop it.
       if(section == OBJECTIVE)
-         LPFhasRowName(pos, 0);
+         LPFhasRowName(pos, nullptr);
 
       // 3b. Look for row name in constraint and store it.
       if(section == CONSTRAINTS)
@@ -1061,7 +1061,7 @@ bool SPxLPBase<R>::readLPF(
       SPxOut::debug(spxout, "DLPFRD09 pos={}\n", pos);
 
       // 7. We have something left to process.
-      while((pos != 0) && (*pos != '\0'))
+      while((pos != nullptr) && (*pos != '\0'))
       {
          // remember our position, so we are sure we make progress.
          pos_old = pos;
@@ -1171,7 +1171,7 @@ bool SPxLPBase<R>::readLPF(
                   have_value = true;
                   val = 1.0;
                   sense = 0;
-                  pos = 0;
+                  pos = nullptr;
                   // next line
                   continue;
                }
@@ -1317,7 +1317,7 @@ bool SPxLPBase<R>::readLPF(
 
          case BINARIES:
          case INTEGERS:
-            if((colidx = LPFreadColName<R>(pos, cnames, cset, 0, spxout)) < 0)
+            if((colidx = LPFreadColName<R>(pos, cnames, cset, nullptr, spxout)) < 0)
             {
                SPX_MSG_WARNING((*this->spxout),
                                (*this->spxout) << "WLPFRD12 in Binary/General section line " << lineno
@@ -1338,7 +1338,7 @@ bool SPxLPBase<R>::readLPF(
                   }
                }
 
-               if(p_intvars != 0)
+               if(p_intvars != nullptr)
                   p_intvars->addIdx(colidx);
             }
 
@@ -1375,10 +1375,10 @@ syntax_error:
    else
       SPX_MSG_ERROR(std::cerr << "ELPFRD15 Syntax error in line " << lineno << std::endl;)
 
-      if(p_cnames == 0)
+      if(p_cnames == nullptr)
          spx_free(cnames);
 
-   if(p_rnames == 0)
+   if(p_rnames == nullptr)
       spx_free(rnames);
 
    spx_free(buf);
@@ -1400,16 +1400,16 @@ static inline void MPSreadName(MPSInput& mps, SPxOut* spxout)
    do
    {
       // This has to be the Line with the NAME section.
-      if(!mps.readLine() || (mps.field0() == 0) || strcmp(mps.field0(), "NAME"))
+      if(!mps.readLine() || (mps.field0() == nullptr) || strcmp(mps.field0(), "NAME"))
          break;
 
       // Sometimes the name is omitted.
-      mps.setProbName((mps.field1() == 0) ? "_MPS_" : mps.field1());
+      mps.setProbName((mps.field1() == nullptr) ? "_MPS_" : mps.field1());
 
       SPX_MSG_INFO2((*spxout), (*spxout) << "IMPSRD01 Problem name   : " << mps.probName() << std::endl;)
 
       // This has to be a new section
-      if(!mps.readLine() || (mps.field0() == 0))
+      if(!mps.readLine() || (mps.field0() == nullptr))
          break;
 
       if(!strcmp(mps.field0(), "ROWS"))
@@ -1436,7 +1436,7 @@ static inline void MPSreadObjsen(MPSInput& mps)
    do
    {
       // This has to be the Line with MIN or MAX.
-      if(!mps.readLine() || (mps.field1() == 0))
+      if(!mps.readLine() || (mps.field1() == nullptr))
          break;
 
       if(!strcmp(mps.field1(), "MIN"))
@@ -1447,7 +1447,7 @@ static inline void MPSreadObjsen(MPSInput& mps)
          break;
 
       // Look for ROWS or OBJNAME Section
-      if(!mps.readLine() || (mps.field0() == 0))
+      if(!mps.readLine() || (mps.field0() == nullptr))
          break;
 
       if(!strcmp(mps.field0(), "ROWS"))
@@ -1472,13 +1472,13 @@ static inline void MPSreadObjname(MPSInput& mps)
    do
    {
       // This has to be the Line with the name.
-      if(!mps.readLine() || (mps.field1() == 0))
+      if(!mps.readLine() || (mps.field1() == nullptr))
          break;
 
       mps.setObjName(mps.field1());
 
       // Look for ROWS Section
-      if(!mps.readLine() || (mps.field0() == 0))
+      if(!mps.readLine() || (mps.field0() == nullptr))
          break;
 
       if(strcmp(mps.field0(), "ROWS"))
@@ -1503,7 +1503,7 @@ static void MPSreadRows(MPSInput& mps, LPRowSetBase<R>& rset, NameSet& rnames, S
 
    while(mps.readLine())
    {
-      if(mps.field0() != 0)
+      if(mps.field0() != nullptr)
       {
          SPX_MSG_INFO2((*spxout), (*spxout) << "IMPSRD02 Objective name : " << mps.objName() << std::endl;)
 
@@ -1515,7 +1515,7 @@ static void MPSreadRows(MPSInput& mps, LPRowSetBase<R>& rset, NameSet& rnames, S
          return;
       }
 
-      if((mps.field1() == 0) || (mps.field2() == 0))
+      if((mps.field1() == nullptr) || (mps.field2() == nullptr))
          break;
 
       if(*mps.field1() == 'N')
@@ -1579,7 +1579,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSe
 
    while(mps.readLine())
    {
-      if(mps.field0() != 0)
+      if(mps.field0() != nullptr)
       {
          if(strcmp(mps.field0(), "RHS"))
             break;
@@ -1595,7 +1595,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSe
          return;
       }
 
-      if((mps.field1() == 0) || (mps.field2() == 0) || (mps.field3() == 0))
+      if((mps.field1() == nullptr) || (mps.field2() == nullptr) || (mps.field3() == nullptr))
          break;
 
       // new column?
@@ -1632,7 +1632,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSe
          {
             assert(cnames.number(colname) == cset.num());
 
-            if(intvars != 0)
+            if(intvars != nullptr)
                intvars->addIdx(cnames.number(colname));
 
             // for Integer variable the default bounds are 0/1
@@ -1652,9 +1652,9 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSe
             vec.add(idx, val);
       }
 
-      if(mps.field5() != 0)
+      if(mps.field5() != nullptr)
       {
-         assert(mps.field4() != 0);
+         assert(mps.field4() != nullptr);
 
          val = atof(mps.field5());
 
@@ -1686,7 +1686,7 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<R>& rset, const NameSet& rnam
 
    while(mps.readLine())
    {
-      if(mps.field0() != 0)
+      if(mps.field0() != nullptr)
       {
          SPX_MSG_INFO2((*spxout), (*spxout) << "IMPSRD03 RHS name       : " << rhsname  << std::endl;);
 
@@ -1702,10 +1702,11 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<R>& rset, const NameSet& rnam
          return;
       }
 
-      if(((mps.field2() != 0) && (mps.field3() == 0)) || ((mps.field4() != 0) && (mps.field5() == 0)))
+      if(((mps.field2() != nullptr) && (mps.field3() == nullptr)) || ((mps.field4() != nullptr)
+            && (mps.field5() == nullptr)))
          mps.insertName("_RHS_");
 
-      if((mps.field1() == 0) || (mps.field2() == 0) || (mps.field3() == 0))
+      if((mps.field1() == nullptr) || (mps.field2() == nullptr) || (mps.field3() == nullptr))
          break;
 
       if(*rhsname == '\0')
@@ -1737,7 +1738,7 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<R>& rset, const NameSet& rnam
                rset.lhs_w(idx) = val;
          }
 
-         if(mps.field5() != 0)
+         if(mps.field5() != nullptr)
          {
             if((idx = rnames.number(mps.field4())) < 0)
                mps.entryIgnored("RHS", mps.field1(), "row", mps.field4());
@@ -1773,7 +1774,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<R>& rset, const NameSet& 
 
    while(mps.readLine())
    {
-      if(mps.field0() != 0)
+      if(mps.field0() != nullptr)
       {
          SPX_MSG_INFO2((*spxout), (*spxout) << "IMPSRD04 Range name     : " << rngname << std::endl;);
 
@@ -1787,10 +1788,11 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<R>& rset, const NameSet& 
          return;
       }
 
-      if(((mps.field2() != 0) && (mps.field3() == 0)) || ((mps.field4() != 0) && (mps.field5() == 0)))
+      if(((mps.field2() != nullptr) && (mps.field3() == nullptr)) || ((mps.field4() != nullptr)
+            && (mps.field5() == nullptr)))
          mps.insertName("_RNG_");
 
-      if((mps.field1() == 0) || (mps.field2() == 0) || (mps.field3() == 0))
+      if((mps.field1() == nullptr) || (mps.field2() == nullptr) || (mps.field3() == nullptr))
          break;
 
       if(*rngname == '\0')
@@ -1837,7 +1839,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<R>& rset, const NameSet& 
             }
          }
 
-         if(mps.field5() != 0)
+         if(mps.field5() != nullptr)
          {
             if((idx = rnames.number(mps.field4())) < 0)
                mps.entryIgnored("Range", mps.field1(), "row", mps.field4());
@@ -1886,7 +1888,7 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<R>& cset, const NameSet& c
 
    while(mps.readLine())
    {
-      if(mps.field0() != 0)
+      if(mps.field0() != nullptr)
       {
          SPX_MSG_INFO2((*spxout), (*spxout) << "IMPSRD05 Bound name     : " << bndname << std::endl;)
 
@@ -1905,16 +1907,16 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<R>& cset, const NameSet& c
             || (!strcmp(mps.field1(), "LI"))
             || (!strcmp(mps.field1(), "UI")))
       {
-         if((mps.field3() != 0) && (mps.field4() == 0))
+         if((mps.field3() != nullptr) && (mps.field4() == nullptr))
             mps.insertName("_BND_", true);
       }
       else
       {
-         if((mps.field2() != 0) && (mps.field3() == 0))
+         if((mps.field2() != nullptr) && (mps.field3() == nullptr))
             mps.insertName("_BND_", true);
       }
 
-      if((mps.field1() == 0) || (mps.field2() == 0) || (mps.field3() == 0))
+      if((mps.field1() == nullptr) || (mps.field2() == nullptr) || (mps.field3() == nullptr))
          break;
 
       if(*bndname == '\0')
@@ -1930,7 +1932,7 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<R>& cset, const NameSet& c
             mps.entryIgnored("column", mps.field3(), "bound", bndname);
          else
          {
-            if(mps.field4() == 0)
+            if(mps.field4() == nullptr)
                val = 0.0;
             else if(!strcmp(mps.field4(), "-Inf") || !strcmp(mps.field4(), "-inf"))
                val = R(-infinity);
@@ -1943,7 +1945,7 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<R>& cset, const NameSet& c
             // ILOG extension (Integer Bound)
             if(mps.field1()[1] == 'I')
             {
-               if(intvars != 0)
+               if(intvars != nullptr)
                   intvars->addIdx(idx);
 
                // if the variable has appeared in the MARKER section of the COLUMNS section then its default bounds were
@@ -1992,7 +1994,7 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<R>& cset, const NameSet& c
                cset.lower_w(idx) = 0.0;
                cset.upper_w(idx) = 1.0;
 
-               if(intvars != 0)
+               if(intvars != nullptr)
                   intvars->addIdx(idx);
 
                break;
@@ -2039,7 +2041,7 @@ bool SPxLPBase<R>::readMPS(
       cnames = p_cnames;
    else
    {
-      cnames = 0;
+      cnames = nullptr;
       spx_alloc(cnames);
       cnames = new(cnames) NameSet();
    }
@@ -2052,7 +2054,7 @@ bool SPxLPBase<R>::readMPS(
    {
       try
       {
-         rnames = 0;
+         rnames = nullptr;
          spx_alloc(rnames);
          rnames = new(rnames) NameSet();
       }
@@ -2123,13 +2125,13 @@ bool SPxLPBase<R>::readMPS(
       assert(isConsistent());
    }
 
-   if(p_cnames == 0)
+   if(p_cnames == nullptr)
    {
       cnames->~NameSet();
       spx_free(cnames);
    }
 
-   if(p_rnames == 0)
+   if(p_rnames == nullptr)
    {
       rnames->~NameSet();
       spx_free(rnames);
@@ -2154,11 +2156,11 @@ static const char* LPFgetRowName(
    int                    p_num_written_rows
 )
 {
-   assert(p_buf != 0);
+   assert(p_buf != nullptr);
    assert(p_idx >= 0);
    assert(p_idx <  p_lp.nRows());
 
-   if(p_rnames != 0)
+   if(p_rnames != nullptr)
    {
       DataKey key = p_lp.rId(p_idx);
 
@@ -2182,11 +2184,11 @@ static const char* getColName(
    char*                  p_buf
 )
 {
-   assert(p_buf != 0);
+   assert(p_buf != nullptr);
    assert(p_idx >= 0);
    assert(p_idx <  p_lp.nCols());
 
-   if(p_cnames != 0)
+   if(p_cnames != nullptr)
    {
       DataKey key = p_lp.cId(p_idx);
 
@@ -2399,10 +2401,9 @@ static void LPFwriteGenerals(
    const DIdxSet*           p_intvars     ///< integer variables
 )
 {
-
    char name[16];
 
-   if(p_intvars == NULL || p_intvars->size() <= 0)
+   if(p_intvars == nullptr || p_intvars->size() <= 0)
       return;  // no integer variables
 
    p_output << "Generals\n";
@@ -2453,8 +2454,8 @@ static void MPSwriteRecord(
 {
    char buf[81];
 
-   spxSnprintf(buf, sizeof(buf), " %-2.2s %-8.8s", (indicator == 0) ? "" : indicator,
-               (name == 0)      ? "" : name);
+   spxSnprintf(buf, sizeof(buf), " %-2.2s %-8.8s", (indicator == nullptr) ? "" : indicator,
+               (name == nullptr)      ? "" : name);
    os << buf;
 
    if(name1 != nullptr)
@@ -2462,7 +2463,7 @@ static void MPSwriteRecord(
       spxSnprintf(buf, sizeof(buf), "%-8.8s  %.15" SOPLEX_REAL_FORMAT, name1, (Real) value1);
       os << buf;
 
-      if(name2 != 0)
+      if(name2 != nullptr)
       {
          spxSnprintf(buf, sizeof(buf), "   %-8.8s  %.15" SOPLEX_REAL_FORMAT, name2, (Real) value2);
          os << buf;
@@ -2498,11 +2499,11 @@ static const char* MPSgetRowName(
    char*                 buf
 )
 {
-   assert(buf != 0);
+   assert(buf != nullptr);
    assert(idx >= 0);
    assert(idx <  lp.nRows());
 
-   if(rnames != 0)
+   if(rnames != nullptr)
    {
       DataKey key = lp.rId(idx);
 
@@ -2569,7 +2570,7 @@ void SPxLPBase<R>::writeMPS(
    // --- COLUMNS Section ---
    p_output << "COLUMNS" << std::endl;
 
-   bool has_intvars = (p_intvars != 0) && (p_intvars->size() > 0);
+   bool has_intvars = (p_intvars != nullptr) && (p_intvars->size() > 0);
 
    for(int j = 0; j < (has_intvars ? 2 : 1); j++)
    {
@@ -2591,16 +2592,16 @@ void SPxLPBase<R>::writeMPS(
          assert(colsize2 % 2 == 0);
 
          for(k = 0; k < colsize2; k += 2)
-            MPSwriteRecord(p_output, 0, getColName(*this, i, p_cnames, name),
+            MPSwriteRecord(p_output, nullptr, getColName(*this, i, p_cnames, name),
                            MPSgetRowName(*this, col.index(k), p_rnames, name1), col.value(k),
                            MPSgetRowName(*this, col.index(k + 1), p_rnames, name2), col.value(k + 1));
 
          if(colsize2 != col.size())
-            MPSwriteRecord(p_output, 0, getColName(*this, i, p_cnames, name),
+            MPSwriteRecord(p_output, nullptr, getColName(*this, i, p_cnames, name),
                            MPSgetRowName(*this, col.index(k), p_rnames, name1), col.value(k));
 
          if(isNotZero(maxObj(i), this->tolerances()->epsilon()) || writeZeroObjective)
-            MPSwriteRecord(p_output, 0, getColName(*this, i, p_cnames, name), "MINIMIZE", -maxObj(i));
+            MPSwriteRecord(p_output, nullptr, getColName(*this, i, p_cnames, name), "MINIMIZE", -maxObj(i));
       }
 
       if(is_intrun)
@@ -2631,11 +2632,11 @@ void SPxLPBase<R>::writeMPS(
 
          if(k < nRows())
          {
-            MPSwriteRecord(p_output, 0, "RHS", MPSgetRowName(*this, i, p_rnames, name1), rhsval1,
+            MPSwriteRecord(p_output, nullptr, "RHS", MPSgetRowName(*this, i, p_rnames, name1), rhsval1,
                            MPSgetRowName(*this, k, p_rnames, name2), rhsval2);
          }
          else
-            MPSwriteRecord(p_output, 0, "RHS", MPSgetRowName(*this, i, p_rnames, name1), rhsval1);
+            MPSwriteRecord(p_output, nullptr, "RHS", MPSgetRowName(*this, i, p_rnames, name1), rhsval1);
 
          i = k + 1;
       }
@@ -2715,7 +2716,8 @@ void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[
                                     int* ndualcols)
 {
    // Setting up the primalrowids and dualcolids arrays if not given as parameters
-   if(primalRowIds == 0 || primalColIds == 0 || dualRowIds == 0 || dualColIds == 0)
+   if(primalRowIds == nullptr || primalColIds == nullptr || dualRowIds == nullptr
+         || dualColIds == nullptr)
    {
       DataArray < SPxRowId > primalrowids(2 * nRows());
       DataArray < SPxColId > primalcolids(2 * nCols());
@@ -2729,25 +2731,25 @@ void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[
       buildDualProblem(dualLP, primalrowids.get_ptr(), primalcolids.get_ptr(), dualrowids.get_ptr(),
                        dualcolids.get_ptr(), &numprimalrows, &numprimalcols, &numdualrows, &numdualcols);
 
-      if(primalRowIds != 0)
+      if(primalRowIds != nullptr)
       {
          primalRowIds = primalrowids.get_ptr();
          (*nprimalrows) = numprimalrows;
       }
 
-      if(primalColIds != 0)
+      if(primalColIds != nullptr)
       {
          primalColIds = primalcolids.get_ptr();
          (*nprimalcols) = numprimalcols;
       }
 
-      if(dualRowIds != 0)
+      if(dualRowIds != nullptr)
       {
          dualRowIds = dualrowids.get_ptr();
          (*ndualrows) = numdualrows;
       }
 
-      if(dualColIds != 0)
+      if(dualColIds != nullptr)
       {
          dualColIds = dualcolids.get_ptr();
          (*ndualcols) = numdualcols;

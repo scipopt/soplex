@@ -116,7 +116,7 @@ public:
       /// consistency check.
       bool isConsistent() const
       {
-         return (name != 0);
+         return (name != nullptr);
       }
       ///@}
 
@@ -222,7 +222,7 @@ public:
    {
       const Name nam(str);
       const DataKey* result = hashtab.get(nam);
-      return result == 0 ? DataKey() : *hashtab.get(nam);
+      return result == nullptr ? DataKey() : *hashtab.get(nam);
    }
 
    /// returns number of name with DataKey \p pkey in NameSet.
@@ -238,7 +238,7 @@ public:
 
       if(hashtab.has(nam))
       {
-         assert(hashtab.get(nam) != 0);
+         assert(hashtab.get(nam) != nullptr);
          return number(*hashtab.get(nam));
       }
       else

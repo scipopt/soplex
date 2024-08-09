@@ -33,7 +33,7 @@ namespace soplex
 template <class R>
 int SPxDantzigPR<R>::selectLeave()
 {
-   assert(this->thesolver != 0);
+   assert(this->thesolver != nullptr);
 
    if(this->thesolver->sparsePricingLeave)
       return selectLeaveSparse();
@@ -64,7 +64,7 @@ int SPxDantzigPR<R>::selectLeave()
 template <class R>
 int SPxDantzigPR<R>::selectLeaveSparse()
 {
-   assert(this->thesolver != 0);
+   assert(this->thesolver != nullptr);
 
    R best   = -this->thetolerance;
    R x;
@@ -98,7 +98,7 @@ int SPxDantzigPR<R>::selectLeaveSparse()
 template <class R>
 SPxId SPxDantzigPR<R>::selectEnter()
 {
-   assert(this->thesolver != 0);
+   assert(this->thesolver != nullptr);
 
    // const SPxBasisBase<R>::Desc&    ds   = this->thesolver->basis().desc();
 
@@ -134,7 +134,7 @@ SPxId SPxDantzigPR<R>::selectEnterX()
 template <class R>
 SPxId SPxDantzigPR<R>::selectEnterSparseDim(R& best, SPxId& enterId)
 {
-   assert(this->thesolver != 0);
+   assert(this->thesolver != nullptr);
 
    int idx;
    R x;
@@ -167,7 +167,7 @@ SPxId SPxDantzigPR<R>::selectEnterSparseDim(R& best, SPxId& enterId)
 template <class R>
 SPxId SPxDantzigPR<R>::selectEnterSparseCoDim(R& best, SPxId& enterId)
 {
-   assert(this->thesolver != 0);
+   assert(this->thesolver != nullptr);
 
    int idx;
    R x;
@@ -199,7 +199,7 @@ SPxId SPxDantzigPR<R>::selectEnterSparseCoDim(R& best, SPxId& enterId)
 template <class R>
 SPxId SPxDantzigPR<R>::selectEnterDenseDim(R& best, SPxId& enterId)
 {
-   assert(this->thesolver != 0);
+   assert(this->thesolver != nullptr);
 
    R x;
 
@@ -223,7 +223,7 @@ SPxId SPxDantzigPR<R>::selectEnterDenseDim(R& best, SPxId& enterId)
 template <class R>
 SPxId SPxDantzigPR<R>::selectEnterDenseCoDim(R& best, SPxId& enterId)
 {
-   assert(this->thesolver != 0);
+   assert(this->thesolver != nullptr);
 
    R x;
 

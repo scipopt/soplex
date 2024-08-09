@@ -40,7 +40,7 @@ namespace soplex
 {
 /** reconstruct a rational vector */
 bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
-                       const DIdxSet* indexSet = 0);
+                       const DIdxSet* indexSet = nullptr);
 
 /** reconstruct a rational solution */
 bool reconstructSol(SolRational& solution);
