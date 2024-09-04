@@ -184,11 +184,12 @@ SECTION:Frequently asked questions about SoPlex
     ANSWER:
     <p>
         No. Some research was done in this direction. You can find most of
-        the results in
-        <a href="http://www.zib.de/PaperWeb/abstracts/TR-96-09">
-        http://www.zib.de/PaperWeb/abstracts/TR-96-09</a> and
-        <a href="http://www.zib.de/PaperWeb/abstracts/SC-95-45">
-        http://www.zib.de/PaperWeb/abstracts/SC-95-45</a>.
+        the results in the PhD thesis of Roland Wunderling
+        <a href="https://nbn-resolving.org/urn:nbn:de:0297-zib-5386">
+        Paralleler und Objektorientierter Simplex-Algorithmus</a> (in German) and
+        ZIB-Report SC-45-95 <a href="https://nbn-resolving.org/urn:nbn:de:0297-zib-2112">
+        Parallelizing the Dual Simplex Method</a> by Robert E. Bixby and
+        Alexander Martin.
     </p>
 
     QUESTION:Is there a wrapper class/library to use SoPlex instead of CPLEX ?
