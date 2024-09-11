@@ -54,7 +54,7 @@ void SoPlexBase<R>::_checkScaling(SPxLPBase<R>* origLP) const
 
       for(int j = 0; j < row.size(); ++j)
       {
-         if(NE(row.value(j), origLP->rowVector(i).value(j)))
+         if(NE(row.value(j), origLP->rowVector(i).value(j), _solver.tolerances()->floatingPointFeastol()))
          {
             SPX_MSG_INFO1(spxout, spxout << "DEBUG: scaling error in row " << i << ", col " << j
                           << ": orig " << origLP->rowVector(i).value(j)
