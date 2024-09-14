@@ -9,10 +9,16 @@ interface & parameters:
 
 miscellaneous:
 
-Next - Release 7.1.1
+
+Release 7.1.2
 ==================
 
-fixed bugs:
+
+September 2024 - Release 7.1.1
+==================
+
+code quality:
+- use nullptr instead of 0 for NULL pointers
 
 June 2024 - Release 7.1.0
 ==================
