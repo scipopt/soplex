@@ -2523,11 +2523,15 @@ private:
    /// computes rational inverse of basis matrix as defined by _rationalLUSolverBind
    void _computeBasisInverseRational();
 
-   /// factorizes rational basis matrix in column representation
+   public:
+
+      /// factorizes rational basis matrix in column representation
    void _factorizeColumnRational(SolRational& sol,
                                  DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
                                  DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& stoppedTime,
                                  bool& stoppedIter, bool& error, bool& optimal);
+
+   private:
 
    /// attempts rational reconstruction of primal-dual solution
    bool _reconstructSolutionRational(SolRational& sol,
