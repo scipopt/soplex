@@ -6,6 +6,8 @@ features:
 fixed bugs:
 
 interface & parameters:
+- add `SolBase` constructor
+- make method `_factorizeColumnRational` public
 
 miscellaneous:
 
