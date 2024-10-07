@@ -1124,7 +1124,7 @@ void SoPlexBase<R>::_ratrecAndOrRatfac(
 
       bool optimal;
       factorizeColumnRational(sol, _basisStatusRows, _basisStatusCols, stoppedTime, stoppedIter, error,
-                               optimal);
+                              optimal);
       factorSolNewBasis = false;
 
       if(stoppedTime)

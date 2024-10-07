@@ -2527,9 +2527,9 @@ public:
 
    /// factorizes rational basis matrix in column representation
    void factorizeColumnRational(SolRational& sol,
-                                 DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
-                                 DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& stoppedTime,
-                                 bool& stoppedIter, bool& error, bool& optimal);
+                                DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
+                                DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& stoppedTime,
+                                bool& stoppedIter, bool& error, bool& optimal);
 
 private:
 
