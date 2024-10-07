@@ -60,7 +60,6 @@ class SolBase
 public:
 
 
-   /// default constructor only for friends
    SolBase(VectorBase<Rational>& primal, VectorBase<Rational>& dual,
            VectorBase<Rational>& reducedCosts)
       : _primal(primal), _dual(dual), _redCost(reducedCosts), _hasDualFarkas(false), _hasPrimalRay(false)
