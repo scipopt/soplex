@@ -60,8 +60,7 @@ class SolBase
 public:
 
 
-   SolBase(VectorBase<Rational>& primal, VectorBase<Rational>& dual,
-           VectorBase<Rational>& reducedCosts)
+   SolBase(VectorBase<R>& primal, VectorBase<R>& dual, VectorBase<R>& reducedCosts)
       : _primal(primal), _dual(dual), _redCost(reducedCosts), _hasDualFarkas(false), _hasPrimalRay(false)
    {
    }
