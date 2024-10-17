@@ -1123,8 +1123,8 @@ void SoPlexBase<R>::_ratrecAndOrRatfac(
       SPX_MSG_INFO1(spxout, spxout << "Performing rational factorization . . .\n");
 
       bool optimal;
-      _factorizeColumnRational(sol, _basisStatusRows, _basisStatusCols, stoppedTime, stoppedIter, error,
-                               optimal);
+      factorizeColumnRational(sol, _basisStatusRows, _basisStatusCols, stoppedTime, stoppedIter, error,
+                              optimal);
       factorSolNewBasis = false;
 
       if(stoppedTime)
@@ -6145,7 +6145,7 @@ void SoPlexBase<R>::_computeBasisInverseRational()
 
 /// factorizes rational basis matrix in column representation
 template <class R>
-void SoPlexBase<R>::_factorizeColumnRational(SolRational& sol,
+void SoPlexBase<R>::factorizeColumnRational(SolRational& sol,
       DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
       DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& stoppedTime,
       bool& stoppedIter, bool& error, bool& optimal)

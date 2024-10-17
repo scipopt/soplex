@@ -58,6 +58,14 @@ class SolBase
    template <class S> friend class SolBase;
 
 public:
+
+
+   SolBase(VectorBase<R>& primal, VectorBase<R>& dual, VectorBase<R>& reducedCosts)
+      : _primal(primal), _dual(dual), _redCost(reducedCosts), _hasDualFarkas(false), _hasPrimalRay(false)
+   {
+   }
+
+
    /// is the stored solution primal feasible?
    bool isPrimalFeasible() const
    {
