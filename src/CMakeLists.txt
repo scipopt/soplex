@@ -21,7 +21,9 @@ set(sources
     soplex/spxid.cpp
     soplex/spxout.cpp
     soplex/usertimer.cpp
-    soplex/wallclocktimer.cpp)
+    soplex/wallclocktimer.cpp
+    soplex_interface.cpp
+    )
 
 set(headers
     soplex/array.h
@@ -118,6 +120,7 @@ set(headers
     soplex/dvector.h
     soplex/wallclocktimer.h
     soplex/fmt.hpp
+    soplex_interface.h
     )
 
 file(GLOB headers
