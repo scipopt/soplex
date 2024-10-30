@@ -21,7 +21,9 @@ set(sources
     soplex/spxid.cpp
     soplex/spxout.cpp
     soplex/usertimer.cpp
-    soplex/wallclocktimer.cpp)
+    soplex/wallclocktimer.cpp
+    soplex_interface.cpp
+    )
 
 set(headers
     soplex/array.h
@@ -118,6 +120,7 @@ set(headers
     soplex/dvector.h
     soplex/wallclocktimer.h
     soplex/fmt.hpp
+    soplex_interface.h
     )
 
 file(GLOB headers
@@ -167,7 +170,7 @@ target_include_directories(libsoplex PUBLIC
 target_link_libraries(libsoplex ${libs})
 
 # create C shared library
-add_library(libsoplexshared SHARED soplex_interface.cpp ${sources})
+add_library(libsoplexshared SHARED ${sources})
 if(MSVC)
     setLibProperties(libsoplexshared "libsoplexshared")
 else()
