@@ -12,9 +12,11 @@ interface & parameters:
 miscellaneous:
 
 
-Release 7.1.2
+November 2024 - Release 7.1.2
 ==================
 
+miscellaneous:
+- include C interface (soplex_interface.h) also in static library when building with cmake
 
 September 2024 - Release 7.1.1
 ==================
