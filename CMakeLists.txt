@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.11)
 
 # FindBoost is removed in version cmake 3.30
 if(POLICY CMP0167)
