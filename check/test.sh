@@ -106,7 +106,7 @@ do
   # Create testset
   "${EXECUTABLE}" --loadset="${SETTINGSFILE}" -t"${TIME}" --saveset="${SETFILE}"
 
-   Solve the instances of the testset
+  # Solve the instances of the testset
   for instance in $(cat "${FULLTSTNAME}")
   do
       echo "@01 ${instance}"
