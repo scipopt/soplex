@@ -3,7 +3,7 @@
 # create tarball for release
 # usage: ./scripts/makedist.sh
 
-VERSION="7.1.2.0"
+VERSION="7.1.3.0"
 NAME="soplex-$VERSION"
 rm -f $NAME.tgz
 rm -f $NAME.tar
