@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.9)
 
+# FindBoost is removed in version cmake 3.30
+if(POLICY CMP0167)
+    cmake_policy(SET CMP0167 NEW)
+endif()
+
 set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_DEBUG} ${CMAKE_C_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_DEBUG} ${CMAKE_CXX_FLAGS_RELEASE}")
 
@@ -175,7 +180,6 @@ if(BOOST)
     find_package(Boost ${BOOST_MINIMUM_VERSION}) # PaPILO requires at least Boost 1.65 (on mac 1.72)
     if(Boost_FOUND)
         set(SOPLEX_WITH_BOOST on)
-        include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
         if(NOT Boost_VERSION_MACRO)
            set(Boost_VERSION_MACRO ${Boost_VERSION})
         endif()
@@ -188,6 +192,10 @@ if(BOOST)
                        Found Boost version is ${Boost_VERSION_STRING}")
             endif()
         endif()
+        if(Boost_DIR)
+            message(STATUS "Found Boost: ${Boost_DIR}")
+        endif()
+        set(libs ${libs} Boost::boost)
         if(MPFR) # MPFR is used within boost multiprecision, so using it without Boost does not make sense
             find_package(MPFR)
         endif()

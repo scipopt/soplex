@@ -9,7 +9,7 @@ set(SOPLEX_FOUND TRUE)
 
 if(@SOPLEX_WITH_BOOST@)
   find_package(Boost @BOOST_MINIMUM_VERSION@)
-  include_directories(${Boost_INCLUDE_DIRS})
+  set(libs ${libs} Boost::boost)
 endif()
 
 if(@SOPLEX_WITH_PAPILO@)
