@@ -2,7 +2,8 @@ Next - Release 8.0.0
 ==================
 
 build system:
-- FindBoost is not longer support by CMake 3.30 with CMP0167 which is enforced for versions 3.30+. Note that BOOST_ROOT is no longer support and Boost_DIR should link to Boost's cmake config
+
+- For cmake >= 3.30 CMP0167 is enforced and BOOST_ROOT no longer supported, please use Boost_DIR instead with these cmake versions.
 
 features:
 
