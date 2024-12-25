@@ -56,6 +56,4 @@ grep -H "@version" doc/xternal.cpp
 grep -H "SOPLEX_VERSION" CMakeLists.txt
 grep -H "^VERSION" Makefile
 grep -H "^VERSION" scripts/makedist.sh
-echo "check copyright info in doxygen documentation:"
-grep "1996" doc/soplexfooter.html
 tail src/soplex/git_hash.cpp
