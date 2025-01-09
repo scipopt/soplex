@@ -37,7 +37,8 @@ void SoPlexBase<R>::_checkScaling(SPxLPBase<R>* origLP) const
    SPX_MSG_INFO1(spxout, spxout << "DEBUG: checking correctness of scaled LP" << std::endl;)
    assert(_realLP->nCols() == origLP->nCols());
    assert(_realLP->nRows() == origLP->nRows());
-   assert(_realLP->isScaled() && !origLP->isScaled());
+   assert(_realLP->isScaled());
+   assert(!origLP->isScaled());
    bool correct = true;
 
    SPX_MSG_INFO1(spxout, spxout << "DEBUG: checking rows..." << std::endl;)
@@ -111,23 +112,19 @@ void SoPlexBase<R>::_checkBasisScaling()
    VectorBase<R>** binvcol = 0;
    VectorBase<R>** binvrow = 0;
    int* inds = nullptr;
-   int basisdim = _solver.nRows(); // do all operations with regard to the column basis
-   bool colrep = (_solver.rep() == SPxSolverBase<R>::COLUMN);
+   int basisdim = _solver.rep() == SPxSolverBase<R>::COLUMN ? _solver.nRows() : _solver.nCols();
    spx_alloc(binvcol, basisdim);
    spx_alloc(binvrow, basisdim);
    spx_alloc(inds, basisdim);
 
-   if(colrep)
-   {
-      SPX_MSG_INFO1(spxout, spxout << "DEBUG: computing columns of inverted basis matrix\n";)
+   SPX_MSG_INFO1(spxout, spxout << "DEBUG: computing columns of inverted basis matrix\n";)
 
-      // collect columns of the basis inverse
-      for(int i = 0; i < basisdim; ++i)
-      {
-         binvcol[i] = new VectorBase<R>(basisdim);
-         binvcol[i]->clear();
-         assert(getBasisInverseColReal(i, binvcol[i]->get_ptr(), 0, 0, true));
-      }
+   // collect columns of the basis inverse
+   for(int i = 0; i < basisdim; ++i)
+   {
+      binvcol[i] = new VectorBase<R>(basisdim);
+      binvcol[i]->clear();
+      assert(getBasisInverseColReal(i, binvcol[i]->get_ptr(), 0, 0, true));
    }
 
    SPX_MSG_INFO1(spxout, spxout << "DEBUG: computing rows of inverted basis matrix\n";)
@@ -140,36 +137,32 @@ void SoPlexBase<R>::_checkBasisScaling()
       assert(getBasisInverseRowReal(i, binvrow[i]->get_ptr(), 0, 0, true));
    }
 
-   if(colrep)
+   SPX_MSG_INFO1(spxout, spxout <<
+                 "DEBUG: checking columns for identity after multiplying with basis matrix\n";)
+
+   // multiply with (unscaled) basis matrix and check result (should be unitvecs)
+   for(int i = 0; i < basisdim; ++i)
    {
-      SPX_MSG_INFO1(spxout, spxout <<
-                    "DEBUG: checking columns for identity after multiplying with basis matrix\n";)
+      VectorBase<R> result(*binvcol[i]);
+      assert(multBasis(result.get_ptr(), true));
+      R sumerror = 0.0;
 
-      // multiply with (unscaled) basis matrix and check result (should be unitvecs)
-      for(int i = 0; i < basisdim; ++i)
+      for(int j = 0; j < basisdim; ++j)
       {
-         VectorBase<R> result(*binvcol[i]);
-         assert(multBasis(result.get_ptr(), true));
-         R sumerror = 0.0;
+         R error = 0.0;
 
-         for(int j = 0; j < basisdim; ++j)
-         {
-            R error = 0.0;
+         if(j != i)
+            error = spxAbs(result[j]);
+         else
+            error = spxAbs(result[j] - 1.0);
 
-            if(j != i)
-               error = spxAbs(result[j]);
-            else
-               error = spxAbs(result[j] - 1.0);
+         if(error > _solver.tolerances()->floatingPointFeastol())
+            SPX_MSG_INFO1(spxout, spxout << "ERROR: col " << i << " " << j << ", " << result[j] << std::endl);
 
-            if(error > _solver.tolerances()->floatingPointFeastol())
-               SPX_MSG_INFO1(spxout, spxout << "ERROR: col " << i << " " << j << ", " << result[j] << std::endl);
-
-            sumerror += error;
-         }
-
-         assert(_solver.rep() == SPxSolverBase<R>::ROW
-                || sumerror < _solver.tolerances()->floatingPointFeastol());
+         sumerror += error;
       }
+
+      assert(LE(sumerror, 0, _solver.tolerances()->floatingPointFeastol()));
    }
 
    SPX_MSG_INFO1(spxout, spxout <<
@@ -196,33 +189,32 @@ void SoPlexBase<R>::_checkBasisScaling()
          sumerror += error;
       }
 
-      assert(sumerror < _solver.tolerances()->floatingPointFeastol());
+      assert(LE(sumerror, 0, _solver.tolerances()->floatingPointFeastol()));
    }
 
    if(_solver.isScaled())
    {
       SPX_MSG_INFO1(spxout, spxout << "DEBUG: unscaling LP\n";)
-      //         _solver.setRep(SPxSolverBase<R>::COLUMN);
-      _solver.unscaleLPandReloadBasis();
-      //         _solver.setBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
-      //         _solver.solve();
+
+      // unscale LP matrix
+      _solver.unscaleLP();
+
+      // invalidate basis factorization
+      _solver.loadMatrixVecs();
 
       VectorBase<R>** binvcol2 = 0;
       VectorBase<R>** binvrow2 = 0;
       spx_alloc(binvcol2, basisdim);
       spx_alloc(binvrow2, basisdim);
 
-      if(colrep)
-      {
-         SPX_MSG_INFO1(spxout, spxout << "DEBUG: computing columns of inverted basis matrix again\n";)
+      SPX_MSG_INFO1(spxout, spxout << "DEBUG: computing columns of inverted basis matrix again\n";)
 
-         // collect columns of the basis inverse
-         for(int i = 0; i < basisdim; ++i)
-         {
-            binvcol2[i] = new VectorBase<R>(basisdim);
-            binvcol2[i]->clear();
-            assert(getBasisInverseColReal(i, binvcol2[i]->get_ptr(), 0, 0, false));
-         }
+      // collect columns of the basis inverse
+      for(int i = 0; i < basisdim; ++i)
+      {
+         binvcol2[i] = new VectorBase<R>(basisdim);
+         binvcol2[i]->clear();
+         assert(getBasisInverseColReal(i, binvcol2[i]->get_ptr(), 0, 0, false));
       }
 
       SPX_MSG_INFO1(spxout, spxout << "DEBUG: computing rows of inverted basis matrix again\n";)
@@ -244,25 +236,22 @@ void SoPlexBase<R>::_checkBasisScaling()
 
          for(int j = 0; j < basisdim; ++j)
          {
-            if(colrep)
+            if(NE((*binvcol[i])[j], (*binvcol2[i])[j], _solver.tolerances()->floatingPointFeastol()))
             {
-               if(NE((*binvcol[i])[j], (*binvcol2[i])[j], _solver.tolerances()->floatingPointFeastol()))
-               {
-                  SPX_MSG_INFO1(spxout, spxout << "ERROR: col " << i << " " << j << ", " << (*binvcol[i])[j] << " " <<
-                                (*binvcol2[i])[j] << std::endl);
-                  sumerror += spxAbs((*binvcol[i])[j] - (*binvcol2[i])[j]);
-               }
+               SPX_MSG_INFO1(spxout, spxout << "ERROR: col " << i << " " << j << ", " <<
+                             (*binvcol[i])[j] << " " << (*binvcol2[i])[j] << std::endl);
+               sumerror += spxAbs((*binvcol[i])[j] - (*binvcol2[i])[j]);
             }
 
             if(NE((*binvrow[i])[j], (*binvrow2[i])[j], _solver.tolerances()->floatingPointFeastol()))
             {
-               SPX_MSG_INFO1(spxout, spxout << "ERROR: row " << i << " " << j << ", " << (*binvrow[i])[j] /
-                             (*binvrow2[i])[j] << std::endl);
+               SPX_MSG_INFO1(spxout, spxout << "ERROR: row " << i << " " << j << ", " <<
+                             (*binvrow[i])[j] << " " << (*binvrow2[i])[j] << std::endl);
                sumerror += spxAbs((*binvrow[i])[j] - (*binvrow2[i])[j]);
             }
          }
 
-         assert(sumerror < _solver.tolerances()->floatingPointFeastol());
+         assert(LE(sumerror, 0, _solver.tolerances()->floatingPointFeastol()));
       }
 
       spx_free(binvcol2);

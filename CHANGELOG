@@ -5,8 +5,10 @@ fixed bugs:
 
 code quality:
 - correct order of columns and rows when dumping basis
+- generalize optional test _checkBasisScaling() of testsoplex.hpp to both representations
 
 miscellaneous:
+- only invalidate factorization after unscaling matrix in _checkBasisScaling() of testsoplex.hpp to keep basis sequence
 
 November 2024 - Release 7.1.2
 ==================
