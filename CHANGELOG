@@ -4,6 +4,7 @@ Release 7.1.3
 fixed bugs:
 
 code quality:
+- correct order of columns and rows when dumping basis
 
 miscellaneous:
 

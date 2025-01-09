@@ -1218,7 +1218,7 @@ R SPxBasisBase<R>::getMatrixMetric(int type)
 }
 
 template <class R>
-void SPxBasisBase<R>::dump()
+void SPxBasisBase<R>::dump() const
 {
    assert(status() > NO_PROBLEM);
    assert(theLP != nullptr);
@@ -1226,42 +1226,21 @@ void SPxBasisBase<R>::dump()
    assert(thedesc.nCols() == theLP->nCols());
    assert(theLP->dim() == matrix.size());
 
-   int i, basesize;
+   int i;
 
    // Dump regardless of the verbosity level if this method is called.
 
    std::cout << "DBASIS09 Basis entries:";
-   basesize = 0;
 
-   for(i = 0; i < theLP->nRows(); ++i)
+   for(i = 0; i < theBaseId.size(); ++i)
    {
-      if(theLP->isBasic(thedesc.rowStatus(i)))
-      {
-         if(basesize % 10 == 0)
-            std::cout << std::endl << "DBASIS10 ";
+      if(i % 10 == 0)
+         std::cout << std::endl << "DBASIS10 ";
 
-         SPxRowId id = theLP->SPxLPBase<R>::rId(i);
-         std::cout << "\tR" << theLP->number(id);
-         basesize++;
-      }
-   }
-
-   for(i = 0; i < theLP->nCols(); ++i)
-   {
-      if(theLP->isBasic(thedesc.colStatus(i)))
-      {
-         if(basesize % 10 == 0)
-            std::cout << std::endl << "DBASIS11 ";
-
-         SPxColId id = theLP->SPxLPBase<R>::cId(i);
-         std::cout << "\tC" << theLP->number(id);
-         basesize++;
-      }
+      std::cout << '\t' << (theBaseId[i].isSPxRowId() ? 'R' : 'C') << theLP->number(theBaseId[i]);
    }
 
    std::cout << std::endl;
-
-   assert(basesize == matrix.size());
 }
 
 template <class R>
