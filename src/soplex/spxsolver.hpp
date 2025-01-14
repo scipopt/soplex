@@ -1838,28 +1838,18 @@ void SPxSolverBase<R>::setType(Type tp)
       switch(stat)
       {
       case FIXED :
-         assert(EQ(this->rhs(row), this->lhs(row), tolerances()->floatingPointFeastol()));
          rstat = SPxBasisBase<R>::Desc::P_FIXED;
          break;
 
-      case ON_UPPER :
-         assert(this->rhs(row) < R(infinity));
-         rstat = this->lhs(row) < this->rhs(row)
-                 ? SPxBasisBase<R>::Desc::P_ON_UPPER
-                 : SPxBasisBase<R>::Desc::P_FIXED;
+      case ON_LOWER :
+         rstat = SPxBasisBase<R>::Desc::P_ON_LOWER;
          break;
 
-      case ON_LOWER :
-         assert(this->lhs(row) > R(-infinity));
-         rstat = this->lhs(row) < this->rhs(row)
-                 ? SPxBasisBase<R>::Desc::P_ON_LOWER
-                 : SPxBasisBase<R>::Desc::P_FIXED;
+      case ON_UPPER :
+         rstat = SPxBasisBase<R>::Desc::P_ON_UPPER;
          break;
 
       case ZERO :
-         /* A 'free' row (i.e., infinite lower & upper bounds) does not really make sense. The user
-          * might (think to) know better, e.g., when temporarily turning off a row. We therefore apply
-          * the same adjustment as in the column case in varStatusToBasisStatusCol(). */
          rstat = SPxBasisBase<R>::Desc::P_FREE;
          break;
 
@@ -1886,35 +1876,18 @@ void SPxSolverBase<R>::setType(Type tp)
       switch(stat)
       {
       case FIXED :
-         if(this->upper(col) == this->lower(col))
-            cstat = SPxBasisBase<R>::Desc::P_FIXED;
-         else if(this->maxObj(col) > 0.0)
-            cstat = SPxBasisBase<R>::Desc::P_ON_UPPER;
-         else
-            cstat = SPxBasisBase<R>::Desc::P_ON_LOWER;
-
-         break;
-
-      case ON_UPPER :
-         assert(this->upper(col) < R(infinity));
-         cstat = this->lower(col) < this->upper(col)
-                 ? SPxBasisBase<R>::Desc::P_ON_UPPER
-                 : SPxBasisBase<R>::Desc::P_FIXED;
+         cstat = SPxBasisBase<R>::Desc::P_FIXED;
          break;
 
       case ON_LOWER :
-         assert(this->lower(col) > R(-infinity));
-         cstat = this->lower(col) < this->upper(col)
-                 ? SPxBasisBase<R>::Desc::P_ON_LOWER
-                 : SPxBasisBase<R>::Desc::P_FIXED;
+         cstat = SPxBasisBase<R>::Desc::P_ON_LOWER;
+         break;
+
+      case ON_UPPER :
+         cstat = SPxBasisBase<R>::Desc::P_ON_UPPER;
          break;
 
       case ZERO :
-
-         /* In this case the upper and lower bounds on the variable should be infinite. The bounds
-          * might, however, have changed and we try to recover from this by changing the status to
-          * 'resonable' settings. Since the status should be implicit free we still always set it
-          * to P_FREE to be consistent */
          cstat = SPxBasisBase<R>::Desc::P_FREE;
          break;
 

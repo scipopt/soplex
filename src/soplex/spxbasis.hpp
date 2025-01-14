@@ -255,16 +255,18 @@ void SPxBasisBase<R>::loadDesc(const Desc& ds)
        */
       if(thedesc.rowStatus(i) >= 0)
          thedesc.rowStatus(i) = dualRowStatus(i);
-      else if(thedesc.rowStatus(i) == SPxBasisBase<R>::Desc::P_FIXED
-              && theLP->SPxLPBase<R>::lhs(i) != theLP->SPxLPBase<R>::rhs(i))
-      {
-         if(theLP->SPxLPBase<R>::lhs(i) > R(-infinity) && theLP->SPxLPBase<R>::maxRowObj(i) < 0.0)
-            thedesc.rowStatus(i) = SPxBasisBase<R>::Desc::P_ON_LOWER;
-         else if(theLP->SPxLPBase<R>::rhs(i) < R(infinity))
-            thedesc.rowStatus(i) = SPxBasisBase<R>::Desc::P_ON_UPPER;
-         else
-            thedesc.rowStatus(i) = SPxBasisBase<R>::Desc::P_FREE;
-      }
+      else if(theLP->SPxLPBase<R>::lhs(i) == theLP->SPxLPBase<R>::rhs(i))
+         thedesc.rowStatus(i) = SPxBasisBase<R>::Desc::P_FIXED;
+      else if(theLP->SPxLPBase<R>::lhs(i) > R(-infinity)
+              && (theLP->SPxLPBase<R>::rhs(i) >= R(infinity)
+                  || thedesc.rowStatus(i) == SPxBasisBase<R>::Desc::P_ON_LOWER
+                  || (thedesc.rowStatus(i) != SPxBasisBase<R>::Desc::P_ON_UPPER
+                      && theLP->SPxLPBase<R>::maxRowObj(i) <= 0)))
+         thedesc.rowStatus(i) = SPxBasisBase<R>::Desc::P_ON_LOWER;
+      else if(theLP->SPxLPBase<R>::rhs(i) < R(infinity))
+         thedesc.rowStatus(i) = SPxBasisBase<R>::Desc::P_ON_UPPER;
+      else
+         thedesc.rowStatus(i) = SPxBasisBase<R>::Desc::P_FREE;
 
       if(theLP->isBasic(thedesc.rowStatus(i)))
       {
@@ -292,17 +294,18 @@ void SPxBasisBase<R>::loadDesc(const Desc& ds)
        */
       if(thedesc.colStatus(i) >= 0)
          thedesc.colStatus(i) = dualColStatus(i);
-      else if(thedesc.colStatus(i) == SPxBasisBase<R>::Desc::P_FIXED
-              && theLP->SPxLPBase<R>::lower(i) != theLP->SPxLPBase<R>::upper(i))
-      {
-         if(theLP->SPxLPBase<R>::lower(i) <= R(-infinity) && theLP->SPxLPBase<R>::upper(i) >= R(infinity))
-            thedesc.colStatus(i) = SPxBasisBase<R>::Desc::P_FREE;
-         else if(theLP->SPxLPBase<R>::upper(i) >= R(infinity)
-                 || (theLP->SPxLPBase<R>::lower(i) > R(-infinity) && theLP->SPxLPBase<R>::maxObj(i) < 0.0))
-            thedesc.colStatus(i) = SPxBasisBase<R>::Desc::P_ON_LOWER;
-         else
-            thedesc.colStatus(i) = SPxBasisBase<R>::Desc::P_ON_UPPER;
-      }
+      else if(theLP->SPxLPBase<R>::lower(i) == theLP->SPxLPBase<R>::upper(i))
+         thedesc.colStatus(i) = SPxBasisBase<R>::Desc::P_FIXED;
+      else if(theLP->SPxLPBase<R>::lower(i) > R(-infinity)
+              && (theLP->SPxLPBase<R>::upper(i) >= R(infinity)
+                  || thedesc.colStatus(i) == SPxBasisBase<R>::Desc::P_ON_LOWER
+                  || (thedesc.colStatus(i) != SPxBasisBase<R>::Desc::P_ON_UPPER
+                      && theLP->SPxLPBase<R>::maxObj(i) <= 0)))
+         thedesc.colStatus(i) = SPxBasisBase<R>::Desc::P_ON_LOWER;
+      else if(theLP->SPxLPBase<R>::upper(i) < R(infinity))
+         thedesc.colStatus(i) = SPxBasisBase<R>::Desc::P_ON_UPPER;
+      else
+         thedesc.colStatus(i) = SPxBasisBase<R>::Desc::P_FREE;
 
       if(theLP->isBasic(thedesc.colStatus(i)))
       {
@@ -726,10 +729,11 @@ void SPxBasisBase<R>::writeBasis(
             /* Default is all non-basic variables on lower bound (if finite) or at zero (if free).
              * nothing to do in this case.
              */
-            assert(theLP->lower(col) <= R(-infinity) || thedesc.colStatus(col) == Desc::P_ON_LOWER
-                   || thedesc.colStatus(col) == Desc::P_FIXED);
-            assert(theLP->lower(col) > R(-infinity) || theLP->upper(col) < R(infinity)
+            assert(thedesc.colStatus(col) == Desc::P_ON_LOWER
+                   || thedesc.colStatus(col) == Desc::P_FIXED
                    || thedesc.colStatus(col) == Desc::P_FREE);
+            assert(thedesc.colStatus(col) == Desc::P_FREE || theLP->lower(col) > R(-infinity));
+            assert(thedesc.colStatus(col) != Desc::P_FREE || theLP->lower(col) <= 0);
          }
       }
    }

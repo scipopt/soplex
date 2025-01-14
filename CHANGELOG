@@ -2,6 +2,7 @@ Release 7.1.3
 ==================
 
 fixed bugs:
+- generalize basis adaption to variable bounds in loadDesc() of spxbasis.hpp to avoid errors and cyclings due to outdated non-basis declarations
 
 code quality:
 - correct order of columns and rows when dumping basis
