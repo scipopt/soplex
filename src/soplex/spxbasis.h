@@ -924,7 +924,7 @@ public:
    void restoreInitialBasis();
 
    /// output basis entries.
-   void dump();
+   void dump() const;
 
    /// consistency check.
    bool isConsistent() const;

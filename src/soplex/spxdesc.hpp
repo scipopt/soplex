@@ -130,17 +130,27 @@ void SPxBasisBase<R>::Desc::dump() const
 
    // Dump regardless of the verbosity level if this method is called.
 
-   std::cout << "DBDESC01 column status: ";
+   std::cout << "DBDESC01 Column status:";
 
-   for(i = 0; i < nCols(); i++)
-      std::cout << static_cast<int>(colStatus(i));
+   for(i = 0; i < nCols(); ++i)
+   {
+      if(i % 10 == 0)
+         std::cout << std::endl << "DBDESC02 ";
+
+      std::cout << '\t' << static_cast<int>(colStatus(i));
+   }
 
    std::cout << std::endl;
 
-   std::cout << "DBDESC02 row status:    ";
+   std::cout << "DBDESC03 Row status:";
 
-   for(i = 0; i < nRows(); i++)
-      std::cout << static_cast<int>(rowStatus(i));
+   for(i = 0; i < nRows(); ++i)
+   {
+      if(i % 10 == 0)
+         std::cout << std::endl << "DBDESC04 ";
+
+      std::cout << '\t' << static_cast<int>(rowStatus(i));
+   }
 
    std::cout << std::endl;
 }

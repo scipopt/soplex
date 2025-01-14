@@ -3245,12 +3245,12 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
       {
          SPxOut::debug(this, "basis (status = {}) desc before set:\n", _boostedSolver.basis().status());
 #ifdef SOPLEX_DEBUG
-         _boostedSolver.basis().desc().dump()
+         _boostedSolver.basis().desc().dump();
 #endif
          _boostedSolver.setBasis(_tmpBasisStatusRows.get_const_ptr(), _tmpBasisStatusCols.get_const_ptr());
          SPxOut::debug(this, "basis (status = {}) desc after set:\n", _boostedSolver.basis().status());
 #ifdef SOPLEX_DEBUG
-         _boostedSolver.basis().desc().dump()
+         _boostedSolver.basis().desc().dump();
 #endif
          _hasBasis = _boostedSolver.basis().status() > SPxBasisBase<BP>::NO_PROBLEM;
          SPxOut::debug(this, "setting basis in solver {} (3)\n", (_hasBasis ? "successful" : "failed"));
