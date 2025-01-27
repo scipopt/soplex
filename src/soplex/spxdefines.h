@@ -81,7 +81,6 @@
 #include <boost/multiprecision/gmp.hpp>
 #else
 #include <boost/multiprecision/cpp_int.hpp>
-using mpq_t = double;
 #endif
 
 #endif
