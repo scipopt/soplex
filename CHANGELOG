@@ -7,6 +7,7 @@ fixed bugs:
 code quality:
 - correct order of columns and rows when dumping basis
 - generalize optional test _checkBasisScaling() of testsoplex.hpp to both representations
+- remove fallback methods for mpq_t if GMP is not linked to avert breaking namespace pollution
 
 miscellaneous:
 - only invalidate factorization after unscaling matrix in _checkBasisScaling() of testsoplex.hpp to keep basis sequence
