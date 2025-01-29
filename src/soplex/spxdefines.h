@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*  Copyright (c) 1996-2024 Zuse Institute Berlin (ZIB)                      */
+/*  Copyright (c) 1996-2025 Zuse Institute Berlin (ZIB)                      */
 /*                                                                           */
 /*  Licensed under the Apache License, Version 2.0 (the "License");          */
 /*  you may not use this file except in compliance with the License.         */
@@ -81,7 +81,6 @@
 #include <boost/multiprecision/gmp.hpp>
 #else
 #include <boost/multiprecision/cpp_int.hpp>
-using mpq_t = double;
 #endif
 
 #endif
@@ -94,7 +93,7 @@ bool EQ(int a, int b);
 #define SOPLEX_VERSION         800
 #define SOPLEX_SUBVERSION        0
 #define SOPLEX_APIVERSION       18
-#define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2024 Zuse Institute Berlin (ZIB)"
+#define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2025 Zuse Institute Berlin (ZIB)"
 
 /*-----------------------------------------------------------------------------
  * Assertion Macros etc.
