@@ -57,6 +57,10 @@ public:
 
 };
 
+#if defined(_MSC_VER) || defined(__INTEL_COMPILER)
+#pragma float_control(precise, on, push)
+#endif
+
 template <>
 class StableSum<double>
 {
@@ -72,9 +76,6 @@ public:
 
    void operator+=(double input)
    {
-#if defined(_MSC_VER) || defined(__INTEL_COMPILER)
-#pragma float_control( precise, on )
-#endif
 #ifdef SOPLEX_CHECK_STABLESUM
       checksum += input;
 #endif
@@ -105,6 +106,10 @@ public:
       return sum + c;
    }
 };
+
+#if defined(_MSC_VER) || defined(__INTEL_COMPILER)
+#pragma float_control(pop)
+#endif
 
 /// Output operator.
 template < class T >
