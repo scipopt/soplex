@@ -59,8 +59,7 @@ bool SPxSolverBase<R>::writeState(
 
    ofs << "# SoPlex version " << SOPLEX_VERSION / 100
        << "." << (SOPLEX_VERSION / 10) % 10
-       << "." << SOPLEX_VERSION % 10
-       << "." << SOPLEX_SUBVERSION << std::endl << std::endl;
+       << "." << SOPLEX_VERSION % 10 << std::endl << std::endl;
    ofs << "# run SoPlex as follows:" << std::endl;
    ofs << "# bin/soplex --loadset=spxcheck.set --readbas=spxcheck.bas spxcheck.mps\n" << std::endl;
    ofs << "int:representation = " << (rep() == SPxSolverBase<R>::COLUMN ? "1" : "2") << std::endl;

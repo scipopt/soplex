@@ -12,8 +12,10 @@ fixed bugs:
 interface & parameters:
 - add `SolBase` constructor
 - make method `factorizeColumnRational` public
+- deprecated SOPLEX_SUBVERSION, SOPLEX_VERSION_SUB, and soplex::subversion()
 
 miscellaneous:
+- removed 4th number in SoPlex version; new format is major.minor.patch
 
 
 Release 7.1.4

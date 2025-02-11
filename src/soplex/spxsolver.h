@@ -536,6 +536,7 @@ public:
       return SOPLEX_VERSION;
    }
    /// return the internal subversion of SPxSolverBase as number
+   /// @deprecated Always 0 and will be removed in a future release.
    int subversion() const
    {
       return SOPLEX_SUBVERSION;
