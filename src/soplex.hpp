@@ -6909,16 +6909,9 @@ template <class R>
 void SoPlexBase<R>::printVersion() const
 {
    // do not use preprocessor directives within the SPX_MSG_INFO1 macro
-#if (SOPLEX_SUBVERSION > 0)
-   SPX_MSG_INFO1(spxout, spxout << "SoPlex version " << SOPLEX_VERSION / 100
-                 << "." << (SOPLEX_VERSION % 100) / 10
-                 << "." << SOPLEX_VERSION % 10
-                 << "." << SOPLEX_SUBVERSION);
-#else
    SPX_MSG_INFO1(spxout, spxout << "SoPlex version " << SOPLEX_VERSION / 100
                  << "." << (SOPLEX_VERSION % 100) / 10
                  << "." << SOPLEX_VERSION % 10);
-#endif
 
 #ifndef NDEBUG
    SPX_MSG_INFO1(spxout, spxout << " [mode: debug]");
@@ -9670,11 +9663,7 @@ bool SoPlexBase<R>::saveSettingsFile(const char* filename, const bool onlyChange
    SPxOut::setFixed(file);
 
    file << "# SoPlexBase version " << SOPLEX_VERSION / 100 << "." << (SOPLEX_VERSION / 10) % 10 << "."
-        << SOPLEX_VERSION % 10;
-#if SOPLEX_SUBVERSION > 0
-   file << "." << SOPLEX_SUBVERSION;
-#endif
-   file << "\n";
+        << SOPLEX_VERSION % 10 << "\n";
 
    for(int i = 0; i < SoPlexBase<R>::BOOLPARAM_COUNT; i++)
    {

@@ -91,7 +91,8 @@ namespace soplex
 bool EQ(int a, int b);
 
 #define SOPLEX_VERSION         800
-#define SOPLEX_SUBVERSION        0
+#define SOPLEX_VERSION_SUB       0  ///< @deprecated Always 0
+#define SOPLEX_SUBVERSION        0  ///< @deprecated Always 0
 #define SOPLEX_APIVERSION       18
 #define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2025 Zuse Institute Berlin (ZIB)"
 
