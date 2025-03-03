@@ -7372,7 +7372,9 @@ bool SoPlexBase<R>::_isConsistent() const
 
    assert(!_hasBasis || _isRealLPLoaded || _basisStatusRows.size() == numRows());
    assert(!_hasBasis || _isRealLPLoaded || _basisStatusCols.size() == numCols());
-   assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED || _hasBasis);
+   // Exact SoPlex does not necessarily have a basis (for example if reconstruction is successful)
+   assert((_rationalLUSolver.status() == SLinSolverRational::UNLOADED
+           || _rationalLUSolver.status() == SLinSolverRational::OK));
    assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED
           || _rationalLUSolver.dim() == _rationalLUSolverBind.size());
    assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED
