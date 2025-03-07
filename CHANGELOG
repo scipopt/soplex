@@ -4,6 +4,11 @@ Next - Release 8.0.0
 build system:
 
 - For cmake >= 3.30 CMP0167 is enforced and BOOST_ROOT no longer supported, please use Boost_DIR instead with these cmake versions.
+- revised SANITIZE options for makefile: removed SANITIZE=full, added SANITIZE=thread, SANITIZE=address, and SANITIZE=memory to enable
+  thread, address, and memory sanitizers, respectively, in addition to undefined behavior sanitizer;
+  changed default to SANITIZE=false
+- replaced `SANITIZE_XYZ=(on|off)` options for cmake by `SANITIZE=(on|off|thread|address|memory)` and let it have an actual effect on the build;
+  undefined behavior sanitizer is always enabled if not `SANITIZE=off` (the default)
 
 features:
 

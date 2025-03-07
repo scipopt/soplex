@@ -96,6 +96,7 @@ LINKCXX_o	=	-o # the trailing space is important
 LINKLIBSUFFIX	=
 DCXX		=	$(CXX)
 LINT		=	flexelint
+SANITIZE	=	false
 AR		=	ar
 AR_o		=
 RANLIB		=	ranlib
