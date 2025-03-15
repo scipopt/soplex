@@ -263,13 +263,14 @@ GMP_LDFLAGS	=
 GMP_CPPFLAGS	=
 endif
 
+# For MPFR, needed for rational solving with precision boosting
 ifeq ($(MPFR),true)
 LDFLAGS += -lmpfr
 else
 # Flags for cpp mpf
 endif
 
-# For boost program options
+# For boost multiprecision, needed for rational solving
 ifeq ($(BOOST),true)
 	LDFLAGS += $(BOOST_LDFLAGS)
 else
