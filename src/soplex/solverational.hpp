@@ -5799,7 +5799,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
    _statistics->syncTime->start();
 
    // if preprocessing is applied, we need to restore the original LP at the end
-   SPxLPRational* rationalLP = 0;
+   SPxLPRational* rationalLP = nullptr;
 
    if(_boostedSimplifier != nullptr || _boostedScaler != nullptr)
    {
@@ -5969,7 +5969,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
             break;
 
          case SPxSolverBase<BP>::ABORT_CYCLING:
-            if(_boostedSimplifier == 0 && boolParam(SoPlexBase<R>::ACCEPTCYCLING))
+            if(_boostedSimplifier == nullptr && boolParam(SoPlexBase<R>::ACCEPTCYCLING))
             {
                _boostedSolver.getPrimalSol(primal);
                _boostedSolver.getDualSol(dual);
@@ -5993,7 +5993,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
          case SPxSolverBase<BP>::UNBOUNDED:
             _hasBasis = (_boostedSolver.basis().status() > SPxBasisBase<BP>::NO_PROBLEM);
 
-            if(_hasBasis && _simplifier == 0)
+            if(_hasBasis && _simplifier == nullptr)
             {
                _tmpBasisStatusRows.reSize(_boostedSolver.nRows());
                _tmpBasisStatusCols.reSize(_boostedSolver.nCols());

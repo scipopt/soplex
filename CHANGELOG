@@ -10,6 +10,8 @@ build system:
   changed default to SANITIZE=false
 - replaced `SANITIZE_XYZ=(on|off)` options for cmake by `SANITIZE=(on|off|thread|address|memory)` and let it have an actual effect on the build;
   undefined behavior sanitizer is always enabled if not `SANITIZE=off` (the default)
+- Makefiles: By default, SoPlex links with MPFR=true and GMP=true if and only if BOOST=true (options GMP=auto and MPFR=auto)
+- Makefiles: Change default value of BOOST to false; set BOOST=true manually to obtain exact rational solving functionality
 
 features:
 

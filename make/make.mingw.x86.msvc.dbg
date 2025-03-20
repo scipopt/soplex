@@ -21,5 +21,8 @@ ZLIB_FLAGS	=	-Ilib/zlib
 GMP_CPPFLAGS  = -Ilib/mpir.$(ARCH)
 GMP_LDFLAGS   =  lib/libmpir.$(ARCH).$(OPT).lib
 
+MPFR_CPPFLAGS  = -Ilib/mpfr.$(ARCH)
+MPFR_LDFLAGS   =  lib/libmpfr.$(ARCH).$(OPT).lib
+
 # NOTE: use this flag throughout the whole compilation process
 CXXFLAGS    +=  -MDd
