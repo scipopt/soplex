@@ -79,11 +79,25 @@ CONTINUE	=	false
 # is it allowed to link to external open source libraries?
 OPENSOURCE	=	true
 
-GMP      =  true
-MPFR     =  false
 ZLIB     =  true
-BOOST    =  true
 QUADMATH =  false
+BOOST    =  false
+GMP      =  auto
+MPFR     =  auto
+
+ifeq ($(GMP),auto)
+GMP     =  $(BOOST)
+ifeq ($(GMP)-$(MAKELEVEL),false-0)
+$(warning GMP was deactived because of missing Boost support (BOOST=false). Set BOOST=true to enable rational solving mode.)
+endif
+endif
+
+ifeq ($(MPFR),auto)
+MPFR     =  $(BOOST)
+ifeq ($(MPFR)-$(MAKELEVEL),false-0)
+$(warning MPFR was deactived because of missing Boost support (BOOST=false). Set BOOST=true to enable rational solving mode.)
+endif
+endif
 
 COMP		=	gnu
 CXX		=	g++
@@ -250,7 +264,9 @@ ALLSRC		=	$(BINSRC) $(EXAMPLESRC) $(LIBSRC)
 # check if it is allowed to link to external open source libraries
 ifeq ($(OPENSOURCE), false)
 	override ZLIB	=	false
+	override BOOST	=	false
 	override GMP	=	false
+	override MPFR	=	false
 endif
 
 GMPDEP	:=	$(SRCDIR)/depend.gmp
@@ -307,6 +323,15 @@ LINKSINFO	+=	" -> \"libmpir.*\" is the path to the MPIR library\n"
 endif
 endif
 
+ifeq ($(MPFR),true)
+ifeq ($(COMP),msvc)
+SOFTLINKS	+=	$(LIBDIR)/mpfr.$(ARCH)
+SOFTLINKS	+=	$(LIBDIR)/libmpfr.$(ARCH).$(OPT).lib
+LINKSINFO	+=	"\n  -> \"mpfr.$(ARCH)\" is a directory containing the mpfr installation, i.e., \"mpfr.$(ARCH)/mpfr.h\" should exist.\n"
+LINKSINFO	+=	" -> \"libmpfr.*\" is the path to the MPFR library\n"
+endif
+endif
+
 ifeq ($(SHARED),true)
 EXT_LIBS	= $(ZLIB_LDFLAGS) $(GMP_LDFLAGS) $(BOOST_LDFLAGS) $(QUADMATH_LDFLAGS)
 endif
@@ -351,15 +376,15 @@ $(BINLINK) $(BINSHORTLINK):	$(BINFILE)
 ifeq ($(SHARED),true)
 $(BINFILE):	$(LIBFILE) $(BINOBJFILES) | $(BINDIR) $(BINOBJDIR)
 		@echo "-> linking $@"
-		$(LINKCXX) $(BINOBJFILES) \
+		($(LINKCXX) $(BINOBJFILES) \
 		$(LDFLAGS) $(LINKCXX_L)$(LIBDIR) $(LINKRPATH)\$$ORIGIN/../$(LIBDIR) $(LINKCXX_l)$(LIBNAME) $(LINKCXX_o)$@ \
-		|| ($(MAKE) errorhints && false)
+		|| ($(MAKE) errorhints && false)) && ($(MAKE) successwarnings || true)
 else
 $(BINFILE):	$(LIBOBJFILES) $(BINOBJFILES) | $(BINDIR) $(BINOBJDIR)
 		@echo "-> linking $@"
-		$(LINKCXX) $(BINOBJFILES) $(LIBOBJFILES) \
+		($(LINKCXX) $(BINOBJFILES) $(LIBOBJFILES) \
 		$(LDFLAGS) $(LINKCXX_o)$@ \
-		|| ($(MAKE) errorhints && false)
+		|| ($(MAKE) errorhints && false)) && ($(MAKE) successwarnings || true)
 endif
 
 .PHONY: example
@@ -657,6 +682,18 @@ ifneq ($(GMP),false)
 		$(error invalid GMP flag selected: GMP=$(GMP). Possible options are: true false)
 endif
 endif
+ifneq ($(MPFR),true)
+ifneq ($(MPFR),false)
+ifneq ($(MPFR),auto)
+		$(error invalid MPFR flag selected: MPFR=$(MPFR). Possible options are: true false auto)
+endif
+endif
+endif
+ifneq ($(BOOST),true)
+ifneq ($(BOOST),false)
+		$(error invalid BOOST flag selected: BOOST=$(BOOST). Possible options are: true false)
+endif
+endif
 ifneq ($(ZLIB),true)
 ifneq ($(ZLIB),false)
 		$(error invalid ZLIB flag selected: ZLIB=$(ZLIB). Possible options are: true false)
@@ -665,11 +702,27 @@ endif
 
 .PHONY: errorhints
 errorhints:
+ifeq ($(MPFR),true)
+		@echo "build failed with MPFR=true: if MPFR is not available, try building with MPFR=false"
+endif
 ifeq ($(ZLIB),true)
 		@echo "build failed with ZLIB=true: if ZLIB is not available, try building with ZLIB=false"
 endif
 ifeq ($(GMP),true)
 		@echo "build failed with GMP=true: if GMP is not available, try building with GMP=false"
+endif
+
+.PHONY: successwarnings
+successwarnings:
+ifeq ($(BOOST),false)
+		@echo "WARNING: built with BOOST=false: rational solving mode is not available"
+else
+ifeq ($(GMP),false)
+		@echo "WARNING: built with GMP=false: rational arithmetic uses Boost fallback (may be slower)"
+endif
+ifeq ($(MPFR),false)
+		@echo "WARNING: built with MPFR=false: no precision boosting available in rational solving mode"
+endif
 endif
 
 # --- EOF ---------------------------------------------------------------------
