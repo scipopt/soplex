@@ -8190,7 +8190,7 @@ void SoPlexBase<R>::_enableSimplifierAndScaler()
    case SIMPLIFIER_OFF:
       _simplifier = nullptr;
 #ifdef SOPLEX_WITH_MPFR
-      _boostedSimplifier = 0;
+      _boostedSimplifier = nullptr;
 #endif
       break;
 
