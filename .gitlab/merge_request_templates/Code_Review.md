@@ -17,7 +17,6 @@
 
 ### Testing
 
-* [ ] SCIP ctest has been checked (type some of `jenkins ctest`).
 * [ ] SCIP debug runs have been checked (type some of `jenkins debug {short,minlp,mip,pb}`).
 * [ ] The performance impact on SCIP has been checked (type some of `jenkins performance {mip,pb} (quick|continue|)`), **or** the changed code will not be executed by default.
 
