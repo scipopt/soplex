@@ -1,3 +1,0 @@
-CPPFLAGS += -I/client/include
-LDFLAGS	 += -L/client/lib
-

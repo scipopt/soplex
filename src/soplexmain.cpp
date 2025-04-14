@@ -67,7 +67,7 @@ void printUsage(const char* const argv[], int idx)
       "\n"
       "algorithmic settings (* indicates default):\n"
       "  --readmode=<value>     choose reading mode for <lpfile> (0* - floating-point, 1 - rational)\n"
-      "  --solvemode=<value>    choose solving mode (0 - floating-point solve, 1* - auto, 2 - force iterative refinement)\n"
+      "  --solvemode=<value>    choose solving mode (0 - floating-point solve, 1* - auto, 2 - exact rational solve)\n"
       "  --arithmetic=<value>   choose base arithmetic type (0 - double, 1 - quadprecision, 2 - higher multiprecision)\n"
 #ifdef SOPLEX_WITH_MPFR
       "  --precision=<value>    choose precision for multiprecision solve (only active when arithmetic=2 minimal value = 50)\n"
