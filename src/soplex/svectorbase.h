@@ -855,6 +855,44 @@ public:
       return true;
    }
 
+   /// Checks whether the array contains any nan entries.
+   bool hasNaNs() const
+   {
+      if(!std::is_floating_point<R>::value)
+      {
+         return false;
+      }
+
+      for(int i = 0; i < size(); ++i)
+      {
+         if(isnan(m_elem[i].val))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   /// Checks whether the array contains any NaN entries.
+   bool hasInfs() const
+   {
+      if(!std::is_floating_point<R>::value)
+      {
+         return false;
+      }
+
+      for(int i = 0; i < size(); ++i)
+      {
+         if(isinf(m_elem[i].val))
+         {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
    ///@}
 };
 

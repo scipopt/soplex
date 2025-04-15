@@ -18,6 +18,7 @@ src/soplex/git_hash.cpp
 # common cache files and folders
 .vscode/
 .nfs*
+.idea
 # compile and release objecs
 *.[oa]
 bin/
@@ -29,6 +30,8 @@ src/soplex/git_hash.cpp
 build/
 debug/
 release/
+cmake-build-debug/
+cmake-build-release/
 # test infrastructure
 check/instancedata
 check/IP

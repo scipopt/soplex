@@ -23,6 +23,8 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include <assert.h>
+#include <math.h>
+
 #include "soplex/spxdefines.h"
 #include "soplex/sorter.h"
 #include "soplex/spxsolver.h"
@@ -688,6 +690,21 @@ SPxId SPxBoundFlippingRT<R>::selectEnter(
    breakpoints[minIdx] = breakpoints[0];
    breakpoints[0] = tmp;
 
+#ifndef NDEBUG
+
+   if(std::is_floating_point<R>::value)
+   {
+      for(int i = 0; i < breakpoints.size(); ++i)
+      {
+         // nan values cannot be handled in sorting
+         assert(!isnan(breakpoints[i].val));
+         // the breakpoint formulas should not produce inf values
+         assert(!isinf(breakpoints[i].val));
+      }
+   }
+
+#endif
+
    // get initial slope
    slope = spxAbs(this->thesolver->fTest()[leaveIdx]);
 
@@ -1040,6 +1057,21 @@ int SPxBoundFlippingRT<R>::selectLeave(
    tmp = breakpoints[minIdx];
    breakpoints[minIdx] = breakpoints[0];
    breakpoints[0] = tmp;
+
+#ifndef NDEBUG
+
+   if(std::is_floating_point<R>::value)
+   {
+      for(int i = 0; i < breakpoints.size(); ++i)
+      {
+         // nan values cannot be handled in sorting
+         assert(!isnan(breakpoints[i].val));
+         // the breakpoint formulas should not produce inf values
+         assert(!isinf(breakpoints[i].val));
+      }
+   }
+
+#endif
 
    // get initial slope
    slope = spxAbs(enterTest);
