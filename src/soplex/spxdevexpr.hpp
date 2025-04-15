@@ -22,6 +22,8 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#include <math.h>
+
 #include "soplex/spxdefines.h"
 
 #define SOPLEX_DEVEX_REFINETOL 2.0
@@ -162,6 +164,21 @@ int SPxDevexPR<R>::buildBestPriceVectorLeave(R feastol)
          prices.append(price);
       }
    }
+
+#ifndef NDEBUG
+
+   if(std::is_floating_point<R>::value)
+   {
+      for(int i = 0; i < prices.size(); ++i)
+      {
+         // nan values cannot be handled in sorting
+         assert(!isnan(prices[i].val));
+         // inf values indicate numerical troubles, which should be handled beforehand
+         assert(!isinf(prices[i].val));
+      }
+   }
+
+#endif
 
    // set up structures for the quicksort implementation
    this->compare.elements = prices.get_const_ptr();
@@ -430,6 +447,21 @@ SPxId SPxDevexPR<R>::buildBestPriceVectorEnterDim(R& best, R feastol)
       }
    }
 
+#ifndef NDEBUG
+
+   if(std::is_floating_point<R>::value)
+   {
+      for(int i = 0; i < prices.size(); ++i)
+      {
+         // nan values cannot be handled in sorting
+         assert(!isnan(prices[i].val));
+         // inf values indicate numerical troubles, which should be handled beforehand
+         assert(!isinf(prices[i].val));
+      }
+   }
+
+#endif
+
    // set up structures for the quicksort implementation
    this->compare.elements = prices.get_const_ptr();
    // do a partial sort to move the best ones to the front
@@ -484,6 +516,21 @@ SPxId SPxDevexPR<R>::buildBestPriceVectorEnterCoDim(R& best, R feastol)
          this->thesolver->isInfeasibleCo[idx] = this->NOT_VIOLATED;
       }
    }
+
+#ifndef NDEBUG
+
+   if(std::is_floating_point<R>::value)
+   {
+      for(int i = 0; i < pricesCo.size(); ++i)
+      {
+         // nan values cannot be handled in sorting
+         assert(!isnan(pricesCo[i].val));
+         // inf values indicate numerical troubles, which should be handled beforehand
+         assert(!isinf(pricesCo[i].val));
+      }
+   }
+
+#endif
 
    // set up structures for the quicksort implementation
    this->compare.elements = pricesCo.get_const_ptr();

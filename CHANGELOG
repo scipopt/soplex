@@ -4,6 +4,9 @@ Release 7.1.4
 fixed bugs:
 - correct use of float_control pragma in stablesum implementation
 - relax assertion that requires a valid basis after rational solving
+- correct handling of exceptional inf values when sorting arrays
+
+interface & parameters:
 
 miscellaneous:
 - rename CMAKE_BUILD_TYPE to SOPLEX_BUILD_TYPE in soplex/config.h

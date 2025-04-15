@@ -3329,9 +3329,11 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, b
                              (unconstrained_below ? "below" : "above"), lp.maxObj(j));
 
                DSVectorBase<R> col_idx_sorted(col);
-
-               // sort col elements by increasing idx
                IdxCompare compare;
+
+               // sort col elements by increasing idx; nonzeros should not contain nan or inf values
+               assert(!col_idx_sorted.hasNaNs());
+               assert(!col_idx_sorted.hasInfs());
                SPxQuicksort(col_idx_sorted.mem(), col_idx_sorted.size(), compare);
 
                std::shared_ptr<PostStep> ptr(new FreeZeroObjVariablePS(lp, j, unconstrained_below,
@@ -4270,7 +4272,12 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLPBase<R>& lp, 
             ElementCompare compare(this->tolerances()->epsilon());
 
             if(m_classSetRows[k].size() > 1)
+            {
+               // nonzeros should not contain nan or inf values
+               assert(!m_classSetRows[k].hasNaNs());
+               assert(!m_classSetRows[k].hasInfs());
                SPxQuicksort(m_classSetRows[k].mem(), m_classSetRows[k].size(), compare);
+            }
 
             // use new index first
             int classIdx = idxSet.index(0);
@@ -4610,7 +4617,12 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, 
             ElementCompare compare(this->tolerances()->epsilon());
 
             if(m_classSetCols[k].size() > 1)
+            {
+               // nonzeros should not contain nan or inf values
+               assert(!m_classSetCols[k].hasNaNs());
+               assert(!m_classSetCols[k].hasInfs());
                SPxQuicksort(m_classSetCols[k].mem(), m_classSetCols[k].size(), compare);
+            }
 
             // use new index first
             int classIdx = idxSet.index(0);
