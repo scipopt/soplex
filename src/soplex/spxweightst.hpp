@@ -24,6 +24,7 @@
 
 
 #include <assert.h>
+#include <math.h>
 #include <iostream>
 
 #include "soplex/spxdefines.h"
@@ -154,7 +155,8 @@ struct Compare
    /// compares the weights
    T operator()(int i1, int i2) const
    {
-      return weight[i1] - weight[i2];
+      // the first case is needed to handle exceptional inf values
+      return (weight[i1] == weight[i2]) ? 0 : weight[i1] - weight[i2];
    }
 };
 
@@ -187,12 +189,42 @@ static void initPrefs(
 
    compare.weight = rowWeight.get_const_ptr();
 
+#ifndef NDEBUG
+
+   if(std::is_floating_point<R>::value)
+   {
+      for(int l = 0; l < row.size(); ++l)
+      {
+         // nan values cannot be handled in sorting
+         assert(!isnan(compare.weight[l]));
+         // the weight formulas should not produce inf values
+         assert(!isinf(compare.weight[l]));
+      }
+   }
+
+#endif
+
    SPxQuicksort(row.get_ptr(), row.size(), compare); // Sort rows
 
    for(i = 0; i < base.nCols(); ++i)
       col[i] = i;
 
    compare.weight = colWeight.get_const_ptr();
+
+#ifndef NDEBUG
+
+   if(std::is_floating_point<R>::value)
+   {
+      for(int l = 0; l < col.size(); ++l)
+      {
+         // nan values cannot be handled in sorting
+         assert(!isnan(compare.weight[l]));
+         // the weight formulas should not produce inf values
+         assert(!isinf(compare.weight[l]));
+      }
+   }
+
+#endif
 
    SPxQuicksort(col.get_ptr(), col.size(), compare); // Sort column
 

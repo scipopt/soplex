@@ -99,7 +99,8 @@ private:
          Breakpoint      j
       ) const
       {
-         return i.val - j.val;
+         // the first case is needed to handle exceptional inf values
+         return (i.val == j.val) ? 0 : i.val - j.val;
       }
    };
    ///@}

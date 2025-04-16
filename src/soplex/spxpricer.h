@@ -95,7 +95,7 @@ protected:
          IdxElement      b
       ) const
       {
-         //the first case is needed to handle inf-values
+         // the first case is needed to handle exceptional inf values
          return (a.val == b.val) ? 0 : b.val - a.val;
       }
    };
