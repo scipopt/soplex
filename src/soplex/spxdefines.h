@@ -31,7 +31,7 @@
  * \ref soplex::SPxOut::VERB_INFO3 "VERB_INFO3" are set.
  * If \c NDEBUG is not defined, the code within \#TRACE is used.
  * If \c SOPLEX_DEBUG is defined, the code within
- * \ref soplex::SPxOut::VERB_DEBUG "DEBUG" is also used.
+ * \ref soplex::SPxOut::VERB_DEBUG "VERB_DEBUG" is also used.
  *
  * If \c WITH_LONG_DOUBLE is defined, all Real numbers are of type
  * long double instead of just double.
