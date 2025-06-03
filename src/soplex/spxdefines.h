@@ -26,9 +26,9 @@
  * @brief Debugging, floating point type and parameter definitions.
  *
  * In optimized code with \c NDEBUG defined, only
- * \ref soplex::SPxOut::VERB_INFO1 "INFO1",
- * \ref soplex::SPxOut::VERB_INFO2 "INFO2", and
- * \ref soplex::SPxOut::VERB_INFO3 "INFO3" are set.
+ * \ref soplex::SPxOut::VERB_INFO1 "VERB_INFO1",
+ * \ref soplex::SPxOut::VERB_INFO2 "VERB_INFO2", and
+ * \ref soplex::SPxOut::VERB_INFO3 "VERB_INFO3" are set.
  * If \c NDEBUG is not defined, the code within \#TRACE is used.
  * If \c SOPLEX_DEBUG is defined, the code within
  * \ref soplex::SPxOut::VERB_DEBUG "DEBUG" is also used.
