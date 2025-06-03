@@ -1380,7 +1380,7 @@ int runSoPlex(int argc, char* argv[])
       if(displayStatistics)
       {
          SPX_MSG_INFO1(soplex->spxout, soplex->spxout << "Statistics\n==========\n\n");
-         soplex->printStatistics(soplex->spxout.getStream(SPxOut::INFO1));
+         soplex->printStatistics(soplex->spxout.getStream(SPxOut::VERB_INFO1));
       }
 
       if(validation->validate)

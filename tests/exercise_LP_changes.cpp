@@ -82,7 +82,7 @@ public:
    static const Real epsilon;
    static const Real epsilon_factor;
    static const Real epsilon_update;
-   static const int verbose = SPxOut::ERROR;
+   static const int verbose = SPxOut::VERB_ERROR;
    static const int precision = 12;
    ///@}
 

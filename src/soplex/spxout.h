@@ -61,16 +61,16 @@ struct EnableDebugOutput
    level. In particular, this means that the first element in an output stream
    should always be the verbosity. For instance, use
    @code
-      spxout << verb( SPxOut::WARNING ) << std::setw( 15 ) << 42 << std::endl;
+      spxout << verb( SPxOut::VERB_WARNING ) << std::setw( 15 ) << 42 << std::endl;
    @endcode
    or
    @code
-      spxout.setVerbosity( SPxOut::WARNING );
+      spxout.setVerbosity( SPxOut::VERB_WARNING );
       spxout << std::setw( 15 ) << 42 << std::endl;
    @endcode
    instead of
    @code
-      spxout << std::setw( 15 ) << verb( SPxOut::WARNING ) << 42 << std::endl;
+      spxout << std::setw( 15 ) << verb( SPxOut::VERB_WARNING ) << 42 << std::endl;
    @endcode
    in order to make sure that @c std::setw( 15 ) is applied to the warning stream.
 */
@@ -85,15 +85,15 @@ public:
    /// Verbosity level
    typedef enum
    {
-      // Note: the implementation uses the fact that ERROR == 0
-      // and that the verbosity levels are subsequent numbers.
-      // If you change this, change the implementation as well.
-      ERROR    = 0,
-      WARNING  = 1,
-      DEBUG    = 2,
-      INFO1    = 3,
-      INFO2    = 4,
-      INFO3    = 5
+      // Note: the implementation uses the fact that VERB_ERROR == 0 and that
+      // the verbosity levels are subsequent numbers. If you change this,
+      // change the implementation as well.
+      VERB_ERROR    = 0,
+      VERB_WARNING  = 1,
+      VERB_DEBUG    = 2,
+      VERB_INFO1    = 3,
+      VERB_INFO2    = 4,
+      VERB_INFO3    = 5
    } Verbosity;
 
    /// helper struct for the output operator
@@ -240,7 +240,7 @@ private:
     Calling
     @code
          SPxOut spxout;
-         spxout << verb( SPxOut::ERROR ) << "This is an error!" << std::endl;
+         spxout << verb( SPxOut::VERB_ERROR ) << "This is an error!" << std::endl;
     @endcode
     passes such a struct to the output operator defined below, which
     extracts the verbosity level from the struct and passes it to the
