@@ -21,6 +21,7 @@ interface & parameters:
 - add `SolBase` constructor
 - make method `factorizeColumnRational` public
 - deprecated SOPLEX_SUBVERSION, SOPLEX_VERSION_SUB, and soplex::subversion()
+- rename enums for verbosity levels: SPxOut::DEBUG to SPxOut::VERB_DEBUG etc.
 
 miscellaneous:
 - removed 4th number in SoPlex version; new format is major.minor.patch

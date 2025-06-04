@@ -91,7 +91,7 @@ void Validation<R>::validateSolveReal(SoPlexBase<R>& soplex)
    R sumDualViolation = 0.0;
    R sol;
 
-   std::ostream& os = soplex.spxout.getStream(SPxOut::INFO1);
+   std::ostream& os = soplex.spxout.getStream(SPxOut::VERB_INFO1);
 
    if(validatesolution == "+infinity")
    {

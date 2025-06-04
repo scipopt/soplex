@@ -5998,27 +5998,27 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       switch(value)
       {
       case 0:
-         spxout.setVerbosity(SPxOut::ERROR);
+         spxout.setVerbosity(SPxOut::VERB_ERROR);
          break;
 
       case 1:
-         spxout.setVerbosity(SPxOut::WARNING);
+         spxout.setVerbosity(SPxOut::VERB_WARNING);
          break;
 
       case 2:
-         spxout.setVerbosity(SPxOut::DEBUG);
+         spxout.setVerbosity(SPxOut::VERB_DEBUG);
          break;
 
       case 3:
-         spxout.setVerbosity(SPxOut::INFO1);
+         spxout.setVerbosity(SPxOut::VERB_INFO1);
          break;
 
       case 4:
-         spxout.setVerbosity(SPxOut::INFO2);
+         spxout.setVerbosity(SPxOut::VERB_INFO2);
          break;
 
       case 5:
-         spxout.setVerbosity(SPxOut::INFO3);
+         spxout.setVerbosity(SPxOut::VERB_INFO3);
          break;
       }
 
@@ -10095,7 +10095,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::optimize(volatile bool* interru
    }
 
    SPX_MSG_INFO1(spxout, spxout << "\n";
-                 printShortStatistics(spxout.getStream(SPxOut::INFO1));
+                 printShortStatistics(spxout.getStream(SPxOut::VERB_INFO1));
                  spxout << "\n");
 
 

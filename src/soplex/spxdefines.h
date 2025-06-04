@@ -26,12 +26,12 @@
  * @brief Debugging, floating point type and parameter definitions.
  *
  * In optimized code with \c NDEBUG defined, only
- * \ref soplex::SPxOut::INFO1 "INFO1",
- * \ref soplex::SPxOut::INFO2 "INFO2", and
- * \ref soplex::SPxOut::INFO3 "INFO3" are set.
+ * \ref soplex::SPxOut::VERB_INFO1 "VERB_INFO1",
+ * \ref soplex::SPxOut::VERB_INFO2 "VERB_INFO2", and
+ * \ref soplex::SPxOut::VERB_INFO3 "VERB_INFO3" are set.
  * If \c NDEBUG is not defined, the code within \#TRACE is used.
  * If \c SOPLEX_DEBUG is defined, the code within
- * \ref soplex::SPxOut::DEBUG "DEBUG" is also used.
+ * \ref soplex::SPxOut::VERB_DEBUG "VERB_DEBUG" is also used.
  *
  * If \c WITH_LONG_DOUBLE is defined, all Real numbers are of type
  * long double instead of just double.
@@ -159,16 +159,16 @@ bool EQ(int a, int b);
 #define SOPLEX_DO_WITH_ERR_VERBOSITY( do_something ) { do_something; }
 #endif
 
-/// Prints out message \p x if the verbosity level is at least SPxOut::ERROR.
+/// Prints out message \p x if the verbosity level is at least SPxOut::VERB_ERROR.
 #define SPX_MSG_ERROR(x)            { SOPLEX_DO_WITH_ERR_VERBOSITY( x ) }
-/// Prints out message \p x if the verbosity level is at least SPxOut::WARNING.
-#define SPX_MSG_WARNING(spxout, x)  { SOPLEX_DO_WITH_TMP_VERBOSITY( SPxOut::WARNING, spxout, x ) }
-/// Prints out message \p x if the verbosity level is at least SPxOut::INFO1.
-#define SPX_MSG_INFO1(spxout, x)    { SOPLEX_DO_WITH_TMP_VERBOSITY( SPxOut::INFO1, spxout, x ) }
-/// Prints out message \p x if the verbosity level is at least SPxOut::INFO2.
-#define SPX_MSG_INFO2(spxout, x)    { SOPLEX_DO_WITH_TMP_VERBOSITY( SPxOut::INFO2, spxout, x ) }
-/// Prints out message \p x if the verbosity level is at least SPxOut::INFO3.
-#define SPX_MSG_INFO3(spxout, x)    { SOPLEX_DO_WITH_TMP_VERBOSITY( SPxOut::INFO3, spxout, x ) }
+/// Prints out message \p x if the verbosity level is at least SPxOut::VERB_WARNING.
+#define SPX_MSG_WARNING(spxout, x)  { SOPLEX_DO_WITH_TMP_VERBOSITY( SPxOut::VERB_WARNING, spxout, x ) }
+/// Prints out message \p x if the verbosity level is at least SPxOut::VERB_INFO1.
+#define SPX_MSG_INFO1(spxout, x)    { SOPLEX_DO_WITH_TMP_VERBOSITY( SPxOut::VERB_INFO1, spxout, x ) }
+/// Prints out message \p x if the verbosity level is at least SPxOut::VERB_INFO2.
+#define SPX_MSG_INFO2(spxout, x)    { SOPLEX_DO_WITH_TMP_VERBOSITY( SPxOut::VERB_INFO2, spxout, x ) }
+/// Prints out message \p x if the verbosity level is at least SPxOut::VERB_INFO3.
+#define SPX_MSG_INFO3(spxout, x)    { SOPLEX_DO_WITH_TMP_VERBOSITY( SPxOut::VERB_INFO3, spxout, x ) }
 
 extern bool msginconsistent(const char* name, const char* file, int line);
 

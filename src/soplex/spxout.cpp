@@ -30,14 +30,14 @@ namespace soplex
 {
 /// constructor
 SPxOut::SPxOut()
-   : m_verbosity(ERROR)
+   : m_verbosity(VERB_ERROR)
    , m_streams(nullptr)
 {
-   spx_alloc(m_streams, INFO3 + 1);
-   m_streams = new(m_streams) std::ostream*[INFO3 + 1];
-   m_streams[ ERROR ] = m_streams[ WARNING ] = &std::cerr;
+   spx_alloc(m_streams, VERB_INFO3 + 1);
+   m_streams = new(m_streams) std::ostream*[VERB_INFO3 + 1];
+   m_streams[ VERB_ERROR ] = m_streams[ VERB_WARNING ] = &std::cerr;
 
-   for(int i = DEBUG; i <= INFO3; ++i)
+   for(int i = VERB_DEBUG; i <= VERB_INFO3; ++i)
       m_streams[ i ] = &std::cout;
 }
 
@@ -54,7 +54,7 @@ SPxOut& SPxOut::operator=(const SPxOut& base)
    if(this != &base)
       m_verbosity = base.m_verbosity;
 
-   for(int i = DEBUG; i <= INFO3; ++i)
+   for(int i = VERB_DEBUG; i <= VERB_INFO3; ++i)
       m_streams[ i ] = base.m_streams[ i ];
 
    return *this;
@@ -64,11 +64,11 @@ SPxOut::SPxOut(const SPxOut& rhs)
 {
    m_verbosity = rhs.m_verbosity;
    m_streams = nullptr;
-   spx_alloc(m_streams, INFO3 + 1);
-   m_streams = new(m_streams) std::ostream*[INFO3 + 1];
-   m_streams[ ERROR ] = m_streams[ WARNING ] = rhs.m_streams[ERROR];
+   spx_alloc(m_streams, VERB_INFO3 + 1);
+   m_streams = new(m_streams) std::ostream*[VERB_INFO3 + 1];
+   m_streams[ VERB_ERROR ] = m_streams[ VERB_WARNING ] = rhs.m_streams[VERB_ERROR];
 
-   for(int i = DEBUG; i <= INFO3; ++i)
+   for(int i = VERB_DEBUG; i <= VERB_INFO3; ++i)
       m_streams[ i ] = rhs.m_streams[ i ];
 }
 
