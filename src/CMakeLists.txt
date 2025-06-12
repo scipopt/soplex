@@ -4,7 +4,7 @@
 function(setLibProperties targetname outputname)
     set_target_properties(${targetname} PROPERTIES
         OUTPUT_NAME ${outputname}
-	MACOSX_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+    )
 endfunction(setLibProperties)
 
 include(GNUInstallDirs)
