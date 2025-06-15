@@ -30,6 +30,7 @@ Release 7.1.5
 ==================
 
 fixed bugs:
+- disable setting the boolean variable MACOSX_RPATH to a string value to actually enable @rpath usage
 
 miscellaneous:
 
