@@ -26,13 +26,16 @@ interface & parameters:
 miscellaneous:
 - removed 4th number in SoPlex version; new format is major.minor.patch
 
-Release 7.1.5
+Release 7.1.6
+==================
+
+fixed bugs:
+
+July 2025 - Release 7.1.5
 ==================
 
 fixed bugs:
 - disable setting the boolean variable MACOSX_RPATH to a string value to actually enable @rpath usage
-
-miscellaneous:
 
 April 2025 - Release 7.1.4
 ==================
