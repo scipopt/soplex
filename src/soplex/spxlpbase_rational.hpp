@@ -81,7 +81,8 @@ void SPxLPBase<Rational>::computePrimalActivity(const VectorBase<Rational>& prim
 }
 
 template<> inline
-Rational SPxLPBase<Rational>::computePrimalActivity(int i, const VectorBase<Rational>& primal, const bool unscaled) const
+Rational SPxLPBase<Rational>::computePrimalActivity(int i, const VectorBase<Rational>& primal,
+      const bool unscaled) const
 {
    if(primal.dim() != nCols())
    {
@@ -93,7 +94,7 @@ Rational SPxLPBase<Rational>::computePrimalActivity(int i, const VectorBase<Rati
    for(c = 0; c < nCols() && primal[c] == 0; c++)
       ;
 
-   if (c >= nCols())
+   if(c >= nCols())
       return 0;
 
    Rational rowActivity = colVector(c)[i] * primal[c];
@@ -103,56 +104,60 @@ Rational SPxLPBase<Rational>::computePrimalActivity(int i, const VectorBase<Rati
    {
       if(primal[c] != 0)
       {
-        rowActivity += colVector(c)[i] * primal[c];
+         rowActivity += colVector(c)[i] * primal[c];
       }
    }
+
    return rowActivity;
 }
 
 template<> inline
-    void SPxLPBase<Rational>::computePrimalActivity(const std::vector<int>& ids, const VectorBase<Rational>& primal,
-                                               VectorBase<Rational>& activity, const bool unscaled) const
+void SPxLPBase<Rational>::computePrimalActivity(const std::vector<int>& ids,
+      const VectorBase<Rational>& primal,
+      VectorBase<Rational>& activity, const bool unscaled) const
 {
-  if(primal.dim() != nCols())
-  {
-    throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
-  }
+   if(primal.dim() != nCols())
+   {
+      throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
+   }
 
-  if(activity.dim() != nRows())
-  {
-    throw SPxInternalCodeException("XSPXLP03 Activity vector computing row activity has wrong dimension");
-  }
+   if(activity.dim() != nRows())
+   {
+      throw SPxInternalCodeException("XSPXLP03 Activity vector computing row activity has wrong dimension");
+   }
 
-  int c;
+   int c;
 
-  for(c = 0; c < nCols() && primal[c] == 0; c++)
-    ;
+   for(c = 0; c < nCols() && primal[c] == 0; c++)
+      ;
 
-  if(c >= nCols())
-  {
-    for (const int i : ids)
-    {
-      activity[i] = 0;
-    }
-    return;
-  }
-
-  for (const int i : ids)
-  {
-    activity[i] = colVector(c)[i] * primal[c];
-  }
-  c++;
-
-  for(; c < nCols(); c++)
-  {
-    if(primal[c] != 0)
-    {
-      for (const int i : ids)
+   if(c >= nCols())
+   {
+      for(const int i : ids)
       {
-        activity[i] += colVector(c)[i] * primal[c];
+         activity[i] = 0;
       }
-    }
-  }
+
+      return;
+   }
+
+   for(const int i : ids)
+   {
+      activity[i] = colVector(c)[i] * primal[c];
+   }
+
+   c++;
+
+   for(; c < nCols(); c++)
+   {
+      if(primal[c] != 0)
+      {
+         for(const int i : ids)
+         {
+            activity[i] += colVector(c)[i] * primal[c];
+         }
+      }
+   }
 }
 
 template<> inline
