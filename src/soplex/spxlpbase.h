@@ -1948,7 +1948,7 @@ public:
    /// Computes activity of the \p i 'th row for a given primal vector
    /// @throw SPxInternalCodeException if the dimension of primal vector does not match number of columns
    /// \p unscaled determines whether the returned data should be unscaled (if scaling was applied prior)
-   virtual R computePrimalActivity(int i, const VectorBase<R>& primal,
+   virtual R computePrimalActivity(const int i, const VectorBase<R>& primal,
                                    const bool unscaled = true) const;
 
    /// Computes activities of the rows \p ids for a given primal vector; activities do not need to be zero;

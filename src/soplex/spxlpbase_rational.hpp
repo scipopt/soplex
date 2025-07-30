@@ -81,7 +81,7 @@ void SPxLPBase<Rational>::computePrimalActivity(const VectorBase<Rational>& prim
 }
 
 template<> inline
-Rational SPxLPBase<Rational>::computePrimalActivity(int i, const VectorBase<Rational>& primal,
+Rational SPxLPBase<Rational>::computePrimalActivity(const int i, const VectorBase<Rational>& primal,
       const bool unscaled) const
 {
    if(primal.dim() != nCols())
