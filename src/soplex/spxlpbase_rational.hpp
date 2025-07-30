@@ -42,8 +42,8 @@
 namespace soplex
 {
 template<> inline
-void SPxLPBase<Rational>::computePrimalActivity(const VectorBase<Rational>& primal,
-      VectorBase<Rational>& activity, const bool unscaled) const
+void SPxLPBase<Rational>::computePrimalActivity(const VectorBase<Rational>& primal, VectorBase<Rational>& activity,
+      const bool unscaled) const
 {
    if(primal.dim() != nCols())
    {
@@ -112,9 +112,9 @@ Rational SPxLPBase<Rational>::computePrimalActivity(int i, const VectorBase<Rati
 }
 
 template<> inline
-void SPxLPBase<Rational>::computePrimalActivity(const std::vector<int>& ids,
-      const VectorBase<Rational>& primal,
-      VectorBase<Rational>& activity, const bool unscaled) const
+void SPxLPBase<Rational>::computePrimalActivity(const std::vector<int>& ids, const VectorBase<Rational>& primal,
+      VectorBase<Rational>& activity,
+      const bool unscaled) const
 {
    if(primal.dim() != nCols())
    {
