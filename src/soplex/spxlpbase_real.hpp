@@ -137,9 +137,13 @@ R SPxLPBase<R>::computePrimalActivity(const int i, const VectorBase<R>& primal,
       const bool unscaled) const
 {
    int ncols = nCols();
+   int nrows = nRows();
 
    if(primal.dim() != ncols)
       throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
+
+   if(i < 0 || i >= nrows)
+      throw SPxInternalCodeException("XSPXLP03 Dual index out of row range");
 
    int c;
 
@@ -205,7 +209,12 @@ void SPxLPBase<R>::computePrimalActivity(const std::vector<int>& ids, const Vect
    if(c >= ncols)
    {
       for(const int i : ids)
+      {
+         if(i < 0 || i >= nrows)
+            throw SPxInternalCodeException("XSPXLP02 Dual index out of row range");
+
          activity[i] = 0;
+      }
 
       return;
    }
@@ -213,7 +222,12 @@ void SPxLPBase<R>::computePrimalActivity(const std::vector<int>& ids, const Vect
    if(unscaled && _isScaled)
    {
       for(const int i : ids)
+      {
+         if(i < 0 || i >= nrows)
+            throw SPxInternalCodeException("XSPXLP04 Dual index out of row range");
+
          activity[i] = primal[c] * lp_scaler->getCoefUnscaled(*this, i, c);
+      }
 
       ++c;
 
@@ -229,7 +243,12 @@ void SPxLPBase<R>::computePrimalActivity(const std::vector<int>& ids, const Vect
    else
    {
       for(const int i : ids)
+      {
+         if(i < 0 || i >= nrows)
+            throw SPxInternalCodeException("XSPXLP06 Dual index out of row range");
+
          activity[i] = primal[c] * colVector(c)[i];
+      }
 
       ++c;
 
@@ -307,10 +326,14 @@ template <class R> inline
 R SPxLPBase<R>::computeDualActivity(const int i, const VectorBase<R>& dual,
       const bool unscaled) const
 {
+   int ncols = nCols();
    int nrows = nRows();
 
    if(dual.dim() != nrows)
       throw SPxInternalCodeException("XSPXLP02 Dual vector for computing dual activity has wrong dimension");
+
+   if(i < 0 || i >= ncols)
+      throw SPxInternalCodeException("XSPXLP04 Primal index out of column range");
 
    int r;
 
@@ -376,7 +399,12 @@ void SPxLPBase<R>::computeDualActivity(const std::vector<int>& ids, const Vector
    if(r >= nrows)
    {
       for(const int i : ids)
+      {
+         if(i < 0 || i >= ncols)
+            throw SPxInternalCodeException("XSPXLP01 Primal index out of column range");
+
          activity[i] = 0;
+      }
 
       return;
    }
@@ -384,7 +412,12 @@ void SPxLPBase<R>::computeDualActivity(const std::vector<int>& ids, const Vector
    if(unscaled && _isScaled)
    {
       for(const int i : ids)
+      {
+         if(i < 0 || i >= ncols)
+            throw SPxInternalCodeException("XSPXLP03 Primal index out of column range");
+
          activity[i] = dual[r] * lp_scaler->getCoefUnscaled(*this, r, i);
+      }
 
       ++r;
 
@@ -400,7 +433,12 @@ void SPxLPBase<R>::computeDualActivity(const std::vector<int>& ids, const Vector
    else
    {
       for(const int i : ids)
+      {
+         if(i < 0 || i >= ncols)
+            throw SPxInternalCodeException("XSPXLP05 Primal index out of column range");
+
          activity[i] = dual[r] * rowVector(r)[i];
+      }
 
       ++r;
 

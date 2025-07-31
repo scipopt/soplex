@@ -84,9 +84,13 @@ Rational SPxLPBase<Rational>::computePrimalActivity(const int i, const VectorBas
       const bool unscaled) const
 {
    int ncols = nCols();
+   int nrows = nRows();
 
    if(primal.dim() != ncols)
       throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
+
+   if(i < 0 || i >= nrows)
+      throw SPxInternalCodeException("XSPXLP03 Dual index out of row range");
 
    int c;
 
@@ -136,13 +140,23 @@ void SPxLPBase<Rational>::computePrimalActivity(const std::vector<int>& ids, con
    if(c >= ncols)
    {
       for(const int i : ids)
+      {
+         if(i < 0 || i >= nrows)
+            throw SPxInternalCodeException("XSPXLP02 Dual index out of row range");
+
          activity[i] = 0;
+      }
 
       return;
    }
 
    for(const int i : ids)
+   {
+      if(i < 0 || i >= nrows)
+         throw SPxInternalCodeException("XSPXLP04 Dual index out of row range");
+
       activity[i] = primal[c] * colVector(c)[i];
+   }
 
    ++c;
 
@@ -198,10 +212,14 @@ template <> inline
 Rational SPxLPBase<Rational>::computeDualActivity(const int i, const VectorBase<Rational>& dual,
       const bool unscaled) const
 {
+   int ncols = nCols();
    int nrows = nRows();
 
    if(dual.dim() != nrows)
       throw SPxInternalCodeException("XSPXLP02 Dual vector for computing dual activity has wrong dimension");
+
+   if(i < 0 || i >= ncols)
+      throw SPxInternalCodeException("XSPXLP04 Primal index out of column range");
 
    int r;
 
@@ -251,13 +269,23 @@ void SPxLPBase<Rational>::computeDualActivity(const std::vector<int>& ids, const
    if(r >= nrows)
    {
       for(const int i : ids)
+      {
+         if(i < 0 || i >= ncols)
+            throw SPxInternalCodeException("XSPXLP01 Primal index out of column range");
+
          activity[i] = 0;
+      }
 
       return;
    }
 
    for(const int i : ids)
+   {
+      if(i < 0 || i >= ncols)
+         throw SPxInternalCodeException("XSPXLP03 Primal index out of column range");
+
       activity[i] = dual[r] * rowVector(r)[i];
+   }
 
    ++r;
 
