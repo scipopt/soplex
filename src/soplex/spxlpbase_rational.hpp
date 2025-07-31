@@ -42,7 +42,8 @@
 namespace soplex
 {
 template<> inline
-void SPxLPBase<Rational>::computePrimalActivity(const VectorBase<Rational>& primal, VectorBase<Rational>& activity,
+void SPxLPBase<Rational>::computePrimalActivity(const VectorBase<Rational>& primal,
+      VectorBase<Rational>& activity,
       const bool unscaled) const
 {
    int ncols = nCols();
@@ -116,7 +117,8 @@ Rational SPxLPBase<Rational>::computePrimalActivity(const int i, const VectorBas
 }
 
 template<> inline
-void SPxLPBase<Rational>::computePrimalActivity(const std::vector<int>& ids, const VectorBase<Rational>& primal,
+void SPxLPBase<Rational>::computePrimalActivity(const std::vector<int>& ids,
+      const VectorBase<Rational>& primal,
       VectorBase<Rational>& activity,
       const bool unscaled) const
 {
@@ -171,7 +173,8 @@ void SPxLPBase<Rational>::computePrimalActivity(const std::vector<int>& ids, con
 }
 
 template<> inline
-void SPxLPBase<Rational>::computeDualActivity(const VectorBase<Rational>& dual, VectorBase<Rational>& activity,
+void SPxLPBase<Rational>::computeDualActivity(const VectorBase<Rational>& dual,
+      VectorBase<Rational>& activity,
       const bool unscaled) const
 {
    int ncols = nCols();
@@ -245,7 +248,8 @@ Rational SPxLPBase<Rational>::computeDualActivity(const int i, const VectorBase<
 }
 
 template <> inline
-void SPxLPBase<Rational>::computeDualActivity(const std::vector<int>& ids, const VectorBase<Rational>& dual,
+void SPxLPBase<Rational>::computeDualActivity(const std::vector<int>& ids,
+      const VectorBase<Rational>& dual,
       VectorBase<Rational>& activity,
       const bool unscaled) const
 {

@@ -134,7 +134,7 @@ void SPxLPBase<R>::computePrimalActivity(const VectorBase<R>& primal, VectorBase
 
 template <class R> inline
 R SPxLPBase<R>::computePrimalActivity(const int i, const VectorBase<R>& primal,
-      const bool unscaled) const
+                                      const bool unscaled) const
 {
    int ncols = nCols();
    int nrows = nRows();
@@ -265,7 +265,7 @@ void SPxLPBase<R>::computePrimalActivity(const std::vector<int>& ids, const Vect
 
 template <class R> inline
 void SPxLPBase<R>::computeDualActivity(const VectorBase<R>& dual, VectorBase<R>& activity,
-      const bool unscaled) const
+                                       const bool unscaled) const
 {
    int ncols = nCols();
    int nrows = nRows();
@@ -324,7 +324,7 @@ void SPxLPBase<R>::computeDualActivity(const VectorBase<R>& dual, VectorBase<R>&
 
 template <class R> inline
 R SPxLPBase<R>::computeDualActivity(const int i, const VectorBase<R>& dual,
-      const bool unscaled) const
+                                    const bool unscaled) const
 {
    int ncols = nCols();
    int nrows = nRows();
@@ -376,8 +376,8 @@ R SPxLPBase<R>::computeDualActivity(const int i, const VectorBase<R>& dual,
 
 template <class R> inline
 void SPxLPBase<R>::computeDualActivity(const std::vector<int>& ids, const VectorBase<R>& dual,
-      VectorBase<R>& activity,
-      const bool unscaled) const
+                                       VectorBase<R>& activity,
+                                       const bool unscaled) const
 {
    int ncols = nCols();
    int nrows = nRows();
