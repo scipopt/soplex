@@ -3865,8 +3865,10 @@ bool SoPlexBase<R>::getPrimalRational(VectorBase<Rational>& vector)
       return false;
 }
 
+
+/// gets the activity for the \p i 'th row given the current primal solution
 template <class R>
-bool SoPlexBase<R>::getRowActivity(int i, R& value)
+bool SoPlexBase<R>::getRowActivity(const int i, R& value)
 {
    if(_realLP != nullptr && hasSol())
    {
@@ -3879,7 +3881,7 @@ bool SoPlexBase<R>::getRowActivity(int i, R& value)
 }
 
 template <class R>
-bool SoPlexBase<R>::getRowActivityRational(int i, Rational& value)
+bool SoPlexBase<R>::getRowActivityRational(const int i, Rational& value)
 {
    if(_rationalLP != nullptr && hasSol())
    {
@@ -3891,30 +3893,33 @@ bool SoPlexBase<R>::getRowActivityRational(int i, Rational& value)
       return false;
 }
 
+
+/// gets the activities for the rows in \p indices given the current primal solution;
+/// all other elements of \p vector are left unchanged;
+/// \p vector must have the same size as the total number of rows
 template <class R>
 bool SoPlexBase<R>::getRowsActivity(const std::vector<int>& indices, VectorBase<R>& vector)
 {
    if(_realLP != nullptr && hasSol())
    {
-      assert(vector.dim() >= static_cast<int>(indices.size()));
       _syncRealSolution();
       _realLP->computePrimalActivity(indices, _solReal._primal, vector);
+      assert(vector.dim() >= static_cast<int>(indices.size()));
       return true;
    }
    else
       return false;
 }
 
-
 template <class R>
-bool SoPlexBase<R>::getRowsActivityReal(const std::vector<int>& indices, R* p_vector, int dim)
+bool SoPlexBase<R>::getRowsActivityReal(const std::vector<int>& indices, R* p_vector, const int dim)
 {
    if(_realLP != nullptr && hasSol())
    {
-      assert(dim >= numRows());
       _syncRealSolution();
       VectorBase<R> vector(dim);
       _realLP->computePrimalActivity(indices, _solReal._primal, vector);
+      assert(dim >= static_cast<int>(indices.size()));
       std::copy(vector.begin(), vector.end(), p_vector);
       return true;
    }
@@ -3922,28 +3927,28 @@ bool SoPlexBase<R>::getRowsActivityReal(const std::vector<int>& indices, R* p_ve
       return false;
 }
 
-
 template <class R>
-bool SoPlexBase<R>::getRowsActivityRational(const std::vector<int>& indices,
-      VectorRational& vector)
+bool SoPlexBase<R>::getRowsActivityRational(const std::vector<int>& indices, VectorRational& vector)
 {
    if(_rationalLP != nullptr && hasSol())
    {
-      assert(vector.dim() >= static_cast<int>(indices.size()));
       _syncRationalSolution();
       _rationalLP->computePrimalActivity(indices, _solRational._primal, vector);
+      assert(vector.dim() >= static_cast<int>(indices.size()));
       return true;
    }
    else
       return false;
 }
 
+
+/// gets the activities for all rows given the current primal solution;
+/// \p vector must have the same size as the total number of rows
 template <class R>
 bool SoPlexBase<R>::getRowsActivity(VectorBase<R>& vector)
 {
    if(_realLP != nullptr && hasSol())
    {
-      assert(vector.dim() >= numRows());
       _syncRealSolution();
       _realLP->computePrimalActivity(_solReal._primal, vector);
       return true;
@@ -3952,13 +3957,11 @@ bool SoPlexBase<R>::getRowsActivity(VectorBase<R>& vector)
       return false;
 }
 
-
 template <class R>
-bool SoPlexBase<R>::getRowsActivityReal(R* p_vector, int dim)
+bool SoPlexBase<R>::getRowsActivityReal(R* p_vector, const int dim)
 {
    if(_realLP != nullptr && hasSol())
    {
-      assert(dim >= numRows());
       _syncRealSolution();
       VectorBase<R> vector(dim);
       _realLP->computePrimalActivity(_solReal._primal, vector);
@@ -3974,7 +3977,6 @@ bool SoPlexBase<R>::getRowsActivityRational(VectorRational& vector)
 {
    if(_rationalLP != nullptr && hasSol())
    {
-      assert(vector.dim() >= numRows());
       _syncRationalSolution();
       _rationalLP->computePrimalActivity(_solRational._primal, vector);
       return true;
@@ -3982,6 +3984,7 @@ bool SoPlexBase<R>::getRowsActivityRational(VectorRational& vector)
    else
       return false;
 }
+
 
 /// gets the vector of slack values if available; returns true on success
 template <class R>
@@ -4026,6 +4029,125 @@ bool SoPlexBase<R>::getDualRational(VectorBase<Rational>& vector)
       return false;
 }
 
+
+/// gets the activity for the \p i 'th column given the current dual solution
+template <class R>
+bool SoPlexBase<R>::getColActivity(const int i, R& value)
+{
+   if(_realLP != nullptr && hasSol())
+   {
+      _syncRealSolution();
+      value = _realLP->computeDualActivity(i, _solReal._dual);
+      return true;
+   }
+   else
+      return false;
+}
+
+template <class R>
+bool SoPlexBase<R>::getColActivityRational(const int i, Rational& value)
+{
+   if(_rationalLP != nullptr && hasSol())
+   {
+      _syncRationalSolution();
+      value = _rationalLP->computeDualActivity(i, _solRational._dual);
+      return true;
+   }
+   else
+      return false;
+}
+
+
+/// gets the activities for the columns in \p indices given the current dual solution;
+/// all other elements of \p vector are left unchanged;
+/// \p vector must have the same size as the total number of columns
+template <class R>
+bool SoPlexBase<R>::getColsActivity(const std::vector<int>& indices, VectorBase<R>& vector)
+{
+   if(_realLP != nullptr && hasSol())
+   {
+      _syncRealSolution();
+      _realLP->computeDualActivity(indices, _solReal._dual, vector);
+      assert(vector.dim() >= static_cast<int>(indices.size()));
+      return true;
+   }
+   else
+      return false;
+}
+
+template <class R>
+bool SoPlexBase<R>::getColsActivityReal(const std::vector<int>& indices, R* p_vector, const int dim)
+{
+   if(_realLP != nullptr && hasSol())
+   {
+      _syncRealSolution();
+      VectorBase<R> vector(dim);
+      _realLP->computeDualActivity(indices, _solReal._dual, vector);
+      assert(dim >= static_cast<int>(indices.size()));
+      std::copy(vector.begin(), vector.end(), p_vector);
+      return true;
+   }
+   else
+      return false;
+}
+
+template <class R>
+bool SoPlexBase<R>::getColsActivityRational(const std::vector<int>& indices, VectorRational& vector)
+{
+   if(_rationalLP != nullptr && hasSol())
+   {
+      _syncRationalSolution();
+      _rationalLP->computeDualActivity(indices, _solRational._dual, vector);
+      assert(vector.dim() >= static_cast<int>(indices.size()));
+      return true;
+   }
+   else
+      return false;
+}
+
+
+/// gets the activities for all columns given the current dual solution;
+/// \p vector must have the same size as the total number of columns
+template <class R>
+bool SoPlexBase<R>::getColsActivity(VectorBase<R>& vector)
+{
+   if(_realLP != nullptr && hasSol())
+   {
+      _syncRealSolution();
+      _realLP->computeDualActivity(_solReal._dual, vector);
+      return true;
+   }
+   else
+      return false;
+}
+
+template <class R>
+bool SoPlexBase<R>::getColsActivityReal(R* p_vector, const int dim)
+{
+   if(_realLP != nullptr && hasSol())
+   {
+      _syncRealSolution();
+      VectorBase<R> vector(dim);
+      _realLP->computeDualActivity(_solReal._dual, vector);
+      std::copy(vector.begin(), vector.end(), p_vector);
+      return true;
+   }
+   else
+      return false;
+}
+
+template <class R>
+bool SoPlexBase<R>::getColsActivityRational(VectorRational& vector)
+{
+   if(_rationalLP != nullptr && hasSol())
+   {
+      _syncRationalSolution();
+      _rationalLP->computeDualActivity(_solRational._dual, vector);
+      return true;
+   }
+   else
+      return false;
+}
 
 
 /// gets the vector of reduced cost values if available; returns true on success
