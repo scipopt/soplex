@@ -77,46 +77,56 @@ template <class R> inline
 void SPxLPBase<R>::computePrimalActivity(const VectorBase<R>& primal, VectorBase<R>& activity,
       const bool unscaled) const
 {
-   if(primal.dim() != nCols())
+   int ncols = nCols();
+   int nrows = nRows();
+
+   if(primal.dim() != ncols)
       throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
 
-   if(activity.dim() != nRows())
+   if(activity.dim() != nrows)
       throw SPxInternalCodeException("XSPXLP03 Activity vector computing row activity has wrong dimension");
 
    int c;
 
-   for(c = 0; c < nCols() && primal[c] == 0; c++)
-      ;
+   for(c = 0; c < ncols; ++c)
+   {
+      if(primal[c] != 0)
+         break;
+   }
 
-   if(c >= nCols())
+   if(c >= ncols)
    {
       activity.clear();
       return;
    }
 
-   DSVectorBase<R> tmp(nRows());
-
    if(unscaled && _isScaled)
    {
+      DSVectorBase<R> tmp(nrows);
+
       lp_scaler->getColUnscaled(*this, c, tmp);
       activity = tmp;
-   }
-   else
-      activity = colVector(c);
+      activity *= primal[c];
+      ++c;
 
-   activity *= primal[c];
-   c++;
-
-   for(; c < nCols(); c++)
-   {
-      if(primal[c] != 0)
+      for(; c < ncols; ++c)
       {
-         if(unscaled && _isScaled)
+         if(primal[c] != 0)
          {
             lp_scaler->getColUnscaled(*this, c, tmp);
             activity.multAdd(primal[c], tmp);
          }
-         else
+      }
+   }
+   else
+   {
+      activity = colVector(c);
+      activity *= primal[c];
+      ++c;
+
+      for(; c < ncols; ++c)
+      {
+         if(primal[c] != 0)
             activity.multAdd(primal[c], colVector(c));
       }
    }
@@ -126,47 +136,48 @@ template <class R> inline
 R SPxLPBase<R>::computePrimalActivity(const int i, const VectorBase<R>& primal,
       const bool unscaled) const
 {
-   if(primal.dim() != nCols())
+   int ncols = nCols();
+
+   if(primal.dim() != ncols)
       throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
 
    int c;
 
-   for(c = 0; c < nCols() && primal[c] == 0; c++)
-      ;
+   for(c = 0; c < ncols; ++c)
+   {
+      if(primal[c] != 0)
+         break;
+   }
 
-   if(c >= nCols())
+   if(c >= ncols)
       return 0;
 
-   R rowActivity;
-
-   DSVectorBase<R> tmp(nRows());
+   R activity;
 
    if(unscaled && _isScaled)
    {
-      lp_scaler->getColUnscaled(*this, c, tmp);
-      rowActivity = tmp[i];
+      activity = primal[c] * lp_scaler->getCoefUnscaled(*this, i, c);
+      ++c;
+
+      for(; c < ncols; ++c)
+      {
+         if(primal[c] != 0)
+            activity += primal[c] * lp_scaler->getCoefUnscaled(*this, i, c);
+      }
    }
    else
-      rowActivity = colVector(c)[i];
-
-   rowActivity *= primal[c];
-   c++;
-
-   for(; c < nCols(); c++)
    {
-      if(primal[c] != 0)
+      activity = primal[c] * colVector(c)[i];
+      ++c;
+
+      for(; c < ncols; ++c)
       {
-         if(unscaled && _isScaled)
-         {
-            lp_scaler->getColUnscaled(*this, c, tmp);
-            rowActivity += primal[c] * tmp[i];
-         }
-         else
-            rowActivity += primal[c] * colVector(c)[i];
+         if(primal[c] != 0)
+            activity += primal[c] * colVector(c)[i];
       }
    }
 
-   return rowActivity;
+   return activity;
 }
 
 template <class R> inline
@@ -174,56 +185,60 @@ void SPxLPBase<R>::computePrimalActivity(const std::vector<int>& ids, const Vect
       VectorBase<R>& activity,
       const bool unscaled) const
 {
-   if(primal.dim() != nCols())
+   int ncols = nCols();
+   int nrows = nRows();
+
+   if(primal.dim() != ncols)
       throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
 
-   if(activity.dim() != nRows())
+   if(activity.dim() != nrows)
       throw SPxInternalCodeException("XSPXLP03 Activity vector computing row activity has wrong dimension");
 
    int c;
 
-   for(c = 0; c < nCols() && primal[c] == 0; c++)
-      ;
+   for(c = 0; c < ncols; ++c)
+   {
+      if(primal[c] != 0)
+         break;
+   }
 
-   if(c >= nCols())
+   if(c >= ncols)
    {
       for(const int i : ids)
-      {
          activity[i] = 0;
-      }
 
       return;
    }
 
-   DSVectorBase<R> tmp(nRows());
-
    if(unscaled && _isScaled)
    {
-      lp_scaler->getColUnscaled(*this, c, tmp);
-      activity = tmp;
+      for(const int i : ids)
+         activity[i] = primal[c] * lp_scaler->getCoefUnscaled(*this, i, c);
+
+      ++c;
+
+      for(; c < ncols; ++c)
+      {
+         if(primal[c] != 0)
+         {
+            for(const int i : ids)
+               activity[i] += primal[c] * lp_scaler->getCoefUnscaled(*this, i, c);
+         }
+      }
    }
    else
-      tmp = colVector(c);
-
-   for(const int i : ids)
    {
-      activity[i] = primal[c] *  tmp[i];
-   }
+      for(const int i : ids)
+         activity[i] = primal[c] * colVector(c)[i];
 
-   c++;
+      ++c;
 
-   for(; c < nCols(); c++)
-   {
-      if(primal[c] != 0)
+      for(; c < ncols; ++c)
       {
-         if(unscaled && _isScaled)
-            lp_scaler->getColUnscaled(*this, c, tmp);
-         else
-            tmp = colVector(c);
-
-         for(const int i : ids)
+         if(primal[c] != 0)
          {
-            activity[i] += primal[c] * tmp[i];
+            for(const int i : ids)
+               activity[i] += primal[c] * colVector(c)[i];
          }
       }
    }
@@ -231,48 +246,58 @@ void SPxLPBase<R>::computePrimalActivity(const std::vector<int>& ids, const Vect
 
 template <class R> inline
 void SPxLPBase<R>::computeDualActivity(const VectorBase<R>& dual, VectorBase<R>& activity,
-                                       const bool unscaled) const
+      const bool unscaled) const
 {
-   if(dual.dim() != nRows())
+   int ncols = nCols();
+   int nrows = nRows();
+
+   if(dual.dim() != nrows)
       throw SPxInternalCodeException("XSPXLP02 Dual vector for computing dual activity has wrong dimension");
 
-   if(activity.dim() != nCols())
+   if(activity.dim() != ncols)
       throw SPxInternalCodeException("XSPXLP04 Activity vector computing dual activity has wrong dimension");
 
    int r;
 
-   for(r = 0; r < nRows() && dual[r] == 0; r++)
-      ;
+   for(r = 0; r < nrows; ++r)
+   {
+      if(dual[r] != 0)
+         break;
+   }
 
-   if(r >= nRows())
+   if(r >= nrows)
    {
       activity.clear();
       return;
    }
 
-   DSVectorBase<R> tmp(nCols());
-
    if(unscaled && _isScaled)
    {
+      DSVectorBase<R> tmp(ncols);
+
       lp_scaler->getRowUnscaled(*this, r, tmp);
       activity = tmp;
-   }
-   else
-      activity = rowVector(r);
+      activity *= dual[r];
+      ++r;
 
-   activity *= dual[r];
-   r++;
-
-   for(; r < nRows(); r++)
-   {
-      if(dual[r] != 0)
+      for(; r < nrows; ++r)
       {
-         if(unscaled && _isScaled)
+         if(dual[r] != 0)
          {
             lp_scaler->getRowUnscaled(*this, r, tmp);
             activity.multAdd(dual[r], tmp);
          }
-         else
+      }
+   }
+   else
+   {
+      activity = rowVector(r);
+      activity *= dual[r];
+      ++r;
+
+      for(; r < nrows; ++r)
+      {
+         if(dual[r] != 0)
             activity.multAdd(dual[r], rowVector(r));
       }
    }
