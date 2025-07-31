@@ -25,7 +25,7 @@ interface & parameters:
 - make method `factorizeColumnRational` public
 - deprecated SOPLEX_SUBVERSION, SOPLEX_VERSION_SUB, and soplex::subversion()
 - rename enums for verbosity levels: SPxOut::DEBUG to SPxOut::VERB_DEBUG etc.
-- add getRowActivity(), getRowActivityRational(), getRowsActivity(), getRowsActivityReal(), and getRowsActivityRational() based on extended computePrimalActivity()
+- add getRowActivity(), getRowActivityRational(), getRowsActivity(), getRowsActivityReal(), getRowsActivityRational(), and getColActivity(), getColActivityRational(), getColsActivity(), getColsActivityReal() based on extended computePrimalActivity() and computeDualActivity()
 
 miscellaneous:
 - removed 4th number in SoPlex version; new format is major.minor.patch
