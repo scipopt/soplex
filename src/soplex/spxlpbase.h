@@ -1979,9 +1979,25 @@ public:
    }
 
    /// Computes "dual" activity of the columns for a given dual vector, i.e., y^T A; activity does not need to be zero
-   /// @throw SPxInternalCodeException if dimension of dual vector does not match number of rows or if the dimension of
+   /// @throw SPxInternalCodeException if the dimension of dual vector does not match number of rows or if the dimension of
    ///        the activity vector does not match the number of columns
+   /// \p unscaled determines whether the returned data should be unscaled (if scaling was applied prior)
    virtual void computeDualActivity(const VectorBase<R>& dual, VectorBase<R>& activity,
+                                    const bool unscaled = true) const;
+
+   /// Computes "dual" activity of the \p i 'th column for a given dual vector, i.e., y^T A
+   /// @throw SPxInternalCodeException if the dimension of dual vector does not match number of rows
+   /// \p unscaled determines whether the returned data should be unscaled (if scaling was applied prior)
+   virtual R computeDualActivity(const int i, const VectorBase<R>& dual,
+                                 const bool unscaled = true) const;
+
+   /// Computes "dual" activities of the columns \p ids for a given dual vector, i.e., y^T A; activities do not need to be zero;
+   /// only the elements with indices in \p ids are computed, the remaining elements of \p activity are not changed
+   /// @throw SPxInternalCodeException if the dimension of dual vector does not match number of rows or if the
+   ///        dimension of the activity vector does not match the number of columns
+   /// \p unscaled determines whether the returned data should be unscaled (if scaling was applied prior)
+   virtual void computeDualActivity(const std::vector<int>& ids, const VectorBase<R>& dual,
+                                    VectorBase<R>& activity,
                                     const bool unscaled = true) const;
 
    /// Updates "dual" activity of the columns for a given dual vector, i.e., y^T A; activity does not need to be zero

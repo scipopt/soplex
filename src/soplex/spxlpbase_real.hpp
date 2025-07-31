@@ -304,6 +304,118 @@ void SPxLPBase<R>::computeDualActivity(const VectorBase<R>& dual, VectorBase<R>&
 }
 
 template <class R> inline
+R SPxLPBase<R>::computeDualActivity(const int i, const VectorBase<R>& dual,
+      const bool unscaled) const
+{
+   int nrows = nRows();
+
+   if(dual.dim() != nrows)
+      throw SPxInternalCodeException("XSPXLP02 Dual vector for computing dual activity has wrong dimension");
+
+   int r;
+
+   for(r = 0; r < nrows; ++r)
+   {
+      if(dual[r] != 0)
+         break;
+   }
+
+   if(r >= nrows)
+      return 0;
+
+   R activity;
+
+   if(unscaled && _isScaled)
+   {
+      activity = dual[r] * lp_scaler->getCoefUnscaled(*this, r, i);
+      ++r;
+
+      for(; r < nrows; ++r)
+      {
+         if(dual[r] != 0)
+            activity += dual[r] * lp_scaler->getCoefUnscaled(*this, r, i);
+      }
+   }
+   else
+   {
+      activity = dual[r] * rowVector(r)[i];
+      ++r;
+
+      for(; r < nrows; ++r)
+      {
+         if(dual[r] != 0)
+            activity += dual[r] * rowVector(r)[i];
+      }
+   }
+
+   return activity;
+}
+
+template <class R> inline
+void SPxLPBase<R>::computeDualActivity(const std::vector<int>& ids, const VectorBase<R>& dual,
+      VectorBase<R>& activity,
+      const bool unscaled) const
+{
+   int ncols = nCols();
+   int nrows = nRows();
+
+   if(dual.dim() != nrows)
+      throw SPxInternalCodeException("XSPXLP02 Dual vector for computing dual activity has wrong dimension");
+
+   if(activity.dim() != ncols)
+      throw SPxInternalCodeException("XSPXLP04 Activity vector computing dual activity has wrong dimension");
+
+   int r;
+
+   for(r = 0; r < nrows; ++r)
+   {
+      if(dual[r] != 0)
+         break;
+   }
+
+   if(r >= nrows)
+   {
+      for(const int i : ids)
+         activity[i] = 0;
+
+      return;
+   }
+
+   if(unscaled && _isScaled)
+   {
+      for(const int i : ids)
+         activity[i] = dual[r] * lp_scaler->getCoefUnscaled(*this, r, i);
+
+      ++r;
+
+      for(; r < nrows; ++r)
+      {
+         if(dual[r] != 0)
+         {
+            for(const int i : ids)
+               activity[i] += dual[r] * lp_scaler->getCoefUnscaled(*this, r, i);
+         }
+      }
+   }
+   else
+   {
+      for(const int i : ids)
+         activity[i] = dual[r] * rowVector(r)[i];
+
+      ++r;
+
+      for(; r < nrows; ++r)
+      {
+         if(dual[r] != 0)
+         {
+            for(const int i : ids)
+               activity[i] += dual[r] * rowVector(r)[i];
+         }
+      }
+   }
+}
+
+template <class R> inline
 R SPxLPBase<R>::maxAbsNzo(bool unscaled) const
 {
    R maxi = 0.0;

@@ -194,6 +194,83 @@ void SPxLPBase<Rational>::computeDualActivity(const VectorBase<Rational>& dual, 
    }
 }
 
+template <> inline
+Rational SPxLPBase<Rational>::computeDualActivity(const int i, const VectorBase<Rational>& dual,
+      const bool unscaled) const
+{
+   int nrows = nRows();
+
+   if(dual.dim() != nrows)
+      throw SPxInternalCodeException("XSPXLP02 Dual vector for computing dual activity has wrong dimension");
+
+   int r;
+
+   for(r = 0; r < nrows; ++r)
+   {
+      if(dual[r] != 0)
+         break;
+   }
+
+   if(r >= nrows)
+      return 0;
+
+   Rational activity = dual[r] * rowVector(r)[i];
+   ++r;
+
+   for(; r < nrows; ++r)
+   {
+      if(dual[r] != 0)
+         activity += dual[r] * rowVector(r)[i];
+   }
+
+   return activity;
+}
+
+template <> inline
+void SPxLPBase<Rational>::computeDualActivity(const std::vector<int>& ids, const VectorBase<Rational>& dual,
+      VectorBase<Rational>& activity,
+      const bool unscaled) const
+{
+   int ncols = nCols();
+   int nrows = nRows();
+
+   if(dual.dim() != nrows)
+      throw SPxInternalCodeException("XSPXLP02 Dual vector for computing dual activity has wrong dimension");
+
+   if(activity.dim() != ncols)
+      throw SPxInternalCodeException("XSPXLP04 Activity vector computing dual activity has wrong dimension");
+
+   int r;
+
+   for(r = 0; r < nrows; ++r)
+   {
+      if(dual[r] != 0)
+         break;
+   }
+
+   if(r >= nrows)
+   {
+      for(const int i : ids)
+         activity[i] = 0;
+
+      return;
+   }
+
+   for(const int i : ids)
+      activity[i] = dual[r] * rowVector(r)[i];
+
+   ++r;
+
+   for(; r < nrows; ++r)
+   {
+      if(dual[r] != 0)
+      {
+         for(const int i : ids)
+            activity[i] += dual[r] * rowVector(r)[i];
+      }
+   }
+}
+
 template<> inline
 Rational SPxLPBase<Rational>::maxAbsNzo(bool /* unscaled */) const
 {
