@@ -187,11 +187,13 @@ public:
    /**@name Constructors / Destructors */
    ///@{
    /// default constructor
-   SLinSolverRational()
-   {}
+   SLinSolverRational() = default;
+   /// copy constructor
+   SLinSolverRational(const SLinSolverRational&) = default;
+   /// move constructor
+   SLinSolverRational(SLinSolverRational&&) = default;
    /// destructor
-   virtual ~SLinSolverRational()
-   {}
+   virtual ~SLinSolverRational() = default;
    /// clone function for polymorphism
    virtual SLinSolverRational* clone() const = 0;
    ///@}

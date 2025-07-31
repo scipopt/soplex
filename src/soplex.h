@@ -663,6 +663,23 @@ public:
    bool getPrimalReal(R* p_vector, int size);      // For SCIP compatibility
    bool getPrimalRational(VectorRational& vector);
 
+   /// gets the activity for the \p i 'th row given the current primal solution
+   bool getRowActivity(int i, R& value);
+   bool getRowActivityRational(int i, Rational& value);
+
+   /// gets the activities for the rows in \p indices given the current primal solution;
+   /// all other elements of \p vector are left unchanged;
+   /// \p vector must have the same size as the total number of rows
+   bool getRowsActivity(const std::vector<int>& indices, VectorBase<R>& vector);
+   bool getRowsActivityReal(const std::vector<int>& indices, R* p_vector, int dim);
+   bool getRowsActivityRational(const std::vector<int>& indices, VectorRational& vector);
+
+   /// gets the activities for all rows given the current primal solution;
+   /// \p vector must have the same size as the total number of rows
+   bool getRowsActivity(VectorBase<R>& vector);
+   bool getRowsActivityReal(R* p_vector, int dim);
+   bool getRowsActivityRational(VectorRational& vector);
+
    /// gets the vector of slack values if available; returns true on success
    bool getSlacksReal(VectorBase<R>& vector);
    bool getSlacksReal(R* p_vector, int dim);
@@ -676,6 +693,23 @@ public:
    bool getDual(VectorBase<R>& vector);
    bool getDualReal(R* p_vector, int dim); /* For SCIP compatibility */
    bool getDualRational(VectorRational& vector);
+
+   /// gets the activity for the \p i 'th column given the current dual solution
+   bool getColActivity(const int i, R& value);
+   bool getColActivityRational(const int i, Rational& value);
+
+   /// gets the activities for the columns in \p indices given the current dual solution;
+   /// all other elements of \p vector are left unchanged;
+   /// \p vector must have the same size as the total number of columns
+   bool getColsActivity(const std::vector<int>& indices, VectorBase<R>& vector);
+   bool getColsActivityReal(const std::vector<int>& indices, R* p_vector, const int dim);
+   bool getColsActivityRational(const std::vector<int>& indices, VectorRational& vector);
+
+   /// gets the activities for all columns given the current dual solution;
+   /// \p vector must have the same size as the total number of columns
+   bool getColsActivity(VectorBase<R>& vector);
+   bool getColsActivityReal(R* p_vector, const int dim);
+   bool getColsActivityRational(VectorRational& vector);
 
    /// gets the vector of reduced cost values if available; returns true on success
    bool getRedCost(VectorBase<R>& vector);

@@ -212,9 +212,12 @@ public:
    SLinSolver()
       : spxout(nullptr)
    {}
+   /// copy constructor
+   SLinSolver(const SLinSolver&) = default;
+   /// move constructor
+   SLinSolver(SLinSolver&&) = default;
    /// destructor
-   virtual ~SLinSolver()
-   {}
+   virtual ~SLinSolver() = default;
    /// clone function for polymorphism
    virtual SLinSolver<R>* clone() const = 0;
    ///@}

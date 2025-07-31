@@ -17,11 +17,15 @@ features:
 
 fixed bugs:
 
+code quality:
+- avoid deprecated implicit copy constructor for 'SPxException', 'SLinSolver', and 'SLinSolverRational'
+
 interface & parameters:
 - add `SolBase` constructor
 - make method `factorizeColumnRational` public
 - deprecated SOPLEX_SUBVERSION, SOPLEX_VERSION_SUB, and soplex::subversion()
 - rename enums for verbosity levels: SPxOut::DEBUG to SPxOut::VERB_DEBUG etc.
+- add getRowActivity(), getRowActivityRational(), getRowsActivity(), getRowsActivityReal(), getRowsActivityRational(), and getColActivity(), getColActivityRational(), getColsActivity(), getColsActivityReal() based on extended computePrimalActivity() and computeDualActivity()
 
 miscellaneous:
 - removed 4th number in SoPlex version; new format is major.minor.patch
@@ -148,7 +152,6 @@ interface & parameters:
   `bool:simplifier_enable_domcol`, `bool:simplifier_enable_dualfix`, `bool:simplifier_enable_fixcontinuous`,
   `bool:simplifier_enable_parallelcols`, `bool:simplifier_enable_parallelrows`, `bool:simplifier_enable_propagation`,
   `bool:simplifier_enable_singletoncols`, `bool:simplifier_enable_stuffing`
-
 
 performance:
 

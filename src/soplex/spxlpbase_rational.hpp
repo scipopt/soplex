@@ -43,78 +43,262 @@ namespace soplex
 {
 template<> inline
 void SPxLPBase<Rational>::computePrimalActivity(const VectorBase<Rational>& primal,
-      VectorBase<Rational>& activity, const bool unscaled) const
+      VectorBase<Rational>& activity,
+      const bool unscaled) const
 {
-   if(primal.dim() != nCols())
-   {
-      throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
-   }
+   int ncols = nCols();
+   int nrows = nRows();
 
-   if(activity.dim() != nRows())
-   {
-      throw SPxInternalCodeException("XSPXLP03 Activity vector computing row activity has wrong dimension");
-   }
+   if(primal.dim() != ncols)
+      throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
+
+   if(activity.dim() != nrows)
+      throw SPxInternalCodeException("XSPXLP02 Activity vector computing row activity has wrong dimension");
 
    int c;
 
-   for(c = 0; c < nCols() && primal[c] == 0; c++)
-      ;
+   for(c = 0; c < ncols; ++c)
+   {
+      if(primal[c] != 0)
+         break;
+   }
 
-   if(c >= nCols())
+   if(c >= ncols)
    {
       activity.clear();
       return;
    }
 
    activity = colVector(c);
-
    activity *= primal[c];
-   c++;
+   ++c;
 
-   for(; c < nCols(); c++)
+   for(; c < ncols; ++c)
+   {
+      if(primal[c] != 0)
+         activity.multAdd(primal[c], colVector(c));
+   }
+}
+
+template<> inline
+Rational SPxLPBase<Rational>::computePrimalActivity(const int i, const VectorBase<Rational>& primal,
+      const bool unscaled) const
+{
+   int ncols = nCols();
+   int nrows = nRows();
+
+   if(primal.dim() != ncols)
+      throw SPxInternalCodeException("XSPXLP03 Primal vector for computing row activity has wrong dimension");
+
+   if(i < 0 || i >= nrows)
+      throw SPxInternalCodeException("XSPXLP04 Dual index out of row range");
+
+   int c;
+
+   for(c = 0; c < ncols; ++c)
+   {
+      if(primal[c] != 0)
+         break;
+   }
+
+   if(c >= ncols)
+      return 0;
+
+   Rational activity = primal[c] * colVector(c)[i];
+   ++c;
+
+   for(; c < ncols; ++c)
+   {
+      if(primal[c] != 0)
+         activity += primal[c] * colVector(c)[i];
+   }
+
+   return activity;
+}
+
+template<> inline
+void SPxLPBase<Rational>::computePrimalActivity(const std::vector<int>& ids,
+      const VectorBase<Rational>& primal,
+      VectorBase<Rational>& activity,
+      const bool unscaled) const
+{
+   int ncols = nCols();
+   int nrows = nRows();
+
+   if(primal.dim() != ncols)
+      throw SPxInternalCodeException("XSPXLP05 Primal vector for computing row activity has wrong dimension");
+
+   if(activity.dim() != nrows)
+      throw SPxInternalCodeException("XSPXLP06 Activity vector computing row activity has wrong dimension");
+
+   int c;
+
+   for(c = 0; c < ncols; ++c)
+   {
+      if(primal[c] != 0)
+         break;
+   }
+
+   if(c >= ncols)
+   {
+      for(const int i : ids)
+      {
+         if(i < 0 || i >= nrows)
+            throw SPxInternalCodeException("XSPXLP07 Dual index out of row range");
+
+         activity[i] = 0;
+      }
+
+      return;
+   }
+
+   for(const int i : ids)
+   {
+      if(i < 0 || i >= nrows)
+         throw SPxInternalCodeException("XSPXLP09 Dual index out of row range");
+
+      activity[i] = primal[c] * colVector(c)[i];
+   }
+
+   ++c;
+
+   for(; c < ncols; ++c)
    {
       if(primal[c] != 0)
       {
-         activity.multAdd(primal[c], colVector(c));
+         for(const int i : ids)
+            activity[i] += primal[c] * colVector(c)[i];
       }
    }
 }
 
 template<> inline
 void SPxLPBase<Rational>::computeDualActivity(const VectorBase<Rational>& dual,
-      VectorBase<Rational>& activity, const bool unscaled) const
+      VectorBase<Rational>& activity,
+      const bool unscaled) const
 {
-   if(dual.dim() != nRows())
-   {
-      throw SPxInternalCodeException("XSPXLP02 Dual vector for computing dual activity has wrong dimension");
-   }
+   int ncols = nCols();
+   int nrows = nRows();
 
-   if(activity.dim() != nCols())
-   {
-      throw SPxInternalCodeException("XSPXLP04 Activity vector computing dual activity has wrong dimension");
-   }
+   if(dual.dim() != nrows)
+      throw SPxInternalCodeException("XSPXLP10 Dual vector for computing dual activity has wrong dimension");
+
+   if(activity.dim() != ncols)
+      throw SPxInternalCodeException("XSPXLP11 Activity vector computing dual activity has wrong dimension");
 
    int r;
 
-   for(r = 0; r < nRows() && dual[r] == 0; r++)
-      ;
+   for(r = 0; r < nrows; ++r)
+   {
+      if(dual[r] != 0)
+         break;
+   }
 
-   if(r >= nRows())
+   if(r >= nrows)
    {
       activity.clear();
       return;
    }
 
    activity = rowVector(r);
-
    activity *= dual[r];
-   r++;
+   ++r;
 
-   for(; r < nRows(); r++)
+   for(; r < nrows; ++r)
+   {
+      if(dual[r] != 0)
+         activity.multAdd(dual[r], rowVector(r));
+   }
+}
+
+template <> inline
+Rational SPxLPBase<Rational>::computeDualActivity(const int i, const VectorBase<Rational>& dual,
+      const bool unscaled) const
+{
+   int ncols = nCols();
+   int nrows = nRows();
+
+   if(dual.dim() != nrows)
+      throw SPxInternalCodeException("XSPXLP12 Dual vector for computing dual activity has wrong dimension");
+
+   if(i < 0 || i >= ncols)
+      throw SPxInternalCodeException("XSPXLP13 Primal index out of column range");
+
+   int r;
+
+   for(r = 0; r < nrows; ++r)
+   {
+      if(dual[r] != 0)
+         break;
+   }
+
+   if(r >= nrows)
+      return 0;
+
+   Rational activity = dual[r] * rowVector(r)[i];
+   ++r;
+
+   for(; r < nrows; ++r)
+   {
+      if(dual[r] != 0)
+         activity += dual[r] * rowVector(r)[i];
+   }
+
+   return activity;
+}
+
+template <> inline
+void SPxLPBase<Rational>::computeDualActivity(const std::vector<int>& ids,
+      const VectorBase<Rational>& dual,
+      VectorBase<Rational>& activity,
+      const bool unscaled) const
+{
+   int ncols = nCols();
+   int nrows = nRows();
+
+   if(dual.dim() != nrows)
+      throw SPxInternalCodeException("XSPXLP14 Dual vector for computing dual activity has wrong dimension");
+
+   if(activity.dim() != ncols)
+      throw SPxInternalCodeException("XSPXLP15 Activity vector computing dual activity has wrong dimension");
+
+   int r;
+
+   for(r = 0; r < nrows; ++r)
+   {
+      if(dual[r] != 0)
+         break;
+   }
+
+   if(r >= nrows)
+   {
+      for(const int i : ids)
+      {
+         if(i < 0 || i >= ncols)
+            throw SPxInternalCodeException("XSPXLP16 Primal index out of column range");
+
+         activity[i] = 0;
+      }
+
+      return;
+   }
+
+   for(const int i : ids)
+   {
+      if(i < 0 || i >= ncols)
+         throw SPxInternalCodeException("XSPXLP18 Primal index out of column range");
+
+      activity[i] = dual[r] * rowVector(r)[i];
+   }
+
+   ++r;
+
+   for(; r < nrows; ++r)
    {
       if(dual[r] != 0)
       {
-         activity.multAdd(dual[r], rowVector(r));
+         for(const int i : ids)
+            activity[i] += dual[r] * rowVector(r)[i];
       }
    }
 }
