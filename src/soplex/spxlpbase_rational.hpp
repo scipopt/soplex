@@ -52,7 +52,7 @@ void SPxLPBase<Rational>::computePrimalActivity(const VectorBase<Rational>& prim
       throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
 
    if(activity.dim() != nrows)
-      throw SPxInternalCodeException("XSPXLP03 Activity vector computing row activity has wrong dimension");
+      throw SPxInternalCodeException("XSPXLP02 Activity vector computing row activity has wrong dimension");
 
    int c;
 
@@ -87,10 +87,10 @@ Rational SPxLPBase<Rational>::computePrimalActivity(const int i, const VectorBas
    int nrows = nRows();
 
    if(primal.dim() != ncols)
-      throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
+      throw SPxInternalCodeException("XSPXLP03 Primal vector for computing row activity has wrong dimension");
 
    if(i < 0 || i >= nrows)
-      throw SPxInternalCodeException("XSPXLP03 Dual index out of row range");
+      throw SPxInternalCodeException("XSPXLP04 Dual index out of row range");
 
    int c;
 
@@ -124,10 +124,10 @@ void SPxLPBase<Rational>::computePrimalActivity(const std::vector<int>& ids, con
    int nrows = nRows();
 
    if(primal.dim() != ncols)
-      throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
+      throw SPxInternalCodeException("XSPXLP05 Primal vector for computing row activity has wrong dimension");
 
    if(activity.dim() != nrows)
-      throw SPxInternalCodeException("XSPXLP03 Activity vector computing row activity has wrong dimension");
+      throw SPxInternalCodeException("XSPXLP06 Activity vector computing row activity has wrong dimension");
 
    int c;
 
@@ -142,7 +142,7 @@ void SPxLPBase<Rational>::computePrimalActivity(const std::vector<int>& ids, con
       for(const int i : ids)
       {
          if(i < 0 || i >= nrows)
-            throw SPxInternalCodeException("XSPXLP02 Dual index out of row range");
+            throw SPxInternalCodeException("XSPXLP07 Dual index out of row range");
 
          activity[i] = 0;
       }
@@ -153,7 +153,7 @@ void SPxLPBase<Rational>::computePrimalActivity(const std::vector<int>& ids, con
    for(const int i : ids)
    {
       if(i < 0 || i >= nrows)
-         throw SPxInternalCodeException("XSPXLP04 Dual index out of row range");
+         throw SPxInternalCodeException("XSPXLP09 Dual index out of row range");
 
       activity[i] = primal[c] * colVector(c)[i];
    }
@@ -178,10 +178,10 @@ void SPxLPBase<Rational>::computeDualActivity(const VectorBase<Rational>& dual, 
    int nrows = nRows();
 
    if(dual.dim() != nrows)
-      throw SPxInternalCodeException("XSPXLP02 Dual vector for computing dual activity has wrong dimension");
+      throw SPxInternalCodeException("XSPXLP10 Dual vector for computing dual activity has wrong dimension");
 
    if(activity.dim() != ncols)
-      throw SPxInternalCodeException("XSPXLP04 Activity vector computing dual activity has wrong dimension");
+      throw SPxInternalCodeException("XSPXLP11 Activity vector computing dual activity has wrong dimension");
 
    int r;
 
@@ -216,10 +216,10 @@ Rational SPxLPBase<Rational>::computeDualActivity(const int i, const VectorBase<
    int nrows = nRows();
 
    if(dual.dim() != nrows)
-      throw SPxInternalCodeException("XSPXLP02 Dual vector for computing dual activity has wrong dimension");
+      throw SPxInternalCodeException("XSPXLP12 Dual vector for computing dual activity has wrong dimension");
 
    if(i < 0 || i >= ncols)
-      throw SPxInternalCodeException("XSPXLP04 Primal index out of column range");
+      throw SPxInternalCodeException("XSPXLP13 Primal index out of column range");
 
    int r;
 
@@ -253,10 +253,10 @@ void SPxLPBase<Rational>::computeDualActivity(const std::vector<int>& ids, const
    int nrows = nRows();
 
    if(dual.dim() != nrows)
-      throw SPxInternalCodeException("XSPXLP02 Dual vector for computing dual activity has wrong dimension");
+      throw SPxInternalCodeException("XSPXLP14 Dual vector for computing dual activity has wrong dimension");
 
    if(activity.dim() != ncols)
-      throw SPxInternalCodeException("XSPXLP04 Activity vector computing dual activity has wrong dimension");
+      throw SPxInternalCodeException("XSPXLP15 Activity vector computing dual activity has wrong dimension");
 
    int r;
 
@@ -271,7 +271,7 @@ void SPxLPBase<Rational>::computeDualActivity(const std::vector<int>& ids, const
       for(const int i : ids)
       {
          if(i < 0 || i >= ncols)
-            throw SPxInternalCodeException("XSPXLP01 Primal index out of column range");
+            throw SPxInternalCodeException("XSPXLP16 Primal index out of column range");
 
          activity[i] = 0;
       }
@@ -282,7 +282,7 @@ void SPxLPBase<Rational>::computeDualActivity(const std::vector<int>& ids, const
    for(const int i : ids)
    {
       if(i < 0 || i >= ncols)
-         throw SPxInternalCodeException("XSPXLP03 Primal index out of column range");
+         throw SPxInternalCodeException("XSPXLP18 Primal index out of column range");
 
       activity[i] = dual[r] * rowVector(r)[i];
    }
