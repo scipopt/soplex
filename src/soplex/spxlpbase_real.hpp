@@ -2687,7 +2687,7 @@ void SPxLPBase<R>::writeMPS(
       }
       else
       {
-         // Continous variables have default upper bound R(infinity)
+         // Continuous variables have default upper bound R(infinity)
          if(upper(i) < R(infinity))
             MPSwriteRecord(p_output, "UP", "BOUND", getColName(*this, i, p_cnames, name1), upper(i));
       }
