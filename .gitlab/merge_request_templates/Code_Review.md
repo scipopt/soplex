@@ -7,7 +7,7 @@
 * [ ] The code change is correct.
 * [ ] The naming and place of new methods is clear and consistent **or** no new methods have been added.
 * [ ] The code is sufficiently documented.
-* [ ] The coding style is OK. (Use astyle.)
+* [ ] The coding style is OK. (jenkins `astyle` job pushes its changes.)
 
 ### Documentation and building
 
