@@ -7,7 +7,7 @@
 * [ ] The code change is correct.
 * [ ] The naming and place of new methods is clear and consistent **or** no new methods have been added.
 * [ ] The code is sufficiently documented.
-* [ ] The coding style is OK. (Use astyle.)
+* [ ] The coding style is OK. (jenkins `astyle` job pushes its changes.)
 
 ### Documentation and building
 
@@ -19,6 +19,7 @@
 
 * [ ] SCIP debug runs have been checked (type some of `jenkins debug {short,minlp,mip,pb}`).
 * [ ] The performance impact on SCIP has been checked (type some of `jenkins performance {mip,pb} (quick|continue|)`), **or** the changed code will not be executed by default.
+* [ ] SCIP ctest has been checked (type `jenkins ctest`).
 
 ### Does this merge introduce an API change? :warning:
 
