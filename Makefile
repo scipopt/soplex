@@ -534,7 +534,9 @@ endif
 				$(MAKE) githash ; \
 			fi'
 ifneq ($(GMP),$(LAST_GMP))
+ifneq ($(GMPSRC),)
 		@-touch $(GMPSRC)
+endif
 endif
 ifneq ($(ZLIB),$(LAST_ZLIB))
 		@-touch $(ZLIBSRC)
