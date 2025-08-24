@@ -222,7 +222,7 @@ public:
    {
       const Name nam(str);
       const DataKey* result = hashtab.get(nam);
-      return result == nullptr ? DataKey() : *hashtab.get(nam);
+      return result == nullptr ? DataKey() : *result;
    }
 
    /// returns number of name with DataKey \p pkey in NameSet.
