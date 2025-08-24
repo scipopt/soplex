@@ -974,7 +974,10 @@ public:
    /// Resets maximum number of SVectorBase%s.
    void reMax(int newmax = 0)
    {
-      list.move(set.reMax(newmax));
+      ptrdiff_t delta = set.reMax(newmax);
+
+      if(delta != 0)
+         list.move(delta);
    }
 
    /// Consistency check.
