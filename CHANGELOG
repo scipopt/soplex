@@ -3,6 +3,9 @@ Release 7.1.6
 
 fixed bugs:
 
+code quality:
+- reorganize NameSet::number() to avoid one hash table lookup and remove false compiler warning
+
 miscellaneous:
 - avoid a false use-after-free compiler warning from GCC 12
 
