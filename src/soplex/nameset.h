@@ -222,7 +222,7 @@ public:
    {
       const Name nam(str);
       const DataKey* result = hashtab.get(nam);
-      return result == nullptr ? DataKey() : *hashtab.get(nam);
+      return result == nullptr ? DataKey() : *result;
    }
 
    /// returns number of name with DataKey \p pkey in NameSet.
@@ -235,14 +235,8 @@ public:
    int number(const char* str) const
    {
       const Name nam(str);
-
-      if(hashtab.has(nam))
-      {
-         assert(hashtab.get(nam) != nullptr);
-         return number(*hashtab.get(nam));
-      }
-      else
-         return -1;
+      const DataKey* result = hashtab.get(nam);
+      return result == nullptr ? -1 : number(*result);
    }
 
    /// does NameSet has a name with number \p pnum?
