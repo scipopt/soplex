@@ -3,6 +3,9 @@ Release 7.1.6
 
 fixed bugs:
 
+miscellaneous:
+- avoid a false use-after-free compiler warning from GCC 12
+
 July 2025 - Release 7.1.5
 ==================
 
