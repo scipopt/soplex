@@ -168,10 +168,6 @@ GCCWARN		=	-pedantic -Wall -W -Wpointer-arith -Wcast-align -Wwrite-strings \
 #			-Wold-style-cast
 #			-Weffc++
 
-ifeq ($(COMP),gnu)
-GCCWARN += -Wno-stringop-overflow
-endif
-
 
 #-----------------------------------------------------------------------------
 include make/make.$(BASE)
