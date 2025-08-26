@@ -237,7 +237,7 @@ char* SoPlex_getPrimalRationalString(void* soplex, int dim)
    VectorRational primal(dim);
    std::string primalstring;
    char* rawstring;
-   long unsigned int stringlength;
+   size_t stringlength;
 
    so->getPrimalRational(primal);
 
@@ -435,7 +435,7 @@ char* SoPlex_objValueRationalString(void* soplex)
    throw SPxException("Rational functions cannot be used when built without Boost.");
 #endif
    /* coverity[unreachable] */
-   long unsigned int stringlength;
+   size_t stringlength;
    char* value;
    std::string objstring;
    SoPlex* so = (SoPlex*)(soplex);
