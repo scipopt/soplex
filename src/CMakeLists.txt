@@ -275,3 +275,8 @@ install(EXPORT soplex-targets FILE soplex-targets.cmake DESTINATION ${CMAKE_INST
 install(FILES "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/soplex-config.cmake"
 	           ${CMAKE_BINARY_DIR}/soplex-config-version.cmake
 		   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/soplex)
+# Install FindMPFR.cmake module.
+if(SOPLEX_WITH_MPFR)
+   install(FILES ${PROJECT_SOURCE_DIR}/cmake/Modules/FindMPFR.cmake
+      DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/soplex)
+endif()
