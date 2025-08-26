@@ -440,8 +440,8 @@ char* SoPlex_objValueRationalString(void* soplex)
    std::string objstring;
    SoPlex* so = (SoPlex*)(soplex);
 
-   stringlength = strlen(objstring.c_str()) + 1;
    objstring = so->objValueRational().str();
+   stringlength = strlen(objstring.c_str()) + 1;
    value = new char[stringlength];
    strncpy(value, objstring.c_str(), stringlength);
    return value;
