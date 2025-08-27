@@ -5381,7 +5381,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                   _simplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost, basisStatusRows.get_ptr(),
                                           basisStatusCols.get_ptr());
                }
-               catch(const SPxInternalCodeException& E)
+               catch(const SPxInternalCodeException&)
                {
                   // error message has already been printed
                   throw SPxInternalCodeException("Error storing the basis");

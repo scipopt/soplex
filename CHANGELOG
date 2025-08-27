@@ -34,12 +34,11 @@ Release 7.1.6
 ==================
 
 fixed bugs:
+- fixed that SoPlex_objValueRationalString did not calculate the required string length correctly
 
 code quality:
 - reorganize NameSet::number() to avoid one hash table lookup and remove false compiler warning
-
-miscellaneous:
-- avoid a false use-after-free compiler warning from GCC 12
+- avoid a false use-after-free compiler warning from GCC 12 and some more fixes of compiler warnings
 
 July 2025 - Release 7.1.5
 ==================
