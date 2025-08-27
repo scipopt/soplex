@@ -49,21 +49,21 @@ void NameSet::add(DataKey& p_key, const char* str)
          reMax(int(factor * max() + 8));
       }
 
-      if(memSize() + int(strlen(str)) >= memMax())
+      if(memSize() + strlen(str) >= memMax())
       {
          memPack();
 
-         if(memSize() + int(strlen(str)) >= memMax())
+         if(memSize() + strlen(str) >= memMax())
          {
-            assert(memFactor >= 1);
-            memRemax(int(memFactor * memMax()) + 9 + int(strlen(str)));
-            assert(memSize() + int(strlen(str)) < memMax());
+            assert(memFactor > 1.0);
+            memRemax(size_t(memFactor * (Real)memMax()) + 9 + strlen(str));
+            assert(memSize() + strlen(str) < memMax());
          }
       }
 
-      int   idx = memused;
+      size_t idx = memused;
       char* tmp = &(mem[idx]);
-      memused  += int(strlen(str)) + 1;
+      memused += strlen(str) + 1;
 
       spxSnprintf(tmp, SPX_MAXSTRLEN, "%s", str);
       *(set.create(p_key)) = idx;
@@ -156,7 +156,7 @@ void NameSet::reMax(int newmax)
    set.reMax(newmax);
 }
 
-void NameSet::memRemax(int newmax)
+void NameSet::memRemax(size_t newmax)
 {
    memmax = (newmax < memSize()) ? memSize() : newmax;
    spx_realloc(mem, memmax);
@@ -170,8 +170,8 @@ void NameSet::memRemax(int newmax)
 void NameSet::memPack()
 {
    char* newmem = nullptr;
-   int   newlast = 0;
-   int   i;
+   size_t newlast = 0;
+   int i;
 
    hashtab.clear();
 
@@ -182,10 +182,10 @@ void NameSet::memPack()
       const char* t = &mem[set[i]];
       spxSnprintf(&newmem[newlast], SPX_MAXSTRLEN, "%s", t);
       set[i] = newlast;
-      newlast += int(strlen(t)) + 1;
+      newlast += strlen(t) + 1;
    }
 
-   memcpy(mem, newmem, static_cast<size_t>(newlast));
+   memcpy(mem, newmem, newlast);
    memused = newlast;
 
    assert(memSize() <= memMax());
@@ -213,7 +213,7 @@ static int NameSetNameHashFunction(const NameSet::Name* str)
    return ((int) res);
 }
 
-NameSet::NameSet(int p_max, int mmax, Real fac, Real memFac)
+NameSet::NameSet(int p_max, size_t mmax, Real fac, Real memFac)
    : set(p_max)
    , mem(nullptr)
    , hashtab(NameSetNameHashFunction, set.max(), 0, fac)

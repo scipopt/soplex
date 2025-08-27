@@ -153,10 +153,10 @@ private:
    //------------------------------
    /**@name Data */
    ///@{
-   DataSet < int > set;  ///< name set.
+   DataSet<size_t> set;  ///< name set
    char* mem;            ///< string memory
-   int memmax;           ///< size of string memory
-   int memused;          ///< size of used string memory
+   size_t memmax;        ///< size of string memory
+   size_t memused;       ///< size of used string memory
    /** Every name in a NameSet is assigned a DataKey by which it can be
        accessed (see NameSet::operator[]()). See DataKey for a more
        detailed description of the concept of Keys.
@@ -200,13 +200,13 @@ public:
    }
 
    /// returns maximum length of string memory.
-   int memMax() const
+   size_t memMax() const
    {
       return memmax;
    }
 
    /// returns used length of string memory.
-   int memSize() const
+   size_t memSize() const
    {
       return memused;
    }
@@ -310,7 +310,7 @@ public:
    void reMax(int newmax = 0);
 
    /// resets memMax() to \p newmax.
-   void memRemax(int newmax = 0);
+   void memRemax(size_t newmax = 0);
 
    /// garbage collection.
    void memPack();
@@ -355,7 +355,7 @@ public:
     */
    explicit
    NameSet(int max = 10000,
-           int mmax = -1,
+           size_t mmax = 0,
            Real fac = 2,
            Real memFac = 2);
 
