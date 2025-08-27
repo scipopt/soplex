@@ -16,6 +16,7 @@ build system:
 features:
 
 fixed bugs:
+- extend memory counters to size_t to avoid segmentation faults for large-scale problems
 
 code quality:
 - avoid deprecated implicit copy constructor for 'SPxException', 'SLinSolver', and 'SLinSolverRational'
@@ -26,6 +27,8 @@ interface & parameters:
 - deprecated SOPLEX_SUBVERSION, SOPLEX_VERSION_SUB, and soplex::subversion()
 - rename enums for verbosity levels: SPxOut::DEBUG to SPxOut::VERB_DEBUG etc.
 - add getRowActivity(), getRowActivityRational(), getRowsActivity(), getRowsActivityReal(), getRowsActivityRational(), and getColActivity(), getColActivityRational(), getColsActivity(), getColsActivityReal() based on extended computePrimalActivity() and computeDualActivity()
+- retype second argument of spx_alloc() and spx_realloc() from int to size_t
+- in class NameSet retype second argument of NameSet(), first argument of memRemax(), return of memMax(), and return of memSize() from int to size_t
 
 miscellaneous:
 - removed 4th number in SoPlex version; new format is major.minor.patch
