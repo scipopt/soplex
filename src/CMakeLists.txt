@@ -266,6 +266,8 @@ ${CMAKE_BINARY_DIR}/soplex-config-version.cmake
 
 #configure the config file for the install
 set(CONF_INCLUDE_DIRS "\${CMAKE_CURRENT_LIST_DIR}/../../../include")
+# add the current directory of the installed soplex-config.cmake as a CMake module path, to find FindMPFR.cmake
+set(EXTRA_CMAKE_MODULE_PATH "\${CMAKE_CURRENT_LIST_DIR}")
 configure_file(${PROJECT_SOURCE_DIR}/soplex-config.cmake.in
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/soplex-config.cmake" @ONLY)
 
@@ -275,3 +277,8 @@ install(EXPORT soplex-targets FILE soplex-targets.cmake DESTINATION ${CMAKE_INST
 install(FILES "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/soplex-config.cmake"
 	           ${CMAKE_BINARY_DIR}/soplex-config-version.cmake
 		   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/soplex)
+# Install FindMPFR.cmake module.
+if(SOPLEX_WITH_MPFR)
+   install(FILES ${PROJECT_SOURCE_DIR}/cmake/Modules/FindMPFR.cmake
+      DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/soplex)
+endif()
