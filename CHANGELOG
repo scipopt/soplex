@@ -39,6 +39,7 @@ Release 7.1.6
 
 fixed bugs:
 - fixed that SoPlex_objValueRationalString did not calculate the required string length correctly
+- clear vector before modifying number of non-zeros in SSVectorBase<R>::assign2productShort() of basevectors.h to avoid uninitialized indexing
 
 code quality:
 - reorganize NameSet::number() to avoid one hash table lookup and remove false compiler warning

@@ -650,41 +650,35 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A,
 {
    assert(x.isSetup());
 
+   clear();
+
    if(x.size() == 0)   // x can be setup but have size 0 => this := zero vector
-   {
-      clear();
       return *this;
-   }
 
    // compute x[0] * A[0]
    int curidx = x.idx[0];
    const T x0 = x.val[curidx];
    const SVectorBase<S>& A0 = A[curidx];
-   int nonzero_idx = 0;
    int xsize = x.size();
    int Aisize;
 
-   num = A0.size();
+   // If x[0] == 0, do nothing.
+   if(isNotZero(x0, this->tolerances()->epsilon()))
+   {
+      Aisize = A0.size();
 
-   if(isZero(x0, this->tolerances()->epsilon()) || num == 0)
-   {
-      // A[0] == 0 or x[0] == 0 => this := zero vector
-      clear();
-   }
-   else
-   {
-      for(int j = 0; j < num; ++j)
+      for(int j = 0; j < Aisize; ++j)
       {
          const Nonzero<S>& elt = A0.element(j);
          const R product = x0 * elt.val;
 
-         // store the value in any case
-         idx[nonzero_idx] = elt.idx;
-         VectorBase<R>::val[elt.idx] = product;
-
          // count only non-zero values; not 'isNotZero(product, epsilon)'
          if(product != 0)
-            ++nonzero_idx;
+         {
+            assert(num < len);
+            idx[num++] = elt.idx;
+            VectorBase<R>::val[elt.idx] = product;
+         }
       }
    }
 
@@ -692,39 +686,39 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A,
    for(int i = 1; i < xsize; ++i)
    {
       curidx = x.idx[i];
-      const T xi     = x.val[curidx];
+      const T xi = x.val[curidx];
       const SVectorBase<S>& Ai = A[curidx];
 
-      // If A[i] == 0 or x[i] == 0, do nothing.
-      Aisize = Ai.size();
-
-      if(isNotZero(xi, this->tolerances()->epsilon()) || Aisize == 0)
+      // If x[i] == 0, do nothing.
+      if(isNotZero(xi, this->tolerances()->epsilon()))
       {
+         Aisize = Ai.size();
+
          // Compute x[i] * A[i] and add it to the existing vector.
          for(int j = 0; j < Aisize; ++j)
          {
             const Nonzero<S>& elt = Ai.element(j);
-            idx[nonzero_idx] = elt.idx;
-            R oldval  = VectorBase<R>::val[elt.idx];
+            const R oldval = VectorBase<R>::val[elt.idx];
+            const R newval = oldval + xi * elt.val;
 
-            // An old value of exactly 0 means the position is still unused.
-            // It will be used now (either by a new nonzero or by a SOPLEX_VECTOR_MARKER),
-            // so increase the counter. If oldval != 0, we just
-            // change an existing NZ-element, so don't increase the counter.
-            if(oldval == 0)
-               ++nonzero_idx;
-
-            // Add the current product x[i] * A[i][j]; if oldval was
-            // SOPLEX_VECTOR_MARKER before, it does not hurt because SOPLEX_VECTOR_MARKER is really small.
-            oldval += xi * elt.val;
-
-            // If the new value is exactly 0, mark the index as used
-            // by setting a value which is nearly 0; otherwise, store
-            // the value. Values below epsilon will be removed later.
-            if(oldval == 0)
+            // If the value becomes exactly 0, mark the index as used by setting a value which is
+            // nearly 0. Values below epsilon will be removed later.
+            if(oldval != 0 && newval == 0)
                VectorBase<R>::val[elt.idx] = SOPLEX_VECTOR_MARKER;
+            // Otherwise, store the value. If oldval was SOPLEX_VECTOR_MARKER before, it does not
+            // hurt because SOPLEX_VECTOR_MARKER is really small.
             else
-               VectorBase<R>::val[elt.idx] = oldval;
+            {
+               VectorBase<R>::val[elt.idx] = newval;
+
+               // If the value changes from exactly 0, the position is still unused, so increase
+               // the counter. Otherwise, we just change the value of an existing element.
+               if(oldval == 0 && newval != 0)
+               {
+                  assert(num < len);
+                  idx[num++] = elt.idx;
+               }
+            }
          }
       }
    }
@@ -733,20 +727,17 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A,
    // zeroing all values which are nearly 0, and setting #num# appropriately.
    int nz_counter = 0;
 
-   for(int i = 0; i < nonzero_idx; ++i)
+   for(int i = 0; i < num; ++i)
    {
       curidx = idx[i];
 
       if(isZero(VectorBase<R>::val[curidx], this->tolerances()->epsilon()))
          VectorBase<R>::val[curidx] = 0;
       else
-      {
-         idx[nz_counter] = curidx;
-         ++nz_counter;
-      }
-
-      num = nz_counter;
+         idx[nz_counter++] = curidx;
    }
+
+   num = nz_counter;
 
    assert(isConsistent());
 
