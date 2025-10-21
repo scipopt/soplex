@@ -137,13 +137,14 @@ bool MPSInput::readLine()
 
          /* Test for fixed format
           */
-         space = m_buf[12] | m_buf[13]
+         space = m_buf[3]
+                 | m_buf[12] | m_buf[13]
                  | m_buf[22] | m_buf[23]
                  | m_buf[36] | m_buf[37] | m_buf[38]
                  | m_buf[47] | m_buf[48]
                  | m_buf[61] | m_buf[62] | m_buf[63];
 
-         if(space == BLANK || len < 13)
+         if(space == BLANK)
          {
             /* Now we have space at the right positions.
              * But are there also the non space where they
@@ -159,7 +160,7 @@ bool MPSInput::readLine()
             /* len < 13 is handle ROW lines with embedded spaces
              * in the names correctly
              */
-            if(number || len < 13)
+            if((m_section != ROWS && number) || (m_section == ROWS && len < 13))
             {
                /* Now we assume fixed format, so we patch possible embedded spaces.
                 */
@@ -169,9 +170,7 @@ bool MPSInput::readLine()
             }
             else
             {
-               if(m_section == COLUMNS || m_section == RHS
-                     || m_section == RANGES  || m_section == BOUNDS)
-                  m_is_new_format = true;
+               m_is_new_format = true;
             }
          }
          else
