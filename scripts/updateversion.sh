@@ -16,7 +16,7 @@ then
     sed -i "s/^VERSION.*/VERSION		:=	$1.$2.$3/" Makefile
     sed -i "s/^ \* @version.*/ \* @version  $1.$2.$3/" doc/xternal.cpp
     sed -i "s/^VERSION=.*/VERSION=\"$1.$2.$3\"/" scripts/makedist.sh
-    sed -i "s/^#define SOPLEX_VERSION.*/#define SOPLEX_VERSION         $1$2$3/" src/soplex/spxdefines.h
+    sed -i "s/^#define SOPLEX_VERSION .*/#define SOPLEX_VERSION         $1$2$3/" src/soplex/spxdefines.h
     sed -i "s/set(SOPLEX_VERSION_MAJOR.*/set(SOPLEX_VERSION_MAJOR $1)/" CMakeLists.txt
     sed -i "s/set(SOPLEX_VERSION_MINOR.*/set(SOPLEX_VERSION_MINOR $2)/" CMakeLists.txt
     sed -i "s/set(SOPLEX_VERSION_PATCH.*/set(SOPLEX_VERSION_PATCH $3)/" CMakeLists.txt
