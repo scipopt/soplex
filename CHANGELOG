@@ -34,7 +34,7 @@ interface & parameters:
 miscellaneous:
 - removed 4th number in SoPlex version; new format is major.minor.patch
 
-Release 7.1.6
+October 2025 - Release 7.1.6
 ==================
 
 fixed bugs:
