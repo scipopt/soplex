@@ -13,6 +13,7 @@ build system:
 - Makefiles: By default, SoPlex links with MPFR=true and GMP=true if and only if BOOST=true (options GMP=auto and MPFR=auto)
 - Makefiles: Change default value of BOOST to false; set BOOST=true manually to obtain exact rational solving functionality
 - cmake: if SoPlex is build with MPFR, then also projects that use such a SoPlex installation will now look for MPFR
+- cmake: updated FindMPFR.cmake so that MPFR_DIR is now supported
 
 features:
 
