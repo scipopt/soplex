@@ -3264,7 +3264,7 @@ void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[
 
          break;
 
-      case LPRowBase<R>::LESS_EQUAL: // <= constriant
+      case LPRowBase<R>::LESS_EQUAL: // <= constraint
          assert(rhs(i) < R(infinity));
          primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
          primalrowsidx++;
