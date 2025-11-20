@@ -2464,9 +2464,4 @@ void SPxLPBase<Rational>::buildDualProblem(SPxLPBase<Rational>& dualLP, SPxRowId
    SPX_MSG_ERROR(std::cerr << "Method buildDualProblem() not implemented for Rational\n");
 }
 
-
-// ---------------------------------------------------------------------------------------------------------------------
-//  Explicit instantiation
-// ---------------------------------------------------------------------------------------------------------------------
-template class SPxLPBase < Rational >;
 } // namespace soplex
