@@ -25,6 +25,7 @@ build system:
 
 fixed bugs:
 - extend memory counters to size_t to avoid segmentation faults for large-scale problems
+- removed instantiation of SPxLPBase<Rational> class template from header file, to avoid problems when SoPlex headers are compiled into several object files of a library
 
 code quality:
 - avoid deprecated implicit copy constructor for classes SPxException, SLinSolver, and SLinSolverRational
