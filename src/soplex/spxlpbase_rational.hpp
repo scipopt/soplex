@@ -1309,7 +1309,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
 
 /// Process RHS section.
 static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSet& rnames,
-                       SPxOut* spxout)
+                       Rational& objoffset, SPxOut* spxout)
 {
    char rhsname[MPSInput::MAX_LINE_LEN] = { '\0' };
    char addname[MPSInput::MAX_LINE_LEN] = { '\0' };
@@ -1355,7 +1355,19 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
       }
       else
       {
-         if((idx = rnames.number(mps.field2())) < 0)
+         if(!strcmp(mps.field2(), mps.objName()))
+         {
+            try
+            {
+               objoffset = -ratFromString(mps.field3());
+            }
+            catch(const std::exception& e)
+            {
+               SPX_MSG_WARNING((*spxout), (*spxout) << "WMPSRD03 Warning: malformed rational value in MPS file\n");
+               std::cerr << e.what() << '\n';
+            }
+         }
+         else if((idx = rnames.number(mps.field2())) < 0)
             mps.entryIgnored("RHS", mps.field1(), "row", mps.field2());
          else
          {
@@ -1380,7 +1392,19 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
 
          if(mps.field5() != nullptr)
          {
-            if((idx = rnames.number(mps.field4())) < 0)
+            if(!strcmp(mps.field4(), mps.objName()))
+            {
+               try
+               {
+                  objoffset = -ratFromString(mps.field5());
+               }
+               catch(const std::exception& e)
+               {
+                  SPX_MSG_WARNING((*spxout), (*spxout) << "WMPSRD03 Warning: malformed rational value in MPS file\n");
+                  std::cerr << e.what() << '\n';
+               }
+            }
+            else if((idx = rnames.number(mps.field4())) < 0)
                mps.entryIgnored("RHS", mps.field1(), "row", mps.field4());
             else
             {
@@ -1712,6 +1736,7 @@ bool SPxLPBase<Rational>::readMPS(
    NameSet*      p_cnames,          ///< column names.
    DIdxSet*      p_intvars)         ///< integer variables.
 {
+   Rational objoffset = 0;
    LPRowSetBase<Rational>& rset = *this;
    LPColSetBase<Rational>& cset = *this;
    NameSet* rnames;
@@ -1776,7 +1801,7 @@ bool SPxLPBase<Rational>::readMPS(
       MPSreadCols(mps, rset, *rnames, cset, *cnames, p_intvars, spxout);
 
    if(mps.section() == MPSInput::RHS)
-      MPSreadRhs(mps, rset, *rnames, spxout);
+      MPSreadRhs(mps, rset, *rnames, objoffset, spxout);
 
    if(mps.section() == MPSInput::RANGES)
       MPSreadRanges(mps, rset, *rnames, spxout);
@@ -1791,6 +1816,7 @@ bool SPxLPBase<Rational>::readMPS(
       clear();
    else
    {
+      changeObjOffset(objoffset);
       changeSense(mps.objSense() == MPSInput::MINIMIZE ? SPxLPBase<Rational>::MINIMIZE :
                   SPxLPBase<Rational>::MAXIMIZE);
 

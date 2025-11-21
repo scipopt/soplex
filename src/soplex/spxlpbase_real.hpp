@@ -1959,7 +1959,8 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSe
 
 /// Process RHS section.
 template <class R>
-static void MPSreadRhs(MPSInput& mps, LPRowSetBase<R>& rset, const NameSet& rnames, SPxOut* spxout)
+static void MPSreadRhs(MPSInput& mps, LPRowSetBase<R>& rset, const NameSet& rnames, R& objoffset,
+                       SPxOut* spxout)
 {
    char rhsname[MPSInput::MAX_LINE_LEN] = { '\0' };
    char addname[MPSInput::MAX_LINE_LEN] = { '\0' };
@@ -2005,7 +2006,9 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<R>& rset, const NameSet& rnam
       }
       else
       {
-         if((idx = rnames.number(mps.field2())) < 0)
+         if(!strcmp(mps.field2(), mps.objName()))
+            objoffset = -atof(mps.field3());
+         else if((idx = rnames.number(mps.field2())) < 0)
             mps.entryIgnored("RHS", mps.field1(), "row", mps.field2());
          else
          {
@@ -2022,7 +2025,9 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<R>& rset, const NameSet& rnam
 
          if(mps.field5() != nullptr)
          {
-            if((idx = rnames.number(mps.field4())) < 0)
+            if(!strcmp(mps.field4(), mps.objName()))
+               objoffset = -atof(mps.field5());
+            else if((idx = rnames.number(mps.field4())) < 0)
                mps.entryIgnored("RHS", mps.field1(), "row", mps.field4());
             else
             {
@@ -2314,6 +2319,7 @@ bool SPxLPBase<R>::readMPS(
    NameSet*      p_cnames,          ///< column names.
    DIdxSet*      p_intvars)         ///< integer variables.
 {
+   R objoffset = 0;
    LPRowSetBase<R>& rset = *this;
    LPColSetBase<R>& cset = *this;
    NameSet* rnames;
@@ -2378,7 +2384,7 @@ bool SPxLPBase<R>::readMPS(
       MPSreadCols(mps, rset, *rnames, cset, *cnames, p_intvars);
 
    if(mps.section() == MPSInput::RHS)
-      MPSreadRhs(mps, rset, *rnames, spxout);
+      MPSreadRhs(mps, rset, *rnames, objoffset, spxout);
 
    if(mps.section() == MPSInput::RANGES)
       MPSreadRanges(mps, rset, *rnames, spxout);
@@ -2393,6 +2399,7 @@ bool SPxLPBase<R>::readMPS(
       clear();
    else
    {
+      changeObjOffset(objoffset);
       changeSense(mps.objSense() == MPSInput::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE);
 
       SPX_MSG_INFO2((*spxout), (*spxout) << "IMPSRD06 Objective sense: " << ((mps.objSense() ==
