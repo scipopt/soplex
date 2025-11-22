@@ -1694,11 +1694,11 @@ static inline void MPSreadName(MPSInput& mps, SPxOut* spxout)
       if(!mps.readLine() || (mps.field0() == nullptr))
          break;
 
-      if(!strcmp(mps.field0(), "ROWS"))
+      if(strcmp(mps.field0(), "ROWS") == 0)
          mps.setSection(MPSInput::ROWS);
-      else if(!strncmp(mps.field0(), "OBJSEN", 6))
+      else if(strncmp(mps.field0(), "OBJSEN", 6) == 0)
          mps.setSection(MPSInput::OBJSEN);
-      else if(!strcmp(mps.field0(), "OBJNAME"))
+      else if(strcmp(mps.field0(), "OBJNAME") == 0)
          mps.setSection(MPSInput::OBJNAME);
       else
          break;
@@ -1721,9 +1721,9 @@ static inline void MPSreadObjsen(MPSInput& mps)
       if(!mps.readLine() || (mps.field1() == nullptr))
          break;
 
-      if(!strcmp(mps.field1(), "MIN"))
+      if(strcmp(mps.field1(), "MIN") == 0)
          mps.setObjSense(MPSInput::MINIMIZE);
-      else if(!strcmp(mps.field1(), "MAX"))
+      else if(strcmp(mps.field1(), "MAX") == 0)
          mps.setObjSense(MPSInput::MAXIMIZE);
       else
          break;
@@ -1732,9 +1732,9 @@ static inline void MPSreadObjsen(MPSInput& mps)
       if(!mps.readLine() || (mps.field0() == nullptr))
          break;
 
-      if(!strcmp(mps.field0(), "ROWS"))
+      if(strcmp(mps.field0(), "ROWS") == 0)
          mps.setSection(MPSInput::ROWS);
-      else if(!strcmp(mps.field0(), "OBJNAME"))
+      else if(strcmp(mps.field0(), "OBJNAME") == 0)
          mps.setSection(MPSInput::OBJNAME);
       else
          break;
@@ -1924,7 +1924,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSe
 
       val = atof(mps.field3());
 
-      if(!strcmp(mps.field2(), mps.objName()))
+      if(strcmp(mps.field2(), mps.objName()) == 0)
          col.setObj(val);
       else
       {
@@ -1940,7 +1940,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSe
 
          val = atof(mps.field5());
 
-         if(!strcmp(mps.field4(), mps.objName()))
+         if(strcmp(mps.field4(), mps.objName()) == 0)
             col.setObj(val);
          else
          {
@@ -1973,11 +1973,11 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<R>& rset, const NameSet& rnam
       {
          SPX_MSG_INFO2((*spxout), (*spxout) << "IMPSRD03 RHS name       : " << rhsname  << std::endl;);
 
-         if(!strcmp(mps.field0(), "RANGES"))
+         if(strcmp(mps.field0(), "RANGES") == 0)
             mps.setSection(MPSInput::RANGES);
-         else if(!strcmp(mps.field0(), "BOUNDS"))
+         else if(strcmp(mps.field0(), "BOUNDS") == 0)
             mps.setSection(MPSInput::BOUNDS);
-         else if(!strcmp(mps.field0(), "ENDATA"))
+         else if(strcmp(mps.field0(), "ENDATA") == 0)
             mps.setSection(MPSInput::ENDATA);
          else
             break;
@@ -2006,7 +2006,7 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<R>& rset, const NameSet& rnam
       }
       else
       {
-         if(!strcmp(mps.field2(), mps.objName()))
+         if(strcmp(mps.field2(), mps.objName()) == 0)
             objoffset = -atof(mps.field3());
          else if((idx = rnames.number(mps.field2())) < 0)
             mps.entryIgnored("RHS", mps.field1(), "row", mps.field2());
@@ -2025,7 +2025,7 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<R>& rset, const NameSet& rnam
 
          if(mps.field5() != nullptr)
          {
-            if(!strcmp(mps.field4(), mps.objName()))
+            if(strcmp(mps.field4(), mps.objName()) == 0)
                objoffset = -atof(mps.field5());
             else if((idx = rnames.number(mps.field4())) < 0)
                mps.entryIgnored("RHS", mps.field1(), "row", mps.field4());
@@ -2065,9 +2065,9 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<R>& rset, const NameSet& 
       {
          SPX_MSG_INFO2((*spxout), (*spxout) << "IMPSRD04 Range name     : " << rngname << std::endl;);
 
-         if(!strcmp(mps.field0(), "BOUNDS"))
+         if(strcmp(mps.field0(), "BOUNDS") == 0)
             mps.setSection(MPSInput::BOUNDS);
-         else if(!strcmp(mps.field0(), "ENDATA"))
+         else if(strcmp(mps.field0(), "ENDATA") == 0)
             mps.setSection(MPSInput::ENDATA);
          else
             break;
@@ -2097,7 +2097,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<R>& rset, const NameSet& 
        *  E   -     rhs + range     rhs
        * ----------------------------------------
        */
-      if(!strcmp(rngname, mps.field1()))
+      if(strcmp(rngname, mps.field1()) == 0)
       {
          if((idx = rnames.number(mps.field2())) < 0)
             mps.entryIgnored("Range", mps.field1(), "row", mps.field2());
@@ -2188,11 +2188,11 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<R>& cset, const NameSet& c
       }
 
       // Is the value field used ?
-      if((!strcmp(mps.field1(), "LO"))
-            || (!strcmp(mps.field1(), "UP"))
-            || (!strcmp(mps.field1(), "FX"))
-            || (!strcmp(mps.field1(), "LI"))
-            || (!strcmp(mps.field1(), "UI")))
+      if(strcmp(mps.field1(), "LO") == 0
+            || strcmp(mps.field1(), "UP") == 0
+            || strcmp(mps.field1(), "FX") == 0
+            || strcmp(mps.field1(), "LI") == 0
+            || strcmp(mps.field1(), "UI") == 0)
       {
          if((mps.field3() != nullptr) && (mps.field4() == nullptr))
             mps.insertName("_BND_", true);
@@ -2213,7 +2213,7 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<R>& cset, const NameSet& c
       }
 
       // Only read the first Bound in section
-      if(!strcmp(bndname, mps.field2()))
+      if(strcmp(bndname, mps.field2()) == 0)
       {
          if((idx = cnames.number(mps.field3())) < 0)
             mps.entryIgnored("column", mps.field3(), "bound", bndname);
@@ -2221,10 +2221,10 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<R>& cset, const NameSet& c
          {
             if(mps.field4() == nullptr)
                val = 0.0;
-            else if(!strcmp(mps.field4(), "-Inf") || !strcmp(mps.field4(), "-inf"))
+            else if(strcmp(mps.field4(), "-Inf") == 0 || strcmp(mps.field4(), "-inf") == 0)
                val = R(-infinity);
-            else if(!strcmp(mps.field4(), "Inf") || !strcmp(mps.field4(), "inf")
-                    || !strcmp(mps.field4(), "+Inf") || !strcmp(mps.field4(), "+inf"))
+            else if(strcmp(mps.field4(), "Inf") == 0 || strcmp(mps.field4(), "inf") == 0
+                    || strcmp(mps.field4(), "+Inf") == 0 || strcmp(mps.field4(), "+inf") == 0)
                val = R(infinity);
             else
                val = atof(mps.field4());

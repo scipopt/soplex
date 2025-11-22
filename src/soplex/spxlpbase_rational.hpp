@@ -1266,7 +1266,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
          std::cerr << e.what() << '\n';
       }
 
-      if(!strcmp(mps.field2(), mps.objName()))
+      if(strcmp(mps.field2(), mps.objName()) == 0)
          col.setObj(val);
       else
       {
@@ -1290,7 +1290,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
             std::cerr << e.what() << '\n';
          }
 
-         if(!strcmp(mps.field4(), mps.objName()))
+         if(strcmp(mps.field4(), mps.objName()) == 0)
             col.setObj(val);
          else
          {
@@ -1322,11 +1322,11 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
       {
          SPX_MSG_INFO2((*spxout), (*spxout) << "IMPSRD03 RHS name       : " << rhsname  << std::endl;);
 
-         if(!strcmp(mps.field0(), "RANGES"))
+         if(strcmp(mps.field0(), "RANGES") == 0)
             mps.setSection(MPSInput::RANGES);
-         else if(!strcmp(mps.field0(), "BOUNDS"))
+         else if(strcmp(mps.field0(), "BOUNDS") == 0)
             mps.setSection(MPSInput::BOUNDS);
-         else if(!strcmp(mps.field0(), "ENDATA"))
+         else if(strcmp(mps.field0(), "ENDATA") == 0)
             mps.setSection(MPSInput::ENDATA);
          else
             break;
@@ -1355,7 +1355,7 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
       }
       else
       {
-         if(!strcmp(mps.field2(), mps.objName()))
+         if(strcmp(mps.field2(), mps.objName()) == 0)
          {
             try
             {
@@ -1392,7 +1392,7 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
 
          if(mps.field5() != nullptr)
          {
-            if(!strcmp(mps.field4(), mps.objName()))
+            if(strcmp(mps.field4(), mps.objName()) == 0)
             {
                try
                {
@@ -1449,9 +1449,9 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
       {
          SPX_MSG_INFO2((*spxout), (*spxout) << "IMPSRD04 Range name     : " << rngname << std::endl;);
 
-         if(!strcmp(mps.field0(), "BOUNDS"))
+         if(strcmp(mps.field0(), "BOUNDS") == 0)
             mps.setSection(MPSInput::BOUNDS);
-         else if(!strcmp(mps.field0(), "ENDATA"))
+         else if(strcmp(mps.field0(), "ENDATA") == 0)
             mps.setSection(MPSInput::ENDATA);
          else
             break;
@@ -1481,7 +1481,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
        *  E   -     rhs + range     rhs
        * ----------------------------------------
        */
-      if(!strcmp(rngname, mps.field1()))
+      if(strcmp(rngname, mps.field1()) == 0)
       {
          if((idx = rnames.number(mps.field2())) < 0)
             mps.entryIgnored("Range", mps.field1(), "row", mps.field2());
@@ -1599,11 +1599,11 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
       }
 
       // Is the value field used ?
-      if((!strcmp(mps.field1(), "LO"))
-            || (!strcmp(mps.field1(), "UP"))
-            || (!strcmp(mps.field1(), "FX"))
-            || (!strcmp(mps.field1(), "LI"))
-            || (!strcmp(mps.field1(), "UI")))
+      if(strcmp(mps.field1(), "LO") == 0
+            || strcmp(mps.field1(), "UP") == 0
+            || strcmp(mps.field1(), "FX") == 0
+            || strcmp(mps.field1(), "LI") == 0
+            || strcmp(mps.field1(), "UI") == 0)
       {
          if((mps.field3() != nullptr) && (mps.field4() == nullptr))
             mps.insertName("_BND_", true);
@@ -1624,7 +1624,7 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
       }
 
       // Only read the first Bound in section
-      if(!strcmp(bndname, mps.field2()))
+      if(strcmp(bndname, mps.field2()) == 0)
       {
          if((idx = cnames.number(mps.field3())) < 0)
             mps.entryIgnored("column", mps.field3(), "bound", bndname);
@@ -1632,10 +1632,10 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
          {
             if(mps.field4() == nullptr)
                val = 0;
-            else if(!strcmp(mps.field4(), "-Inf") || !strcmp(mps.field4(), "-inf"))
+            else if(strcmp(mps.field4(), "-Inf") == 0 || strcmp(mps.field4(), "-inf") == 0)
                val = -infinity;
-            else if(!strcmp(mps.field4(), "Inf") || !strcmp(mps.field4(), "inf")
-                    || !strcmp(mps.field4(), "+Inf") || !strcmp(mps.field4(), "+inf"))
+            else if(strcmp(mps.field4(), "Inf") == 0 || strcmp(mps.field4(), "inf") == 0
+                    || strcmp(mps.field4(), "+Inf") == 0 || strcmp(mps.field4(), "+inf") == 0)
                val = infinity;
             else
                try
