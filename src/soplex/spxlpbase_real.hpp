@@ -1376,10 +1376,16 @@ bool SPxLPBase<R>::readLPF(
                val = LPFreadValue<R>(pos, spxout) * pre_sign;
             }
 
-            if(*pos == '\0')
-               continue;
+            if(!have_value)
+               goto syntax_error;
 
-            if(!have_value || !LPFisColName(pos))
+            if(*pos == '\0')
+            {
+               changeObjOffset(val);
+               continue;
+            }
+
+            if(!LPFisColName(pos))
                goto syntax_error;
 
             have_value = false;
