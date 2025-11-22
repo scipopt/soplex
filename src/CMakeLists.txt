@@ -235,10 +235,12 @@ install(FILES
      ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/ranges.h
      DESTINATION include/soplex/external/fmt)
 
+# TODO this is necessary only if ZLIB_FOUND?
 install(FILES
      ${PROJECT_SOURCE_DIR}/src/soplex/external/zstr/zstr.hpp
      ${PROJECT_SOURCE_DIR}/src/soplex/external/zstr/strict_fstream.hpp
      DESTINATION include/soplex/external/zstr)
+install(FILES ${PROJECT_SOURCE_DIR}/src/soplex/external/zstr/License.txt DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/soplex/zstr)
 
 # install the binary and the library to appropriate lcoations and add them to an export group
 install(TARGETS soplex libsoplex libsoplex-pic libsoplexshared EXPORT soplex-targets
@@ -250,6 +252,10 @@ install(TARGETS soplex libsoplex libsoplex-pic libsoplexshared EXPORT soplex-tar
 if(MSVC)
     install(FILES $<TARGET_PDB_FILE:libsoplexshared> $<TARGET_PDB_FILE:soplex> DESTINATION ${CMAKE_INSTALL_BINDIR} OPTIONAL)
 endif()
+
+# install license files of soplex and fmt
+install(FILES ${PROJECT_SOURCE_DIR}/LICENSE DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/soplex)
+install(FILES ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/LICENSE.rst DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/soplex/fmt)
 
 # Add library targets to the build-tree export set
 export(TARGETS libsoplex libsoplex-pic libsoplexshared
