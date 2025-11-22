@@ -247,6 +247,10 @@ install(TARGETS soplex libsoplex libsoplex-pic libsoplexshared EXPORT soplex-tar
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
+if(MSVC)
+    install(FILES $<TARGET_PDB_FILE:libsoplexshared> $<TARGET_PDB_FILE:soplex> DESTINATION ${CMAKE_INSTALL_BINDIR} OPTIONAL)
+endif()
+
 # Add library targets to the build-tree export set
 export(TARGETS libsoplex libsoplex-pic libsoplexshared
   FILE "${CMAKE_BINARY_DIR}/soplex-targets.cmake")
