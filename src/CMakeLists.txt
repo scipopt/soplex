@@ -233,19 +233,23 @@ install(FILES
      ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/posix.h
      ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/printf.h
      ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/ranges.h
- DESTINATION include/soplex/external/fmt)
+     DESTINATION include/soplex/external/fmt)
 
- install(FILES
+install(FILES
      ${PROJECT_SOURCE_DIR}/src/soplex/external/zstr/zstr.hpp
      ${PROJECT_SOURCE_DIR}/src/soplex/external/zstr/strict_fstream.hpp
-  DESTINATION include/soplex/external/zstr)
+     DESTINATION include/soplex/external/zstr)
 
 # install the binary and the library to appropriate lcoations and add them to an export group
 install(TARGETS soplex libsoplex libsoplex-pic libsoplexshared EXPORT soplex-targets
-	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+if(MSVC)
+    install(FILES $<TARGET_PDB_FILE:libsoplexshared> $<TARGET_PDB_FILE:soplex> DESTINATION ${CMAKE_INSTALL_BINDIR} OPTIONAL)
+endif()
 
 # Add library targets to the build-tree export set
 export(TARGETS libsoplex libsoplex-pic libsoplexshared
