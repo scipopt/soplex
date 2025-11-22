@@ -1113,10 +1113,11 @@ bool SPxLPBase<R>::readLPF(
    int sense = 0;
 
    int lineno = 0;
+   bool initial;
    bool unnamed = true;
    bool finished = false;
    bool other;
-   bool have_value = true;
+   bool have_value = false;
    int i;
    int k;
    int buf_size;
@@ -1205,7 +1206,10 @@ bool SPxLPBase<R>::readLPF(
       }
 
       if(finished)
+      {
+         finished = !have_value;
          break;
+      }
 
       if((size_t) buf_size > sizeof(tmp))
       {
@@ -1228,11 +1232,17 @@ bool SPxLPBase<R>::readLPF(
       {
          if(LPFhasKeyword(pos, "max[imize]"))
          {
+            if(have_value)
+               goto syntax_error;
+
             changeSense(SPxLPBase<R>::MAXIMIZE);
             section = OBJECTIVE;
          }
          else if(LPFhasKeyword(pos, "min[imize]"))
          {
+            if(have_value)
+               goto syntax_error;
+
             changeSense(SPxLPBase<R>::MINIMIZE);
             section = OBJECTIVE;
          }
@@ -1244,14 +1254,15 @@ bool SPxLPBase<R>::readLPF(
                || LPFhasKeyword(pos, "s[.][    ]t[.]")
                || LPFhasKeyword(pos, "lazy con[straints]"))
          {
+            if(have_value)
+               goto syntax_error;
+
             // store objective vector
             for(int j = vec.size() - 1; j >= 0; --j)
                cset.maxObj_w(vec.index(j)) = vec.value(j);
 
             // multiplication with -1 for minimization is done below
             vec.clear();
-            have_value = true;
-            val = 1.0;
             section = CONSTRAINTS;
          }
       }
@@ -1260,26 +1271,54 @@ bool SPxLPBase<R>::readLPF(
                || LPFhasKeyword(pos, "s[uch][    ]t[hat]")
                || LPFhasKeyword(pos, "s[.][    ]t[.]")))
       {
-         have_value = true;
-         val = 1.0;
+         if(have_value)
+            goto syntax_error;
       }
       else
       {
          if(LPFhasKeyword(pos, "lazy con[straints]"))
-            ;
+         {
+            if(have_value)
+               goto syntax_error;
+         }
          else if(LPFhasKeyword(pos, "bound[s]"))
+         {
+            if(have_value)
+               goto syntax_error;
+
             section = BOUNDS;
+         }
          else if(LPFhasKeyword(pos, "bin[ary]"))
+         {
+            if(have_value)
+               goto syntax_error;
+
             section = BINARIES;
+         }
          else if(LPFhasKeyword(pos, "bin[aries]"))
+         {
+            if(have_value)
+               goto syntax_error;
+
             section = BINARIES;
+         }
          else if(LPFhasKeyword(pos, "gen[erals]"))
+         {
+            if(have_value)
+               goto syntax_error;
+
             section = INTEGERS;
+         }
          else if(LPFhasKeyword(pos, "int[egers]"))   // this is undocumented
+         {
+            if(have_value)
+               goto syntax_error;
+
             section = INTEGERS;
+         }
          else if(LPFhasKeyword(pos, "end"))
          {
-            finished = true;
+            finished = !have_value;
             break;
          }
          else if(LPFhasKeyword(pos, "s[ubject][   ]t[o]")  // second time
@@ -1287,13 +1326,8 @@ bool SPxLPBase<R>::readLPF(
                  || LPFhasKeyword(pos, "s[.][    ]t[.]")
                  || LPFhasKeyword(pos, "lazy con[straints]"))
          {
-            // In principle this has to checked for all keywords above,
-            // otherwise we just ignore any half finished constraint
             if(have_value)
                goto syntax_error;
-
-            have_value = true;
-            val = 1.0;
          }
       }
 
@@ -1339,6 +1373,7 @@ bool SPxLPBase<R>::readLPF(
       //--- Line processing loop
       //-----------------------------------------------------------------------
       pos = line;
+      initial = true;
 
       SPxOut::debug(spxout, "DLPFRD09 pos={}\n", pos);
 
@@ -1374,21 +1409,31 @@ bool SPxLPBase<R>::readLPF(
 
                have_value = true;
                val = LPFreadValue<R>(pos, spxout) * pre_sign;
+
+               /* continue next line with sign */
+               if(*pos == '\0' && (*(pos - 1) == '+' || *(pos - 1) == '-'))
+                  continue;
             }
 
-            if(!have_value)
-               goto syntax_error;
-
-            if(*pos == '\0')
+            if(!have_value && initial)
+               val = 1.0;
+            else
             {
-               changeObjOffset(val);
-               continue;
+               if(!have_value)
+                  goto syntax_error;
+
+               have_value = false;
+
+               if(*pos == '\0')
+               {
+                  changeObjOffset(val);
+                  break;
+               }
             }
 
             if(!LPFisColName(pos))
                goto syntax_error;
 
-            have_value = false;
             colidx = LPFreadColName(pos, cnames, cset, &emptycol, spxout);
             vec.add(colidx, val);
             break;
@@ -1456,7 +1501,7 @@ bool SPxLPBase<R>::readLPF(
                      rnames->add(name);
                   }
 
-                  have_value = true;
+                  have_value = false;
                   val = 1.0;
                   sense = 0;
                   pos = nullptr;
@@ -1465,7 +1510,12 @@ bool SPxLPBase<R>::readLPF(
                }
             }
 
-            if(*pos == '\0')
+            if(!have_value && initial)
+            {
+               have_value = true;
+               val = 1.0;
+            }
+            else if(*pos == '\0')
                continue;
 
             if(have_value)
@@ -1642,6 +1692,8 @@ bool SPxLPBase<R>::readLPF(
 
          if(pos == pos_old)
             goto syntax_error;
+
+         initial = false;
       }
    }
 
