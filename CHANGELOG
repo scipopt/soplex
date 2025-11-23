@@ -11,38 +11,44 @@ fixed bugs:
 
 miscellaneous:
 
-Next - Release 8.0.0
+
+Release 8.0.1
 ==================
 
-build system:
+fixed bugs:
 
-- For cmake >= 3.30 CMP0167 is enforced and BOOST_ROOT no longer supported, please use Boost_DIR instead with these cmake versions.
+
+November 2025 - Release 8.0.0
+==================
+
+interface & parameters:
+- method SoPlexBase<R>::factorizeColumnRational() is now public
+- added getRowActivity(), getRowActivityRational(), getRowsActivity(), getRowsActivityReal(), getRowsActivityRational(), and getColActivity(), getColActivityRational(), getColsActivity(), getColsActivityReal() to SoPlexBase<R>, based on extended computePrimalActivity() and computeDualActivity()
+- rename enums for verbosity levels: SPxOut::DEBUG to SPxOut::VERB_DEBUG etc.
+- changed type of second argument of spx_alloc() and spx_realloc() from int to size_t
+- changed second argument of NameSet::NameSet(), first argument of NameSet::memRemax(), return of NameSet::memMax(), and return of NameSet::memSize() from int to size_t
+- add constructor for class SolBase
+- deprecated SOPLEX_SUBVERSION, SOPLEX_VERSION_SUB, and soplex::subversion()
+
+build system:
+- for cmake >= 3.30, CMP0167 is enforced and BOOST_ROOT no longer supported; use Boost_DIR instead with these cmake versions
 - increased minimal required cmake version to 3.11
 - revised SANITIZE options for makefile: removed SANITIZE=full, added SANITIZE=thread, SANITIZE=address, and SANITIZE=memory to enable
   thread, address, and memory sanitizers, respectively, in addition to undefined behavior sanitizer;
   changed default to SANITIZE=false
-- replaced `SANITIZE_XYZ=(on|off)` options for cmake by `SANITIZE=(on|off|thread|address|memory)` and let it have an actual effect on the build;
+- replaced SANITIZE_XYZ=(on|off) options for cmake by SANITIZE=(on|off|thread|address|memory) and let it have an actual effect on the build;
   undefined behavior sanitizer is always enabled if not `SANITIZE=off` (the default)
-- Makefiles: By default, SoPlex links with MPFR=true and GMP=true if and only if BOOST=true (options GMP=auto and MPFR=auto)
-- Makefiles: Change default value of BOOST to false; set BOOST=true manually to obtain exact rational solving functionality
+- Makefiles: by default, SoPlex links with MPFR=true and GMP=true if and only if BOOST=true (options GMP=auto and MPFR=auto)
+- Makefiles: change default value of BOOST to false; set BOOST=true manually to obtain exact rational solving functionality
 - cmake: if SoPlex is build with MPFR, then also projects that use such a SoPlex installation will now look for MPFR
-
-features:
+- cmake: updated FindMPFR.cmake so that MPFR_DIR is now supported
 
 fixed bugs:
 - extend memory counters to size_t to avoid segmentation faults for large-scale problems
+- removed instantiation of SPxLPBase<Rational> class template from header file, to avoid problems when SoPlex headers are compiled into several object files of a library
 
 code quality:
-- avoid deprecated implicit copy constructor for 'SPxException', 'SLinSolver', and 'SLinSolverRational'
-
-interface & parameters:
-- add `SolBase` constructor
-- make method `factorizeColumnRational` public
-- deprecated SOPLEX_SUBVERSION, SOPLEX_VERSION_SUB, and soplex::subversion()
-- rename enums for verbosity levels: SPxOut::DEBUG to SPxOut::VERB_DEBUG etc.
-- add getRowActivity(), getRowActivityRational(), getRowsActivity(), getRowsActivityReal(), getRowsActivityRational(), and getColActivity(), getColActivityRational(), getColsActivity(), getColsActivityReal() based on extended computePrimalActivity() and computeDualActivity()
-- retype second argument of spx_alloc() and spx_realloc() from int to size_t
-- in class NameSet retype second argument of NameSet(), first argument of memRemax(), return of memMax(), and return of memSize() from int to size_t
+- avoid deprecated implicit copy constructor for classes SPxException, SLinSolver, and SLinSolverRational
 
 miscellaneous:
 - removed 4th number in SoPlex version; new format is major.minor.patch
