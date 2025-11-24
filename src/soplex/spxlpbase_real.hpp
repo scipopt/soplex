@@ -1935,7 +1935,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSe
          return;
       }
 
-      if((mps.field1() == nullptr) || (mps.field2() == nullptr) || (mps.field3() == nullptr))
+      if(mps.field1() == nullptr)
          break;
 
       // new column?
@@ -1978,6 +1978,14 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSe
             // for Integer variable the default bounds are 0/1
             col.setUpper(1.0);
          }
+      }
+
+      if(mps.field2() == nullptr || mps.field3() == nullptr)
+      {
+         if(mps.field2() == nullptr && mps.field3() == nullptr)
+            continue;
+
+         break;
       }
 
       val = atof(mps.field3());
