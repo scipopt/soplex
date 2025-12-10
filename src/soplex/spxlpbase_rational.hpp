@@ -572,10 +572,11 @@ bool SPxLPBase<Rational>::readLPF(
    int sense = 0;
 
    int lineno = 0;
+   int initial;
    bool unnamed = true;
    bool finished = false;
    bool other;
-   bool have_value = true;
+   bool have_value = false;
    int i;
    int k;
    int buf_size;
@@ -662,7 +663,10 @@ bool SPxLPBase<Rational>::readLPF(
       }
 
       if(finished)
+      {
+         finished = !have_value;
          break;
+      }
 
       if((size_t) buf_size > sizeof(tmp))
       {
@@ -685,11 +689,17 @@ bool SPxLPBase<Rational>::readLPF(
       {
          if(LPFhasKeyword(pos, "max[imize]"))
          {
+            if(have_value)
+               goto syntax_error;
+
             changeSense(SPxLPBase<Rational>::MAXIMIZE);
             section = OBJECTIVE;
          }
          else if(LPFhasKeyword(pos, "min[imize]"))
          {
+            if(have_value)
+               goto syntax_error;
+
             changeSense(SPxLPBase<Rational>::MINIMIZE);
             section = OBJECTIVE;
          }
@@ -701,14 +711,15 @@ bool SPxLPBase<Rational>::readLPF(
                || LPFhasKeyword(pos, "s[.][    ]t[.]")
                || LPFhasKeyword(pos, "lazy con[straints]"))
          {
+            if(have_value)
+               goto syntax_error;
+
             // store objective vector
             for(int j = vec.size() - 1; j >= 0; --j)
                cset.maxObj_w(vec.index(j)) = vec.value(j);
 
             // multiplication with -1 for minimization is done below
             vec.clear();
-            have_value = true;
-            val = 1;
             section = CONSTRAINTS;
          }
       }
@@ -717,26 +728,54 @@ bool SPxLPBase<Rational>::readLPF(
                || LPFhasKeyword(pos, "s[uch][    ]t[hat]")
                || LPFhasKeyword(pos, "s[.][    ]t[.]")))
       {
-         have_value = true;
-         val = 1;
+         if(have_value)
+            goto syntax_error;
       }
       else
       {
          if(LPFhasKeyword(pos, "lazy con[straints]"))
-            ;
+         {
+            if(have_value)
+               goto syntax_error;
+         }
          else if(LPFhasKeyword(pos, "bound[s]"))
+         {
+            if(have_value)
+               goto syntax_error;
+
             section = BOUNDS;
+         }
          else if(LPFhasKeyword(pos, "bin[ary]"))
+         {
+            if(have_value)
+               goto syntax_error;
+
             section = BINARIES;
+         }
          else if(LPFhasKeyword(pos, "bin[aries]"))
+         {
+            if(have_value)
+               goto syntax_error;
+
             section = BINARIES;
+         }
          else if(LPFhasKeyword(pos, "gen[erals]"))
+         {
+            if(have_value)
+               goto syntax_error;
+
             section = INTEGERS;
+         }
          else if(LPFhasKeyword(pos, "int[egers]"))   // this is undocumented
+         {
+            if(have_value)
+               goto syntax_error;
+
             section = INTEGERS;
+         }
          else if(LPFhasKeyword(pos, "end"))
          {
-            finished = true;
+            finished = !have_value;
             break;
          }
          else if(LPFhasKeyword(pos, "s[ubject][   ]t[o]")  // second time
@@ -744,13 +783,8 @@ bool SPxLPBase<Rational>::readLPF(
                  || LPFhasKeyword(pos, "s[.][    ]t[.]")
                  || LPFhasKeyword(pos, "lazy con[straints]"))
          {
-            // In principle this has to checked for all keywords above,
-            // otherwise we just ignore any half finished constraint
             if(have_value)
                goto syntax_error;
-
-            have_value = true;
-            val = 1;
          }
       }
 
@@ -796,6 +830,7 @@ bool SPxLPBase<Rational>::readLPF(
       //--- Line processing loop
       //-----------------------------------------------------------------------
       pos = line;
+      initial = true;
 
       SPxOut::debug(spxout, "DLPFRD09 pos= {}\n", pos);
 
@@ -828,15 +863,31 @@ bool SPxLPBase<Rational>::readLPF(
                have_value = true;
                val = LPFreadValue(pos, spxout, lineno);
                val *= pre_sign;
+
+               /* continue next line with sign */
+               if(*pos == '\0' && (*(pos - 1) == '+' || *(pos - 1) == '-'))
+                  continue;
             }
 
-            if(*pos == '\0')
-               continue;
+            if(!have_value && initial)
+               val = 1.0;
+            else
+            {
+               if(!have_value)
+                  goto syntax_error;
 
-            if(!have_value || !LPFisColName(pos))
+               have_value = false;
+
+               if(*pos == '\0')
+               {
+                  changeObjOffset(val);
+                  break;
+               }
+            }
+
+            if(!LPFisColName(pos))
                goto syntax_error;
 
-            have_value = false;
             colidx = LPFreadColName(pos, cnames, cset, &emptycol, spxout);
             vec.add(colidx, val);
             break;
@@ -895,7 +946,7 @@ bool SPxLPBase<Rational>::readLPF(
                      rnames->add(name);
                   }
 
-                  have_value = true;
+                  have_value = false;
                   val = 1;
                   sense = 0;
                   pos = nullptr;
@@ -904,7 +955,12 @@ bool SPxLPBase<Rational>::readLPF(
                }
             }
 
-            if(*pos == '\0')
+            if(!have_value && initial)
+            {
+               have_value = true;
+               val = 1;
+            }
+            else if(*pos == '\0')
                continue;
 
             if(have_value)
@@ -1081,6 +1137,8 @@ bool SPxLPBase<Rational>::readLPF(
 
          if(pos == pos_old)
             goto syntax_error;
+
+         initial = false;
       }
    }
 
@@ -1211,7 +1269,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
          return;
       }
 
-      if((mps.field1() == nullptr) || (mps.field2() == nullptr) || (mps.field3() == nullptr))
+      if(mps.field1() == nullptr)
          break;
 
       // new column?
@@ -1256,6 +1314,14 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
          }
       }
 
+      if(mps.field2() == nullptr || mps.field3() == nullptr)
+      {
+         if(mps.field2() == nullptr && mps.field3() == nullptr)
+            continue;
+
+         break;
+      }
+
       try
       {
          val = ratFromString(mps.field3());
@@ -1266,7 +1332,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
          std::cerr << e.what() << '\n';
       }
 
-      if(!strcmp(mps.field2(), mps.objName()))
+      if(strcmp(mps.field2(), mps.objName()) == 0)
          col.setObj(val);
       else
       {
@@ -1290,7 +1356,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
             std::cerr << e.what() << '\n';
          }
 
-         if(!strcmp(mps.field4(), mps.objName()))
+         if(strcmp(mps.field4(), mps.objName()) == 0)
             col.setObj(val);
          else
          {
@@ -1309,7 +1375,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
 
 /// Process RHS section.
 static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSet& rnames,
-                       SPxOut* spxout)
+                       Rational& objoffset, SPxOut* spxout)
 {
    char rhsname[MPSInput::MAX_LINE_LEN] = { '\0' };
    char addname[MPSInput::MAX_LINE_LEN] = { '\0' };
@@ -1322,11 +1388,11 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
       {
          SPX_MSG_INFO2((*spxout), (*spxout) << "IMPSRD03 RHS name       : " << rhsname  << std::endl;);
 
-         if(!strcmp(mps.field0(), "RANGES"))
+         if(strcmp(mps.field0(), "RANGES") == 0)
             mps.setSection(MPSInput::RANGES);
-         else if(!strcmp(mps.field0(), "BOUNDS"))
+         else if(strcmp(mps.field0(), "BOUNDS") == 0)
             mps.setSection(MPSInput::BOUNDS);
-         else if(!strcmp(mps.field0(), "ENDATA"))
+         else if(strcmp(mps.field0(), "ENDATA") == 0)
             mps.setSection(MPSInput::ENDATA);
          else
             break;
@@ -1355,7 +1421,19 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
       }
       else
       {
-         if((idx = rnames.number(mps.field2())) < 0)
+         if(strcmp(mps.field2(), mps.objName()) == 0)
+         {
+            try
+            {
+               objoffset = -ratFromString(mps.field3());
+            }
+            catch(const std::exception& e)
+            {
+               SPX_MSG_WARNING((*spxout), (*spxout) << "WMPSRD03 Warning: malformed rational value in MPS file\n");
+               std::cerr << e.what() << '\n';
+            }
+         }
+         else if((idx = rnames.number(mps.field2())) < 0)
             mps.entryIgnored("RHS", mps.field1(), "row", mps.field2());
          else
          {
@@ -1380,7 +1458,19 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
 
          if(mps.field5() != nullptr)
          {
-            if((idx = rnames.number(mps.field4())) < 0)
+            if(strcmp(mps.field4(), mps.objName()) == 0)
+            {
+               try
+               {
+                  objoffset = -ratFromString(mps.field5());
+               }
+               catch(const std::exception& e)
+               {
+                  SPX_MSG_WARNING((*spxout), (*spxout) << "WMPSRD03 Warning: malformed rational value in MPS file\n");
+                  std::cerr << e.what() << '\n';
+               }
+            }
+            else if((idx = rnames.number(mps.field4())) < 0)
                mps.entryIgnored("RHS", mps.field1(), "row", mps.field4());
             else
             {
@@ -1425,9 +1515,9 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
       {
          SPX_MSG_INFO2((*spxout), (*spxout) << "IMPSRD04 Range name     : " << rngname << std::endl;);
 
-         if(!strcmp(mps.field0(), "BOUNDS"))
+         if(strcmp(mps.field0(), "BOUNDS") == 0)
             mps.setSection(MPSInput::BOUNDS);
-         else if(!strcmp(mps.field0(), "ENDATA"))
+         else if(strcmp(mps.field0(), "ENDATA") == 0)
             mps.setSection(MPSInput::ENDATA);
          else
             break;
@@ -1457,7 +1547,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
        *  E   -     rhs + range     rhs
        * ----------------------------------------
        */
-      if(!strcmp(rngname, mps.field1()))
+      if(strcmp(rngname, mps.field1()) == 0)
       {
          if((idx = rnames.number(mps.field2())) < 0)
             mps.entryIgnored("Range", mps.field1(), "row", mps.field2());
@@ -1575,11 +1665,11 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
       }
 
       // Is the value field used ?
-      if((!strcmp(mps.field1(), "LO"))
-            || (!strcmp(mps.field1(), "UP"))
-            || (!strcmp(mps.field1(), "FX"))
-            || (!strcmp(mps.field1(), "LI"))
-            || (!strcmp(mps.field1(), "UI")))
+      if(strcmp(mps.field1(), "LO") == 0
+            || strcmp(mps.field1(), "UP") == 0
+            || strcmp(mps.field1(), "FX") == 0
+            || strcmp(mps.field1(), "LI") == 0
+            || strcmp(mps.field1(), "UI") == 0)
       {
          if((mps.field3() != nullptr) && (mps.field4() == nullptr))
             mps.insertName("_BND_", true);
@@ -1600,7 +1690,7 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
       }
 
       // Only read the first Bound in section
-      if(!strcmp(bndname, mps.field2()))
+      if(strcmp(bndname, mps.field2()) == 0)
       {
          if((idx = cnames.number(mps.field3())) < 0)
             mps.entryIgnored("column", mps.field3(), "bound", bndname);
@@ -1608,10 +1698,10 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
          {
             if(mps.field4() == nullptr)
                val = 0;
-            else if(!strcmp(mps.field4(), "-Inf") || !strcmp(mps.field4(), "-inf"))
+            else if(strcmp(mps.field4(), "-Inf") == 0 || strcmp(mps.field4(), "-inf") == 0)
                val = -infinity;
-            else if(!strcmp(mps.field4(), "Inf") || !strcmp(mps.field4(), "inf")
-                    || !strcmp(mps.field4(), "+Inf") || !strcmp(mps.field4(), "+inf"))
+            else if(strcmp(mps.field4(), "Inf") == 0 || strcmp(mps.field4(), "inf") == 0
+                    || strcmp(mps.field4(), "+Inf") == 0 || strcmp(mps.field4(), "+inf") == 0)
                val = infinity;
             else
                try
@@ -1712,6 +1802,7 @@ bool SPxLPBase<Rational>::readMPS(
    NameSet*      p_cnames,          ///< column names.
    DIdxSet*      p_intvars)         ///< integer variables.
 {
+   Rational objoffset = 0;
    LPRowSetBase<Rational>& rset = *this;
    LPColSetBase<Rational>& cset = *this;
    NameSet* rnames;
@@ -1776,7 +1867,7 @@ bool SPxLPBase<Rational>::readMPS(
       MPSreadCols(mps, rset, *rnames, cset, *cnames, p_intvars, spxout);
 
    if(mps.section() == MPSInput::RHS)
-      MPSreadRhs(mps, rset, *rnames, spxout);
+      MPSreadRhs(mps, rset, *rnames, objoffset, spxout);
 
    if(mps.section() == MPSInput::RANGES)
       MPSreadRanges(mps, rset, *rnames, spxout);
@@ -1791,6 +1882,7 @@ bool SPxLPBase<Rational>::readMPS(
       clear();
    else
    {
+      changeObjOffset(objoffset);
       changeSense(mps.objSense() == MPSInput::MINIMIZE ? SPxLPBase<Rational>::MINIMIZE :
                   SPxLPBase<Rational>::MAXIMIZE);
 

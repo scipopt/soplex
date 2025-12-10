@@ -1113,10 +1113,11 @@ bool SPxLPBase<R>::readLPF(
    int sense = 0;
 
    int lineno = 0;
+   bool initial;
    bool unnamed = true;
    bool finished = false;
    bool other;
-   bool have_value = true;
+   bool have_value = false;
    int i;
    int k;
    int buf_size;
@@ -1205,7 +1206,10 @@ bool SPxLPBase<R>::readLPF(
       }
 
       if(finished)
+      {
+         finished = !have_value;
          break;
+      }
 
       if((size_t) buf_size > sizeof(tmp))
       {
@@ -1228,11 +1232,17 @@ bool SPxLPBase<R>::readLPF(
       {
          if(LPFhasKeyword(pos, "max[imize]"))
          {
+            if(have_value)
+               goto syntax_error;
+
             changeSense(SPxLPBase<R>::MAXIMIZE);
             section = OBJECTIVE;
          }
          else if(LPFhasKeyword(pos, "min[imize]"))
          {
+            if(have_value)
+               goto syntax_error;
+
             changeSense(SPxLPBase<R>::MINIMIZE);
             section = OBJECTIVE;
          }
@@ -1244,14 +1254,15 @@ bool SPxLPBase<R>::readLPF(
                || LPFhasKeyword(pos, "s[.][    ]t[.]")
                || LPFhasKeyword(pos, "lazy con[straints]"))
          {
+            if(have_value)
+               goto syntax_error;
+
             // store objective vector
             for(int j = vec.size() - 1; j >= 0; --j)
                cset.maxObj_w(vec.index(j)) = vec.value(j);
 
             // multiplication with -1 for minimization is done below
             vec.clear();
-            have_value = true;
-            val = 1.0;
             section = CONSTRAINTS;
          }
       }
@@ -1260,26 +1271,54 @@ bool SPxLPBase<R>::readLPF(
                || LPFhasKeyword(pos, "s[uch][    ]t[hat]")
                || LPFhasKeyword(pos, "s[.][    ]t[.]")))
       {
-         have_value = true;
-         val = 1.0;
+         if(have_value)
+            goto syntax_error;
       }
       else
       {
          if(LPFhasKeyword(pos, "lazy con[straints]"))
-            ;
+         {
+            if(have_value)
+               goto syntax_error;
+         }
          else if(LPFhasKeyword(pos, "bound[s]"))
+         {
+            if(have_value)
+               goto syntax_error;
+
             section = BOUNDS;
+         }
          else if(LPFhasKeyword(pos, "bin[ary]"))
+         {
+            if(have_value)
+               goto syntax_error;
+
             section = BINARIES;
+         }
          else if(LPFhasKeyword(pos, "bin[aries]"))
+         {
+            if(have_value)
+               goto syntax_error;
+
             section = BINARIES;
+         }
          else if(LPFhasKeyword(pos, "gen[erals]"))
+         {
+            if(have_value)
+               goto syntax_error;
+
             section = INTEGERS;
+         }
          else if(LPFhasKeyword(pos, "int[egers]"))   // this is undocumented
+         {
+            if(have_value)
+               goto syntax_error;
+
             section = INTEGERS;
+         }
          else if(LPFhasKeyword(pos, "end"))
          {
-            finished = true;
+            finished = !have_value;
             break;
          }
          else if(LPFhasKeyword(pos, "s[ubject][   ]t[o]")  // second time
@@ -1287,13 +1326,8 @@ bool SPxLPBase<R>::readLPF(
                  || LPFhasKeyword(pos, "s[.][    ]t[.]")
                  || LPFhasKeyword(pos, "lazy con[straints]"))
          {
-            // In principle this has to checked for all keywords above,
-            // otherwise we just ignore any half finished constraint
             if(have_value)
                goto syntax_error;
-
-            have_value = true;
-            val = 1.0;
          }
       }
 
@@ -1339,6 +1373,7 @@ bool SPxLPBase<R>::readLPF(
       //--- Line processing loop
       //-----------------------------------------------------------------------
       pos = line;
+      initial = true;
 
       SPxOut::debug(spxout, "DLPFRD09 pos={}\n", pos);
 
@@ -1374,15 +1409,31 @@ bool SPxLPBase<R>::readLPF(
 
                have_value = true;
                val = LPFreadValue<R>(pos, spxout) * pre_sign;
+
+               /* continue next line with sign */
+               if(*pos == '\0' && (*(pos - 1) == '+' || *(pos - 1) == '-'))
+                  continue;
             }
 
-            if(*pos == '\0')
-               continue;
+            if(!have_value && initial)
+               val = 1.0;
+            else
+            {
+               if(!have_value)
+                  goto syntax_error;
 
-            if(!have_value || !LPFisColName(pos))
+               have_value = false;
+
+               if(*pos == '\0')
+               {
+                  changeObjOffset(val);
+                  break;
+               }
+            }
+
+            if(!LPFisColName(pos))
                goto syntax_error;
 
-            have_value = false;
             colidx = LPFreadColName(pos, cnames, cset, &emptycol, spxout);
             vec.add(colidx, val);
             break;
@@ -1450,7 +1501,7 @@ bool SPxLPBase<R>::readLPF(
                      rnames->add(name);
                   }
 
-                  have_value = true;
+                  have_value = false;
                   val = 1.0;
                   sense = 0;
                   pos = nullptr;
@@ -1459,7 +1510,12 @@ bool SPxLPBase<R>::readLPF(
                }
             }
 
-            if(*pos == '\0')
+            if(!have_value && initial)
+            {
+               have_value = true;
+               val = 1.0;
+            }
+            else if(*pos == '\0')
                continue;
 
             if(have_value)
@@ -1636,6 +1692,8 @@ bool SPxLPBase<R>::readLPF(
 
          if(pos == pos_old)
             goto syntax_error;
+
+         initial = false;
       }
    }
 
@@ -1694,11 +1752,11 @@ static inline void MPSreadName(MPSInput& mps, SPxOut* spxout)
       if(!mps.readLine() || (mps.field0() == nullptr))
          break;
 
-      if(!strcmp(mps.field0(), "ROWS"))
+      if(strcmp(mps.field0(), "ROWS") == 0)
          mps.setSection(MPSInput::ROWS);
-      else if(!strncmp(mps.field0(), "OBJSEN", 6))
+      else if(strncmp(mps.field0(), "OBJSEN", 6) == 0)
          mps.setSection(MPSInput::OBJSEN);
-      else if(!strcmp(mps.field0(), "OBJNAME"))
+      else if(strcmp(mps.field0(), "OBJNAME") == 0)
          mps.setSection(MPSInput::OBJNAME);
       else
          break;
@@ -1721,9 +1779,9 @@ static inline void MPSreadObjsen(MPSInput& mps)
       if(!mps.readLine() || (mps.field1() == nullptr))
          break;
 
-      if(!strcmp(mps.field1(), "MIN"))
+      if(strcmp(mps.field1(), "MIN") == 0)
          mps.setObjSense(MPSInput::MINIMIZE);
-      else if(!strcmp(mps.field1(), "MAX"))
+      else if(strcmp(mps.field1(), "MAX") == 0)
          mps.setObjSense(MPSInput::MAXIMIZE);
       else
          break;
@@ -1732,9 +1790,9 @@ static inline void MPSreadObjsen(MPSInput& mps)
       if(!mps.readLine() || (mps.field0() == nullptr))
          break;
 
-      if(!strcmp(mps.field0(), "ROWS"))
+      if(strcmp(mps.field0(), "ROWS") == 0)
          mps.setSection(MPSInput::ROWS);
-      else if(!strcmp(mps.field0(), "OBJNAME"))
+      else if(strcmp(mps.field0(), "OBJNAME") == 0)
          mps.setSection(MPSInput::OBJNAME);
       else
          break;
@@ -1877,7 +1935,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSe
          return;
       }
 
-      if((mps.field1() == nullptr) || (mps.field2() == nullptr) || (mps.field3() == nullptr))
+      if(mps.field1() == nullptr)
          break;
 
       // new column?
@@ -1922,9 +1980,17 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSe
          }
       }
 
+      if(mps.field2() == nullptr || mps.field3() == nullptr)
+      {
+         if(mps.field2() == nullptr && mps.field3() == nullptr)
+            continue;
+
+         break;
+      }
+
       val = atof(mps.field3());
 
-      if(!strcmp(mps.field2(), mps.objName()))
+      if(strcmp(mps.field2(), mps.objName()) == 0)
          col.setObj(val);
       else
       {
@@ -1940,7 +2006,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSe
 
          val = atof(mps.field5());
 
-         if(!strcmp(mps.field4(), mps.objName()))
+         if(strcmp(mps.field4(), mps.objName()) == 0)
             col.setObj(val);
          else
          {
@@ -1959,7 +2025,8 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSe
 
 /// Process RHS section.
 template <class R>
-static void MPSreadRhs(MPSInput& mps, LPRowSetBase<R>& rset, const NameSet& rnames, SPxOut* spxout)
+static void MPSreadRhs(MPSInput& mps, LPRowSetBase<R>& rset, const NameSet& rnames, R& objoffset,
+                       SPxOut* spxout)
 {
    char rhsname[MPSInput::MAX_LINE_LEN] = { '\0' };
    char addname[MPSInput::MAX_LINE_LEN] = { '\0' };
@@ -1972,11 +2039,11 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<R>& rset, const NameSet& rnam
       {
          SPX_MSG_INFO2((*spxout), (*spxout) << "IMPSRD03 RHS name       : " << rhsname  << std::endl;);
 
-         if(!strcmp(mps.field0(), "RANGES"))
+         if(strcmp(mps.field0(), "RANGES") == 0)
             mps.setSection(MPSInput::RANGES);
-         else if(!strcmp(mps.field0(), "BOUNDS"))
+         else if(strcmp(mps.field0(), "BOUNDS") == 0)
             mps.setSection(MPSInput::BOUNDS);
-         else if(!strcmp(mps.field0(), "ENDATA"))
+         else if(strcmp(mps.field0(), "ENDATA") == 0)
             mps.setSection(MPSInput::ENDATA);
          else
             break;
@@ -2005,7 +2072,9 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<R>& rset, const NameSet& rnam
       }
       else
       {
-         if((idx = rnames.number(mps.field2())) < 0)
+         if(strcmp(mps.field2(), mps.objName()) == 0)
+            objoffset = -atof(mps.field3());
+         else if((idx = rnames.number(mps.field2())) < 0)
             mps.entryIgnored("RHS", mps.field1(), "row", mps.field2());
          else
          {
@@ -2022,7 +2091,9 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<R>& rset, const NameSet& rnam
 
          if(mps.field5() != nullptr)
          {
-            if((idx = rnames.number(mps.field4())) < 0)
+            if(strcmp(mps.field4(), mps.objName()) == 0)
+               objoffset = -atof(mps.field5());
+            else if((idx = rnames.number(mps.field4())) < 0)
                mps.entryIgnored("RHS", mps.field1(), "row", mps.field4());
             else
             {
@@ -2060,9 +2131,9 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<R>& rset, const NameSet& 
       {
          SPX_MSG_INFO2((*spxout), (*spxout) << "IMPSRD04 Range name     : " << rngname << std::endl;);
 
-         if(!strcmp(mps.field0(), "BOUNDS"))
+         if(strcmp(mps.field0(), "BOUNDS") == 0)
             mps.setSection(MPSInput::BOUNDS);
-         else if(!strcmp(mps.field0(), "ENDATA"))
+         else if(strcmp(mps.field0(), "ENDATA") == 0)
             mps.setSection(MPSInput::ENDATA);
          else
             break;
@@ -2092,7 +2163,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<R>& rset, const NameSet& 
        *  E   -     rhs + range     rhs
        * ----------------------------------------
        */
-      if(!strcmp(rngname, mps.field1()))
+      if(strcmp(rngname, mps.field1()) == 0)
       {
          if((idx = rnames.number(mps.field2())) < 0)
             mps.entryIgnored("Range", mps.field1(), "row", mps.field2());
@@ -2183,11 +2254,11 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<R>& cset, const NameSet& c
       }
 
       // Is the value field used ?
-      if((!strcmp(mps.field1(), "LO"))
-            || (!strcmp(mps.field1(), "UP"))
-            || (!strcmp(mps.field1(), "FX"))
-            || (!strcmp(mps.field1(), "LI"))
-            || (!strcmp(mps.field1(), "UI")))
+      if(strcmp(mps.field1(), "LO") == 0
+            || strcmp(mps.field1(), "UP") == 0
+            || strcmp(mps.field1(), "FX") == 0
+            || strcmp(mps.field1(), "LI") == 0
+            || strcmp(mps.field1(), "UI") == 0)
       {
          if((mps.field3() != nullptr) && (mps.field4() == nullptr))
             mps.insertName("_BND_", true);
@@ -2208,7 +2279,7 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<R>& cset, const NameSet& c
       }
 
       // Only read the first Bound in section
-      if(!strcmp(bndname, mps.field2()))
+      if(strcmp(bndname, mps.field2()) == 0)
       {
          if((idx = cnames.number(mps.field3())) < 0)
             mps.entryIgnored("column", mps.field3(), "bound", bndname);
@@ -2216,10 +2287,10 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<R>& cset, const NameSet& c
          {
             if(mps.field4() == nullptr)
                val = 0.0;
-            else if(!strcmp(mps.field4(), "-Inf") || !strcmp(mps.field4(), "-inf"))
+            else if(strcmp(mps.field4(), "-Inf") == 0 || strcmp(mps.field4(), "-inf") == 0)
                val = R(-infinity);
-            else if(!strcmp(mps.field4(), "Inf") || !strcmp(mps.field4(), "inf")
-                    || !strcmp(mps.field4(), "+Inf") || !strcmp(mps.field4(), "+inf"))
+            else if(strcmp(mps.field4(), "Inf") == 0 || strcmp(mps.field4(), "inf") == 0
+                    || strcmp(mps.field4(), "+Inf") == 0 || strcmp(mps.field4(), "+inf") == 0)
                val = R(infinity);
             else
                val = atof(mps.field4());
@@ -2314,6 +2385,7 @@ bool SPxLPBase<R>::readMPS(
    NameSet*      p_cnames,          ///< column names.
    DIdxSet*      p_intvars)         ///< integer variables.
 {
+   R objoffset = 0;
    LPRowSetBase<R>& rset = *this;
    LPColSetBase<R>& cset = *this;
    NameSet* rnames;
@@ -2378,7 +2450,7 @@ bool SPxLPBase<R>::readMPS(
       MPSreadCols(mps, rset, *rnames, cset, *cnames, p_intvars);
 
    if(mps.section() == MPSInput::RHS)
-      MPSreadRhs(mps, rset, *rnames, spxout);
+      MPSreadRhs(mps, rset, *rnames, objoffset, spxout);
 
    if(mps.section() == MPSInput::RANGES)
       MPSreadRanges(mps, rset, *rnames, spxout);
@@ -2393,6 +2465,7 @@ bool SPxLPBase<R>::readMPS(
       clear();
    else
    {
+      changeObjOffset(objoffset);
       changeSense(mps.objSense() == MPSInput::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE);
 
       SPX_MSG_INFO2((*spxout), (*spxout) << "IMPSRD06 Objective sense: " << ((mps.objSense() ==
