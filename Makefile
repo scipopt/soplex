@@ -85,20 +85,6 @@ BOOST    =  false
 GMP      =  auto
 MPFR     =  auto
 
-ifeq ($(GMP),auto)
-GMP     =  $(BOOST)
-ifeq ($(GMP)-$(MAKELEVEL),false-0)
-$(warning GMP was deactived because of missing Boost support (BOOST=false). Set BOOST=true to enable rational solving mode.)
-endif
-endif
-
-ifeq ($(MPFR),auto)
-MPFR     =  $(BOOST)
-ifeq ($(MPFR)-$(MAKELEVEL),false-0)
-$(warning MPFR was deactived because of missing Boost support (BOOST=false). Set BOOST=true to enable rational solving mode.)
-endif
-endif
-
 COMP		=	gnu
 CXX		=	g++
 CXX_c		=	-c # the trailing space is important
@@ -263,6 +249,20 @@ ifeq ($(OPENSOURCE), false)
 	override BOOST	=	false
 	override GMP	=	false
 	override MPFR	=	false
+endif
+
+ifeq ($(GMP),auto)
+GMP     =  $(BOOST)
+ifeq ($(GMP)-$(MAKELEVEL),false-0)
+$(warning GMP was deactived because of missing Boost support (BOOST=false). Set BOOST=true to enable rational solving mode.)
+endif
+endif
+
+ifeq ($(MPFR),auto)
+MPFR     =  $(BOOST)
+ifeq ($(MPFR)-$(MAKELEVEL),false-0)
+$(warning MPFR was deactived because of missing Boost support (BOOST=false). Set BOOST=true to enable rational solving mode.)
+endif
 endif
 
 GMPDEP	:=	$(SRCDIR)/depend.gmp
