@@ -16,7 +16,9 @@ Release 8.0.1
 ==================
 
 fixed bugs:
-
+- do not ignore objective offset in real problem file
+- accept empty column in MPS file
+- reject missing continuation in LP file
 
 November 2025 - Release 8.0.0
 ==================

@@ -8880,7 +8880,8 @@ bool SoPlexBase<R>::_readFileReal(const char* filename, NameSet* rowNames, NameS
       setIntParam(SoPlexBase<R>::OBJSENSE,
                   (_realLP->spxSense() == SPxLPBase<R>::MAXIMIZE ? SoPlexBase<R>::OBJSENSE_MAXIMIZE :
                    SoPlexBase<R>::OBJSENSE_MINIMIZE), true);
-      _realLP->changeObjOffset(realParam(SoPlexBase<R>::OBJ_OFFSET));
+      setRealParam(SoPlexBase<R>::OBJ_OFFSET,
+                   Real(realParam(SoPlexBase<R>::OBJ_OFFSET) + _realLP->objOffset()));
 
       // if sync mode is auto, we have to copy the (rounded) R LP to the rational LP; this is counted to sync time
       // and not to reading time
@@ -8924,7 +8925,9 @@ bool SoPlexBase<R>::_readFileRational(const char* filename, NameSet* rowNames, N
       setIntParam(SoPlexBase<R>::OBJSENSE,
                   (_rationalLP->spxSense() == SPxLPRational::MAXIMIZE ? SoPlexBase<R>::OBJSENSE_MAXIMIZE :
                    SoPlexBase<R>::OBJSENSE_MINIMIZE), true);
-      _rationalLP->changeObjOffset(realParam(SoPlexBase<R>::OBJ_OFFSET));
+      // TODO: handle rational objoffset
+      setRealParam(SoPlexBase<R>::OBJ_OFFSET,
+                   Real(realParam(SoPlexBase<R>::OBJ_OFFSET) + _rationalLP->objOffset()));
       _recomputeRangeTypesRational();
 
       // if sync mode is auto, we have to copy the (rounded) R LP to the rational LP; this is counted to sync time
