@@ -19,6 +19,7 @@ fixed bugs:
 - do not ignore objective offset in real problem file
 - accept empty column in MPS file
 - reject missing continuation in LP file
+- fix missing include of boost/version.hpp in soplexmain.cpp
 
 November 2025 - Release 8.0.0
 ==================

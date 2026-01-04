@@ -34,6 +34,10 @@
 #include <iomanip>
 #include <fstream>
 
+#ifdef SOPLEX_WITH_BOOST
+#include <boost/version.hpp>
+#endif
+
 #include "soplex.h"
 #include "soplex/validation.h"
 
