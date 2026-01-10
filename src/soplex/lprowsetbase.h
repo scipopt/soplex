@@ -235,10 +235,10 @@ public:
    /// Returns the inequalitiy type of the \p i 'th LPRowBase.
    typename LPRowBase<R>::Type type(int i) const
    {
-      if(rhs(i) >= R(infinity))
+      if(rhs(i) >= PrecisionTraits<R>::defaultInfinity())
          return LPRowBase<R>::GREATER_EQUAL;
 
-      if(lhs(i) <= R(-infinity))
+      if(lhs(i) <= -PrecisionTraits<R>::defaultInfinity())
          return LPRowBase<R>::LESS_EQUAL;
 
       if(lhs(i) == rhs(i))
@@ -259,11 +259,11 @@ public:
       switch(t)
       {
       case LPRowBase<R>::LESS_EQUAL:
-         lhs_w(i) = R(-infinity);
+         lhs_w(i) = -PrecisionTraits<R>::defaultInfinity();
          break;
 
       case LPRowBase<R>::EQUAL:
-         if(lhs_w(i) > R(-infinity))
+         if(lhs_w(i) > -PrecisionTraits<R>::defaultInfinity())
             rhs_w(i) = lhs(i);
          else
             lhs_w(i) = rhs(i);
@@ -271,7 +271,7 @@ public:
          break;
 
       case LPRowBase<R>::GREATER_EQUAL:
-         rhs_w(i) = R(infinity);
+         rhs_w(i) = PrecisionTraits<R>::defaultInfinity();
          break;
 
       case LPRowBase<R>::RANGE:
@@ -286,11 +286,11 @@ public:
    /// Returns the value of the \p i'th LPRowBase.
    const R& value(int i) const
    {
-      if(rhs(i) < R(infinity))
+      if(rhs(i) < PrecisionTraits<R>::defaultInfinity())
          return rhs(i);
       else
       {
-         assert(lhs(i) > R(-infinity));
+         assert(lhs(i) > -PrecisionTraits<R>::defaultInfinity());
          return lhs(i);
       }
    }

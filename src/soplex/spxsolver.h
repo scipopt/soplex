@@ -490,7 +490,7 @@ public:
    }
 
    /// set the _tolerances member variable
-   virtual void setTolerances(std::shared_ptr<Tolerances> newTolerances)
+   virtual void setTolerances(std::shared_ptr<TolerancesBase<R>> newTolerances)
    {
       this->_tolerances = newTolerances;
       // set tolerances for all the UpdateVectors
@@ -505,7 +505,7 @@ public:
    }
 
    /// returns current tolerances
-   const std::shared_ptr<Tolerances>& tolerances() const
+   const std::shared_ptr<TolerancesBase<R>>& tolerances() const
    {
       return this->_tolerances;
    }
@@ -851,6 +851,11 @@ public:
    R epsilon() const
    {
       return this->tolerances()->epsilon();
+   }
+   /// R-typed infinity threshold (use inftyValue to avoid shadowing global infinity constant)
+   R inftyValue() const
+   {
+      return this->tolerances()->infinity();
    }
    /// feasibility tolerance maintained by ratio test during ENTER algorithm.
    R entertol() const
@@ -2103,7 +2108,7 @@ public:
    /// return iteration limit.
    virtual int terminationIter() const;
    /// set objective limit.
-   virtual void setTerminationValue(R value = R(infinity));
+   virtual void setTerminationValue(R value = PrecisionTraits<R>::defaultInfinity());
    /// return objective limit.
    virtual R terminationValue() const;
    /// get objective value of current solution.

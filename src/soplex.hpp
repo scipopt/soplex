@@ -40,6 +40,8 @@
 #include <strings.h>
 #endif
 
+#include <limits>  // for std::numeric_limits
+
 namespace soplex
 {
 template <class R>
@@ -423,6 +425,14 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
    lower[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] = 1;
    upper[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] = INT_MAX;
    defaultValue[SoPlexBase<R>::STORE_BASIS_SIMPLEX_FREQ] = 10000;
+
+   // initial precision (in bits) for multiprecision floating-point arithmetic
+   name[SoPlexBase<R>::INITIAL_PRECISION] = "initialPrecision";
+   description[SoPlexBase<R>::INITIAL_PRECISION] =
+      "initial precision in bits for multiprecision (3400 bits = ~1024 decimal digits)";
+   lower[SoPlexBase<R>::INITIAL_PRECISION] = 50;
+   upper[SoPlexBase<R>::INITIAL_PRECISION] = 100000;
+   defaultValue[SoPlexBase<R>::INITIAL_PRECISION] = 50;
 }
 
 template <class R>
@@ -479,7 +489,7 @@ SoPlexBase<R>::Settings::RealParam::RealParam()
    name[SoPlexBase<R>::INFTY] = "infty";
    description[SoPlexBase<R>::INFTY] = "infinity threshold";
    lower[SoPlexBase<R>::INFTY] = 1e10;
-   upper[SoPlexBase<R>::INFTY] = 1e100;
+   upper[SoPlexBase<R>::INFTY] = 1e300;
    defaultValue[SoPlexBase<R>::INFTY] = SOPLEX_DEFAULT_INFINITY;
 
    // time limit in seconds (INFTY if unlimited)
@@ -525,7 +535,7 @@ SoPlexBase<R>::Settings::RealParam::RealParam()
       "maximum increase of scaling factors between refinements";
    lower[SoPlexBase<R>::MAXSCALEINCR] = 1.0;
    upper[SoPlexBase<R>::MAXSCALEINCR] = SOPLEX_DEFAULT_INFINITY;
-   defaultValue[SoPlexBase<R>::MAXSCALEINCR] = 1e25;
+   defaultValue[SoPlexBase<R>::MAXSCALEINCR] = 1e100;
 
    // lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)
    name[SoPlexBase<R>::LIFTMINVAL] = "liftminval";
@@ -1465,6 +1475,8 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
       _ratiotesterFast = rhs._ratiotesterFast;
       _ratiotesterBoundFlipping = rhs._ratiotesterBoundFlipping;
       _tolerances = rhs._tolerances;
+      _boostedTolerances = rhs._boostedTolerances;
+      _rationalTolerances = rhs._rationalTolerances;
 
       // copy solution data
       _status = rhs._status;
@@ -1479,7 +1491,7 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
          _solRational = rhs._solRational;
 
       _solver.setTolerances(_tolerances);
-      _boostedSolver.setTolerances(_tolerances);
+      _boostedSolver.setTolerances(_boostedTolerances);
 
       _simplifierMainSM.setTolerances(_tolerances);
       _simplifierPaPILO.setTolerances(_tolerances);
@@ -1492,12 +1504,12 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
       _scalerGeoequi.setTolerances(_tolerances);
       _scalerLeastsq.setTolerances(_tolerances);
 
-      _boostedScalerUniequi.setTolerances(_tolerances);
-      _boostedScalerBiequi.setTolerances(_tolerances);
-      _boostedScalerGeo1.setTolerances(_tolerances);
-      _boostedScalerGeo8.setTolerances(_tolerances);
-      _boostedScalerGeoequi.setTolerances(_tolerances);
-      _boostedScalerLeastsq.setTolerances(_tolerances);
+      _boostedScalerUniequi.setTolerances(_boostedTolerances);
+      _boostedScalerBiequi.setTolerances(_boostedTolerances);
+      _boostedScalerGeo1.setTolerances(_boostedTolerances);
+      _boostedScalerGeo8.setTolerances(_boostedTolerances);
+      _boostedScalerGeoequi.setTolerances(_boostedTolerances);
+      _boostedScalerLeastsq.setTolerances(_boostedTolerances);
 
       // set tolerances for ratio testers
       _ratiotesterBoundFlipping.setTolerances(_tolerances);
@@ -1505,14 +1517,14 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
       _ratiotesterHarris.setTolerances(_tolerances);
       _ratiotesterTextbook.setTolerances(_tolerances);
 
-      _boostedRatiotesterBoundFlipping.setTolerances(_tolerances);
-      _boostedRatiotesterFast.setTolerances(_tolerances);
-      _boostedRatiotesterHarris.setTolerances(_tolerances);
-      _boostedRatiotesterTextbook.setTolerances(_tolerances);
+      _boostedRatiotesterBoundFlipping.setTolerances(_boostedTolerances);
+      _boostedRatiotesterFast.setTolerances(_boostedTolerances);
+      _boostedRatiotesterHarris.setTolerances(_boostedTolerances);
+      _boostedRatiotesterTextbook.setTolerances(_boostedTolerances);
 
       // set tolerances for slufactor
       _slufactor.setTolerances(_tolerances);
-      _boostedSlufactor.setTolerances(_tolerances);
+      _boostedSlufactor.setTolerances(_boostedTolerances);
 
       // set message handlers in members
       _solver.setOutstream(spxout);
@@ -1585,6 +1597,13 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
       _rationalPosone = 1;
       _rationalNegone = -1;
       _rationalZero = 0;
+
+      // copy R-typed tolerance storage
+      _rationalEpsilon = rhs._rationalEpsilon;
+      _rationalEpsilonFactorization = rhs._rationalEpsilonFactorization;
+      _rationalEpsilonUpdate = rhs._rationalEpsilonUpdate;
+      _rationalEpsilonPivot = rhs._rationalEpsilonPivot;
+      _rationalTolerancesSet = rhs._rationalTolerancesSet;
 #endif
    }
 
@@ -3737,9 +3756,9 @@ R SoPlexBase<R>::objValueReal()
    assert(OBJSENSE_MINIMIZE == -1);
 
    if(status() == SPxSolverBase<R>::UNBOUNDED)
-      return realParam(SoPlexBase<R>::INFTY) * intParam(SoPlexBase<R>::OBJSENSE);
+      return infty() * intParam(SoPlexBase<R>::OBJSENSE);
    else if(status() == SPxSolverBase<R>::INFEASIBLE)
-      return -realParam(SoPlexBase<R>::INFTY) * intParam(SoPlexBase<R>::OBJSENSE);
+      return -infty() * intParam(SoPlexBase<R>::OBJSENSE);
    else if(hasSol())
    {
       _syncRealSolution();
@@ -4635,9 +4654,9 @@ typename SPxSolverBase<R>::VarStatus SoPlexBase<R>::basisColStatus(int col) cons
    // if no basis is available, return slack basis
    else if(!hasBasis())
    {
-      if(lowerReal(col) > -realParam(SoPlexBase<R>::INFTY))
+      if(lowerReal(col) > -infty())
          return SPxSolverBase<R>::ON_LOWER;
-      else if(upperReal(col) < realParam(SoPlexBase<R>::INFTY))
+      else if(upperReal(col) < infty())
          return SPxSolverBase<R>::ON_UPPER;
       else
          return SPxSolverBase<R>::ZERO;
@@ -4670,9 +4689,9 @@ void SoPlexBase<R>::getBasis(typename SPxSolverBase<R>::VarStatus rows[],
 
       for(int i = numCols() - 1; i >= 0; i--)
       {
-         if(lowerReal(i) > -realParam(SoPlexBase<R>::INFTY))
+         if(lowerReal(i) > -infty())
             cols[i] = SPxSolverBase<R>::ON_LOWER;
-         else if(upperReal(i) < realParam(SoPlexBase<R>::INFTY))
+         else if(upperReal(i) < infty())
             cols[i] = SPxSolverBase<R>::ON_UPPER;
          else
             cols[i] = SPxSolverBase<R>::ZERO;
@@ -6004,7 +6023,7 @@ const typename SoPlexBase<R>::Settings& SoPlexBase<R>::settings() const
 }
 
 /// returns current tolerances
-template <class R> const std::shared_ptr<Tolerances> SoPlexBase<R>::tolerances() const
+template <class R> const std::shared_ptr<TolerancesBase<R>> SoPlexBase<R>::tolerances() const
 {
    return _tolerances;
 }
@@ -6315,7 +6334,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
          _simplifier->setTolerances(this->_tolerances);
 
       if(_boostedSimplifier != nullptr)
-         _boostedSimplifier->setTolerances(this->_tolerances);
+         _boostedSimplifier->setTolerances(this->_boostedTolerances);
 
       break;
 
@@ -6384,7 +6403,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
          _scaler->setTolerances(this->_tolerances);
 
       if(_boostedScaler != nullptr)
-         _boostedScaler->setTolerances(this->_tolerances);
+         _boostedScaler->setTolerances(this->_boostedTolerances);
 
       break;
 
@@ -6697,6 +6716,16 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       _boostedSolver.setStoreBasisFreqForBoosting(value);
       break;
 
+   case SoPlexBase<R>::INITIAL_PRECISION:
+      // Update initial precision for multiprecision floating-point
+      _initialPrecision = value;
+#ifdef SOPLEX_WITH_MPFR
+      // Also set the current MPFR precision if it's higher than current
+      if(value > (int)BP::default_precision())
+         BP::default_precision(value);
+#endif
+      break;
+
    default:
       return false;
    }
@@ -6738,8 +6767,13 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
       }
 
 #endif
+      // During initialization, use R-typed default from PrecisionTraits for the R-typed tolerances
+      // Keep _rationalFeastol using double value since it's for Rational arithmetic
       _rationalFeastol = value;
-      this->_tolerances->setFeastol(value);
+      if(init)
+         this->_tolerances->setFeastol(PrecisionTraits<R>::defaultFeastol());
+      else
+         this->_tolerances->setFeastol(value);
       break;
 
    // dual feasibility tolerance; passed to the floating point solver only when calling solve()
@@ -6755,28 +6789,47 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
       }
 
 #endif
+      // During initialization, use R-typed default from PrecisionTraits for the R-typed tolerances
+      // Keep _rationalOpttol using double value since it's for Rational arithmetic
       _rationalOpttol = value;
-      this->_tolerances->setOpttol(value);
+      if(init)
+         this->_tolerances->setOpttol(PrecisionTraits<R>::defaultFeastol());
+      else
+         this->_tolerances->setOpttol(value);
       break;
 
    // general zero tolerance
    case SoPlexBase<R>::EPSILON_ZERO:
-      _tolerances->setEpsilon(Real(value));
+      // During initialization, use R-typed default from PrecisionTraits to avoid
+      // double-precision defaults being applied to high-precision types
+      if(init)
+         _tolerances->setEpsilon(PrecisionTraits<R>::defaultEpsilon());
+      else
+         _tolerances->setEpsilon(R(value));
       break;
 
    // zero tolerance used in factorization
    case SoPlexBase<R>::EPSILON_FACTORIZATION:
-      _tolerances->setEpsilonFactorization(Real(value));
+      if(init)
+         _tolerances->setEpsilonFactorization(PrecisionTraits<R>::defaultEpsilonFactorization());
+      else
+         _tolerances->setEpsilonFactorization(R(value));
       break;
 
    // zero tolerance used in update of the factorization
    case SoPlexBase<R>::EPSILON_UPDATE:
-      _tolerances->setEpsilonUpdate(Real(value));
+      if(init)
+         _tolerances->setEpsilonUpdate(PrecisionTraits<R>::defaultEpsilonUpdate());
+      else
+         _tolerances->setEpsilonUpdate(R(value));
       break;
 
    // pivot zero tolerance used in factorization (declare numerical singularity for small LU pivots)
    case SoPlexBase<R>::EPSILON_PIVOT:
-      _tolerances->setEpsilonPivot(Real(value));
+      if(init)
+         _tolerances->setEpsilonPivot(PrecisionTraits<R>::defaultEpsilonPivot());
+      else
+         _tolerances->setEpsilonPivot(R(value));
       break;
 
    // infinity threshold
@@ -6906,6 +6959,209 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
 
    _currentSettings->_realParamValues[param] = tmp_value;
    return true;
+}
+
+
+/// returns R-typed tolerance parameter value
+template <class R>
+R SoPlexBase<R>::toleranceParam(const ToleranceParam param) const
+{
+   assert(param >= 0);
+   assert(param < TOLERANCEPARAM_COUNT);
+
+   switch(param)
+   {
+   case SoPlexBase<R>::TOLERANCE_EPSILON:
+      // _tolerances->epsilon() uses stored string for MPFR conversion when set
+      return _tolerances->epsilon();
+
+   case SoPlexBase<R>::TOLERANCE_EPSILON_FACTORIZATION:
+      return _tolerances->epsilonFactorization();
+
+   case SoPlexBase<R>::TOLERANCE_EPSILON_UPDATE:
+      return _tolerances->epsilonUpdate();
+
+   case SoPlexBase<R>::TOLERANCE_EPSILON_PIVOT:
+      return _tolerances->epsilonPivot();
+
+   case SoPlexBase<R>::TOLERANCE_FEASTOL:
+      return _tolerances->feastol();
+
+   case SoPlexBase<R>::TOLERANCE_OPTTOL:
+      return _tolerances->opttol();
+
+   case SoPlexBase<R>::TOLERANCE_FPFEASTOL:
+      return _tolerances->floatingPointFeastol();
+
+   case SoPlexBase<R>::TOLERANCE_FPOPTTOL:
+      return _tolerances->floatingPointOpttol();
+
+   case SoPlexBase<R>::TOLERANCE_INFTY:
+      return _tolerances->infinity();
+
+   default:
+      return R(0);
+   }
+}
+
+
+/// sets R-typed tolerance parameter value; returns true on success
+/// Note: Values are converted to Real (double) for storage. For high-precision tolerance values,
+/// use the Rational-based _rationalFeastol/_rationalOpttol members which preserve full precision.
+template <class R>
+bool SoPlexBase<R>::setToleranceParam(const ToleranceParam param, const R& value)
+{
+   assert(param >= 0);
+   assert(param < TOLERANCEPARAM_COUNT);
+
+   // Tolerance values must be positive
+   if(value <= R(0))
+      return false;
+
+   switch(param)
+   {
+   case SoPlexBase<R>::TOLERANCE_EPSILON:
+      _tolerances->setEpsilon(value);
+#ifdef SOPLEX_WITH_BOOST
+      _rationalEpsilon = Rational(value);
+      // _rationalTolerancesSet = true;  // DISABLED FOR TEST
+#endif
+      break;
+
+   case SoPlexBase<R>::TOLERANCE_EPSILON_FACTORIZATION:
+      _tolerances->setEpsilonFactorization(value);
+#ifdef SOPLEX_WITH_BOOST
+      _rationalEpsilonFactorization = Rational(value);
+      // _rationalTolerancesSet = true;  // DISABLED FOR TEST
+#endif
+      break;
+
+   case SoPlexBase<R>::TOLERANCE_EPSILON_UPDATE:
+      _tolerances->setEpsilonUpdate(value);
+#ifdef SOPLEX_WITH_BOOST
+      _rationalEpsilonUpdate = Rational(value);
+      // _rationalTolerancesSet = true;  // DISABLED FOR TEST
+#endif
+      break;
+
+   case SoPlexBase<R>::TOLERANCE_EPSILON_PIVOT:
+      _tolerances->setEpsilonPivot(value);
+#ifdef SOPLEX_WITH_BOOST
+      _rationalEpsilonPivot = Rational(value);
+      // _rationalTolerancesSet = true;  // DISABLED FOR TEST
+#endif
+      break;
+
+   case SoPlexBase<R>::TOLERANCE_FEASTOL:
+      _tolerances->setFeastol(value);
+      // Also update the rational feastol which preserves full precision
+#ifdef SOPLEX_WITH_BOOST
+      _rationalFeastol = Rational(value);
+#endif
+      break;
+
+   case SoPlexBase<R>::TOLERANCE_OPTTOL:
+      _tolerances->setOpttol(value);
+      // Also update the rational opttol which preserves full precision
+#ifdef SOPLEX_WITH_BOOST
+      _rationalOpttol = Rational(value);
+#endif
+      break;
+
+   case SoPlexBase<R>::TOLERANCE_FPFEASTOL:
+      _tolerances->setFloatingPointFeastol(value);
+      break;
+
+   case SoPlexBase<R>::TOLERANCE_FPOPTTOL:
+      _tolerances->setFloatingPointOpttol(value);
+      break;
+
+   case SoPlexBase<R>::TOLERANCE_INFTY:
+      _tolerances->setInfinity(value);
+      break;
+
+   default:
+      return false;
+   }
+
+   return true;
+}
+
+
+/// sets tolerance parameter from string (for arbitrary precision values)
+template <class R>
+bool SoPlexBase<R>::setToleranceParamString(const ToleranceParam param, const char* valueString)
+{
+   if(valueString == nullptr)
+      return false;
+
+   try
+   {
+#ifdef SOPLEX_WITH_BOOST
+      // Parse string directly to R type - no Rational involved
+      // MPFR can parse scientific notation like "1e-280" directly
+      R rValue = StringToNumber<R>::convert(valueString);
+
+      // Tolerance values must be positive
+      if(rValue <= R(0))
+         return false;
+
+      // Store the string for high-precision access and also set the R-typed value
+      switch(param)
+      {
+      case SoPlexBase<R>::TOLERANCE_EPSILON:
+         _tolerances->setEpsilonRational(valueString);
+         _tolerances->setEpsilon(rValue);
+         break;
+
+      case SoPlexBase<R>::TOLERANCE_EPSILON_FACTORIZATION:
+         _tolerances->setEpsilonFactorizationRational(valueString);
+         _tolerances->setEpsilonFactorization(rValue);
+         break;
+
+      case SoPlexBase<R>::TOLERANCE_EPSILON_UPDATE:
+         _tolerances->setEpsilonUpdateRational(valueString);
+         _tolerances->setEpsilonUpdate(rValue);
+         break;
+
+      case SoPlexBase<R>::TOLERANCE_EPSILON_PIVOT:
+         _tolerances->setEpsilonPivotRational(valueString);
+         _tolerances->setEpsilonPivot(rValue);
+         break;
+
+      case SoPlexBase<R>::TOLERANCE_FEASTOL:
+         _tolerances->setFeastolRational(valueString);
+         _tolerances->setFeastol(rValue);
+         break;
+
+      case SoPlexBase<R>::TOLERANCE_OPTTOL:
+         _tolerances->setOpttolRational(valueString);
+         _tolerances->setOpttol(rValue);
+         break;
+
+      case SoPlexBase<R>::TOLERANCE_FPFEASTOL:
+         _tolerances->setFloatingPointFeastol(Real(rValue));
+         break;
+
+      case SoPlexBase<R>::TOLERANCE_FPOPTTOL:
+         _tolerances->setFloatingPointOpttol(Real(rValue));
+         break;
+
+      default:
+         return false;
+      }
+
+      return true;
+#else
+      // Without Boost, fall back to R conversion (limited precision)
+      R value(valueString);
+      return setToleranceParam(param, value);
+#endif
+   }
+   catch(...)
+   {
+      return false;
+   }
 }
 
 
@@ -7314,9 +7570,9 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
       {
          for(int i = 0; i < _realLP->rhs().dim(); i++)
          {
-            if(((_realLP->rhs()[i] >= R(realParam(SoPlexBase<R>::INFTY)))
+            if(((_realLP->rhs()[i] >= R(infty()))
                   != (_rationalLP->rhs()[i] >= _rationalPosInfty))
-                  || (_realLP->rhs()[i] < R(realParam(SoPlexBase<R>::INFTY))
+                  || (_realLP->rhs()[i] < R(infty())
                       && _rationalLP->rhs()[i] < _rationalPosInfty
                       && !isAdjacentTo(_rationalLP->rhs()[i], (double)_realLP->rhs()[i])))
             {
@@ -7344,9 +7600,9 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
       {
          for(int i = 0; i < _realLP->lhs().dim(); i++)
          {
-            if(((_realLP->lhs()[i] <= R(-realParam(SoPlexBase<R>::INFTY)))
+            if(((_realLP->lhs()[i] <= R(-infty()))
                   != (_rationalLP->lhs()[i] <= _rationalNegInfty))
-                  || (_realLP->lhs()[i] > R(-realParam(SoPlexBase<R>::INFTY))
+                  || (_realLP->lhs()[i] > R(-infty())
                       && _rationalLP->lhs()[i] > _rationalNegInfty
                       && !isAdjacentTo(_rationalLP->lhs()[i], (double)_realLP->lhs()[i])))
             {
@@ -7400,9 +7656,9 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
       {
          for(int i = 0; i < _realLP->upper().dim(); i++)
          {
-            if(((_realLP->upper()[i] >= R(realParam(SoPlexBase<R>::INFTY)))
+            if(((_realLP->upper()[i] >= R(infty()))
                   != (_rationalLP->upper()[i] >= _rationalPosInfty))
-                  || (_realLP->upper()[i] < R(realParam(SoPlexBase<R>::INFTY))
+                  || (_realLP->upper()[i] < R(infty())
                       && _rationalLP->upper()[i] < _rationalPosInfty
                       && !isAdjacentTo(_rationalLP->upper()[i], (double)_realLP->upper()[i])))
             {
@@ -7428,9 +7684,9 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
       {
          for(int i = 0; i < _realLP->lower().dim(); i++)
          {
-            if(((_realLP->lower()[i] <= R(-realParam(SoPlexBase<R>::INFTY)))
+            if(((_realLP->lower()[i] <= R(-infty()))
                   != (_rationalLP->lower()[i] <= _rationalNegInfty))
-                  || (_realLP->lower()[i] >= R(-realParam(SoPlexBase<R>::INFTY))
+                  || (_realLP->lower()[i] >= R(-infty())
                       && _rationalLP->lower()[i] > _rationalNegInfty
                       && !isAdjacentTo(_rationalLP->lower()[i], (double)_realLP->lower()[i])))
             {
@@ -7626,7 +7882,7 @@ bool SoPlexBase<R>::_isSolveStopped(bool& stoppedTime, bool& stoppedIter) const
 {
    assert(_statistics != nullptr);
 
-   stoppedTime = (realParam(TIMELIMIT) < realParam(INFTY)
+   stoppedTime = (realParam(TIMELIMIT) < infty()
                   && _statistics->solvingTime->time() >= realParam(TIMELIMIT));
    stoppedIter = (intParam(ITERLIMIT) >= 0 && _statistics->iterations >= intParam(ITERLIMIT))
                  || (intParam(REFLIMIT) >= 0 && _statistics->refinements >= intParam(REFLIMIT))
@@ -7646,14 +7902,14 @@ typename SoPlexBase<R>::RangeType SoPlexBase<R>::_rangeTypeReal(const R& lower,
 
    if(lower <= R(-infinity))
    {
-      if(upper >= R(infinity))
+      if(upper >= infty())
          return RANGETYPE_FREE;
       else
          return RANGETYPE_UPPER;
    }
    else
    {
-      if(upper >= R(infinity))
+      if(upper >= infty())
          return RANGETYPE_LOWER;
       else if(lower == upper)
          return RANGETYPE_FIXED;
@@ -7785,7 +8041,7 @@ void SoPlexBase<R>::_addRowsReal(const LPRowSetBase<R>& lprowset)
 
 /// adds a single column to the R LP and adjusts basis
 template <class R>
-void SoPlexBase<R>::_addColReal(const LPColReal& lpcol)
+void SoPlexBase<R>::_addColReal(const LPColBase<R>& lpcol)
 {
    assert(_realLP != nullptr);
 
@@ -7796,9 +8052,9 @@ void SoPlexBase<R>::_addColReal(const LPColReal& lpcol)
       _hasBasis = (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
    else if(_hasBasis)
    {
-      if(lpcol.lower() > -realParam(SoPlexBase<R>::INFTY))
+      if(lpcol.lower() > -infty())
          _basisStatusCols.append(SPxSolverBase<R>::ON_LOWER);
-      else if(lpcol.upper() < realParam(SoPlexBase<R>::INFTY))
+      else if(lpcol.upper() < infty())
          _basisStatusCols.append(SPxSolverBase<R>::ON_UPPER);
       else
          _basisStatusCols.append(SPxSolverBase<R>::ZERO);
@@ -7829,7 +8085,7 @@ void SoPlexBase<R>::_addColReal(R obj, R lower, const SVectorBase<R>& lpcol, R u
 
 /// adds multiple columns to the R LP and adjusts basis
 template <class R>
-void SoPlexBase<R>::_addColsReal(const LPColSetReal& lpcolset)
+void SoPlexBase<R>::_addColsReal(const LPColSetBase<R>& lpcolset)
 {
    assert(_realLP != nullptr);
 
@@ -7842,9 +8098,9 @@ void SoPlexBase<R>::_addColsReal(const LPColSetReal& lpcolset)
    {
       for(int i = 0; i < lpcolset.num(); i++)
       {
-         if(lpcolset.lower(i) > -realParam(SoPlexBase<R>::INFTY))
+         if(lpcolset.lower(i) > -infty())
             _basisStatusCols.append(SPxSolverBase<R>::ON_LOWER);
-         else if(lpcolset.upper(i) < realParam(SoPlexBase<R>::INFTY))
+         else if(lpcolset.upper(i) < infty())
             _basisStatusCols.append(SPxSolverBase<R>::ON_UPPER);
          else
             _basisStatusCols.append(SPxSolverBase<R>::ZERO);
@@ -7871,12 +8127,12 @@ void SoPlexBase<R>::_changeRowReal(int i, const LPRowBase<R>& lprow)
       if(_basisStatusRows[i] != SPxSolverBase<R>::BASIC)
          _hasBasis = false;
       else if(_basisStatusRows[i] == SPxSolverBase<R>::ON_LOWER
-              && lprow.lhs() <= -realParam(SoPlexBase<R>::INFTY))
-         _basisStatusRows[i] = (lprow.rhs() < realParam(SoPlexBase<R>::INFTY)) ? SPxSolverBase<R>::ON_UPPER :
+              && lprow.lhs() <= -infty())
+         _basisStatusRows[i] = (lprow.rhs() < infty()) ? SPxSolverBase<R>::ON_UPPER :
                                SPxSolverBase<R>::ZERO;
       else if(_basisStatusRows[i] == SPxSolverBase<R>::ON_UPPER
-              && lprow.rhs() >= realParam(SoPlexBase<R>::INFTY))
-         _basisStatusRows[i] = (lprow.lhs() > -realParam(SoPlexBase<R>::INFTY)) ?
+              && lprow.rhs() >= infty())
+         _basisStatusRows[i] = (lprow.lhs() > -infty()) ?
                                SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ZERO;
    }
 
@@ -7900,8 +8156,8 @@ void SoPlexBase<R>::_changeLhsReal(const VectorBase<R>& lhs)
    {
       for(int i = numRows() - 1; i >= 0; i--)
       {
-         if(_basisStatusRows[i] == SPxSolverBase<R>::ON_LOWER && lhs[i] <= -realParam(SoPlexBase<R>::INFTY))
-            _basisStatusRows[i] = (rhsReal(i) < realParam(SoPlexBase<R>::INFTY)) ? SPxSolverBase<R>::ON_UPPER :
+         if(_basisStatusRows[i] == SPxSolverBase<R>::ON_LOWER && lhs[i] <= -infty())
+            _basisStatusRows[i] = (rhsReal(i) < infty()) ? SPxSolverBase<R>::ON_UPPER :
                                   SPxSolverBase<R>::ZERO;
       }
    }
@@ -7923,8 +8179,8 @@ void SoPlexBase<R>::_changeLhsReal(int i, const R& lhs)
       _hasBasis = (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
    }
    else if(_hasBasis && _basisStatusRows[i] == SPxSolverBase<R>::ON_LOWER
-           && lhs <= -realParam(SoPlexBase<R>::INFTY))
-      _basisStatusRows[i] = (rhsReal(i) < realParam(SoPlexBase<R>::INFTY)) ? SPxSolverBase<R>::ON_UPPER :
+           && lhs <= -infty())
+      _basisStatusRows[i] = (rhsReal(i) < infty()) ? SPxSolverBase<R>::ON_UPPER :
                             SPxSolverBase<R>::ZERO;
 
    _rationalLUSolver.clear();
@@ -7949,8 +8205,8 @@ void SoPlexBase<R>::_changeRhsReal(const VectorBase<R>& rhs)
    {
       for(int i = numRows() - 1; i >= 0; i--)
       {
-         if(_basisStatusRows[i] == SPxSolverBase<R>::ON_UPPER && rhs[i] >= realParam(SoPlexBase<R>::INFTY))
-            _basisStatusRows[i] = (lhsReal(i) > -realParam(SoPlexBase<R>::INFTY)) ? SPxSolverBase<R>::ON_LOWER :
+         if(_basisStatusRows[i] == SPxSolverBase<R>::ON_UPPER && rhs[i] >= infty())
+            _basisStatusRows[i] = (lhsReal(i) > -infty()) ? SPxSolverBase<R>::ON_LOWER :
                                   SPxSolverBase<R>::ZERO;
       }
    }
@@ -7974,8 +8230,8 @@ void SoPlexBase<R>::_changeRhsReal(int i, const R& rhs)
       _hasBasis = (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
    }
    else if(_hasBasis && _basisStatusRows[i] == SPxSolverBase<R>::ON_UPPER
-           && rhs >= realParam(SoPlexBase<R>::INFTY))
-      _basisStatusRows[i] = (lhsReal(i) > -realParam(SoPlexBase<R>::INFTY)) ? SPxSolverBase<R>::ON_LOWER :
+           && rhs >= infty())
+      _basisStatusRows[i] = (lhsReal(i) > -infty()) ? SPxSolverBase<R>::ON_LOWER :
                             SPxSolverBase<R>::ZERO;
 
    _rationalLUSolver.clear();
@@ -8000,12 +8256,12 @@ void SoPlexBase<R>::_changeRangeReal(const VectorBase<R>& lhs, const VectorBase<
    {
       for(int i = numRows() - 1; i >= 0; i--)
       {
-         if(_basisStatusRows[i] == SPxSolverBase<R>::ON_LOWER && lhs[i] <= -realParam(SoPlexBase<R>::INFTY))
-            _basisStatusRows[i] = (rhs[i] < realParam(SoPlexBase<R>::INFTY)) ? SPxSolverBase<R>::ON_UPPER :
+         if(_basisStatusRows[i] == SPxSolverBase<R>::ON_LOWER && lhs[i] <= -infty())
+            _basisStatusRows[i] = (rhs[i] < infty()) ? SPxSolverBase<R>::ON_UPPER :
                                   SPxSolverBase<R>::ZERO;
          else if(_basisStatusRows[i] == SPxSolverBase<R>::ON_UPPER
-                 && rhs[i] >= realParam(SoPlexBase<R>::INFTY))
-            _basisStatusRows[i] = (lhs[i] > -realParam(SoPlexBase<R>::INFTY)) ? SPxSolverBase<R>::ON_LOWER :
+                 && rhs[i] >= infty())
+            _basisStatusRows[i] = (lhs[i] > -infty()) ? SPxSolverBase<R>::ON_LOWER :
                                   SPxSolverBase<R>::ZERO;
       }
    }
@@ -8030,11 +8286,11 @@ void SoPlexBase<R>::_changeRangeReal(int i, const R& lhs, const R& rhs)
    }
    else if(_hasBasis)
    {
-      if(_basisStatusRows[i] == SPxSolverBase<R>::ON_LOWER && lhs <= -realParam(SoPlexBase<R>::INFTY))
-         _basisStatusRows[i] = (rhs < realParam(SoPlexBase<R>::INFTY)) ? SPxSolverBase<R>::ON_UPPER :
+      if(_basisStatusRows[i] == SPxSolverBase<R>::ON_LOWER && lhs <= -infty())
+         _basisStatusRows[i] = (rhs < infty()) ? SPxSolverBase<R>::ON_UPPER :
                                SPxSolverBase<R>::ZERO;
-      else if(_basisStatusRows[i] == SPxSolverBase<R>::ON_UPPER && rhs >= realParam(SoPlexBase<R>::INFTY))
-         _basisStatusRows[i] = (lhs > -realParam(SoPlexBase<R>::INFTY)) ? SPxSolverBase<R>::ON_LOWER :
+      else if(_basisStatusRows[i] == SPxSolverBase<R>::ON_UPPER && rhs >= infty())
+         _basisStatusRows[i] = (lhs > -infty()) ? SPxSolverBase<R>::ON_LOWER :
                                SPxSolverBase<R>::ZERO;
    }
 
@@ -8045,7 +8301,7 @@ void SoPlexBase<R>::_changeRangeReal(int i, const R& lhs, const R& rhs)
 
 /// replaces column \p i with \p lpcol and adjusts basis
 template <class R>
-void SoPlexBase<R>::_changeColReal(int i, const LPColReal& lpcol)
+void SoPlexBase<R>::_changeColReal(int i, const LPColBase<R>& lpcol)
 {
    assert(_realLP != nullptr);
 
@@ -8061,12 +8317,12 @@ void SoPlexBase<R>::_changeColReal(int i, const LPColReal& lpcol)
       if(_basisStatusCols[i] == SPxSolverBase<R>::BASIC)
          _hasBasis = false;
       else if(_basisStatusCols[i] == SPxSolverBase<R>::ON_LOWER
-              && lpcol.lower() <= -realParam(SoPlexBase<R>::INFTY))
-         _basisStatusCols[i] = (lpcol.upper() < realParam(SoPlexBase<R>::INFTY)) ?
+              && lpcol.lower() <= -infty())
+         _basisStatusCols[i] = (lpcol.upper() < infty()) ?
                                SPxSolverBase<R>::ON_UPPER : SPxSolverBase<R>::ZERO;
       else if(_basisStatusCols[i] == SPxSolverBase<R>::ON_UPPER
-              && lpcol.upper() >= realParam(SoPlexBase<R>::INFTY))
-         _basisStatusCols[i] = (lpcol.lower() > -realParam(SoPlexBase<R>::INFTY)) ?
+              && lpcol.upper() >= infty())
+         _basisStatusCols[i] = (lpcol.lower() > -infty()) ?
                                SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ZERO;
    }
 
@@ -8093,8 +8349,8 @@ void SoPlexBase<R>::_changeLowerReal(const VectorBase<R>& lower)
       for(int i = numCols() - 1; i >= 0; i--)
       {
          if(_basisStatusCols[i] == SPxSolverBase<R>::ON_LOWER
-               && lower[i] <= -realParam(SoPlexBase<R>::INFTY))
-            _basisStatusCols[i] = (upperReal(i) < realParam(SoPlexBase<R>::INFTY)) ?
+               && lower[i] <= -infty())
+            _basisStatusCols[i] = (upperReal(i) < infty()) ?
                                   SPxSolverBase<R>::ON_UPPER : SPxSolverBase<R>::ZERO;
       }
    }
@@ -8118,8 +8374,8 @@ void SoPlexBase<R>::_changeLowerReal(int i, const R& lower)
       _hasBasis = (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
    }
    else if(_hasBasis && _basisStatusCols[i] == SPxSolverBase<R>::ON_LOWER
-           && lower <= -realParam(SoPlexBase<R>::INFTY))
-      _basisStatusCols[i] = (upperReal(i) < realParam(SoPlexBase<R>::INFTY)) ?
+           && lower <= -infty())
+      _basisStatusCols[i] = (upperReal(i) < infty()) ?
                             SPxSolverBase<R>::ON_UPPER : SPxSolverBase<R>::ZERO;
 
    _rationalLUSolver.clear();
@@ -8144,8 +8400,8 @@ void SoPlexBase<R>::_changeUpperReal(const VectorBase<R>& upper)
    {
       for(int i = numCols() - 1; i >= 0; i--)
       {
-         if(_basisStatusCols[i] == SPxSolverBase<R>::ON_UPPER && upper[i] >= realParam(SoPlexBase<R>::INFTY))
-            _basisStatusCols[i] = (lowerReal(i) > -realParam(SoPlexBase<R>::INFTY)) ?
+         if(_basisStatusCols[i] == SPxSolverBase<R>::ON_UPPER && upper[i] >= infty())
+            _basisStatusCols[i] = (lowerReal(i) > -infty()) ?
                                   SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ZERO;
       }
    }
@@ -8169,8 +8425,8 @@ void SoPlexBase<R>::_changeUpperReal(int i, const R& upper)
       _hasBasis = (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
    }
    else if(_hasBasis &&  _basisStatusCols[i] == SPxSolverBase<R>::ON_UPPER
-           && upper >= realParam(SoPlexBase<R>::INFTY))
-      _basisStatusCols[i] = (lowerReal(i) > -realParam(SoPlexBase<R>::INFTY)) ?
+           && upper >= infty())
+      _basisStatusCols[i] = (lowerReal(i) > -infty()) ?
                             SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ZERO;
 
    _rationalLUSolver.clear();
@@ -8196,12 +8452,12 @@ void SoPlexBase<R>::_changeBoundsReal(const VectorBase<R>& lower, const VectorBa
       for(int i = numCols() - 1; i >= 0; i--)
       {
          if(_basisStatusCols[i] == SPxSolverBase<R>::ON_LOWER
-               && lower[i] <= -realParam(SoPlexBase<R>::INFTY))
-            _basisStatusCols[i] = (upper[i] < realParam(SoPlexBase<R>::INFTY)) ? SPxSolverBase<R>::ON_UPPER :
+               && lower[i] <= -infty())
+            _basisStatusCols[i] = (upper[i] < infty()) ? SPxSolverBase<R>::ON_UPPER :
                                   SPxSolverBase<R>::ZERO;
          else if(_basisStatusCols[i] == SPxSolverBase<R>::ON_UPPER
-                 && upper[i] >= realParam(SoPlexBase<R>::INFTY))
-            _basisStatusCols[i] = (lower[i] > -realParam(SoPlexBase<R>::INFTY)) ? SPxSolverBase<R>::ON_LOWER :
+                 && upper[i] >= infty())
+            _basisStatusCols[i] = (lower[i] > -infty()) ? SPxSolverBase<R>::ON_LOWER :
                                   SPxSolverBase<R>::ZERO;
       }
    }
@@ -8226,12 +8482,12 @@ void SoPlexBase<R>::_changeBoundsReal(int i, const R& lower, const R& upper)
    }
    else if(_hasBasis)
    {
-      if(_basisStatusCols[i] == SPxSolverBase<R>::ON_LOWER && lower <= -realParam(SoPlexBase<R>::INFTY))
-         _basisStatusCols[i] = (upper < realParam(SoPlexBase<R>::INFTY)) ? SPxSolverBase<R>::ON_UPPER :
+      if(_basisStatusCols[i] == SPxSolverBase<R>::ON_LOWER && lower <= -infty())
+         _basisStatusCols[i] = (upper < infty()) ? SPxSolverBase<R>::ON_UPPER :
                                SPxSolverBase<R>::ZERO;
       else if(_basisStatusCols[i] == SPxSolverBase<R>::ON_UPPER
-              && upper >= realParam(SoPlexBase<R>::INFTY))
-         _basisStatusCols[i] = (lower > -realParam(SoPlexBase<R>::INFTY)) ? SPxSolverBase<R>::ON_LOWER :
+              && upper >= infty())
+         _basisStatusCols[i] = (lower > -infty()) ? SPxSolverBase<R>::ON_LOWER :
                                SPxSolverBase<R>::ZERO;
    }
 
@@ -8553,7 +8809,7 @@ void SoPlexBase<R>::_ensureRationalLP()
       spx_alloc(_rationalLP);
       _rationalLP = new(_rationalLP) SPxLPRational();
       _rationalLP->setOutstream(spxout);
-      _rationalLP->setTolerances(this->tolerances());
+      _rationalLP->setTolerances(_rationalTolerances);
    }
 }
 
@@ -8596,16 +8852,16 @@ void SoPlexBase<R>::_solveBoostedRealLPAndRecordStatistics(volatile bool* interr
    bool _hadBasis = _hasBasis;
 
    // set time and iteration limit
-   if(intParam(SoPlexBase<R>::ITERLIMIT) < realParam(SoPlexBase<R>::INFTY))
+   if(intParam(SoPlexBase<R>::ITERLIMIT) < infty())
       _boostedSolver.setTerminationIter(intParam(SoPlexBase<R>::ITERLIMIT) - _statistics->iterations);
    else
       _boostedSolver.setTerminationIter(-1);
 
-   if(realParam(SoPlexBase<R>::TIMELIMIT) < realParam(SoPlexBase<R>::INFTY))
+   if(realParam(SoPlexBase<R>::TIMELIMIT) < infty())
       _boostedSolver.setTerminationTime(Real(realParam(SoPlexBase<R>::TIMELIMIT)) -
                                         _statistics->solvingTime->time());
    else
-      _boostedSolver.setTerminationTime(Real(realParam(SoPlexBase<R>::INFTY)));
+      _boostedSolver.setTerminationTime(Real(infty()));
 
    // ensure that tolerances are not too small
    R mintol = 1e4 * _solver.epsilon();
@@ -8730,16 +8986,16 @@ void SoPlexBase<R>::_solveRealLPAndRecordStatistics(volatile bool* interrupt)
    bool _hadBasis = _hasBasis;
 
    // set time and iteration limit
-   if(intParam(SoPlexBase<R>::ITERLIMIT) < realParam(SoPlexBase<R>::INFTY))
+   if(intParam(SoPlexBase<R>::ITERLIMIT) < infty())
       _solver.setTerminationIter(intParam(SoPlexBase<R>::ITERLIMIT) - _statistics->iterations);
    else
       _solver.setTerminationIter(-1);
 
-   if(realParam(SoPlexBase<R>::TIMELIMIT) < realParam(SoPlexBase<R>::INFTY))
+   if(realParam(SoPlexBase<R>::TIMELIMIT) < infty())
       _solver.setTerminationTime(Real(realParam(SoPlexBase<R>::TIMELIMIT)) -
                                  _statistics->solvingTime->time());
    else
-      _solver.setTerminationTime(Real(realParam(SoPlexBase<R>::INFTY)));
+      _solver.setTerminationTime(Real(infty()));
 
    // ensure that tolerances are not too small
    R mintol = 1e4 * _solver.epsilon();
@@ -9425,9 +9681,11 @@ SoPlexBase<R>::SoPlexBase()
    , _rationalNegone(-1)
    , _rationalZero(0)
 {
-   _tolerances = std::make_shared<Tolerances>();
+   _tolerances = std::make_shared<TolerancesBase<R>>();
+   _boostedTolerances = std::make_shared<TolerancesBase<BP>>();
+   _rationalTolerances = std::make_shared<TolerancesBase<Rational>>();
    _solver.setTolerances(_tolerances);
-   _boostedSolver.setTolerances(_tolerances);
+   _boostedSolver.setTolerances(_boostedTolerances);
    // set tolerances for scalers
    _scalerUniequi.setTolerances(_tolerances);
    _scalerBiequi.setTolerances(_tolerances);
@@ -9436,12 +9694,12 @@ SoPlexBase<R>::SoPlexBase()
    _scalerGeoequi.setTolerances(_tolerances);
    _scalerLeastsq.setTolerances(_tolerances);
 
-   _boostedScalerUniequi.setTolerances(_tolerances);
-   _boostedScalerBiequi.setTolerances(_tolerances);
-   _boostedScalerGeo1.setTolerances(_tolerances);
-   _boostedScalerGeo8.setTolerances(_tolerances);
-   _boostedScalerGeoequi.setTolerances(_tolerances);
-   _boostedScalerLeastsq.setTolerances(_tolerances);
+   _boostedScalerUniequi.setTolerances(_boostedTolerances);
+   _boostedScalerBiequi.setTolerances(_boostedTolerances);
+   _boostedScalerGeo1.setTolerances(_boostedTolerances);
+   _boostedScalerGeo8.setTolerances(_boostedTolerances);
+   _boostedScalerGeoequi.setTolerances(_boostedTolerances);
+   _boostedScalerLeastsq.setTolerances(_boostedTolerances);
 
    // set tolerances for ratio testers
    _ratiotesterBoundFlipping.setTolerances(_tolerances);
@@ -9449,14 +9707,14 @@ SoPlexBase<R>::SoPlexBase()
    _ratiotesterHarris.setTolerances(_tolerances);
    _ratiotesterTextbook.setTolerances(_tolerances);
 
-   _boostedRatiotesterBoundFlipping.setTolerances(_tolerances);
-   _boostedRatiotesterFast.setTolerances(_tolerances);
-   _boostedRatiotesterHarris.setTolerances(_tolerances);
-   _boostedRatiotesterTextbook.setTolerances(_tolerances);
+   _boostedRatiotesterBoundFlipping.setTolerances(_boostedTolerances);
+   _boostedRatiotesterFast.setTolerances(_boostedTolerances);
+   _boostedRatiotesterHarris.setTolerances(_boostedTolerances);
+   _boostedRatiotesterTextbook.setTolerances(_boostedTolerances);
 
    // set tolerances for slufactor
    _slufactor.setTolerances(_tolerances);
-   _boostedSlufactor.setTolerances(_tolerances);
+   _boostedSlufactor.setTolerances(_boostedTolerances);
    // transfer message handler
    _solver.setOutstream(spxout);
    _scalerUniequi.setOutstream(spxout);
@@ -9470,8 +9728,9 @@ SoPlexBase<R>::SoPlexBase()
    _solver.setBasisSolver(&_slufactor);
 
 #ifdef SOPLEX_WITH_MPFR
-   // set initial precision
-   BP::default_precision(_initialPrecision);
+   // Capture the current precision (user may have set it higher)
+   // Do NOT reset it - we want to preserve the user's precision setting
+   _initialPrecision = BP::default_precision();
 
    _boostedSolver.setOutstream(spxout);
    _boostedScalerUniequi.setOutstream(spxout);
@@ -9496,6 +9755,13 @@ SoPlexBase<R>::SoPlexBase()
    _hasOldUnbdBasis = false;
 
    _boostingLimitReached = false;
+
+   // Initialize rational tolerance storage
+   _rationalEpsilon = Rational(0);
+   _rationalEpsilonFactorization = Rational(0);
+   _rationalEpsilonUpdate = Rational(0);
+   _rationalEpsilonPivot = Rational(0);
+   _rationalTolerancesSet = false;
 #endif
 
    // the R LP is initially stored in the solver; the rational LP is constructed, when the parameter SYNCMODE is
@@ -10156,10 +10422,10 @@ bool SoPlexBase<R>::readBasisFile(const char* filename, const NameSet* rowNames,
    {
       if(lowerRealInternal(i) == upperRealInternal(i))
          _basisStatusCols[i] = SPxSolverBase<R>::FIXED;
-      else if(lowerRealInternal(i) <= double(-realParam(SoPlexBase<R>::INFTY))
-              && upperRealInternal(i) >= double(realParam(SoPlexBase<R>::INFTY)))
+      else if(lowerRealInternal(i) <= double(-infty())
+              && upperRealInternal(i) >= double(infty()))
          _basisStatusCols[i] = SPxSolverBase<R>::ZERO;
-      else if(lowerRealInternal(i) <= double(-realParam(SoPlexBase<R>::INFTY)))
+      else if(lowerRealInternal(i) <= double(-infty()))
          _basisStatusCols[i] = SPxSolverBase<R>::ON_UPPER;
       else
          _basisStatusCols[i] = SPxSolverBase<R>::ON_LOWER;

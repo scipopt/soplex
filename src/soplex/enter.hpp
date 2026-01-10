@@ -508,7 +508,7 @@ void SPxSolverBase<R>::getEnterVals
          enterRO = this->maxObj(enterIdx);
          objChange -= enterVal * enterRO;
 
-         if(enterLB <= R(-infinity))
+         if(enterLB <= -this->inftyValue())
             ds.colStatus(enterIdx) = SPxBasisBase<R>::Desc::D_ON_LOWER;
          else if(EQ(enterLB, enterUB, this->epsilon()))
             ds.colStatus(enterIdx) = SPxBasisBase<R>::Desc::D_FREE;
@@ -527,7 +527,7 @@ void SPxSolverBase<R>::getEnterVals
          enterRO = this->maxObj(enterIdx);
          objChange -= enterVal * enterRO;
 
-         if(enterUB >= R(infinity))
+         if(enterUB >= this->inftyValue())
             ds.colStatus(enterIdx) = SPxBasisBase<R>::Desc::D_ON_UPPER;
          else if(EQ(enterLB, enterUB, this->epsilon()))
             ds.colStatus(enterIdx) = SPxBasisBase<R>::Desc::D_FREE;
@@ -544,16 +544,16 @@ void SPxSolverBase<R>::getEnterVals
          enterPric = (*thePvec)[enterIdx];
          enterRO = this->maxObj(enterIdx);
          ds.colStatus(enterIdx) = SPxBasisBase<R>::Desc::D_UNDEFINED;
-         enterMax = (enterRO - enterPric > 0) ? R(infinity) : R(-infinity);
+         enterMax = (enterRO - enterPric > 0) ? this->inftyValue() : -this->inftyValue();
          break;
 
       // dual/rowwise cases:
       case SPxBasisBase<R>::Desc::D_ON_UPPER :
          assert(rep() == ROW);
-         assert(theUCbound[enterIdx] < R(infinity));
+         assert(theUCbound[enterIdx] < this->inftyValue());
          enterUB = theUCbound[enterIdx];
-         enterLB = R(-infinity);
-         enterMax = R(-infinity);
+         enterLB = -this->inftyValue();
+         enterMax = -this->inftyValue();
          enterVal = enterUB;
          enterPric = (*theCoPvec)[enterIdx];
          enterRO = SPxLPBase<R>::lower(enterIdx);
@@ -563,10 +563,10 @@ void SPxSolverBase<R>::getEnterVals
 
       case SPxBasisBase<R>::Desc::D_ON_LOWER :
          assert(rep() == ROW);
-         assert(theLCbound[enterIdx] > R(-infinity));
+         assert(theLCbound[enterIdx] > -this->inftyValue());
          enterLB = theLCbound[enterIdx];
-         enterUB = R(infinity);
-         enterMax = R(infinity);
+         enterUB = this->inftyValue();
+         enterMax = this->inftyValue();
          enterVal = enterLB;
          enterPric = (*theCoPvec)[enterIdx];
          enterRO = SPxLPBase<R>::upper(enterIdx);
@@ -577,16 +577,16 @@ void SPxSolverBase<R>::getEnterVals
       case SPxBasisBase<R>::Desc::D_FREE:
          assert(rep() == ROW);
          assert(SPxLPBase<R>::lower(enterIdx) == SPxLPBase<R>::upper(enterIdx));
-         enterUB = R(infinity);
-         enterLB = R(-infinity);
+         enterUB = this->inftyValue();
+         enterLB = -this->inftyValue();
          enterVal = 0;
          enterRO = SPxLPBase<R>::upper(enterIdx);
          enterPric = (*theCoPvec)[enterIdx];
 
          if(enterPric > enterRO)
-            enterMax = R(infinity);
+            enterMax = this->inftyValue();
          else
-            enterMax = R(-infinity);
+            enterMax = -this->inftyValue();
 
          ds.colStatus(enterIdx) = SPxBasisBase<R>::Desc::P_FIXED;
          break;
@@ -598,8 +598,8 @@ void SPxSolverBase<R>::getEnterVals
          if(enterPric > SPxLPBase<R>::upper(enterIdx))
          {
             enterLB = theLCbound[enterIdx];
-            enterUB = R(infinity);
-            enterMax = R(infinity);
+            enterUB = this->inftyValue();
+            enterMax = this->inftyValue();
             enterVal = enterLB;
             enterRO = SPxLPBase<R>::upper(enterIdx);
             ds.colStatus(enterIdx) = SPxBasisBase<R>::Desc::P_ON_UPPER;
@@ -609,8 +609,8 @@ void SPxSolverBase<R>::getEnterVals
             enterUB = theUCbound[enterIdx];
             enterVal = enterUB;
             enterRO = SPxLPBase<R>::lower(enterIdx);
-            enterLB = R(-infinity);
-            enterMax = R(-infinity);
+            enterLB = -this->inftyValue();
+            enterMax = -this->inftyValue();
             ds.colStatus(enterIdx) = SPxBasisBase<R>::Desc::P_ON_LOWER;
          }
 
@@ -660,7 +660,7 @@ void SPxSolverBase<R>::getEnterVals
          enterRO = this->maxRowObj(enterIdx);
          objChange -= enterRO * enterVal;
 
-         if(enterUB >= R(infinity))
+         if(enterUB >= this->inftyValue())
             ds.rowStatus(enterIdx) = SPxBasisBase<R>::Desc::D_ON_LOWER;
          else if(EQ(enterLB, enterUB, this->epsilon()))
             ds.rowStatus(enterIdx) = SPxBasisBase<R>::Desc::D_FREE;
@@ -679,7 +679,7 @@ void SPxSolverBase<R>::getEnterVals
          enterRO = this->maxRowObj(enterIdx);
          objChange -= enterRO * enterVal;
 
-         if(enterLB <= R(-infinity))
+         if(enterLB <= -this->inftyValue())
             ds.rowStatus(enterIdx) = SPxBasisBase<R>::Desc::D_ON_UPPER;
          else if(EQ(enterLB, enterUB, this->epsilon()))
             ds.rowStatus(enterIdx) = SPxBasisBase<R>::Desc::D_FREE;
@@ -703,11 +703,11 @@ void SPxSolverBase<R>::getEnterVals
       // dual/rowwise cases:
       case SPxBasisBase<R>::Desc::D_ON_UPPER :
          assert(rep() == ROW);
-         assert(theURbound[enterIdx] < R(infinity));
+         assert(theURbound[enterIdx] < this->inftyValue());
          enterUB = theURbound[enterIdx];
-         enterLB = R(-infinity);
+         enterLB = -this->inftyValue();
          enterVal = enterUB;
-         enterMax = R(-infinity);
+         enterMax = -this->inftyValue();
          enterPric = (*thePvec)[enterIdx];
          enterRO = this->lhs(enterIdx);
          objChange -= enterRO * enterVal;
@@ -716,11 +716,11 @@ void SPxSolverBase<R>::getEnterVals
 
       case SPxBasisBase<R>::Desc::D_ON_LOWER :
          assert(rep() == ROW);
-         assert(theLRbound[enterIdx] > R(-infinity));
+         assert(theLRbound[enterIdx] > -this->inftyValue());
          enterLB = theLRbound[enterIdx];
-         enterUB = R(infinity);
+         enterUB = this->inftyValue();
          enterVal = enterLB;
-         enterMax = R(infinity);
+         enterMax = this->inftyValue();
          enterPric = (*thePvec)[enterIdx];
          enterRO = this->rhs(enterIdx);
          objChange -= enterRO * enterVal;
@@ -730,12 +730,12 @@ void SPxSolverBase<R>::getEnterVals
       case SPxBasisBase<R>::Desc::D_FREE:
          assert(rep() == ROW);
          assert(this->rhs(enterIdx) == this->lhs(enterIdx));
-         enterUB = R(infinity);
-         enterLB = R(-infinity);
+         enterUB = this->inftyValue();
+         enterLB = -this->inftyValue();
          enterVal = 0;
          enterPric = (*thePvec)[enterIdx];
          enterRO = this->rhs(enterIdx);
-         enterMax = (enterPric > enterRO) ? R(infinity) : R(-infinity);
+         enterMax = (enterPric > enterRO) ? this->inftyValue() : -this->inftyValue();
          ds.rowStatus(enterIdx) = SPxBasisBase<R>::Desc::P_FIXED;
          break;
 
@@ -747,8 +747,8 @@ void SPxSolverBase<R>::getEnterVals
          {
             enterLB = theLRbound[enterIdx];
             enterVal = enterLB;
-            enterUB = R(infinity);
-            enterMax = R(infinity);
+            enterUB = this->inftyValue();
+            enterMax = this->inftyValue();
             enterRO = this->rhs(enterIdx);
             ds.rowStatus(enterIdx) = SPxBasisBase<R>::Desc::P_ON_UPPER;
          }
@@ -756,8 +756,8 @@ void SPxSolverBase<R>::getEnterVals
          {
             enterUB = theURbound[enterIdx];
             enterVal = enterUB;
-            enterLB = R(-infinity);
-            enterMax = R(-infinity);
+            enterLB = -this->inftyValue();
+            enterMax = -this->inftyValue();
             enterRO = this->lhs(enterIdx);
             ds.rowStatus(enterIdx) = SPxBasisBase<R>::Desc::P_ON_LOWER;
          }
@@ -1478,7 +1478,7 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
        happen in primal/columnwise case with upper and lower bounds on
        variables.
    */
-   else if(!polish && leaveVal < R(infinity) && leaveVal > R(-infinity))
+   else if(!polish && leaveVal < this->inftyValue() && leaveVal > -this->inftyValue())
    {
       assert(rep() == COLUMN);
       assert(EQ(leaveVal, -enterMax, this->epsilon()));

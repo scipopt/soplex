@@ -1370,7 +1370,7 @@ SLUFactor<R>::~SLUFactor()
 }
 
 template <class R>
-static R betterThreshold(R th, Real epsilon)
+static R betterThreshold(R th, R epsilon)
 {
    assert(th < R(1.0));
 

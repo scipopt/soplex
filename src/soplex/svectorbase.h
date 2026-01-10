@@ -502,7 +502,7 @@ public:
    /// Minimum absolute value.
    R minAbs() const
    {
-      R mini = R(infinity);
+      R mini = PrecisionTraits<R>::defaultInfinity();
 
       for(int i = size() - 1; i >= 0; --i)
       {

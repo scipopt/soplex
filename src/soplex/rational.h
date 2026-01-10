@@ -947,6 +947,11 @@ public:
       r.rationalErrorMessage();
       return r;
    };
+   inline friend Rational sqrt(const Rational& r)
+   {
+      r.rationalErrorMessage();
+      return r;
+   };
    inline friend int sign(const Rational& r)
    {
       r.rationalErrorMessage();

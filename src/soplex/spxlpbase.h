@@ -164,13 +164,13 @@ public:
    ///@{
 
    /// returns current tolerances
-   const std::shared_ptr<Tolerances> tolerances() const
+   const std::shared_ptr<TolerancesBase<R>> tolerances() const
    {
       return _tolerances;
    }
 
    /// set tolerances
-   virtual void setTolerances(std::shared_ptr<Tolerances> tolerances)
+   virtual void setTolerances(std::shared_ptr<TolerancesBase<R>> tolerances)
    {
       this->_tolerances = tolerances;
    }
@@ -1293,13 +1293,13 @@ public:
          bool hasLower = false;
          bool hasUpper = false;
 
-         if(lower(i) > R(-infinity))
+         if(lower(i) > -this->tolerances()->infinity())
          {
             countLower++;
             hasLower = true;
          }
 
-         if(upper(i) < R(infinity))
+         if(upper(i) < this->tolerances()->infinity())
          {
             countUpper++;
             hasUpper = true;
@@ -1321,13 +1321,13 @@ public:
          bool hasRhs = false;
          bool hasLhs = false;
 
-         if(lhs(i) > R(-infinity))
+         if(lhs(i) > -this->tolerances()->infinity())
          {
             countLhs++;
             hasLhs = true;
          }
 
-         if(rhs(i) < R(infinity))
+         if(rhs(i) < this->tolerances()->infinity())
          {
             countRhs++;
             hasRhs = true;
@@ -1480,7 +1480,7 @@ public:
    /// changes \p i 'th lower bound to \p newLower. \p scale determines whether the new data should be scaled
    virtual void changeLower(int i, const R& newLower, bool scale = false)
    {
-      if(scale && newLower > R(-infinity))
+      if(scale && newLower > -this->tolerances()->infinity())
       {
          assert(_isScaled);
          assert(lp_scaler);
@@ -1528,7 +1528,7 @@ public:
    /// Changes \p i 'th upper bound to \p newUpper. \p scale determines whether the new data should be scaled
    virtual void changeUpper(int i, const R& newUpper, bool scale = false)
    {
-      if(scale && newUpper < R(infinity))
+      if(scale && newUpper < this->tolerances()->infinity())
       {
          assert(_isScaled);
          assert(lp_scaler);
@@ -1608,7 +1608,7 @@ public:
    /// Changes \p i 'th left hand side value to \p newLhs. \p scale determines whether the new data should be scaled
    virtual void changeLhs(int i, const R& newLhs, bool scale = false)
    {
-      if(scale && newLhs > R(-infinity))
+      if(scale && newLhs > -this->tolerances()->infinity())
       {
          assert(_isScaled);
          assert(lp_scaler);
@@ -1656,7 +1656,7 @@ public:
    /// Changes \p i 'th right hand side value to \p newRhs. \p scale determines whether the new data should be scaled
    virtual void changeRhs(int i, const R& newRhs, bool scale = false)
    {
-      if(scale && newRhs < R(infinity))
+      if(scale && newRhs < this->tolerances()->infinity())
       {
          assert(_isScaled);
          assert(lp_scaler);
@@ -2113,7 +2113,7 @@ public:
 
 protected:
 
-   std::shared_ptr<Tolerances> _tolerances;
+   std::shared_ptr<TolerancesBase<R>> _tolerances;
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Protected write access */
@@ -2397,10 +2397,10 @@ private:
       {
          newRowScaleExp = lp_scaler->computeScaleExp(vec, colscaleExp);
 
-         if(rhs(idx) < R(infinity))
+         if(rhs(idx) < this->tolerances()->infinity())
             rhs_w(idx) = spxLdexp(rhs_w(idx), newRowScaleExp);
 
-         if(lhs(idx) > R(-infinity))
+         if(lhs(idx) > -this->tolerances()->infinity())
             lhs_w(idx) = spxLdexp(lhs_w(idx), newRowScaleExp);
 
          maxRowObj_w(idx) = spxLdexp(maxRowObj_w(idx), newRowScaleExp);
@@ -2453,10 +2453,10 @@ private:
       {
          newRowScaleExp = lp_scaler->computeScaleExp(rowVec, colscaleExp);
 
-         if(rhs(idx) < R(infinity))
+         if(rhs(idx) < this->tolerances()->infinity())
             rhs_w(idx) = spxLdexp(rhs_w(idx), newRowScaleExp);
 
-         if(lhs(idx) > R(-infinity))
+         if(lhs(idx) > -this->tolerances()->infinity())
             lhs_w(idx) = spxLdexp(lhs_w(idx), newRowScaleExp);
 
          maxRowObj_w(idx) = spxLdexp(maxRowObj_w(idx), newRowScaleExp);
@@ -2566,10 +2566,10 @@ private:
          {
             newRowScaleExp = lp_scaler->computeScaleExp(vec, colscaleExp);
 
-            if(rhs(i) < R(infinity))
+            if(rhs(i) < this->tolerances()->infinity())
                rhs_w(i) = spxLdexp(rhs_w(i), newRowScaleExp);
 
-            if(lhs(i) > R(-infinity))
+            if(lhs(i) > -this->tolerances()->infinity())
                lhs_w(i) = spxLdexp(lhs_w(i), newRowScaleExp);
 
             maxRowObj_w(i) = spxLdexp(maxRowObj_w(i), newRowScaleExp);
@@ -2630,10 +2630,10 @@ private:
       {
          newColScaleExp = lp_scaler->computeScaleExp(vec, rowscaleExp);
 
-         if(upper(idx) < R(infinity))
+         if(upper(idx) < this->tolerances()->infinity())
             upper_w(idx) = spxLdexp(upper_w(idx), - newColScaleExp);
 
-         if(lower(idx) > R(-infinity))
+         if(lower(idx) > -this->tolerances()->infinity())
             lower_w(idx) = spxLdexp(lower_w(idx), - newColScaleExp);
 
          maxObj_w(idx) = spxLdexp(maxObj_w(idx), newColScaleExp);
@@ -2689,10 +2689,10 @@ private:
       {
          newColScaleExp = lp_scaler->computeScaleExp(colVec, rowscaleExp);
 
-         if(upper(idx) < R(infinity))
+         if(upper(idx) < this->tolerances()->infinity())
             upper_w(idx) = spxLdexp(upper_w(idx), - newColScaleExp);
 
-         if(lower(idx) > R(-infinity))
+         if(lower(idx) > -this->tolerances()->infinity())
             lower_w(idx) = spxLdexp(lower_w(idx), - newColScaleExp);
 
          maxObj_w(idx) = spxLdexp(maxObj_w(idx), newColScaleExp);
@@ -2808,10 +2808,10 @@ private:
          {
             newColScaleExp = lp_scaler->computeScaleExp(vec, rowscaleExp);
 
-            if(upper(i) < R(infinity))
+            if(upper(i) < this->tolerances()->infinity())
                upper_w(i) = spxLdexp(upper_w(i), - newColScaleExp);
 
-            if(lower(i) > R(-infinity))
+            if(lower(i) > -this->tolerances()->infinity())
                lower_w(i) = spxLdexp(lower_w(i), - newColScaleExp);
 
             maxObj_w(i) = spxLdexp(maxObj_w(i), newColScaleExp);
@@ -2895,7 +2895,19 @@ public:
       , spxout(old.spxout)
    {
       lp_scaler = nullptr;
-      _tolerances = old._tolerances;
+      // When copying from a different precision type, create new tolerances with converted values
+      if(old.tolerances())
+      {
+         _tolerances = std::make_shared<TolerancesBase<R>>();
+         _tolerances->setEpsilon(R(old.tolerances()->epsilon()));
+         _tolerances->setEpsilonFactorization(R(old.tolerances()->epsilonFactorization()));
+         _tolerances->setEpsilonUpdate(R(old.tolerances()->epsilonUpdate()));
+         _tolerances->setEpsilonPivot(R(old.tolerances()->epsilonPivot()));
+         _tolerances->setFeastol(R(old.tolerances()->feastol()));
+         _tolerances->setOpttol(R(old.tolerances()->opttol()));
+         _tolerances->setFloatingPointFeastol(R(old.tolerances()->floatingPointFeastol()));
+         _tolerances->setFloatingPointOpttol(R(old.tolerances()->floatingPointOpttol()));
+      }
       assert(isConsistent());
    }
 
@@ -2935,7 +2947,20 @@ public:
                     SPxLPBase<R>::MAXIMIZE;
          offset = R(old.offset);
          _isScaled = old._isScaled;
-         _tolerances = old._tolerances;
+
+         // When copying from a different precision type, create new tolerances with converted values
+         if(old._tolerances)
+         {
+            _tolerances = std::make_shared<TolerancesBase<R>>();
+            _tolerances->setEpsilon(R(old._tolerances->epsilon()));
+            _tolerances->setEpsilonFactorization(R(old._tolerances->epsilonFactorization()));
+            _tolerances->setEpsilonUpdate(R(old._tolerances->epsilonUpdate()));
+            _tolerances->setEpsilonPivot(R(old._tolerances->epsilonPivot()));
+            _tolerances->setFeastol(R(old._tolerances->feastol()));
+            _tolerances->setOpttol(R(old._tolerances->opttol()));
+            _tolerances->setFloatingPointFeastol(R(old._tolerances->floatingPointFeastol()));
+            _tolerances->setFloatingPointOpttol(R(old._tolerances->floatingPointOpttol()));
+         }
 
          // this may have un-intended consequences in the future
          lp_scaler = nullptr;

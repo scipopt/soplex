@@ -76,7 +76,7 @@ int SPxHarrisRT<R>::maxDelta(
          themax = (x > themax) ? x : themax;
          x = (up[i] - vec[i] + this->delta) / x;
 
-         if(x < theval && up[i] < R(infinity))
+         if(x < theval && up[i] < this->tolerances()->infinity())
             theval = x;
       }
       else if(x < -epsilon)
@@ -84,7 +84,7 @@ int SPxHarrisRT<R>::maxDelta(
          themax = (-x > themax) ? -x : themax;
          x = (low[i] - vec[i] - this->delta) / x;
 
-         if(x < theval && low[i] > R(-infinity))
+         if(x < theval && low[i] > -this->tolerances()->infinity())
             theval = x;
       }
    }
@@ -133,7 +133,7 @@ int SPxHarrisRT<R>::minDelta(
          themax = (x > themax) ? x : themax;
          x = (low[i] - vec[i] - this->delta) / x;
 
-         if(x > theval && low[i] > R(-infinity))
+         if(x > theval && low[i] > -this->tolerances()->infinity())
             theval = x;
       }
       else if(x < -epsilon)
@@ -141,7 +141,7 @@ int SPxHarrisRT<R>::minDelta(
          themax = (-x > themax) ? -x : themax;
          x = (up[i] - vec[i] + this->delta) / x;
 
-         if(x > theval && up[i] < R(infinity))
+         if(x > theval && up[i] < this->tolerances()->infinity())
             theval = x;
       }
    }
@@ -212,7 +212,7 @@ int SPxHarrisRT<R>::selectLeave(R& val, R, bool)
 
       // phase 2:
       stab = 0;
-      sel = R(-infinity);
+      sel = -this->tolerances()->infinity();
       useeps = maxabs * epsilon * 0.001;
 
       if(useeps < epsilon)
@@ -284,7 +284,7 @@ int SPxHarrisRT<R>::selectLeave(R& val, R, bool)
 
       // phase 2:
       stab = 0;
-      sel = R(infinity);
+      sel = this->tolerances()->infinity();
       useeps = maxabs * epsilon * 0.001;
 
       if(useeps < epsilon)
@@ -425,7 +425,7 @@ SPxId SPxHarrisRT<R>::selectEnter(R& val, int, bool)
 
          // phase 2:
          stab = 0;
-         sel = R(-infinity);
+         sel = -this->tolerances()->infinity();
          ruseeps = rmaxabs * 0.001 * epsilon;
 
          if(ruseeps < epsilon)
@@ -643,7 +643,7 @@ SPxId SPxHarrisRT<R>::selectEnter(R& val, int, bool)
 
          // phase 2:
          stab = 0;
-         sel = R(infinity);
+         sel = this->tolerances()->infinity();
          ruseeps = rmaxabs * epsilon * 0.001;
          cuseeps = cmaxabs * epsilon * 0.001;
 

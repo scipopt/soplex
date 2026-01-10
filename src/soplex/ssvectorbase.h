@@ -81,7 +81,7 @@ private:
    ///@}
 
 protected:
-   std::shared_ptr<Tolerances> _tolerances;
+   std::shared_ptr<TolerancesBase<R>> _tolerances;
 
 public:
 
@@ -111,13 +111,13 @@ public:
    }
 
    /// set the _tolerances member variable
-   virtual void setTolerances(std::shared_ptr<Tolerances> newTolerances)
+   virtual void setTolerances(std::shared_ptr<TolerancesBase<R>> newTolerances)
    {
       this->_tolerances = newTolerances;
    }
 
    /// returns current tolerances
-   const std::shared_ptr<Tolerances>& tolerances() const
+   const std::shared_ptr<TolerancesBase<R>>& tolerances() const
    {
       assert(this->_tolerances != nullptr);
       return this->_tolerances;
@@ -671,7 +671,7 @@ public:
    ///@{
 
    /// Default constructor.
-   explicit SSVectorBase(int p_dim, std::shared_ptr<Tolerances> tol = nullptr)
+   explicit SSVectorBase(int p_dim, std::shared_ptr<TolerancesBase<R>> tol = nullptr)
       : VectorBase<R>(p_dim)
       , IdxSet()
       , setupStatus(true)

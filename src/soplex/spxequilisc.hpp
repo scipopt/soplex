@@ -48,7 +48,7 @@ static R maxPrescaledRatio(const SPxLPBase<R>& lp, const std::vector<R>& coScale
    for(int i = 0; i < n; ++i)
    {
       const SVectorBase<R>& vec = rowRatio ? lp.rowVector(i) : lp.colVector(i);
-      R mini = R(infinity);
+      R mini = lp.tolerances()->infinity();
       R maxi = 0.0;
 
       for(int j = 0; j < vec.size(); ++j)
@@ -66,7 +66,7 @@ static R maxPrescaledRatio(const SPxLPBase<R>& lp, const std::vector<R>& coScale
             maxi = x;
       }
 
-      if(mini == R(infinity))
+      if(mini == lp.tolerances()->infinity())
          continue;
 
       const R p = maxi / mini;
@@ -104,7 +104,7 @@ void SPxEquiliSC<R>::computeEquiExpVec(const SVSetBase<R>* vecset, const DataArr
 
       assert(maxi > 0.0);
 
-      spxFrexp(Real(1.0 / maxi), &(scaleExp[i]));
+      spxFrexp(R(1) / maxi, &(scaleExp[i]));
 
       scaleExp[i] -= 1;
    }
@@ -137,7 +137,7 @@ void SPxEquiliSC<R>::computeEquiExpVec(const SVSetBase<R>* vecset, const std::ve
 
       assert(maxi > 0.0);
 
-      spxFrexp(Real(1.0 / maxi), &(scaleExp[i]));
+      spxFrexp(R(1) / maxi, &(scaleExp[i]));
 
       scaleExp[i] -= 1;
    }

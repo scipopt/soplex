@@ -87,11 +87,11 @@ template <class R>
 void SPxSolverBase<R>::calculateProblemRanges()
 {
    // only collect absolute values
-   R minobj = R(infinity);
+   R minobj = this->inftyValue();
    R maxobj = 0.0;
-   R minbound = R(infinity);
+   R minbound = this->inftyValue();
    R maxbound = 0.0;
-   R minside = R(infinity);
+   R minside = this->inftyValue();
    R maxside = 0.0;
 
    // get min and max absolute values of bounds and objective
@@ -101,13 +101,13 @@ void SPxSolverBase<R>::calculateProblemRanges()
       R absupp = spxAbs(this->lower(j));
       R absobj = spxAbs(this->obj(j));
 
-      if(abslow < R(infinity))
+      if(abslow < this->inftyValue())
       {
          minbound = SOPLEX_MIN(minbound, abslow);
          maxbound = SOPLEX_MAX(maxbound, abslow);
       }
 
-      if(absupp < R(infinity))
+      if(absupp < this->inftyValue())
       {
          minbound = SOPLEX_MIN(minbound, absupp);
          maxbound = SOPLEX_MAX(maxbound, absupp);
@@ -123,13 +123,13 @@ void SPxSolverBase<R>::calculateProblemRanges()
       R abslhs = spxAbs(this->lhs(i));
       R absrhs = spxAbs(this->rhs(i));
 
-      if(abslhs > R(infinity))
+      if(abslhs > this->inftyValue())
       {
          minside = SOPLEX_MIN(minside, abslhs);
          maxside = SOPLEX_MAX(maxside, abslhs);
       }
 
-      if(absrhs < R(infinity))
+      if(absrhs < this->inftyValue())
       {
          minside = SOPLEX_MIN(minside, absrhs);
          maxside = SOPLEX_MAX(maxside, absrhs);
@@ -147,7 +147,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
    SPxId enterId;
    int   leaveNum;
    int   loopCount = 0;
-   R  minShift = R(infinity);
+   R  minShift = this->inftyValue();
    int   cycleCount = 0;
    bool  priced = false;
    R  lastDelta = 1;
@@ -1809,7 +1809,7 @@ bool SPxSolverBase<R>::terminate()
    }
 
    // objLimit is set and we are running DUAL:
-   // - objLimit is set if objLimit < R(infinity)
+   // - objLimit is set if objLimit < this->inftyValue()
    // - DUAL is running if rep() * type() > 0 == DUAL (-1 == PRIMAL)
    //
    // In this case we have given a objective value limit, e.g, through a
@@ -1822,7 +1822,7 @@ bool SPxSolverBase<R>::terminate()
    // - MAXIMIZATION Problem
    //   We want stop the solving process if
    //   objLimit >= current objective value of the DUAL LP
-   if(objLimit < R(infinity) && type() * rep() > 0)
+   if(objLimit < this->inftyValue() && type() * rep() > 0)
    {
       // We have no bound shifts; therefore, we can trust the current
       // objective value.

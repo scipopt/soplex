@@ -58,7 +58,7 @@ protected:
    /// name of the starter
    const char* m_name;
    /// tolerances for the starter
-   std::shared_ptr<Tolerances> _tolerances;
+   std::shared_ptr<TolerancesBase<R>> _tolerances;
    ///@}
 
 public:
@@ -111,12 +111,12 @@ public:
    ///@}
 
    /// set the tolerances to be used by the starter
-   virtual void setTolerances(const std::shared_ptr<Tolerances>& tolerances)
+   virtual void setTolerances(const std::shared_ptr<TolerancesBase<R>>& tolerances)
    {
       _tolerances = tolerances;
    }
    /// get the toelrances used by the starter
-   virtual const std::shared_ptr<Tolerances>& tolerances() const
+   virtual const std::shared_ptr<TolerancesBase<R>>& tolerances() const
    {
       return _tolerances;
    }

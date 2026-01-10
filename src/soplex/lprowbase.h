@@ -40,7 +40,7 @@ namespace soplex
  *
  *  Class LPRowBase provides constraints for linear programs in the form \f[ l \le a^Tx \le r, \f] where \em a is a
  *  DSVector. \em l is referred to as %left hand side, \em r as %right hand side and \em a as \em row \em vector or the
- *  constraint vector. \em l and \em r may also take values \f$\pm\f$ R(infinity).  This static member is predefined, but
+ *  constraint vector. \em l and \em r may also take values \f$\pm\f$ PrecisionTraits<R>::defaultInfinity().  This static member is predefined, but
  *  may be overridden to meet the needs of the LP solver to be used.
  *
  *  LPRowBases allow to specify regular inequalities of the form \f[ a^Tx \sim \alpha, \f] where \f$\sim\f$ can take any
@@ -94,7 +94,7 @@ public:
 
    /// Constructs LPRowBase with a vector ready to hold \p defDim nonzeros.
    explicit LPRowBase(int defDim = 0)
-      : left(0), right(R(infinity)), object(0), vec(defDim)
+      : left(0), right(PrecisionTraits<R>::defaultInfinity()), object(0), vec(defDim)
    {
       assert(isConsistent());
    }
@@ -142,7 +142,7 @@ public:
       switch(p_type)
       {
       case LESS_EQUAL:
-         left = R(-infinity);
+         left = -PrecisionTraits<R>::defaultInfinity();
          right = p_value;
          break;
 
@@ -153,7 +153,7 @@ public:
 
       case GREATER_EQUAL:
          left = p_value;
-         right = R(infinity);
+         right = PrecisionTraits<R>::defaultInfinity();
          break;
 
       default:
@@ -176,10 +176,10 @@ public:
    /// Gets type of row.
    Type type() const
    {
-      if(rhs() >= R(infinity))
+      if(rhs() >= PrecisionTraits<R>::defaultInfinity())
          return GREATER_EQUAL;
 
-      if(lhs() <= R(-infinity))
+      if(lhs() <= -PrecisionTraits<R>::defaultInfinity())
          return LESS_EQUAL;
 
       if(lhs() == rhs())
@@ -194,11 +194,11 @@ public:
       switch(p_type)
       {
       case LESS_EQUAL:
-         left = R(-infinity);
+         left = -PrecisionTraits<R>::defaultInfinity();
          break;
 
       case EQUAL:
-         if(lhs() > R(-infinity))
+         if(lhs() > -PrecisionTraits<R>::defaultInfinity())
             right = lhs();
          else
             left = rhs();
@@ -206,7 +206,7 @@ public:
          break;
 
       case GREATER_EQUAL:
-         right = R(infinity);
+         right = PrecisionTraits<R>::defaultInfinity();
          break;
 
       case RANGE:
@@ -227,7 +227,7 @@ public:
    {
       assert(type() != RANGE);
 
-      return (rhs() < R(infinity)) ? rhs() : lhs();
+      return (rhs() < PrecisionTraits<R>::defaultInfinity()) ? rhs() : lhs();
    }
 
    /// Left-hand side value.

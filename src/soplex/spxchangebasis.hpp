@@ -236,9 +236,9 @@ primalColStatus(int i, const SPxLPBase<R>* theLP)
 {
    assert(theLP != nullptr);
 
-   if(theLP->upper(i) < R(infinity))
+   if(theLP->upper(i) < theLP->tolerances()->infinity())
    {
-      if(theLP->lower(i) > R(-infinity))
+      if(theLP->lower(i) > -theLP->tolerances()->infinity())
       {
          if(theLP->lower(i) == theLP->SPxLPBase<R>::upper(i))
             return SPxBasisBase<R>::Desc::P_FIXED;
@@ -260,7 +260,7 @@ primalColStatus(int i, const SPxLPBase<R>* theLP)
       else
          return SPxBasisBase<R>::Desc::P_ON_UPPER;
    }
-   else if(theLP->lower(i) > R(-infinity))
+   else if(theLP->lower(i) > -theLP->tolerances()->infinity())
       return SPxBasisBase<R>::Desc::P_ON_LOWER;
    else
       return SPxBasisBase<R>::Desc::P_FREE;

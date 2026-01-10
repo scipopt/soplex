@@ -74,7 +74,7 @@ int SPxDefaultRT<R>::selectLeave(R& val, R, bool)
 
          if(x > epsilon)
          {
-            if(ub[i] < R(infinity))
+            if(ub[i] < this->tolerances()->infinity())
             {
                R y = (ub[i] - vec[i] + this->delta) / x;
 
@@ -87,7 +87,7 @@ int SPxDefaultRT<R>::selectLeave(R& val, R, bool)
          }
          else if(x < -epsilon)
          {
-            if(lb[i] > R(-infinity))
+            if(lb[i] > -this->tolerances()->infinity())
             {
                R y = (lb[i] - vec[i] - this->delta) / x;
 
@@ -131,7 +131,7 @@ int SPxDefaultRT<R>::selectLeave(R& val, R, bool)
 
          if(x < -epsilon)
          {
-            if(ub[i] < R(infinity))
+            if(ub[i] < this->tolerances()->infinity())
             {
                R y = (ub[i] - vec[i] + this->delta) / x;
 
@@ -144,7 +144,7 @@ int SPxDefaultRT<R>::selectLeave(R& val, R, bool)
          }
          else if(x > epsilon)
          {
-            if(lb[i] > R(-infinity))
+            if(lb[i] > -this->tolerances()->infinity())
             {
                R y = (lb[i] - vec[i] - this->delta) / x;
 
@@ -222,7 +222,7 @@ SPxId SPxDefaultRT<R>::selectEnter(R& max, int, bool)
 
          if(x > epsilon)
          {
-            if(upb[i] < R(infinity))
+            if(upb[i] < this->tolerances()->infinity())
             {
                R y = (upb[i] - pvec[i] + this->delta) / x;
 
@@ -236,7 +236,7 @@ SPxId SPxDefaultRT<R>::selectEnter(R& max, int, bool)
          }
          else if(x < -epsilon)
          {
-            if(lpb[i] > R(-infinity))
+            if(lpb[i] > -this->tolerances()->infinity())
             {
                R y = (lpb[i] - pvec[i] - this->delta) / x;
 
@@ -257,7 +257,7 @@ SPxId SPxDefaultRT<R>::selectEnter(R& max, int, bool)
 
          if(x > epsilon)
          {
-            if(ucb[i] < R(infinity))
+            if(ucb[i] < this->tolerances()->infinity())
             {
                R y = (ucb[i] - cvec[i] + this->delta) / x;
 
@@ -271,7 +271,7 @@ SPxId SPxDefaultRT<R>::selectEnter(R& max, int, bool)
          }
          else if(x < -epsilon)
          {
-            if(lcb[i] > R(-infinity))
+            if(lcb[i] > -this->tolerances()->infinity())
             {
                R y = (lcb[i] - cvec[i] - this->delta) / x;
 
@@ -309,7 +309,7 @@ SPxId SPxDefaultRT<R>::selectEnter(R& max, int, bool)
 
          if(x > epsilon)
          {
-            if(lpb[i] > R(-infinity))
+            if(lpb[i] > -this->tolerances()->infinity())
             {
                R y = (lpb[i] - pvec[i] - this->delta) / x;
 
@@ -323,7 +323,7 @@ SPxId SPxDefaultRT<R>::selectEnter(R& max, int, bool)
          }
          else if(x < -epsilon)
          {
-            if(upb[i] < R(infinity))
+            if(upb[i] < this->tolerances()->infinity())
             {
                R y = (upb[i] - pvec[i] + this->delta) / x;
 
@@ -344,7 +344,7 @@ SPxId SPxDefaultRT<R>::selectEnter(R& max, int, bool)
 
          if(x > epsilon)
          {
-            if(lcb[i] > R(-infinity))
+            if(lcb[i] > -this->tolerances()->infinity())
             {
                R y = (lcb[i] - cvec[i] - this->delta) / x;
 
@@ -358,7 +358,7 @@ SPxId SPxDefaultRT<R>::selectEnter(R& max, int, bool)
          }
          else if(x < -epsilon)
          {
-            if(ucb[i] < R(infinity))
+            if(ucb[i] < this->tolerances()->infinity())
             {
                R y = (ucb[i] - cvec[i] + this->delta) / x;
 

@@ -63,7 +63,7 @@ protected:
    /// allowed bound violation
    R delta;
    /// tolerances used by the solver
-   std::shared_ptr<Tolerances> _tolerances;
+   std::shared_ptr<TolerancesBase<R>> _tolerances;
    ///@}
 
 public:
@@ -112,12 +112,12 @@ public:
    }
 
    /// set the _tolerances member variable
-   virtual void setTolerances(std::shared_ptr<Tolerances> newTolerances)
+   virtual void setTolerances(std::shared_ptr<TolerancesBase<R>> newTolerances)
    {
       this->_tolerances = newTolerances;
    }
    /// get the _tolerances member variable
-   const std::shared_ptr<Tolerances> tolerances() const
+   const std::shared_ptr<TolerancesBase<R>> tolerances() const
    {
       return _tolerances;
    }

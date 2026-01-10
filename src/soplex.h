@@ -1167,8 +1167,12 @@ public:
       /// after how many simplex pivots do we store the advanced and stable basis, 1 = every iterations
       STORE_BASIS_SIMPLEX_FREQ = 27,
 
+      /// initial precision (in bits) for multiprecision floating-point arithmetic
+      /// For 1000+ decimal digits, use 3400+ bits. Default is 50 bits (~15 decimal digits).
+      INITIAL_PRECISION = 28,
+
       /// number of integer parameters
-      INTPARAM_COUNT = 28
+      INTPARAM_COUNT = 29
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -1516,6 +1520,46 @@ public:
    } RationalParam;
 #endif
 
+   /**
+    * @brief R-typed tolerance parameters for arbitrary precision support.
+    *
+    * These parameters allow setting tolerances using the solver's native numeric type R,
+    * enabling true arbitrary-precision tolerance values (e.g., 1e-280 for 1024-bit floats).
+    * For backward compatibility, setRealParam() still works with double values.
+    */
+   typedef enum
+   {
+      /// general zero tolerance (same as EPSILON_ZERO but R-typed)
+      TOLERANCE_EPSILON = 0,
+
+      /// zero tolerance for factorization (same as EPSILON_FACTORIZATION but R-typed)
+      TOLERANCE_EPSILON_FACTORIZATION = 1,
+
+      /// zero tolerance for factorization update (same as EPSILON_UPDATE but R-typed)
+      TOLERANCE_EPSILON_UPDATE = 2,
+
+      /// pivot zero tolerance (same as EPSILON_PIVOT but R-typed)
+      TOLERANCE_EPSILON_PIVOT = 3,
+
+      /// feasibility tolerance (same as FEASTOL but R-typed)
+      TOLERANCE_FEASTOL = 4,
+
+      /// optimality tolerance (same as OPTTOL but R-typed)
+      TOLERANCE_OPTTOL = 5,
+
+      /// floating point feasibility tolerance (same as FPFEASTOL but R-typed)
+      TOLERANCE_FPFEASTOL = 6,
+
+      /// floating point optimality tolerance (same as FPOPTTOL but R-typed)
+      TOLERANCE_FPOPTTOL = 7,
+
+      /// infinity threshold (R-typed, replaces REALPARAM::INFTY for high precision)
+      TOLERANCE_INFTY = 8,
+
+      /// number of tolerance parameters
+      TOLERANCEPARAM_COUNT = 9
+   } ToleranceParam;
+
    /// class of parameter settings
    class Settings
    {
@@ -1626,7 +1670,7 @@ public:
    const Settings& settings() const;
 
    /// returns current tolerances
-   const std::shared_ptr<Tolerances> tolerances() const;
+   const std::shared_ptr<TolerancesBase<R>> tolerances() const;
 
    /// sets boolean parameter value; returns true on success
    bool setBoolParam(const BoolParam param, const bool value, const bool init = true);
@@ -1641,6 +1685,21 @@ public:
    /// sets rational parameter value; returns true on success
    bool setRationalParam(const RationalParam param, const Rational value, const bool init = true);
 #endif
+
+   /// returns R-typed tolerance parameter value
+   R toleranceParam(const ToleranceParam param) const;
+
+   /// returns R-typed infinity threshold (convenience method for toleranceParam(TOLERANCE_INFTY))
+   R infty() const { return _tolerances->infinity(); }
+
+   /// sets R-typed tolerance parameter value; returns true on success
+   /// This allows setting tolerances using the solver's native numeric type R,
+   /// enabling true arbitrary-precision tolerance values (e.g., 1e-280 for 1024-bit floats)
+   bool setToleranceParam(const ToleranceParam param, const R& value);
+
+   /// sets tolerance parameter from string (for arbitrary precision values)
+   /// The string is parsed using the R type's constructor
+   bool setToleranceParamString(const ToleranceParam param, const char* valueString);
 
    /// sets parameter settings; returns true on success
    bool setSettings(const Settings& newSettings, const bool init = true);
@@ -1728,13 +1787,18 @@ private:
 
    Settings* _currentSettings;
 
-   std::shared_ptr<Tolerances> _tolerances;
+   std::shared_ptr<TolerancesBase<R>> _tolerances;
 
    Rational _rationalPosInfty;
    Rational _rationalNegInfty;
    Rational _rationalFeastol;
    Rational _rationalOpttol;
    Rational _rationalMaxscaleincr;
+   Rational _rationalEpsilon;             ///< R-typed epsilon for high-precision solving
+   Rational _rationalEpsilonFactorization; ///< R-typed epsilon for factorization
+   Rational _rationalEpsilonUpdate;        ///< R-typed epsilon for update
+   Rational _rationalEpsilonPivot;         ///< R-typed epsilon for pivot
+   bool _rationalTolerancesSet;            ///< true if user has set R-typed tolerances
 
    ///@}
 
@@ -1789,6 +1853,9 @@ private:
 
    // boosted solver object
    SPxSolverBase<BP> _boostedSolver;
+
+   // tolerances for boosted solver and components (uses BP precision type)
+   std::shared_ptr<TolerancesBase<BP>> _boostedTolerances;
 
    // ------------- Main attributes for precision boosting
 
@@ -1870,6 +1937,9 @@ private:
 
    ///@name Data for the rational LP
    ///@{
+
+   // tolerances for rational LP and components (uses Rational type)
+   std::shared_ptr<TolerancesBase<Rational>> _rationalTolerances;
 
    SPxLPRational* _rationalLP;
    SLUFactorRational _rationalLUSolver;
@@ -2036,13 +2106,13 @@ private:
    void _addRowsReal(const LPRowSetBase<R>& lprowset);
 
    /// adds a single column to the real LP and adjusts basis
-   void _addColReal(const LPColReal& lpcol);
+   void _addColReal(const LPColBase<R>& lpcol);
 
    /// adds a single column to the real LP and adjusts basis
    void _addColReal(R obj, R lower, const SVectorBase<R>& lpcol, R upper);
 
    /// adds multiple columns to the real LP and adjusts basis
-   void _addColsReal(const LPColSetReal& lpcolset);
+   void _addColsReal(const LPColSetBase<R>& lpcolset);
 
    /// replaces row \p i with \p lprow and adjusts basis
    void _changeRowReal(int i, const LPRowBase<R>& lprow);
@@ -2066,7 +2136,7 @@ private:
    void _changeRangeReal(int i, const R& lhs, const R& rhs);
 
    /// replaces column \p i with \p lpcol and adjusts basis
-   void _changeColReal(int i, const LPColReal& lpcol);
+   void _changeColReal(int i, const LPColBase<R>& lpcol);
 
    /// changes vector of lower bounds to \p lower and adjusts basis
    void _changeLowerReal(const VectorBase<R>& lower);

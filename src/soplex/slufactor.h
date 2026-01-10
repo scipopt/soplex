@@ -303,7 +303,7 @@ public:
    bool isConsistent() const;
 
    /// set tolerances
-   virtual void setTolerances(std::shared_ptr<Tolerances> tolerances)
+   virtual void setTolerances(std::shared_ptr<TolerancesBase<R>> tolerances)
    {
       this->_tolerances = tolerances;
       this->eta.setTolerances(tolerances);

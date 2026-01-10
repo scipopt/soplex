@@ -268,7 +268,7 @@ public:
    }
 
    /// set tolerances
-   void setTolerances(std::shared_ptr<Tolerances> tolerances)
+   void setTolerances(std::shared_ptr<TolerancesBase<R>> tolerances)
    {
       this->_tolerances = tolerances;
       this->updPrimRhs.setTolerances(tolerances);

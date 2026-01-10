@@ -80,7 +80,7 @@ protected:
    /// message handler
    SPxOut*     spxout;
    ///< tolerances used by the solver
-   std::shared_ptr<Tolerances> _tolerances;
+   std::shared_ptr<TolerancesBase<R>> _tolerances;
    ///@}
 
 public:
@@ -117,6 +117,7 @@ public:
       , m_objoffset(0.0)
       , m_minReduction(1e-4)
       , spxout(nullptr)
+      , _tolerances(std::make_shared<TolerancesBase<R>>())  // Initialize with default tolerances
    {
       assert(isConsistent());
 
@@ -136,6 +137,7 @@ public:
       , m_objoffset(old.m_objoffset)
       , m_minReduction(old.m_minReduction)
       , spxout(old.spxout)
+      , _tolerances(old._tolerances)  // Copy the tolerances shared_ptr
    {
       m_timeUsed = TimerFactory::createTimer(m_timerType);
       assert(isConsistent());
@@ -158,6 +160,7 @@ public:
          m_objoffset = rhs.m_objoffset;
          m_minReduction = rhs.m_minReduction;
          spxout = rhs.spxout;
+         _tolerances = rhs._tolerances;
 
          assert(isConsistent());
       }
@@ -265,14 +268,19 @@ public:
    }
 
    /// set the _tolerances member variable
-   virtual void setTolerances(std::shared_ptr<Tolerances> newTolerances)
+   virtual void setTolerances(std::shared_ptr<TolerancesBase<R>> newTolerances)
    {
       this->_tolerances = newTolerances;
    }
    /// get the _tolerances member variable
-   const std::shared_ptr<Tolerances> tolerances() const
+   const std::shared_ptr<TolerancesBase<R>> tolerances() const
    {
       return _tolerances;
+   }
+   /// get R-typed infinity threshold
+   R infinity() const
+   {
+      return _tolerances->infinity();
    }
 
 };

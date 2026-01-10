@@ -230,14 +230,14 @@ void SPxSolverBase<R>::getLeaveVals(
          assert(rep() == ROW);
          ds.rowStatus(leaveNum) = this->dualRowStatus(leaveNum);
          leavebound = 0;
-         leaveMax = R(-infinity);
+         leaveMax = -this->inftyValue();
          break;
 
       case SPxBasisBase<R>::Desc::P_ON_LOWER :
          assert(rep() == ROW);
          ds.rowStatus(leaveNum) = this->dualRowStatus(leaveNum);
          leavebound = 0;
-         leaveMax = R(infinity);
+         leaveMax = this->inftyValue();
          break;
 
       case SPxBasisBase<R>::Desc::P_FREE :
@@ -251,9 +251,9 @@ void SPxSolverBase<R>::getLeaveVals(
          leavebound = -this->rhs(leaveNum);
 
          if((*theFvec)[leaveIdx] < theLBbound[leaveIdx])
-            leaveMax = R(infinity);
+            leaveMax = this->inftyValue();
          else
-            leaveMax = R(-infinity);
+            leaveMax = -this->inftyValue();
 
          break;
 
@@ -261,7 +261,7 @@ void SPxSolverBase<R>::getLeaveVals(
          assert(rep() == COLUMN);
          ds.rowStatus(leaveNum) = SPxBasisBase<R>::Desc::P_ON_UPPER;
          leavebound = -this->rhs(leaveNum);                // slack !!
-         leaveMax = R(infinity);
+         leaveMax = this->inftyValue();
          objChange += theLRbound[leaveNum] * this->rhs(leaveNum);
          break;
 
@@ -269,7 +269,7 @@ void SPxSolverBase<R>::getLeaveVals(
          assert(rep() == COLUMN);
          ds.rowStatus(leaveNum) = SPxBasisBase<R>::Desc::P_ON_LOWER;
          leavebound = -this->lhs(leaveNum);                // slack !!
-         leaveMax = R(-infinity);
+         leaveMax = -this->inftyValue();
          objChange += theURbound[leaveNum] * this->lhs(leaveNum);
          break;
 
@@ -279,17 +279,17 @@ void SPxSolverBase<R>::getLeaveVals(
          if((*theFvec)[leaveIdx] > theLBbound[leaveIdx])
          {
             ds.rowStatus(leaveNum) = SPxBasisBase<R>::Desc::P_ON_LOWER;
-            theLRbound[leaveNum] = R(-infinity);
+            theLRbound[leaveNum] = -this->inftyValue();
             leavebound = -this->lhs(leaveNum);            // slack !!
-            leaveMax = R(-infinity);
+            leaveMax = -this->inftyValue();
             objChange += theURbound[leaveNum] * this->lhs(leaveNum);
          }
          else
          {
             ds.rowStatus(leaveNum) = SPxBasisBase<R>::Desc::P_ON_UPPER;
-            theURbound[leaveNum] = R(infinity);
+            theURbound[leaveNum] = this->inftyValue();
             leavebound = -this->rhs(leaveNum);            // slack !!
-            leaveMax = R(infinity);
+            leaveMax = this->inftyValue();
             objChange += theLRbound[leaveNum] * this->rhs(leaveNum);
          }
 
@@ -317,14 +317,14 @@ void SPxSolverBase<R>::getLeaveVals(
          assert(rep() == ROW);
          ds.colStatus(leaveNum) = this->dualColStatus(leaveNum);
          leavebound = 0;
-         leaveMax = R(-infinity);
+         leaveMax = -this->inftyValue();
          break;
 
       case SPxBasisBase<R>::Desc::P_ON_LOWER :
          assert(rep() == ROW);
          ds.colStatus(leaveNum) = this->dualColStatus(leaveNum);
          leavebound = 0;
-         leaveMax = R(infinity);
+         leaveMax = this->inftyValue();
          break;
 
       case SPxBasisBase<R>::Desc::P_FREE :
@@ -334,12 +334,12 @@ void SPxSolverBase<R>::getLeaveVals(
          if((*theFvec)[leaveIdx] < theLBbound[leaveIdx])
          {
             leavebound = theLBbound[leaveIdx];
-            leaveMax = R(-infinity);
+            leaveMax = -this->inftyValue();
          }
          else
          {
             leavebound = theUBbound[leaveIdx];
-            leaveMax = R(infinity);
+            leaveMax = this->inftyValue();
          }
 
          break;
@@ -352,9 +352,9 @@ void SPxSolverBase<R>::getLeaveVals(
          objChange += this->maxObj(leaveNum) * leavebound;
 
          if((*theFvec)[leaveIdx] < theLBbound[leaveIdx])
-            leaveMax = R(infinity);
+            leaveMax = this->inftyValue();
          else
-            leaveMax = R(-infinity);
+            leaveMax = -this->inftyValue();
 
          break;
 
@@ -363,7 +363,7 @@ void SPxSolverBase<R>::getLeaveVals(
          ds.colStatus(leaveNum) = SPxBasisBase<R>::Desc::P_ON_UPPER;
          leavebound = SPxLPBase<R>::upper(leaveNum);
          objChange += theUCbound[leaveNum] * leavebound;
-         leaveMax = R(-infinity);
+         leaveMax = -this->inftyValue();
          break;
 
       case SPxBasisBase<R>::Desc::D_ON_UPPER :
@@ -371,7 +371,7 @@ void SPxSolverBase<R>::getLeaveVals(
          ds.colStatus(leaveNum) = SPxBasisBase<R>::Desc::P_ON_LOWER;
          leavebound = SPxLPBase<R>::lower(leaveNum);
          objChange += theLCbound[leaveNum] * leavebound;
-         leaveMax = R(infinity);
+         leaveMax = this->inftyValue();
          break;
 
       case SPxBasisBase<R>::Desc::D_ON_BOTH :
@@ -379,18 +379,18 @@ void SPxSolverBase<R>::getLeaveVals(
 
          if((*theFvec)[leaveIdx] > theUBbound[leaveIdx])
          {
-            leaveMax = R(-infinity);
+            leaveMax = -this->inftyValue();
             leavebound = SPxLPBase<R>::upper(leaveNum);
             objChange += theUCbound[leaveNum] * leavebound;
-            theLCbound[leaveNum] = R(-infinity);
+            theLCbound[leaveNum] = -this->inftyValue();
             ds.colStatus(leaveNum) = SPxBasisBase<R>::Desc::P_ON_UPPER;
          }
          else
          {
-            leaveMax = R(infinity);
+            leaveMax = this->inftyValue();
             leavebound = SPxLPBase<R>::lower(leaveNum);
             objChange += theLCbound[leaveNum] * leavebound;
-            theUCbound[leaveNum] = R(infinity);
+            theUCbound[leaveNum] = this->inftyValue();
             ds.colStatus(leaveNum) = SPxBasisBase<R>::Desc::P_ON_LOWER;
          }
 
@@ -436,22 +436,22 @@ void SPxSolverBase<R>::getLeaveVals2(
          else
             newCoPrhs = theURbound[idx];
 
-         newUBbound = R(infinity);
-         newLBbound = R(-infinity);
+         newUBbound = this->inftyValue();
+         newLBbound = -this->inftyValue();
          ds.rowStatus(idx) = SPxBasisBase<R>::Desc::P_FIXED;
          break;
 
       case SPxBasisBase<R>::Desc::D_ON_UPPER :
          assert(rep() == ROW);
          newUBbound = 0;
-         newLBbound = R(-infinity);
+         newLBbound = -this->inftyValue();
          ds.rowStatus(idx) = SPxBasisBase<R>::Desc::P_ON_LOWER;
          newCoPrhs = theLRbound[idx];
          break;
 
       case SPxBasisBase<R>::Desc::D_ON_LOWER :
          assert(rep() == ROW);
-         newUBbound = R(infinity);
+         newUBbound = this->inftyValue();
          newLBbound = 0;
          ds.rowStatus(idx) = SPxBasisBase<R>::Desc::P_ON_UPPER;
          newCoPrhs = theURbound[idx];
@@ -463,13 +463,13 @@ void SPxSolverBase<R>::getLeaveVals2(
          if(leaveMax * thePvec->delta()[idx] < 0)
          {
             newUBbound = 0;
-            newLBbound = R(-infinity);
+            newLBbound = -this->inftyValue();
             ds.rowStatus(idx) = SPxBasisBase<R>::Desc::P_ON_LOWER;
             newCoPrhs = theLRbound[idx];
          }
          else
          {
-            newUBbound = R(infinity);
+            newUBbound = this->inftyValue();
             newLBbound = 0;
             ds.rowStatus(idx) = SPxBasisBase<R>::Desc::P_ON_UPPER;
             newCoPrhs = theURbound[idx];
@@ -481,7 +481,7 @@ void SPxSolverBase<R>::getLeaveVals2(
          assert(rep() == COLUMN);
          ds.rowStatus(idx) = this->dualRowStatus(idx);
 
-         if(this->lhs(idx) > R(-infinity))
+         if(this->lhs(idx) > -this->inftyValue())
             theURbound[idx] = theLRbound[idx];
 
          newCoPrhs = theLRbound[idx];        // slack !!
@@ -495,7 +495,7 @@ void SPxSolverBase<R>::getLeaveVals2(
          assert(rep() == COLUMN);
          ds.rowStatus(idx) = this->dualRowStatus(idx);
 
-         if(this->rhs(idx) < R(infinity))
+         if(this->rhs(idx) < this->inftyValue())
             theLRbound[idx] = theURbound[idx];
 
          newCoPrhs = theURbound[idx];        // slack !!
@@ -513,8 +513,8 @@ void SPxSolverBase<R>::getLeaveVals2(
          SPX_MSG_ERROR(std::cerr << "ELEAVE53 ERROR: not yet debugged!" << std::endl;)
          ds.rowStatus(idx) = this->dualRowStatus(idx);
          newCoPrhs = theURbound[idx];        // slack !!
-         newUBbound = R(infinity);
-         newLBbound = R(-infinity);
+         newUBbound = this->inftyValue();
+         newLBbound = -this->inftyValue();
          enterBound = 0;
 #endif
          break;
@@ -548,14 +548,14 @@ void SPxSolverBase<R>::getLeaveVals2(
       case SPxBasisBase<R>::Desc::D_ON_UPPER :
          assert(rep() == ROW);
          newUBbound = 0;
-         newLBbound = R(-infinity);
+         newLBbound = -this->inftyValue();
          ds.colStatus(idx) = SPxBasisBase<R>::Desc::P_ON_LOWER;
          newCoPrhs = theLCbound[idx];
          break;
 
       case SPxBasisBase<R>::Desc::D_ON_LOWER :
          assert(rep() == ROW);
-         newUBbound = R(infinity);
+         newUBbound = this->inftyValue();
          newLBbound = 0;
          ds.colStatus(idx) = SPxBasisBase<R>::Desc::P_ON_UPPER;
          newCoPrhs = theUCbound[idx];
@@ -563,8 +563,8 @@ void SPxSolverBase<R>::getLeaveVals2(
 
       case SPxBasisBase<R>::Desc::D_FREE :
          assert(rep() == ROW);
-         newUBbound = R(infinity);
-         newLBbound = R(-infinity);
+         newUBbound = this->inftyValue();
+         newLBbound = -this->inftyValue();
          newCoPrhs = theLCbound[idx];
          ds.colStatus(idx) = SPxBasisBase<R>::Desc::P_FIXED;
          break;
@@ -575,13 +575,13 @@ void SPxSolverBase<R>::getLeaveVals2(
          if(leaveMax * theCoPvec->delta()[idx] < 0)
          {
             newUBbound = 0;
-            newLBbound = R(-infinity);
+            newLBbound = -this->inftyValue();
             ds.colStatus(idx) = SPxBasisBase<R>::Desc::P_ON_LOWER;
             newCoPrhs = theLCbound[idx];
          }
          else
          {
-            newUBbound = R(infinity);
+            newUBbound = this->inftyValue();
             newLBbound = 0;
             ds.colStatus(idx) = SPxBasisBase<R>::Desc::P_ON_UPPER;
             newCoPrhs = theUCbound[idx];
@@ -593,7 +593,7 @@ void SPxSolverBase<R>::getLeaveVals2(
          assert(rep() == COLUMN);
          ds.colStatus(idx) = this->dualColStatus(idx);
 
-         if(SPxLPBase<R>::lower(idx) > R(-infinity))
+         if(SPxLPBase<R>::lower(idx) > -this->inftyValue())
             theLCbound[idx] = theUCbound[idx];
 
          newCoPrhs = theUCbound[idx];
@@ -607,7 +607,7 @@ void SPxSolverBase<R>::getLeaveVals2(
          assert(rep() == COLUMN);
          ds.colStatus(idx) = this->dualColStatus(idx);
 
-         if(SPxLPBase<R>::upper(idx) < R(infinity))
+         if(SPxLPBase<R>::upper(idx) < this->inftyValue())
             theUCbound[idx] = theLCbound[idx];
 
          newCoPrhs = theLCbound[idx];
@@ -1106,7 +1106,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
             }
 
             theUBbound[leaveIdx] = 0;
-            theLBbound[leaveIdx] = R(-infinity);
+            theLBbound[leaveIdx] = -this->inftyValue();
          }
          else
          {
@@ -1123,7 +1123,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
                (*theCoPrhs)[leaveIdx] = theUCbound[leaveNum];
             }
 
-            theUBbound[leaveIdx] = R(infinity);
+            theUBbound[leaveIdx] = this->inftyValue();
             theLBbound[leaveIdx] = 0;
          }
 
@@ -1144,7 +1144,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
       if((leaveMax > entertol() && enterVal <= entertol()) || (leaveMax < -entertol()
             && enterVal >= -entertol()))
       {
-         if((theUBbound[leaveIdx] < R(infinity) || theLBbound[leaveIdx] > R(-infinity))
+         if((theUBbound[leaveIdx] < this->inftyValue() || theLBbound[leaveIdx] > -this->inftyValue())
                && leaveStat != SPxBasisBase<R>::Desc::P_FREE
                && leaveStat != SPxBasisBase<R>::Desc::D_FREE)
          {

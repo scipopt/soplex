@@ -51,16 +51,75 @@ class CLUFactor
 public:
 
    /// set tolerances
-   void setTolerances(std::shared_ptr<Tolerances> tolerances)
+   void setTolerances(std::shared_ptr<TolerancesBase<R>> tolerances)
    {
       this->_tolerances = tolerances;
    }
    /// get tolerances
-   const std::shared_ptr<Tolerances> tolerances() const
+   const std::shared_ptr<TolerancesBase<R>> tolerances() const
    {
       return _tolerances;
    }
 
+protected:
+   /// Get epsilon in R precision, using Rational storage when available for high precision
+   inline R getEpsilon() const
+   {
+#ifdef SOPLEX_WITH_BOOST
+      if(_tolerances->hasRationalEpsilons())
+         return StringToNumber<R>::convert(_tolerances->epsilonRational());
+#endif
+      return R(_tolerances->epsilon());
+   }
+
+   /// Get pivot epsilon in R precision, using Rational storage when available
+   inline R getEpsilonPivot() const
+   {
+#ifdef SOPLEX_WITH_BOOST
+      // Check if rational epsilon for pivot is set (use same flag as general epsilon)
+      if(_tolerances->hasRationalEpsilons())
+      {
+         // Use pivot-specific string if available, otherwise fall back to general epsilon
+         const std::string& pivotStr = _tolerances->epsilonPivotRational();
+         if(!pivotStr.empty())
+            return StringToNumber<R>::convert(pivotStr);
+         // Fall back to general epsilon
+         return StringToNumber<R>::convert(_tolerances->epsilonRational());
+      }
+#endif
+      return R(_tolerances->epsilonPivot());
+   }
+
+   /// Get update epsilon in R precision, using Rational storage when available
+   inline R getEpsilonUpdate() const
+   {
+#ifdef SOPLEX_WITH_BOOST
+      if(_tolerances->hasRationalEpsilons())
+      {
+         // Use update-specific string if available, otherwise fall back to general epsilon
+         const std::string& updateStr = _tolerances->epsilonUpdateRational();
+         if(!updateStr.empty())
+            return StringToNumber<R>::convert(updateStr);
+         // Fall back to general epsilon
+         return StringToNumber<R>::convert(_tolerances->epsilonRational());
+      }
+#endif
+      return R(_tolerances->epsilonUpdate());
+   }
+
+   /// Check if value is numerically zero (using current epsilon tolerance)
+   inline bool isNumericallyZero(const R& val) const
+   {
+      return isZero(val, getEpsilon());
+   }
+
+   /// Check if value is numerically non-zero (using current epsilon tolerance)
+   inline bool isNumericallyNonZero(const R& val) const
+   {
+      return isNotZero(val, getEpsilon());
+   }
+
+public:
    //----------------------------------------
    /**@name Public types */
    ///@{
@@ -227,7 +286,7 @@ protected:
    Timer*  factorTime;        ///< Time spent in factorizations
    int     factorCount;       ///< Number of factorizations
    int     hugeValues;        ///< number of times huge values occurred during solve (only used in debug mode)
-   std::shared_ptr<Tolerances> _tolerances; ///< Tolerances for the factorization
+   std::shared_ptr<TolerancesBase<R>> _tolerances; ///< Tolerances for the factorization
    ///@}
 
 private:

@@ -48,7 +48,7 @@ static R computeScalingVec(
       const SVectorBase<R>& vec = (*vecset)[i];
 
       R maxi = 0.0;
-      R mini = R(infinity);
+      R mini = PrecisionTraits<R>::defaultInfinity();
 
       for(int j = 0; j < vec.size(); ++j)
       {
@@ -65,13 +65,13 @@ static R computeScalingVec(
       }
 
       // empty rows/cols are possible
-      if(mini == R(infinity) || maxi == 0.0)
+      if(mini == PrecisionTraits<R>::defaultInfinity() || maxi == 0.0)
       {
          mini = 1.0;
          maxi = 1.0;
       }
 
-      assert(mini < R(infinity));
+      assert(mini < PrecisionTraits<R>::defaultInfinity());
       assert(maxi > 0.0);
 
       scaleval[unsigned(i)] = 1.0 / spxSqrt(mini * maxi);

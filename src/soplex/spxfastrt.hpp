@@ -158,7 +158,7 @@ int SPxFastRT<R>::maxDelta(
             mabs = (x > mabs) ? x : mabs;
             u = up[i];
 
-            if(u < R(infinity))
+            if(u < this->tolerances()->infinity())
             {
                y = u - vec[i];
 
@@ -180,7 +180,7 @@ int SPxFastRT<R>::maxDelta(
             mabs = (-x > mabs) ? -x : mabs;
             l = low[i];
 
-            if(l > R(-infinity))
+            if(l > -this->tolerances()->infinity())
             {
                y = l - vec[i];
 
@@ -235,7 +235,7 @@ int SPxFastRT<R>::maxDelta(
                mabs = (x > mabs) ? x : mabs;
                u = up[i];
 
-               if(u < R(infinity))
+               if(u < this->tolerances()->infinity())
                {
                   y = u - vec[i];
 
@@ -256,7 +256,7 @@ int SPxFastRT<R>::maxDelta(
                mabs = (-x > mabs) ? -x : mabs;
                l = low[i];
 
-               if(l > R(-infinity))
+               if(l > -this->tolerances()->infinity())
                {
                   y = l - vec[i];
 
@@ -337,7 +337,7 @@ int SPxFastRT<R>::minDelta(
             mabs = (x > mabs) ? x : mabs;
             l = low[i];
 
-            if(l > R(-infinity))
+            if(l > -this->tolerances()->infinity())
             {
                y = l - vec[i];
 
@@ -359,7 +359,7 @@ int SPxFastRT<R>::minDelta(
             mabs = (-x > mabs) ? -x : mabs;
             u = up[i];
 
-            if(u < R(infinity))
+            if(u < this->tolerances()->infinity())
             {
                y = u - vec[i];
 
@@ -415,7 +415,7 @@ int SPxFastRT<R>::minDelta(
                mabs = (x > mabs) ? x : mabs;
                l = low[i];
 
-               if(l > R(-infinity))
+               if(l > -this->tolerances()->infinity())
                {
                   y = l - vec[i];
 
@@ -436,7 +436,7 @@ int SPxFastRT<R>::minDelta(
                mabs = (-x > mabs) ? -x : mabs;
                u = up[i];
 
-               if(u < R(infinity))
+               if(u < this->tolerances()->infinity())
                {
                   y = u - vec[i];
 
@@ -734,7 +734,7 @@ int SPxFastRT<R>::maxSelect(
    R& bestDelta,
    R max)
 {
-   R best = R(-infinity);
+   R best = -this->tolerances()->infinity();
    bestDelta = 0.0;
    assert(this->m_type == SPxSolverBase<R>::ENTER);
    return maxSelect(val, stab, best, bestDelta, max,
@@ -751,7 +751,7 @@ SPxId SPxFastRT<R>::maxSelect(
 )
 {
    int indp, indc;
-   R best = R(-infinity);
+   R best = -this->tolerances()->infinity();
    bestDelta = 0.0;
    iscoid = true;
    indc = maxSelect(val, stab, best, bestDelta, max,
@@ -783,7 +783,7 @@ int SPxFastRT<R>::minSelect(
    R& bestDelta,
    R max)
 {
-   R best = R(infinity);
+   R best = this->tolerances()->infinity();
    bestDelta = 0.0;
    assert(this->m_type == SPxSolverBase<R>::ENTER);
    return minSelect(val, stab, best, bestDelta, max,
@@ -798,7 +798,7 @@ SPxId SPxFastRT<R>::minSelect(
    R& bestDelta,
    R max)
 {
-   R best = R(infinity);
+   R best = this->tolerances()->infinity();
    bestDelta = 0.0;
    iscoid = true;
    int indc = minSelect(val, stab, best, bestDelta, max,

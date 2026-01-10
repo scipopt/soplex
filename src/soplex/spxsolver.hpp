@@ -997,7 +997,7 @@ void SPxSolverBase<R>::setType(Type tp)
 
       // calling value() without having a suitable status is an error.
       if(!isInitialized())
-         return R(infinity);
+         return this->inftyValue();
 
       if(rep() == ROW)
       {
@@ -1078,10 +1078,10 @@ void SPxSolverBase<R>::setType(Type tp)
       , timerType(ttype)
       , theCumulativeTime(0.0)
       , maxIters(-1)
-      , maxTime(R(infinity))
+      , maxTime(R(infinity))  // Will be updated after construction if needed
       , nClckSkipsLeft(0)
       , nCallsToTimelim(0)
-      , objLimit(R(infinity))
+      , objLimit(R(infinity))  // Will be updated after construction if needed
       , useTerminationValue(true)
       , m_status(UNKNOWN)
       , m_nonbasicValue(0.0)
@@ -1741,7 +1741,7 @@ void SPxSolverBase<R>::setType(Type tp)
       ++nCallsToTimelim;
 
       // check if a time limit is actually set
-      if(maxTime >= R(infinity))
+      if(maxTime >= this->inftyValue())
          return false;
 
       // check if the expensive system call to update the time should be skipped again
@@ -1963,8 +1963,8 @@ void SPxSolverBase<R>::setType(Type tp)
          else
          {
             if((p_rows[row] == FIXED && this->lhs(row) != this->rhs(row))
-                  || (p_rows[row] == ON_UPPER && this->rhs(row) >= R(infinity))
-                  || (p_rows[row] == ON_LOWER && this->lhs(row) <= R(-infinity)))
+                  || (p_rows[row] == ON_UPPER && this->rhs(row) >= this->inftyValue())
+                  || (p_rows[row] == ON_LOWER && this->lhs(row) <= -this->inftyValue()))
                return false;
          }
       }
@@ -1982,8 +1982,8 @@ void SPxSolverBase<R>::setType(Type tp)
          else
          {
             if((p_cols[col] == FIXED && this->lower(col) != this->upper(col))
-                  || (p_cols[col] == ON_UPPER && this->upper(col) >= R(infinity))
-                  || (p_cols[col] == ON_LOWER && this->lower(col) <= R(-infinity)))
+                  || (p_cols[col] == ON_UPPER && this->upper(col) >= this->inftyValue())
+                  || (p_cols[col] == ON_LOWER && this->lower(col) <= -this->inftyValue()))
                return false;
          }
       }

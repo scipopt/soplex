@@ -95,11 +95,11 @@ void Validation<R>::validateSolveReal(SoPlexBase<R>& soplex)
 
    if(validatesolution == "+infinity")
    {
-      sol = soplex.realParam(SoPlexBase<R>::INFTY);
+      sol = soplex.infty();
    }
    else if(validatesolution == "-infinity")
    {
-      sol = -soplex.realParam(SoPlexBase<R>::INFTY);
+      sol = -soplex.infty();
    }
    else
    {
@@ -110,8 +110,8 @@ void Validation<R>::validateSolveReal(SoPlexBase<R>& soplex)
 
    // skip check in case presolving detected infeasibility/unboundedness
    if(SPxSolverBase<R>::INForUNBD == soplex.status() &&
-         (sol == soplex.realParam(SoPlexBase<R>::INFTY)
-          || sol == -soplex.realParam(SoPlexBase<R>::INFTY)))
+         (sol == soplex.infty()
+          || sol == -soplex.infty()))
       objViolation = 0.0;
 
    if(! EQ(objViolation, R(0.0), validatetolerance))

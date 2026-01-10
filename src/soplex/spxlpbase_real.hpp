@@ -489,7 +489,7 @@ R SPxLPBase<R>::maxAbsNzo(bool unscaled) const
 template <class R> inline
 R SPxLPBase<R>::minAbsNzo(bool unscaled) const
 {
-   R mini = R(infinity);
+   R mini = this->tolerances()->infinity();
 
    if(unscaled && _isScaled)
    {
@@ -1066,7 +1066,7 @@ static R LPFreadInfinity(char*& pos)
 
    (void) LPFhasKeyword(++pos, "inf[inity]");
 
-   return sense * R(infinity);
+   return sense * PrecisionTraits<R>::defaultInfinity();
 }
 
 
@@ -1113,11 +1113,10 @@ bool SPxLPBase<R>::readLPF(
    int sense = 0;
 
    int lineno = 0;
-   bool initial;
    bool unnamed = true;
    bool finished = false;
    bool other;
-   bool have_value = false;
+   bool have_value = true;
    int i;
    int k;
    int buf_size;
@@ -1206,10 +1205,7 @@ bool SPxLPBase<R>::readLPF(
       }
 
       if(finished)
-      {
-         finished = !have_value;
          break;
-      }
 
       if((size_t) buf_size > sizeof(tmp))
       {
@@ -1232,17 +1228,11 @@ bool SPxLPBase<R>::readLPF(
       {
          if(LPFhasKeyword(pos, "max[imize]"))
          {
-            if(have_value)
-               goto syntax_error;
-
             changeSense(SPxLPBase<R>::MAXIMIZE);
             section = OBJECTIVE;
          }
          else if(LPFhasKeyword(pos, "min[imize]"))
          {
-            if(have_value)
-               goto syntax_error;
-
             changeSense(SPxLPBase<R>::MINIMIZE);
             section = OBJECTIVE;
          }
@@ -1254,15 +1244,14 @@ bool SPxLPBase<R>::readLPF(
                || LPFhasKeyword(pos, "s[.][    ]t[.]")
                || LPFhasKeyword(pos, "lazy con[straints]"))
          {
-            if(have_value)
-               goto syntax_error;
-
             // store objective vector
             for(int j = vec.size() - 1; j >= 0; --j)
                cset.maxObj_w(vec.index(j)) = vec.value(j);
 
             // multiplication with -1 for minimization is done below
             vec.clear();
+            have_value = true;
+            val = 1.0;
             section = CONSTRAINTS;
          }
       }
@@ -1271,54 +1260,26 @@ bool SPxLPBase<R>::readLPF(
                || LPFhasKeyword(pos, "s[uch][    ]t[hat]")
                || LPFhasKeyword(pos, "s[.][    ]t[.]")))
       {
-         if(have_value)
-            goto syntax_error;
+         have_value = true;
+         val = 1.0;
       }
       else
       {
          if(LPFhasKeyword(pos, "lazy con[straints]"))
-         {
-            if(have_value)
-               goto syntax_error;
-         }
+            ;
          else if(LPFhasKeyword(pos, "bound[s]"))
-         {
-            if(have_value)
-               goto syntax_error;
-
             section = BOUNDS;
-         }
          else if(LPFhasKeyword(pos, "bin[ary]"))
-         {
-            if(have_value)
-               goto syntax_error;
-
             section = BINARIES;
-         }
          else if(LPFhasKeyword(pos, "bin[aries]"))
-         {
-            if(have_value)
-               goto syntax_error;
-
             section = BINARIES;
-         }
          else if(LPFhasKeyword(pos, "gen[erals]"))
-         {
-            if(have_value)
-               goto syntax_error;
-
             section = INTEGERS;
-         }
          else if(LPFhasKeyword(pos, "int[egers]"))   // this is undocumented
-         {
-            if(have_value)
-               goto syntax_error;
-
             section = INTEGERS;
-         }
          else if(LPFhasKeyword(pos, "end"))
          {
-            finished = !have_value;
+            finished = true;
             break;
          }
          else if(LPFhasKeyword(pos, "s[ubject][   ]t[o]")  // second time
@@ -1326,8 +1287,13 @@ bool SPxLPBase<R>::readLPF(
                  || LPFhasKeyword(pos, "s[.][    ]t[.]")
                  || LPFhasKeyword(pos, "lazy con[straints]"))
          {
+            // In principle this has to checked for all keywords above,
+            // otherwise we just ignore any half finished constraint
             if(have_value)
                goto syntax_error;
+
+            have_value = true;
+            val = 1.0;
          }
       }
 
@@ -1373,7 +1339,6 @@ bool SPxLPBase<R>::readLPF(
       //--- Line processing loop
       //-----------------------------------------------------------------------
       pos = line;
-      initial = true;
 
       SPxOut::debug(spxout, "DLPFRD09 pos={}\n", pos);
 
@@ -1409,31 +1374,15 @@ bool SPxLPBase<R>::readLPF(
 
                have_value = true;
                val = LPFreadValue<R>(pos, spxout) * pre_sign;
-
-               /* continue next line with sign */
-               if(*pos == '\0' && (*(pos - 1) == '+' || *(pos - 1) == '-'))
-                  continue;
             }
 
-            if(!have_value && initial)
-               val = 1.0;
-            else
-            {
-               if(!have_value)
-                  goto syntax_error;
+            if(*pos == '\0')
+               continue;
 
-               have_value = false;
-
-               if(*pos == '\0')
-               {
-                  changeObjOffset(val);
-                  break;
-               }
-            }
-
-            if(!LPFisColName(pos))
+            if(!have_value || !LPFisColName(pos))
                goto syntax_error;
 
+            have_value = false;
             colidx = LPFreadColName(pos, cnames, cset, &emptycol, spxout);
             vec.add(colidx, val);
             break;
@@ -1472,13 +1421,13 @@ bool SPxLPBase<R>::readLPF(
                {
                   if(sense == '<')
                   {
-                     row.setLhs(R(-infinity));
+                     row.setLhs(-this->tolerances()->infinity());
                      row.setRhs(val);
                   }
                   else if(sense == '>')
                   {
                      row.setLhs(val);
-                     row.setRhs(R(infinity));
+                     row.setRhs(this->tolerances()->infinity());
                   }
                   else
                   {
@@ -1501,7 +1450,7 @@ bool SPxLPBase<R>::readLPF(
                      rnames->add(name);
                   }
 
-                  have_value = false;
+                  have_value = true;
                   val = 1.0;
                   sense = 0;
                   pos = nullptr;
@@ -1510,12 +1459,7 @@ bool SPxLPBase<R>::readLPF(
                }
             }
 
-            if(!have_value && initial)
-            {
-               have_value = true;
-               val = 1.0;
-            }
-            else if(*pos == '\0')
+            if(*pos == '\0')
                continue;
 
             if(have_value)
@@ -1618,8 +1562,8 @@ bool SPxLPBase<R>::readLPF(
 
             if(LPFisFree(pos))
             {
-               cset.lower_w(colidx) = R(-infinity);
-               cset.upper_w(colidx) =  R(infinity);
+               cset.lower_w(colidx) = -this->tolerances()->infinity();
+               cset.upper_w(colidx) =  this->tolerances()->infinity();
                other = true;
                pos += 4;  // set position after the word "free"
             }
@@ -1692,8 +1636,6 @@ bool SPxLPBase<R>::readLPF(
 
          if(pos == pos_old)
             goto syntax_error;
-
-         initial = false;
       }
    }
 
@@ -1752,11 +1694,11 @@ static inline void MPSreadName(MPSInput& mps, SPxOut* spxout)
       if(!mps.readLine() || (mps.field0() == nullptr))
          break;
 
-      if(strcmp(mps.field0(), "ROWS") == 0)
+      if(!strcmp(mps.field0(), "ROWS"))
          mps.setSection(MPSInput::ROWS);
-      else if(strncmp(mps.field0(), "OBJSEN", 6) == 0)
+      else if(!strncmp(mps.field0(), "OBJSEN", 6))
          mps.setSection(MPSInput::OBJSEN);
-      else if(strcmp(mps.field0(), "OBJNAME") == 0)
+      else if(!strcmp(mps.field0(), "OBJNAME"))
          mps.setSection(MPSInput::OBJNAME);
       else
          break;
@@ -1779,9 +1721,9 @@ static inline void MPSreadObjsen(MPSInput& mps)
       if(!mps.readLine() || (mps.field1() == nullptr))
          break;
 
-      if(strcmp(mps.field1(), "MIN") == 0)
+      if(!strcmp(mps.field1(), "MIN"))
          mps.setObjSense(MPSInput::MINIMIZE);
-      else if(strcmp(mps.field1(), "MAX") == 0)
+      else if(!strcmp(mps.field1(), "MAX"))
          mps.setObjSense(MPSInput::MAXIMIZE);
       else
          break;
@@ -1790,9 +1732,9 @@ static inline void MPSreadObjsen(MPSInput& mps)
       if(!mps.readLine() || (mps.field0() == nullptr))
          break;
 
-      if(strcmp(mps.field0(), "ROWS") == 0)
+      if(!strcmp(mps.field0(), "ROWS"))
          mps.setSection(MPSInput::ROWS);
-      else if(strcmp(mps.field0(), "OBJNAME") == 0)
+      else if(!strcmp(mps.field0(), "OBJNAME"))
          mps.setSection(MPSInput::OBJNAME);
       else
          break;
@@ -1874,7 +1816,7 @@ static void MPSreadRows(MPSInput& mps, LPRowSetBase<R>& rset, NameSet& rnames, S
          {
          case 'G':
             row.setLhs(0.0);
-            row.setRhs(R(infinity));
+            row.setRhs(PrecisionTraits<R>::defaultInfinity());
             break;
 
          case 'E':
@@ -1883,7 +1825,7 @@ static void MPSreadRows(MPSInput& mps, LPRowSetBase<R>& rset, NameSet& rnames, S
             break;
 
          case 'L':
-            row.setLhs(R(-infinity));
+            row.setLhs(-PrecisionTraits<R>::defaultInfinity());
             row.setRhs(0.0);
             break;
 
@@ -1935,7 +1877,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSe
          return;
       }
 
-      if(mps.field1() == nullptr)
+      if((mps.field1() == nullptr) || (mps.field2() == nullptr) || (mps.field3() == nullptr))
          break;
 
       // new column?
@@ -1966,7 +1908,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSe
          vec.clear();
          col.setObj(0.0);
          col.setLower(0.0);
-         col.setUpper(R(infinity));
+         col.setUpper(PrecisionTraits<R>::defaultInfinity());
 
          if(mps.isInteger())
          {
@@ -1980,17 +1922,9 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSe
          }
       }
 
-      if(mps.field2() == nullptr || mps.field3() == nullptr)
-      {
-         if(mps.field2() == nullptr && mps.field3() == nullptr)
-            continue;
-
-         break;
-      }
-
       val = atof(mps.field3());
 
-      if(strcmp(mps.field2(), mps.objName()) == 0)
+      if(!strcmp(mps.field2(), mps.objName()))
          col.setObj(val);
       else
       {
@@ -2006,7 +1940,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSe
 
          val = atof(mps.field5());
 
-         if(strcmp(mps.field4(), mps.objName()) == 0)
+         if(!strcmp(mps.field4(), mps.objName()))
             col.setObj(val);
          else
          {
@@ -2025,8 +1959,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSe
 
 /// Process RHS section.
 template <class R>
-static void MPSreadRhs(MPSInput& mps, LPRowSetBase<R>& rset, const NameSet& rnames, R& objoffset,
-                       SPxOut* spxout)
+static void MPSreadRhs(MPSInput& mps, LPRowSetBase<R>& rset, const NameSet& rnames, SPxOut* spxout)
 {
    char rhsname[MPSInput::MAX_LINE_LEN] = { '\0' };
    char addname[MPSInput::MAX_LINE_LEN] = { '\0' };
@@ -2039,11 +1972,11 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<R>& rset, const NameSet& rnam
       {
          SPX_MSG_INFO2((*spxout), (*spxout) << "IMPSRD03 RHS name       : " << rhsname  << std::endl;);
 
-         if(strcmp(mps.field0(), "RANGES") == 0)
+         if(!strcmp(mps.field0(), "RANGES"))
             mps.setSection(MPSInput::RANGES);
-         else if(strcmp(mps.field0(), "BOUNDS") == 0)
+         else if(!strcmp(mps.field0(), "BOUNDS"))
             mps.setSection(MPSInput::BOUNDS);
-         else if(strcmp(mps.field0(), "ENDATA") == 0)
+         else if(!strcmp(mps.field0(), "ENDATA"))
             mps.setSection(MPSInput::ENDATA);
          else
             break;
@@ -2072,39 +2005,35 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<R>& rset, const NameSet& rnam
       }
       else
       {
-         if(strcmp(mps.field2(), mps.objName()) == 0)
-            objoffset = -atof(mps.field3());
-         else if((idx = rnames.number(mps.field2())) < 0)
+         if((idx = rnames.number(mps.field2())) < 0)
             mps.entryIgnored("RHS", mps.field1(), "row", mps.field2());
          else
          {
             val = atof(mps.field3());
 
             // LE or EQ
-            if(rset.rhs(idx) < R(infinity))
+            if(rset.rhs(idx) < PrecisionTraits<R>::defaultInfinity())
                rset.rhs_w(idx) = val;
 
             // GE or EQ
-            if(rset.lhs(idx) > R(-infinity))
+            if(rset.lhs(idx) > -PrecisionTraits<R>::defaultInfinity())
                rset.lhs_w(idx) = val;
          }
 
          if(mps.field5() != nullptr)
          {
-            if(strcmp(mps.field4(), mps.objName()) == 0)
-               objoffset = -atof(mps.field5());
-            else if((idx = rnames.number(mps.field4())) < 0)
+            if((idx = rnames.number(mps.field4())) < 0)
                mps.entryIgnored("RHS", mps.field1(), "row", mps.field4());
             else
             {
                val = atof(mps.field5());
 
                // LE or EQ
-               if(rset.rhs(idx) < R(infinity))
+               if(rset.rhs(idx) < PrecisionTraits<R>::defaultInfinity())
                   rset.rhs_w(idx) = val;
 
                // GE or EQ
-               if(rset.lhs(idx) > R(-infinity))
+               if(rset.lhs(idx) > -PrecisionTraits<R>::defaultInfinity())
                   rset.lhs_w(idx) = val;
             }
          }
@@ -2131,9 +2060,9 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<R>& rset, const NameSet& 
       {
          SPX_MSG_INFO2((*spxout), (*spxout) << "IMPSRD04 Range name     : " << rngname << std::endl;);
 
-         if(strcmp(mps.field0(), "BOUNDS") == 0)
+         if(!strcmp(mps.field0(), "BOUNDS"))
             mps.setSection(MPSInput::BOUNDS);
-         else if(strcmp(mps.field0(), "ENDATA") == 0)
+         else if(!strcmp(mps.field0(), "ENDATA"))
             mps.setSection(MPSInput::ENDATA);
          else
             break;
@@ -2163,7 +2092,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<R>& rset, const NameSet& 
        *  E   -     rhs + range     rhs
        * ----------------------------------------
        */
-      if(strcmp(rngname, mps.field1()) == 0)
+      if(!strcmp(rngname, mps.field1()))
       {
          if((idx = rnames.number(mps.field2())) < 0)
             mps.entryIgnored("Range", mps.field1(), "row", mps.field2());
@@ -2172,7 +2101,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<R>& rset, const NameSet& 
             val = atof(mps.field3());
 
             // EQ
-            if((rset.lhs(idx) > R(-infinity)) && (rset.rhs_w(idx) <  R(infinity)))
+            if((rset.lhs(idx) > -PrecisionTraits<R>::defaultInfinity()) && (rset.rhs_w(idx) <  PrecisionTraits<R>::defaultInfinity()))
             {
                assert(rset.lhs(idx) == rset.rhs(idx));
 
@@ -2184,7 +2113,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<R>& rset, const NameSet& 
             else
             {
                // GE
-               if(rset.lhs(idx) > R(-infinity))
+               if(rset.lhs(idx) > -PrecisionTraits<R>::defaultInfinity())
                   rset.rhs_w(idx)  = rset.lhs(idx) + spxAbs(val);
                // LE
                else
@@ -2201,7 +2130,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<R>& rset, const NameSet& 
                val = atof(mps.field5());
 
                // EQ
-               if((rset.lhs(idx) > R(-infinity)) && (rset.rhs(idx) <  R(infinity)))
+               if((rset.lhs(idx) > -PrecisionTraits<R>::defaultInfinity()) && (rset.rhs(idx) <  PrecisionTraits<R>::defaultInfinity()))
                {
                   assert(rset.lhs(idx) == rset.rhs(idx));
 
@@ -2213,7 +2142,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<R>& rset, const NameSet& 
                else
                {
                   // GE
-                  if(rset.lhs(idx) > R(-infinity))
+                  if(rset.lhs(idx) > -PrecisionTraits<R>::defaultInfinity())
                      rset.rhs_w(idx)  = rset.lhs(idx) + spxAbs(val);
                   // LE
                   else
@@ -2254,11 +2183,11 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<R>& cset, const NameSet& c
       }
 
       // Is the value field used ?
-      if(strcmp(mps.field1(), "LO") == 0
-            || strcmp(mps.field1(), "UP") == 0
-            || strcmp(mps.field1(), "FX") == 0
-            || strcmp(mps.field1(), "LI") == 0
-            || strcmp(mps.field1(), "UI") == 0)
+      if((!strcmp(mps.field1(), "LO"))
+            || (!strcmp(mps.field1(), "UP"))
+            || (!strcmp(mps.field1(), "FX"))
+            || (!strcmp(mps.field1(), "LI"))
+            || (!strcmp(mps.field1(), "UI")))
       {
          if((mps.field3() != nullptr) && (mps.field4() == nullptr))
             mps.insertName("_BND_", true);
@@ -2279,7 +2208,7 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<R>& cset, const NameSet& c
       }
 
       // Only read the first Bound in section
-      if(strcmp(bndname, mps.field2()) == 0)
+      if(!strcmp(bndname, mps.field2()))
       {
          if((idx = cnames.number(mps.field3())) < 0)
             mps.entryIgnored("column", mps.field3(), "bound", bndname);
@@ -2287,11 +2216,11 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<R>& cset, const NameSet& c
          {
             if(mps.field4() == nullptr)
                val = 0.0;
-            else if(strcmp(mps.field4(), "-Inf") == 0 || strcmp(mps.field4(), "-inf") == 0)
-               val = R(-infinity);
-            else if(strcmp(mps.field4(), "Inf") == 0 || strcmp(mps.field4(), "inf") == 0
-                    || strcmp(mps.field4(), "+Inf") == 0 || strcmp(mps.field4(), "+inf") == 0)
-               val = R(infinity);
+            else if(!strcmp(mps.field4(), "-Inf") || !strcmp(mps.field4(), "-inf"))
+               val = -PrecisionTraits<R>::defaultInfinity();
+            else if(!strcmp(mps.field4(), "Inf") || !strcmp(mps.field4(), "inf")
+                    || !strcmp(mps.field4(), "+Inf") || !strcmp(mps.field4(), "+inf"))
+               val = PrecisionTraits<R>::defaultInfinity();
             else
                val = atof(mps.field4());
 
@@ -2302,10 +2231,10 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<R>& cset, const NameSet& c
                   intvars->addIdx(idx);
 
                // if the variable has appeared in the MARKER section of the COLUMNS section then its default bounds were
-               // set to 0,1; the first time it is declared integer we need to change to default bounds 0,R(infinity)
+               // set to 0,1; the first time it is declared integer we need to change to default bounds 0,infinity
                if(oldbinvars.pos(idx) < 0)
                {
-                  cset.upper_w(idx) = R(infinity);
+                  cset.upper_w(idx) = PrecisionTraits<R>::defaultInfinity();
                   oldbinvars.addIdx(idx);
                }
             }
@@ -2328,18 +2257,18 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<R>& cset, const NameSet& c
                }
                else
                {
-                  cset.lower_w(idx) = R(-infinity);
-                  cset.upper_w(idx) = R(infinity);
+                  cset.lower_w(idx) = -PrecisionTraits<R>::defaultInfinity();
+                  cset.upper_w(idx) = PrecisionTraits<R>::defaultInfinity();
                }
 
                break;
 
             case 'M':
-               cset.lower_w(idx) = R(-infinity);
+               cset.lower_w(idx) = -PrecisionTraits<R>::defaultInfinity();
                break;
 
             case 'P':
-               cset.upper_w(idx) = R(infinity);
+               cset.upper_w(idx) = PrecisionTraits<R>::defaultInfinity();
                break;
 
             // Ilog extension (Binary)
@@ -2385,7 +2314,6 @@ bool SPxLPBase<R>::readMPS(
    NameSet*      p_cnames,          ///< column names.
    DIdxSet*      p_intvars)         ///< integer variables.
 {
-   R objoffset = 0;
    LPRowSetBase<R>& rset = *this;
    LPColSetBase<R>& cset = *this;
    NameSet* rnames;
@@ -2450,7 +2378,7 @@ bool SPxLPBase<R>::readMPS(
       MPSreadCols(mps, rset, *rnames, cset, *cnames, p_intvars);
 
    if(mps.section() == MPSInput::RHS)
-      MPSreadRhs(mps, rset, *rnames, objoffset, spxout);
+      MPSreadRhs(mps, rset, *rnames, spxout);
 
    if(mps.section() == MPSInput::RANGES)
       MPSreadRanges(mps, rset, *rnames, spxout);
@@ -2465,7 +2393,6 @@ bool SPxLPBase<R>::readMPS(
       clear();
    else
    {
-      changeObjOffset(objoffset);
       changeSense(mps.objSense() == MPSInput::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE);
 
       SPX_MSG_INFO2((*spxout), (*spxout) << "IMPSRD06 Objective sense: " << ((mps.objSense() ==
@@ -2643,11 +2570,11 @@ static void LPFwriteRow(
 
    if(p_lhs == p_rhs)
       p_output << " = " << p_rhs;
-   else if(p_lhs <= R(-infinity))
+   else if(p_lhs <= -PrecisionTraits<R>::defaultInfinity())
       p_output << " <= " << p_rhs;
    else
    {
-      assert(p_rhs >= R(infinity));
+      assert(p_rhs >= p_lp.tolerances()->infinity());
       p_output << " >= " << p_lhs;
    }
 
@@ -2675,14 +2602,14 @@ static void LPFwriteRows(
       const R lhs = p_lp.lhs(i);
       const R rhs = p_lp.rhs(i);
 
-      if(lhs > R(-infinity) && rhs < R(infinity) && lhs != rhs)
+      if(lhs > -p_lp.tolerances()->infinity() && rhs < p_lp.tolerances()->infinity() && lhs != rhs)
       {
          // ranged row -> write two non-ranged rows
          p_output << " " << LPFgetRowName(p_lp, i, p_rnames, name, i) << "_1 : ";
-         LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), lhs, R(infinity));
+         LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), lhs, p_lp.tolerances()->infinity());
 
          p_output << " " << LPFgetRowName(p_lp, i, p_rnames, name, i) << "_2 : ";
-         LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), R(-infinity), rhs);
+         LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), -p_lp.tolerances()->infinity(), rhs);
       }
       else
       {
@@ -2695,7 +2622,7 @@ static void LPFwriteRows(
 
 
 // write the variable bounds
-// (the default bounds 0 <= x <= R(infinity) are not written)
+// (the default bounds 0 <= x <= infinity are not written)
 template <class R>
 static void LPFwriteBounds(
    const SPxLPBase<R>&   p_lp,       ///< the LP to write
@@ -2717,9 +2644,9 @@ static void LPFwriteBounds(
       {
          p_output << "  "   << getColName(p_lp, j, p_cnames, name) << " = "  << upper << '\n';
       }
-      else if(lower > R(-infinity))
+      else if(lower > -p_lp.tolerances()->infinity())
       {
-         if(upper < R(infinity))
+         if(upper < p_lp.tolerances()->infinity())
          {
             // range bound
             if(lower != 0)
@@ -2735,7 +2662,7 @@ static void LPFwriteBounds(
                      << getColName(p_lp, j, p_cnames, name)
                      << '\n';
       }
-      else if(upper < R(infinity))
+      else if(upper < p_lp.tolerances()->infinity())
          p_output << "   -Inf <= "
                   << getColName(p_lp, j, p_cnames, name)
                   << " <= " << upper << '\n';
@@ -2835,9 +2762,9 @@ static R MPSgetRHS(R left, R right)
 {
    R rhsval;
 
-   if(left > R(-infinity))   /// This includes ranges
+   if(left > -PrecisionTraits<R>::defaultInfinity())   /// This includes ranges
       rhsval = left;
-   else if(right <  R(infinity))
+   else if(right <  PrecisionTraits<R>::defaultInfinity())
       rhsval = right;
    else
       throw SPxInternalCodeException("XMPSWR01 This should never happen.");
@@ -2905,14 +2832,14 @@ void SPxLPBase<R>::writeMPS(
    {
       if(lhs(i) == rhs(i))
          indicator = "E";
-      else if((lhs(i) > R(-infinity)) && (rhs(i) < R(infinity)))
+      else if((lhs(i) > -this->tolerances()->infinity()) && (rhs(i) < this->tolerances()->infinity()))
       {
          indicator = "E";
          has_ranges = true;
       }
-      else if(lhs(i) > R(-infinity))
+      else if(lhs(i) > -this->tolerances()->infinity())
          indicator = "G";
-      else if(rhs(i) <  R(infinity))
+      else if(rhs(i) <  this->tolerances()->infinity())
          indicator = "L";
       else
          throw SPxInternalCodeException("XMPSWR02 This should never happen.");
@@ -3004,7 +2931,7 @@ void SPxLPBase<R>::writeMPS(
 
       for(i = 0; i < nRows(); i++)
       {
-         if((lhs(i) > R(-infinity)) && (rhs(i) < R(infinity)))
+         if((lhs(i) > -this->tolerances()->infinity()) && (rhs(i) < this->tolerances()->infinity()))
             MPSwriteRecord(p_output, "", "RANGE", MPSgetRowName(*this, i, p_rnames, name1), rhs(i) - lhs(i));
       }
    }
@@ -3020,7 +2947,7 @@ void SPxLPBase<R>::writeMPS(
          continue;
       }
 
-      if((lower(i) <= R(-infinity)) && (upper(i) >= R(infinity)))
+      if((lower(i) <= -this->tolerances()->infinity()) && (upper(i) >= this->tolerances()->infinity()))
       {
          MPSwriteRecord<R>(p_output, "FR", "BOUND", getColName(*this, i, p_cnames, name1));
          continue;
@@ -3028,7 +2955,7 @@ void SPxLPBase<R>::writeMPS(
 
       if(lower(i) != 0.0)
       {
-         if(lower(i) > R(-infinity))
+         if(lower(i) > -this->tolerances()->infinity())
             MPSwriteRecord(p_output, "LO", "BOUND", getColName(*this, i, p_cnames, name1), lower(i));
          else
             MPSwriteRecord<R>(p_output, "MI", "BOUND", getColName(*this, i, p_cnames, name1));
@@ -3037,13 +2964,13 @@ void SPxLPBase<R>::writeMPS(
       if(has_intvars && (p_intvars->pos(i) >= 0))
       {
          // Integer variables have default upper bound 1.0, but we should write
-         // it nevertheless since CPLEX seems to assume R(infinity) otherwise.
+         // it nevertheless since CPLEX seems to assume this->tolerances()->infinity() otherwise.
          MPSwriteRecord(p_output, "UP", "BOUND", getColName(*this, i, p_cnames, name1), upper(i));
       }
       else
       {
-         // Continuous variables have default upper bound R(infinity)
-         if(upper(i) < R(infinity))
+         // Continuous variables have default upper bound this->tolerances()->infinity()
+         if(upper(i) < this->tolerances()->infinity())
             MPSwriteRecord(p_output, "UP", "BOUND", getColName(*this, i, p_cnames, name1), upper(i));
       }
    }
@@ -3133,19 +3060,19 @@ void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[
       primalColIds[primalcolsidx] = cId(i);
       primalcolsidx++;
 
-      if(lower(i) <= R(-infinity) && upper(i) >= R(infinity))   // unrestricted variables
+      if(lower(i) <= -this->tolerances()->infinity() && upper(i) >= this->tolerances()->infinity())   // unrestricted variables
       {
          dualrows.create(0, obj(i), obj(i));
          numAddedRows++;
       }
-      else if(lower(i) <= R(-infinity))   // no lower bound is set, indicating a <= 0 variable
+      else if(lower(i) <= -this->tolerances()->infinity())   // no lower bound is set, indicating a <= 0 variable
       {
          if(isZero(upper(i), this->tolerances()->epsilon()))   // standard bound variable
          {
             if(spxSense() == MINIMIZE)
-               dualrows.create(0, obj(i), R(infinity));
+               dualrows.create(0, obj(i), this->tolerances()->infinity());
             else
-               dualrows.create(0, R(-infinity), obj(i));
+               dualrows.create(0, -this->tolerances()->infinity(), obj(i));
          }
          else // additional upper bound on the variable
          {
@@ -3154,12 +3081,12 @@ void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[
             if(spxSense() == MINIMIZE)
             {
                dualrows.create(0, obj(i), obj(i));
-               dualcols.add(upper(i), R(-infinity), col, 0.0);
+               dualcols.add(upper(i), -this->tolerances()->infinity(), col, 0.0);
             }
             else
             {
                dualrows.create(0, obj(i), obj(i));
-               dualcols.add(upper(i), 0.0, col, R(infinity));
+               dualcols.add(upper(i), 0.0, col, this->tolerances()->infinity());
             }
 
             col.clear();
@@ -3169,14 +3096,14 @@ void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[
 
          numAddedRows++;
       }
-      else if(upper(i) >= R(infinity))   // no upper bound set, indicating a >= 0 variable
+      else if(upper(i) >= this->tolerances()->infinity())   // no upper bound set, indicating a >= 0 variable
       {
          if(isZero(lower(i), this->tolerances()->epsilon()))   // standard bound variable
          {
             if(spxSense() == MINIMIZE)
-               dualrows.create(0, R(-infinity), obj(i));
+               dualrows.create(0, -this->tolerances()->infinity(), obj(i));
             else
-               dualrows.create(0, obj(i), R(infinity));
+               dualrows.create(0, obj(i), this->tolerances()->infinity());
          }
          else // additional lower bound on the variable
          {
@@ -3185,12 +3112,12 @@ void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[
             if(spxSense() == MINIMIZE)
             {
                dualrows.create(0, obj(i), obj(i));
-               dualcols.add(lower(i), 0.0, col, R(infinity));
+               dualcols.add(lower(i), 0.0, col, this->tolerances()->infinity());
             }
             else
             {
                dualrows.create(0, obj(i), obj(i));
-               dualcols.add(lower(i), R(-infinity), col, 0.0);
+               dualcols.add(lower(i), -this->tolerances()->infinity(), col, 0.0);
             }
 
             col.clear();
@@ -3208,13 +3135,13 @@ void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[
 
             if(spxSense() == MINIMIZE)
             {
-               dualrows.create(0, R(-infinity), obj(i));
-               dualcols.add(upper(i), R(-infinity), col, 0.0);
+               dualrows.create(0, -this->tolerances()->infinity(), obj(i));
+               dualcols.add(upper(i), -this->tolerances()->infinity(), col, 0.0);
             }
             else
             {
-               dualrows.create(0, obj(i), R(infinity));
-               dualcols.add(upper(i), 0.0, col, R(infinity));
+               dualrows.create(0, obj(i), this->tolerances()->infinity());
+               dualcols.add(upper(i), 0.0, col, this->tolerances()->infinity());
             }
 
             col.clear();
@@ -3228,13 +3155,13 @@ void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[
 
             if(spxSense() == MINIMIZE)
             {
-               dualrows.create(0, obj(i), R(infinity));
-               dualcols.add(lower(i), 0.0, col, R(infinity));
+               dualrows.create(0, obj(i), this->tolerances()->infinity());
+               dualcols.add(lower(i), 0.0, col, this->tolerances()->infinity());
             }
             else
             {
-               dualrows.create(0, R(-infinity), obj(i));
-               dualcols.add(lower(i), R(-infinity), col, 0.0);
+               dualrows.create(0, -this->tolerances()->infinity(), obj(i));
+               dualcols.add(lower(i), -this->tolerances()->infinity(), col, 0.0);
             }
 
             col.clear();
@@ -3249,13 +3176,13 @@ void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[
 
             if(spxSense() == MINIMIZE)
             {
-               dualcols.add(lower(i), 0.0, col, R(infinity));
-               dualcols.add(upper(i), R(-infinity), col, 0.0);
+               dualcols.add(lower(i), 0.0, col, this->tolerances()->infinity());
+               dualcols.add(upper(i), -this->tolerances()->infinity(), col, 0.0);
             }
             else
             {
-               dualcols.add(lower(i), R(-infinity), col, 0.0);
-               dualcols.add(upper(i), 0.0, col, R(infinity));
+               dualcols.add(lower(i), -this->tolerances()->infinity(), col, 0.0);
+               dualcols.add(upper(i), 0.0, col, this->tolerances()->infinity());
             }
 
             col.clear();
@@ -3272,8 +3199,8 @@ void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[
          dualrows.create(0, obj(i), obj(i));
 
          col.add(numAddedRows, 1.0);
-         dualcols.add(lower(i), 0, col, R(infinity));
-         dualcols.add(lower(i), R(-infinity), col, 0);
+         dualcols.add(lower(i), 0, col, this->tolerances()->infinity());
+         dualcols.add(lower(i), -this->tolerances()->infinity(), col, 0);
          col.clear();
 
          numVarBoundCols += 2;
@@ -3299,53 +3226,53 @@ void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[
       switch(rowType(i))
       {
       case LPRowBase<R>::RANGE: // range constraint, requires the addition of two dual variables
-         assert(lhs(i) > R(-infinity));
-         assert(rhs(i) < R(infinity));
+         assert(lhs(i) > -this->tolerances()->infinity());
+         assert(rhs(i) < this->tolerances()->infinity());
 
          if(spxSense() == MINIMIZE)
          {
             primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
             primalrowsidx++;
-            dualcols.add(lhs(i), 0.0, rowVector(i), R(infinity));
+            dualcols.add(lhs(i), 0.0, rowVector(i), this->tolerances()->infinity());
 
             primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
             primalrowsidx++;
-            dualcols.add(rhs(i), R(-infinity), rowVector(i), 0.0);
+            dualcols.add(rhs(i), -this->tolerances()->infinity(), rowVector(i), 0.0);
          }
          else
          {
             primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
             primalrowsidx++;
-            dualcols.add(lhs(i), R(-infinity), rowVector(i), 0.0);
+            dualcols.add(lhs(i), -this->tolerances()->infinity(), rowVector(i), 0.0);
 
             primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
             primalrowsidx++;
-            dualcols.add(rhs(i), 0.0, rowVector(i), R(infinity));
+            dualcols.add(rhs(i), 0.0, rowVector(i), this->tolerances()->infinity());
          }
 
          break;
 
       case LPRowBase<R>::GREATER_EQUAL: // >= constraint
-         assert(lhs(i) > R(-infinity));
+         assert(lhs(i) > -this->tolerances()->infinity());
          primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
          primalrowsidx++;
 
          if(spxSense() == MINIMIZE)
-            dualcols.add(lhs(i), 0.0, rowVector(i), R(infinity));
+            dualcols.add(lhs(i), 0.0, rowVector(i), this->tolerances()->infinity());
          else
-            dualcols.add(lhs(i), R(-infinity), rowVector(i), 0.0);
+            dualcols.add(lhs(i), -this->tolerances()->infinity(), rowVector(i), 0.0);
 
          break;
 
       case LPRowBase<R>::LESS_EQUAL: // <= constraint
-         assert(rhs(i) < R(infinity));
+         assert(rhs(i) < this->tolerances()->infinity());
          primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
          primalrowsidx++;
 
          if(spxSense() == MINIMIZE)
-            dualcols.add(rhs(i), R(-infinity), rowVector(i), 0.0);
+            dualcols.add(rhs(i), -this->tolerances()->infinity(), rowVector(i), 0.0);
          else
-            dualcols.add(rhs(i), 0.0, rowVector(i), R(infinity));
+            dualcols.add(rhs(i), 0.0, rowVector(i), this->tolerances()->infinity());
 
          break;
 
@@ -3353,7 +3280,7 @@ void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[
          assert(EQ(lhs(i), rhs(i), this->tolerances()->epsilon()));
          primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
          primalrowsidx++;
-         dualcols.add(rhs(i), R(-infinity), rowVector(i), R(infinity));
+         dualcols.add(rhs(i), -this->tolerances()->infinity(), rowVector(i), this->tolerances()->infinity());
          break;
 
       default:

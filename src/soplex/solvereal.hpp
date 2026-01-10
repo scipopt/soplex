@@ -77,8 +77,8 @@ void SoPlexBase<R>::_optimize(volatile bool* interrupt)
 
    // solve and store solution; if we have a starting basis, do not apply preprocessing; if we are solving from
    // scratch, apply preprocessing according to parameter settings
-   if(!_hasBasis && realParam(SoPlexBase<R>::OBJLIMIT_LOWER) == -realParam(SoPlexBase<R>::INFTY)
-         && realParam(SoPlexBase<R>::OBJLIMIT_UPPER) == realParam(SoPlexBase<R>::INFTY))
+   if(!_hasBasis && realParam(SoPlexBase<R>::OBJLIMIT_LOWER) == -infty()
+         && realParam(SoPlexBase<R>::OBJLIMIT_UPPER) == infty())
       _preprocessAndSolveReal(true, interrupt);
    else
       _preprocessAndSolveReal(false, interrupt);

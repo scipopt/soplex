@@ -94,18 +94,18 @@ void SPxSolverBase<R>::clearDualBounds(
    {
    case SPxBasisBase<R>::Desc::P_ON_UPPER + SPxBasisBase<R>::Desc::P_ON_LOWER :
    case SPxBasisBase<R>::Desc::D_FREE :
-      upp = R(infinity);
-      lw  = R(-infinity);
+      upp = this->inftyValue();
+      lw  = -this->inftyValue();
       break;
 
    case SPxBasisBase<R>::Desc::P_ON_UPPER :
    case SPxBasisBase<R>::Desc::D_ON_LOWER :
-      upp = R(infinity);
+      upp = this->inftyValue();
       break;
 
    case SPxBasisBase<R>::Desc::P_ON_LOWER :
    case SPxBasisBase<R>::Desc::D_ON_UPPER :
-      lw  = R(-infinity);
+      lw  = -this->inftyValue();
       break;
 
    default:
@@ -186,18 +186,18 @@ void SPxSolverBase<R>::setEnterBound4Row(int i, int n)
    switch(this->desc().rowStatus(n))
    {
    case SPxBasisBase<R>::Desc::P_ON_LOWER :
-      theLBbound[i] = R(-infinity);
+      theLBbound[i] = -this->inftyValue();
       theUBbound[i] = theURbound[n];
       break;
 
    case SPxBasisBase<R>::Desc::P_ON_UPPER :
       theLBbound[i] = theLRbound[n];
-      theUBbound[i] = R(infinity);
+      theUBbound[i] = this->inftyValue();
       break;
 
    case SPxBasisBase<R>::Desc::P_FIXED:
-      theLBbound[i] = R(-infinity);
-      theUBbound[i] = R(infinity);
+      theLBbound[i] = -this->inftyValue();
+      theUBbound[i] = this->inftyValue();
       break;
 
    default:
@@ -216,18 +216,18 @@ void SPxSolverBase<R>::setEnterBound4Col(int i, int n)
    switch(this->desc().colStatus(n))
    {
    case SPxBasisBase<R>::Desc::P_ON_LOWER :
-      theLBbound[i] = R(-infinity);
+      theLBbound[i] = -this->inftyValue();
       theUBbound[i] = theUCbound[n];
       break;
 
    case SPxBasisBase<R>::Desc::P_ON_UPPER :
       theLBbound[i] = theLCbound[n];
-      theUBbound[i] = R(infinity);
+      theUBbound[i] = this->inftyValue();
       break;
 
    case SPxBasisBase<R>::Desc::P_FIXED:
-      theLBbound[i] = R(-infinity);
-      theUBbound[i] = R(infinity);
+      theLBbound[i] = -this->inftyValue();
+      theUBbound[i] = this->inftyValue();
       break;
 
    default:
@@ -266,18 +266,18 @@ void SPxSolverBase<R>::setLeaveBound4Row(int i, int n)
    switch(this->desc().rowStatus(n))
    {
    case SPxBasisBase<R>::Desc::P_ON_LOWER :
-      theLBbound[i] = R(-infinity);
+      theLBbound[i] = -this->inftyValue();
       theUBbound[i] = -this->maxRowObj(n);
       break;
 
    case SPxBasisBase<R>::Desc::P_ON_UPPER :
       theLBbound[i] = -this->maxRowObj(n);
-      theUBbound[i] = R(infinity);
+      theUBbound[i] = this->inftyValue();
       break;
 
    case SPxBasisBase<R>::Desc::P_ON_UPPER + SPxBasisBase<R>::Desc::P_ON_LOWER :
-      theLBbound[i] = R(-infinity);
-      theUBbound[i] = R(infinity);
+      theLBbound[i] = -this->inftyValue();
+      theUBbound[i] = this->inftyValue();
       break;
 
    case SPxBasisBase<R>::Desc::P_FREE :
@@ -302,18 +302,18 @@ void SPxSolverBase<R>::setLeaveBound4Col(int i, int n)
    switch(this->desc().colStatus(n))
    {
    case SPxBasisBase<R>::Desc::P_ON_LOWER :
-      theLBbound[i] = R(-infinity);
+      theLBbound[i] = -this->inftyValue();
       theUBbound[i] = 0;
       break;
 
    case SPxBasisBase<R>::Desc::P_ON_UPPER :
       theLBbound[i] = 0;
-      theUBbound[i] = R(infinity);
+      theUBbound[i] = this->inftyValue();
       break;
 
    case SPxBasisBase<R>::Desc::P_FIXED :
-      theLBbound[i] = R(-infinity);
-      theUBbound[i] = R(infinity);
+      theLBbound[i] = -this->inftyValue();
+      theUBbound[i] = this->inftyValue();
       break;
 
    case SPxBasisBase<R>::Desc::P_FREE :

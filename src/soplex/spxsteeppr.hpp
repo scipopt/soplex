@@ -219,7 +219,7 @@ void SPxSteepPR<R>::left4(int n, SPxId id)
 
          if(coWeights_ptr[j] < delta)
             coWeights_ptr[j] = delta; // coWeights_ptr[j] = delta / (1+delta-x);
-         else if(coWeights_ptr[j] >= R(infinity))
+         else if(coWeights_ptr[j] >= this->tolerances()->infinity())
             coWeights_ptr[j] = 1.0 / this->thetolerance;
       }
 
@@ -355,7 +355,7 @@ int SPxSteepPR<R>::selectLeaveX(R tol)
 {
    const R* coWeights_ptr = this->thesolver->coWeights.get_const_ptr();
    const R* fTest         = this->thesolver->fTest().get_const_ptr();
-   R best = R(-infinity);
+   R best = -this->tolerances()->infinity();
    R x;
    int lastIdx = -1;
 
@@ -383,7 +383,7 @@ int SPxSteepPR<R>::selectLeaveSparse(R tol)
 {
    const R* coWeights_ptr = this->thesolver->coWeights.get_const_ptr();
    const R* fTest         = this->thesolver->fTest().get_const_ptr();
-   R best = R(-infinity);
+   R best = -this->tolerances()->infinity();
    R x;
    int lastIdx = -1;
    int idx;
@@ -421,7 +421,7 @@ int SPxSteepPR<R>::selectLeaveHyper(R tol)
    const R* coPen = this->thesolver->coWeights.get_const_ptr();
    const R* fTest = this->thesolver->fTest().get_const_ptr();
    R leastBest = -1;
-   R best = R(-infinity);
+   R best = -this->tolerances()->infinity();
    R x;
    int bestIdx = -1;
    int idx = 0;
@@ -524,7 +524,7 @@ void SPxSteepPR<R>::entered4(SPxId /* id */, int n)
          if(coWeights_ptr[i] < delta)
             coWeights_ptr[i] = delta;
          // coWeights_ptr[i] = 1;
-         else if(coWeights_ptr[i] > R(infinity))
+         else if(coWeights_ptr[i] > this->tolerances()->infinity())
             coWeights_ptr[i] = 1 / this->thesolver->epsilon();
       }
 
@@ -541,7 +541,7 @@ void SPxSteepPR<R>::entered4(SPxId /* id */, int n)
          if(weights_ptr[i] < delta)
             weights_ptr[i] = delta;
          // weights_ptr[i] = 1;
-         else if(weights_ptr[i] > R(infinity))
+         else if(weights_ptr[i] > this->tolerances()->infinity())
             weights_ptr[i] = 1.0 / this->thesolver->epsilon();
       }
    }
@@ -743,8 +743,8 @@ SPxId SPxSteepPR<R>::selectEnterX(R tol)
    R best;
    R bestCo;
 
-   best = R(-infinity);
-   bestCo = R(-infinity);
+   best = -this->tolerances()->infinity();
+   bestCo = -this->tolerances()->infinity();
 
    if(this->thesolver->hyperPricingEnter && !refined)
    {

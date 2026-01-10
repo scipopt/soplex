@@ -78,7 +78,7 @@ public:
    /** Construct LPColBase with a column vector ready for taking \p defDim nonzeros.
     */
    explicit LPColBase(int defDim = 0)
-      : up(R(infinity)), low(0), object(0), vec(defDim)
+      : up(PrecisionTraits<R>::defaultInfinity()), low(0), object(0), vec(defDim)
    {
       assert(isConsistent());
    }

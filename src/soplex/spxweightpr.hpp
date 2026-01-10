@@ -117,7 +117,7 @@ int SPxWeightPR<R>::selectLeave()
 {
    const R* test = this->thesolver->fTest().get_const_ptr();
    R type = 1 - 2 * (this->thesolver->rep() == SPxSolverBase<R>::COLUMN ? 1 : 0);
-   R best = type * R(infinity);
+   R best = type * this->tolerances()->infinity();
    int lastIdx = -1;
    R x;
    int i;
@@ -150,7 +150,7 @@ SPxId SPxWeightPR<R>::selectEnter()
    const VectorBase<R>& cTest = (this->solver()->rep() == SPxSolverBase<R>::ROW)
                                 ? this->solver()->coTest() : this->solver()->test();
    const typename SPxBasisBase<R>::Desc& ds = this->solver()->basis().desc();
-   R best = R(infinity);
+   R best = this->tolerances()->infinity();
    SPxId lastId;
    R x;
    int i;

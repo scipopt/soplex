@@ -632,8 +632,8 @@ papilo::Problem<R> buildProblem(SPxLPBase<R>& lp)
       R objective = lp.obj(i);
       builder.setColLb(i, lowerbound);
       builder.setColUb(i, upperbound);
-      builder.setColLbInf(i, lowerbound <= -R(infinity));
-      builder.setColUbInf(i, upperbound >= R(infinity));
+      builder.setColLbInf(i, lowerbound <= -lp.tolerances()->infinity());
+      builder.setColUbInf(i, upperbound >= lp.tolerances()->infinity());
 
       builder.setColIntegral(i, false);
       builder.setObj(i, objective * switch_sign);
@@ -662,8 +662,8 @@ papilo::Problem<R> buildProblem(SPxLPBase<R>& lp)
       R rhs = lp.rhs(i);
       builder.setRowLhs(i, lhs);
       builder.setRowRhs(i, rhs);
-      builder.setRowLhsInf(i, lhs <= -R(infinity));
-      builder.setRowRhsInf(i, rhs >= R(infinity));
+      builder.setRowLhsInf(i, lhs <= -lp.tolerances()->infinity());
+      builder.setRowRhsInf(i, rhs >= lp.tolerances()->infinity());
    }
 
    return builder.build();
@@ -879,12 +879,12 @@ void Presol<R>::applyPresolveResultsToColumns(SPxLPBase <R>& lp, const papilo::P
       R lb = lowerBounds[col];
 
       if(colFlags[col].test(papilo::ColFlag::kLbInf))
-         lb = -R(infinity);
+         lb = -lp.tolerances()->infinity();
 
       R ub = upperBounds[col];
 
       if(colFlags[col].test(papilo::ColFlag::kUbInf))
-         ub = R(infinity);
+         ub = lp.tolerances()->infinity();
 
       LPColBase<R> column(objective.coefficients[col]* switch_sign, emptyVector, ub, lb);
       lp.addCol(column);
@@ -909,12 +909,12 @@ void Presol<R>::applyPresolveResultsToRows(SPxLPBase <R>& lp, const papilo::Prob
       R rhs = problem.getConstraintMatrix().getRightHandSides()[row];
 
       if(problem.getRowFlags()[row].test(papilo::RowFlag::kRhsInf))
-         rhs = R(infinity);
+         rhs = lp.tolerances()->infinity();
 
       R lhs = problem.getConstraintMatrix().getLeftHandSides()[row];
 
       if(problem.getRowFlags()[row].test(papilo::RowFlag::kLhsInf))
-         lhs = -R(infinity);
+         lhs = -lp.tolerances()->infinity();
 
       const papilo::SparseVectorView<R> papiloRowVector =
          problem.getConstraintMatrix().getRowCoefficients(row);

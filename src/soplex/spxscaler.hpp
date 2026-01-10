@@ -183,7 +183,7 @@ int SPxScaler<R>::computeScaleExp(const SVectorBase<R>& vec,
    else
    {
       int scaleExp;
-      spxFrexp(R(1.0 / maxi), &(scaleExp));
+      spxFrexp(R(1) / maxi, &(scaleExp));
       return scaleExp - 1;
    }
 }
@@ -211,10 +211,10 @@ void SPxScaler<R>::applyScaling(SPxLPBase<R>& lp)
 
       lp.maxRowObj_w(i) = spxLdexp(lp.maxRowObj(i), exp2);
 
-      if(lp.rhs(i) < R(infinity))
+      if(lp.rhs(i) < lp.tolerances()->infinity())
          lp.rhs_w(i) = spxLdexp(lp.rhs_w(i), exp2);
 
-      if(lp.lhs(i) > R(-infinity))
+      if(lp.lhs(i) > -this->tolerances()->infinity())
          lp.lhs_w(i) = spxLdexp(lp.lhs_w(i), exp2);
 
       SPxOut::debug(this, "DEBUG: rowscaleExp({}): {}\n", i, exp2);
@@ -234,10 +234,10 @@ void SPxScaler<R>::applyScaling(SPxLPBase<R>& lp)
 
       lp.maxObj_w(i) = spxLdexp(lp.maxObj_w(i), exp2);
 
-      if(lp.upper(i) < R(infinity))
+      if(lp.upper(i) < lp.tolerances()->infinity())
          lp.upper_w(i) = spxLdexp(lp.upper_w(i), -exp2);
 
-      if(lp.lower(i) > R(-infinity))
+      if(lp.lower(i) > -this->tolerances()->infinity())
          lp.lower_w(i) = spxLdexp(lp.lower_w(i), -exp2);
 
       SPxOut::debug(this, "DEBUG: colscaleExp({}): {}\n", i, exp2);
@@ -271,10 +271,10 @@ void SPxScaler<R>::unscale(SPxLPBase<R>& lp)
 
       lp.maxRowObj_w(i) = spxLdexp(lp.maxRowObj(i), -exp2);
 
-      if(lp.rhs(i) < R(infinity))
+      if(lp.rhs(i) < lp.tolerances()->infinity())
          lp.rhs_w(i) = spxLdexp(lp.rhs_w(i), -exp2);
 
-      if(lp.lhs(i) > R(-infinity))
+      if(lp.lhs(i) > -this->tolerances()->infinity())
          lp.lhs_w(i) = spxLdexp(lp.lhs_w(i), -exp2);
    }
 
@@ -293,10 +293,10 @@ void SPxScaler<R>::unscale(SPxLPBase<R>& lp)
 
       lp.maxObj_w(i) = spxLdexp(lp.maxObj_w(i), -exp2);
 
-      if(lp.upper(i) < R(infinity))
+      if(lp.upper(i) < lp.tolerances()->infinity())
          lp.upper_w(i) = spxLdexp(lp.upper_w(i), exp2);
 
-      if(lp.lower(i) > R(-infinity))
+      if(lp.lower(i) > -this->tolerances()->infinity())
          lp.lower_w(i) = spxLdexp(lp.lower_w(i), exp2);
    }
 
@@ -384,7 +384,7 @@ R SPxScaler<R>::getColMinAbsUnscaled(const SPxLPBase<R>& lp, int i) const
    DataArray < int >& rowscaleExp = *m_activeRowscaleExp;
    const SVectorBase<R>& colVec = lp.LPColSetBase<R>::colVector(i);
 
-   R min = R(infinity);
+   R min = lp.tolerances()->infinity();
    int exp1;
    int exp2 = colscaleExp[i];
 
@@ -409,7 +409,7 @@ R SPxScaler<R>::upperUnscaled(const SPxLPBase<R>& lp, int i) const
    assert(i < lp.nCols());
    assert(i >= 0);
 
-   if(lp.LPColSetBase<R>::upper(i) < R(infinity))
+   if(lp.LPColSetBase<R>::upper(i) < lp.tolerances()->infinity())
    {
       const DataArray < int >& colscaleExp = lp.LPColSetBase<R>::scaleExp;
       return spxLdexp(lp.LPColSetBase<R>::upper(i), colscaleExp[i]);
@@ -441,7 +441,7 @@ R SPxScaler<R>::lowerUnscaled(const SPxLPBase<R>& lp, int i) const
    assert(i < lp.nCols());
    assert(i >= 0);
 
-   if(lp.LPColSetBase<R>::lower(i) > R(-infinity))
+   if(lp.LPColSetBase<R>::lower(i) > -this->tolerances()->infinity())
    {
       const DataArray < int >& colscaleExp = lp.LPColSetBase<R>::scaleExp;
       return spxLdexp(lp.LPColSetBase<R>::lower(i), colscaleExp[i]);
@@ -552,7 +552,7 @@ R SPxScaler<R>::getRowMinAbsUnscaled(const SPxLPBase<R>& lp, int i) const
    DataArray < int >& rowscaleExp = *m_activeRowscaleExp;
    const SVectorBase<R>& rowVec = lp.LPRowSetBase<R>::rowVector(i);
 
-   R min = R(infinity);
+   R min = lp.tolerances()->infinity();
 
    int exp1;
    int exp2 = rowscaleExp[i];
@@ -577,7 +577,7 @@ R SPxScaler<R>::rhsUnscaled(const SPxLPBase<R>& lp, int i) const
    assert(i < lp.nRows());
    assert(i >= 0);
 
-   if(lp.LPRowSetBase<R>::rhs(i) < R(infinity))
+   if(lp.LPRowSetBase<R>::rhs(i) < lp.tolerances()->infinity())
    {
       const DataArray < int >& rowscaleExp = lp.LPRowSetBase<R>::scaleExp;
       return spxLdexp(lp.LPRowSetBase<R>::rhs(i), -rowscaleExp[i]);
@@ -610,7 +610,7 @@ R SPxScaler<R>::lhsUnscaled(const SPxLPBase<R>& lp, int i) const
    assert(i < lp.nRows());
    assert(i >= 0);
 
-   if(lp.LPRowSetBase<R>::lhs(i) > R(-infinity))
+   if(lp.LPRowSetBase<R>::lhs(i) > -this->tolerances()->infinity())
    {
       const DataArray < int >& rowscaleExp = lp.LPRowSetBase<R>::scaleExp;
       return spxLdexp(lp.LPRowSetBase<R>::lhs(i), -rowscaleExp[i]);
@@ -818,11 +818,11 @@ R SPxScaler<R>::minAbsColscale() const
 {
    const DataArray < int >& colscaleExp = *m_activeColscaleExp;
 
-   R mini = R(infinity);
+   R mini = PrecisionTraits<R>::defaultInfinity();
 
    for(int i = 0; i < colscaleExp.size(); ++i)
-      if(spxAbs(spxLdexp(1.0, colscaleExp[i])) < mini)
-         mini = spxAbs(spxLdexp(1.0, colscaleExp[i]));
+      if(spxAbs(spxLdexp(R(1), colscaleExp[i])) < mini)
+         mini = spxAbs(spxLdexp(R(1), colscaleExp[i]));
 
    return mini;
 }
@@ -835,8 +835,8 @@ R SPxScaler<R>::maxAbsColscale() const
    R maxi = 0.0;
 
    for(int i = 0; i < colscaleExp.size(); ++i)
-      if(spxAbs(spxLdexp(1.0, colscaleExp[i])) > maxi)
-         maxi = spxAbs(spxLdexp(1.0, colscaleExp[i]));
+      if(spxAbs(spxLdexp(R(1), colscaleExp[i])) > maxi)
+         maxi = spxAbs(spxLdexp(R(1), colscaleExp[i]));
 
 
    return maxi;
@@ -853,7 +853,7 @@ R SPxScaler<R>::minAbsRowscale() const
       if(rowscaleExp[i] < mini)
          mini = rowscaleExp[i];
 
-   return spxLdexp(1.0, mini);
+   return spxLdexp(R(1), mini);
 }
 
 template <class R>
@@ -867,7 +867,7 @@ R SPxScaler<R>::maxAbsRowscale() const
       if(rowscaleExp[i] > maxi)
          maxi = rowscaleExp[i];
 
-   return spxLdexp(1.0, maxi);
+   return spxLdexp(R(1), maxi);
 }
 
 /** \f$\max_{j\in\mbox{ cols}}
@@ -883,7 +883,7 @@ R SPxScaler<R>::maxColRatio(const SPxLPBase<R>& lp) const
    for(int i = 0; i < lp.nCols(); ++i)
    {
       const SVectorBase<R>& vec  = lp.colVector(i);
-      R           mini = R(infinity);
+      R           mini = lp.tolerances()->infinity();
       R           maxi = 0.0;
 
       for(int j = 0; j < vec.size(); ++j)
@@ -900,7 +900,7 @@ R SPxScaler<R>::maxColRatio(const SPxLPBase<R>& lp) const
             maxi = x;
       }
 
-      if(mini == R(infinity))
+      if(mini == lp.tolerances()->infinity())
          continue;
 
       R p = maxi / mini;
@@ -925,7 +925,7 @@ R SPxScaler<R>::maxRowRatio(const SPxLPBase<R>& lp) const
    for(int i = 0; i < lp.nRows(); ++i)
    {
       const SVectorBase<R>& vec  = lp.rowVector(i);
-      R           mini = R(infinity);
+      R           mini = lp.tolerances()->infinity();
       R           maxi = 0.0;
 
       for(int j = 0; j < vec.size(); ++j)
@@ -942,7 +942,7 @@ R SPxScaler<R>::maxRowRatio(const SPxLPBase<R>& lp) const
             maxi = x;
       }
 
-      if(mini == R(infinity))
+      if(mini == lp.tolerances()->infinity())
          continue;
 
       R p = maxi / mini;

@@ -69,7 +69,7 @@ protected:
    /// violation bound
    R        thetolerance;
    /// tolerances used by the solver
-   std::shared_ptr<Tolerances> _tolerances;
+   std::shared_ptr<TolerancesBase<R>> _tolerances;
    ///@}
 
 
@@ -158,9 +158,19 @@ public:
 
 
    /// set the _tolerances member variable
-   virtual void setTolerances(std::shared_ptr<Tolerances> newTolerances)
+   virtual void setTolerances(std::shared_ptr<TolerancesBase<R>> newTolerances)
    {
       this->_tolerances = newTolerances;
+   }
+   /// get the _tolerances member variable
+   const std::shared_ptr<TolerancesBase<R>> tolerances() const
+   {
+      return _tolerances;
+   }
+   /// get R-typed infinity threshold
+   R infinity() const
+   {
+      return _tolerances->infinity();
    }
 
    /// sets pricing type.

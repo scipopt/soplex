@@ -94,8 +94,8 @@ void SPxSolverBase<R>::computeFrhs()
                   throw SPxInternalCodeException("XSVECS01 This should never happen.");
                }
 
-               assert(x < R(infinity));
-               assert(x > R(-infinity));
+               assert(x < this->inftyValue());
+               assert(x > -this->inftyValue());
                (*theFrhs)[i] += x;     // slack !
             }
          }
@@ -144,13 +144,13 @@ void SPxSolverBase<R>::computeFrhs()
                   break;
 
                default:
-                  assert(this->lhs(i) <= R(-infinity) && this->rhs(i) >= R(infinity));
+                  assert(this->lhs(i) <= -this->inftyValue() && this->rhs(i) >= this->inftyValue());
                   x = 0.0;
                   break;
                }
 
-               assert(x < R(infinity));
-               assert(x > R(-infinity));
+               assert(x < this->inftyValue());
+               assert(x > -this->inftyValue());
                // assert(x == 0.0);
 
                if(x != 0.0)
@@ -202,8 +202,8 @@ void SPxSolverBase<R>::computeFrhsXtra()
             throw SPxInternalCodeException("XSVECS02 This should never happen.");
          }
 
-         assert(x < R(infinity));
-         assert(x > R(-infinity));
+         assert(x < this->inftyValue());
+         assert(x > -this->inftyValue());
 
          if(x != 0.0)
             theFrhs->multAdd(-x, vector(i));
@@ -265,8 +265,8 @@ void SPxSolverBase<R>::computeFrhs1(
             throw SPxInternalCodeException("XSVECS04 This should never happen.");
          }
 
-         assert(x < R(infinity));
-         assert(x > R(-infinity));
+         assert(x < this->inftyValue());
+         assert(x > -this->inftyValue());
 
          if(x != 0.0)
             theFrhs->multAdd(-x, vector(i));
@@ -342,8 +342,8 @@ void SPxSolverBase<R>::computeFrhs2(
             throw SPxInternalCodeException("XSVECS05 This should never happen.");
          }
 
-         assert(x < R(infinity));
-         assert(x > R(-infinity));
+         assert(x < this->inftyValue());
+         assert(x > -this->inftyValue());
 
          (*theFrhs)[i] -= x; // This is a slack, so no need to multiply a vector.
       }
@@ -379,19 +379,19 @@ void SPxSolverBase<R>::computeEnterCoPrhs4Row(int i, int n)
    {
    // rowwise representation:
    case SPxBasisBase<R>::Desc::P_FIXED :
-      assert(this->lhs(n) > R(-infinity));
+      assert(this->lhs(n) > -this->inftyValue());
       assert(EQ(this->rhs(n), this->lhs(n), this->epsilon()));
 
    //lint -fallthrough
    case SPxBasisBase<R>::Desc::P_ON_UPPER :
       assert(rep() == ROW);
-      assert(this->rhs(n) < R(infinity));
+      assert(this->rhs(n) < this->inftyValue());
       (*theCoPrhs)[i] = this->rhs(n);
       break;
 
    case SPxBasisBase<R>::Desc::P_ON_LOWER :
       assert(rep() == ROW);
-      assert(this->lhs(n) > R(-infinity));
+      assert(this->lhs(n) > -this->inftyValue());
       (*theCoPrhs)[i] = this->lhs(n);
       break;
 
@@ -414,18 +414,18 @@ void SPxSolverBase<R>::computeEnterCoPrhs4Col(int i, int n)
    // rowwise representation:
    case SPxBasisBase<R>::Desc::P_FIXED :
       assert(EQ(SPxLPBase<R>::upper(n), SPxLPBase<R>::lower(n), this->epsilon()));
-      assert(SPxLPBase<R>::lower(n) > R(-infinity));
+      assert(SPxLPBase<R>::lower(n) > -this->inftyValue());
 
    //lint -fallthrough
    case SPxBasisBase<R>::Desc::P_ON_UPPER :
       assert(rep() == ROW);
-      assert(SPxLPBase<R>::upper(n) < R(infinity));
+      assert(SPxLPBase<R>::upper(n) < this->inftyValue());
       (*theCoPrhs)[i] = SPxLPBase<R>::upper(n);
       break;
 
    case SPxBasisBase<R>::Desc::P_ON_LOWER :
       assert(rep() == ROW);
-      assert(SPxLPBase<R>::lower(n) > R(-infinity));
+      assert(SPxLPBase<R>::lower(n) > -this->inftyValue());
       (*theCoPrhs)[i] = SPxLPBase<R>::lower(n);
       break;
 
@@ -471,19 +471,19 @@ void SPxSolverBase<R>::computeLeaveCoPrhs4Row(int i, int n)
    {
    case SPxBasisBase<R>::Desc::D_ON_BOTH :
    case SPxBasisBase<R>::Desc::P_FIXED :
-      assert(theLRbound[n] > R(-infinity));
+      assert(theLRbound[n] > -this->inftyValue());
       assert(EQ(theURbound[n], theLRbound[n], this->epsilon()));
 
    //lint -fallthrough
    case SPxBasisBase<R>::Desc::D_ON_UPPER :
    case SPxBasisBase<R>::Desc::P_ON_UPPER :
-      assert(theURbound[n] < R(infinity));
+      assert(theURbound[n] < this->inftyValue());
       (*theCoPrhs)[i] = theURbound[n];
       break;
 
    case SPxBasisBase<R>::Desc::D_ON_LOWER :
    case SPxBasisBase<R>::Desc::P_ON_LOWER :
-      assert(theLRbound[n] > R(-infinity));
+      assert(theLRbound[n] > -this->inftyValue());
       (*theCoPrhs)[i] = theLRbound[n];
       break;
 
@@ -504,19 +504,19 @@ void SPxSolverBase<R>::computeLeaveCoPrhs4Col(int i, int n)
    case SPxBasisBase<R>::Desc::D_UNDEFINED :
    case SPxBasisBase<R>::Desc::D_ON_BOTH :
    case SPxBasisBase<R>::Desc::P_FIXED :
-      assert(theLCbound[n] > R(-infinity));
+      assert(theLCbound[n] > -this->inftyValue());
       assert(EQ(theUCbound[n], theLCbound[n], this->epsilon()));
 
    //lint -fallthrough
    case SPxBasisBase<R>::Desc::D_ON_LOWER :
    case SPxBasisBase<R>::Desc::P_ON_UPPER :
-      assert(theUCbound[n] < R(infinity));
+      assert(theUCbound[n] < this->inftyValue());
       (*theCoPrhs)[i] = theUCbound[n];
       break;
 
    case SPxBasisBase<R>::Desc::D_ON_UPPER :
    case SPxBasisBase<R>::Desc::P_ON_LOWER :
-      assert(theLCbound[n] > R(-infinity));
+      assert(theLCbound[n] > -this->inftyValue());
       (*theCoPrhs)[i] = theLCbound[n];
       break;
 

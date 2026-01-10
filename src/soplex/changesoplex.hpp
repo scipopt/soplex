@@ -280,9 +280,9 @@ void SPxSolverBase<R>::changeLowerStatus(int i, R newLower, R oldLower)
    switch(stat)
    {
    case SPxBasisBase<R>::Desc::P_ON_LOWER:
-      if(newLower <= R(-infinity))
+      if(newLower <= -this->inftyValue())
       {
-         if(currUpper >= R(infinity))
+         if(currUpper >= this->inftyValue())
          {
             stat = SPxBasisBase<R>::Desc::P_FREE;
 
@@ -316,7 +316,7 @@ void SPxSolverBase<R>::changeLowerStatus(int i, R newLower, R oldLower)
       break;
 
    case SPxBasisBase<R>::Desc::P_FREE:
-      if(newLower > R(-infinity))
+      if(newLower > -this->inftyValue())
       {
          stat = SPxBasisBase<R>::Desc::P_ON_LOWER;
 
@@ -415,9 +415,9 @@ void SPxSolverBase<R>::changeUpperStatus(int i, R newUpper, R oldUpper)
       break;
 
    case SPxBasisBase<R>::Desc::P_ON_UPPER:
-      if(newUpper >= R(infinity))
+      if(newUpper >= this->inftyValue())
       {
-         if(currLower <= R(-infinity))
+         if(currLower <= -this->inftyValue())
          {
             stat = SPxBasisBase<R>::Desc::P_FREE;
 
@@ -445,7 +445,7 @@ void SPxSolverBase<R>::changeUpperStatus(int i, R newUpper, R oldUpper)
       break;
 
    case SPxBasisBase<R>::Desc::P_FREE:
-      if(newUpper < R(infinity))
+      if(newUpper < this->inftyValue())
       {
          stat = SPxBasisBase<R>::Desc::P_ON_UPPER;
 
@@ -550,9 +550,9 @@ void SPxSolverBase<R>::changeLhsStatus(int i, R newLhs, R oldLhs)
    switch(stat)
    {
    case SPxBasisBase<R>::Desc::P_ON_LOWER:
-      if(newLhs <= R(-infinity))
+      if(newLhs <= -this->inftyValue())
       {
-         if(currRhs >= R(infinity))
+         if(currRhs >= this->inftyValue())
          {
             stat = SPxBasisBase<R>::Desc::P_FREE;
 
@@ -586,7 +586,7 @@ void SPxSolverBase<R>::changeLhsStatus(int i, R newLhs, R oldLhs)
       break;
 
    case SPxBasisBase<R>::Desc::P_FREE:
-      if(newLhs > R(-infinity))
+      if(newLhs > -this->inftyValue())
       {
          stat = SPxBasisBase<R>::Desc::P_ON_LOWER;
 
@@ -676,9 +676,9 @@ void SPxSolverBase<R>::changeRhsStatus(int i, R newRhs, R oldRhs)
    switch(stat)
    {
    case SPxBasisBase<R>::Desc::P_ON_UPPER:
-      if(newRhs >= R(infinity))
+      if(newRhs >= this->inftyValue())
       {
-         if(currLhs <= R(-infinity))
+         if(currLhs <= -this->inftyValue())
          {
             stat = SPxBasisBase<R>::Desc::P_FREE;
 
@@ -712,7 +712,7 @@ void SPxSolverBase<R>::changeRhsStatus(int i, R newRhs, R oldRhs)
       break;
 
    case SPxBasisBase<R>::Desc::P_FREE:
-      if(newRhs < R(infinity))
+      if(newRhs < this->inftyValue())
       {
          stat = SPxBasisBase<R>::Desc::P_ON_UPPER;
 

@@ -56,9 +56,9 @@ SPxBasisBase<R>::dualRowStatus(int i) const
 {
    assert(theLP != nullptr);
 
-   if(theLP->rhs(i) < R(infinity))
+   if(theLP->rhs(i) < theLP->tolerances()->infinity())
    {
-      if(theLP->lhs(i) > R(-infinity))
+      if(theLP->lhs(i) > -theLP->tolerances()->infinity())
       {
          if(theLP->lhs(i) == theLP->rhs(i))
             return Desc::D_FREE;
@@ -68,7 +68,7 @@ SPxBasisBase<R>::dualRowStatus(int i) const
       else
          return Desc::D_ON_LOWER;
    }
-   else if(theLP->lhs(i) > R(-infinity))
+   else if(theLP->lhs(i) > -theLP->tolerances()->infinity())
       return Desc::D_ON_UPPER;
    else
       return Desc::D_UNDEFINED;
@@ -80,9 +80,9 @@ SPxBasisBase<R>::dualColStatus(int i) const
 {
    assert(theLP != nullptr);
 
-   if(theLP->SPxLPBase<R>::upper(i) < R(infinity))
+   if(theLP->SPxLPBase<R>::upper(i) < theLP->tolerances()->infinity())
    {
-      if(theLP->SPxLPBase<R>::lower(i) > R(-infinity))
+      if(theLP->SPxLPBase<R>::lower(i) > -theLP->tolerances()->infinity())
       {
          if(theLP->SPxLPBase<R>::lower(i) == theLP->SPxLPBase<R>::upper(i))
             return Desc::D_FREE;
@@ -92,7 +92,7 @@ SPxBasisBase<R>::dualColStatus(int i) const
       else
          return Desc::D_ON_LOWER;
    }
-   else if(theLP->SPxLPBase<R>::lower(i) > R(-infinity))
+   else if(theLP->SPxLPBase<R>::lower(i) > -theLP->tolerances()->infinity())
       return Desc::D_ON_UPPER;
    else
       return Desc::D_UNDEFINED;
@@ -158,8 +158,8 @@ bool SPxBasisBase<R>::isDescValid(const Desc& ds)
 
          if((ds.rowstat[row] == Desc::P_FIXED
                && theLP->SPxLPBase<R>::lhs(row) != theLP->SPxLPBase<R>::rhs(row))
-               || (ds.rowstat[row] == Desc::P_ON_UPPER && theLP->SPxLPBase<R>::rhs(row) >= R(infinity))
-               || (ds.rowstat[row] == Desc::P_ON_LOWER && theLP->SPxLPBase<R>::lhs(row) <= R(-infinity)))
+               || (ds.rowstat[row] == Desc::P_ON_UPPER && theLP->SPxLPBase<R>::rhs(row) >= theLP->tolerances()->infinity())
+               || (ds.rowstat[row] == Desc::P_ON_LOWER && theLP->SPxLPBase<R>::lhs(row) <= -theLP->tolerances()->infinity()))
          {
             SPxOut::debug(this, "IBASIS22 Nonbasic row with incorrect status: lhs={}, rhs={}, stat={}\n",
                           theLP->SPxLPBase<R>::lhs(row), theLP->SPxLPBase<R>::rhs(row),
@@ -186,8 +186,8 @@ bool SPxBasisBase<R>::isDescValid(const Desc& ds)
 
          if((ds.colstat[col] == Desc::P_FIXED
                && theLP->SPxLPBase<R>::lower(col) != theLP->SPxLPBase<R>::upper(col))
-               || (ds.colstat[col] == Desc::P_ON_UPPER && theLP->SPxLPBase<R>::upper(col) >= R(infinity))
-               || (ds.colstat[col] == Desc::P_ON_LOWER && theLP->SPxLPBase<R>::lower(col) <= R(-infinity)))
+               || (ds.colstat[col] == Desc::P_ON_UPPER && theLP->SPxLPBase<R>::upper(col) >= theLP->tolerances()->infinity())
+               || (ds.colstat[col] == Desc::P_ON_LOWER && theLP->SPxLPBase<R>::lower(col) <= -theLP->tolerances()->infinity()))
          {
             SPxOut::debug(this,
                           "IBASIS24 Nonbasic column {} with incorrect status: lower={}, upper={}, stat={}\n",
@@ -257,13 +257,13 @@ void SPxBasisBase<R>::loadDesc(const Desc& ds)
          thedesc.rowStatus(i) = dualRowStatus(i);
       else if(theLP->SPxLPBase<R>::lhs(i) == theLP->SPxLPBase<R>::rhs(i))
          thedesc.rowStatus(i) = SPxBasisBase<R>::Desc::P_FIXED;
-      else if(theLP->SPxLPBase<R>::lhs(i) > R(-infinity)
-              && (theLP->SPxLPBase<R>::rhs(i) >= R(infinity)
+      else if(theLP->SPxLPBase<R>::lhs(i) > -theLP->tolerances()->infinity()
+              && (theLP->SPxLPBase<R>::rhs(i) >= theLP->tolerances()->infinity()
                   || thedesc.rowStatus(i) == SPxBasisBase<R>::Desc::P_ON_LOWER
                   || (thedesc.rowStatus(i) != SPxBasisBase<R>::Desc::P_ON_UPPER
                       && theLP->SPxLPBase<R>::maxRowObj(i) <= 0)))
          thedesc.rowStatus(i) = SPxBasisBase<R>::Desc::P_ON_LOWER;
-      else if(theLP->SPxLPBase<R>::rhs(i) < R(infinity))
+      else if(theLP->SPxLPBase<R>::rhs(i) < theLP->tolerances()->infinity())
          thedesc.rowStatus(i) = SPxBasisBase<R>::Desc::P_ON_UPPER;
       else
          thedesc.rowStatus(i) = SPxBasisBase<R>::Desc::P_FREE;
@@ -296,13 +296,13 @@ void SPxBasisBase<R>::loadDesc(const Desc& ds)
          thedesc.colStatus(i) = dualColStatus(i);
       else if(theLP->SPxLPBase<R>::lower(i) == theLP->SPxLPBase<R>::upper(i))
          thedesc.colStatus(i) = SPxBasisBase<R>::Desc::P_FIXED;
-      else if(theLP->SPxLPBase<R>::lower(i) > R(-infinity)
-              && (theLP->SPxLPBase<R>::upper(i) >= R(infinity)
+      else if(theLP->SPxLPBase<R>::lower(i) > -theLP->tolerances()->infinity()
+              && (theLP->SPxLPBase<R>::upper(i) >= theLP->tolerances()->infinity()
                   || thedesc.colStatus(i) == SPxBasisBase<R>::Desc::P_ON_LOWER
                   || (thedesc.colStatus(i) != SPxBasisBase<R>::Desc::P_ON_UPPER
                       && theLP->SPxLPBase<R>::maxObj(i) <= 0)))
          thedesc.colStatus(i) = SPxBasisBase<R>::Desc::P_ON_LOWER;
-      else if(theLP->SPxLPBase<R>::upper(i) < R(infinity))
+      else if(theLP->SPxLPBase<R>::upper(i) < theLP->tolerances()->infinity())
          thedesc.colStatus(i) = SPxBasisBase<R>::Desc::P_ON_UPPER;
       else
          thedesc.colStatus(i) = SPxBasisBase<R>::Desc::P_FREE;
@@ -499,10 +499,10 @@ bool SPxBasisBase<R>::readBasis(
    {
       if(theLP->SPxLPBase<R>::lower(i) == theLP->SPxLPBase<R>::upper(i))
          l_desc.colstat[i] = Desc::P_FIXED;
-      else if(theLP->SPxLPBase<R>::lower(i) <= R(-infinity)
-              && theLP->SPxLPBase<R>::upper(i) >= R(infinity))
+      else if(theLP->SPxLPBase<R>::lower(i) <= -theLP->tolerances()->infinity()
+              && theLP->SPxLPBase<R>::upper(i) >= theLP->tolerances()->infinity())
          l_desc.colstat[i] = Desc::P_FREE;
-      else if(theLP->SPxLPBase<R>::lower(i) <= R(-infinity))
+      else if(theLP->SPxLPBase<R>::lower(i) <= -theLP->tolerances()->infinity())
          l_desc.colstat[i] = Desc::P_ON_UPPER;
       else
          l_desc.colstat[i] = Desc::P_ON_LOWER;
@@ -732,7 +732,7 @@ void SPxBasisBase<R>::writeBasis(
             assert(thedesc.colStatus(col) == Desc::P_ON_LOWER
                    || thedesc.colStatus(col) == Desc::P_FIXED
                    || thedesc.colStatus(col) == Desc::P_FREE);
-            assert(thedesc.colStatus(col) == Desc::P_FREE || theLP->lower(col) > R(-infinity));
+            assert(thedesc.colStatus(col) == Desc::P_FREE || theLP->lower(col) > -theLP->tolerances()->infinity());
             assert(thedesc.colStatus(col) != Desc::P_FREE || theLP->lower(col) <= 0);
          }
       }
@@ -971,23 +971,41 @@ void SPxBasisBase<R>::factorize()
    switch(factor->load(matrix.get_ptr(), matrix.size()))
    {
    case SLinSolver<R>::OK :
+   {
       if(status() == SINGULAR)
          setStatus(REGULAR);
 
       factorized = true;
       minStab = factor->stability();
 
-      // This seems always to be about 1e-7
-      if(minStab > 1e-4)
-         minStab *= 0.001;
+      // Scale stability thresholds based on epsilon for high-precision support.
+      // For double precision (epsilon ~1e-16), these are 1e-4, 1e-5, 1e-6.
+      // For higher precision, they scale proportionally with epsilon.
+      // Use Rational-stored epsilon when available for high-precision operations.
+#ifdef SOPLEX_WITH_BOOST
+      R eps;
+      if(theLP->tolerances()->hasRationalEpsilons())
+         eps = StringToNumber<R>::convert(theLP->tolerances()->epsilonRational());
+      else
+         eps = theLP->tolerances()->epsilon();
+#else
+      R eps = theLP->tolerances()->epsilon();
+#endif
+      R stabThresh1 = eps * R(1e12);  // ~1e-4 for eps=1e-16, scales with epsilon
+      R stabThresh2 = eps * R(1e11);  // ~1e-5 for eps=1e-16, scales with epsilon
+      R stabThresh3 = eps * R(1e10);  // ~1e-6 for eps=1e-16, scales with epsilon
 
-      if(minStab > 1e-5)
-         minStab *= 0.01;
+      if(minStab > stabThresh1)
+         minStab *= R(0.001);
 
-      if(minStab > 1e-6)
-         minStab *= 0.1;
+      if(minStab > stabThresh2)
+         minStab *= R(0.01);
+
+      if(minStab > stabThresh3)
+         minStab *= R(0.1);
 
       break;
+   }
 
    case SLinSolver<R>::SINGULAR :
       setStatus(SINGULAR);
@@ -1213,7 +1231,7 @@ R SPxBasisBase<R>::condition(int maxiters, R tolerance)
 template <class R>
 R SPxBasisBase<R>::getMatrixMetric(int type)
 {
-   R metric = R(infinity);
+   R metric = theLP->tolerances()->infinity();
 
    if(factorized)
       metric = factor->matrixMetric(type);
