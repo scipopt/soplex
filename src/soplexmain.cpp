@@ -26,6 +26,9 @@
  * @brief Command line interface of SoPlex LP solver
  */
 
+#include "soplex.h"
+#include "soplex/validation.h"
+
 #include <assert.h>
 #include <math.h>
 #include <string.h>
@@ -37,9 +40,6 @@
 #ifdef SOPLEX_WITH_BOOST
 #include <boost/version.hpp>
 #endif
-
-#include "soplex.h"
-#include "soplex/validation.h"
 
 using namespace soplex;
 
