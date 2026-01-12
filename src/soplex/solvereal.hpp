@@ -300,11 +300,17 @@ void SoPlexBase<R>::_preprocessAndSolveReal(bool applySimplifier, volatile bool*
          assert(_basisStatusCols.size() == this->numCols());
 
          _solver.loadLP(*_realLP, false);
+         // CRITICAL: loadLP creates new tolerances object, must re-set our shared tolerances
+         _solver.setTolerances(_tolerances);
          _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
       }
       // load real LP and set up slack basis
       else
+      {
          _solver.loadLP(*_realLP, true);
+         // CRITICAL: loadLP creates new tolerances object, must re-set our shared tolerances
+         _solver.setTolerances(_tolerances);
+      }
 
       // if there is no simplifier, then the original and the transformed problem are identical and it is more
       // memory-efficient to keep only the problem in the solver
@@ -800,6 +806,8 @@ template <class R>
 void SoPlexBase<R>::_loadRealLP(bool initBasis)
 {
    _solver.loadLP(*_realLP, initBasis);
+   // CRITICAL: loadLP creates new tolerances object, must re-set our shared tolerances
+   _solver.setTolerances(_tolerances);
    _isRealLPLoaded = true;
    _realLP->~SPxLPBase<R>();
    spx_free(_realLP);

@@ -8835,6 +8835,8 @@ void SoPlexBase<R>::_ensureRealLPLoaded()
       assert(_realLP != &_solver);
 
       _solver.loadLP(*_realLP);
+      // CRITICAL: loadLP creates new tolerances object, must re-set our shared tolerances
+      _solver.setTolerances(_tolerances);
       _realLP->~SPxLPBase<R>();
       spx_free(_realLP);
       _realLP = &_solver;
@@ -8858,7 +8860,6 @@ void SoPlexBase<R>::_ensureRealLPLoaded()
 template <class R>
 void SoPlexBase<R>::_solveBoostedRealLPAndRecordStatistics(volatile bool* interrupt)
 {
-
    ///@todo precision-boosting add arg SPxSolverBase<S> solver (idea for the future)
    bool _hadBasis = _hasBasis;
 
@@ -8882,6 +8883,20 @@ void SoPlexBase<R>::_solveBoostedRealLPAndRecordStatistics(volatile bool* interr
 
    if(this->tolerances()->floatingPointOpttol() < mintol)
       this->tolerances()->setFloatingPointOpttol(Real(mintol));
+
+   // also ensure that boosted solver tolerances are not too small
+   // In bugfix-80, the boosted solver shared _tolerances with the Real solver, so the
+   // above clamping affected both. In HDR, they have separate tolerance objects.
+   // Use the same mintol as for _tolerances (based on double-precision epsilon) to maintain
+   // compatibility with bugfix-80 behavior - this ensures reasonable working tolerances
+   // regardless of the boosted precision level.
+   BP boostedMintol = BP(mintol);
+
+   if(_boostedTolerances->floatingPointFeastol() < boostedMintol)
+      _boostedTolerances->setFloatingPointFeastol(boostedMintol);
+
+   if(_boostedTolerances->floatingPointOpttol() < boostedMintol)
+      _boostedTolerances->setFloatingPointOpttol(boostedMintol);
 
    // set correct representation
    if((intParam(SoPlexBase<R>::REPRESENTATION) == SoPlexBase<R>::REPRESENTATION_COLUMN
@@ -9276,7 +9291,11 @@ void SoPlexBase<R>::_syncLPReal(bool time)
 
    // copy LP
    if(_isRealLPLoaded)
+   {
       _solver.loadLP((SPxLPBase<R>)(*_rationalLP));
+      // CRITICAL: loadLP creates new tolerances object, must re-set our shared tolerances
+      _solver.setTolerances(_tolerances);
+   }
    else
       *_realLP = *_rationalLP;
 
@@ -9739,8 +9758,10 @@ SoPlexBase<R>::SoPlexBase()
    _solver.setBasisSolver(&_slufactor);
 
 #ifdef SOPLEX_WITH_MPFR
-   // Capture the current precision (user may have set it higher)
-   // Do NOT reset it - we want to preserve the user's precision setting
+   // Set initial precision to at least 50 bits (the original default)
+   // If user has already set a higher precision, preserve it
+   if(BP::default_precision() < 50)
+      BP::default_precision(50);
    _initialPrecision = BP::default_precision();
 
    _boostedSolver.setOutstream(spxout);
@@ -10350,6 +10371,8 @@ bool SoPlexBase<R>::readBasisFile(const char* filename, const NameSet* rowNames,
       assert(_realLP != &_solver);
 
       _solver.loadLP(*_realLP);
+      // CRITICAL: loadLP creates new tolerances object, must re-set our shared tolerances
+      _solver.setTolerances(_tolerances);
       _realLP->~SPxLPBase<R>();
       spx_free(_realLP);
       _realLP = &_solver;

@@ -73,9 +73,10 @@ static std::string strerror()
         return "Unknown error (" + std::to_string(err_num) + ")";
     }
 #else
-// GNU-specific strerror_r()
-    char * p = strerror_r(errno, &buff[0], buff.size());
-    return std::string(p, std::strlen(p));
+// GNU-specific strerror_r() - also works for POSIX since both fill the buffer
+    const int err_num = errno;
+    strerror_r(err_num, &buff[0], buff.size());
+    return trim_to_null(buff);
 #endif
 }
 

@@ -60,6 +60,8 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
       assert(_realLP != &_solver);
 
       _solver.loadLP(*_realLP);
+      // CRITICAL: loadLP creates new tolerances object, must re-set our shared tolerances
+      _solver.setTolerances(this->_tolerances);
       spx_free(_realLP);
       _realLP = &_solver;
       _isRealLPLoaded = true;
@@ -2397,6 +2399,13 @@ void SoPlexBase<R>::_switchToBoosted()
 
       // invalidate rational basis factorization
       _rationalLUSolver.clear();
+
+      // invalidate old bases from double-precision solver so boosted solver starts fresh
+      // This is important because bases from double-precision may be "optimal" numerically
+      // but produce solutions that can't be reconstructed to exact rationals
+      _hasOldBasis = false;
+      _hasOldFeasBasis = false;
+      _hasOldUnbdBasis = false;
    }
    else
    {
@@ -2415,8 +2424,20 @@ void SoPlexBase<R>::_setupBoostedSolver()
 
    _statistics->boostingStepTime->start();
 
+   // Ensure boosted tolerances have consistent infinity value BEFORE loading LP.
+   // This is critical because loadLP uses inftyValue() for bound comparisons.
+   // Note: We don't copy floatingPointFeastol/Opttol from _tolerances here -
+   // the precision-specific tolerances computed by PrecisionTraits are used.
+   // This allows the boosted solver to potentially do more iterations when
+   // loading a basis from the double-precision solver.
+   this->_boostedTolerances->setInfinity(BP(this->realParam(SoPlexBase<R>::INFTY)));
+
    // load the data from the rationalLP
    _boostedSolver.loadLP(*_rationalLP, false);
+
+   // CRITICAL: loadLP's operator= creates new tolerances object, overwriting our _boostedTolerances.
+   // We must re-set the tolerances AFTER loadLP to use our shared boosted tolerances object.
+   _boostedSolver.setTolerances(this->_boostedTolerances);
 
    // if no warm-start, load available advanced basis
    if(!_isBoostedStartingFromSlack())
@@ -2806,11 +2827,23 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
       this->_tolerances->setEpsilonUpdate((Real) epsilonUpdate);
       this->_tolerances->setEpsilonPivot((Real) epsilonPivot);
 
+      // Also update the boosted solver's tolerances with full BP precision
+      this->_boostedTolerances->setEpsilon(epsilonZero);
+      this->_boostedTolerances->setEpsilonFactorization(epsilonFactor);
+      this->_boostedTolerances->setEpsilonUpdate(epsilonUpdate);
+      this->_boostedTolerances->setEpsilonPivot(epsilonPivot);
+
+      // Set infinity to be consistent with Real solver's infinity (1e100)
+      // This ensures LP bounds are handled correctly in the boosted solver
+      this->_boostedTolerances->setInfinity(BP(this->realParam(SoPlexBase<R>::INFTY)));
+
       // set tolerances of the boosted solver
       if(boolParam(SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION))
       {
          this->_tolerances->setFloatingPointFeastol((Real) tolerance);
          this->_tolerances->setFloatingPointOpttol((Real) tolerance);
+         this->_boostedTolerances->setFloatingPointFeastol(tolerance);
+         this->_boostedTolerances->setFloatingPointOpttol(tolerance);
       }
    }
 
@@ -2997,6 +3030,13 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
       SPX_MSG_INFO1(spxout, spxout << "\nNo success. Launch new boosted solve . . .\n");
       needNewBoostedIt = true;
 
+      // Invalidate old bases so next precision level starts fresh.
+      // The basis from this precision level was structurally optimal but numerically inadequate
+      // (rational reconstruction failed), so reusing it at higher precision won't help.
+      _hasOldBasis = false;
+      _hasOldFeasBasis = false;
+      _hasOldUnbdBasis = false;
+
       // stop rational solving time
       _statistics->rationalTime->stop();
    }
@@ -3086,11 +3126,23 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
       this->_tolerances->setEpsilonUpdate((Real) epsilonUpdate);
       this->_tolerances->setEpsilonPivot((Real) epsilonPivot);
 
+      // Also update the boosted solver's tolerances with full BP precision
+      this->_boostedTolerances->setEpsilon(epsilonZero);
+      this->_boostedTolerances->setEpsilonFactorization(epsilonFactor);
+      this->_boostedTolerances->setEpsilonUpdate(epsilonUpdate);
+      this->_boostedTolerances->setEpsilonPivot(epsilonPivot);
+
+      // Set infinity to be consistent with Real solver's infinity (1e100)
+      // This ensures LP bounds are handled correctly in the boosted solver
+      this->_boostedTolerances->setInfinity(BP(this->realParam(SoPlexBase<R>::INFTY)));
+
       // set tolerances of the boosted solver
       if(boolParam(SoPlexBase<R>::ADAPT_TOLS_TO_MULTIPRECISION))
       {
          this->_tolerances->setFloatingPointFeastol((Real) tolerance);
          this->_tolerances->setFloatingPointOpttol((Real) tolerance);
+         this->_boostedTolerances->setFloatingPointFeastol(tolerance);
+         this->_boostedTolerances->setFloatingPointOpttol(tolerance);
       }
    }
 
@@ -3377,6 +3429,13 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
    {
       SPX_MSG_INFO1(spxout, spxout << "\nNo success. Launch new boosted solve . . .\n");
       needNewBoostedIt = true;
+
+      // Invalidate old bases so next precision level starts fresh.
+      // The basis from this precision level was structurally optimal but numerically inadequate
+      // (rational reconstruction failed), so reusing it at higher precision won't help.
+      _hasOldBasis = false;
+      _hasOldFeasBasis = false;
+      _hasOldUnbdBasis = false;
 
       // stop rational solving time
       _statistics->rationalTime->stop();
@@ -3871,6 +3930,8 @@ void SoPlexBase<R>::_restoreLPReal()
    {
 #ifndef SOPLEX_MANUAL_ALT
       _solver.loadLP(_manualRealLP);
+      // CRITICAL: loadLP creates new tolerances object, must re-set our shared tolerances
+      _solver.setTolerances(this->_tolerances);
 #else
       _realLP->changeLower(_manualLower);
       _realLP->changeUpper(_manualUpper);
@@ -5545,6 +5606,8 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
    {
       assert(rationalLP != nullptr);
       _solver.loadLP((SPxLPBase<R>)(*rationalLP));
+      // CRITICAL: loadLP creates new tolerances object, must re-set our shared tolerances
+      _solver.setTolerances(this->_tolerances);
       rationalLP->~SPxLPRational();
       spx_free(rationalLP);
 
@@ -6093,6 +6156,8 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
    {
       assert(rationalLP != nullptr);
       _boostedSolver.loadLP((SPxLPBase<BP>)(*rationalLP));
+      // CRITICAL: loadLP creates new tolerances object, must re-set our shared tolerances
+      _boostedSolver.setTolerances(this->_boostedTolerances);
       rationalLP->~SPxLPRational();
       spx_free(rationalLP);
 
