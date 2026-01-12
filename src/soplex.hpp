@@ -6720,9 +6720,11 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       // Update initial precision for multiprecision floating-point
       _initialPrecision = value;
 #ifdef SOPLEX_WITH_MPFR
+
       // Also set the current MPFR precision if it's higher than current
       if(value > (int)BP::default_precision())
          BP::default_precision(value);
+
 #endif
       break;
 
@@ -6770,10 +6772,12 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
       // During initialization, use R-typed default from PrecisionTraits for the R-typed tolerances
       // Keep _rationalFeastol using double value since it's for Rational arithmetic
       _rationalFeastol = value;
+
       if(init)
          this->_tolerances->setFeastol(PrecisionTraits<R>::defaultFeastol());
       else
          this->_tolerances->setFeastol(value);
+
       break;
 
    // dual feasibility tolerance; passed to the floating point solver only when calling solve()
@@ -6792,20 +6796,24 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
       // During initialization, use R-typed default from PrecisionTraits for the R-typed tolerances
       // Keep _rationalOpttol using double value since it's for Rational arithmetic
       _rationalOpttol = value;
+
       if(init)
          this->_tolerances->setOpttol(PrecisionTraits<R>::defaultFeastol());
       else
          this->_tolerances->setOpttol(value);
+
       break;
 
    // general zero tolerance
    case SoPlexBase<R>::EPSILON_ZERO:
+
       // During initialization, use R-typed default from PrecisionTraits to avoid
       // double-precision defaults being applied to high-precision types
       if(init)
          _tolerances->setEpsilon(PrecisionTraits<R>::defaultEpsilon());
       else
          _tolerances->setEpsilon(R(value));
+
       break;
 
    // zero tolerance used in factorization
@@ -6814,6 +6822,7 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
          _tolerances->setEpsilonFactorization(PrecisionTraits<R>::defaultEpsilonFactorization());
       else
          _tolerances->setEpsilonFactorization(R(value));
+
       break;
 
    // zero tolerance used in update of the factorization
@@ -6822,6 +6831,7 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
          _tolerances->setEpsilonUpdate(PrecisionTraits<R>::defaultEpsilonUpdate());
       else
          _tolerances->setEpsilonUpdate(R(value));
+
       break;
 
    // pivot zero tolerance used in factorization (declare numerical singularity for small LU pivots)
@@ -6830,6 +6840,7 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
          _tolerances->setEpsilonPivot(PrecisionTraits<R>::defaultEpsilonPivot());
       else
          _tolerances->setEpsilonPivot(R(value));
+
       break;
 
    // infinity threshold

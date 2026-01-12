@@ -158,8 +158,10 @@ bool SPxBasisBase<R>::isDescValid(const Desc& ds)
 
          if((ds.rowstat[row] == Desc::P_FIXED
                && theLP->SPxLPBase<R>::lhs(row) != theLP->SPxLPBase<R>::rhs(row))
-               || (ds.rowstat[row] == Desc::P_ON_UPPER && theLP->SPxLPBase<R>::rhs(row) >= theLP->tolerances()->infinity())
-               || (ds.rowstat[row] == Desc::P_ON_LOWER && theLP->SPxLPBase<R>::lhs(row) <= -theLP->tolerances()->infinity()))
+               || (ds.rowstat[row] == Desc::P_ON_UPPER
+                   && theLP->SPxLPBase<R>::rhs(row) >= theLP->tolerances()->infinity())
+               || (ds.rowstat[row] == Desc::P_ON_LOWER
+                   && theLP->SPxLPBase<R>::lhs(row) <= -theLP->tolerances()->infinity()))
          {
             SPxOut::debug(this, "IBASIS22 Nonbasic row with incorrect status: lhs={}, rhs={}, stat={}\n",
                           theLP->SPxLPBase<R>::lhs(row), theLP->SPxLPBase<R>::rhs(row),
@@ -186,8 +188,10 @@ bool SPxBasisBase<R>::isDescValid(const Desc& ds)
 
          if((ds.colstat[col] == Desc::P_FIXED
                && theLP->SPxLPBase<R>::lower(col) != theLP->SPxLPBase<R>::upper(col))
-               || (ds.colstat[col] == Desc::P_ON_UPPER && theLP->SPxLPBase<R>::upper(col) >= theLP->tolerances()->infinity())
-               || (ds.colstat[col] == Desc::P_ON_LOWER && theLP->SPxLPBase<R>::lower(col) <= -theLP->tolerances()->infinity()))
+               || (ds.colstat[col] == Desc::P_ON_UPPER
+                   && theLP->SPxLPBase<R>::upper(col) >= theLP->tolerances()->infinity())
+               || (ds.colstat[col] == Desc::P_ON_LOWER
+                   && theLP->SPxLPBase<R>::lower(col) <= -theLP->tolerances()->infinity()))
          {
             SPxOut::debug(this,
                           "IBASIS24 Nonbasic column {} with incorrect status: lower={}, upper={}, stat={}\n",
@@ -732,7 +736,8 @@ void SPxBasisBase<R>::writeBasis(
             assert(thedesc.colStatus(col) == Desc::P_ON_LOWER
                    || thedesc.colStatus(col) == Desc::P_FIXED
                    || thedesc.colStatus(col) == Desc::P_FREE);
-            assert(thedesc.colStatus(col) == Desc::P_FREE || theLP->lower(col) > -theLP->tolerances()->infinity());
+            assert(thedesc.colStatus(col) == Desc::P_FREE
+                   || theLP->lower(col) > -theLP->tolerances()->infinity());
             assert(thedesc.colStatus(col) != Desc::P_FREE || theLP->lower(col) <= 0);
          }
       }
@@ -984,10 +989,12 @@ void SPxBasisBase<R>::factorize()
       // Use Rational-stored epsilon when available for high-precision operations.
 #ifdef SOPLEX_WITH_BOOST
       R eps;
+
       if(theLP->tolerances()->hasRationalEpsilons())
          eps = StringToNumber<R>::convert(theLP->tolerances()->epsilonRational());
       else
          eps = theLP->tolerances()->epsilon();
+
 #else
       R eps = theLP->tolerances()->epsilon();
 #endif

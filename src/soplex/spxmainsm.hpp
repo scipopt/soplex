@@ -1309,7 +1309,8 @@ void SPxMainSM<R>::DuplicateColsPS::execute(VectorBase<R>& x,
       if(isZero(z2, this->epsilon()))
          z2 = 0.0;
 
-      if(m_loJ <= -this->infinity() && m_upJ >= this->infinity() && m_loK <= -this->infinity() && m_upK >= this->infinity())
+      if(m_loJ <= -this->infinity() && m_upJ >= this->infinity() && m_loK <= -this->infinity()
+            && m_upK >= this->infinity())
       {
          cStatus[m_j] = SPxSolverBase<R>::ZERO;
          x[m_j] = 0.0;

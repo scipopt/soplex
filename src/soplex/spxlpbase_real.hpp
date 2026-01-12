@@ -2101,7 +2101,8 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<R>& rset, const NameSet& 
             val = atof(mps.field3());
 
             // EQ
-            if((rset.lhs(idx) > -PrecisionTraits<R>::defaultInfinity()) && (rset.rhs_w(idx) <  PrecisionTraits<R>::defaultInfinity()))
+            if((rset.lhs(idx) > -PrecisionTraits<R>::defaultInfinity())
+                  && (rset.rhs_w(idx) <  PrecisionTraits<R>::defaultInfinity()))
             {
                assert(rset.lhs(idx) == rset.rhs(idx));
 
@@ -2130,7 +2131,8 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<R>& rset, const NameSet& 
                val = atof(mps.field5());
 
                // EQ
-               if((rset.lhs(idx) > -PrecisionTraits<R>::defaultInfinity()) && (rset.rhs(idx) <  PrecisionTraits<R>::defaultInfinity()))
+               if((rset.lhs(idx) > -PrecisionTraits<R>::defaultInfinity())
+                     && (rset.rhs(idx) <  PrecisionTraits<R>::defaultInfinity()))
                {
                   assert(rset.lhs(idx) == rset.rhs(idx));
 
@@ -3060,12 +3062,14 @@ void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[
       primalColIds[primalcolsidx] = cId(i);
       primalcolsidx++;
 
-      if(lower(i) <= -this->tolerances()->infinity() && upper(i) >= this->tolerances()->infinity())   // unrestricted variables
+      if(lower(i) <= -this->tolerances()->infinity()
+            && upper(i) >= this->tolerances()->infinity())   // unrestricted variables
       {
          dualrows.create(0, obj(i), obj(i));
          numAddedRows++;
       }
-      else if(lower(i) <= -this->tolerances()->infinity())   // no lower bound is set, indicating a <= 0 variable
+      else if(lower(i) <=
+              -this->tolerances()->infinity())   // no lower bound is set, indicating a <= 0 variable
       {
          if(isZero(upper(i), this->tolerances()->epsilon()))   // standard bound variable
          {
@@ -3096,7 +3100,8 @@ void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[
 
          numAddedRows++;
       }
-      else if(upper(i) >= this->tolerances()->infinity())   // no upper bound set, indicating a >= 0 variable
+      else if(upper(i) >=
+              this->tolerances()->infinity())   // no upper bound set, indicating a >= 0 variable
       {
          if(isZero(lower(i), this->tolerances()->epsilon()))   // standard bound variable
          {

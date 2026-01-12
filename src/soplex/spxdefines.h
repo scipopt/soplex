@@ -348,12 +348,15 @@ struct SafeSqrt<Real>
 template <>
 struct SafeSqrt<boost::multiprecision::number<boost::multiprecision::gmp_rational, boost::multiprecision::et_off>>
 {
-   static boost::multiprecision::number<boost::multiprecision::gmp_rational, boost::multiprecision::et_off> compute(
-      const boost::multiprecision::number<boost::multiprecision::gmp_rational, boost::multiprecision::et_off>& val)
+   static boost::multiprecision::number<boost::multiprecision::gmp_rational, boost::multiprecision::et_off>
+   compute(
+      const boost::multiprecision::number<boost::multiprecision::gmp_rational, boost::multiprecision::et_off>&
+      val)
    {
       // Convert to double, take sqrt, convert back (approximate but avoids irrational results)
       double dval = static_cast<double>(val);
-      return boost::multiprecision::number<boost::multiprecision::gmp_rational, boost::multiprecision::et_off>(std::sqrt(dval));
+      return boost::multiprecision::number<boost::multiprecision::gmp_rational, boost::multiprecision::et_off>
+             (std::sqrt(dval));
    }
 };
 #endif
@@ -461,13 +464,34 @@ struct PrecisionTraits
 template <>
 struct PrecisionTraits<Real>
 {
-   static Real defaultEpsilon() { return SOPLEX_DEFAULT_EPS_ZERO; }
-   static Real defaultEpsilonFactorization() { return SOPLEX_DEFAULT_EPS_FACTOR; }
-   static Real defaultEpsilonUpdate() { return SOPLEX_DEFAULT_EPS_UPDATE; }
-   static Real defaultEpsilonPivot() { return SOPLEX_DEFAULT_EPS_PIVOR; }
-   static Real defaultFeastol() { return SOPLEX_DEFAULT_BND_VIOL; }
-   static Real defaultInfinity() { return SOPLEX_DEFAULT_INFINITY; }
-   static Real markerValue(const Real& eps) { return eps * eps; }
+   static Real defaultEpsilon()
+   {
+      return SOPLEX_DEFAULT_EPS_ZERO;
+   }
+   static Real defaultEpsilonFactorization()
+   {
+      return SOPLEX_DEFAULT_EPS_FACTOR;
+   }
+   static Real defaultEpsilonUpdate()
+   {
+      return SOPLEX_DEFAULT_EPS_UPDATE;
+   }
+   static Real defaultEpsilonPivot()
+   {
+      return SOPLEX_DEFAULT_EPS_PIVOR;
+   }
+   static Real defaultFeastol()
+   {
+      return SOPLEX_DEFAULT_BND_VIOL;
+   }
+   static Real defaultInfinity()
+   {
+      return SOPLEX_DEFAULT_INFINITY;
+   }
+   static Real markerValue(const Real& eps)
+   {
+      return eps * eps;
+   }
 };
 
 #ifdef SOPLEX_WITH_BOOST
@@ -492,8 +516,10 @@ struct PrecisionTraits<boost::multiprecision::number<
       // Digits is in decimal digits; use 80% of available precision for epsilon
       int expDigits = static_cast<int>(Digits * 0.8);
       R result = R(1);
+
       for(int i = 0; i < expDigits; ++i)
          result /= R(10);
+
       return result;
    }
 
@@ -514,8 +540,10 @@ struct PrecisionTraits<boost::multiprecision::number<
    {
       int expDigits = static_cast<int>(Digits * 0.6);
       R result = R(1);
+
       for(int i = 0; i < expDigits; ++i)
          result /= R(10);
+
       return result;
    }
 
@@ -524,8 +552,10 @@ struct PrecisionTraits<boost::multiprecision::number<
    {
       int expDigits = static_cast<int>(Digits * 0.65);
       R result = R(1);
+
       for(int i = 0; i < expDigits; ++i)
          result /= R(10);
+
       return result;
    }
 
@@ -534,8 +564,10 @@ struct PrecisionTraits<boost::multiprecision::number<
    {
       int expDigits = static_cast<int>(Digits * 0.5);
       R result = R(1);
+
       for(int i = 0; i < expDigits; ++i)
          result *= R(10);
+
       return result;
    }
 
@@ -560,8 +592,10 @@ struct PrecisionTraits<boost::multiprecision::number<
       // Convert bits to decimal digits: digits10 ~ prec * log10(2) ~ prec * 0.301
       int decDigits = static_cast<int>(prec * 0.301 * 0.8);
       R result = R(1);
+
       for(int i = 0; i < decDigits; ++i)
          result /= R(10);
+
       return result;
    }
 
@@ -580,8 +614,10 @@ struct PrecisionTraits<boost::multiprecision::number<
       unsigned prec = boost::multiprecision::mpfr_float_backend<0>::default_precision();
       int decDigits = static_cast<int>(prec * 0.301 * 0.6);
       R result = R(1);
+
       for(int i = 0; i < decDigits; ++i)
          result /= R(10);
+
       return result;
    }
 
@@ -590,8 +626,10 @@ struct PrecisionTraits<boost::multiprecision::number<
       unsigned prec = boost::multiprecision::mpfr_float_backend<0>::default_precision();
       int decDigits = static_cast<int>(prec * 0.301 * 0.65);
       R result = R(1);
+
       for(int i = 0; i < decDigits; ++i)
          result /= R(10);
+
       return result;
    }
 
@@ -600,8 +638,10 @@ struct PrecisionTraits<boost::multiprecision::number<
       unsigned prec = boost::multiprecision::mpfr_float_backend<0>::default_precision();
       int decDigits = static_cast<int>(prec * 0.301 * 0.5);
       R result = R(1);
+
       for(int i = 0; i < decDigits; ++i)
          result *= R(10);
+
       return result;
    }
 
@@ -624,8 +664,10 @@ struct PrecisionTraits<boost::multiprecision::number<
    {
       int expDigits = static_cast<int>(Digits * 0.8);
       R result = R(1);
+
       for(int i = 0; i < expDigits; ++i)
          result /= R(10);
+
       return result;
    }
 
@@ -643,8 +685,10 @@ struct PrecisionTraits<boost::multiprecision::number<
    {
       int expDigits = static_cast<int>(Digits * 0.6);
       R result = R(1);
+
       for(int i = 0; i < expDigits; ++i)
          result /= R(10);
+
       return result;
    }
 
@@ -652,8 +696,10 @@ struct PrecisionTraits<boost::multiprecision::number<
    {
       int expDigits = static_cast<int>(Digits * 0.65);
       R result = R(1);
+
       for(int i = 0; i < expDigits; ++i)
          result /= R(10);
+
       return result;
    }
 
@@ -661,8 +707,10 @@ struct PrecisionTraits<boost::multiprecision::number<
    {
       int expDigits = static_cast<int>(Digits * 0.5);
       R result = R(1);
+
       for(int i = 0; i < expDigits; ++i)
          result *= R(10);
+
       return result;
    }
 
@@ -775,9 +823,11 @@ public:
    R epsilon() const
    {
 #ifdef SOPLEX_WITH_BOOST
+
       // Return string-converted value if high-precision epsilon is set
       if(s_rational_epsilon_set && !s_epsilon_str.empty())
          return StringToNumber<R>::convert(s_epsilon_str);
+
 #endif
       return s_epsilon;
    }
@@ -787,8 +837,10 @@ public:
    T epsilonAs() const
    {
 #ifdef SOPLEX_WITH_BOOST
+
       if(s_rational_epsilon_set && !s_epsilon_str.empty())
          return StringToNumber<T>::convert(s_epsilon_str);
+
 #endif
       return T(s_epsilon);
    }
@@ -799,10 +851,12 @@ public:
       s_epsilon = eps;
       // Update epsilon multiplier for scaling
       R defaultEps = PrecisionTraits<R>::defaultEpsilon();
+
       if(defaultEps > R(0))
       {
          // Use sqrt of ratio to scale other tolerances proportionally
          R ratio = s_epsilon / defaultEps;
+
          if(ratio > R(0))
             s_epsilon_multiplier = SafeSqrt<R>::compute(ratio);
          else
@@ -812,6 +866,7 @@ public:
       {
          s_epsilon_multiplier = R(1);
       }
+
       updateMarker();
    }
 
@@ -857,19 +912,34 @@ public:
    }
 
    /// check if rational epsilons are set
-   bool hasRationalEpsilons() const { return s_rational_epsilon_set; }
+   bool hasRationalEpsilons() const
+   {
+      return s_rational_epsilon_set;
+   }
 
    /// get the stored epsilon string (for inspection)
-   const std::string& epsilonRational() const { return s_epsilon_str; }
+   const std::string& epsilonRational() const
+   {
+      return s_epsilon_str;
+   }
 
    /// get the stored factorization epsilon string
-   const std::string& epsilonFactorizationRational() const { return s_epsilon_factorization_str; }
+   const std::string& epsilonFactorizationRational() const
+   {
+      return s_epsilon_factorization_str;
+   }
 
    /// get the stored update epsilon string
-   const std::string& epsilonUpdateRational() const { return s_epsilon_update_str; }
+   const std::string& epsilonUpdateRational() const
+   {
+      return s_epsilon_update_str;
+   }
 
    /// get the stored pivot epsilon string
-   const std::string& epsilonPivotRational() const { return s_epsilon_pivot_str; }
+   const std::string& epsilonPivotRational() const
+   {
+      return s_epsilon_pivot_str;
+   }
 
    /// set feastol from string value (for high-precision solving)
    void setFeastolRational(const std::string& ftol)
@@ -886,97 +956,149 @@ public:
    }
 
    /// get the stored feastol string
-   const std::string& feastolRational() const { return s_feastol_str; }
+   const std::string& feastolRational() const
+   {
+      return s_feastol_str;
+   }
 
    /// get the stored opttol string
-   const std::string& opttolRational() const { return s_opttol_str; }
+   const std::string& opttolRational() const
+   {
+      return s_opttol_str;
+   }
 #endif
 
    /// zero epsilon used in factorization
    R epsilonFactorization() const
    {
 #ifdef SOPLEX_WITH_BOOST
+
       if(s_rational_epsilon_set && !s_epsilon_factorization_str.empty())
          return StringToNumber<R>::convert(s_epsilon_factorization_str);
+
 #endif
       return s_epsilon_factorization;
    }
 
    /// set zero epsilon used in factorization
-   void setEpsilonFactorization(const R& eps) { s_epsilon_factorization = eps; }
+   void setEpsilonFactorization(const R& eps)
+   {
+      s_epsilon_factorization = eps;
+   }
 
    /// zero epsilon used in factorization update
    R epsilonUpdate() const
    {
 #ifdef SOPLEX_WITH_BOOST
+
       if(s_rational_epsilon_set && !s_epsilon_update_str.empty())
          return StringToNumber<R>::convert(s_epsilon_update_str);
+
 #endif
       return s_epsilon_update;
    }
 
    /// set zero epsilon used in factorization update
-   void setEpsilonUpdate(const R& eps) { s_epsilon_update = eps; }
+   void setEpsilonUpdate(const R& eps)
+   {
+      s_epsilon_update = eps;
+   }
 
    /// zero epsilon used in pivot
    R epsilonPivot() const
    {
 #ifdef SOPLEX_WITH_BOOST
+
       if(s_rational_epsilon_set && !s_epsilon_pivot_str.empty())
          return StringToNumber<R>::convert(s_epsilon_pivot_str);
+
 #endif
       return s_epsilon_pivot;
    }
 
    /// set zero epsilon used in pivot
-   void setEpsilonPivot(const R& eps) { s_epsilon_pivot = eps; }
+   void setEpsilonPivot(const R& eps)
+   {
+      s_epsilon_pivot = eps;
+   }
 
    /// global feasibility tolerance
    R feastol() const
    {
 #ifdef SOPLEX_WITH_BOOST
+
       if(s_rational_epsilon_set && !s_feastol_str.empty())
          return StringToNumber<R>::convert(s_feastol_str);
+
 #endif
       return s_feastol;
    }
 
    /// set global feasibility tolerance
-   void setFeastol(const R& ftol) { s_feastol = ftol; }
+   void setFeastol(const R& ftol)
+   {
+      s_feastol = ftol;
+   }
 
    /// global optimality tolerance
    R opttol() const
    {
 #ifdef SOPLEX_WITH_BOOST
+
       if(s_rational_epsilon_set && !s_opttol_str.empty())
          return StringToNumber<R>::convert(s_opttol_str);
+
 #endif
       return s_opttol;
    }
 
    /// set global optimality tolerance
-   void setOpttol(const R& otol) { s_opttol = otol; }
+   void setOpttol(const R& otol)
+   {
+      s_opttol = otol;
+   }
 
    /// floating point feasibility tolerance used within the solver
-   R floatingPointFeastol() const { return s_floating_point_feastol; }
+   R floatingPointFeastol() const
+   {
+      return s_floating_point_feastol;
+   }
 
    /// set floating point feasibility tolerance used within the solver
-   void setFloatingPointFeastol(const R& ftol) { s_floating_point_feastol = ftol; }
+   void setFloatingPointFeastol(const R& ftol)
+   {
+      s_floating_point_feastol = ftol;
+   }
 
    /// floating point optimality tolerance used within the solver
-   R floatingPointOpttol() const { return s_floating_point_opttol; }
+   R floatingPointOpttol() const
+   {
+      return s_floating_point_opttol;
+   }
 
    /// set floating point optimality tolerance used within the solver
-   void setFloatingPointOpttol(const R& otol) { s_floating_point_opttol = otol; }
+   void setFloatingPointOpttol(const R& otol)
+   {
+      s_floating_point_opttol = otol;
+   }
 
    /// Get marker value for sparse vector operations (replaces SOPLEX_VECTOR_MARKER)
-   R marker() const { return s_marker; }
+   R marker() const
+   {
+      return s_marker;
+   }
 
    /// R-typed infinity threshold (replaces double-precision REALPARAM::INFTY)
-   R infinity() const { return s_infinity; }
+   R infinity() const
+   {
+      return s_infinity;
+   }
 
    /// set R-typed infinity threshold
-   void setInfinity(const R& inf) { s_infinity = inf; }
+   void setInfinity(const R& inf)
+   {
+      s_infinity = inf;
+   }
 
    /// scale a value such that it remains unchanged at default epsilon, but is scaled with smaller epsilon values
    /// this is updated in setEpsilon()

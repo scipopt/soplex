@@ -2895,6 +2895,7 @@ public:
       , spxout(old.spxout)
    {
       lp_scaler = nullptr;
+
       // When copying from a different precision type, create new tolerances with converted values
       if(old.tolerances())
       {
@@ -2908,6 +2909,7 @@ public:
          _tolerances->setFloatingPointFeastol(R(old.tolerances()->floatingPointFeastol()));
          _tolerances->setFloatingPointOpttol(R(old.tolerances()->floatingPointOpttol()));
       }
+
       assert(isConsistent());
    }
 

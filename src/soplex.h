@@ -1690,7 +1690,10 @@ public:
    R toleranceParam(const ToleranceParam param) const;
 
    /// returns R-typed infinity threshold (convenience method for toleranceParam(TOLERANCE_INFTY))
-   R infty() const { return _tolerances->infinity(); }
+   R infty() const
+   {
+      return _tolerances->infinity();
+   }
 
    /// sets R-typed tolerance parameter value; returns true on success
    /// This allows setting tolerances using the solver's native numeric type R,
