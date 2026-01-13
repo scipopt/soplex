@@ -126,6 +126,13 @@ public:
    void clear();
    /// set tolerances of internal pricers
    void setPricingTolerance(R tol);
+   /// set tolerances - propagate to internal pricers
+   virtual void setTolerances(std::shared_ptr<TolerancesBase<R>> newTolerances)
+   {
+      SPxPricer<R>::setTolerances(newTolerances);
+      devex.setTolerances(newTolerances);
+      steep.setTolerances(newTolerances);
+   }
    /// set the solver
    virtual void load(SPxSolverBase<R>* base);
    /// set entering/leaving algorithm

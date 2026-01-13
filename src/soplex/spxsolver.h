@@ -502,6 +502,16 @@ public:
       this->thePvec->setTolerances(newTolerances);
       this->theRPvec->setTolerances(newTolerances);
       this->theCPvec->setTolerances(newTolerances);
+
+      // propagate tolerances to attached components
+      if(thepricer != nullptr)
+         thepricer->setTolerances(newTolerances);
+
+      if(theratiotester != nullptr)
+         theratiotester->setTolerances(newTolerances);
+
+      if(thestarter != nullptr)
+         thestarter->setTolerances(newTolerances);
    }
 
    /// returns current tolerances

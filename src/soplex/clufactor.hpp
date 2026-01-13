@@ -29,20 +29,17 @@ namespace soplex
 {
 
 /**
- * @note Precision-Aware Zero Comparisons
+ * @note Zero Comparisons in CLUFactor
  *
- * For arbitrary precision support, numerical zero comparisons in this file
- * should use the epsilon-based helper methods defined in clufactor.h:
+ * Most zero comparisons in this file use exact comparison (x != 0.0) because
+ * they are checking for "structural zeros" - values that are exactly zero due
+ * to cancellation during elimination. Using epsilon-based comparison would
+ * incorrectly filter out small but non-zero values.
  *
- *   - isNumericallyNonZero(x) instead of (x != 0.0)
- *   - isNumericallyZero(x) instead of (x == 0.0)
- *
- * These use _tolerances->epsilon() which scales appropriately for the
- * numeric type R (e.g., 1e-280 for 1024-bit floats).
- *
- * Some comparisons intentionally remain exact (structural checks like n == 0,
- * or marker value assignments). The key numerical stability comparisons have
- * been updated to use the epsilon-based methods.
+ * The helper methods isNumericallyZero()/isNumericallyNonZero() defined in
+ * clufactor.h are available for cases where epsilon-based comparison is
+ * appropriate (e.g., comparing tolerance thresholds), but most iteration
+ * and elimination checks should use exact comparison.
  */
 
 /* Macro to print a warning message for huge values */
@@ -1129,9 +1126,10 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
             // and becomes zero. This would lead to an infinite loop in the
             // above elimination code, since the corresponding column index would
             // be enqueued for further elimination again and agian.
-            // Use epsilon-based check for numerical stability at arbitrary precision.
+            // Note: Use exact comparison here, not epsilon-based, since we're
+            // detecting structural zeros from exact cancellation.
 
-            if(isNumericallyNonZero(x))
+            if(x != 0.0)
             {
                if(spxAbs(x) > l_maxabs)
                   l_maxabs = spxAbs(x);
@@ -1263,7 +1261,9 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
             j = corig[i];
             x = p_work[j];
 
-            if(isNumericallyNonZero(x))
+            // Use exact comparison here, not epsilon-based, since we're
+            // detecting structural zeros from exact cancellation.
+            if(x != 0.0)
             {
                if(spxAbs(x) > l_maxabs)
                   l_maxabs = spxAbs(x);
@@ -3174,7 +3174,7 @@ void CLUFactor<R>::solveUright(R* wrk, R* vec) const
 
       vec[r] = 0.0;
 
-      if(isNumericallyNonZero(x))
+      if(x != 0.0)
       {
          for(int j = u.col.start[c]; j < u.col.start[c] + u.col.len[c]; j++)
             vec[u.col.idx[j]] -= x * u.col.val[j];
@@ -3716,7 +3716,7 @@ void CLUFactor<R>::solveUleft(R* p_work, R* vec)
 
       vec[c]  = 0.0;
 
-      if(isNumericallyNonZero(x))
+      if(x != 0.0)
       {
          SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE01", x);
          SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE02", diag[r]);
@@ -4053,7 +4053,7 @@ void CLUFactor<R>::solveLleft(R* vec) const
       int  r = l.rorig[i];
       R x = vec[r];
 
-      if(isNumericallyNonZero(x))
+      if(x != 0.0)
       {
          for(int k = l.rbeg[r]; k < l.rbeg[r + 1]; k++)
          {
@@ -4715,7 +4715,7 @@ void CLUFactor<R>::solveLleftNoNZ(R* vec)
       r = rorig[i];
       x = vec[r];
 
-      if(isNumericallyNonZero(x))
+      if(x != 0.0)
       {
          k = rbeg[r];
          j = rbeg[r + 1] - k;
