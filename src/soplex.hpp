@@ -9758,10 +9758,12 @@ SoPlexBase<R>::SoPlexBase()
    _solver.setBasisSolver(&_slufactor);
 
 #ifdef SOPLEX_WITH_MPFR
+
    // Set initial precision to at least 50 bits (the original default)
    // If user has already set a higher precision, preserve it
    if(BP::default_precision() < 50)
       BP::default_precision(50);
+
    _initialPrecision = BP::default_precision();
 
    _boostedSolver.setOutstream(spxout);
