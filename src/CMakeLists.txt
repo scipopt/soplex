@@ -145,7 +145,7 @@ set_target_properties(libsoplex-pic PROPERTIES
     VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}
     SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
 add_dependencies(libsoplex-pic soplex_update_githash)
-target_include_directories(libsoplex-pic PUBLIC
+target_include_directories(libsoplex-pic BEFORE PUBLIC
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:include>)
@@ -163,7 +163,7 @@ set_target_properties(libsoplex PROPERTIES
     VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}
     SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
 add_dependencies(libsoplex soplex_update_githash)
-target_include_directories(libsoplex PUBLIC
+target_include_directories(libsoplex BEFORE PUBLIC
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:include>)
@@ -185,7 +185,7 @@ if(MSVC)
     target_compile_options(libsoplexshared PUBLIC "/Zc:__cplusplus")
     setLibProperties(libsoplexshared "libsoplexshared")
 endif()
-target_include_directories(libsoplexshared PUBLIC
+target_include_directories(libsoplexshared BEFORE PUBLIC
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:include>)
