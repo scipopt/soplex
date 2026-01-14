@@ -38,19 +38,6 @@
  */
 #ifndef _SPXDEFINES_H_
 #define _SPXDEFINES_H_
-#include <cmath>
-
-#ifdef _MSC_VER
-#include <float.h>
-#endif
-
-#include <assert.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <string>
-#include <iostream>
-#include <cstdlib>
-#include <memory>
 
 /*
  * include build configuration flags
@@ -84,6 +71,19 @@
 #endif
 
 #endif
+
+#include <assert.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <string>
+#include <iostream>
+#include <cstdlib>
+#include <memory>
+#include <cmath>
+#ifdef _MSC_VER
+#include <float.h>
+#endif
+
 
 namespace soplex
 {
