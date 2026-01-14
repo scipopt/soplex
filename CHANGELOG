@@ -6,6 +6,7 @@ fixed bugs:
 - accept empty column in MPS file
 - reject missing continuation in LP file
 - fix missing include of boost/version.hpp in soplexmain.cpp
+- prioritize local includes in cmake to ensure correct configuration for globally installed version
 
 November 2025 - Release 8.0.0
 ==================
