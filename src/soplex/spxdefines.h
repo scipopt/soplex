@@ -452,12 +452,6 @@ struct PrecisionTraits
    {
       return R(SOPLEX_DEFAULT_INFINITY);
    }
-
-   /// Compute marker value from epsilon (used for sparse vector operations)
-   static R markerValue(const R& eps)
-   {
-      return eps * eps;
-   }
 };
 
 /// Specialization of PrecisionTraits for Real (double/long double/float)
@@ -487,10 +481,6 @@ struct PrecisionTraits<Real>
    static Real defaultInfinity()
    {
       return SOPLEX_DEFAULT_INFINITY;
-   }
-   static Real markerValue(const Real& eps)
-   {
-      return eps * eps;
    }
 };
 
@@ -570,12 +560,6 @@ struct PrecisionTraits<boost::multiprecision::number<
 
       return result;
    }
-
-   /// Marker value: epsilon squared
-   static R markerValue(const R& eps)
-   {
-      return eps * eps;
-   }
 };
 
 /// Specialization for MPFR with 0 digits (variable precision at runtime)
@@ -644,11 +628,6 @@ struct PrecisionTraits<boost::multiprecision::number<
 
       return result;
    }
-
-   static R markerValue(const R& eps)
-   {
-      return eps * eps;
-   }
 };
 #endif // SOPLEX_WITH_MPFR
 
@@ -713,11 +692,6 @@ struct PrecisionTraits<boost::multiprecision::number<
 
       return result;
    }
-
-   static R markerValue(const R& eps)
-   {
-      return eps * eps;
-   }
 };
 #endif // SOPLEX_WITH_CPPMPF
 
@@ -762,8 +736,6 @@ private:
    R s_floating_point_opttol;
    /// multiplier for fixed numbers that should change if s_epsilon changes
    R s_epsilon_multiplier;
-   /// marker value for sparse vector operations (scales with epsilon)
-   R s_marker;
    /// infinity threshold (R-typed for high precision)
    R s_infinity;
 
@@ -781,12 +753,6 @@ private:
 #endif
    ///@}
 
-   /// Update the marker value based on current epsilon
-   void updateMarker()
-   {
-      s_marker = PrecisionTraits<R>::markerValue(s_epsilon);
-   }
-
 public:
 
    /// default constructor using precision-appropriate defaults
@@ -800,7 +766,6 @@ public:
       , s_floating_point_feastol(PrecisionTraits<R>::defaultFeastol())
       , s_floating_point_opttol(PrecisionTraits<R>::defaultFeastol())
       , s_epsilon_multiplier(R(1))
-      , s_marker(R(0))
       , s_infinity(PrecisionTraits<R>::defaultInfinity())
 #ifdef SOPLEX_WITH_BOOST
       , s_epsilon_str("")
@@ -811,9 +776,7 @@ public:
       , s_opttol_str("")
       , s_rational_epsilon_set(false)
 #endif
-   {
-      updateMarker();
-   }
+   {}
 
    //------------------------------------
    /**@name Access / modification */
@@ -866,8 +829,6 @@ public:
       {
          s_epsilon_multiplier = R(1);
       }
-
-      updateMarker();
    }
 
 #ifdef SOPLEX_WITH_BOOST
@@ -1082,10 +1043,10 @@ public:
       s_floating_point_opttol = otol;
    }
 
-   /// Get marker value for sparse vector operations (replaces SOPLEX_VECTOR_MARKER)
+   /// Get marker value for sparse vector operations
    R marker() const
    {
-      return s_marker;
+      return std::numeric_limits<R>::min();
    }
 
    /// R-typed infinity threshold (replaces double-precision REALPARAM::INFTY)

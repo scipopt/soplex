@@ -44,8 +44,6 @@
 #include "soplex/svsetbase.h"
 #include "soplex/timer.h"
 
-/// @deprecated Use tolerances()->marker() instead for precision-aware marker values
-#define SOPLEX_VECTOR_MARKER   1e-100
 
 namespace soplex
 {
@@ -707,7 +705,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A,
             if(oldval != 0 && newval == 0)
                VectorBase<R>::val[elt.idx] = this->tolerances()->marker();
             // Otherwise, store the value. If oldval was the marker value before, it does not
-            // hurt because the marker is very small (scales with epsilon).
+            // hurt because the marker is really small.
             else
             {
                VectorBase<R>::val[elt.idx] = newval;

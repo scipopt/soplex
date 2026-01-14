@@ -58,12 +58,6 @@ namespace soplex
 #define SOPLEX_DEBUG_CHECK_HUGE_VALUE( prefix, value ) /**/
 #endif
 
-/* This number is used to decide wether a value is zero
- * or was explicitly set to zero.
- * @deprecated Use _tolerances->marker() instead for precision-aware marker values
- */
-#define SOPLEX_FACTOR_MARKER     1e-100
-
 static const Real verySparseFactor = 0.001;
 static const Real verySparseFactor4right = 0.2;
 static const Real verySparseFactor4left  = 0.1;
@@ -4775,7 +4769,7 @@ void CLUFactor<R>::vSolveLright(R* vec, int* ridx, int& rn, R eps)
    {
       x = vec[lrow[i]];
 
-      // check whether there is a corresponding value in the rhs VectorBase<R>; skipping/ignoring FACTOR_MARKER
+      // check whether there is a corresponding value in the rhs VectorBase<R>; skipping/ignoring marker()
       if(isNotZero(x, eps))
       {
          k = lbeg[i];
@@ -4848,14 +4842,14 @@ void CLUFactor<R>::vSolveLright2(
       x2 = vec2[j];
       x = vec[j];
 
-      // check whether there is a corresponding value in the first rhs VectorBase<R>; skipping/ignoring FACTOR_MARKER
+      // check whether there is a corresponding value in the first rhs VectorBase<R>; skipping/ignoring marker()
       if(isNotZero(x, eps))
       {
          k = lbeg[i];
          idx = &(lidx[k]);
          val = &(lval[k]);
 
-         // check whether there is  also a corresponding value in the second rhs VectorBase<R>; skipping/ignoring FACTOR_MARKER
+         // check whether there is  also a corresponding value in the second rhs VectorBase<R>; skipping/ignoring marker()
          if(isNotZero(x2, eps2))
          {
             for(j = lbeg[i + 1]; j > k; --j)
