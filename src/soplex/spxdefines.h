@@ -79,6 +79,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <memory>
+#include <limits>
 #include <cmath>
 #ifdef _MSC_VER
 #include <float.h>
