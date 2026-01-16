@@ -6157,7 +6157,7 @@ template <class R>
 void SoPlexBase<R>::factorizeColumnRational(SolRational& sol,
       DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
       DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& stoppedTime,
-      bool& stoppedIter, bool& error, bool& optimal, bool& ratfacjump)
+      bool& stoppedIter, bool& error, bool& optimal, bool ratfacjump)
 {
    // start rational solving time
    _statistics->rationalTime->start();
