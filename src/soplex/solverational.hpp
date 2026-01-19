@@ -6141,14 +6141,23 @@ void SoPlexBase<R>::_computeBasisInverseRational()
    return;
 }
 
-
-
 /// factorizes rational basis matrix in column representation
 template <class R>
 void SoPlexBase<R>::factorizeColumnRational(SolRational& sol,
       DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
       DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& stoppedTime,
       bool& stoppedIter, bool& error, bool& optimal)
+{
+   factorizeColumnRational(sol, basisStatusRows, basisStatusCols, stoppedTime, stoppedIter,
+                           error, optimal, boolParam(RATFACJUMP));
+}
+
+/// factorizes rational basis matrix in column representation
+template <class R>
+void SoPlexBase<R>::factorizeColumnRational(SolRational& sol,
+      DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
+      DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& stoppedTime,
+      bool& stoppedIter, bool& error, bool& optimal, bool forceSolutionUpdate)
 {
    // start rational solving time
    _statistics->rationalTime->start();
@@ -6528,7 +6537,7 @@ void SoPlexBase<R>::factorizeColumnRational(SolRational& sol,
    // store solution
    optimal = primalFeasible && dualFeasible;
 
-   if(optimal || boolParam(SoPlexBase<R>::RATFACJUMP))
+   if(optimal || forceSolutionUpdate)
    {
       _hasBasis = true;
 

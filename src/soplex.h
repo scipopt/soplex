@@ -2565,6 +2565,12 @@ public:
                                 DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& stoppedTime,
                                 bool& stoppedIter, bool& error, bool& optimal);
 
+   /// factorizes rational basis matrix in column representation
+   void factorizeColumnRational(SolRational& sol,
+                                DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
+                                DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& stoppedTime,
+                                bool& stoppedIter, bool& error, bool& optimal, bool forceSolutionUpdate);
+
 private:
 
    /// attempts rational reconstruction of primal-dual solution
