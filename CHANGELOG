@@ -4,7 +4,7 @@ Next - Release 9.0.0
 features:
 
 interface & parameters:
-- added an overloaded version of SoPlexBase<R>::factorizeColumnRational() with an additional boolean parameter ratfacjump. (SOPLEX_APIVERSION 21)
+- added an overloaded version of SoPlexBase<R>::factorizeColumnRational() with an additional boolean parameter forceSolutionUpdate to compute solution values also when the basis is not optimal. (SOPLEX_APIVERSION 21)
 
 build system:
 
