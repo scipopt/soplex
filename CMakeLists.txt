@@ -109,6 +109,9 @@ add_custom_target(soplex_update_githash
 add_custom_target(soplex_cleanup_config ALL
                   COMMAND ${CMAKE_COMMAND} -E remove -f "${PROJECT_SOURCE_DIR}/src/soplex/config.h")
 
+# include build before to ensure local configuration
+include_directories(BEFORE ${PROJECT_BINARY_DIR})
+
 if(NOT "${CMAKE_CXX_COMPILE_FEATURES}" MATCHES "cxx_thread_local")
     add_definitions(-DTHREADLOCAL=)
 endif()
