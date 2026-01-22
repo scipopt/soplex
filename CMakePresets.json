@@ -1,0 +1,33 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "default",
+      "description": "Default full configuration",
+      "cacheVariables": {
+        "LTO": "On"
+      }
+    },
+    {
+      "name": "minimal",
+      "description": "Minimal built-in configuration",
+      "cacheVariables": {
+        "AUTOBUILD": "Off",
+        "PAPILO": "Off",
+        "ZLIB": "Off",
+        "BOOST": "Off",
+        "GMP": "Off",
+        "MPFR": "Off",
+        "QUADMATH": "Off"
+      }
+    },
+    {
+      "name": "interface",
+      "description": "User interface configuration",
+      "cacheVariables": {
+        "AUTOBUILD": "Off",
+        "LTO": "On"
+      }
+    }
+  ]
+}
