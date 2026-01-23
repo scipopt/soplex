@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.11)
 
+# INTERPROCEDURAL_OPTIMIZATION is enforced when enabled.
+if(POLICY CMP0069)
+   cmake_policy(SET CMP0069 NEW)
+endif()
+
 # FindBoost is removed in version cmake 3.30
 if(POLICY CMP0167)
     cmake_policy(SET CMP0167 NEW)
@@ -43,6 +48,20 @@ option(MT "use static runtime libraries for Visual Studio compiler" OFF)
 option(SANITIZE "should sanitizers be enabled if available" OFF)
 option(COVERAGE "enable coverage support" OFF)
 option(PAPILO "should papilo library be linked" ON)
+option(LTO "Enable Link Time Optimization, aka Interprocedural Optimization" OFF)
+
+if(LTO)
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT LTO_AVAILABLE LANGUAGES CXX OUTPUT output)
+    if(LTO_AVAILABLE)
+        message(STATUS "LTO available")
+    else(LTO_AVAILABLE)
+        message(STATUS "LTO not available: ${output}")
+    endif(LTO_AVAILABLE)
+else()
+    message(STATUS "LTO not enabled")
+    set(LTO_AVAILABLE FALSE)
+endif()
 
 SET(COVERAGE_CTEST_ARGS "" CACHE STRING "additional ctest arguments for coverage")
 

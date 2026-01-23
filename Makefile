@@ -57,6 +57,7 @@ SPXGITHASH	=
 VERBOSE		=	false
 SHARED		=	false
 OPT		=	opt
+LTO		=	false
 STATICLIBEXT	=	a
 SHAREDLIBEXT	=	so
 LIBEXT		=	$(STATICLIBEXT)
