@@ -189,7 +189,8 @@ target_include_directories(libsoplexshared PUBLIC
     $<INSTALL_INTERFACE:include>)
 target_link_libraries(libsoplexshared libsoplex ${libs})
 set_target_properties(libsoplexshared PROPERTIES CXX_VISIBILITY_PRESET default)
-set_property(TARGET libsoplexshared PROPERTY INTERPROCEDURAL_OPTIMIZATION ${LTO_AVAILABLE})
+# TODO: enable Windows LTO
+set_property(TARGET libsoplexshared PROPERTY INTERPROCEDURAL_OPTIMIZATION NOT MSVC AND ${LTO_AVAILABLE})
 
 # create soplex binary using library without pic
 add_executable(soplex soplexmain.cpp)
