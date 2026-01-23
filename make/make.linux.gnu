@@ -36,8 +36,8 @@ ifeq ($(LTO),true)
   LTOFLAG := $(word $(shell expr \( $(GCCVERSION) \>= 10 \) + 1), -flto -flto=auto)
 
   CXXFLAGS	+=	$(LTOFLAG) -fno-fat-lto-objects
-  LDFLAGS	+=	$(LTOFLAG)
+  LDFLAGS	+=	$(LTOFLAG) -Wno-stringop-overflow -Wno-alloc-size-larger-than
 ifeq ($(SHARED),true)
-  LIBBUILDFLAGS +=	$(LTOFLAG)
+  LIBBUILDFLAGS +=	$(LTOFLAG) -Wno-stringop-overflow -Wno-alloc-size-larger-than
 endif
 endif
