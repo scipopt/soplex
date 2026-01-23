@@ -6,6 +6,7 @@ features:
 interface & parameters:
 
 build system:
+- add link-time-optimization for release builds if supported by compiler, use -DLTO=on for cmake or LTO=true for make to enable
 
 fixed bugs:
 
