@@ -43,7 +43,6 @@ option(STATIC_GMP "Prefer static GMP lib" OFF)
 option(BOOST "Use Boost (required to build the binary). Disable if you only want to build libsoplex." ON)
 option(QUADMATH "should quadmath library be used" OFF)
 option(MPFR "Use MPFR" ON)
-option(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS "Export all symbols into the DLL" ON)
 option(MT "use static runtime libraries for Visual Studio compiler" OFF)
 option(SANITIZE "should sanitizers be enabled if available" OFF)
 option(COVERAGE "enable coverage support" OFF)
@@ -52,7 +51,7 @@ option(LTO "Enable Link Time Optimization, aka Interprocedural Optimization" OFF
 
 if(LTO)
     # link time optimization fails with dynamic symbol export for MSVC
-    if(NOT MSVC OR NOT CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS)
+    if(NOT MSVC)
         include(CheckIPOSupported)
         check_ipo_supported(RESULT LTO_AVAILABLE LANGUAGES CXX OUTPUT output)
         if(LTO_AVAILABLE)
@@ -244,6 +243,8 @@ endif()
 
 # disable fused floating point contraction to enhance reproducibility across compilers and architectures
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    # TODO: manually export symbols
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
     add_compile_options(/fp:precise /bigobj)
     add_definitions(/wd4100)
     add_definitions(/wd4661)
