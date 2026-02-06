@@ -38,8 +38,6 @@ bool EQ(int a, int b)
    return (a == b);
 }
 
-SOPLEX_THREADLOCAL const Real infinity                 = SOPLEX_DEFAULT_INFINITY;
-
 bool msginconsistent(const char* name, const char* file, int line)
 {
    assert(name != nullptr);

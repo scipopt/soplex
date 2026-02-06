@@ -299,7 +299,7 @@ typedef double Real;
 
 #define SPX_MAXSTRLEN       1024 /**< maximum string length in SoPlex */
 
-SOPLEX_THREADLOCAL extern const Real infinity;
+static const Real infinity = SOPLEX_DEFAULT_INFINITY;
 
 class Tolerances
 {

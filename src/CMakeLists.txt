@@ -128,10 +128,6 @@ file(GLOB headers
     soplex/*.hpp
 )
 
-if(MSVC)
-   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-endif()
-
 # create soplex library with pic
 add_library(libsoplex-pic STATIC ${sources})
 if(MSVC)
@@ -150,6 +146,7 @@ target_include_directories(libsoplex-pic BEFORE PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:include>)
 target_link_libraries(libsoplex-pic ${libs})
+set_property(TARGET libsoplex-pic PROPERTY INTERPROCEDURAL_OPTIMIZATION ${LTO_AVAILABLE})
 
 # create soplex library without pic
 add_library(libsoplex STATIC ${sources})
@@ -168,6 +165,7 @@ target_include_directories(libsoplex BEFORE PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:include>)
 target_link_libraries(libsoplex ${libs})
+set_property(TARGET libsoplex PROPERTY INTERPROCEDURAL_OPTIMIZATION ${LTO_AVAILABLE})
 
 # create C shared library
 add_library(libsoplexshared SHARED ${sources})
@@ -191,15 +189,17 @@ target_include_directories(libsoplexshared BEFORE PUBLIC
     $<INSTALL_INTERFACE:include>)
 target_link_libraries(libsoplexshared libsoplex ${libs})
 set_target_properties(libsoplexshared PROPERTIES CXX_VISIBILITY_PRESET default)
+# TODO: enable Windows LTO
+set_property(TARGET libsoplexshared PROPERTY INTERPROCEDURAL_OPTIMIZATION NOT MSVC AND ${LTO_AVAILABLE})
 
 # create soplex binary using library without pic
 add_executable(soplex soplexmain.cpp)
 target_link_libraries(soplex LINK_PUBLIC libsoplex)
-
 if(EMSCRIPTEN AND EMSCRIPTEN_HTML)
     set_target_properties(soplex PROPERTIES LINK_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/soplex_webdemo_shell.html)
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
 endif()
+set_property(TARGET soplex PROPERTY INTERPROCEDURAL_OPTIMIZATION ${LTO_AVAILABLE})
 
 if(SANITIZE)
     find_package(Sanitizers)
@@ -212,6 +212,7 @@ endif(SANITIZE)
 
 add_executable(example EXCLUDE_FROM_ALL example.cpp)
 target_link_libraries(example libsoplex)
+set_property(TARGET example PROPERTY INTERPROCEDURAL_OPTIMIZATION ${LTO_AVAILABLE})
 
 # set the install rpath to the installed destination
 set_target_properties(soplex PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")

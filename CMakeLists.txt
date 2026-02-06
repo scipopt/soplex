@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.11)
 
+# INTERPROCEDURAL_OPTIMIZATION is enforced when enabled.
+if(POLICY CMP0069)
+   cmake_policy(SET CMP0069 NEW)
+endif()
+
 # FindBoost is removed in version cmake 3.30
 if(POLICY CMP0167)
     cmake_policy(SET CMP0167 NEW)
@@ -38,11 +43,32 @@ option(STATIC_GMP "Prefer static GMP lib" OFF)
 option(BOOST "Use Boost (required to build the binary). Disable if you only want to build libsoplex." ON)
 option(QUADMATH "should quadmath library be used" OFF)
 option(MPFR "Use MPFR" ON)
-option(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS "Export all symbols into the DLL" ON)
 option(MT "use static runtime libraries for Visual Studio compiler" OFF)
 option(SANITIZE "should sanitizers be enabled if available" OFF)
 option(COVERAGE "enable coverage support" OFF)
 option(PAPILO "should papilo library be linked" ON)
+option(LTO "Enable Link Time Optimization, aka Interprocedural Optimization" OFF)
+
+if(LTO)
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT LTO_AVAILABLE LANGUAGES CXX OUTPUT output)
+    if(LTO_AVAILABLE)
+        message(STATUS "LTO available")
+
+        # with link-time optimization enabled, we get additional warnings at link time on
+        # - some presumed malloc() calls with size 18446744073709551608 ((uint)-1)
+        # - some presumed memmove() calls in boost::container::short_vector via papilo to a 0-length memory
+        # we disable these warnings (need to pass them to the compiler when linking)
+        if((CMAKE_CXX_COMPILER_ID MATCHES "GNU") OR (CMAKE_CXX_COMPILER_ID MATCHES "CLANG"))
+            add_link_options(-Wno-alloc-size-larger-than -Wno-stringop-overflow)
+        endif()
+    else(LTO_AVAILABLE)
+        message(STATUS "LTO not available: ${output}")
+    endif(LTO_AVAILABLE)
+else()
+    message(STATUS "LTO not enabled")
+    set(LTO_AVAILABLE FALSE)
+endif()
 
 SET(COVERAGE_CTEST_ARGS "" CACHE STRING "additional ctest arguments for coverage")
 
@@ -214,6 +240,8 @@ endif()
 
 # disable fused floating point contraction to enhance reproducibility across compilers and architectures
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    # TODO: manually export symbols
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
     add_compile_options(/fp:precise /bigobj)
     add_definitions(/wd4100)
     add_definitions(/wd4661)

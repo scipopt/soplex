@@ -5,3 +5,11 @@ ARFLAGS		=	crs
 ZLIB_FLAGS	=
 ZLIB_LDFLAGS 	=	-lz
 CXXFLAGS        +=      $(GCCWARN) -ffp-contract=off -std=c++14
+
+ifeq ($(LTO),true)
+  CXXFLAGS	+=	-flto
+  LDFLAGS	+=	-flto
+ifeq ($(SHARED),true)
+  LIBBUILDFLAGS +=	-flto
+endif
+endif
