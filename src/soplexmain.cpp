@@ -1456,14 +1456,6 @@ int main(int argc, char* argv[])
    int precision = 0;
    int optidx;
 
-   // find out which precision/solvemode soplex should be run in. the rest happens in runSoPlex
-   // no options were given
-   if(argc <= 1)
-   {
-      printUsage(argv, 0);
-      return 1;
-   }
-
    // read arguments from command line
    for(optidx = 1; optidx < argc; optidx++)
    {
@@ -1484,6 +1476,7 @@ int main(int argc, char* argv[])
          return 1;
       }
 
+      // find out which arithmetic soplex should be run in, the rest happens in runSoPlex
       switch(option[1])
       {
       case '-' :
