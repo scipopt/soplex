@@ -37,9 +37,6 @@
 #include <iomanip>
 #include <fstream>
 
-#ifdef SOPLEX_WITH_BOOST
-#include <boost/version.hpp>
-#endif
 
 using namespace soplex;
 
@@ -52,6 +49,7 @@ void printUsage(const char* const argv[], int idx)
 {
    const char* usage =
       "general options:\n"
+      "  --version              print version and compiler information\n"
       "  --readbas=<basfile>    read starting basis from file\n"
       "  --writebas=<basfile>   write terminal basis to file\n"
       "  --writefile=<lpfile>   write LP to file in LP or MPS format depending on extension\n"
@@ -802,6 +800,9 @@ int runSoPlex(int argc, char* argv[])
       soplex->printVersion();
       SPX_MSG_INFO1(soplex->spxout, soplex->spxout << SOPLEX_COPYRIGHT << std::endl << std::endl);
 
+      soplex->printExternalCodes();
+      SPX_MSG_INFO1(soplex->spxout, soplex->spxout << std::endl);
+
       validation = nullptr;
       spx_alloc(validation);
       new(validation) Validation<R>();
@@ -844,8 +845,36 @@ int runSoPlex(int argc, char* argv[])
          {
             option = &option[2];
 
+            // --version : print compiler information
+            if(strncmp(option, "version", 7) == 0)
+            {
+               // compiler
+               SPX_MSG_INFO1(soplex->spxout, soplex->spxout << "Compiler: ");
+#if defined(__INTEL_COMPILER)
+               SPX_MSG_INFO1(soplex->spxout, soplex->spxout << "Intel " << __INTEL_COMPILER << std::endl);
+#elif defined(__clang__)
+               SPX_MSG_INFO1(soplex->spxout, soplex->spxout << "clang " << __clang_major__ << "." <<
+                             __clang_minor__ << "." << __clang_patchlevel__ << std::endl);
+#elif defined(_MSC_VER)
+               SPX_MSG_INFO1(soplex->spxout, soplex->spxout << "microsoft visual c++ " << _MSC_FULL_VER <<
+                             std::endl);
+#elif defined(__GNUC__)
+#if defined(__GNUC_PATCHLEVEL__)
+               SPX_MSG_INFO1(soplex->spxout, soplex->spxout << "gcc " << __GNUC__ << "." << __GNUC_MINOR__ << "."
+                             << __GNUC_PATCHLEVEL__ << std::endl);
+#else
+               SPX_MSG_INFO1(soplex->spxout, soplex->spxout << "gcc " << __GNUC__ << "." << __GNUC_MINOR__ <<
+                             std::endl);
+#endif
+#else
+               SPX_MSG_INFO1(soplex->spxout, soplex->spxout << "unknown" << std::endl);
+#endif
+
+               returnValue = 0;
+               goto TERMINATE_FREESTRINGS;
+            }
             // --readbas=<basfile> : read starting basis from file
-            if(strncmp(option, "readbas=", 8) == 0)
+            else if(strncmp(option, "readbas=", 8) == 0)
             {
                if(readbasname == nullptr)
                {

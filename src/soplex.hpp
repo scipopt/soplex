@@ -26,19 +26,38 @@
  * @brief General templated functions for SoPlex
  */
 
+#include "soplex/config.h"
+
+#ifdef _MSC_VER
+#define strncasecmp _strnicmp
+#else
+#include <strings.h>
+#endif
+#include <iomanip>
+#include <sstream>
+
+#ifdef SOPLEX_WITH_PAPILO
+#include "papilo/Config.hpp"
+#endif
+#ifdef SOPLEX_WITH_BOOST
+#include <boost/version.hpp>
+#endif
+#ifdef SOPLEX_WITH_GMP
+#include <gmp.h>
+#endif
+#ifdef SOPLEX_WITH_MPFR
+#include <mpfr.h>
+#endif
+#ifdef SOPLEX_WITH_ZLIB
+#include <zlib.h>
+#endif
+
+
 /// maximum length of lines in settings file
 #define SPX_SET_MAX_LINE_LEN 500
 
 /// default setting for LU refactorization interval
 #define SOPLEX_REFACTOR_INTERVAL 200
-
-#ifdef _MSC_VER
-#define strncasecmp _strnicmp
-#endif
-
-#ifndef _MSC_VER
-#include <strings.h>
-#endif
 
 namespace soplex
 {
@@ -7170,19 +7189,72 @@ void SoPlexBase<R>::printVersion() const
    SPX_MSG_INFO1(spxout, spxout << " [rational: long double]");
 #endif
 
+#ifdef SOPLEX_WITH_PAPILO
+   SPX_MSG_INFO1(spxout, spxout << " [PaPILO "
+                 << PAPILO_VERSION_MAJOR << "." << PAPILO_VERSION_MINOR << "." << PAPILO_VERSION_PATCH << "]");
+#else
+   SPX_MSG_INFO1(spxout, spxout << " [PaPILO n/a]");
+#endif
+
+   SPX_MSG_INFO1(spxout, spxout << " [GitHash: " << getGitHash() << "]\n");
+}
+
+
+/// prints external libraries
+template <class R>
+void SoPlexBase<R>::printExternalCodes() const
+{
+   SPX_MSG_INFO1(spxout, spxout << "External libraries:");
+
+#if !defined(SOPLEX_WITH_PAPILO) && !defined(SOPLEX_WITH_BOOST) && !defined(SOPLEX_WITH_GMP) && !defined(SOPLEX_WITH_MPFR) && !defined(SOPLEX_WITH_ZLIB)
+   SPX_MSG_INFO1(spxout, spxout << " none\n");
+   return;
+#endif
+
+   SPX_MSG_INFO1(spxout, spxout << "\n");
 
 #ifdef SOPLEX_WITH_PAPILO
-   SPX_MSG_INFO1(spxout, spxout << " [PaPILO  " << PAPILO_VERSION_MAJOR << "." << PAPILO_VERSION_MINOR
-                 << "." << PAPILO_VERSION_PATCH);
+   {
+      std::ostringstream papiloversion;
+      papiloversion << PAPILO_VERSION_MAJOR << "." << PAPILO_VERSION_MINOR << "." << PAPILO_VERSION_PATCH;
+      SPX_MSG_INFO1(spxout, spxout << "  PaPILO " << std::left << std::setw(13) << papiloversion.str()
+                    << " Parallel Presolve for Integer and Linear Optimization");
+   }
 #ifdef PAPILO_GITHASH_AVAILABLE
-   SPX_MSG_INFO1(spxout, spxout << " {" <<  PAPILO_GITHASH << "}");
+   SPX_MSG_INFO1(spxout, spxout << " [GitHash: " << PAPILO_GITHASH << "]");
 #endif
-   SPX_MSG_INFO1(spxout, spxout << "]\n");
-#else
-   SPX_MSG_INFO1(spxout, spxout << " [PaPILO: not available]");
+   SPX_MSG_INFO1(spxout, spxout << "\n");
 #endif
 
-   SPX_MSG_INFO1(spxout, spxout << " [githash: " << getGitHash() << "]\n");
+#ifdef SOPLEX_WITH_BOOST
+   {
+      std::ostringstream boostversion;
+      boostversion << BOOST_VERSION / 100000 << "." << BOOST_VERSION / 100 % 1000 << "." << BOOST_VERSION
+                   % 100;
+      SPX_MSG_INFO1(spxout, spxout << "  Boost " << std::left << std::setw(14) << boostversion.str()
+                    << " Boost C++ Libraries (boost.org)\n");
+   }
+#endif
+
+#ifdef SOPLEX_WITH_GMP
+#ifdef mpir_version
+   SPX_MSG_INFO1(spxout, spxout << "  MPIR " << std::left << std::setw(15) << mpir_version
+                 << " Multiple Precision Integers and Rationals Library developed by W. Hart (mpir.org)\n");
+#else
+   SPX_MSG_INFO1(spxout, spxout << "  GMP " << std::left << std::setw(16) << gmp_version
+                 << " GNU Multiple Precision Arithmetic Library developed by T. Granlund (gmplib.org)\n");
+#endif
+#endif
+
+#ifdef SOPLEX_WITH_MPFR
+   SPX_MSG_INFO1(spxout, spxout << "  MPFR " << std::left << std::setw(15) << MPFR_VERSION_STRING
+                 << " GNU Multiple Precision Floating-Point Reliable Library (mpfr.org)\n");
+#endif
+
+#ifdef SOPLEX_WITH_ZLIB
+   SPX_MSG_INFO1(spxout, spxout << "  ZLIB " << std::left << std::setw(15) << ZLIB_VERSION
+                 << " General Purpose Compression Library by J. Gailly and M. Adler (zlib.net)\n");
+#endif
 }
 
 
