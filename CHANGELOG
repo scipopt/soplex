@@ -3,6 +3,7 @@ Release 8.0.2
 
 fixed bugs:
 - print version header also without arguments
+- ensure that PaPILO defines are available in fmt.hpp
 
 February 2026 - Release 8.0.1
 ==================
