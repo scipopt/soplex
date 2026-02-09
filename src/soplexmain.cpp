@@ -37,9 +37,6 @@
 #include <iomanip>
 #include <fstream>
 
-#ifdef SOPLEX_WITH_BOOST
-#include <boost/version.hpp>
-#endif
 
 using namespace soplex;
 
@@ -802,6 +799,9 @@ int runSoPlex(int argc, char* argv[])
 
       soplex->printVersion();
       SPX_MSG_INFO1(soplex->spxout, soplex->spxout << SOPLEX_COPYRIGHT << std::endl << std::endl);
+
+      soplex->printExternalCodes();
+      SPX_MSG_INFO1(soplex->spxout, soplex->spxout << std::endl);
 
       validation = nullptr;
       spx_alloc(validation);
