@@ -2,9 +2,11 @@ Next - Release 9.0.0
 ==================
 
 features:
+- command line option --version to print version and compiler information
 
 interface & parameters:
 - added an overloaded version of SoPlexBase<R>::factorizeColumnRational() with an additional boolean parameter forceSolutionUpdate to compute solution values also when the basis is not optimal. (SOPLEX_APIVERSION 21)
+- add SoPlexBase<R>::printExternalCodes() to print external libraries (SOPLEX_APIVERSION 22)
 
 build system:
 - add link-time-optimization for release builds if supported by compiler, use -DLTO=on for cmake or LTO=true for make to enable
