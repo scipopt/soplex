@@ -24,18 +24,18 @@
 
 #include <assert.h>
 
-#if defined(_WIN32) || defined(_WIN64)
+#ifdef _WIN32
 
 #include <time.h>
 
-#else   // !(_WIN32 || _WIN64)
+#else   // !_WIN32
 
 #include <sys/types.h>
 #include <sys/times.h>
 //#include <sys/param.h>
 #include <unistd.h>
 
-#endif  // !(_WIN32 || _WIN64)
+#endif  // !_WIN32
 
 #include "soplex/spxdefines.h"
 #include "soplex/usertimer.h"
@@ -60,11 +60,11 @@ const long UserTimer::ticks_per_sec = long(TIMES_TICKS_PER_SEC);
 // get actual user, system and real time from system
 void UserTimer::updateTicks() const
 {
-#if defined(_WIN32) || defined(_WIN64)
+#ifdef _WIN32
 
    uTicks = clock();
 
-#else   /* !(_WIN32 || _WIN64) */
+#else   // !_WIN32
 
    struct tms now;
    clock_t    ret = times(&now);
@@ -74,7 +74,7 @@ void UserTimer::updateTicks() const
 
    uTicks = now.tms_utime;
 
-#endif  /* !(_WIN32 || _WIN64) */
+#endif  // !_WIN32
 }
 
 // start timer, resume accounting user, system and real time.
