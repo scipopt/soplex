@@ -5,6 +5,9 @@ fixed bugs:
 - print version header also without arguments
 - ensure that PaPILO defines are available in fmt.hpp
 
+code quality:
+- removed some unnecessary #define's for compilation on windows
+
 February 2026 - Release 8.0.1
 ==================
 

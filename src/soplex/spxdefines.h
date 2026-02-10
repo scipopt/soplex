@@ -459,7 +459,7 @@ inline int spxSnprintf(
 
    va_start(ap, s); /*lint !e826*/
 
-#if defined(_WIN32) || defined(_WIN64)
+#ifdef _WIN32
    n = _vsnprintf(t, len, s, ap);
 #else
    n = vsnprintf(t, len, s, ap); /*lint !e571*/

@@ -29,24 +29,6 @@
 #define FMT_HEADER_ONLY
 #endif
 
-/* if those macros are not defined and fmt includes windows.h
- * then many macros are defined that can interfere with standard C++ code
- */
-#ifndef NOMINMAX
-#define NOMINMAX
-#define SOPLEX_DEFINED_NOMINMAX
-#endif
-
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#define SOPLEX_DEFINED_WIN32_LEAN_AND_MEAN
-#endif
-
-#ifndef NOGDI
-#define NOGDI
-#define SOPLEX_DEFINED_NOGDI
-#endif
-
 #include "soplex/spxdefines.h"
 #ifdef SOPLEX_WITH_PAPILO
 #include "papilo/Config.hpp"
@@ -59,21 +41,6 @@
 #else
 #include "papilo/external/fmt/format.h"
 #include "papilo/external/fmt/ostream.h"
-#endif
-
-#ifdef SOPLEX_DEFINED_NOGDI
-#undef NOGDI
-#undef SOPLEX_DEFINED_NOGDI
-#endif
-
-#ifdef SOPLEX_DEFINED_NOMINMAX
-#undef NOMINMAX
-#undef SOPLEX_DEFINED_NOMINMAX
-#endif
-
-#ifdef SOPLEX_DEFINED_WIN32_LEAN_AND_MEAN
-#undef WIN32_LEAN_AND_MEAN
-#undef SOPLEX_DEFINED_WIN32_LEAN_AND_MEAN
 #endif
 
 #endif

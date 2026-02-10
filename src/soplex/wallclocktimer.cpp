@@ -24,7 +24,7 @@
 
 #include <assert.h>
 
-#if defined(_WIN32) || defined(_WIN64)
+#ifdef _WIN32
 #include <windows.h>
 #else
 #include <sys/times.h>
@@ -44,12 +44,11 @@ void WallclockTimer::start()
    // ignore start request if timer is running
    if(status != RUNNING)
    {
-#if !defined(_WIN32) && !defined(_WIN64)
-      struct timeval tp; /*lint !e86*/
-#endif
-#if defined(_WIN32) || defined(_WIN64)
+#ifdef _WIN32
       sec = -::time(nullptr);
 #else
+      struct timeval tp; /*lint !e86*/
+
       gettimeofday(&tp, nullptr);
 
       if(tp.tv_usec > usec)   /*lint !e115 !e40*/
@@ -64,6 +63,7 @@ void WallclockTimer::start()
       }
 
 #endif
+
       status = RUNNING;
    }
 
@@ -76,14 +76,12 @@ Real WallclockTimer::stop()
    // status remains unchanged if timer is not running
    if(status == RUNNING)
    {
-#if !defined(_WIN32) && !defined(_WIN64)
-      struct timeval tp; /*lint !e86*/
-#endif
-
-#if defined(_WIN32) || defined(_WIN64)
+#ifdef _WIN32
       // we need the blank specifier to distiguish this method from WallclockTimer::time
       sec += ::time(nullptr);
 #else
+      struct timeval tp; /*lint !e86*/
+
       gettimeofday(&tp, nullptr);
 
       if(tp.tv_usec + usec > 1000000)   /*lint !e115 !e40*/
@@ -98,6 +96,7 @@ Real WallclockTimer::stop()
       }
 
 #endif
+
       status = STOPPED;
       lasttime = wall2sec(sec, usec);
    }
@@ -108,17 +107,15 @@ Real WallclockTimer::stop()
 
 Real WallclockTimer::time() const
 {
-#if !defined(_WIN32) && !defined(_WIN64)
-   struct timeval tp; /*lint !e86*/
-#endif
-
    // only update times if timer is still running
    if(status == RUNNING)
    {
-#if defined(_WIN32) || defined(_WIN64)
+#ifdef _WIN32
       // we need the blank specifier to distiguish this method from WallclockTimer::time
       lasttime = wall2sec(sec + ::time(nullptr), 0);
 #else
+      struct timeval tp; /*lint !e86*/
+
       gettimeofday(&tp, nullptr);
 
       // check whether the microseconds add up to more than a second
