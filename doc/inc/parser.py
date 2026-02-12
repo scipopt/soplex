@@ -121,7 +121,7 @@ def write_faqinc(f, sections, sectiontimes):
          f.write('            <h4>%s</h4>        </a>\n' % question)
          f.write('        </div>\n')
          f.write('    </div>\n')
-         f.write('    <div id="%s_ans" class="answer">\n' % label)
+         f.write('    <div id="%s_ans">\n' % label)
          f.write('       %s' % answer)
          f.write('    </div>\n')
          f.write('  </li>\n  ')
