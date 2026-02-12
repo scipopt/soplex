@@ -53,9 +53,8 @@ SECTION:Frequently asked questions about SoPlex
             has an older interface to 1.2.1 only.
         </li>
         <li>
-            There is also an interface to <a
-            href="https://projects.coin-or.org/Osi">COIN
-            OSI</a>.
+            <a href="https://github.com/coin-or/Osi/">COIN-OR OSI</a>
+            has an older interface to SoPlex < 4.0.
         </li>
     </ul>
 
