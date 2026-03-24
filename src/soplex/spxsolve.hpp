@@ -629,14 +629,16 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                   unShift();
 
                   R maxinfeas = maxInfeas();
+                  R maxsubopt = maxSubopt();
 
                   SPX_MSG_INFO3((*this->spxout),
                                 (*this->spxout) << " --- maxInfeas: " << maxinfeas
+                                << ", maxSubopt: " << maxsubopt
                                 << ", shift: " << shift()
                                 << ", entertol: " << entertol() << std::endl;
                                )
 
-                  if(priced && maxinfeas + shift() <= entertol())
+                  if(priced && maxinfeas + shift() <= entertol() && maxsubopt <= leavetol())
                   {
                      setBasisStatus(SPxBasisBase<R>::OPTIMAL);
                      m_status = OPTIMAL;
@@ -976,6 +978,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
 
                   SPX_MSG_INFO3((*this->spxout),
                                 (*this->spxout) << " --- maxInfeas: " << maxInfeas()
+                                << ", maxSubopt: " << maxSubopt()
                                 << ", shift: " << shift()
                                 << ", leavetol: " << leavetol()
                                 << ", cycle count: " << cycleCount << std::endl;
@@ -994,9 +997,11 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                   unShift();
 
                   R maxinfeas = maxInfeas();
+                  R maxsubopt = maxSubopt();
 
                   SPX_MSG_INFO3((*this->spxout),
                                 (*this->spxout) << " --- maxInfeas: " << maxinfeas
+                                << ", maxSubopt: " << maxsubopt
                                 << ", shift: " << shift()
                                 << ", leavetol: " << leavetol() << std::endl;
                                )
@@ -1004,7 +1009,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                   // We stop if we are indeed optimal, or if we have already been
                   // two times at this place. In this case it seems futile to
                   // continue.
-                  if(priced && maxinfeas + shift() <= leavetol())
+                  if(priced && maxinfeas + shift() <= leavetol() && maxsubopt <= entertol())
                   {
                      setBasisStatus(SPxBasisBase<R>::OPTIMAL);
                      m_status = OPTIMAL;

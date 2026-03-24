@@ -6,6 +6,7 @@ fixed bugs:
 - ensure that PaPILO defines are available in fmt.hpp
 - keep sanitizers enabled if only unsupported for some language in cmake
 - consider numerical degradation in iteration stalling condition to avoid oscillation cycles
+- check suboptimality separately with correct tolerance to avoid early termination
 
 code quality:
 - removed some unnecessary #define's for compilation on windows
