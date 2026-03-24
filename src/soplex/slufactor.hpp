@@ -164,6 +164,7 @@ void SLUFactor<R>::solve2right4update(
       forest.forceSetup();
    }
 
+   rhs.setSize(0);
    rhs.forceSetup();
    ssvec.setSize(0);
    ssvec.forceSetup();
@@ -228,6 +229,7 @@ void SLUFactor<R>::solve2right4update(
       forest.forceSetup();
    }
 
+   rhs.setSize(0);
    rhs.forceSetup();
    ssvec.setSize(0);
    ssvec.forceSetup();
@@ -295,7 +297,9 @@ void SLUFactor<R>::solve3right4update(
       forest.forceSetup();
    }
 
+   rhs.setSize(0);
    rhs.forceSetup();
+   rhs2.setSize(0);
    rhs2.forceSetup();
    ssvec.setSize(0);
    ssvec.forceSetup();
@@ -373,7 +377,9 @@ void SLUFactor<R>::solve3right4update(
       forest.forceSetup();
    }
 
+   rhs.setSize(0);
    rhs.forceSetup();
+   rhs2.setSize(0);
    rhs2.forceSetup();
    ssvec.setSize(0);
    ssvec.forceSetup();
@@ -413,13 +419,10 @@ void SLUFactor<R>::solveLeft(SSVectorBase<R>& x, const SVectorBase<R>& b)  //con
    int n = this->vSolveLeft(epsilon, x.altValues(), x.altIndexMem(),
                             ssvec.altValues(), ssvec.altIndexMem(), sz);
 
+   x.setSize(n);
+
    if(n > 0)
-   {
-      x.setSize(n);
       x.forceSetup();
-   }
-   else
-      x.unSetup();
 
    ssvec.setSize(0);
    ssvec.forceSetup();
@@ -452,7 +455,6 @@ void SLUFactor<R>::solveLeft(
    n = this->vSolveLeft2(epsilon, x.altValues(), x.altIndexMem(), svec, sidx, n,
                          y.get_ptr(), rhs2.altValues(), ridx, rn);
 
-   // this will unsetup x
    x.setSize(n);
 
    if(n > 0)
@@ -510,7 +512,9 @@ void SLUFactor<R>::solveLeft(
    if(n1 > 0)
       x.forceSetup();
 
-   //   if (n2 > 0)
+   //   y.setSize(n2);
+   //
+   //   if(n2 > 0)
    //      y.forceSetup();
 
    ssvec.setSize(0);

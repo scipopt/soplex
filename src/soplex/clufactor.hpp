@@ -44,11 +44,6 @@ namespace soplex
 #define SOPLEX_DEBUG_CHECK_HUGE_VALUE( prefix, value ) /**/
 #endif
 
-/* This number is used to decide wether a value is zero
- * or was explicitly set to zero.
- */
-#define SOPLEX_FACTOR_MARKER     1e-100
-
 static const Real verySparseFactor = 0.001;
 static const Real verySparseFactor4right = 0.2;
 static const Real verySparseFactor4left  = 0.1;
@@ -820,7 +815,7 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
       {
          i = nonz[j];
          x = p_work[i];
-         p_work[i] = 0.0;
+         p_work[i] = 0;
 
          if(isNotZero(x, R(_tolerances->epsilonUpdate())))
          {
@@ -874,7 +869,7 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
       for(i = 0; i < dim; ++i)
       {
          x = p_work[i];
-         p_work[i] = 0.0;
+         p_work[i] = 0;
 
          if(isNotZero(x, R(_tolerances->epsilonUpdate())))
          {
@@ -1015,12 +1010,12 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
          while(num)
          {
 #ifndef NDEBUG
-            // The numbers seem to be often 1e-100, is this ok ?
 
+            // check that queued values are initialized
             for(i = 0; i < num; ++i)
-               assert(p_work[corig[nonz[i]]] != 0.0);
+               assert(!isPlusZero(p_work[corig[nonz[i]]]));
 
-#endif // NDEBUG
+#endif
             i = deQueueMin(nonz, &num);
 
             if(i == r)
@@ -1028,7 +1023,12 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
 
             k = corig[i];
 
-            assert(p_work[k] != 0.0);
+            // reset and skip a cancelled value
+            if(p_work[k] == 0)
+            {
+               p_work[k] = +R(0);
+               continue;
+            }
 
             n = rorig[i];
 
@@ -1038,7 +1038,7 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
 
             lval[ll] = x;
 
-            p_work[k] = 0.0;
+            p_work[k] = 0;
 
             ll++;
 
@@ -1054,35 +1054,38 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
                int jj = ridx[j];
                R y = p_work[jj];
 
-               if(y == 0)
+               if(isPlusZero(y))
                   enQueueMin(nonz, &num, cperm[jj]);
 
                y -= x * rval[j];
 
-               p_work[jj] = y + ((y == 0) ? SOPLEX_FACTOR_MARKER : 0.0);
+               p_work[jj] = (y != 0) ? y : -R(0);
             }
          }
+
+         assert(i == r);
 
          if(lbeg[l.firstUnused - 1] == ll)
             (l.firstUnused)--;
          else
             lbeg[l.firstUnused] = ll;
 
-
          /*  Set diagonal value
           */
-         if(i != r)
+
+         k = corig[r];
+
+         x = p_work[k];
+
+         p_work[k] = 0;
+
+         if(x == 0)
          {
             this->stat = SLinSolver<R>::SINGULAR;
             throw SPxStatusException("XFORE01 The loaded matrix is singular");
          }
 
-         k = corig[r];
-
-         x = p_work[k];
          diag[rowno] = 1 / x;
-         p_work[k] = 0.0;
-
 
          /*  make row large enough to fit all nonzeros.
           */
@@ -1112,7 +1115,7 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
             // above elimination code, since the corresponding column index would
             // be enqueued for further elimination again and agian.
 
-            if(x != 0.0)
+            if(x != 0)
             {
                if(spxAbs(x) > l_maxabs)
                   l_maxabs = spxAbs(x);
@@ -1120,8 +1123,6 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
                ridx[n] = j;
 
                rval[n] = x;
-
-               p_work[j] = 0.0;
 
                ++n;
 
@@ -1136,6 +1137,8 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
 
                cidx[cbeg[j] + clen[j]++] = rowno;
             }
+
+            p_work[j] = 0;
          }
 
          rlen[rowno] = n - rbeg[rowno];
@@ -1171,13 +1174,12 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
          {
             k = corig[i];
 
-            if(p_work[k] != 0.0)
+            if(p_work[k] != 0)
             {
                n = rorig[i];
                x = p_work[k] * diag[n];
                lidx[ll] = n;
                lval[ll] = x;
-               p_work[k] = 0.0;
                ll++;
 
                if(spxAbs(x) > l_maxabs)
@@ -1190,6 +1192,8 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
                for(; j < m; ++j)
                   p_work[ridx[j]] -= x * rval[j];
             }
+
+            p_work[k] = 0;
          }
 
          if(lbeg[l.firstUnused - 1] == ll)
@@ -1197,24 +1201,22 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
          else
             lbeg[l.firstUnused] = ll;
 
-
          /*  Set diagonal value
           */
+
          k = corig[r];
 
          x = p_work[k];
 
-         if(x == 0.0)
+         p_work[k] = 0;
+
+         if(x == 0)
          {
             this->stat = SLinSolver<R>::SINGULAR;
             throw SPxStatusException("XFORE02 The loaded matrix is singular");
-            //            return;
          }
 
          diag[rowno] = 1 / x;
-
-         p_work[k] = 0.0;
-
 
          /*  count remaining nonzeros in work and make row large enough
           *  to fit them all.
@@ -1222,7 +1224,7 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
          n = 0;
 
          for(i = r + 1; i < dim; ++i)
-            if(p_work[corig[i]] != 0.0)
+            if(p_work[corig[i]] != 0)
                n++;
 
          if(rmax[rowno] < n)
@@ -1244,7 +1246,7 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
             j = corig[i];
             x = p_work[j];
 
-            if(x != 0.0)
+            if(x != 0)
             {
                if(spxAbs(x) > l_maxabs)
                   l_maxabs = spxAbs(x);
@@ -1252,8 +1254,6 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
                ridx[n] = j;
 
                rval[n] = x;
-
-               p_work[j] = 0.0;
 
                ++n;
 
@@ -1268,6 +1268,8 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
 
                cidx[cbeg[j] + clen[j]++] = rowno;
             }
+
+            p_work[j] = 0;
          }
 
          rlen[rowno] = n - rbeg[rowno];
@@ -1294,7 +1296,6 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
    {
       this->stat = SLinSolver<R>::SINGULAR;
       throw SPxStatusException("XFORE03 The loaded matrix is singular");
-      //      return;
    }
 
    maxabs = l_maxabs;
@@ -1311,9 +1312,9 @@ void CLUFactor<R>::update(int p_col, R* p_work, const int* p_idx, int num)
    R* lval;
    R x, rezi;
 
-   assert(p_work[p_col] != 0.0);
+   assert(p_work[p_col] != 0);
    rezi = 1 / p_work[p_col];
-   p_work[p_col] = 0.0;
+   p_work[p_col] = 0;
 
    ll = makeLvec(num, p_col);
    //   ll = fac->makeLvec(num, col);
@@ -1324,7 +1325,7 @@ void CLUFactor<R>::update(int p_col, R* p_work, const int* p_idx, int num)
    {
       lidx[ll] = j;
       lval[ll] = rezi * p_work[j];
-      p_work[j] = 0.0;
+      p_work[j] = 0;
       ++ll;
    }
 
@@ -1338,7 +1339,7 @@ void CLUFactor<R>::update(int p_col, R* p_work, const int* p_idx, int num)
       j = p_idx[i];
       lidx[ll] = j;
       lval[ll] = x = rezi * p_work[j];
-      p_work[j] = 0.0;
+      p_work[j] = 0;
       ++ll;
 
       if(spxAbs(x) > maxabs)
@@ -1360,7 +1361,7 @@ void CLUFactor<R>::updateNoClear(
    R* lval;
    R x, rezi;
 
-   assert(p_work[p_col] != 0.0);
+   assert(p_work[p_col] != 0);
    rezi = 1 / p_work[p_col];
    ll = makeLvec(num, p_col);
    //ll = fac->makeLvec(num, col);
@@ -2126,7 +2127,7 @@ void CLUFactor<R>::selectPivots(R threshold)
    int len;
    int beg;
    R l_maxabs;
-   R x = R(0.0);   // This value should never be used.
+   R x = R(0);   // This value should never be used.
    int mkwtz;
    int candidates;
 
@@ -2656,7 +2657,7 @@ int CLUFactor<R>::setupColVals()
    for(i = 0; i < thedim; i++)
       u.col.len[i] = 0;
 
-   maxabs = R(0.0);
+   maxabs = R(0);
 
    for(i = 0; i < thedim; i++)
    {
@@ -3153,9 +3154,9 @@ void CLUFactor<R>::solveUright(R* wrk, R* vec) const
       int  c = col.orig[i];
       R x = wrk[c] = diag[r] * vec[r];
 
-      vec[r] = 0.0;
+      vec[r] = 0;
 
-      if(x != 0.0)
+      if(x != 0)
          //if (isNotZero(x))
       {
          for(int j = u.col.start[c]; j < u.col.start[c] + u.col.len[c]; j++)
@@ -3237,7 +3238,7 @@ void CLUFactor<R>::solveUright2(
       p_work2[c] = x2 = diag[r] * vec2[r];
       vec1[r] = vec2[r] = 0;
 
-      if(x1 != 0.0 && x2 != 0.0)
+      if(x1 != 0 && x2 != 0)
       {
          val = &cval[cbeg[c]];
          idx = &cidx[cbeg[c]];
@@ -3249,7 +3250,7 @@ void CLUFactor<R>::solveUright2(
             vec2[*idx++] -= x2 * (*val++);
          }
       }
-      else if(x1 != 0.0)
+      else if(x1 != 0)
       {
          val = &cval[cbeg[c]];
          idx = &cidx[cbeg[c]];
@@ -3258,7 +3259,7 @@ void CLUFactor<R>::solveUright2(
          while(j-- > 0)
             vec1[*idx++] -= x1 * (*val++);
       }
-      else if(x2 != 0.0)
+      else if(x2 != 0)
       {
          val = &cval[cbeg[c]];
          idx = &cidx[cbeg[c]];
@@ -3321,7 +3322,7 @@ int CLUFactor<R>::solveUright2eps(
       }
       else if(notzero1)
       {
-         p_work2[c] = 0.0;
+         p_work2[c] = +R(0);
          *nonz++ = c;
          n++;
          val = &cval[cbeg[c]];
@@ -3333,7 +3334,7 @@ int CLUFactor<R>::solveUright2eps(
       }
       else if(notzero2)
       {
-         p_work1[c] = 0.0;
+         p_work1[c] = +R(0);
          val = &cval[cbeg[c]];
          idx = &cidx[cbeg[c]];
          j = clen[c];
@@ -3343,8 +3344,8 @@ int CLUFactor<R>::solveUright2eps(
       }
       else
       {
-         p_work1[c] = 0.0;
-         p_work2[c] = 0.0;
+         p_work1[c] = +R(0);
+         p_work2[c] = +R(0);
       }
    }
 
@@ -3370,7 +3371,7 @@ void CLUFactor<R>::solveLright(R* vec)
 
    for(i = 0; i < end; ++i)
    {
-      if((x = vec[lrow[i]]) != 0.0)
+      if((x = vec[lrow[i]]) != 0)
       {
          SPxOut::debug(this, "y{}={}\n", lrow[i], vec[lrow[i]]);
 
@@ -3435,7 +3436,7 @@ void CLUFactor<R>::solveLright2(R* vec1, R* vec2)
       x1 = vec1[lrow[i]];
       x2 = vec2[lrow[i]];
 
-      if(x1 != 0 && x2 != 0.0)
+      if(x1 != 0 && x2 != 0)
       {
          k = lbeg[i];
          idx = &(lidx[k]);
@@ -3447,7 +3448,7 @@ void CLUFactor<R>::solveLright2(R* vec1, R* vec2)
             vec2[*idx++] -= x2 * (*val++);
          }
       }
-      else if(x1 != 0.0)
+      else if(x1 != 0)
       {
          k = lbeg[i];
          idx = &(lidx[k]);
@@ -3456,7 +3457,7 @@ void CLUFactor<R>::solveLright2(R* vec1, R* vec2)
          for(j = lbeg[i + 1]; j > k; --j)
             vec1[*idx++] -= x1 * (*val++);
       }
-      else if(x2 != 0.0)
+      else if(x2 != 0)
       {
          k = lbeg[i];
          idx = &(lidx[k]);
@@ -3514,7 +3515,7 @@ void CLUFactor<R>::solveUpdateRight(R* vec)
 
    for(i = l.firstUpdate; i < end; ++i)
    {
-      if((x = vec[lrow[i]]) != 0.0)
+      if((x = vec[lrow[i]]) != 0)
       {
          k = lbeg[i];
          idx = &(lidx[k]);
@@ -3553,7 +3554,7 @@ void CLUFactor<R>::solveUpdateRight2(R* vec1, R* vec2)
       x1 = vec1[lrow[i]];
       x2 = vec2[lrow[i]];
 
-      if(x1 != 0.0 && x2 != 0.0)
+      if(x1 != 0 && x2 != 0)
       {
          k = lbeg[i];
          idx = &(lidx[k]);
@@ -3565,7 +3566,7 @@ void CLUFactor<R>::solveUpdateRight2(R* vec1, R* vec2)
             vec2[*idx++] -= x2 * (*val++);
          }
       }
-      else if(x1 != 0.0)
+      else if(x1 != 0)
       {
          k = lbeg[i];
          idx = &(lidx[k]);
@@ -3574,7 +3575,7 @@ void CLUFactor<R>::solveUpdateRight2(R* vec1, R* vec2)
          for(j = lbeg[i + 1]; j > k; --j)
             vec1[*idx++] -= x1 * (*val++);
       }
-      else if(x2 != 0.0)
+      else if(x2 != 0)
       {
          k = lbeg[i];
          idx = &(lidx[k]);
@@ -3600,7 +3601,7 @@ int CLUFactor<R>::solveRight4update(R* vec, int* nonz, R eps,
       {
          forestIdx[n] = i;
          forest[i]    = rhs[i];
-         n           += rhs[i] != 0.0 ? 1 : 0;
+         n           += rhs[i] != 0 ? 1 : 0;
       }
 
       *forestNum = n;
@@ -3647,7 +3648,7 @@ int CLUFactor<R>::solveRight2update(R* vec1,
       {
          forestIdx[n] = i;
          forest[i]    = rhs1[i];
-         n           += rhs1[i] != 0.0 ? 1 : 0;
+         n           += rhs1[i] != 0 ? 1 : 0;
       }
 
       *forestNum = n;
@@ -3687,18 +3688,17 @@ void CLUFactor<R>::solveUleft(R* p_work, R* vec)
 {
    for(int i = 0; i < thedim; ++i)
    {
-      int  c  = col.orig[i];
-      int  r  = row.orig[i];
+      int c = col.orig[i];
+      int r = row.orig[i];
 
       assert(c >= 0);    // Inna/Tobi: otherwise, vec[c] would be strange...
       assert(r >= 0);    // Inna/Tobi: otherwise, diag[r] would be strange...
 
-      R x  = vec[c];
+      R x = vec[c];
 
+      vec[c] = 0;
 
-      vec[c]  = 0.0;
-
-      if(x != 0.0)
+      if(x != 0)
       {
          SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE01", x);
          SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE02", diag[r]);
@@ -3743,7 +3743,7 @@ void CLUFactor<R>::solveUleft2(
       x1 = vec1[c];
       x2 = vec2[c];
 
-      if((x1 != 0.0) && (x2 != 0.0))
+      if(x1 != 0 && x2 != 0)
       {
          SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE04", x1);
          SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE05", x2);
@@ -3765,7 +3765,7 @@ void CLUFactor<R>::solveUleft2(
             idx++;
          }
       }
-      else if(x1 != 0.0)
+      else if(x1 != 0)
       {
          SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE09", x1);
          SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE10", diag[r]);
@@ -3782,7 +3782,7 @@ void CLUFactor<R>::solveUleft2(
             idx++;
          }
       }
-      else if(x2 != 0.0)
+      else if(x2 != 0)
       {
          SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE12", x2);
          SOPLEX_DEBUG_CHECK_HUGE_VALUE("WSOLVE13", diag[r]);
@@ -3831,9 +3831,9 @@ int CLUFactor<R>::solveLleft2forest(
       x1 = vec1[j];
       x2 = vec2[j];
 
-      if(x1 != 0.0)
+      if(x1 != 0)
       {
-         if(x2 != 0.0)
+         if(x2 != 0)
          {
             k = lbeg[i];
             val = &lval[k];
@@ -3855,7 +3855,7 @@ int CLUFactor<R>::solveLleft2forest(
                vec1[*idx++] -= x1 * (*val++);
          }
       }
-      else if(x2 != 0.0)
+      else if(x2 != 0)
       {
          k = lbeg[i];
          val = &lval[k];
@@ -3989,7 +3989,7 @@ int CLUFactor<R>::solveLleftForest(R* vec, int* /* nonz */, R /* eps */)
 
    for(i = l.firstUnused - 1; i >= end; --i)
    {
-      if((x = vec[lrow[i]]) != 0.0)
+      if((x = vec[lrow[i]]) != 0)
       {
          k = lbeg[i];
          val = &lval[k];
@@ -4035,7 +4035,7 @@ void CLUFactor<R>::solveLleft(R* vec) const
       int  r = l.rorig[i];
       R x = vec[r];
 
-      if(x != 0.0)
+      if(x != 0)
       {
          for(int k = l.rbeg[r]; k < l.rbeg[r + 1]; k++)
          {
@@ -4221,7 +4221,7 @@ int CLUFactor<R>::solveUpdateLeft(R eps, R* vec, int* nonz, int n)
          tmp += vec[*idx++] * (*val++);
       }
 
-      if(y == 0)
+      if(isPlusZero(y))
       {
          y = -R(tmp);
 
@@ -4234,11 +4234,26 @@ int CLUFactor<R>::solveUpdateLeft(R eps, R* vec, int* nonz, int n)
       else
       {
          y = -R(tmp);
-         vec[k] = (y != 0) ? y : SOPLEX_FACTOR_MARKER;
+         vec[k] = (y != 0) ? y : -R(0);
       }
    }
 
-   return n;
+   // remove cancelled zeros
+   int nnz = 0;
+
+   for(i = 0; i < n; ++i)
+   {
+      k = nonz[i];
+
+      // add nonzero entry
+      if(vec[k] != 0)
+         nonz[nnz++] = k;
+      // clear minus zero
+      else
+         vec[k] = +R(0);
+   }
+
+   return nnz;
 }
 
 template <class R>
@@ -4362,7 +4377,7 @@ int CLUFactor<R>::solveUleft(R eps,
             assert(j >= 0 && j < thedim);
             y = rhs[j];
 
-            if(y == 0)
+            if(isPlusZero(y))
             {
                y = -x * (*val++);
 
@@ -4375,7 +4390,7 @@ int CLUFactor<R>::solveUleft(R eps,
             else
             {
                y -= x * (*val++);
-               rhs[j] = (y != 0) ? y : SOPLEX_FACTOR_MARKER;
+               rhs[j] = (y != 0) ? y : -R(0);
             }
          }
       }
@@ -4439,7 +4454,7 @@ void CLUFactor<R>::solveUleftNoNZ(R eps, R* vec,
             assert(j >= 0 && j < thedim);
             y = rhs[j];
 
-            if(y == 0)
+            if(isPlusZero(y))
             {
                y = -x * (*val++);
 
@@ -4452,7 +4467,7 @@ void CLUFactor<R>::solveUleftNoNZ(R eps, R* vec,
             else
             {
                y -= x * (*val++);
-               rhs[j] = (y != 0) ? y : SOPLEX_FACTOR_MARKER;
+               rhs[j] = (y != 0) ? y : -R(0);
             }
          }
       }
@@ -4478,7 +4493,7 @@ int CLUFactor<R>::solveLleftForest(R eps, R* vec, int* nonz, int n)
    {
       assert(i >= 0 && i < l.size);
 
-      if((x = vec[lrow[i]]) != 0.0)
+      if((x = vec[lrow[i]]) != 0)
       {
          k = lbeg[i];
          assert(k >= 0 && k < l.size);
@@ -4491,7 +4506,7 @@ int CLUFactor<R>::solveLleftForest(R eps, R* vec, int* nonz, int n)
             assert(m >= 0 && m < thedim);
             y = vec[m];
 
-            if(y == 0)
+            if(isPlusZero(y))
             {
                y = -x * (*val++);
 
@@ -4504,13 +4519,28 @@ int CLUFactor<R>::solveLleftForest(R eps, R* vec, int* nonz, int n)
             else
             {
                y -= x * (*val++);
-               vec[m] = (y != 0) ? y : SOPLEX_FACTOR_MARKER;
+               vec[m] = (y != 0) ? y : -R(0);
             }
          }
       }
    }
 
-   return n;
+   // remove cancelled zeros
+   int nnz = 0;
+
+   for(i = 0; i < n; ++i)
+   {
+      k = nonz[i];
+
+      // add nonzero entry
+      if(vec[k] != 0)
+         nonz[nnz++] = k;
+      // clear minus zero
+      else
+         vec[k] = +R(0);
+   }
+
+   return nnz;
 }
 
 
@@ -4530,7 +4560,7 @@ void CLUFactor<R>::solveLleftForestNoNZ(R* vec)
 
    for(i = l.firstUnused - 1; i >= end; --i)
    {
-      if((x = vec[lrow[i]]) != 0.0)
+      if((x = vec[lrow[i]]) != 0)
       {
          assert(i >= 0 && i < l.size);
          k = lbeg[i];
@@ -4618,7 +4648,7 @@ int CLUFactor<R>::solveLleft(R eps, R* vec, int* nonz, int rn)
             int m = *idx++;
             y = vec[m];
 
-            if(y == 0)
+            if(isPlusZero(y))
             {
                y = -x * *val++;
 
@@ -4631,7 +4661,7 @@ int CLUFactor<R>::solveLleft(R eps, R* vec, int* nonz, int rn)
             else
             {
                y -= x * *val++;
-               vec[m] = (y != 0) ? y : SOPLEX_FACTOR_MARKER;
+               vec[m] = (y != 0) ? y : -R(0);
             }
          }
       }
@@ -4639,8 +4669,22 @@ int CLUFactor<R>::solveLleft(R eps, R* vec, int* nonz, int rn)
          vec[r] = 0;
    }
 
+   // remove cancelled zeros
+   int nnz = 0;
+
    for(i = 0; i < n; ++i)
-      *nonz++ = *last++;
+   {
+      k = last[i];
+
+      // add nonzero entry
+      if(vec[k] != 0)
+         nonz[nnz++] = k;
+      // clear minus zero
+      else
+         vec[k] = +R(0);
+   }
+
+   n = nnz;
 
 #endif
 
@@ -4697,7 +4741,7 @@ void CLUFactor<R>::solveLleftNoNZ(R* vec)
       r = rorig[i];
       x = vec[r];
 
-      if(x != 0.0)
+      if(x != 0)
       {
          k = rbeg[r];
          j = rbeg[r + 1] - k;
@@ -4719,7 +4763,7 @@ template <class R>
 void inline CLUFactor<R>::updateSolutionVectorLright(R change, int j, R& vec, int* idx, int& nnz)
 {
    // create a new entry in #ridx
-   if(vec == 0.0)
+   if(isPlusZero(vec))
    {
       assert(nnz < thedim);
       idx[nnz] = j;
@@ -4728,9 +4772,9 @@ void inline CLUFactor<R>::updateSolutionVectorLright(R change, int j, R& vec, in
 
    vec -= change;
 
-   // mark the entry where exact eliminiation occurred
-   if(vec == 0.0)
-      vec = SOPLEX_FACTOR_MARKER;
+   // mark the entry where exact elimination occurred
+   if(vec == 0)
+      vec = -R(0);
 }
 
 // solve Lz = b, inplace, using and preserving sparisity structure in the rhs and solution VectorBase<R>
@@ -4757,7 +4801,7 @@ void CLUFactor<R>::vSolveLright(R* vec, int* ridx, int& rn, R eps)
    {
       x = vec[lrow[i]];
 
-      // check whether there is a corresponding value in the rhs VectorBase<R>; skipping/ignoring FACTOR_MARKER
+      // check whether there is a corresponding value in the rhs VectorBase<R>; ignoring small values
       if(isNotZero(x, eps))
       {
          k = lbeg[i];
@@ -4830,14 +4874,14 @@ void CLUFactor<R>::vSolveLright2(
       x2 = vec2[j];
       x = vec[j];
 
-      // check whether there is a corresponding value in the first rhs VectorBase<R>; skipping/ignoring FACTOR_MARKER
+      // check whether there is a corresponding value in the first rhs VectorBase<R>; ignoring small values
       if(isNotZero(x, eps))
       {
          k = lbeg[i];
          idx = &(lidx[k]);
          val = &(lval[k]);
 
-         // check whether there is  also a corresponding value in the second rhs VectorBase<R>; skipping/ignoring FACTOR_MARKER
+         // check whether there is  also a corresponding value in the second rhs VectorBase<R>; ignoring small values
          if(isNotZero(x2, eps2))
          {
             for(j = lbeg[i + 1]; j > k; --j)
@@ -5137,7 +5181,7 @@ int CLUFactor<R>::vSolveUright(R* vec, int* vidx,
             assert(k >= 0 && k < thedim);
             y = rhs[k];
 
-            if(y == 0)
+            if(isPlusZero(y))
             {
                y = -x * (*val++);
 
@@ -5150,8 +5194,7 @@ int CLUFactor<R>::vSolveUright(R* vec, int* vidx,
             else
             {
                y -= x * (*val++);
-               y += (y == 0) ? SOPLEX_FACTOR_MARKER : 0;
-               rhs[k] = y;
+               rhs[k] = (y != 0) ? y : -R(0);
             }
          }
 
@@ -5274,7 +5317,7 @@ void CLUFactor<R>::vSolveUrightNoNZ(R* vec,
             assert(k >= 0 && k < thedim);
             y = rhs[k];
 
-            if(y == 0)
+            if(isPlusZero(y))
             {
                y = -x * (*val++);
 
@@ -5287,8 +5330,7 @@ void CLUFactor<R>::vSolveUrightNoNZ(R* vec,
             else
             {
                y -= x * (*val++);
-               y += (y == 0) ? SOPLEX_FACTOR_MARKER : 0;
-               rhs[k] = y;
+               rhs[k] = (y != 0) ? y : -R(0);
             }
          }
       }
@@ -5369,7 +5411,7 @@ int CLUFactor<R>::vSolveUright2(
                assert(k >= 0 && k < thedim);
                y2 = rhs2[k];
 
-               if(y2 == 0)
+               if(isPlusZero(y2))
                {
                   y2 = -x2 * (*val);
 
@@ -5382,12 +5424,12 @@ int CLUFactor<R>::vSolveUright2(
                else
                {
                   y2 -= x2 * (*val);
-                  rhs2[k] = (y2 != 0) ? y2 : SOPLEX_FACTOR_MARKER;
+                  rhs2[k] = (y2 != 0) ? y2 : -R(0);
                }
 
                y = rhs[k];
 
-               if(y == 0)
+               if(isPlusZero(y))
                {
                   y = -x * (*val++);
 
@@ -5400,8 +5442,7 @@ int CLUFactor<R>::vSolveUright2(
                else
                {
                   y -= x * (*val++);
-                  y += (y == 0) ? SOPLEX_FACTOR_MARKER : 0;
-                  rhs[k] = y;
+                  rhs[k] = (y != 0) ? y : -R(0);
                }
             }
          }
@@ -5413,7 +5454,7 @@ int CLUFactor<R>::vSolveUright2(
                assert(k >= 0 && k < thedim);
                y = rhs[k];
 
-               if(y == 0)
+               if(isPlusZero(y))
                {
                   y = -x * (*val++);
 
@@ -5426,8 +5467,7 @@ int CLUFactor<R>::vSolveUright2(
                else
                {
                   y -= x * (*val++);
-                  y += (y == 0) ? SOPLEX_FACTOR_MARKER : 0;
-                  rhs[k] = y;
+                  rhs[k] = (y != 0) ? y : -R(0);
                }
             }
          }
@@ -5447,7 +5487,7 @@ int CLUFactor<R>::vSolveUright2(
             assert(k >= 0 && k < thedim);
             y2 = rhs2[k];
 
-            if(y2 == 0)
+            if(isPlusZero(y2))
             {
                y2 = -x2 * (*val++);
 
@@ -5460,7 +5500,7 @@ int CLUFactor<R>::vSolveUright2(
             else
             {
                y2 -= x2 * (*val++);
-               rhs2[k] = (y2 != 0) ? y2 : SOPLEX_FACTOR_MARKER;
+               rhs2[k] = (y2 != 0) ? y2 : -R(0);
             }
          }
       }
@@ -5570,17 +5610,35 @@ int CLUFactor<R>::vSolveUpdateRight(R* vec, int* ridx, int n, R eps)
 
          for(j = lbeg[i + 1]; j > k; --j)
          {
-            int m = ridx[n] = *idx++;
+            int m = *idx++;
             assert(m >= 0 && m < thedim);
             y = vec[m];
-            n += (y == 0) ? 1 : 0;
+
+            if(isPlusZero(y))
+               ridx[n++] = m;
+
             y = y - x * (*val++);
-            vec[m] = (y != 0) ? y : SOPLEX_FACTOR_MARKER;
+            vec[m] = (y != 0) ? y : -R(0);
          }
       }
    }
 
-   return n;
+   // remove cancelled zeros
+   int nnz = 0;
+
+   for(i = 0; i < n; ++i)
+   {
+      k = ridx[i];
+
+      // add nonzero entry
+      if(vec[k] != 0)
+         ridx[nnz++] = k;
+      // clear minus zero
+      else
+         vec[k] = +R(0);
+   }
+
+   return nnz;
 }
 
 template <class R>
@@ -5605,7 +5663,7 @@ void CLUFactor<R>::vSolveUpdateRightNoNZ(R* vec, R /*eps*/)
    {
       assert(i >= 0 && i < thedim);
 
-      if((x = vec[lrow[i]]) != 0.0)
+      if((x = vec[lrow[i]]) != 0)
       {
          k = lbeg[i];
          assert(k >= 0 && k < l.size);

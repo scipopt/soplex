@@ -44,8 +44,6 @@
 #include "soplex/svsetbase.h"
 #include "soplex/timer.h"
 
-#define SOPLEX_VECTOR_MARKER   1e-100
-
 namespace soplex
 {
 
@@ -398,28 +396,21 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
       for(int i = vec.size() - 1; i >= 0; --i)
       {
          j = vec.index(i);
+         x = v[j] + xx * vec.value(i);
 
-         if(v[j] != 0)
+         if(isNotZero(x, this->getEpsilon()))
          {
-            x = v[j] + xx * vec.value(i);
+            if(v[j] == 0)
+               addIdx(j);
 
-            if(isNotZero(x, this->tolerances()->epsilon()))
-               v[j] = x;
-            else
-            {
-               adjust = true;
-               v[j] = SOPLEX_VECTOR_MARKER;
-            }
+            v[j] = x;
          }
          else
          {
-            x = xx * vec.value(i);
+            if(v[j] != 0)
+               adjust = true;
 
-            if(isNotZero(x, this->tolerances()->epsilon()))
-            {
-               v[j] = x;
-               addIdx(j);
-            }
+            v[j] = 0;
          }
       }
 
@@ -433,10 +424,8 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
          {
             x = v[*iptr];
 
-            if(isNotZero(x, this->tolerances()->epsilon()))
+            if(isNotZero(x, this->getEpsilon()))
                *iiptr++ = *iptr;
-            else
-               v[*iptr] = 0;
          }
 
          num = int(iiptr - idx);
@@ -528,7 +517,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product(const SSVectorBase<S>& x, const
    {
       y = A[i] * x;
 
-      if(isNotZero(y, this->tolerances()->epsilon()))
+      if(isNotZero(y, this->getEpsilon()))
       {
          VectorBase<R>::val[i] = y;
          IdxSet::addIdx(i);
@@ -620,7 +609,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product1(const SVSetBase<S>& A, const S
    const SVectorBase<S>& Ai = A[nzidx];
 
    // compute A[nzidx] * nzval:
-   if(isZero(nzval, this->tolerances()->epsilon()) || Ai.size() == 0)
+   if(isZero(nzval, this->getEpsilon()) || Ai.size() == 0)
       clear();    // this := zero vector
    else
    {
@@ -663,7 +652,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A,
    int Aisize;
 
    // If x[0] == 0, do nothing.
-   if(isNotZero(x0, this->tolerances()->epsilon()))
+   if(isNotZero(x0, this->getEpsilon()))
    {
       Aisize = A0.size();
 
@@ -689,37 +678,24 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A,
       const T xi = x.val[curidx];
       const SVectorBase<S>& Ai = A[curidx];
 
-      // If x[i] == 0, do nothing.
-      if(isNotZero(xi, this->tolerances()->epsilon()))
+      Aisize = Ai.size();
+
+      // Compute x[i] * A[i] and add it to the existing vector.
+      for(int j = 0; j < Aisize; ++j)
       {
-         Aisize = Ai.size();
+         const Nonzero<S>& elt = Ai.element(j);
+         const R oldval = VectorBase<R>::val[elt.idx];
+         const R newval = oldval + xi * elt.val;
 
-         // Compute x[i] * A[i] and add it to the existing vector.
-         for(int j = 0; j < Aisize; ++j)
+         // If the value was positive zero, the position is still unused, so increase the counter.
+         if(isPlusZero(oldval))
          {
-            const Nonzero<S>& elt = Ai.element(j);
-            const R oldval = VectorBase<R>::val[elt.idx];
-            const R newval = oldval + xi * elt.val;
-
-            // If the value becomes exactly 0, mark the index as used by setting a value which is
-            // nearly 0. Values below epsilon will be removed later.
-            if(oldval != 0 && newval == 0)
-               VectorBase<R>::val[elt.idx] = SOPLEX_VECTOR_MARKER;
-            // Otherwise, store the value. If oldval was SOPLEX_VECTOR_MARKER before, it does not
-            // hurt because SOPLEX_VECTOR_MARKER is really small.
-            else
-            {
-               VectorBase<R>::val[elt.idx] = newval;
-
-               // If the value changes from exactly 0, the position is still unused, so increase
-               // the counter. Otherwise, we just change the value of an existing element.
-               if(oldval == 0 && newval != 0)
-               {
-                  assert(num < len);
-                  idx[num++] = elt.idx;
-               }
-            }
+            assert(num < len);
+            idx[num++] = elt.idx;
          }
+
+         // If the value becomes exactly 0, mark the index as used by setting negative zero.
+         VectorBase<R>::val[elt.idx] = (newval != 0) ? newval : -R(0);
       }
    }
 
@@ -731,8 +707,8 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A,
    {
       curidx = idx[i];
 
-      if(isZero(VectorBase<R>::val[curidx], this->tolerances()->epsilon()))
-         VectorBase<R>::val[curidx] = 0;
+      if(isZero(VectorBase<R>::val[curidx], this->getEpsilon()))
+         VectorBase<R>::val[curidx] = +R(0);
       else
          idx[nz_counter++] = curidx;
    }
@@ -819,7 +795,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, 
          {
             // If x[i] is really nonzero, compute A[i] * x[i] and adapt x.idx,
             // otherwise set x[i] to 0.
-            if(isNotZero(xval, this->tolerances()->epsilon()))
+            if(isNotZero(xval, this->getEpsilon()))
             {
                const SVectorBase<S>& Ai = A[i];
                x.idx[ nzcount++ ] = i;
@@ -864,7 +840,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign(const SVectorBase<S>& rhs)
       int k = rhs.index(i);
       S v = rhs.value(i);
 
-      if(isZero(v, this->tolerances()->epsilon()))
+      if(isZero(v, this->getEpsilon()))
          VectorBase<R>::val[k] = 0;
       else
       {
@@ -1015,7 +991,7 @@ SVectorBase<R>& SVectorBase<R>::operator=(const SSVectorBase<S>& sv)
    {
       idx = sv.index(i);
 
-      if(sv.value(idx) != 0.0)
+      if(sv.value(idx) != 0)
       {
          e->idx = idx;
          e->val = sv[idx];
