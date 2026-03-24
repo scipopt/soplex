@@ -299,6 +299,22 @@ typedef double Real;
 
 #define SPX_MAXSTRLEN       1024 /**< maximum string length in SoPlex */
 
+/* Sparse vector handling:
+ * - Positive zero (+0): Uninitialized position, not in structure
+ * - Negative zero (-0): Value cancelled to zero, can temporarily remain
+ * - Nonzero value: Active structure position
+ * Zero distinction avoids duplicate indices when values cancel to zero during updates.
+ * Only apply to floating point types because the rational zero is unsigned.
+ */
+
+/// detects whether value is positive zero
+template <typename R>
+inline bool isPlusZero(R x)
+{
+   using std::signbit;
+   return x == 0 && !signbit(x);
+}
+
 SOPLEX_THREADLOCAL extern const Real infinity;
 
 class Tolerances
