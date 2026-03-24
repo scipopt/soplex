@@ -119,7 +119,6 @@ public:
    /// returns current tolerances
    const std::shared_ptr<Tolerances>& tolerances() const
    {
-      assert(this->_tolerances != nullptr);
       return this->_tolerances;
    }
 
@@ -131,7 +130,6 @@ public:
 
    R getEpsilon() const
    {
-      assert(this->_tolerances != nullptr);
       return this->_tolerances == nullptr ? R(0) : R(this->tolerances()->epsilon());
    }
 
@@ -153,16 +151,10 @@ public:
 
          for(int i = 0; i < d; ++i)
          {
-            if(VectorBase<R>::val[i] != R(0))
-            {
-               if(spxAbs(VectorBase<R>::val[i]) <= this->getEpsilon())
-                  VectorBase<R>::val[i] = R(0);
-               else
-               {
-                  idx[num] = i;
-                  num++;
-               }
-            }
+            if(isNotZero(VectorBase<R>::val[i], this->getEpsilon()))
+               idx[num++] = i;
+            else
+               VectorBase<R>::val[i] = +R(0);
          }
 
          setupStatus = true;
@@ -174,6 +166,31 @@ public:
    /// Forces setup status.
    void forceSetup()
    {
+      // check vector setup
+#ifndef NDEBUG
+      assert(VectorBase<R>::dim() >= 0);
+      std::vector<bool> entry(VectorBase<R>::dim(), false);
+      assert(num >= 0);
+      assert(num <= VectorBase<R>::dim());
+
+      for(int i = 0; i < num; ++i)
+      {
+         assert(idx[i] >= 0);
+         assert(idx[i] < VectorBase<R>::dim());
+         assert(VectorBase<R>::val[idx[i]] != 0);
+         assert(VectorBase<R>::val[idx[i]] == VectorBase<R>::val[idx[i]]);
+         assert(!entry[idx[i]]);
+         entry[idx[i]] = true;
+      }
+
+      for(int i = 0; i < VectorBase<R>::dim(); ++i)
+      {
+         if(!entry[i])
+            assert(soplex::isPlusZero<R>(VectorBase<R>::val[i]));
+      }
+
+#endif
+
       setupStatus = true;
    }
 
@@ -755,18 +772,15 @@ public:
 
          for(int i = 0; i < d; ++i)
          {
-            if(rhs.val[i] != 0)
+            if(isNotZero(rhs.val[i], this->getEpsilon()))
             {
-               if(spxAbs(rhs.val[i]) > this->getEpsilon())
-               {
-                  rhs.idx[num] = i;
-                  idx[num] = i;
-                  VectorBase<R>::val[i] = rhs.val[i];
-                  num++;
-               }
-               else
-                  rhs.val[i] = 0;
+               rhs.idx[num] = i;
+               idx[num] = i;
+               VectorBase<R>::val[i] = rhs.val[i];
+               num++;
             }
+            else
+               rhs.val[i] = +R(0);
          }
 
          rhs.num = num;

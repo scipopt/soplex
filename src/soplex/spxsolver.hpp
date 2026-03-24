@@ -712,8 +712,7 @@ void SPxSolverBase<R>::setType(Type tp)
 
    /* We compute how much the current solution violates (primal or dual) feasibility. In the
       row/enter or column/leave algorithm the maximum violation of dual feasibility is
-      computed. In the row/leave or column/enter algorithm the primal feasibility is checked.
-      Additionally, the violation from pricing is taken into account. */
+      computed. In the row/leave or column/enter algorithm the primal feasibility is checked. */
    template <class R>
    R SPxSolverBase<R>::maxInfeas() const
    {
@@ -721,9 +720,6 @@ void SPxSolverBase<R>::setType(Type tp)
 
       if(type() == ENTER)
       {
-         if(m_pricingViolUpToDate && m_pricingViolCoUpToDate)
-            inf = m_pricingViol + m_pricingViolCo;
-
          for(int i = 0; i < dim(); i++)
          {
             if((*theFvec)[i] > theUBbound[i])
@@ -735,9 +731,6 @@ void SPxSolverBase<R>::setType(Type tp)
       else
       {
          assert(type() == LEAVE);
-
-         if(m_pricingViolUpToDate)
-            inf = m_pricingViol;
 
          for(int i = 0; i < dim(); i++)
          {
@@ -757,6 +750,21 @@ void SPxSolverBase<R>::setType(Type tp)
       }
 
       return inf;
+   }
+
+   /* We compute how much the current solution violates (primal or dual) optimality. */
+   template <class R>
+   R SPxSolverBase<R>::maxSubopt() const
+   {
+      R sub = 0.0;
+
+      if(m_pricingViolUpToDate)
+         sub = SOPLEX_MAX(sub, m_pricingViol);
+
+      if(m_pricingViolCoUpToDate)
+         sub = SOPLEX_MAX(sub, m_pricingViolCo);
+
+      return sub;
    }
 
    /* check for (dual) violations above tol and immediately return false w/o checking the remaining values

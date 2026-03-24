@@ -493,15 +493,6 @@ public:
    virtual void setTolerances(std::shared_ptr<Tolerances> newTolerances)
    {
       this->_tolerances = newTolerances;
-      // set tolerances for all the UpdateVectors
-      this->primVec.setTolerances(newTolerances);
-      this->dualVec.setTolerances(newTolerances);
-      this->addVec.setTolerances(newTolerances);
-      this->theFvec->setTolerances(newTolerances);
-      this->theCoPvec->setTolerances(newTolerances);
-      this->thePvec->setTolerances(newTolerances);
-      this->theRPvec->setTolerances(newTolerances);
-      this->theCPvec->setTolerances(newTolerances);
    }
 
    /// returns current tolerances
@@ -1848,11 +1839,18 @@ public:
    /// maximal infeasibility of basis
    /** This method is called before concluding optimality. Since it is
     *  possible that some stable implementation of class
-    *  SPxRatioTester yielded a slightly infeasible (or unpriced)
-    *  basis, this must be checked before terminating with an optimal
-    *  solution.
+    *  SPxRatioTester yielded a slightly infeasible basis,
+    *  this must be checked before terminating with an optimal solution.
     */
    virtual R maxInfeas() const;
+
+   /// maximal suboptimality of basis
+   /** This method is called before concluding optimality. Since it is
+    *  possible that some stable implementation of class
+    *  SPxPricer yielded a slightly unpriced basis,
+    *  this must be checked before terminating with an optimal solution.
+    */
+   virtual R maxSubopt() const;
 
    /// check for violations above tol and immediately return false w/o checking the remaining values
    /** This method is useful for verifying whether an objective limit can be used as termination criterion

@@ -947,10 +947,20 @@ public:
       r.rationalErrorMessage();
       return r;
    };
+   inline friend bool signbit(const Rational& r)
+   {
+      r.rationalErrorMessage();
+      return false;
+   };
    inline friend int sign(const Rational& r)
    {
       r.rationalErrorMessage();
       return 0;
+   };
+   inline friend Rational operator+(const Rational& q)
+   {
+      q.rationalErrorMessage();
+      return q;
    };
    inline friend Rational operator-(const Rational& q)
    {
