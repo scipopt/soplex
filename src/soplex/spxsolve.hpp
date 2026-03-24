@@ -567,7 +567,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                if((this->iteration() - stallRefIter) % SOPLEX_MAXSTALLS == 0
                      && basis().status() != SPxBasisBase<R>::INFEASIBLE)
                {
-                  if(spxAbs(value() - stallRefValue) <= epsilon() && spxAbs(shift() - stallRefShift) <= epsilon())
+                  if(-rep() * sense() * (stallRefValue - value()) + (stallRefShift - shift()) <= epsilon())
                   {
                      if(stallNumRecovers < SOPLEX_MAXSTALLRECOVERS)
                      {
@@ -908,7 +908,7 @@ typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve(volatile bool* interru
                if((this->iteration() - stallRefIter) % SOPLEX_MAXSTALLS == 0
                      && basis().status() != SPxBasisBase<R>::INFEASIBLE)
                {
-                  if(spxAbs(value() - stallRefValue) <= epsilon() && spxAbs(shift() - stallRefShift) <= epsilon())
+                  if(rep() * sense() * (stallRefValue - value()) + (stallRefShift - shift()) <= epsilon())
                   {
                      if(stallNumRecovers < SOPLEX_MAXSTALLRECOVERS)
                      {
