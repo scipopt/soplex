@@ -25,6 +25,8 @@ fixed bugs:
 - consider numerical degradation in iteration stalling condition to avoid oscillation cycles
 - check suboptimality separately with correct tolerance to avoid early termination
 - remove positive numeric markers from sparse vector structures to avoid unnecessary floating point deviation
+- allow singular status of rational basis in the consistency check
+- count rational singularity as iterative refinement fail to guarantee loop termination
 
 code quality:
 - removed some unnecessary #define's for compilation on windows

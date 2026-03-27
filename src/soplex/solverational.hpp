@@ -597,11 +597,8 @@ void SoPlexBase<R>::_performOptIRWrapper(
          while(true);
       }
    }
-   else
+   else if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
    {
-      assert(boolParam(
-                SoPlexBase<R>::PRECISION_BOOSTING)); // at least one option between IR and precision boosting must be activated
-
       // initial precision solve
       if(!_switchedToBoosted)
       {
@@ -640,6 +637,13 @@ void SoPlexBase<R>::_performOptIRWrapper(
          }
          while(true);
       }
+   }
+   else
+   {
+      SPX_MSG_ERROR(std::cerr <<
+                    "ERROR: at least iterative_refinement or precision_boosting must be activated for rational solving"
+                    << std::endl;)
+      error = true;
    }
 
 #else
@@ -1025,10 +1029,16 @@ void SoPlexBase<R>::_checkRefinementProgress(
    {
       SPX_MSG_INFO2(spxout, spxout << "Failed to reduce violation significantly.\n");
       bestViolation *= violationImprovementFactor;
-      numFailedRefinements++;
+      ++numFailedRefinements;
    }
    else
+   {
       bestViolation = maxViolation;
+
+      // rational singularity is structural refinement fail
+      if(_rationalLUSolver.status() == SLinSolverRational::SINGULAR)
+         ++numFailedRefinements;
+   }
 }
 
 
@@ -2311,6 +2321,7 @@ void SoPlexBase<R>::_performOptIRStable(
       }
       else
       {
+         _rationalLUSolver.clear();
          factorSolNewBasis = true;
          lastStallRefinements = 0;
          _statistics->pivotRefinements = _statistics->refinements;
@@ -3281,6 +3292,7 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
       }
       else
       {
+         _rationalLUSolver.clear();
          factorSolNewBasis = true;
          lastStallRefinements = 0;
          _statistics->pivotRefinements = _statistics->refinements;
