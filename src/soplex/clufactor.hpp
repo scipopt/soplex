@@ -1063,8 +1063,6 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
             }
          }
 
-         assert(i == r);
-
          if(lbeg[l.firstUnused - 1] == ll)
             (l.firstUnused)--;
          else
@@ -1084,6 +1082,8 @@ void CLUFactor<R>::forestUpdate(int p_col, R* p_work, int num, int* nonz)
             this->stat = SLinSolver<R>::SINGULAR;
             throw SPxStatusException("XFORE01 The loaded matrix is singular");
          }
+
+         assert(i == r);
 
          diag[rowno] = 1 / x;
 
