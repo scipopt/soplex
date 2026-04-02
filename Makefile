@@ -51,7 +51,7 @@ include make/make.detecthost
 # default settings
 #-----------------------------------------------------------------------------
 
-VERSION		:=	8.0.2
+VERSION		:=	8.0.3
 SPXGITHASH	=
 
 VERBOSE		=	false
