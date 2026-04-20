@@ -2,6 +2,7 @@ Release 8.0.3
 ==================
 
 fixed bugs:
+- keep row order when writing LP files to improve reproducibility, thereby accelerating by avoiding sparse indexing
 
 
 April 2026 - Release 8.0.2
