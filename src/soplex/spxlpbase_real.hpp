@@ -2573,12 +2573,18 @@ static void LPFwriteSVector(
    char name[16];
    int num_coeffs = 0;
 
-   for(int j = 0; j < p_lp.nCols(); ++j)
-   {
-      const R coeff = p_svec[j];
+   // Write zeros in column order to maintain sequence when reading back.
+   const int n = writeZeroCoefficients ? p_lp.nCols() : p_svec.size();
+   VectorBase<R> dense(writeZeroCoefficients ? n : 0);
 
-      if(coeff == 0 && !writeZeroCoefficients)
-         continue;
+   if(writeZeroCoefficients)
+      dense.assign(p_svec);
+
+   for(int k = 0; k < n; ++k)
+   {
+      // Access vector entry without sparse search.
+      const int j = writeZeroCoefficients ? k : p_svec.index(k);
+      const R coeff = writeZeroCoefficients ? dense[k] : p_svec.value(k);
 
       if(num_coeffs == 0)
          p_output << coeff << " " << getColName(p_lp, j, p_cnames, name);
