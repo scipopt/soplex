@@ -922,7 +922,7 @@ SVectorBase<R>& SVectorBase<R>::operator=(const VectorBase<S>& vec)
 
    clear();
 
-   for(int i = vec.dim() - 1; i >= 0; --i)
+   for(int i = 0; i < vec.dim(); ++i)
    {
       if(vec[i] != 0)
       {
@@ -953,7 +953,7 @@ SVectorBase<Real>& SVectorBase<Real>::operator=(const VectorBase<S>& vec)
 
    clear();
 
-   for(int i = vec.dim() - 1; i >= 0; --i)
+   for(int i = 0; i < vec.dim(); ++i)
    {
       if(vec[i] != 0)
       {
