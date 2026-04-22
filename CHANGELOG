@@ -2,8 +2,8 @@ Release 8.0.3
 ==================
 
 fixed bugs:
+- keep vector order when assigning SVectorBase from VectorBase to avoid unexpected reversion
 - keep row order when writing LP files to improve reproducibility, thereby accelerating by avoiding sparse indexing
-
 
 April 2026 - Release 8.0.2
 ==================
