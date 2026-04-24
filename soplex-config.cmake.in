@@ -30,4 +30,8 @@ endif()
 
 if(@SOPLEX_WITH_PAPILO@)
   set(SOPLEX_WITH_PAPILO TRUE)
+  if(NOT PAPILO_DIR)
+    set(PAPILO_DIR "@PAPILO_DIR@")
+  endif()
+  find_dependency(PAPILO CONFIG)
 endif()
