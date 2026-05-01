@@ -95,8 +95,8 @@ private:
       const Breakpoint*  entry;
 
       R operator()(
-         Breakpoint      i,
-         Breakpoint      j
+         const Breakpoint&  i,
+         const Breakpoint&  j
       ) const
       {
          // the first case is needed to handle exceptional inf values
