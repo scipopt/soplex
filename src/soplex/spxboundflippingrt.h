@@ -94,13 +94,14 @@ private:
 
       const Breakpoint*  entry;
 
-      R operator()(
+      int operator()(
          const Breakpoint&  i,
          const Breakpoint&  j
       ) const
       {
-         // the first case is needed to handle exceptional inf values
-         return (i.val == j.val) ? 0 : i.val - j.val;
+         if(i.val < j.val) return -1;
+         if(i.val > j.val) return 1;
+         return 0;  // also handles inf==inf correctly
       }
    };
    ///@}
