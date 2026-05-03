@@ -113,19 +113,19 @@ void SPxQuicksort(T* keys, int end, COMPARATOR& compare, int start = 0, bool typ
       {
          if(type)
          {
-            while(lo < end && compare(keys[lo], pivotkey) < 0)
-               lo++;
+            while(compare(keys[lo], pivotkey) < 0)
+               ++lo;
 
             while(hi > start && compare(keys[hi], pivotkey) >= 0)
-               hi--;
+               --hi;
          }
          else
          {
             while(lo < end && compare(pivotkey, keys[lo]) >= 0)
-               lo++;
+               ++lo;
 
-            while(hi > start && compare(pivotkey, keys[hi]) < 0)
-               hi--;
+            while(compare(pivotkey, keys[hi]) < 0)
+               --hi;
          }
 
          if(lo >= hi)
@@ -134,9 +134,8 @@ void SPxQuicksort(T* keys, int end, COMPARATOR& compare, int start = 0, bool typ
          tmp = keys[lo];
          keys[lo] = keys[hi];
          keys[hi] = tmp;
-
-         lo++;
-         hi--;
+         ++lo;
+         --hi;
       }
 
       assert((hi == lo - 1) || (type && hi == start) || (!type && lo == end));
@@ -145,7 +144,7 @@ void SPxQuicksort(T* keys, int end, COMPARATOR& compare, int start = 0, bool typ
       if(type)
       {
          while(lo < end && compare(pivotkey, keys[lo]) >= 0)
-            lo++;
+            ++lo;
 
          /* make sure that we have at least one element in the smaller partition */
          if(lo == start)
@@ -156,14 +155,13 @@ void SPxQuicksort(T* keys, int end, COMPARATOR& compare, int start = 0, bool typ
             tmp = keys[lo];
             keys[lo] = keys[mid];
             keys[mid] = tmp;
-
-            lo++;
+            ++lo;
          }
       }
       else
       {
          while(hi > start && compare(keys[hi], pivotkey) >= 0)
-            hi--;
+            --hi;
 
          /* make sure that we have at least one element in the smaller partition */
          if(hi == end)
@@ -174,8 +172,7 @@ void SPxQuicksort(T* keys, int end, COMPARATOR& compare, int start = 0, bool typ
             tmp = keys[hi];
             keys[hi] = keys[mid];
             keys[mid] = tmp;
-
-            hi--;
+            --hi;
          }
       }
 
@@ -296,19 +293,19 @@ int SPxQuicksortPart(T* keys, COMPARATOR& compare, int start, int end, int size,
    {
       if(type)
       {
-         while(lo < end && compare(keys[lo], pivotkey) < 0)
-            lo++;
+         while(compare(keys[lo], pivotkey) < 0)
+            ++lo;
 
          while(hi > start2 && compare(keys[hi], pivotkey) >= 0)
-            hi--;
+            --hi;
       }
       else
       {
          while(lo < end && compare(pivotkey, keys[lo]) >= 0)
-            lo++;
+            ++lo;
 
-         while(hi > start2 && compare(pivotkey, keys[hi]) < 0)
-            hi--;
+         while(compare(pivotkey, keys[hi]) < 0)
+            --hi;
       }
 
       if(lo >= hi)
@@ -317,9 +314,8 @@ int SPxQuicksortPart(T* keys, COMPARATOR& compare, int start, int end, int size,
       tmp = keys[lo];
       keys[lo] = keys[hi];
       keys[hi] = tmp;
-
-      lo++;
-      hi--;
+      ++lo;
+      --hi;
    }
 
    assert((hi == lo - 1) || (type && hi == start2) || (!type && lo == end));
@@ -328,7 +324,7 @@ int SPxQuicksortPart(T* keys, COMPARATOR& compare, int start, int end, int size,
    if(type)
    {
       while(lo < end && compare(pivotkey, keys[lo]) >= 0)
-         lo++;
+         ++lo;
 
       /* make sure that we have at least one element in the smaller partition */
       if(lo == start2)
@@ -339,14 +335,13 @@ int SPxQuicksortPart(T* keys, COMPARATOR& compare, int start, int end, int size,
          tmp = keys[lo];
          keys[lo] = keys[mid];
          keys[mid] = tmp;
-
-         lo++;
+         ++lo;
       }
    }
    else
    {
       while(hi > start2 && compare(keys[hi], pivotkey) >= 0)
-         hi--;
+         --hi;
 
       /* make sure that we have at least one element in the smaller partition */
       if(hi == end)
@@ -357,8 +352,7 @@ int SPxQuicksortPart(T* keys, COMPARATOR& compare, int start, int end, int size,
          tmp = keys[hi];
          keys[hi] = keys[mid];
          keys[mid] = tmp;
-
-         hi--;
+         --hi;
       }
    }
 
