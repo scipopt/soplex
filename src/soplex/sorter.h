@@ -121,10 +121,10 @@ void SPxQuicksort(T* keys, int end, COMPARATOR& compare, int start = 0, bool typ
          }
          else
          {
-            while(lo < end && compare(keys[lo], pivotkey) <= 0)
+            while(lo < end && compare(pivotkey, keys[lo]) >= 0)
                lo++;
 
-            while(hi > start && compare(keys[hi], pivotkey) > 0)
+            while(hi > start && compare(pivotkey, keys[hi]) < 0)
                hi--;
          }
 
@@ -162,7 +162,7 @@ void SPxQuicksort(T* keys, int end, COMPARATOR& compare, int start = 0, bool typ
       }
       else
       {
-         while(hi > start && compare(pivotkey, keys[hi]) <= 0)
+         while(hi > start && compare(keys[hi], pivotkey) >= 0)
             hi--;
 
          /* make sure that we have at least one element in the smaller partition */
@@ -304,10 +304,10 @@ int SPxQuicksortPart(T* keys, COMPARATOR& compare, int start, int end, int size,
       }
       else
       {
-         while(lo < end && compare(keys[lo], pivotkey) <= 0)
+         while(lo < end && compare(pivotkey, keys[lo]) >= 0)
             lo++;
 
-         while(hi > start2 && compare(keys[hi], pivotkey) > 0)
+         while(hi > start2 && compare(pivotkey, keys[hi]) < 0)
             hi--;
       }
 
@@ -345,7 +345,7 @@ int SPxQuicksortPart(T* keys, COMPARATOR& compare, int start, int end, int size,
    }
    else
    {
-      while(hi > start2 && compare(pivotkey, keys[hi]) <= 0)
+      while(hi > start2 && compare(keys[hi], pivotkey) >= 0)
          hi--;
 
       /* make sure that we have at least one element in the smaller partition */
