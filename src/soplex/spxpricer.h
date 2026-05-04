@@ -90,13 +90,15 @@ protected:
 
       const IdxElement*  elements;
 
-      R operator()(
+      // returning -1/0/1
+      int operator()(
          IdxElement      a,
          IdxElement      b
       ) const
       {
-         // the first case is needed to handle exceptional inf values
-         return (a.val == b.val) ? 0 : b.val - a.val;
+         if(a.val > b.val) return -1;
+         if(a.val < b.val) return 1;
+         return 0;  // also handles inf==inf correctly (avoids inf-inf=NaN)
       }
    };
 
