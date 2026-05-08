@@ -6273,7 +6273,7 @@ int CLUFactor<R>::vSolveLeft(R eps,
       // perform the dense solve
       solveLleftNoNZ(vec);
       // signal the caller that the nonzero pattern is lost
-      return 0;
+      return -1;
    }
    else
       return solveLleft(eps, vec, idx, rn);
