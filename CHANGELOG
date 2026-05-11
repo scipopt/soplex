@@ -24,6 +24,9 @@ fixed bugs:
 - keep row order when writing LP files to improve reproducibility, thereby accelerating by avoiding sparse indexing
 - find PaPILO in cmake configuration to avoid linking error for projects without direct dependency
 
+miscellaneous:
+- fix UDL definition in fmt external to support modern clang
+
 April 2026 - Release 8.0.2
 ==================
 
