@@ -4326,7 +4326,6 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLPBase<R>& lp, 
 
    int idxFirstDupRows = -1;
    int idxLastDupRows = -1;
-   int numDelRows = 0;
 
    for(int k = 0; k < lp.nRows(); ++k)
    {
@@ -4344,8 +4343,6 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLPBase<R>& lp, 
             int i = m_dupRows[k].index(l);
             perm_tmp[i] = -1;
          }
-
-         numDelRows += (m_dupRows[k].size() - 1);
       }
    }
 

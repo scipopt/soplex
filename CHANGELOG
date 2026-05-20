@@ -8,6 +8,7 @@ fixed bugs:
 
 miscellaneous:
 - fix UDL definition in fmt external to support modern clang
+- removed an unused local variable in duplicate rows simplifier to fix a compiler warning
 
 April 2026 - Release 8.0.2
 ==================
