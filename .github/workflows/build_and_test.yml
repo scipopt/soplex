@@ -1,0 +1,23 @@
+name: Build and Test
+
+on: [push, pull_request, workflow_dispatch]
+
+concurrency:
+  group: ${{github.workflow}}-${{github.ref}}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y git g++ make cmake libgmp-dev libreadline-dev libncurses-dev libboost-all-dev zlib1g-dev libzstd-dev
+    - uses: actions/checkout@v2
+    - name: Build
+      run: |
+        cmake -S. -Bbuild
+        cmake --build build -j
+    - name: Run tests
+      run: (cd build && ctest --output-on-failure)
