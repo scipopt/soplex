@@ -21,6 +21,9 @@ Release 8.0.4
 
 fixed bugs:
 
+miscellaneous:
+- disable deprecated iterators in fmt external to support modern MSVC
+
 
 July 2026 - Release 8.0.3
 ==================
