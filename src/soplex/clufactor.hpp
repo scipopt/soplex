@@ -6267,8 +6267,7 @@ int CLUFactor<R>::vSolveLeft(R eps,
       rn = solveLleftForest(eps, vec, idx, rn);
    }
 
-   // TODO verify the correctness of this check
-   if(rn + l.firstUpdate > verySparseFactor4left * thedim)
+   if(rn > verySparseFactor4left * thedim)
    {
       // perform the dense solve
       solveLleftNoNZ(vec);
