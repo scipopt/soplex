@@ -1634,8 +1634,12 @@ private:
       int operator()(const typename SVectorBase<R>::Element& e1,
                      const typename SVectorBase<R>::Element& e2) const
       {
-         if(LT(e1.val, e2.val, this->epsiloncompare)) return -1;
-         if(GT(e1.val, e2.val, this->epsiloncompare)) return 1;
+         if(LT(e1.val, e2.val, this->epsiloncompare))
+            return -1;
+
+         if(GT(e1.val, e2.val, this->epsiloncompare))
+            return 1;
+
          return 0;
       }
    };
@@ -1648,8 +1652,12 @@ private:
       int operator()(const typename SVectorBase<R>::Element& e1,
                      const typename SVectorBase<R>::Element& e2) const
       {
-         if(e1.idx < e2.idx) return -1;
-         if(e1.idx > e2.idx) return 1;
+         if(e1.idx < e2.idx)
+            return -1;
+
+         if(e1.idx > e2.idx)
+            return 1;
+
          return 0;
       }
    };

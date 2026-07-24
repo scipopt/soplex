@@ -97,8 +97,12 @@ private:
          const Breakpoint&  j
       ) const
       {
-         if(i.val < j.val) return -1;
-         if(i.val > j.val) return 1;
+         if(i.val < j.val)
+            return -1;
+
+         if(i.val > j.val)
+            return 1;
+
          return 0;
       }
    };

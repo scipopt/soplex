@@ -154,8 +154,12 @@ struct Compare
 
    int operator()(int i1, int i2) const
    {
-      if(weight[i1] < weight[i2]) return -1;
-      if(weight[i1] > weight[i2]) return 1;
+      if(weight[i1] < weight[i2])
+         return -1;
+
+      if(weight[i1] > weight[i2])
+         return 1;
+
       return 0;
    }
 };
