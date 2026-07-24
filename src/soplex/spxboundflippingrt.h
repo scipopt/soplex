@@ -80,13 +80,11 @@ private:
       BreakpointSource   src;                /**< origin of breakpoint, i.e. vector which was searched */
    };
 
-   /** Compare class for breakpoints
-    */
+   /// Compare class for breakpoints
    struct BreakpointCompare
    {
       public:
-      /** constructor
-       */
+      /// constructor
       BreakpointCompare()
          : entry(nullptr)
       {
@@ -101,7 +99,7 @@ private:
       {
          if(i.val < j.val) return -1;
          if(i.val > j.val) return 1;
-         return 0;  // also handles inf==inf correctly
+         return 0;
       }
    };
    ///@}

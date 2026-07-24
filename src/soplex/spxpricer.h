@@ -90,15 +90,14 @@ protected:
 
       const IdxElement*  elements;
 
-      // returning -1/0/1
       int operator()(
-         IdxElement      a,
-         IdxElement      b
+         const IdxElement&  a,
+         const IdxElement&  b
       ) const
       {
          if(a.val > b.val) return -1;
          if(a.val < b.val) return 1;
-         return 0;  // also handles inf==inf correctly (avoids inf-inf=NaN)
+         return 0;
       }
    };
 
