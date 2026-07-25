@@ -53,8 +53,7 @@ public:
    template < class S >
    Nonzero<R>& operator=(const Nonzero<S>& vec)
    {
-      // todo: is the cast really necessary? Previous code worked without a cast
-      val = (R) vec.val;
+      val = R(vec.val);
       idx = vec.idx;
       return *this;
    }
@@ -722,6 +721,7 @@ public:
             m_elem[i].idx = sv.index(i);
          }
 
+         set_size(sv.size());
          assert(isConsistent());
       }
 
@@ -753,6 +753,7 @@ public:
             }
          }
 
+         set_size(sv.size());
          assert(isConsistent());
       }
 
