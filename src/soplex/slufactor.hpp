@@ -90,8 +90,7 @@ void SLUFactor<R>::solveRight4update(SSVectorBase<R>& x, const SVectorBase<R>& b
       m = this->vSolveRight4update(epsilon, x.altValues(), x.altIndexMem(),
                                    ssvec.altValues(), ssvec.altIndexMem(), n, nullptr, nullptr, nullptr);
       x.setSize(m);
-      //x.forceSetup();
-      x.unSetup();
+      x.forceSetup();
       eta.setup_and_assign(x);
    }
    else
@@ -146,8 +145,7 @@ void SLUFactor<R>::solve2right4update(
                                     ssvec.get_ptr(), sidx, n, y.get_ptr(),
                                     epsilon, rhs.altValues(), ridx, rsize, nullptr, nullptr, nullptr);
       x.setSize(m);
-      //      x.forceSetup();
-      x.unSetup();
+      x.forceSetup();
       eta.setup_and_assign(x);
    }
    else
@@ -206,10 +204,9 @@ void SLUFactor<R>::solve2right4update(
                                       rhs.altValues(), ridx, rsize,
                                       nullptr, nullptr, nullptr);
       x.setSize(n);
-      //      x.forceSetup();
-      x.unSetup();
+      x.forceSetup();
       y.setSize(rsize);
-      y.unSetup();
+      y.forceSetup();
       eta.setup_and_assign(x);
    }
    else
@@ -278,8 +275,7 @@ void SLUFactor<R>::solve3right4update(
                                     y2.get_ptr(), epsilon, rhs2.altValues(), ridx2, rsize2,
                                     nullptr, nullptr, nullptr);
       x.setSize(m);
-      //      x.forceSetup();
-      x.unSetup();
+      x.forceSetup();
       eta.setup_and_assign(x);
    }
    else
@@ -347,12 +343,11 @@ void SLUFactor<R>::solve3right4update(
                                       rhs2.altValues(), ridx2, rsize2,
                                       nullptr, nullptr, nullptr);
       x.setSize(n);
-      //      x.forceSetup();
-      x.unSetup();
+      x.forceSetup();
       y.setSize(rsize);
-      y.unSetup();
+      y.forceSetup();
       y2.setSize(rsize2);
-      y2.unSetup();
+      y2.forceSetup();
       eta.setup_and_assign(x);
    }
    else
@@ -424,8 +419,6 @@ void SLUFactor<R>::solveLeft(SSVectorBase<R>& x, const SVectorBase<R>& b)  //con
       x.setSize(n);
       x.forceSetup();
    }
-   else
-      x.setup();
 
    ssvec.setSize(0);
    ssvec.forceSetup();
@@ -459,10 +452,7 @@ void SLUFactor<R>::solveLeft(
                          y.get_ptr(), rhs2.altValues(), ridx, rn);
 
    x.setSize(n);
-
-   if(n > 0)
-      x.forceSetup();
-
+   x.forceSetup();
    ssvec.setSize(0);
    ssvec.forceSetup();
 
@@ -499,27 +489,16 @@ void SLUFactor<R>::solveLeft(
                               y.altValues(), y.altIndexMem(),
                               rhs2.altValues(), rhs2.altIndexMem(), n2);
       y.setSize(n2);
-
-      if(n2 > 0)
-         y.forceSetup();
+      y.forceSetup();
    }
    else
    {
       n1 = this->vSolveLeft2(epsilon, x.altValues(), x.altIndexMem(), svec, sidx, n1,
                              y.altValues(), rhs2.altValues(), rhs2.altIndexMem(), n2);
-      //      y.setup();
    }
 
    x.setSize(n1);
-
-   if(n1 > 0)
-      x.forceSetup();
-
-   //   y.setSize(n2);
-   //
-   //   if(n2 > 0)
-   //      y.forceSetup();
-
+   x.forceSetup();
    ssvec.setSize(0);
    ssvec.forceSetup();
 
@@ -558,10 +537,7 @@ void SLUFactor<R>::solveLeft(
                          z.get_ptr(), rhs3.altValues(), rhs3.altIndexMem(), n3);
 
    x.setSize(n);
-
-   if(n > 0)
-      x.forceSetup();
-
+   x.forceSetup();
    ssvec.setSize(0);
    ssvec.forceSetup();
 
@@ -601,18 +577,11 @@ void SLUFactor<R>::solveLeft(
                            z.altValues(), z.altIndexMem(),
                            rhs3.altValues(), rhs3.altIndexMem(), n3);
    x.setSize(n1);
+   x.forceSetup();
    y.setSize(n2);
+   y.forceSetup();
    z.setSize(n3);
-
-   if(n1 > 0)
-      x.forceSetup();
-
-   if(n2 > 0)
-      y.forceSetup();
-
-   if(n3 > 0)
-      z.forceSetup();
-
+   z.forceSetup();
    ssvec.setSize(0);
    ssvec.forceSetup();
 

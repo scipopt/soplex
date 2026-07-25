@@ -85,8 +85,7 @@ inline void SLUFactorRational::solveRight4update(SSVectorRational& x, const SVec
       m = vSolveRight4update(x.altValues(), x.altIndexMem(),
                              ssvec.altValues(), ssvec.altIndexMem(), n, nullptr, nullptr, nullptr);
       x.setSize(m);
-      //x.forceSetup();
-      x.unSetup();
+      x.forceSetup();
       eta.setup_and_assign(x);
    }
    else
@@ -135,8 +134,7 @@ inline void SLUFactorRational::solve2right4update(
                               ssvec.get_ptr(), sidx, n, y.get_ptr(),
                               rhs.altValues(), ridx, rsize, nullptr, nullptr, nullptr);
       x.setSize(m);
-      //      x.forceSetup();
-      x.unSetup();
+      x.forceSetup();
       eta.setup_and_assign(x);
    }
    else
@@ -191,8 +189,7 @@ inline void SLUFactorRational::solve3right4update(
                               y2.get_ptr(), rhs2.altValues(), ridx2, rsize2,
                               nullptr, nullptr, nullptr);
       x.setSize(m);
-      //      x.forceSetup();
-      x.unSetup();
+      x.forceSetup();
       eta.setup_and_assign(x);
    }
    else
@@ -239,14 +236,8 @@ inline void SLUFactorRational::solveLeft(SSVectorRational& x, const SVectorRatio
    int n = vSolveLeft(x.altValues(), x.altIndexMem(),
                       ssvec.altValues(), ssvec.altIndexMem(), sz);
 
-   if(n > 0)
-   {
-      x.setSize(n);
-      x.forceSetup();
-   }
-   else
-      x.unSetup();
-
+   x.setSize(n);
+   x.forceSetup();
    ssvec.setSize(0);
    ssvec.forceSetup();
 
@@ -277,12 +268,7 @@ inline void SLUFactorRational::solveLeft(
                    y.get_ptr(), rhs2.altValues(), ridx, rn);
 
    x.setSize(n);
-
-   if(n > 0)
-      x.forceSetup();
-   else
-      x.unSetup();
-
+   x.forceSetup();
    rhs2.setSize(0);
    rhs2.forceSetup();
    ssvec.setSize(0);
@@ -317,12 +303,7 @@ inline void SLUFactorRational::solveLeft(
                    z.get_ptr(), rhs3.altValues(), rhs3.altIndexMem(), rhs3.size());
 
    x.setSize(n);
-
-   if(n > 0)
-      x.forceSetup();
-   else
-      x.unSetup();
-
+   x.forceSetup();
    ssvec.setSize(0);
    ssvec.forceSetup();
 
