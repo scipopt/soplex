@@ -368,7 +368,7 @@ public:
    template < class S >
    SSVectorBase<R>& operator+=(const VectorBase<S>& vec)
    {
-      VectorBase<S>::operator+=(vec);
+      VectorBase<R>::operator+=(vec);
 
       if(isSetup())
       {

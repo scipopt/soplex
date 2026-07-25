@@ -447,6 +447,8 @@ inline
 SSVectorBase<R>& SSVectorBase<R>::assignPWproduct4setup(const SSVectorBase<S>& x,
       const SSVectorBase<T>& y)
 {
+   assert(this != (const SSVectorBase<R>*)(&x));
+   assert(this != (const SSVectorBase<R>*)(&y));
    assert(dim() == x.dim());
    assert(x.dim() == y.dim());
    assert(x.isSetup());
@@ -507,6 +509,7 @@ template < class S, class T >
 inline
 SSVectorBase<R>& SSVectorBase<R>::assign2product(const SSVectorBase<S>& x, const SVSetBase<T>& A)
 {
+   assert(this != (const SSVectorBase<R>*)(&x));
    assert(A.num() == dim());
 
    R y;
@@ -637,6 +640,7 @@ inline
 SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A,
       const SSVectorBase<T>& x)
 {
+   assert(this != (const SSVectorBase<R>*)(&x));
    assert(x.isSetup());
 
    clear();
@@ -729,6 +733,7 @@ inline
 SSVectorBase<R>& SSVectorBase<R>::assign2productFull(const SVSetBase<S>& A,
       const SSVectorBase<T>& x)
 {
+   assert(this != (const SSVectorBase<R>*)(&x));
    assert(x.isSetup());
 
    if(x.size() == 0)   // x can be setup but have size 0 => this := zero vector
@@ -772,6 +777,7 @@ template < class S, class T >
 inline
 SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, SSVectorBase<T>& x)
 {
+   assert(this != (const SSVectorBase<R>*)(&x));
    assert(!x.isSetup());
 
    if(x.dim() == 0)
@@ -987,11 +993,11 @@ SVectorBase<R>& SVectorBase<R>::operator=(const SSVectorBase<S>& sv)
 
    Nonzero<R>* e = m_elem;
 
-   for(int i = 0; i < nnz; ++i)
+   for(int i = 0; i < sv.size(); ++i)
    {
       idx = sv.index(i);
 
-      if(sv.value(idx) != 0)
+      if(sv[idx] != 0)
       {
          e->idx = idx;
          e->val = sv[idx];

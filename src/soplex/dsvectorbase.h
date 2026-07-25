@@ -223,13 +223,12 @@ public:
    /**@name Modification */
    ///@{
 
-   /// Append nonzeros of \p sv.
-   template < class S >
-   void add(const SVectorBase<S>& vec)
+   /// Append nonzeros of \p vec.
+   void add(const SVectorBase<R>& vec)
    {
       SVectorBase<R>::clear();
       makeMem(vec.size());
-      SVectorBase<S>::add(vec);
+      SVectorBase<R>::add(vec);
    }
 
    /// Append one nonzero \p (i,v).
