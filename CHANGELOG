@@ -2,6 +2,11 @@ Release 8.0.4
 ==================
 
 fixed bugs:
+- enable functional assignment of SVectorBase from SSVectorBase
+- assign nonzero size in scaleAssign() of SVectorBase
+
+code quality:
+- remove broken template of DSVectorBase::add() from incompatible SVectorBase
 
 miscellaneous:
 - disable deprecated iterators in fmt external to support modern MSVC
