@@ -152,11 +152,15 @@ struct Compare
    //   const SPxSolverBase* base;     ///< the solver
    const T*      weight;   ///< the weights to compare
 
-   /// compares the weights
-   T operator()(int i1, int i2) const
+   int operator()(int i1, int i2) const
    {
-      // the first case is needed to handle exceptional inf values
-      return (weight[i1] == weight[i2]) ? 0 : weight[i1] - weight[i2];
+      if(weight[i1] < weight[i2])
+         return -1;
+
+      if(weight[i1] > weight[i2])
+         return 1;
+
+      return 0;
    }
 };
 

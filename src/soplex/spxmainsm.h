@@ -1634,13 +1634,13 @@ private:
       int operator()(const typename SVectorBase<R>::Element& e1,
                      const typename SVectorBase<R>::Element& e2) const
       {
-         if(EQ(e1.val, e2.val, this->epsiloncompare))
-            return 0;
-
-         if(e1.val < e2.val)
+         if(LT(e1.val, e2.val, this->epsiloncompare))
             return -1;
-         else // (e1.val > e2.val)
+
+         if(GT(e1.val, e2.val, this->epsiloncompare))
             return 1;
+
+         return 0;
       }
    };
    /// comparator for class SVectorBase<R>::Element: compare nonzeros according to index
@@ -1652,13 +1652,13 @@ private:
       int operator()(const typename SVectorBase<R>::Element& e1,
                      const typename SVectorBase<R>::Element& e2) const
       {
-         if(EQ(e1.idx, e2.idx))
-            return 0;
-
          if(e1.idx < e2.idx)
             return -1;
-         else // (e1.idx > e2.idx)
+
+         if(e1.idx > e2.idx)
             return 1;
+
+         return 0;
       }
    };
    ///@}

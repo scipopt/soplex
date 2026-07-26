@@ -795,14 +795,13 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, 
       for(int i = 0; i < end; ++i)
       {
          // advance to the next element != 0
-         T& xval = x.val[i];
-
-         if(xval != 0)
+         if(x.val[i] != 0)
          {
             // If x[i] is really nonzero, compute A[i] * x[i] and adapt x.idx,
             // otherwise set x[i] to 0.
-            if(isNotZero(xval, this->getEpsilon()))
+            if(isNotZero(x.val[i], this->getEpsilon()))
             {
+               const T xval = x.val[i];
                const SVectorBase<S>& Ai = A[i];
                x.idx[ nzcount++ ] = i;
 
@@ -813,7 +812,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, 
                }
             }
             else
-               xval = 0;
+               x.val[i] = 0;
          }
       }
 
