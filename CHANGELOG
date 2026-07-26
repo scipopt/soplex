@@ -4,6 +4,11 @@ Next - Release 9.0.0
 features:
 - command line option --version to print version and compiler information
 
+performance:
+- accelerate product method SSVectorBase::assign2productAndSetup() by caching vector entry
+- accelerate comparator classes Compare, IdxCompare, BreakpointCompare, and ElementCompare by avoiding argument copies and reformulating difference computations
+- accelerate sorting functions SPxQuicksort and SPxQuicksortPart by removing redundant checks and simplifying comparator calls
+
 interface & parameters:
 - added an overloaded version of SoPlexBase<R>::factorizeColumnRational() with an additional boolean parameter forceSolutionUpdate to compute solution values also when the basis is not optimal. (SOPLEX_APIVERSION 21)
 - add SoPlexBase<R>::printExternalCodes() to print external libraries (SOPLEX_APIVERSION 22)
