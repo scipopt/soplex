@@ -63,9 +63,11 @@ template < class S >
 inline
 VectorBase<R>& VectorBase<R>::operator=(const SVectorBase<S>& vec)
 {
+   const int n = vec.size();
+
    clear();
 
-   for(int i = 0; i < vec.size(); ++i)
+   for(int i = 0; i < n; ++i)
    {
       assert(vec.index(i) < dim());
       val[vec.index(i)] = vec.value(i);
@@ -453,14 +455,13 @@ SSVectorBase<R>& SSVectorBase<R>::assignPWproduct4setup(const SSVectorBase<S>& x
    assert(x.dim() == y.dim());
    assert(x.isSetup());
    assert(y.isSetup());
+   const int n = x.size() - 1;
+   const int m = y.size() - 1;
+   int i = 0;
+   int j = 0;
 
    clear();
    setupStatus = false;
-
-   int i = 0;
-   int j = 0;
-   int n = x.size() - 1;
-   int m = y.size() - 1;
 
    /* both x and y non-zero vectors? */
    if(m >= 0 && n >= 0)
@@ -652,7 +653,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A,
    int curidx = x.idx[0];
    const T x0 = x.val[curidx];
    const SVectorBase<S>& A0 = A[curidx];
-   int xsize = x.size();
+   const int xsize = x.size();
    int Aisize;
 
    // If x[0] == 0, do nothing.
@@ -742,8 +743,8 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productFull(const SVSetBase<S>& A,
       return *this;
    }
 
+   const int xsize = x.size();
    bool A_is_zero = true;
-   int xsize = x.size();
    int Aisize;
 
    for(int i = 0; i < xsize; ++i)
@@ -789,8 +790,8 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, 
    else
    {
       // x is not setup, so walk through its value vector
+      const int end = x.dim();
       int nzcount = 0;
-      int end = x.dim();
 
       for(int i = 0; i < end; ++i)
       {
@@ -836,8 +837,7 @@ inline
 SSVectorBase<R>& SSVectorBase<R>::assign(const SVectorBase<S>& rhs)
 {
    assert(rhs.dim() <= VectorBase<R>::dim());
-
-   int s = rhs.size();
+   const int s = rhs.size();
    num = 0;
 
    for(int i = 0; i < s; ++i)
@@ -870,8 +870,7 @@ inline
 SSVectorBase<Rational>& SSVectorBase<Rational>::assign(const SVectorBase<Rational>& rhs)
 {
    assert(rhs.dim() <= VectorBase<Rational>::dim());
-
-   int s = rhs.size();
+   const int s = rhs.size();
    num = 0;
 
    for(int i = 0; i < s; ++i)
@@ -922,12 +921,13 @@ template < class S >
 inline
 SVectorBase<R>& SVectorBase<R>::operator=(const VectorBase<S>& vec)
 {
+   const int d = vec.dim();
    int n = 0;
    Nonzero<R>* e = m_elem;
 
    clear();
 
-   for(int i = 0; i < vec.dim(); ++i)
+   for(int i = 0; i < d; ++i)
    {
       if(vec[i] != 0)
       {
@@ -953,12 +953,13 @@ template < class S >
 inline
 SVectorBase<Real>& SVectorBase<Real>::operator=(const VectorBase<S>& vec)
 {
+   const int d = vec.dim();
    int n = 0;
    Nonzero<Real>* e = m_elem;
 
    clear();
 
-   for(int i = 0; i < vec.dim(); ++i)
+   for(int i = 0; i < d; ++i)
    {
       if(vec[i] != 0)
       {
@@ -985,14 +986,14 @@ inline
 SVectorBase<R>& SVectorBase<R>::operator=(const SSVectorBase<S>& sv)
 {
    assert(sv.isSetup());
-   assert(max() >= sv.size());
-
+   const int n = sv.size();
+   assert(n <= max());
    int nnz = 0;
    int idx;
 
    Nonzero<R>* e = m_elem;
 
-   for(int i = 0; i < sv.size(); ++i)
+   for(int i = 0; i < n; ++i)
    {
       idx = sv.index(i);
 
@@ -1018,12 +1019,12 @@ inline
 R SVectorBase<R>::operator*(const VectorBase<R>& w) const
 {
    StableSum<R> x;
-   Nonzero<R>* e = m_elem;
+   const Nonzero<R>* e = m_elem;
 
    for(int i = size() - 1; i >= 0; --i)
    {
       x += e->val * w[e->idx];
-      e++;
+      ++e;
    }
 
    return x;
@@ -1114,11 +1115,12 @@ template < class R >
 inline
 std::ostream& operator<<(std::ostream& s, const VectorBase<R>& vec)
 {
+   const int d = vec.dim() - 1;
    int i;
 
    s << '(';
 
-   for(i = 0; i < vec.dim() - 1; ++i)
+   for(i = 0; i < d; ++i)
       s << vec[i] << ", ";
 
    s << vec[i] << ')';
@@ -1133,9 +1135,10 @@ template < class R >
 inline
 VectorBase<R> operator-(const SVectorBase<R>& v, const VectorBase<R>& w)
 {
-   VectorBase<R> res(w.dim());
+   const int d = w.dim();
+   VectorBase<R> res(d);
 
-   for(int i = 0; i < res.dim(); ++i)
+   for(int i = 0; i < d; ++i)
       res[i] = -w[i];
 
    res += v;
@@ -1151,9 +1154,10 @@ template < class R >
 inline
 DSVectorBase<R> operator*(const SVectorBase<R>& v, R x)
 {
-   DSVectorBase<R> res(v.size());
+   const int n = v.size();
+   DSVectorBase<R> res(n);
 
-   for(int i = 0; i < v.size(); ++i)
+   for(int i = 0; i < n; ++i)
       res.add(v.index(i), v.value(i) * x);
 
    return res;
@@ -1227,7 +1231,9 @@ template < class R >
 inline
 std::ostream& operator<<(std::ostream& os, const SVectorBase<R>& v)
 {
-   for(int i = 0, j = 0; i < v.size(); ++i)
+   const int n = v.size();
+
+   for(int i = 0, j = 0; i < n; ++i)
    {
       if(j)
       {

@@ -144,9 +144,9 @@ public:
    {
       if(!isSetup())
       {
-         IdxSet::clear();
+         const int d = dim();
 
-         int d = dim();
+         IdxSet::clear();
          num = 0;
 
          for(int i = 0; i < d; ++i)
@@ -168,22 +168,23 @@ public:
    {
       // check vector setup
 #ifndef NDEBUG
-      assert(VectorBase<R>::dim() >= 0);
-      std::vector<bool> entry(VectorBase<R>::dim(), false);
+      const int d = VectorBase<R>::dim();
+      assert(d >= 0);
+      std::vector<bool> entry(d, false);
       assert(num >= 0);
-      assert(num <= VectorBase<R>::dim());
+      assert(num <= d);
 
       for(int i = 0; i < num; ++i)
       {
          assert(idx[i] >= 0);
-         assert(idx[i] < VectorBase<R>::dim());
+         assert(idx[i] < d);
          assert(VectorBase<R>::val[idx[i]] != 0);
          assert(VectorBase<R>::val[idx[i]] == VectorBase<R>::val[idx[i]]);
          assert(!entry[idx[i]]);
          entry[idx[i]] = true;
       }
 
-      for(int i = 0; i < VectorBase<R>::dim(); ++i)
+      for(int i = 0; i < d; ++i)
       {
          if(!entry[i])
             assert(soplex::isPlusZero<R>(VectorBase<R>::val[i]));
@@ -650,18 +651,19 @@ public:
    bool isConsistent() const
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
+      const int d = VectorBase<R>::dim();
 
-      if(VectorBase<R>::dim() > IdxSet::max())
+      if(d > IdxSet::max())
          return SPX_MSG_INCONSISTENT("SSVectorBase");
 
-      if(VectorBase<R>::dim() < IdxSet::dim())
+      if(d < IdxSet::dim())
          return SPX_MSG_INCONSISTENT("SSVectorBase");
 
       if(isSetup())
       {
-         for(int i = 0; i < VectorBase<R>::dim(); ++i)
+         for(int i = 0; i < d; ++i)
          {
-            int j = pos(i);
+            const int j = pos(i);
 
             if(j < 0 && spxAbs(VectorBase<R>::val[i]) > 0)
             {
@@ -761,13 +763,15 @@ public:
 
          for(int i = size() - 1; i >= 0; --i)
          {
-            int j  = index(i);
+            const int j = index(i);
+
             VectorBase<R>::val[j] = rhs.val[j];
          }
       }
       else
       {
-         int d = rhs.dim();
+         const int d = rhs.dim();
+
          num = 0;
 
          for(int i = 0; i < d; ++i)
@@ -777,7 +781,7 @@ public:
                rhs.idx[num] = i;
                idx[num] = i;
                VectorBase<R>::val[i] = rhs.val[i];
-               num++;
+               ++num;
             }
             else
                rhs.val[i] = +R(0);
@@ -816,13 +820,15 @@ public:
 
             for(int i = size() - 1; i >= 0; --i)
             {
-               int j = index(i);
+               const int j = index(i);
+
                VectorBase<R>::val[j] = rhs.val[j];
             }
          }
          else
          {
-            int d = rhs.dim();
+            const int d = rhs.dim();
+
             num = 0;
 
             for(int i = 0; i < d; ++i)
@@ -831,7 +837,7 @@ public:
                {
                   VectorBase<R>::val[i] = rhs.val[i];
                   idx[num] = i;
-                  num++;
+                  ++num;
                }
             }
          }
@@ -862,21 +868,24 @@ public:
 
             for(int i = size() - 1; i >= 0; --i)
             {
-               int j = index(i);
+               const int j = index(i);
+
                VectorBase<R>::val[j] = rhs.val[j];
             }
          }
          else
          {
+            const int d = rhs.dim();
+
             num = 0;
 
-            for(int i = 0; i < rhs.dim(); ++i)
+            for(int i = 0; i < d; ++i)
             {
                if(spxAbs(rhs.val[i]) > this->getEpsilon())
                {
                   VectorBase<R>::val[i] = rhs.val[i];
                   idx[num] = i;
-                  num++;
+                  ++num;
                }
             }
          }

@@ -175,11 +175,15 @@ public:
    /// Inserts all elements from \p t before \p i 'th element.
    void insert(int i, const ClassArray<T>& t)
    {
+      assert(this != &t);
+
       if(t.size())
       {
-         insert(i, t.size());
+         const int n = t.size();
 
-         for(int j = 0; j < t.size(); j++)
+         insert(i, n);
+
+         for(int j = 0; j < n; ++j)
             data[i + j] = t[j];
       }
    }
@@ -187,12 +191,13 @@ public:
    /// Removes \p m elements starting at \p n.
    void remove(int n = 0, int m = 1)
    {
+      const int s = size();
       assert(n >= 0);
-      assert(n < size());
+      assert(n < s);
       assert(m >= 0);
-      assert(n + m <= size());
+      assert(n + m <= s);
 
-      for(int j = n + m; j < size(); j++)
+      for(int j = n + m; j < s; ++j)
          data[j - m] = data[j];
 
       thesize -= m;
@@ -273,25 +278,26 @@ public:
          return 0;
       }
 
-      /* allocate new memory */
+      const int n = size();
       T* newMem = nullptr;
+      int i;
+
+      /* allocate new memory */
       spx_alloc(newMem, newMax);
 
       /* call copy constructor for first elements */
-      int i;
-
-      for(i = 0; i < size() && i < newSize; i++)
+      for(i = 0; i < n && i < newSize; ++i)
          new(&(newMem[i])) T(data[i]);
 
       /* call default constructor for remaining elements */
-      for(; i < newMax; i++)
+      for(; i < newMax; ++i)
          new(&(newMem[i])) T();
 
       /* compute pointer difference */
       ptrdiff_t pshift = reinterpret_cast<char*>(newMem) - reinterpret_cast<char*>(data);
 
       /* free old memory */
-      for(i = themax - 1; i >= 0; i--)
+      for(i = themax - 1; i >= 0; --i)
          data[i].~T();
 
       spx_free(data);
@@ -309,9 +315,11 @@ public:
    {
       if(this != &rhs)
       {
-         reSize(rhs.size());
+         const int n = rhs.size();
 
-         for(int i = 0; i < size(); i++)
+         reSize(n);
+
+         for(int i = 0; i < n; ++i)
             data[i] = rhs.data[i];
 
          assert(isConsistent());
@@ -343,17 +351,19 @@ public:
       , data(0)
       , memFactor(old.memFactor)
    {
-      /* allocate memory */
-      spx_alloc(data, max());
-
-      /* call copy constructor for first elements */
+      const int n = size();
+      const int m = max();
       int i;
 
-      for(i = 0; i < size(); i++)
+      /* allocate memory */
+      spx_alloc(data, m);
+
+      /* call copy constructor for first elements */
+      for(i = 0; i < n; ++i)
          new(&(data[i])) T(old.data[i]);
 
       /* call default constructor for remaining elements */
-      for(; i < max(); i++)
+      for(; i < m; ++i)
          new(&(data[i])) T();
 
       assert(isConsistent());
@@ -378,10 +388,12 @@ public:
       else
          themax = (thesize == 0) ? 1 : thesize;
 
-      spx_alloc(data, max());
+      const int m = max();
+
+      spx_alloc(data, m);
 
       /* call default constructor for each element */
-      for(int i = 0; i < max(); i++)
+      for(int i = 0; i < m; ++i)
          new(&(data[i])) T();
 
       assert(isConsistent());
