@@ -45,21 +45,24 @@ void SPxShellsort(T* keys, int end, COMPARATOR& compare, int start = 0)
 
    for(int k = 2; k >= 0; --k)
    {
-      int h = incs[k];
-      int first = start + h;
+      const int h = incs[k];
 
-      for(int i = first; i <= end; ++i)
+      for(int i = start + h; i <= end; ++i)
       {
-         T tempkey = keys[i];
-         int j = i;
-
-         while(j >= first && compare(tempkey, keys[j - h]) < 0)
+         if(compare(keys[i], keys[i - h]) < 0)
          {
-            keys[j] = keys[j - h];
-            j -= h;
-         }
+            const T tmp = keys[i];
+            int j = i - h;
 
-         keys[j] = tempkey;
+            do
+            {
+               keys[j + h] = keys[j];
+               j -= h;
+            }
+            while(j >= start && compare(tmp, keys[j]) < 0);
+
+            keys[j + h] = tmp;
+         }
       }
    }
 }
@@ -201,9 +204,7 @@ void SPxQuicksort(T* keys, int end, COMPARATOR& compare, int start = 0, bool typ
 
    /* use shell sort on the remaining small list */
    if(end - start >= 1)
-   {
       SPxShellsort(keys, end, compare, start);
-   }
 
 #ifdef CHECK_SORTING
 
