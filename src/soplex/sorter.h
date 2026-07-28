@@ -38,23 +38,20 @@ namespace soplex
 template < class T, class COMPARATOR >
 void SPxShellsort(T* keys, int end, COMPARATOR& compare, int start = 0)
 {
-   static const int incs[3] = {1, 5, 19}; /* sequence of increments */
-   int k;
+   static const int incs[3] = {1, 5, 19}; // sequence of increments
 
-   assert(start <= end);
+   assert(start >= 0);
+   assert(end >= start);
 
-   for(k = 2; k >= 0; --k)
+   for(int k = 2; k >= 0; --k)
    {
       int h = incs[k];
-      int first = h + start;
-      int i;
+      int first = start + h;
 
-      for(i = first; i <= end; ++i)
+      for(int i = first; i <= end; ++i)
       {
-         int j;
          T tempkey = keys[i];
-
-         j = i;
+         int j = i;
 
          while(j >= first && compare(tempkey, keys[j - h]) < 0)
          {
@@ -68,7 +65,6 @@ void SPxShellsort(T* keys, int end, COMPARATOR& compare, int start = 0)
 }
 
 
-
 /// Generic QuickSort implementation.
 /** This template function sorts an array \p t holding \p n elements of
     type T using \p compare for comparisons. Class COMPARATOR must provide
@@ -77,14 +73,14 @@ void SPxShellsort(T* keys, int end, COMPARATOR& compare, int start = 0)
     - = 0, if \p t1 and \p t2 can appear in any order, or
     - > 0, if \p t1 is to appear after \p t2.
 */
-
 template < class T, class COMPARATOR >
 void SPxQuicksort(T* keys, int end, COMPARATOR& compare, int start = 0, bool type = true)
 {
    assert(start >= 0);
+   assert(end >= start);
 
-   /* nothing to sort for less than two elements */
-   if(end <= start + 1)
+   /* nothing to sort for at most one element */
+   if(end - start <= 1)
       return;
 
    /* reduce end position to last element index */
@@ -100,9 +96,7 @@ void SPxQuicksort(T* keys, int end, COMPARATOR& compare, int start = 0, bool typ
       int mid;
 
       /* select pivot element */
-      mid = start + (end - start) / 2; // Instead of (start + end)/2 because the
-      // latter can overflow if start + end >
-      // INT_MAX
+      mid = start + (end - start) / 2; // avoid overflowing (start + end) / 2
       pivotkey = keys[mid];
 
       /* partition the array into elements < pivot [start,hi] and elements >= pivot [lo,end] */
@@ -134,6 +128,7 @@ void SPxQuicksort(T* keys, int end, COMPARATOR& compare, int start = 0, bool typ
          tmp = keys[lo];
          keys[lo] = keys[hi];
          keys[hi] = tmp;
+
          ++lo;
          --hi;
       }
@@ -155,6 +150,7 @@ void SPxQuicksort(T* keys, int end, COMPARATOR& compare, int start = 0, bool typ
             tmp = keys[lo];
             keys[lo] = keys[mid];
             keys[mid] = tmp;
+
             ++lo;
          }
       }
@@ -172,6 +168,7 @@ void SPxQuicksort(T* keys, int end, COMPARATOR& compare, int start = 0, bool typ
             tmp = keys[hi];
             keys[hi] = keys[mid];
             keys[mid] = tmp;
+
             --hi;
          }
       }
@@ -208,7 +205,6 @@ void SPxQuicksort(T* keys, int end, COMPARATOR& compare, int start = 0, bool typ
       SPxShellsort(keys, end, compare, start);
    }
 
-
 #ifdef CHECK_SORTING
 
    for(int i = start; i < end; ++i)
@@ -233,43 +229,43 @@ void SPxQuicksort(T* keys, int end, COMPARATOR& compare, int start = 0, bool typ
  * @param keys               array of elements to be sorted between index start and end
  * @param compare            comparator
  * @param start              index of first element in range to be sorted
- * @param end                index of last element in range to be sorted, plus 1
- * @param size               guaranteed number of sorted elements
- * @param start2             auxiliary start index of sub range used for recursive call
- * @param end2               auxiliary end index of sub range used for recursive call
+ * @param end                index of last element in range to be sorted plus 1
+ * @param size               guaranteed number of additionally sorted elements
+ * @param start2             auxiliary start index of sub range used for recursive call (deprecated)
+ * @param end2               auxiliary end index of sub range used for recursive call (disabled)
  * @param type               type of sorting, to be more flexable on degenerated cases
+ * @return                   index of last element in range sorted plus 1
  */
 template < class T, class COMPARATOR >
 int SPxQuicksortPart(T* keys, COMPARATOR& compare, int start, int end, int size, int start2 = 0,
                      int end2 = 0, bool type = true)
 {
    assert(start >= 0);
+   assert(end >= start);
+   assert(start2 <= end);
+   assert(end2 <= end);
 
-   /* nothing to sort for less than two elements */
-   if(end < start + 1)
-      return 0;
-   else if(end == start + 1)
-      return 1;
+   /* nothing to sort for at most one element */
+   if(end - start <= 1)
+      return end;
 
-   /* we assume that range {start, ..., start2-1} already contains the start2-start smallest elements in sorted order;
-    * start2 has to lie in {start, ..., end-1} */
-   if(start2 < start)
-      start2 = start;
-
+   /* we assume that range {start, ..., start2-1} already contains start2-start smallest elements in sorted order */
 #ifdef CHECK_SORTING
-   assert(start2 < end);
 
    for(int i = start; i < start2 - 1; ++i)
       assert(compare(keys[i], keys[i + 1]) <= 0);
 
 #endif
-   assert(end2 <= end);
+
+   /* skip sorted prefix */
+   if(start < start2)
+      start = start2;
 
    /* if all remaining elements should be sorted, we simply call standard quicksort */
-   if(start2 + size >= end - 1)
+   if(start >= end - size - 1)
    {
-      SPxQuicksort(keys, end, compare, start2, type);
-      return end - 1;
+      SPxQuicksort(keys, end, compare, start, type);
+      return end;
    }
 
    T pivotkey;
@@ -282,11 +278,11 @@ int SPxQuicksortPart(T* keys, COMPARATOR& compare, int start, int end, int size,
    --end;
 
    /* select pivot element */
-   mid = (start2 + end) / 2;
+   mid = start + (end - start) / 2; // avoid overflowing (start + end) / 2
    pivotkey = keys[mid];
 
    /* partition the array into elements < pivot [start,hi] and elements >= pivot [lo,end] */
-   lo = start2;
+   lo = start;
    hi = end;
 
    for(;;)
@@ -296,7 +292,7 @@ int SPxQuicksortPart(T* keys, COMPARATOR& compare, int start, int end, int size,
          while(compare(keys[lo], pivotkey) < 0)
             ++lo;
 
-         while(hi > start2 && compare(keys[hi], pivotkey) >= 0)
+         while(hi > start && compare(keys[hi], pivotkey) >= 0)
             --hi;
       }
       else
@@ -314,11 +310,12 @@ int SPxQuicksortPart(T* keys, COMPARATOR& compare, int start, int end, int size,
       tmp = keys[lo];
       keys[lo] = keys[hi];
       keys[hi] = tmp;
+
       ++lo;
       --hi;
    }
 
-   assert((hi == lo - 1) || (type && hi == start2) || (!type && lo == end));
+   assert((hi == lo - 1) || (type && hi == start) || (!type && lo == end));
 
    /* skip entries which are equal to the pivot element (three partitions, <, =, > than pivot)*/
    if(type)
@@ -327,7 +324,7 @@ int SPxQuicksortPart(T* keys, COMPARATOR& compare, int start, int end, int size,
          ++lo;
 
       /* make sure that we have at least one element in the smaller partition */
-      if(lo == start2)
+      if(lo == start)
       {
          /* everything is greater or equal than the pivot element: move pivot to the left (degenerate case) */
          assert(compare(keys[mid], pivotkey) == 0); /* the pivot element did not change its position */
@@ -335,12 +332,13 @@ int SPxQuicksortPart(T* keys, COMPARATOR& compare, int start, int end, int size,
          tmp = keys[lo];
          keys[lo] = keys[mid];
          keys[mid] = tmp;
+
          ++lo;
       }
    }
    else
    {
-      while(hi > start2 && compare(keys[hi], pivotkey) >= 0)
+      while(hi > start && compare(keys[hi], pivotkey) >= 0)
          --hi;
 
       /* make sure that we have at least one element in the smaller partition */
@@ -352,33 +350,34 @@ int SPxQuicksortPart(T* keys, COMPARATOR& compare, int start, int end, int size,
          tmp = keys[hi];
          keys[hi] = keys[mid];
          keys[mid] = tmp;
+
          --hi;
       }
    }
 
 #ifdef CHECK_SORTING
 
-   for(int i = start2; i < lo; ++i)
+   for(int i = start; i < lo; ++i)
       assert(compare(keys[i], pivotkey) <= 0);
 
 #endif
 
    /* if we only need to sort less than half of the "<" part, use partial sort again */
-   if(2 * size <= hi - start2)
+   if(start <= hi - 2 * size)
    {
       return SPxQuicksortPart(keys, compare, start, hi + 1, size, start2, end2, !type);
    }
    /* otherwise, and if we do not need to sort the ">" part, use standard quicksort on the "<" part */
-   else if(size <= lo - start2)
+   else if(start <= lo - size)
    {
-      SPxQuicksort(keys, hi + 1, compare, start2, !type);
-      return lo - 1;
+      SPxQuicksort(keys, hi + 1, compare, start, !type);
+      return lo;
    }
    /* otherwise we have to sort the "<" part fully (use standard quicksort) and the ">" part partially */
    else
    {
-      SPxQuicksort(keys, hi + 1, compare, start2, !type);
-      return SPxQuicksortPart(keys, compare, start, end + 1, size + start2 - lo, lo, end2, !type);
+      SPxQuicksort(keys, hi + 1, compare, start, !type);
+      return SPxQuicksortPart(keys, compare, lo, end + 1, start + size - lo, start2, end2, !type);
    }
 }
 

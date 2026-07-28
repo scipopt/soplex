@@ -27,6 +27,8 @@ Release 8.0.4
 fixed bugs:
 - enable functional assignment of SVectorBase from SSVectorBase
 - assign nonzero size in scaleAssign() of SVectorBase
+- correct SPxQuicksortPart return to end index after sorted range
+- avoid index overflows in SPxQuicksort and SPxQuicksortPart
 
 code quality:
 - remove broken template of DSVectorBase::add() from incompatible SVectorBase
