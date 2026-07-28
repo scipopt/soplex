@@ -86,11 +86,8 @@ private:
       public:
       /// constructor
       BreakpointCompare()
-         : entry(nullptr)
       {
       }
-
-      const Breakpoint*  entry;
 
       int operator()(
          const Breakpoint&  i,
