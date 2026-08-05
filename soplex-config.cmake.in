@@ -11,6 +11,12 @@ set(SOPLEX_PIC_LIBRARIES libsoplex-pic @CONF_SANITIZE_FLAGS@)
 set(SOPLEX_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
 set(SOPLEX_FOUND TRUE)
 
+# If SoPlex was built with system FMT then we also need it.
+set(SOPLEX_WITH_SYSTEM_FMT @SOPLEX_WITH_SYSTEM_FMT@)
+if(SOPLEX_WITH_SYSTEM_FMT)
+  find_dependency(fmt CONFIG)
+endif()
+
 # If SoPlex was built with MPFR then we also need it.
 set(SOPLEX_WITH_MPFR @SOPLEX_WITH_MPFR@)
 if(SOPLEX_WITH_MPFR)

@@ -258,7 +258,7 @@ endif()
 
 # install license files of soplex and fmt
 install(FILES ${PROJECT_SOURCE_DIR}/LICENSE DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/soplex)
-if (NOT SYSTEM_FMT)
+if(NOT SYSTEM_FMT)
     install(FILES ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/LICENSE.rst DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/soplex/fmt)
 endif()
 
