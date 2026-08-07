@@ -5,9 +5,9 @@ features:
 - command line option --version to print version and compiler information
 
 performance:
-- accelerate product method SSVectorBase::assign2productAndSetup() by caching vector entry
-- accelerate comparator classes Compare, IdxCompare, BreakpointCompare, and ElementCompare by avoiding argument copies and reformulating difference computations
-- accelerate sorting functions SPxQuicksort and SPxQuicksortPart by removing redundant checks and simplifying comparator calls
+- accelerate data classes ClassArray, SVectorBase, and SSVectorBase by caching vector entries and sizes
+- accelerate comparator classes Compare, IdxCompare, BreakpointCompare, and ElementCompare by removing unused fields, avoiding argument copies, and reformulating difference computations
+- accelerate sorting functions SPxShellsort, SPxQuicksort, and SPxQuicksortPart by removing redundant checks, skipping ordered entries, and reformulating to iteration
 
 interface & parameters:
 - added an overloaded version of SoPlexBase<R>::factorizeColumnRational() with an additional boolean parameter forceSolutionUpdate to compute solution values also when the basis is not optimal. (SOPLEX_APIVERSION 21)
