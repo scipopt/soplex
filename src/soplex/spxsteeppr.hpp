@@ -283,8 +283,6 @@ int SPxSteepPR<R>::buildBestPriceVectorLeave(R feastol)
 
 #endif
 
-   // set up structures for the quicksort implementation
-   this->compare.elements = prices.get_const_ptr();
    // do a partial sort to move the best ones to the front
    // TODO this can be done more efficiently, since we only need the indices
    nsorted = SPxQuicksortPart(prices.get_ptr(), this->compare, 0, prices.size(),
@@ -605,8 +603,6 @@ SPxId SPxSteepPR<R>::buildBestPriceVectorEnterDim(R& best, R feastol)
 
 #endif
 
-   // set up structures for the quicksort implementation
-   this->compare.elements = prices.get_const_ptr();
    // do a partial sort to move the best ones to the front
    // TODO this can be done more efficiently, since we only need the indices
    nsorted = SPxQuicksortPart(prices.get_ptr(), this->compare, 0, prices.size(),
@@ -678,8 +674,6 @@ SPxId SPxSteepPR<R>::buildBestPriceVectorEnterCoDim(R& best, R feastol)
 
 #endif
 
-   // set up structures for the quicksort implementation
-   this->compare.elements = pricesCo.get_const_ptr();
    // do a partial sort to move the best ones to the front
    // TODO this can be done more efficiently, since we only need the indices
    nsorted = SPxQuicksortPart(pricesCo.get_ptr(), this->compare, 0, pricesCo.size(),

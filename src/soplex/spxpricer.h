@@ -85,10 +85,7 @@ protected:
       public:
       /// constructor
       IdxCompare()
-         : elements(nullptr)
       {}
-
-      const IdxElement*  elements;
 
       int operator()(
          const IdxElement&  a,

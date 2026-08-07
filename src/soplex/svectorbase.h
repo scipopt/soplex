@@ -197,7 +197,7 @@ public:
    {
       if(m_elem != nullptr)
       {
-         int n = size();
+         const int n = size();
 
          for(int p = 0; p < n; ++p)
          {
@@ -285,7 +285,7 @@ public:
 
       if(v != 0.0)
       {
-         int n = size();
+         const int n = size();
 
          m_elem[n].idx = i;
          m_elem[n].val = v;
@@ -299,9 +299,8 @@ public:
    void add(int i)
    {
       assert(m_elem != nullptr);
-      assert(size() < max());
-
-      int n = size();
+      const int n = size();
+      assert(n < max());
 
       m_elem[n].idx = i;
       set_size(n + 1);
@@ -431,7 +430,7 @@ public:
       assert(n >= 0);
       assert(n < size());
 
-      int newsize = size() - 1;
+      const int newsize = size() - 1;
       set_size(newsize);
 
       if(n < newsize)
@@ -524,8 +523,8 @@ public:
    R length2() const
    {
       R x = 0;
-      int n = size();
       const Nonzero<R>* e = m_elem;
+      int n = size();
 
       while(n--)
       {
@@ -539,8 +538,8 @@ public:
    /// Scaling.
    SVectorBase<R>& operator*=(const R& x)
    {
-      int n = size();
       Nonzero<R>* e = m_elem;
+      int n = size();
 
       assert(x != 0);
 
@@ -560,9 +559,9 @@ public:
    template < class S >
    R operator*(const SVectorBase<S>& w) const
    {
+      const int n = size();
+      const int m = w.size();
       StableSum<R> x;
-      int n = size();
-      int m = w.size();
 
       if(n == 0 || m == 0)
          return x;
@@ -637,12 +636,11 @@ public:
    {
       if(this != &sv)
       {
-         assert(max() >= sv.size());
-
-         int i = sv.size();
-         int nnz = 0;
-         Nonzero<R>* e = m_elem;
          const Nonzero<R>* s = sv.m_elem;
+         Nonzero<R>* e = m_elem;
+         int nnz = 0;
+         int i = sv.size();
+         assert(i <= max());
 
          while(i--)
          {
@@ -682,12 +680,11 @@ public:
    {
       if(this != (const SVectorBase<R>*)(&sv))
       {
-         assert(max() >= sv.size());
-
-         int i = sv.size();
-         int nnz = 0;
-         Nonzero<R>* e = m_elem;
          const Nonzero<S>* s = sv.m_elem;
+         Nonzero<R>* e = m_elem;
+         int nnz = 0;
+         int i = sv.size();
+         assert(i <= max());
 
          while(i--)
          {
@@ -713,15 +710,16 @@ public:
    {
       if(this != &sv)
       {
-         assert(max() >= sv.size());
+         const int n = sv.size();
+         assert(n <= max());
 
-         for(int i = 0; i < sv.size(); ++i)
+         for(int i = 0; i < n; ++i)
          {
             m_elem[i].val = spxLdexp(sv.value(i), scaleExp);
             m_elem[i].idx = sv.index(i);
          }
 
-         set_size(sv.size());
+         set_size(n);
          assert(isConsistent());
       }
 
@@ -734,11 +732,12 @@ public:
    {
       if(this != &sv)
       {
-         assert(max() >= sv.size());
+         const int n = sv.size();
+         assert(n <= max());
 
          if(negateExp)
          {
-            for(int i = 0; i < sv.size(); ++i)
+            for(int i = 0; i < n; ++i)
             {
                m_elem[i].val = spxLdexp(sv.value(i), -scaleExp[sv.index(i)]);
                m_elem[i].idx = sv.index(i);
@@ -746,14 +745,14 @@ public:
          }
          else
          {
-            for(int i = 0; i < sv.size(); ++i)
+            for(int i = 0; i < n; ++i)
             {
                m_elem[i].val = spxLdexp(sv.value(i), scaleExp[sv.index(i)]);
                m_elem[i].idx = sv.index(i);
             }
          }
 
-         set_size(sv.size());
+         set_size(n);
          assert(isConsistent());
       }
 
@@ -765,11 +764,11 @@ public:
    template < class S >
    SVectorBase<R>& assignArray(const S* rowValues, const int* rowIndices, int rowSize)
    {
-      assert(max() >= rowSize);
-
+      const int m = max();
+      assert(m >= rowSize);
       int i;
 
-      for(i = 0; i < rowSize && i < max(); i++)
+      for(i = 0; i < rowSize && i < m; ++i)
       {
          m_elem[i].val = rowValues[i];
          m_elem[i].idx = rowIndices[i];
@@ -864,7 +863,9 @@ public:
          return false;
       }
 
-      for(int i = 0; i < size(); ++i)
+      const int n = size();
+
+      for(int i = 0; i < n; ++i)
       {
          if(isnan(m_elem[i].val))
          {
@@ -883,7 +884,9 @@ public:
          return false;
       }
 
-      for(int i = 0; i < size(); ++i)
+      const int n = size();
+
+      for(int i = 0; i < n; ++i)
       {
          if(isinf(m_elem[i].val))
          {
@@ -904,9 +907,9 @@ template <>
 template < class S >
 Real SVectorBase<Real>::operator*(const SVectorBase<S>& w) const
 {
+   const int n = size();
+   const int m = w.size();
    StableSum<Real> x;
-   int n = size();
-   int m = w.size();
 
    if(n == 0 || m == 0)
       return Real(0);

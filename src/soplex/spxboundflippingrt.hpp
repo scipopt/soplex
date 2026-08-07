@@ -716,9 +716,7 @@ SPxId SPxBoundFlippingRT<R>::selectEnter(
       slope = spxAbs(this->thesolver->instableLeaveVal);
    }
 
-   // set up structures for the quicksort implementation
    BreakpointCompare compare;
-   compare.entry = breakpoints.get_const_ptr();
 
    // pointer to end of sorted part of breakpoints
    int sorted = 1;
@@ -1084,9 +1082,7 @@ int SPxBoundFlippingRT<R>::selectLeave(
       slope = this->thesolver->instableEnterVal;
    }
 
-   // set up structures for the quicksort implementation
    BreakpointCompare compare;
-   compare.entry = breakpoints.get_const_ptr();
 
    // pointer to end of sorted part of breakpoints
    int sorted = 1;
