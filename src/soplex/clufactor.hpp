@@ -46,7 +46,10 @@ namespace soplex
 
 static const Real verySparseFactor = 0.001;
 static const Real verySparseFactor4right = 0.2;
-static const Real verySparseFactor4left  = 0.1;
+/* The sparse kernel of the left L solve is switched to a dense sweep as soon as
+ * the solution has more nonzeros than this fraction of the dimension.
+ */
+static const Real verySparseFactor4left  = 0.01;
 
 /* generic heap management */
 static inline void enQueueMax(int* heap, int* size, int elem)
@@ -4620,53 +4623,101 @@ int CLUFactor<R>::solveLleft(R eps, R* vec, int* nonz, int rn)
 
 #else
 
-   /*  move rhsidx to a heap
+   /* Density of the solution is not known beforehand, so we start sparse and measure density on the fly.
+    * NOTE: this is only a rough estimate. Actually, it should make more sense to track the maximum heap
+    * size, but more complicated and needs tuning
     */
-   for(i = 0; i < rn;)
-      enQueueMax(nonz, &i, rperm[nonz[i]]);
+   const int nzLimit = std::max(int(verySparseFactor4left * thedim), 1);
 
    last = nonz + thedim;
 
-   while(rn > 0)
+   /* position of the row treated last; all nonzeros still queued are located in front
+    */
+   int pos = thedim;
+
+   if(rn <= nzLimit)
    {
-      i = deQueueMax(nonz, &rn);
-      r = rorig[i];
-      x = vec[r];
+      /*  move rhsidx to a heap
+       */
+      for(i = 0; i < rn;)
+         enQueueMax(nonz, &i, rperm[nonz[i]]);
 
-      if(isNotZero(x, eps))
+      while(rn > 0)
       {
-         *(--last) = r;
-         n++;
-         k = rbeg[r];
-         j = rbeg[r + 1] - k;
-         val = &rval[k];
-         idx = &ridx[k];
+         // solution getting too dense?
+         if(n + rn > nzLimit)
+            break;
 
-         while(j-- > 0)
+         i = deQueueMax(nonz, &rn);
+         pos = i;
+         r = rorig[i];
+         x = vec[r];
+
+         if(isNotZero(x, eps))
          {
-            assert(l.rperm[*idx] < i);
-            int m = *idx++;
-            y = vec[m];
+            *(--last) = r;
+            n++;
+            k = rbeg[r];
+            j = rbeg[r + 1] - k;
+            val = &rval[k];
+            idx = &ridx[k];
 
-            if(isPlusZero(y))
+            while(j-- > 0)
             {
-               y = -x * *val++;
+               assert(l.rperm[*idx] < i);
+               int m = *idx++;
+               y = vec[m];
 
-               if(isNotZero(y, eps))
+               if(isPlusZero(y))
                {
-                  vec[m] = y;
-                  enQueueMax(nonz, &rn, rperm[m]);
+                  y = -x * *val++;
+
+                  if(isNotZero(y, eps))
+                  {
+                     vec[m] = y;
+                     enQueueMax(nonz, &rn, rperm[m]);
+                  }
+               }
+               else
+               {
+                  y -= x * *val++;
+                  vec[m] = (y != 0) ? y : -R(0);
                }
             }
-            else
+         }
+         else
+            vec[r] = 0;
+      }
+   }
+
+   if(rn > 0)
+   {
+      /* Sweep the remaining rows densely
+       */
+      for(i = pos - 1; i >= 0; --i)
+      {
+         r = rorig[i];
+         x = vec[r];
+
+         if(isNotZero(x, eps))
+         {
+            *(--last) = r;
+            n++;
+            k = rbeg[r];
+            j = rbeg[r + 1] - k;
+            val = &rval[k];
+            idx = &ridx[k];
+
+            while(j-- > 0)
             {
-               y -= x * *val++;
-               vec[m] = (y != 0) ? y : -R(0);
+               assert(l.rperm[*idx] < i);
+               vec[*idx++] -= x * *val++;
             }
          }
+         // clear minus zeros and values below the tolerance
+         else if(!isPlusZero(x))
+            vec[r] = +R(0);
       }
-      else
-         vec[r] = 0;
    }
 
    // remove cancelled zeros
@@ -6267,15 +6318,8 @@ int CLUFactor<R>::vSolveLeft(R eps,
       rn = solveLleftForest(eps, vec, idx, rn);
    }
 
-   if(rn > verySparseFactor4left * thedim)
-   {
-      // perform the dense solve
-      solveLleftNoNZ(vec);
-      // signal the caller that the nonzero pattern is lost
-      return -1;
-   }
-   else
-      return solveLleft(eps, vec, idx, rn);
+   // solveLleft() falls back to a dense sweep on its own if L-solve turns out to be too dense.
+   return solveLleft(eps, vec, idx, rn);
 }
 
 template <class R>
