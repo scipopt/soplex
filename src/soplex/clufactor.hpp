@@ -4631,11 +4631,10 @@ int CLUFactor<R>::solveLleft(R eps, R* vec, int* nonz, int rn)
 
    last = nonz + thedim;
 
-   /* position of the row treated last; all nonzeros still queued are located in front
-    */
-   int pos = thedim;
-
-   if(rn <= nzLimit)
+   // side already too dense
+   if(rn > nzLimit)
+      i = thedim;
+   else
    {
       /*  move rhsidx to a heap
        */
@@ -4644,12 +4643,7 @@ int CLUFactor<R>::solveLleft(R eps, R* vec, int* nonz, int rn)
 
       while(rn > 0)
       {
-         // solution getting too dense?
-         if(n + rn > nzLimit)
-            break;
-
          i = deQueueMax(nonz, &rn);
-         pos = i;
          r = rorig[i];
          x = vec[r];
 
@@ -4687,6 +4681,10 @@ int CLUFactor<R>::solveLleft(R eps, R* vec, int* nonz, int rn)
          }
          else
             vec[r] = 0;
+
+         // solution getting too dense?
+         if(n + rn > nzLimit)
+            break;
       }
    }
 
@@ -4694,7 +4692,7 @@ int CLUFactor<R>::solveLleft(R eps, R* vec, int* nonz, int rn)
    {
       /* Sweep the remaining rows densely
        */
-      for(i = pos - 1; i >= 0; --i)
+      for(--i; i >= 0; --i)
       {
          r = rorig[i];
          x = vec[r];
@@ -4714,9 +4712,9 @@ int CLUFactor<R>::solveLleft(R eps, R* vec, int* nonz, int rn)
                vec[*idx++] -= x * *val++;
             }
          }
-         // clear minus zeros and values below the tolerance
-         else if(!isPlusZero(x))
-            vec[r] = +R(0);
+         // clear values below the tolerance
+         else
+            vec[r] = 0;
       }
    }
 

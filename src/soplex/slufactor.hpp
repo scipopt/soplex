@@ -414,12 +414,8 @@ void SLUFactor<R>::solveLeft(SSVectorBase<R>& x, const SVectorBase<R>& b)  //con
    int n = this->vSolveLeft(epsilon, x.altValues(), x.altIndexMem(),
                             ssvec.altValues(), ssvec.altIndexMem(), sz);
 
-   if(n >= 0)
-   {
-      x.setSize(n);
-      x.forceSetup();
-   }
-
+   x.setSize(n);
+   x.forceSetup();
    ssvec.setSize(0);
    ssvec.forceSetup();
 
