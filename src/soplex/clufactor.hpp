@@ -46,9 +46,6 @@ namespace soplex
 
 static const Real verySparseFactor = 0.001;
 static const Real verySparseFactor4right = 0.2;
-/* The sparse kernel of the left L solve is switched to a dense sweep as soon as
- * the solution has more nonzeros than this fraction of the dimension.
- */
 static const Real verySparseFactor4left  = 0.01;
 
 /* generic heap management */
@@ -4623,10 +4620,8 @@ int CLUFactor<R>::solveLleft(R eps, R* vec, int* nonz, int rn)
 
 #else
 
-   /* Density of the solution is not known beforehand, so we start sparse and measure density on the fly.
-    * NOTE: this is only a rough estimate. Actually, it should make more sense to track the maximum heap
-    * size, but more complicated and needs tuning
-    */
+   // density of the solution is estimated by sum of current side and solution nonzeros on the fly
+   //@todo track the maximum heap size for better sparsity limit
    const int nzLimit = std::max(int(verySparseFactor4left * thedim), 1);
 
    last = nonz + thedim;
@@ -4636,8 +4631,7 @@ int CLUFactor<R>::solveLleft(R eps, R* vec, int* nonz, int rn)
       i = thedim;
    else
    {
-      /*  move rhsidx to a heap
-       */
+      // move rhsidx to a heap
       for(i = 0; i < rn;)
          enQueueMax(nonz, &i, rperm[nonz[i]]);
 
@@ -4682,16 +4676,15 @@ int CLUFactor<R>::solveLleft(R eps, R* vec, int* nonz, int rn)
          else
             vec[r] = 0;
 
-         // solution getting too dense?
+         // solution getting too dense
          if(n + rn > nzLimit)
             break;
       }
    }
 
+   // compute remaining densely
    if(rn > 0)
    {
-      /* Sweep the remaining rows densely
-       */
       for(--i; i >= 0; --i)
       {
          r = rorig[i];
@@ -4712,7 +4705,6 @@ int CLUFactor<R>::solveLleft(R eps, R* vec, int* nonz, int rn)
                vec[*idx++] -= x * *val++;
             }
          }
-         // clear values below the tolerance
          else
             vec[r] = 0;
       }
@@ -6316,7 +6308,6 @@ int CLUFactor<R>::vSolveLeft(R eps,
       rn = solveLleftForest(eps, vec, idx, rn);
    }
 
-   // solveLleft() falls back to a dense sweep on its own if L-solve turns out to be too dense.
    return solveLleft(eps, vec, idx, rn);
 }
 
