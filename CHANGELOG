@@ -8,6 +8,8 @@ performance:
 - accelerate data classes ClassArray, SVectorBase, and SSVectorBase by caching vector entries and sizes
 - accelerate comparator classes Compare, IdxCompare, BreakpointCompare, and ElementCompare by removing unused fields, avoiding argument copies, and reformulating difference computations
 - accelerate sorting functions SPxShellsort, SPxQuicksort, and SPxQuicksortPart by removing redundant checks, skipping ordered entries, and reformulating to iteration
+- detect sparsity inside CLUFactor<R>::solveLleft() to dynamically enter dense solving mode
+- adapt the left sparsity factor to 0.01
 
 interface & parameters:
 - added an overloaded version of SoPlexBase<R>::factorizeColumnRational() with an additional boolean parameter forceSolutionUpdate to compute solution values also when the basis is not optimal. (SOPLEX_APIVERSION 21)

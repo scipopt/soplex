@@ -46,7 +46,7 @@ namespace soplex
 
 static const Real verySparseFactor = 0.001;
 static const Real verySparseFactor4right = 0.2;
-static const Real verySparseFactor4left  = 0.1;
+static const Real verySparseFactor4left  = 0.01;
 
 /* generic heap management */
 static inline void enQueueMax(int* heap, int* size, int elem)
@@ -4620,53 +4620,94 @@ int CLUFactor<R>::solveLleft(R eps, R* vec, int* nonz, int rn)
 
 #else
 
-   /*  move rhsidx to a heap
-    */
-   for(i = 0; i < rn;)
-      enQueueMax(nonz, &i, rperm[nonz[i]]);
+   // density of the solution is estimated by sum of current side and solution nonzeros on the fly
+   //@todo track the maximum heap size for better sparsity limit
+   const int nzLimit = std::max(int(verySparseFactor4left * thedim), 1);
 
    last = nonz + thedim;
 
-   while(rn > 0)
+   // side already too dense
+   if(rn > nzLimit)
+      i = thedim;
+   else
    {
-      i = deQueueMax(nonz, &rn);
-      r = rorig[i];
-      x = vec[r];
+      // move rhsidx to a heap
+      for(i = 0; i < rn;)
+         enQueueMax(nonz, &i, rperm[nonz[i]]);
 
-      if(isNotZero(x, eps))
+      while(rn > 0)
       {
-         *(--last) = r;
-         n++;
-         k = rbeg[r];
-         j = rbeg[r + 1] - k;
-         val = &rval[k];
-         idx = &ridx[k];
+         i = deQueueMax(nonz, &rn);
+         r = rorig[i];
+         x = vec[r];
 
-         while(j-- > 0)
+         if(isNotZero(x, eps))
          {
-            assert(l.rperm[*idx] < i);
-            int m = *idx++;
-            y = vec[m];
+            *(--last) = r;
+            n++;
+            k = rbeg[r];
+            j = rbeg[r + 1] - k;
+            val = &rval[k];
+            idx = &ridx[k];
 
-            if(isPlusZero(y))
+            while(j-- > 0)
             {
-               y = -x * *val++;
+               assert(l.rperm[*idx] < i);
+               int m = *idx++;
+               y = vec[m];
 
-               if(isNotZero(y, eps))
+               if(isPlusZero(y))
                {
-                  vec[m] = y;
-                  enQueueMax(nonz, &rn, rperm[m]);
+                  y = -x * *val++;
+
+                  if(isNotZero(y, eps))
+                  {
+                     vec[m] = y;
+                     enQueueMax(nonz, &rn, rperm[m]);
+                  }
+               }
+               else
+               {
+                  y -= x * *val++;
+                  vec[m] = (y != 0) ? y : -R(0);
                }
             }
-            else
+         }
+         else
+            vec[r] = 0;
+
+         // solution getting too dense
+         if(n + rn > nzLimit)
+            break;
+      }
+   }
+
+   // compute remaining densely
+   if(rn > 0)
+   {
+      for(--i; i >= 0; --i)
+      {
+         r = rorig[i];
+         x = vec[r];
+
+         if(isNotZero(x, eps))
+         {
+            *(--last) = r;
+            n++;
+            k = rbeg[r];
+            j = rbeg[r + 1] - k;
+            val = &rval[k];
+            idx = &ridx[k];
+
+            while(j-- > 0)
             {
-               y -= x * *val++;
-               vec[m] = (y != 0) ? y : -R(0);
+               assert(l.rperm[*idx] < i);
+               vec[*idx++] -= x * *val++;
             }
          }
+         else
+            vec[r] = 0;
       }
-      else
-         vec[r] = 0;
    }
 
    // remove cancelled zeros
@@ -6267,16 +6308,7 @@ int CLUFactor<R>::vSolveLeft(R eps,
       rn = solveLleftForest(eps, vec, idx, rn);
    }
 
-   // TODO verify the correctness of this check
-   if(rn + l.firstUpdate > verySparseFactor4left * thedim)
-   {
-      // perform the dense solve
-      solveLleftNoNZ(vec);
-      // signal the caller that the nonzero pattern is lost
-      return -1;
-   }
-   else
-      return solveLleft(eps, vec, idx, rn);
+   return solveLleft(eps, vec, idx, rn);
 }
 
 template <class R>
