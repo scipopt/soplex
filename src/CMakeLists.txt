@@ -221,20 +221,22 @@ set_target_properties(soplex PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/$
 install(FILES ${headers} ${PROJECT_BINARY_DIR}/soplex/config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/soplex)
 install(FILES soplex.h soplex.hpp soplex_interface.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-install(FILES
-     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/chrono.h
-     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/color.h
-     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/compile.h
-     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/core.h
-     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/format-inl.h
-     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/format.h
-     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/locale.h
-     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/os.h
-     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/ostream.h
-     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/posix.h
-     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/printf.h
-     ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/ranges.h
-     DESTINATION include/soplex/external/fmt)
+if(NOT SYSTEM_FMT)
+    install(FILES
+        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/chrono.h
+        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/color.h
+        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/compile.h
+        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/core.h
+        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/format-inl.h
+        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/format.h
+        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/locale.h
+        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/os.h
+        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/ostream.h
+        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/posix.h
+        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/printf.h
+        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/ranges.h
+        DESTINATION include/soplex/external/fmt)
+endif()
 
 # TODO this is necessary only if ZLIB_FOUND?
 install(FILES
@@ -256,7 +258,9 @@ endif()
 
 # install license files of soplex and fmt
 install(FILES ${PROJECT_SOURCE_DIR}/LICENSE DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/soplex)
-install(FILES ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/LICENSE.rst DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/soplex/fmt)
+if(NOT SYSTEM_FMT)
+    install(FILES ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/LICENSE.rst DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/soplex/fmt)
+endif()
 
 # Add library targets to the build-tree export set
 export(TARGETS libsoplex libsoplex-pic libsoplexshared

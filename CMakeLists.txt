@@ -48,6 +48,7 @@ option(SANITIZE "should sanitizers be enabled if available" OFF)
 option(COVERAGE "enable coverage support" OFF)
 option(PAPILO "should papilo library be linked" ON)
 option(LTO "Enable Link Time Optimization, aka Interprocedural Optimization" OFF)
+option(SYSTEM_FMT "Use system FMT library instead of bundled headers" OFF)
 
 if(LTO)
     include(CheckIPOSupported)
@@ -150,6 +151,12 @@ if(COVERAGE)
     SETUP_TARGET_FOR_COVERAGE(NAME coverage
                           EXECUTABLE bash -c "ctest ${COVERAGE_CTEST_ARGS}"
                           DEPENDENCIES soplex)
+endif()
+
+if(SYSTEM_FMT)
+    find_package(fmt CONFIG REQUIRED)
+    set(SOPLEX_WITH_SYSTEM_FMT on)
+    set(libs ${libs} fmt::fmt)
 endif()
 
 if(ZLIB)

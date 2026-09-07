@@ -17,6 +17,7 @@ interface & parameters:
 
 build system:
 - add link-time-optimization for release builds if supported by compiler, use -DLTO=on for cmake or LTO=true for make to enable
+- add option to link FMT library of system instead of bundled headers, use -DSYSTEM_FMT=on for cmake or SYSTEM_FMT=true for make to enable
 
 fixed bugs:
 

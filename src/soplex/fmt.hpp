@@ -25,22 +25,27 @@
 #ifndef _SOPLEX_FMT_HPP_
 #define _SOPLEX_FMT_HPP_
 
-#ifndef FMT_HEADER_ONLY
-#define FMT_HEADER_ONLY
-#endif
-
 #include "soplex/spxdefines.h"
 #ifdef SOPLEX_WITH_PAPILO
 #include "papilo/Config.hpp"
 #endif
 
-/* to provide backwards compatibility use fmt of PaPILO <= 2.3 due to breaking changes in fmt 7 */
+#if defined(SOPLEX_WITH_SYSTEM_FMT)
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+#else
+// bundled fmt header-only
+#ifndef FMT_HEADER_ONLY
+#define FMT_HEADER_ONLY
+#endif
+// to provide backwards compatibility use fmt of PaPILO <= 2.3 due to breaking changes in fmt 7
 #if !defined(SOPLEX_WITH_PAPILO) || PAPILO_VERSION_MAJOR > 2 || (PAPILO_VERSION_MAJOR == 2 && PAPILO_VERSION_MINOR > 3)
 #include "soplex/external/fmt/format.h"
 #include "soplex/external/fmt/ostream.h"
 #else
 #include "papilo/external/fmt/format.h"
 #include "papilo/external/fmt/ostream.h"
+#endif
 #endif
 
 #endif
