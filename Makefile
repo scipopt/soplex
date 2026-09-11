@@ -87,7 +87,11 @@ GMP      =  auto
 MPFR     =  auto
 SYSTEM_FMT = false
 
+ifeq ($(OSTYPE),darwin)
+COMP		=	clang
+else
 COMP		=	gnu
+endif
 CXX		=	g++
 CXX_c		=	-c # the trailing space is important
 CXX_o		=	-o # the trailing space is important
