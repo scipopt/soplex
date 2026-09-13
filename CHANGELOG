@@ -1,4 +1,4 @@
-Next - Release 9.0.0
+September 2026 - Release 8.1.0
 ==================
 
 features:
@@ -11,6 +11,12 @@ performance:
 - detect sparsity inside CLUFactor<R>::solveLleft() to dynamically enter dense solving mode
 - adapt the left sparsity factor to 0.01
 
+fixed bugs:
+- enable functional assignment of SVectorBase from SSVectorBase
+- assign nonzero size in scaleAssign() of SVectorBase
+- correct SPxQuicksortPart return to end index after sorted range
+- avoid index overflows in SPxQuicksort and SPxQuicksortPart
+
 interface & parameters:
 - added an overloaded version of SoPlexBase<R>::factorizeColumnRational() with an additional boolean parameter forceSolutionUpdate to compute solution values also when the basis is not optimal. (SOPLEX_APIVERSION 21)
 - add SoPlexBase<R>::printExternalCodes() to print external libraries (SOPLEX_APIVERSION 22)
@@ -20,26 +26,9 @@ build system:
 - add option to link FMT library of system instead of bundled headers, use -DSYSTEM_FMT=on for cmake or SYSTEM_FMT=true for make to enable
 - in Makefile, changed default compiler (COMP) from gnu to clang when on macOS and added make/make.darwin.arm.clang{.opt,.dbg,}
 
-fixed bugs:
-
-miscellaneous:
-
-
-Release 8.0.4
-==================
-
-fixed bugs:
-- enable functional assignment of SVectorBase from SSVectorBase
-- assign nonzero size in scaleAssign() of SVectorBase
-- correct SPxQuicksortPart return to end index after sorted range
-- avoid index overflows in SPxQuicksort and SPxQuicksortPart
-
-code quality:
-- remove broken template of DSVectorBase::add() from incompatible SVectorBase
-
 miscellaneous:
 - disable deprecated iterators in fmt external to support modern MSVC
-
+- remove broken template of DSVectorBase::add() from incompatible SVectorBase
 
 July 2026 - Release 8.0.3
 ==================
