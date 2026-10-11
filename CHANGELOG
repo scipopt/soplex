@@ -17,7 +17,7 @@ Release 8.1.1
 ==================
 
 fixed bugs:
-
+- set basis after full simplification in SoPlexBase<R>::_storeSolutionRealFromPresol() to avoid unnecessary resolve
 
 September 2026 - Release 8.1.0
 ==================
