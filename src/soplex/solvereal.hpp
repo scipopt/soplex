@@ -686,11 +686,10 @@ void SoPlexBase<R>::_storeSolutionReal(bool verify)
 
       assert(_realLP == &_solver);
 
-      // reset basis status
+      // load unsimplified basis into solver and set basis status
+      _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
       _solver.setBasisStatus(simplifiedBasisStatus);
 
-      _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
-      // load unsimplified basis into solver
       assert(_basisStatusRows.size() == numRows());
       assert(_basisStatusCols.size() == this->numCols());
       _hasBasis = true;
@@ -787,6 +786,9 @@ void SoPlexBase<R>::_storeSolutionRealFromPresol()
    _hasSolReal = true;
    _solReal._isPrimalFeasible = true;
    _solReal._isDualFeasible = true;
+
+   // load unsimplified basis into solver and set basis status
+   _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
    _solver.setBasisStatus(SPxBasisBase<R>::OPTIMAL);
 
    // check solution for violations and solve again if necessary
