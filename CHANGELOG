@@ -3,6 +3,8 @@ Release 8.1.1
 
 fixed bugs:
 - set basis after full simplification in SoPlexBase<R>::_storeSolutionRealFromPresol() to avoid unnecessary resolve
+- restrict cost computation to nonbasic variables in SPxMainSM<R>::unsimplify() and Presol<R>::unsimplify() to keep basic dual zeros unsigned
+- resolve aggregations constants in SPxMainSM<R>::AggregationPS::execute() and SPxMainSM<R>::MultiAggregationPS::execute() to correct postsolved activities
 
 September 2026 - Release 8.1.0
 ==================

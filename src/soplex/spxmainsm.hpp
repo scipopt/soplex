@@ -1469,6 +1469,12 @@ void SPxMainSM<R>::AggregationPS::execute(VectorBase<R>& x, VectorBase<R>& y, Ve
    x[m_j] = z * scale / aij;
    s[m_i] = m_rhs;
 
+   for(int k = 0; k < m_col.size(); ++k)
+   {
+      if(m_col.index(k) != m_i)
+         s[m_col.index(k)] += m_col.value(k) * (m_rhs / aij);
+   }
+
    if(isOptimal && (LT(x[m_j], m_lower, this->feastol()) || GT(x[m_j], m_upper, this->feastol())))
    {
       SPX_MSG_ERROR(std::cerr << "EMAISM: numerical violation after disaggregating variable" << std::endl;
@@ -1574,6 +1580,12 @@ void SPxMainSM<R>::MultiAggregationPS::execute(VectorBase<R>& x, VectorBase<R>& 
 
    x[m_j] = z * scale / aij;
    s[m_i] = 0.0;
+
+   for(int k = 0; k < m_col.size(); ++k)
+   {
+      if(m_col.index(k) != m_i)
+         s[m_col.index(k)] += m_col.value(k) * (m_const / aij);
+   }
 
 #ifndef NDEBUG
 
@@ -5293,14 +5305,20 @@ void SPxMainSM<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
       m_hist.reSize(k);
    }
 
-   // for maximization problems, we have to switch signs of dual and reduced cost values back
+   // for maximization problems, we have to switch signs of nonbasic dual and reduced cost values back
    if(m_thesense == SPxLPBase<R>::MAXIMIZE)
    {
       for(int j = 0; j < m_redCost.dim(); ++j)
-         m_redCost[j] = -m_redCost[j];
+      {
+         if(m_cBasisStat[j] != SPxSolverBase<R>::BASIC)
+            m_redCost[j] = -m_redCost[j];
+      }
 
       for(int i = 0; i < m_dual.dim(); ++i)
-         m_dual[i] = -m_dual[i];
+      {
+         if(m_rBasisStat[i] != SPxSolverBase<R>::BASIC)
+            m_dual[i] = -m_dual[i];
+      }
    }
 
    if(m_addedcols > 0)
