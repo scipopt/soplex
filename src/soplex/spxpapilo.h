@@ -539,15 +539,19 @@ void Presol<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y,
    for(int j = 0; j < (int)postsolveStorage.nColsOriginal; ++j)
    {
       m_prim[j] = originalSolution.primal[j];
-      m_redCost[j] = switch_sign * originalSolution.reducedCosts[j];
       m_cBasisStat[j] = convertToSoplexStatus(originalSolution.varBasisStatus[j]);
+
+      if(m_cBasisStat[j] != SPxSolverBase<R>::BASIC)
+         m_redCost[j] = switch_sign * originalSolution.reducedCosts[j];
    }
 
    for(int i = 0; i < (int)postsolveStorage.nRowsOriginal; ++i)
    {
-      m_dual[i] = switch_sign * originalSolution.dual[i];
       m_slack[i] = originalSolution.slack[i];
       m_rBasisStat[i] = convertToSoplexStatus(originalSolution.rowBasisStatus[i]);
+
+      if(m_rBasisStat[i] != SPxSolverBase<R>::BASIC)
+         m_dual[i] = switch_sign * originalSolution.dual[i];
    }
 
 }
