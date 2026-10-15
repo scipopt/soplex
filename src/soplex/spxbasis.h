@@ -906,6 +906,7 @@ public:
    /// unloads the LP from the basis.
    virtual void unLoad()
    {
+      invalidate();
       theLP = nullptr;
       setStatus(NO_PROBLEM);
    }

@@ -567,17 +567,14 @@ void SPxSolverBase<R>::setType(Type tp)
    void SPxSolverBase<R>::unscaleLPandReloadBasis()
    {
       SPxLPBase<R>::unscaleLP();
-      SPxBasisBase<R>::invalidate();
-      unInit();
-      init();
+      invalidateBasis();
    }
 
    template <class R>
    void SPxSolverBase<R>::invalidateBasis()
    {
-      SPxBasisBase<R>::invalidate();
       unInit();
-      init();
+      SPxBasisBase<R>::invalidate();
    }
 
    template <class R>
@@ -619,8 +616,7 @@ void SPxSolverBase<R>::setType(Type tp)
 
       if(!initialized)
       {
-         init();  // not sure if init() is neccessary here
-         // we must not go on here because not all vectors (e.g. fVec) may be set up correctly
+         init();
          return;
       }
 
