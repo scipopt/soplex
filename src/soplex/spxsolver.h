@@ -624,7 +624,7 @@ public:
    /// unscales the LP and reloads the basis
    void unscaleLPandReloadBasis();
 
-   /// invalidates the basis, triggers refactorization
+   /// invalidates the basis
    void invalidateBasis();
 
    /** Load basis from \p filename in MPS format. If \p rowNames and \p

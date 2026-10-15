@@ -302,9 +302,9 @@ void SoPlexBase<R>::_preprocessAndSolveReal(bool applySimplifier, volatile bool*
          _solver.loadLP(*_realLP, false);
          _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
       }
-      // load real LP and set up slack basis
+      // load real LP without a basis
       else
-         _solver.loadLP(*_realLP, true);
+         _solver.loadLP(*_realLP, false);
 
       // if there is no simplifier, then the original and the transformed problem are identical and it is more
       // memory-efficient to keep only the problem in the solver
@@ -336,8 +336,13 @@ void SoPlexBase<R>::_preprocessAndSolveReal(bool applySimplifier, volatile bool*
          keepbounds &= boolParam(SoPlexBase<R>::ROWBOUNDFLIPS);
 
       Real remainingTime = _solver.getMaxTime() - _solver.time();
+
       simplificationStatus = _simplifier->simplify(_solver, remainingTime, keepbounds,
                              _solver.random.getSeed());
+
+      // reduce basis to simplified problem
+      _solver.basis().load(&_solver, false);
+
       _solver.changeObjOffset(_simplifier->getObjoffset() + realParam(SoPlexBase<R>::OBJ_OFFSET));
       _solver.setScalingInfo(false);
       _applyPolishing = true;
