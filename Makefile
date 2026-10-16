@@ -76,6 +76,10 @@ LINKSINFO	=
 # these variables are needed for cluster runs
 MEM		=	2000
 CONTINUE	=	false
+DEBUGTOOL	=	none
+CLUSTERNODES	=	all
+EXCLUDENODES	=	none
+SLURMACCOUNT	=	default
 
 # is it allowed to link to external open source libraries?
 OPENSOURCE	=	true
@@ -267,16 +271,10 @@ endif
 
 ifeq ($(GMP),auto)
 GMP     =  $(BOOST)
-ifeq ($(GMP)-$(MAKELEVEL),false-0)
-$(warning GMP was deactived because of missing Boost support (BOOST=false). Set BOOST=true to enable rational solving mode.)
-endif
 endif
 
 ifeq ($(MPFR),auto)
 MPFR     =  $(BOOST)
-ifeq ($(MPFR)-$(MAKELEVEL),false-0)
-$(warning MPFR was deactived because of missing Boost support (BOOST=false). Set BOOST=true to enable rational solving mode.)
-endif
 endif
 
 GMPDEP	:=	$(SRCDIR)/depend.gmp

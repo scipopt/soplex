@@ -23,7 +23,12 @@
 #*                                                                           *#
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
 
-# Execute binary and write logfiles, gets called by check_cluster.sh.
+# Execute binary and write logfiles, gets called by check_cluster.sh or run_group.sh.
+#
+# When called with a phase argument (setup/solve), only that phase runs.
+# Without argument (or "all"), all phases run in sequence.
+
+PHASE="${1:-all}"
 
 # check if tmp-path exists
 if test ! -d "${CLIENTTMPDIR}"
@@ -35,35 +40,80 @@ fi
 OUTFILE="${CLIENTTMPDIR}/${BASENAME}.out"
 ERRFILE="${CLIENTTMPDIR}/${BASENAME}.err"
 BASFILE="${CLIENTTMPDIR}/${BASENAME}.bas"
+PERFFILE="${CLIENTTMPDIR}/${BASENAME}.perf"
 TMPFILE="${SOLVERPATH}/${OUTPUTDIR}/${BASENAME}.tmp"
-
-uname -a                               > "${OUTFILE}"
-uname -a                               > "${ERRFILE}"
 
 # function to copy back the ${OUTPUTDIR} and delete temporary files
 function cleanup {
-    rm -f "${TMPFILE}"
+    if [[ "${PHASE}" == "all" || "${PHASE}" == "solve" ]]
+    then
+        rm -f "${TMPFILE}"
 
-    mv "${OUTFILE}" "${SOLVERPATH}/${OUTPUTDIR}/${BASENAME}.out"
-    mv "${ERRFILE}" "${SOLVERPATH}/${OUTPUTDIR}/${BASENAME}.err"
-    mv "${BASFILE}" "${SOLVERPATH}/${OUTPUTDIR}/${BASENAME}.bas"
+        mv "${OUTFILE}" "${SOLVERPATH}/${OUTPUTDIR}/${BASENAME}.out"
+        mv "${ERRFILE}" "${SOLVERPATH}/${OUTPUTDIR}/${BASENAME}.err"
+        if test -f "${BASFILE}"
+        then
+            mv "${BASFILE}" "${SOLVERPATH}/${OUTPUTDIR}/${BASENAME}.bas"
+        fi
+        if test -f "${PERFFILE}"
+        then
+            mv "${PERFFILE}" "${SOLVERPATH}/${OUTPUTDIR}/${BASENAME}.perf"
+        fi
+    fi
 }
 
 # ensure TMPFILE is deleted and ${OUTPUTDIR} are copied when exiting (normally or due to abort/interrupt)
 trap cleanup EXIT
 
-echo "@01 ${FILENAME}"                >> "${OUTFILE}"
-echo "@01 ${FILENAME}"                >> "${ERRFILE}"
-echo "-----------------------------"  >> "${OUTFILE}"
-date                                  >> "${OUTFILE}"
-date                                  >> "${ERRFILE}"
-echo "-----------------------------"  >> "${OUTFILE}"
-date +"@03 %s"                        >> "${OUTFILE}"
-"${EXECNAME}" --loadset="${SOLVERPATH}/../settings/${SETTINGS}.set" --writebas="${BASFILE}" -v4 --int:displayfreq=10000 -c -q -t"${TIMELIMIT}" "${INSTANCE}" >> "${OUTFILE}" 2>> "${ERRFILE}"
-date +"@04 %s"                        >> "${OUTFILE}"
-echo "-----------------------------"  >> "${OUTFILE}"
-date                                  >> "${OUTFILE}"
-echo "-----------------------------"  >> "${OUTFILE}"
-date                                  >> "${ERRFILE}"
+if [[ "${PHASE}" == "all" || "${PHASE}" == "setup" ]]
+then
+    uname -a                               > "${OUTFILE}"
+    uname -a                               > "${ERRFILE}"
 
-rm -f "${TMPFILE}"
+    echo "@01 ${FILENAME}"                >> "${OUTFILE}"
+    echo "@01 ${FILENAME}"                >> "${ERRFILE}"
+    echo "-----------------------------"  >> "${OUTFILE}"
+    date                                  >> "${OUTFILE}"
+    date                                  >> "${ERRFILE}"
+    echo "-----------------------------"  >> "${OUTFILE}"
+    date +"@03 %s"                        >> "${OUTFILE}"
+    echo "@05 ${TIMELIMIT}"               >> "${OUTFILE}"
+
+    # system state before solve: available memory (kB), cumulative CPU ticks (idle total)
+    if test -r /proc/meminfo && test -r /proc/stat
+    then
+        echo "@07 $(awk '/MemAvailable/ {print $2}' /proc/meminfo) $(awk '/^cpu / {printf "%d %d\n", $5, $2+$3+$4+$5+$6+$7+$8+$9}' /proc/stat)" >> "${OUTFILE}"
+    fi
+
+fi
+
+# resolve placeholders in the executable name (done by the caller in setup/solve mode)
+if [[ "${PHASE}" == "all" ]]
+then
+    . ./prepare_execname.sh
+fi
+
+if [[ "${PHASE}" == "all" || "${PHASE}" == "solve" ]]
+then
+    SOLVECMD="${EXECNAME} --loadset=\"${SOLVERPATH}/../settings/${SETTINGS}.set\" --writebas=\"${BASFILE}\" -v4 --int:displayfreq=10000 -c -q -t\"${TIMELIMIT}\" \"${INSTANCE}\""
+
+    # hold the core until all steps of the group are submitted
+    if test -n "${HOLD}"
+    then
+        SOLVECMD="bash -c 'sleep ${HOLD}; ${SOLVECMD}'"
+    fi
+
+    eval "${SRUN:+${SRUN} }${SOLVECMD}" >> "${OUTFILE}" 2>> "${ERRFILE}"
+
+    # system state after solve: same format as @07
+    if test -r /proc/meminfo && test -r /proc/stat
+    then
+        echo "@08 $(awk '/MemAvailable/ {print $2}' /proc/meminfo) $(awk '/^cpu / {printf "%d %d\n", $5, $2+$3+$4+$5+$6+$7+$8+$9}' /proc/stat)" >> "${OUTFILE}"
+    fi
+    echo "@09 ${TARGETFREQ:-0}"           >> "${OUTFILE}"
+    date +"@04 %s"                        >> "${OUTFILE}"
+    echo "-----------------------------"  >> "${OUTFILE}"
+    date                                  >> "${OUTFILE}"
+    echo "-----------------------------"  >> "${OUTFILE}"
+    date                                  >> "${ERRFILE}"
+fi

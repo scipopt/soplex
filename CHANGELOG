@@ -23,6 +23,10 @@ fixed bugs:
 - skip basis reinitialization in SPxSolverBase<R>::invalidateBasis() to avoid premature factorization
 - load original and simplified problem without basis in SoPlexBase<R>::_preprocessAndSolveReal() to unlock starter generation
 
+miscellaneous:
+- added DEBUGTOOL=perf option for check scripts to collect perf statistics (new sections @06, @09, @10), including computation and comparison of non-memory-stalling frequency-normalized time
+- check scripts now require python and write available memory (kB) and the current cumulative CPU ticks (from /proc/stat) before and after the solve to the .out file (new sections @07 and @08)
+
 September 2026 - Release 8.1.0
 ==================
 

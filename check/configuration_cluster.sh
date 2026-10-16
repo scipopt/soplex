@@ -1,53 +1,47 @@
 #!/bin/bash
-#* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-#*                                                                           *
-#*                  This file is part of the class library                   *
-#*       SoPlex --- the Sequential object-oriented simPlex.                  *
-#*                                                                           *
-#*  Copyright (c) 1996-2026 Zuse Institute Berlin (ZIB)                      *
-#*                                                                           *
-#*  Licensed under the Apache License, Version 2.0 (the "License");          *
-#*  you may not use this file except in compliance with the License.         *
-#*  You may obtain a copy of the License at                                  *
-#*                                                                           *
-#*      http://www.apache.org/licenses/LICENSE-2.0                           *
-#*                                                                           *
-#*  Unless required by applicable law or agreed to in writing, software      *
-#*  distributed under the License is distributed on an "AS IS" BASIS,        *
-#*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
-#*  See the License for the specific language governing permissions and      *
-#*  limitations under the License.                                           *
-#*                                                                           *
-#*  You should have received a copy of the Apache-2.0 license                *
-#*  along with SoPlex; see the file LICENSE. If not email to soplex@zib.de.  *
-#*                                                                           *
-#* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+#* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
+#*                                                                           *#
+#*                  This file is part of the class library                   *#
+#*       SoPlex --- the Sequential object-oriented simPlex.                  *#
+#*                                                                           *#
+#*  Copyright (c) 1996-2026 Zuse Institute Berlin (ZIB)                      *#
+#*                                                                           *#
+#*  Licensed under the Apache License, Version 2.0 (the "License");          *#
+#*  you may not use this file except in compliance with the License.         *#
+#*  You may obtain a copy of the License at                                  *#
+#*                                                                           *#
+#*      http://www.apache.org/licenses/LICENSE-2.0                           *#
+#*                                                                           *#
+#*  Unless required by applicable law or agreed to in writing, software      *#
+#*  distributed under the License is distributed on an "AS IS" BASIS,        *#
+#*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *#
+#*  See the License for the specific language governing permissions and      *#
+#*  limitations under the License.                                           *#
+#*                                                                           *#
+#*  You should have received a copy of the Apache-2.0 license                *#
+#*  along with SoPlex; see the file LICENSE. If not email soplex@zib.de.     *#
+#*                                                                           *#
+#* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
 
 # configures environment variables for cluster runs.
 # to be invoked inside a check_cluster.sh script
 # This script cancels the process if required variables are not correctly set
 
 # input variables - should be passed to this script
-# QUEUE=${1}    # the name of the cluster (M620, dbg, telecom-dbg, mip-dbg, opt-low, opt)
-# PPN=${2}      # number of cluster nodes to use
-# EXCLUSIVE=${3} # should cluster nodes be blocked for other users while the jobs are running?
-# QUEUETYPE=${4} # either 'srun' or 'qsub'
+# QUEUE     # the name of the cluster queue
+# PPN       # number of cluster nodes to use
+# EXCLUSIVE # should cluster nodes be blocked for other users while the jobs are running?
+# QUEUETYPE # either 'srun' or 'qsub'
 
 # new environment variables defined by this script:
-#   HARDTIMELIMIT - hard time limit
-#   NICE          - cluster job nice flag
-#   ACCOUNT       - cluster job account flag
-#   CLUSTERQUEUE  - list of cluster queues
-
-NICE=""
-if [[ "$(uname -n)" =~ htc ]]; then
-  # z1 cluster
-  ACCOUNT="optimi_integer"
-else
-  # opt machines
-  ACCOUNT="mip"
-fi
-CLUSTERQUEUE="${QUEUE}"
+#   NICE            - cluster job nice flag
+#   ACCOUNT         - cluster job account flag
+#   CLUSTERQUEUE    - resolved cluster partition
+#   CONSTRAINT      - node feature constraint
+#   CPUFREQ         - cpu frequency request for reproducible timing
+#   TARGETFREQ      - target frequency (kHz) for time normalization
+#   EXCLUSIVE       - exclusive sbatch flag
+#   AUTO_PPN_PENDING - whether instances-per-node has to be computed automatically
 
 # check if queue has been defined
 if test "${QUEUE}" = ""
@@ -63,16 +57,6 @@ then
     exit 1
 fi
 
-# we add 100% to the hard time limit and additional 600 seconds in case of small time limits
-# NOTE: the jobs should have a hard running time of more than 5 minutes; if not so, these
-#       jobs get automatically assigned in the "exrpess" queue; this queue has only 4 CPUs
-#       available
-HARDTIMELIMIT=$(((TIMELIMIT + 600) + TIMELIMIT))
-
-# we add 10% to the hard memory limit and additional 100MB to the hard memory limit
-HARDMEMLIMIT=$(((MEMLIMIT + 100) + (MEMLIMIT / 10)))
-
-
 # check whether there is enough memory on the host system, otherwise we need to submit from the target system
 if test "${QUEUETYPE}" = "srun"
 then
@@ -85,135 +69,92 @@ then
             exit 1
         fi
     fi
-fi
 
-# in case of qsub queue the memory is measured in kB and in case of srun the time needs to be formatted
-if test  "${QUEUETYPE}" = "qsub"
-then
-    HARDMEMLIMIT=$((HARDMEMLIMIT * 1024000))
-else
-    MYMINUTES=0
-    MYHOURS=0
-    MYDAYS=0
-
-    #calculate seconds, minutes, hours and days
-    MYSECONDS=$((HARDTIMELIMIT % 60))
-    TMP=$((HARDTIMELIMIT / 60))
-    if test "${TMP}" != "0"
+    # use medium frequency with Performance governor if available
+    if scontrol show config 2>/dev/null | grep -qE '^CpuFreqGovernors\b.*\bPerformance\b'
     then
-        MYMINUTES=$((TMP % 60))
-        TMP=$((TMP / 60))
-        if test "${TMP}" != "0"
-        then
-            MYHOURS=$((TMP % 24))
-            MYDAYS=$((TMP / 24))
-        fi
-    fi
-    #format seconds to have two characters
-    if test "${MYSECONDS}" -lt 10
-    then
-        MYSECONDS=0"${MYSECONDS}"
-    fi
-    #format minutes to have two characters
-    if test "${MYMINUTES}" -lt 10
-    then
-        MYMINUTES=0"${MYMINUTES}"
-    fi
-    #format hours to have two characters
-    if test "${MYHOURS}" -lt 10
-    then
-        MYHOURS=0"${MYHOURS}"
-    fi
-    #format HARDTIMELIMT
-    if test "${MYDAYS}" = "0"
-    then
-        HARDTIMELIMIT="${MYHOURS}":"${MYMINUTES}":"${MYSECONDS}"
+        CPUFREQ="medium-medium:Performance"
     else
-        HARDTIMELIMIT="${MYDAYS}"-"${MYHOURS}":"${MYMINUTES}":"${MYSECONDS}"
+        CPUFREQ="medium-medium"
     fi
 fi
 
+CLUSTERQUEUE="${QUEUE}"
+CONSTRAINT=""
+NICE=""
+ACCOUNT=""
 
-#define clusterqueue, which might not be the QUEUE, because this might be an alias for a bunch of QUEUEs
-if test "${CLUSTERQUEUE}" = "dbg"
-then
-    CLUSTERQUEUE="mip-dbg"
-    ACCOUNT="mip-dbg"
-elif test "${CLUSTERQUEUE}" = "mip-dbg"
-then
-    ACCOUNT="mip-dbg"
-elif test "${CLUSTERQUEUE}" = "opt-low"
-then
-    CLUSTERQUEUE="opt"
-    NICE="--nice=10000"
-
-    # wakeup the cluster
-    make --makefile=wakeup-slurm wake_opt
-elif test "${CLUSTERQUEUE}" = "M620-low"
-then
-    NICE="--nice=10000"
-    CLUSTERQUEUE="M620"
-
-    # wakeup the cluster
-    make --makefile=wakeup-slurm wake_M620
-elif test "${CLUSTERQUEUE}" = "M620v3-low"
-then
-    NICE="--nice=10000"
-    CLUSTERQUEUE="M620v3"
-
-    # wakeup the cluster
-    make --makefile=wakeup-slurm wake_M620v3
-elif test "${CLUSTERQUEUE}" = "M630-low"
-then
-    NICE="--nice=10000"
-    CLUSTERQUEUE="M630"
-
-    # wakeup the cluster
-    make --makefile=wakeup-slurm wake_M630
-elif test "${CLUSTERQUEUE}" = "M620x"
-then
-    CLUSTERQUEUE="M620,M620v2,M620v3"
-
-    # wakeup the cluster
-    make --makefile=wakeup-slurm wake_M620
-    make --makefile=wakeup-slurm wake_M620v2
-    make --makefile=wakeup-slurm wake_M620v3
-elif test "${CLUSTERQUEUE}" = "M640-low"
-then
-    NICE="--nice=10000"
-    CLUSTERQUEUE="M640"
-
-    # wakeup the cluster
-    make --makefile=wakeup-slurm wake_M640
-elif test "${CLUSTERQUEUE}" = "moskito"
-then
+if [ "${CLUSTERQUEUE}" = "moskito" ] || [ "${CLUSTERQUEUE}" = "prio" ]; then
     ACCOUNT="dopt"
+elif [[ "$(uname -n)" =~ htc ]]; then
+    ACCOUNT=$(sshare -U -P --noheader --format=Account | head -n 1)
+fi
+
+if test "${CLUSTERQUEUE}" = "M640v2-low"
+then
+    NICE="--nice=10000"
+    CLUSTERQUEUE="M640v2"
+fi
+
+if test "${CLUSTERQUEUE}" = "M640v2"
+then
+    CONSTRAINT="Gold5222"
+    CLUSTERQUEUE="opt_int"
+    ACCOUNT="optimi_integer"
+    TARGETFREQ=2528567
+elif test "${CLUSTERQUEUE}" = "R740"
+then
+    CONSTRAINT="Gold6246"
+    CLUSTERQUEUE="high-mem"
+    TARGETFREQ=3300000
+elif test "${CLUSTERQUEUE}" = "C6520"
+then
+    CONSTRAINT="Gold6338"
+    CLUSTERQUEUE="big"
+    TARGETFREQ=1980945
+    # exclude nodes with broken frequency scaling
+    test "${EXCLUDENODES}" = "none" && EXCLUDENODES=""
+    EXCLUDENODES="htc-cmp[101-102],htc-cmp104,htc-cmp126,htc-cmp[145-148]${EXCLUDENODES:+,${EXCLUDENODES}}"
+elif test "${CLUSTERQUEUE}" = "R650"
+then
+    CONSTRAINT="Gold6342"
+    CLUSTERQUEUE="big"
+    TARGETFREQ=2128567
+elif test "${CLUSTERQUEUE}" = "R7525"
+then
+    CONSTRAINT="EPYC7542"
+    CLUSTERQUEUE="big"
+    TARGETFREQ=2900000
+elif test "${CLUSTERQUEUE}" = "R7525X"
+then
+    CONSTRAINT="EPYC7773X"
+    CLUSTERQUEUE="high-mem"
+    TARGETFREQ=1900000
+elif test "${CLUSTERQUEUE}" = "small"
+then
+    if [ "${DEBUGTOOL}" == "rr" ] || [ "${DEBUGTOOL}" == "perf" ]
+    then
+        # exclude nodes that don't have access to hardware performance counters enabled
+        test "${EXCLUDENODES}" = "none" && EXCLUDENODES=""
+        EXCLUDENODES="htc-cmp[220-229]${EXCLUDENODES:+,${EXCLUDENODES}}"
+    fi
+    if [ "${DEBUGTOOL}" == "rr" ]
+    then
+        # rr does not run reliably on AMD Zen CPUs, so restrict to Intel nodes
+        CONSTRAINT="Intel"
+    fi
 fi
 
 # check if the slurm blades should be used exclusively
 if test "${EXCLUSIVE}" = "true"
 then
     EXCLUSIVE=" --exclusive"
+    AUTO_PPN_PENDING=0
+elif test "${EXCLUSIVE}" = "auto"
+then
+    EXCLUSIVE=" --exclusive"
+    AUTO_PPN_PENDING=1
 else
     EXCLUSIVE=""
-fi
-
-
-CONSTRAINT=""
-if test "${CLUSTERQUEUE}" = "Gold6338"
-then
-    CONSTRAINT="Gold6338"
-    CLUSTERQUEUE="big"
-elif test "${CLUSTERQUEUE}" = "Gold6342"
-then
-    CONSTRAINT="Gold6342"
-    CLUSTERQUEUE="big"
-elif test "${CLUSTERQUEUE}" = "M640v2"
-then
-    CONSTRAINT="Gold5222"
-    CLUSTERQUEUE="opt_int"
-elif test "${CLUSTERQUEUE}" = "M640"
-then
-    CONSTRAINT="Gold5122"
-    CLUSTERQUEUE="opt_int"
+    AUTO_PPN_PENDING=0
 fi
