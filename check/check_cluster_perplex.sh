@@ -90,12 +90,8 @@ then
     exit
 fi
 
-# we use the time limit as hard time limit because perPlex does not accept a time limit
-HARDTIMELIMIT="${TIMELIMIT}"
-HARDMEMLIMIT="${MEMLIMIT}"
-
 # configure cluster-related environment variables
-# defines the following environment variables: NICE, ACCOUNT, CLUSTERQUEUE, HARDTIMELIMIT
+# defines the following environment variables: NICE, ACCOUNT, CLUSTERQUEUE
 . ./configuration_cluster.sh
 
 # counter to define file names for a test set uniquely

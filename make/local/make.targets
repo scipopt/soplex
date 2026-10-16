@@ -7,10 +7,10 @@ OPTHOST	   	 := $(shell uname -n | sed 's/\(.zib.de\)//g' | tr -cd '[:alpha:]')
 .PHONY: testcluster
 testcluster:
 		cd check; \
-		$(shell) ./check_cluster.sh $(TEST) $(EXECUTABLE) \
-		$(notdir $(EXECUTABLE)) $(SETTINGS) $(TIME) $(MEM) \
-		$(CONTINUE) \
-		$(QUEUETYPE) $(QUEUE) $(PPN) $(CLIENTTMPDIR) $(NOWAITCLUSTER) $(EXCLUSIVE) $(OUTPUTDIR) $(SEEDS);
+		$(shell) ./check_cluster.sh $(TEST) $(EXECUTABLE) $(SETTINGS) \
+		$(notdir $(EXECUTABLE)) $(OUTPUTDIR) $(TIME) $(MEM) $(CONTINUE) \
+		$(QUEUETYPE) $(QUEUE) $(PPN) $(CLIENTTMPDIR) $(NOWAITCLUSTER) $(EXCLUSIVE) $(SEEDS) \
+		$(DEBUGTOOL) $(CLUSTERNODES) $(EXCLUDENODES) $(SLURMACCOUNT);
 
 .PHONY: testclusterperplex
 testclusterperplex:

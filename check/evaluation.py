@@ -1,7 +1,8 @@
 #! /usr/bin/env python3
 
 import sys
-import math
+import os
+import re
 import json
 import fractions
 import io
@@ -28,12 +29,33 @@ def typeofvalue(text):
 
     return str
 
+def isnum(text):
+    return typeofvalue(text) in [int, float, fractions.Fraction]
+
 def fracttofloat(value):
     try:
-        float(value)
         return float(value)
     except ValueError:
         return float(fractions.Fraction(value))
+
+# convert a numeric token to float, keep non-numerics (e.g. '-') as is
+def tofloat(value):
+    return fracttofloat(value) if isnum(value) else value
+
+def fieldval(line):
+    return line.split(':', 1)[1].split()[0]
+
+# the larger of two values, ignoring non-numeric entries
+def vmax(a, b):
+    an = isinstance(a, (int, float))
+    bn = isinstance(b, (int, float))
+    if not an and not bn:
+        return '-'
+    if not an:
+        return b
+    if not bn:
+        return a
+    return a if a > b else b
 
 if len(sys.argv) > 2:
     if not len(sys.argv) == 3:
@@ -48,13 +70,8 @@ decomp = False
 if sys.argv[1] == '-d':
     decomp = True
 
-# specify columns for the output (can be modified)
-columns = ['name','rows','cols','pviol','dviol','iters','polish','refs','solvetime','value','status']
-ncolumns = len(columns)
-
-if decomp:
-    decompcolumns = ['ppiv','dpiv','avgpdegen','avgddegen','redprob','compprob','rediter','compiter','algiter']
-    columns.extend(decompcolumns)
+decompcolumns = ['ppiv','dpiv','avgpdegen','avgddegen','redprob','compprob','rediter','compiter','algiter']
+perfcolumns = ['instructions','cycles','clock','nmsfreq','normtime']
 
 if decomp:
     outname = sys.argv[2]
@@ -67,10 +84,16 @@ outlines = outfile.readlines()
 outfile.close()
 
 testset = outname.split('/')[-1].split('.')[1]
-testname = 'testset/'+testset+'.test'
-soluname = 'testset/'+testset+'.solu'
-
 settings = outname.split('/')[-1].split('.')[-2]
+
+# locate the test and solution files
+testname = ''
+soluname = ''
+for d in ['testset', 'instancedata/testsets']:
+    if not testname and os.path.isfile(d+'/'+testset+'.test'):
+        testname = d+'/'+testset+'.test'
+    if not soluname and os.path.isfile(d+'/'+testset+'.solu'):
+        soluname = d+'/'+testset+'.solu'
 
 # maximum length of instance names
 namelength = 18
@@ -79,11 +102,15 @@ namelength = 18
 tolerance = 1e-6
 
 instances = {}
-stats = False
-printedIdentifier = False
+instancename = ''
 section = 'soplex'
+stats = False
+failflag = False
+inorigcol = False
+printperf = False
+printedIdentifier = False
 
-for idx, outline in enumerate(outlines):
+for outline in outlines:
     # print identifier
     if outline.startswith('@01'):
         # convert line to used instance name
@@ -106,27 +133,61 @@ for idx, outline in enumerate(outlines):
         instances[instancename]['settings'] = settings
         instances[instancename]['testset'] = testset
         # wait for statistics block
+        section = 'soplex'
         stats = False
+        failflag = False
+        inorigcol = False
+        continue
 
     # invalidate instancename
-    elif outline.startswith('=ready='):
+    if outline.startswith('=ready='):
         section = 'soplex'
         instancename = ''
+        stats = False
+        continue
 
-    elif outline.startswith('=perplex='):
+    if outline.startswith('=perplex='):
         section = 'perplex'
         stats = False
         instances[instancename]['perplex'] = 'unknown'
+        continue
 
-    elif outline.startswith('=qsoptex='):
+    if outline.startswith('=qsoptex='):
         section = 'qsoptex'
         stats = False
         instances[instancename]['qso:stat'] = 'unknown'
         instances[instancename]['qso:lpval'] = '--'
         instances[instancename]['qso:time'] = instances[instancename]['timelimit']
         instances[instancename]['qso:prec'] = 64
+        continue
 
-    elif section == 'perplex':
+    if instancename == '':
+        continue
+
+    # frequency normalization markers injected by evalcheck_cluster.sh
+    if outline.startswith('@06'):
+        for token in outline.split()[1:]:
+            key, _, val = token.partition('=')
+            if key == 'instructions:u' and isnum(val):
+                instances[instancename]['instructions'] = int(fracttofloat(val))
+            elif key == 'cpu-cycles:u' and isnum(val):
+                instances[instancename]['cycles'] = int(fracttofloat(val))
+            elif key == 'task-clock' and isnum(val):
+                instances[instancename]['clock'] = fracttofloat(val)
+        printperf = True
+        continue
+
+    if outline.startswith('@10'):
+        for token in outline.split()[1:]:
+            key, _, val = token.partition('=')
+            if key == 'nmsfreq' and isnum(val):
+                instances[instancename]['nmsfreq'] = int(fracttofloat(val))
+            elif key == 'normtime' and isnum(val):
+                instances[instancename]['normtime'] = fracttofloat(val)
+        printperf = True
+        continue
+
+    if section == 'perplex':
         if outline.find('No such file or directory') >= 0:
             instances[instancename]['perplex'] = 'readerror'
         elif outline.startswith('Basis read'):
@@ -143,8 +204,9 @@ for idx, outline in enumerate(outlines):
                 instances[instancename]['perplex'] = 'dinfeas'
         elif outline.startswith('Solution is not ') and instances[instancename]['perplex'] == 'timeout':
             instances[instancename]['perplex'] = 'pdinfeas'
+        continue
 
-    elif section == 'qsoptex':
+    if section == 'qsoptex':
         if outline.startswith('Time for SOLVER:'):
             instances[instancename]['qso:time'] = fracttofloat(outline.split()[-2])
         elif outline.find('Problem Solved Exactly') >= 0:
@@ -157,133 +219,189 @@ for idx, outline in enumerate(outlines):
             instances[instancename]['qso:lpval'] = outline.split()[2].rstrip(',')
         elif outline.find('Trying mpf with') >= 0:
             instances[instancename]['qso:prec'] = max( int(outline.split()[3]), instances[instancename]['qso:prec'] )
+        continue
 
-    elif outline.startswith('SoPlex version'):
+    if outline.startswith('SoPlex version'):
         instances[instancename]['githash'] = outline.split()[-1].rstrip(']')[0:9]
         if not printedIdentifier:
             printedIdentifier = True
             print('\n')
             print(outline)
+        continue
 
-    elif outline.startswith('Primal solution infeasible') or outline.startswith('Dual solution infeasible'):
+    if outline.startswith('Primal solution infeasible') or outline.startswith('Dual solution infeasible'):
         instances[instancename]['status'] = 'fail'
+        failflag = True
+        continue
 
-    elif outline.startswith('real:timelimit'):
+    if outline.startswith('real:timelimit'):
         instances[instancename]['timelimit'] = fracttofloat(outline.split()[-1])
+        continue
 
-    elif outline.startswith('Statistics'):
+    if outline.startswith('Statistics'):
         stats = True
+        continue
 
-    if stats:
-        if outline.startswith('SoPlex status'):
-            if outline.find('time limit') >= 0:
-                instances[instancename]['status'] = 'timeout'
+    if not stats:
+        continue
+
+    inst = instances[instancename]
+
+    if outline.startswith('SoPlex status'):
+        if outline.find('time limit') >= 0:
+            inst['status'] = 'timeout'
+        else:
+            reportstat = outline.split()[-1].strip('[]')
+            if reportstat == 'optimal' and failflag:
+                inst['status'] = 'fail'
             else:
-                checkstat = instances[instancename]['status']
-                reportstat = outline.split()[-1].strip('[]')
-                if reportstat == 'optimal' and checkstat == 'fail':
-                    instances[instancename]['status'] = checkstat
-                else:
-                    instances[instancename]['status'] = reportstat
+                inst['status'] = reportstat
 
-        elif outline.startswith('Solution'):
-            instances[instancename]['value'] = fracttofloat(outlines[idx+1].split()[-1])
+    elif outline.startswith('  Objective value'):
+        inst['value'] = tofloat(fieldval(outline))
 
-        elif outline.startswith('Original problem'):
-            instances[instancename]['cols'] = int(outlines[idx+1].split()[2])
-            instances[instancename]['boxedcols'] = int(outlines[idx+2].split()[2])
-            instances[instancename]['lbcols'] = int(outlines[idx+3].split()[3])
-            instances[instancename]['ubcols'] = int(outlines[idx+4].split()[3])
-            instances[instancename]['freecols'] = int(outlines[idx+5].split()[2])
-            instances[instancename]['rows'] = int(outlines[idx+6].split()[2])
-            instances[instancename]['equalrows'] = int(outlines[idx+7].split()[2])
-            instances[instancename]['rangedrows'] = int(outlines[idx+8].split()[2])
-            instances[instancename]['lhsrows'] = int(outlines[idx+9].split()[2])
-            instances[instancename]['rhsrows'] = int(outlines[idx+10].split()[2])
-            instances[instancename]['freerows'] = int(outlines[idx+11].split()[2])
-            instances[instancename]['nonzeros'] = int(outlines[idx+12].split()[2])
-            instances[instancename]['colnonzeros'] = fracttofloat(outlines[idx+13].split()[3])
-            instances[instancename]['rownonzeros'] = fracttofloat(outlines[idx+14].split()[3])
-            instances[instancename]['sparsity'] = fracttofloat(outlines[idx+15].split()[2])
-            instances[instancename]['minabsval'] = fracttofloat(outlines[idx+16].split()[4])
-            instances[instancename]['maxabsval'] = fracttofloat(outlines[idx+17].split()[4])
+    elif outline.startswith('  Columns'):
+        inorigcol = True
+        if 'cols' not in inst:
+            inst['cols'] = int(fieldval(outline))
+    elif outline.startswith('  Rows'):
+        inorigcol = False
+        if 'rows' not in inst:
+            inst['rows'] = int(fieldval(outline))
 
-        elif outline.startswith('Violation'):
-            primviol = outlines[idx+2].split()[3]
-            dualviol = outlines[idx+3].split()[3]
-            if typeofvalue(primviol) in [int,float,fractions.Fraction] and typeofvalue(dualviol) in [int,float,fractions.Fraction]:
-                instances[instancename]['pviol'] = float("{:.2e}".format(fracttofloat(primviol)))
-                instances[instancename]['dviol'] = float("{:.2e}".format(fracttofloat(dualviol)))
-            else:
-                instances[instancename]['pviol'] = '-'
-                instances[instancename]['dviol'] = '-'
+    elif re.match(r' *boxed :', outline):
+        inst['boxedcols'] = int(fieldval(outline))
+    elif re.match(r' *lower bound :', outline):
+        inst['lbcols'] = int(fieldval(outline))
+    elif re.match(r' *upper bound :', outline):
+        inst['ubcols'] = int(fieldval(outline))
+    elif re.match(r' *free :', outline):
+        if inorigcol:
+            inst['freecols'] = int(fieldval(outline))
+        else:
+            inst['freerows'] = int(fieldval(outline))
+    elif re.match(r' *equal :', outline):
+        inst['equalrows'] = int(fieldval(outline))
+    elif re.match(r' *ranged :', outline):
+        inst['rangedrows'] = int(fieldval(outline))
+    elif re.match(r' *lhs :', outline):
+        inst['lhsrows'] = int(fieldval(outline))
+    elif re.match(r' *rhs :', outline):
+        inst['rhsrows'] = int(fieldval(outline))
+    elif outline.startswith('  Nonzeros'):
+        inst['nonzeros'] = int(fieldval(outline))
+    elif re.match(r' *per column :', outline):
+        inst['colnonzeros'] = fracttofloat(fieldval(outline))
+    elif re.match(r' *per row :', outline):
+        inst['rownonzeros'] = fracttofloat(fieldval(outline))
+    elif re.match(r' *sparsity :', outline):
+        inst['sparsity'] = fracttofloat(fieldval(outline))
+    elif re.match(r' *min\. abs\. value :', outline):
+        inst['minabsval'] = fracttofloat(fieldval(outline))
+    elif re.match(r' *max\. abs\. value :', outline):
+        inst['maxabsval'] = fracttofloat(fieldval(outline))
 
-        elif outline.startswith('Total time'):
-            instances[instancename]['time'] = fracttofloat(outline.split()[3])
-            instances[instancename]['readtime'] = fracttofloat(outlines[idx+1].split()[2])
-            instances[instancename]['solvetime'] = fracttofloat(outlines[idx+2].split()[2])
-            instances[instancename]['preproctime'] = fracttofloat(outlines[idx+3].split()[2])
-            instances[instancename]['simplextime'] = fracttofloat(outlines[idx+4].split()[2])
-            instances[instancename]['synctime'] = fracttofloat(outlines[idx+5].split()[2])
-            instances[instancename]['transformtime'] = fracttofloat(outlines[idx+6].split()[2])
-            instances[instancename]['rationaltime'] = fracttofloat(outlines[idx+7].split()[2])
-            instances[instancename]['othertime'] = fracttofloat(outlines[idx+8].split()[2])
+    elif outline.startswith('  Max/sum bound') or outline.startswith('  Max/sum row'):
+        inst['pviol'] = vmax(inst.get('pviol', '-'), tofloat(fieldval(outline)))
+    elif outline.startswith('  Max/sum redcost') or outline.startswith('  Max/sum dual'):
+        inst['dviol'] = vmax(inst.get('dviol', '-'), tofloat(fieldval(outline)))
 
-        elif outline.startswith('Refinements'):
-            instances[instancename]['refs'] = int(outline.split()[2])
-            instances[instancename]['stallrefs'] = int(outlines[idx+1].split()[2])
-            instances[instancename]['pivrefs'] = int(outlines[idx+2].split()[2])
-            instances[instancename]['feasrefs'] = int(outlines[idx+3].split()[2])
-            instances[instancename]['unbdrefs'] = int(outlines[idx+4].split()[2])
+    elif outline.startswith('Total time'):
+        inst['time'] = fracttofloat(fieldval(outline))
+    elif outline.startswith('  Reading'):
+        inst['readtime'] = fracttofloat(fieldval(outline))
+    elif outline.startswith('  Solving'):
+        inst['solvetime'] = fracttofloat(fieldval(outline))
+    elif outline.startswith('  Preprocessing'):
+        inst['preproctime'] = fracttofloat(fieldval(outline))
+    elif outline.startswith('  Simplex'):
+        inst['simplextime'] = fracttofloat(fieldval(outline))
+    elif outline.startswith('  Synchronization'):
+        inst['synctime'] = fracttofloat(fieldval(outline))
+    elif outline.startswith('  Transformation'):
+        inst['transformtime'] = fracttofloat(fieldval(outline))
+    elif outline.startswith('  Rational'):
+        inst['rationaltime'] = fracttofloat(fieldval(outline))
+    elif outline.startswith('  Other'):
+        inst['othertime'] = fracttofloat(fieldval(outline))
 
-        elif outline.startswith('Iterations'):
-            instances[instancename]['iters'] = int(outline.split()[2])
-            instances[instancename]['scratchiters'] = int(outlines[idx+1].split()[3])
-            instances[instancename]['basisiters'] = int(outlines[idx+2].split()[3])
-            instances[instancename]['primaliters'] = int(outlines[idx+3].split()[2])
-            instances[instancename]['dualiters'] = int(outlines[idx+4].split()[2])
-            instances[instancename]['flips'] = int(outlines[idx+5].split()[3])
-            instances[instancename]['polish'] = int(outlines[idx+6].split()[-1])
-            instances[instancename]['speed'] = round(fracttofloat(instances[instancename]['iters'])/max(instances[instancename]['solvetime'],tolerance),2)
+    elif outline.startswith('Refinements'):
+        inst['refs'] = int(fieldval(outline))
+    elif outline.startswith('  Stalling'):
+        if 'stallrefs' not in inst:
+            inst['stallrefs'] = int(fieldval(outline))
+    elif outline.startswith('  Pivoting'):
+        if 'pivrefs' not in inst:
+            inst['pivrefs'] = int(fieldval(outline))
+    elif outline.startswith('  Feasibility'):
+        if 'feasrefs' not in inst:
+            inst['feasrefs'] = int(fieldval(outline))
+    elif outline.startswith('  Unboundedness'):
+        if 'unbdrefs' not in inst:
+            inst['unbdrefs'] = int(fieldval(outline))
 
-        elif outline.startswith('LU factorizations'):
-            instances[instancename]['lufacts'] = int(outline.split()[3])
-            instances[instancename]['factortime'] = fracttofloat(outlines[idx+2].split()[3])
+    elif re.match(r'Iterations +:', outline):
+        inst['iters'] = int(fieldval(outline))
+        inst['speed'] = round(fracttofloat(inst['iters']) / max(inst.get('solvetime', 0.0), tolerance), 2)
+    elif outline.startswith('  From scratch'):
+        if 'scratchiters' not in inst:
+            inst['scratchiters'] = int(fieldval(outline))
+    elif outline.startswith('  From basis'):
+        if 'basisiters' not in inst:
+            inst['basisiters'] = int(fieldval(outline))
+    elif re.match(r'  Primal +:', outline):
+        if 'primaliters' not in inst:
+            inst['primaliters'] = int(fieldval(outline))
+    elif re.match(r'  Dual +:', outline):
+        if 'dualiters' not in inst:
+            inst['dualiters'] = int(fieldval(outline))
+    elif outline.startswith('  Bound flips'):
+        if 'flips' not in inst:
+            inst['flips'] = int(fieldval(outline))
+    elif outline.startswith('  Sol. polishing'):
+        if 'polish' not in inst:
+            inst['polish'] = int(fieldval(outline))
 
-        elif outline.startswith('LU solves'):
-            instances[instancename]['lusolves'] = int(outline.split()[3])
-            instances[instancename]['lusolvetime'] = fracttofloat(outlines[idx+2].split()[3])
+    elif outline.startswith('LU factorizations'):
+        inst['lufacts'] = int(fieldval(outline))
+    elif outline.startswith('  Factor. time'):
+        inst['factortime'] = fracttofloat(fieldval(outline))
+    elif outline.startswith('LU solves'):
+        inst['lusolves'] = int(fieldval(outline))
+    elif outline.startswith('  Solve time'):
+        inst['lusolvetime'] = fracttofloat(fieldval(outline))
 
-        elif decomp:
-            if outline.startswith('Degeneracy'):
-                instances[instancename]['ppiv'] = int(outlines[idx + 1].split()[3])
-                instances[instancename]['dpiv'] = int(outlines[idx + 2].split()[3])
-                instances[instancename]['primcand'] = int(outlines[idx + 3].split()[3])
-                instances[instancename]['dualcand'] = int(outlines[idx + 4].split()[3])
-                instances[instancename]['avgpdegen'] = fracttofloat(outlines[idx + 5].split()[3])
-                instances[instancename]['avgddegen'] = fracttofloat(outlines[idx + 6].split()[3])
+    elif decomp:
+        if outline.startswith('  Primal Pivots'):
+            inst['ppiv'] = int(fieldval(outline))
+        elif outline.startswith('  Dual Pivots'):
+            inst['dpiv'] = int(fieldval(outline))
+        elif outline.startswith('  Primal Candidates'):
+            inst['primcand'] = int(fieldval(outline))
+        elif outline.startswith('  Dual Candidates'):
+            inst['dualcand'] = int(fieldval(outline))
+        elif outline.startswith('  Average Primal'):
+            inst['avgpdegen'] = fracttofloat(fieldval(outline))
+        elif outline.startswith('  Average Dual'):
+            inst['avgddegen'] = fracttofloat(fieldval(outline))
+        elif outline.startswith('Algorithm Iterations'):
+            inst['algiter'] = int(fieldval(outline))
+        elif outline.startswith('  Reduced Problem'):
+            inst['rediter'] = int(fieldval(outline))
+        elif outline.startswith('  Comp. Problem'):
+            inst['compiter'] = int(fieldval(outline))
+        elif outline.startswith('Red. Problem Status'):
+            inst['redprob'] = int(fieldval(outline))
+        elif outline.startswith('Comp. Problem Status'):
+            inst['compprob'] = int(fieldval(outline))
 
-            elif outline.startswith('Algorithm Iterations'):
-                instances[instancename]['algiter'] = int(outline.split()[2])
-
-            elif outline.startswith('Decomp. Iterations'):
-                instances[instancename]['rediter'] = int(outlines[idx + 3].split()[3])
-                instances[instancename]['compiter'] = int(outlines[idx + 4].split()[3])
-
-            elif outline.startswith('Red. Problem Status'):
-                instances[instancename]['redprob'] = int(outline.split()[4])
-
-            elif outline.startswith('Comp. Problem Status'):
-                instances[instancename]['compprob'] = int(outline.split()[3])
-
+for inst in instances.values():
+    for key in ['pviol','dviol']:
+        if isinstance(inst.get(key), float):
+            inst[key] = float("{:.2e}".format(inst[key]))
 
 # try parsing solution file
-check_solu = False
-try:
-    with open(soluname):
-        check_solu = True
-except IOError:
-    check_solu = False
+check_solu = bool(soluname)
 
 if check_solu:
     solufile = open(soluname,'r')
@@ -309,7 +427,7 @@ if check_solu:
                         instances[name]['status'] = 'inconsistent'
                 elif value == 'unknown':
                     instances[name]['status'] = 'not verified'
-                elif (abs(instances[name]['value'] - value))/max(abs(instances[name]['value']),abs(value),tolerance) > tolerance:
+                elif isinstance(instances[name].get('value'), (int, float)) and (abs(instances[name]['value'] - value))/max(abs(instances[name]['value']),abs(value),tolerance) > tolerance:
                     instances[name]['status'] = 'inconsistent'
     solufile.close()
 
@@ -325,6 +443,15 @@ unbounded = sum(1 for name in instances if instances[name]['status'] == 'unbound
 optimal = sum(1 for name in instances if instances[name]['status'] == 'optimal')
 aborts = sum(1 for name in instances if instances[name]['status'] == 'abort')
 inconsistents = sum(1 for name in instances if instances[name]['status'] == 'inconsistent')
+
+# specify columns for the output (can be modified)
+columns = ['name','rows','cols','pviol','dviol','iters','polish','refs','solvetime','value']
+if printperf:
+    columns.extend(perfcolumns)
+columns.append('status')
+ncolumns = len(columns)
+if decomp:
+    columns.extend(decompcolumns)
 
 length = []
 output = ''
@@ -354,11 +481,9 @@ print('\nResults (testset '+testset+', settings '+settings+'):')
 print('{} total: {} optimal, {} infeasible, {} unbounded, {} timeouts, {} inconsistents, {} fails, {} aborts'.format(len(instances),optimal,infeasible,unbounded,timeouts,inconsistents,fails,aborts))
 
 # try to check for missing files
-check_test = False
-try:
-    with open(testname):
-        check_test = True
-except IOError:
+check_test = bool(testname)
+
+if not check_test:
     print('No testset file found to check run for completeness.')
 
 if not check_solu:

@@ -22,6 +22,9 @@ git ls-files "*.sh" "*.py" | xargs chmod 750
 git ls-files -c | xargs tar --transform "s|^|${NAME}/|" -cvhf $NAME.tar \
     --exclude="*~" \
     --exclude=".*" \
+    --exclude="suppressions*" \
+    --exclude="check/prepare*" \
+    --exclude="check/run*" \
     --exclude="check/*cluster*" \
     --exclude="check/make_solu*" \
     --exclude="check/testset/*" \

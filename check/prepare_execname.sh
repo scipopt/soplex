@@ -23,20 +23,22 @@
 #*                                                                           *#
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
 
-# Very simple evaluation script,
-#
-# Called by 'test.sh'
+# replace placeholders and probe perf events in EXECNAME
+# expects: EXECNAME, ERRFILE, PERFFILE
+# sets: EXECNAME (with placeholders resolved)
 
-OUTFILE="${1}"
+EXECNAME="${EXECNAME/ERRFILE_PLACEHOLDER/${ERRFILE}}"
+EXECNAME="${EXECNAME/RRTRACEFOLDER_PLACEHOLDER/${ERRFILE}}"
+EXECNAME="${EXECNAME/PERFFILE_PLACEHOLDER/${PERFFILE}}"
 
-SOPLEXOPTIMAL=$(grep -c "SoPlex status       : problem is solved \[optimal\]" "${OUTFILE}")
-optimal=$((SOPLEXOPTIMAL / 2))
-total=$(grep -c "=ready=" "${OUTFILE}")
-
-echo
-echo 'Summary:'
-echo
-echo 'total  : '${total}
-echo 'optimal: '${optimal}
-echo
-echo 'please install python for better statistics and evaluation'
+# determine available perf events on this node
+if echo "${EXECNAME}" | grep -q 'PERFEVENTS_PLACEHOLDER'
+then
+    PERF_EVENTS=""
+    for event in cpu-cycles:u cpu-cycles:k instructions:u instructions:k cache-references:u cache-misses:u branch-instructions:u branch-misses:u L1-dcache-loads:u L1-dcache-load-misses:u L1-icache-load-misses:u dTLB-loads:u dTLB-load-misses:u iTLB-load-misses:u minor-faults:u minor-faults:k major-faults:u major-faults:k context-switches cpu-migrations cycle_activity.cycles_mem_any cycle_activity.stalls_mem_any cycle_activity.stalls_total task-clock; do
+        if perf stat -e "${event}" true 2>/dev/null; then
+            PERF_EVENTS="${PERF_EVENTS:+${PERF_EVENTS},}${event}"
+        fi
+    done
+    EXECNAME="${EXECNAME/PERFEVENTS_PLACEHOLDER/${PERF_EVENTS}}"
+fi

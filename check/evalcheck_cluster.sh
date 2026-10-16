@@ -23,7 +23,9 @@
 #*                                                                           *#
 #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
 
-# evaluate logfiles from testrun started by 'make testcluster'
+# evaluate logfiles from testrun started by 'make testcluster', possibly uploads to rubberband
+#
+# If the environment variable RBCLI_TAG is set, then it will be passed as tags to rbcli.
 #
 # USAGE, from directory check, call
 #              ./evalcheck_cluster.sh results/check.*.eval
@@ -31,6 +33,7 @@
 export LANG=C
 
 REMOVE=0
+UPLOAD=0
 DECOMP=0
 AWKARGS=""
 FILES=""
@@ -42,6 +45,9 @@ do
         if test "${i}" = "-r"
         then
             REMOVE=1
+        elif test "${i}" = "-U"
+        then
+            UPLOAD=1
         else
             AWKARGS="${AWKARGS} ${i}"
         fi
@@ -65,6 +71,7 @@ do
     ERRFILE="${DIR}/${EVALFILE}.err"
     RESFILE="${DIR}/${EVALFILE}.res"
     SETFILE="${DIR}/${EVALFILE}.set"
+    METAFILE="${DIR}/${EVALFILE}.meta"
 
     # check if the eval file exists; if this is the case construct the overall solution files
     if test -e "${DIR}/${EVALFILE}.eval"
@@ -92,9 +99,42 @@ do
             fi
 
             FILE="${i}.out"
+            PERFF="${i}.perf"
             if test -e "${FILE}"
             then
                 cat "${FILE}" >> "${OUTFILE}"
+                # if a .perf file exists, inject perf counters and frequency-normalized time
+                if test -e "${PERFF}"
+                then
+                    PERFDATA=$(awk -F, 'NF>1 && !/^#/ && $1 !~ /<not/ {printf " %s=%s", $3, $1}' "${PERFF}")
+                    read MEANFREQ NMSFREQ <<< $(awk -F, '
+                        $3 == "cpu-cycles:u" { cu = $1 }
+                        $3 == "cpu-cycles:k" { ck = $1 }
+                        $3 == "task-clock"   { tc = $1 }
+                        $3 == "cycle_activity.stalls_mem_any" { sm = $1 }
+                        END {
+                            mf = (tc > 0) ? (cu + ck) / tc : 0;
+                            nmsc = cu + ck - sm; if (nmsc <= 0) nmsc = 1;
+                            nmsf = (tc > 0) ? nmsc / tc : 0;
+                            printf "%.0f %.0f", mf, nmsf;
+                        }' "${PERFF}")
+                    NORMTIME=$(awk -v nmsfreq="${NMSFREQ}" '
+                        /^@05/                   { timelimit = $2 }
+                        /^@09/                   { targetfreq = $2 }
+                        /^  Solving/             { tottime = $3 }
+                        END {
+                            normtime = (nmsfreq > 0 && targetfreq > 0) ? tottime * (nmsfreq / targetfreq) : tottime;
+                            if( timelimit > 0 && (tottime >= timelimit || normtime >= timelimit) )
+                                normtime = timelimit;
+                            printf "%.3f", normtime;
+                        }' "${FILE}")
+                    echo "@06${PERFDATA}" >> "${OUTFILE}"
+                    printf "@10 meanfreq=%s nmsfreq=%s normtime=%s\n" "${MEANFREQ}" "${NMSFREQ}" "${NORMTIME}" >> "${OUTFILE}"
+                    if test "${REMOVE}" = "1"
+                    then
+                        rm -f "${PERFF}"
+                    fi
+                fi
                 if test "${REMOVE}" = "1"
                 then
                     rm -f "${FILE}"
@@ -172,6 +212,18 @@ do
             ./evaluation.py -d "${OUTFILE}" | tee "${RESFILE}"
         else
             ./evaluation.py "${OUTFILE}" | tee "${RESFILE}"
+        fi
+
+        if test "${UPLOAD}" = "1"
+        then
+            if test -z "${RBCLI_TAG}"
+            then
+                echo "rbcli up ${OUTFILE} ${ERRFILE} ${SETFILE} ${METAFILE}"
+                rbcli up "${OUTFILE}" "${ERRFILE}" "${SETFILE}" "${METAFILE}"
+            else
+                echo "rbcli --tags ${RBCLI_TAG} up ${OUTFILE} ${ERRFILE} ${SETFILE} ${METAFILE}"
+                rbcli --tags "${RBCLI_TAG}" up "${OUTFILE}" "${ERRFILE}" "${SETFILE}" "${METAFILE}"
+            fi
         fi
     fi
 done
