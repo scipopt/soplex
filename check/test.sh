@@ -67,7 +67,7 @@ do
 
   BASENAME=${OUTPUTDIR}/check.${TSTNAME}.${BINID}.${SETTINGS}
 
-  if (( SEEDS > 0 )); then
+  if (( s > 0 )); then
       BASENAME="${BASENAME}-s${s}"
   fi
 
@@ -117,11 +117,6 @@ do
   date >> "${OUTFILE}"
   date >> "${ERRFILE}"
 
-  # check whether python is available
-  if command -v python >/dev/null 2>&1
-  then
-      python evaluation.py "${OUTFILE}" | tee "${RESFILE}"
-  else
-      ./evaluation.sh "${OUTFILE}" | tee "${RESFILE}"
-  fi
+  # evaluate the results
+  python evaluation.py "${OUTFILE}" | tee "${RESFILE}"
 done
