@@ -7,6 +7,7 @@ fixed bugs:
 - resolve aggregations constants in SPxMainSM<R>::AggregationPS::execute() and SPxMainSM<R>::MultiAggregationPS::execute() to correct postsolved activities
 - skip basis reinitialization in SPxSolverBase<R>::invalidateBasis() to avoid premature factorization
 - load original and simplified problem without basis in SoPlexBase<R>::_preprocessAndSolveReal() to unlock starter generation
+- handle objective offset at any position in LP reader
 
 miscellaneous:
 - added DEBUGTOOL=perf option for check scripts to collect perf statistics (new sections @06, @09, @10), including computation and comparison of non-memory-stalling frequency-normalized time
