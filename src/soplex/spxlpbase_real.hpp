@@ -1424,9 +1424,10 @@ bool SPxLPBase<R>::readLPF(
 
                have_value = false;
 
-               if(*pos == '\0')
+               /* add objective offset at end or before another term */
+               if(*pos == '\0' || LPFisValue(pos))
                {
-                  changeObjOffset(val);
+                  changeObjOffset(objOffset() + val);
                   break;
                }
             }
