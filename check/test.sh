@@ -35,6 +35,7 @@ SETTINGS="${3}"   # name of settings (has to be in settings)
 TIME="${4}"       # time limit
 OUTPUTDIR="${5}"  # results directory
 SEEDS="${6}"      # the number of random seeds - 0 only default seeds
+GLBSEEDSHIFT="${7}" # the global seed shift
 
 
 # check if all variables defined (by checking the last one)
@@ -59,6 +60,8 @@ fi
 # run different random seeds
 for (( s=0; s<=${SEEDS}; s++ ))
 do
+  SEED=$(( s + GLBSEEDSHIFT ))
+  EXECNAME="${EXECUTABLE} --loadset=${SETTINGSFILE} --uint:random_seed=${SEED} -t${TIME} --int:displayfreq=1000 -v4 -c -q"
   BINNAME=$(basename "${EXECUTABLE}")
   # get host name
   HOST=$(uname -n | sed 's/\(.zib.de\)//g')
@@ -67,12 +70,13 @@ do
 
   BASENAME=${OUTPUTDIR}/check.${TSTNAME}.${BINID}.${SETTINGS}
 
-  if (( s > 0 )); then
-      BASENAME="${BASENAME}-s${s}"
+  if (( SEED > 0 )); then
+      BASENAME="${BASENAME}-s${SEED}"
   fi
 
   OUTFILE="${BASENAME}.out"
   ERRFILE="${BASENAME}.err"
+  BASFILE="${BASENAME}.bas"
   RESFILE="${BASENAME}.res"
   SETFILE="${BASENAME}.set"
 
@@ -103,15 +107,12 @@ do
       aix)  AWK=gawk ;;
   esac
 
-  # Create testset
-  "${EXECUTABLE}" --loadset="${SETTINGSFILE}" -t"${TIME}" --saveset="${SETFILE}"
-
   # Solve the instances of the testset
   for instance in $(cat "${FULLTSTNAME}")
   do
       echo "@01 ${instance}"
       echo "@01 ${instance}" >> "${ERRFILE}"
-      ${EXECUTABLE} --loadset="${SETFILE}" -v4 --int:displayfreq=10000 -c -q -t"${TIME}" "${instance}" 2>> "${ERRFILE}"
+      ${EXECNAME} --saveset="${SETFILE}" --writebas="${BASFILE}" "${instance}" 2>> "${ERRFILE}"
       echo "=ready="
   done | tee -a "${OUTFILE}"
   date >> "${OUTFILE}"

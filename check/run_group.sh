@@ -29,8 +29,8 @@
 #
 # usage: run_group.sh SRUN_PREFIX NUM_INSTANCES [FIELDS...]
 #
-# FIELDS contains NUM_INSTANCES groups of 10 positional arguments each:
-#   SOLVERPATH EXECNAME BASENAME FILENAME OUTPUTDIR TIMELIMIT SETTINGS INSTANCE CLIENTTMPDIR TARGETFREQ
+# FIELDS contains NUM_INSTANCES groups of 9 positional arguments each:
+#   SOLVERPATH EXECNAME BASENAME FILENAME OUTPUTDIR TIMELIMIT INSTANCE CLIENTTMPDIR TARGETFREQ
 
 SRUN_PREFIX="$1"
 NUM_INSTANCES="$2"
@@ -40,14 +40,14 @@ shift 2
 for ((i = 0; i < NUM_INSTANCES; i++))
 do
     EXECNAME="$2"
-    ERRFILE="$9/$3.err"
-    PERFFILE="$9/$3.perf"
+    ERRFILE="$8/$3.err"
+    PERFFILE="$8/$3.perf"
     . ./prepare_execname.sh
 
-    printf -v "INST_${i}" 'export SOLVERPATH=%q EXECNAME=%q BASENAME=%q FILENAME=%q OUTPUTDIR=%q TIMELIMIT=%q SETTINGS=%q INSTANCE=%q CLIENTTMPDIR=%q TARGETFREQ=%q' \
-        "$1" "${EXECNAME}" "$3" "$4" "$5" "$6" "$7" "$8" "$9" "${10}"
+    printf -v "INST_${i}" 'export SOLVERPATH=%q EXECNAME=%q BASENAME=%q FILENAME=%q OUTPUTDIR=%q TIMELIMIT=%q INSTANCE=%q CLIENTTMPDIR=%q TARGETFREQ=%q' \
+        "$1" "${EXECNAME}" "$3" "$4" "$5" "$6" "$7" "$8" "$9"
     export "INST_${i}"
-    shift 10
+    shift 9
 done
 
 # phase 1: setup solver environments
