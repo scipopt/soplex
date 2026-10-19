@@ -10449,8 +10449,8 @@ void SoPlexBase<R>::printShortStatistics(std::ostream& os)
    SPxOut::setFixed(os, 2);
    os << "Solving time (sec)  : " << this->_statistics->solvingTime->time() << "\n"
       << "Iterations          : " << this->_statistics->iterations << "\n";
-   SPxOut::setScientific(os);
-   os << "Objective value     : " << objValueReal() << "\n";
+   SPxOut::setScientific(os, 15);
+   os << "Objective value     : " << std::showpos << objValueReal() << "\n";
 }
 // @todo: temporary fix need to worry about precision
 /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used;
@@ -10579,12 +10579,12 @@ void SoPlexBase<R>::setTimings(const Timer::TYPE ttype)
 template <class R>
 void SoPlexBase<R>::printSolutionStatistics(std::ostream& os)
 {
-   SPxOut::setScientific(os);
+   SPxOut::setScientific(os, 15);
 
    if(_lastSolveMode == SOLVEMODE_REAL)
    {
       os << "Solution (real)     : \n"
-         << "  Objective value   : " << objValueReal() << "\n";
+         << "  Objective value   : " << std::showpos << objValueReal() << "\n";
    }
    else if(_lastSolveMode == SOLVEMODE_RATIONAL)
    {
