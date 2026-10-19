@@ -86,22 +86,35 @@ outfile.close()
 testset = outname.split('/')[-1].split('.')[1]
 settings = outname.split('/')[-1].split('.')[-2]
 
-# locate the test and solution files
+# locate test file
 testname = ''
-soluname = ''
 for d in ['testset', 'instancedata/testsets']:
-    if not testname and os.path.isfile(d+'/'+testset+'.test'):
+    if os.path.isfile(d+'/'+testset+'.test'):
         testname = d+'/'+testset+'.test'
-    if not soluname and os.path.isfile(d+'/'+testset+'.solu'):
-        soluname = d+'/'+testset+'.solu'
+        break
+
+# locate solution file
+soluname = ''
+for f in [testset, testset.split('_', 1)[0], testset.split('-', 1)[0], 'all']:
+    for d in ['testset', 'instancedata/testsets']:
+        if os.path.isfile(d+'/'+f+'.solu'):
+            soluname = d+'/'+f+'.solu'
+            break
+    if soluname:
+        break
 
 # maximum length of instance names
 namelength = 18
 
-# tolerance for solution value check
+# tolerances for solution value check
 tolerance = 1e-6
+reltol = 1e-5
+
+# solver statuses indicating reached limit
+limitstats = ('timeout', 'iterlimit', 'objlimit')
 
 instances = {}
+objsenses = {}
 instancename = ''
 section = 'soplex'
 stats = False
@@ -128,7 +141,7 @@ for outline in outlines:
 
         # initialize new data set
         instances[instancename] = {}
-        instances[instancename]['status'] = 'abort'
+        instances[instancename]['status'] = 'fail (abort)'
         instances[instancename]['name'] = shortname
         instances[instancename]['settings'] = settings
         instances[instancename]['testset'] = testset
@@ -230,7 +243,7 @@ for outline in outlines:
         continue
 
     if outline.startswith('Primal solution infeasible') or outline.startswith('Dual solution infeasible'):
-        instances[instancename]['status'] = 'fail'
+        instances[instancename]['status'] = 'fail (solution infeasible)'
         failflag = True
         continue
 
@@ -248,17 +261,26 @@ for outline in outlines:
     inst = instances[instancename]
 
     if outline.startswith('SoPlex status'):
-        if outline.find('time limit') >= 0:
-            inst['status'] = 'timeout'
-        else:
-            reportstat = outline.split()[-1].strip('[]')
-            if reportstat == 'optimal' and failflag:
-                inst['status'] = 'fail'
-            else:
-                inst['status'] = reportstat
+        beg = outline.find('[')
+        reportstat = outline[beg + 1:outline.find(']')] if beg >= 0 else ''
+        if reportstat.startswith('optimal'):
+            reportstat = 'optimal'
+        elif reportstat == 'time limit reached':
+            reportstat = 'timeout'
+        elif reportstat == 'iteration limit reached':
+            reportstat = 'iterlimit'
+        elif reportstat == 'objective limit reached':
+            reportstat = 'objlimit'
+        elif reportstat not in ('infeasible', 'unbounded'):
+            reportstat = 'fail (abort)'
+        if not failflag or reportstat != 'optimal':
+            inst['status'] = reportstat
 
     elif outline.startswith('  Objective value'):
         inst['value'] = tofloat(fieldval(outline))
+
+    elif outline.startswith('Objective sense'):
+        objsenses[instancename] = -1 if 'maximize' in outline.lower() else 1
 
     elif outline.startswith('  Columns'):
         inorigcol = True
@@ -420,29 +442,63 @@ if check_solu:
                 value = 'unknown'
         if name in instances:
             instances[name]['soluval'] = value
-            if not instances[name]['status'] in ['timeout', 'fail', 'abort']:
+            status = instances[name]['status']
+            if not status.startswith('fail') and status not in limitstats:
                 # check solution status
                 if value in ['infeasible', 'unbounded']:
-                    if not instances[name]['status'] == value:
-                        instances[name]['status'] = 'inconsistent'
+                    instances[name]['status'] = 'ok' if status == value else 'fail (solution on infeasible instance)'
                 elif value == 'unknown':
-                    instances[name]['status'] = 'not verified'
-                elif isinstance(instances[name].get('value'), (int, float)) and (abs(instances[name]['value'] - value))/max(abs(instances[name]['value']),abs(value),tolerance) > tolerance:
-                    instances[name]['status'] = 'inconsistent'
+                    instances[name]['status'] = 'solved not verified'
+                elif status == 'optimal':
+                    solverval = instances[name]['value']
+                    valtol = reltol * max(abs(solverval), 1.0)
+                    diff = objsenses.get(name, 1) * (solverval - value)
+                    instances[name]['status'] = 'fail (objective value)' if tag in ('=opt=', '=best=') and diff > valtol or tag in ('=opt=', '=bestdual=') and diff < -valtol else 'ok'
+                else:
+                    instances[name]['status'] = 'fail (objective value)'
     solufile.close()
+
+# declare instances without reference unverified
+for name in instances:
+    if instances[name]['status'] in ('optimal', 'infeasible', 'unbounded'):
+        instances[name]['status'] = 'solved not verified'
 
 # save dictionary to file later use in compare script
 with open(dataname, 'w') as f:
     json.dump(instances, f)
 
-# count solution status
-fails = sum(1 for name in instances if instances[name]['status'] == 'fail')
-timeouts = sum(1 for name in instances if instances[name]['status'] == 'timeout')
-infeasible = sum(1 for name in instances if instances[name]['status'] == 'infeasible')
-unbounded = sum(1 for name in instances if instances[name]['status'] == 'unbounded')
-optimal = sum(1 for name in instances if instances[name]['status'] == 'optimal')
-aborts = sum(1 for name in instances if instances[name]['status'] == 'abort')
-inconsistents = sum(1 for name in instances if instances[name]['status'] == 'inconsistent')
+# count solution status while determining total and (shifted) geometric mean of iterations and time
+passed = 0
+limits = 0
+fails = 0
+itergeomshift = 100.0
+timegeomshift = 1.0
+stotiters = 0
+stottime = 0.0
+itergeom = 0.0
+timegeom = 0.0
+shifteditergeom = itergeomshift
+shiftedtimegeom = timegeomshift
+nprobs = 0
+for name in instances:
+    status = instances[name]['status']
+    if status == 'ok' or status == 'solved not verified':
+        passed += 1
+    elif status in limitstats:
+        limits += 1
+    elif status.startswith('fail'):
+        fails += 1
+    n = instances[name].get('iters') or 0
+    t = instances[name].get('time') or 0.0
+    stotiters += n
+    stottime += t
+    nprobs += 1
+    itergeom = itergeom ** ((nprobs - 1) / nprobs) * max(n, 1.0) ** (1.0 / nprobs)
+    timegeom = timegeom ** ((nprobs - 1) / nprobs) * max(t, 1.0) ** (1.0 / nprobs)
+    shifteditergeom = shifteditergeom ** ((nprobs - 1) / nprobs) * max(n + itergeomshift, 1.0) ** (1.0 / nprobs)
+    shiftedtimegeom = shiftedtimegeom ** ((nprobs - 1) / nprobs) * max(t + timegeomshift, 1.0) ** (1.0 / nprobs)
+shifteditergeom -= itergeomshift
+shiftedtimegeom -= timegeomshift
 
 # specify columns for the output (can be modified)
 columns = ['name','rows','cols','pviol','dviol','iters','polish','refs','solvetime','value']
@@ -478,7 +534,9 @@ for name in sorted(instances):
     print(output)
 
 print('\nResults (testset '+testset+', settings '+settings+'):')
-print('{} total: {} optimal, {} infeasible, {} unbounded, {} timeouts, {} inconsistents, {} fails, {} aborts'.format(len(instances),optimal,infeasible,unbounded,timeouts,inconsistents,fails,aborts))
+print('{} total: {} pass, {} limit, {} fail'.format(nprobs, passed, limits, fails))
+print('iters total {}, geom. mean {:.3f}, shifted geom. mean {:.3f}'.format(stotiters, itergeom, shifteditergeom))
+print('time total {:.3f}, geom. mean {:.3f}, shifted geom. mean {:.3f}'.format(stottime, timegeom, shiftedtimegeom))
 
 # try to check for missing files
 check_test = bool(testname)
