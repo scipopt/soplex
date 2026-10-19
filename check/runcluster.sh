@@ -41,14 +41,12 @@ OUTFILE="${CLIENTTMPDIR}/${BASENAME}.out"
 ERRFILE="${CLIENTTMPDIR}/${BASENAME}.err"
 BASFILE="${CLIENTTMPDIR}/${BASENAME}.bas"
 PERFFILE="${CLIENTTMPDIR}/${BASENAME}.perf"
-TMPFILE="${SOLVERPATH}/${OUTPUTDIR}/${BASENAME}.tmp"
+SETFILE="${SOLVERPATH}/${OUTPUTDIR}/${BASENAME}.set"
 
-# function to copy back the ${OUTPUTDIR} and delete temporary files
+# function to move the result files to ${OUTPUTDIR}
 function cleanup {
     if [[ "${PHASE}" == "all" || "${PHASE}" == "solve" ]]
     then
-        rm -f "${TMPFILE}"
-
         mv "${OUTFILE}" "${SOLVERPATH}/${OUTPUTDIR}/${BASENAME}.out"
         mv "${ERRFILE}" "${SOLVERPATH}/${OUTPUTDIR}/${BASENAME}.err"
         if test -f "${BASFILE}"
@@ -62,7 +60,7 @@ function cleanup {
     fi
 }
 
-# ensure TMPFILE is deleted and ${OUTPUTDIR} are copied when exiting (normally or due to abort/interrupt)
+# ensure the result files are moved to ${OUTPUTDIR} when exiting (normally or due to abort/interrupt)
 trap cleanup EXIT
 
 if [[ "${PHASE}" == "all" || "${PHASE}" == "setup" ]]
@@ -95,7 +93,7 @@ fi
 
 if [[ "${PHASE}" == "all" || "${PHASE}" == "solve" ]]
 then
-    SOLVECMD="${EXECNAME} --loadset=\"${SOLVERPATH}/../settings/${SETTINGS}.set\" --writebas=\"${BASFILE}\" -v4 --int:displayfreq=10000 -c -q -t\"${TIMELIMIT}\" \"${INSTANCE}\""
+    SOLVECMD="${EXECNAME} --saveset=\"${SETFILE}\" --writebas=\"${BASFILE}\" \"${INSTANCE}\""
 
     # hold the core until all steps of the group are submitted
     if test -n "${HOLD}"

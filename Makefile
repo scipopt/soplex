@@ -69,6 +69,7 @@ SETTINGS	=	default
 TIME		=	3600
 OUTPUTDIR	=	results
 SEEDS		=	0
+GLBSEEDSHIFT	=	0
 MAKESOFTLINKS	=	true
 SOFTLINKS	=
 LINKSINFO	=
@@ -463,7 +464,7 @@ doc:
 
 .PHONY: test
 test:		#$(BINFILE)
-		cd check; ./test.sh $(TEST) $(EXECUTABLE) $(SETTINGS) $(TIME) $(OUTPUTDIR) $(SEEDS)
+		cd check; ./test.sh $(TEST) $(EXECUTABLE) $(SETTINGS) $(TIME) $(OUTPUTDIR) $(SEEDS) $(GLBSEEDSHIFT)
 
 .PHONY: check
 check:	#$(BINFILE)

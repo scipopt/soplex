@@ -55,10 +55,11 @@ CLIENTTMPDIR="${12}"
 NOWAITCLUSTER="${13}"
 EXCLUSIVE="${14}"
 SEEDS="${15}"
-DEBUGTOOL="${16}"
-CLUSTERNODES="${17}"
-EXCLUDENODES="${18}"
-SLURMACCOUNT="${19}"
+GLBSEEDSHIFT="${16}"
+DEBUGTOOL="${17}"
+CLUSTERNODES="${18}"
+EXCLUDENODES="${19}"
+SLURMACCOUNT="${20}"
 
 # check if all variables defined (by checking the last one)
 if test -z "${SLURMACCOUNT}"
@@ -79,6 +80,7 @@ then
     echo "NOWAITCLUSTER = ${NOWAITCLUSTER}"
     echo "EXCLUSIVE     = ${EXCLUSIVE}"
     echo "SEEDS         = ${SEEDS}"
+    echo "GLBSEEDSHIFT  = ${GLBSEEDSHIFT}"
     echo "DEBUGTOOL     = ${DEBUGTOOL}"
     echo "CLUSTERNODES  = ${CLUSTERNODES}"
     echo "EXCLUDENODES  = ${EXCLUDENODES}"
@@ -106,7 +108,7 @@ fi
 . ./configuration_cluster.sh
 
 # prefix the executable with the debug tool command (placeholders resolved in runcluster.sh)
-EXECNAME="${DEBUGTOOLCMD}${EXECUTABLE}"
+EXECBASE="${DEBUGTOOLCMD}${EXECUTABLE}"
 
 # resolve the default slurm account to the one chosen by configuration_cluster.sh
 if test "${SLURMACCOUNT}" = "default"
@@ -203,7 +205,7 @@ fi
 AUTO_BATCH_COUNT=0          # number of instances accumulated so far
 AUTO_BATCH_JOBNAME=""       # job name of first instance in group
 AUTO_BATCH_NAMES=""         # space-separated instance names for echo
-AUTO_BATCH_ARGS=()          # positional arguments for run_group.sh (10 per instance)
+AUTO_BATCH_ARGS=()          # positional arguments for run_group.sh (9 per instance)
 
 # flush the current auto mode batch as a single exclusive sbatch job
 flush_auto_batch() {
@@ -225,9 +227,11 @@ flush_auto_batch() {
 # run different random seeds
 for (( s=0; s<=${SEEDS}; s++ ))
 do
+    SEED=$(( s + GLBSEEDSHIFT ))
+    EXECNAME="${EXECBASE} --loadset=${SETTINGSFILE} --uint:random_seed=${SEED} -t${TIMELIMIT} --int:displayfreq=1000 -v4 -c -q"
     EVALFILE="${SOPLEXPATH}/${OUTPUTDIR}/check.${TSTNAME}.${BINID}.${QUEUE}.${SETTINGS}"
-    if (( s > 0 )); then
-        EVALFILE="${EVALFILE}-s${s}"
+    if (( SEED > 0 )); then
+        EVALFILE="${EVALFILE}-s${SEED}"
     fi
     EVALFILE="${EVALFILE}.eval"
     echo > "${EVALFILE}"
@@ -273,25 +277,26 @@ do
                 ./waitcluster.sh 1600 "${QUEUE}" 200
             fi
 
-            SHORTFILENAME=$(basename "${i}" .gz)
-            SHORTFILENAME=$(basename "${SHORTFILENAME}" .mps)
-            SHORTFILENAME=$(basename "${SHORTFILENAME}" .lp)
-            SHORTFILENAME=$(basename "${SHORTFILENAME}" .opb)
+            SHORTPROBNAME=$(basename "${i}" .gz)
+            SHORTPROBNAME=$(basename "${SHORTPROBNAME}" .mps)
+            SHORTPROBNAME=$(basename "${SHORTPROBNAME}" .lp)
+            SHORTPROBNAME=$(basename "${SHORTPROBNAME}" .opb)
+            SHORTPROBNAME="${SHORTPROBNAME::25}"
 
-            SHORTNAME="${USER}.${TSTNAME}.${COUNT}_${SHORTFILENAME}.${BINID}.${QUEUE}.${SETTINGS}"
-            if (( s > 0 )); then
-                SHORTNAME="${SHORTNAME}-s${s}"
+            FILENAME="${USER}.${TSTNAME}.${COUNT}_${SHORTPROBNAME}.${BINID}.${QUEUE}.${SETTINGS}"
+            if (( SEED > 0 )); then
+                FILENAME="${FILENAME}-s${SEED}"
             fi
-            RESBASE="${SOPLEXPATH}/${OUTPUTDIR}/${SHORTNAME}"
+            RESBASE="${SOPLEXPATH}/${OUTPUTDIR}/${FILENAME}"
 
             echo "${RESBASE}" >> "${EVALFILE}"
 
             # in case we want to continue we check if the job was already performed
             if test "${CONTINUE}" != "false"
             then
-                if test -e "${OUTPUTDIR}/${SHORTNAME}.out"
+                if test -e "${OUTPUTDIR}/${FILENAME}.out"
                 then
-                    echo "skipping file ${i} due to existing output file ${SHORTNAME}.out"
+                    echo "skipping file ${i} due to existing output file ${FILENAME}.out"
                     continue
                 fi
             fi
@@ -299,29 +304,25 @@ do
             # additional environment variables needed by runcluster.sh
             export SOLVERPATH="${SOPLEXPATH}"
             export EXECNAME
-            export BASENAME="${SHORTNAME}" # careful, runcluster.sh uses BASENAME in a different sense
+            export BASENAME="${FILENAME}" # careful, runcluster.sh uses BASENAME in a different sense
             export FILENAME="${i}"         # careful, runcluster.sh uses FILENAME in a different sense
             export OUTPUTDIR="${OUTPUTDIR}"
             export TIMELIMIT="${TIMELIMIT}"
-            export SETTINGS="${SETTINGS}"
             export INSTANCE="${SOPLEXPATH}/${i}"
             export CLIENTTMPDIR="${CLIENTTMPDIR}"
             export TARGETFREQ
-
-            # Create testset, without printing output
-            "${EXECUTABLE}" --loadset="${SETTINGSFILE}" -t"${TIMELIMIT}" --saveset="${SOLVERPATH}/${OUTPUTDIR}/${SHORTNAME}.set" > /dev/null
 
             if test  "${QUEUETYPE}" = "srun"
             then
                 if test "${AUTO_PPN_PENDING}" -eq 1
                 then
                     # auto mode: accumulate instance arguments into current batch
-                    AUTO_BATCH_ARGS+=("${SOLVERPATH}" "${EXECNAME}" "${SHORTNAME}" "${i}" "${OUTPUTDIR}" "${TIMELIMIT}" "${SETTINGS}" "${SOLVERPATH}/${i}" "${CLIENTTMPDIR}" "${TARGETFREQ}")
+                    AUTO_BATCH_ARGS+=("${SOLVERPATH}" "${EXECNAME}" "${BASENAME}" "${i}" "${OUTPUTDIR}" "${TIMELIMIT}" "${SOLVERPATH}/${i}" "${CLIENTTMPDIR}" "${TARGETFREQ}")
                     AUTO_BATCH_COUNT=$(( AUTO_BATCH_COUNT + 1 ))
-                    AUTO_BATCH_NAMES="${AUTO_BATCH_NAMES} ${SHORTFILENAME}"
+                    AUTO_BATCH_NAMES="${AUTO_BATCH_NAMES} ${SHORTPROBNAME}"
                     if test -z "${AUTO_BATCH_JOBNAME}"
                     then
-                        AUTO_BATCH_JOBNAME="SPX-${SHORTFILENAME}"
+                        AUTO_BATCH_JOBNAME="SPX-${SHORTPROBNAME}"
                     fi
                     # flush when batch is full
                     if test "${AUTO_BATCH_COUNT}" -ge "${AUTO_PPN}"
@@ -333,12 +334,12 @@ do
                     then
                         export SRUN="srun --exact -n 1 -c 1 --mem=${HARDMEMLIMIT} --propagate=STACK --cpu_bind=verbose,cores ${SRUN_FLAGS}"
                     fi
-                    echo sbatch --job-name=SPX-"${SHORTFILENAME}" --constraint="${CONSTRAINT}" -n 1 -c 1 --mem="${HARDMEMLIMIT}" -p "${CLUSTERQUEUE}" -A "${SLURMACCOUNT}" ${NICE} --time="${HARDTIMELIMIT}" --cpu-freq=${CPUFREQ} ${EXCLUSIVE} ${NODE_FLAGS} --output=/dev/null runcluster.sh
-                    sbatch --job-name=SPX-"${SHORTFILENAME}" --constraint="${CONSTRAINT}" -n 1 -c 1 --mem="${HARDMEMLIMIT}" -p "${CLUSTERQUEUE}" -A "${SLURMACCOUNT}" ${NICE} --time="${HARDTIMELIMIT}" --cpu-freq=${CPUFREQ} ${EXCLUSIVE} ${NODE_FLAGS} --output=/dev/null runcluster.sh
+                    echo sbatch --job-name=SPX-"${SHORTPROBNAME}" --constraint="${CONSTRAINT}" -n 1 -c 1 --mem="${HARDMEMLIMIT}" -p "${CLUSTERQUEUE}" -A "${SLURMACCOUNT}" ${NICE} --time="${HARDTIMELIMIT}" --cpu-freq=${CPUFREQ} ${EXCLUSIVE} ${NODE_FLAGS} --output=/dev/null runcluster.sh
+                    sbatch --job-name=SPX-"${SHORTPROBNAME}" --constraint="${CONSTRAINT}" -n 1 -c 1 --mem="${HARDMEMLIMIT}" -p "${CLUSTERQUEUE}" -A "${SLURMACCOUNT}" ${NICE} --time="${HARDTIMELIMIT}" --cpu-freq=${CPUFREQ} ${EXCLUSIVE} ${NODE_FLAGS} --output=/dev/null runcluster.sh
                 fi
             else
                 # -V to copy all environment variables
-                qsub -l walltime="${HARDTIMELIMIT}" -l mem="${HARDMEMLIMIT}" -l nodes=1:ppn="${PPN}" -N SOPLEX"${SHORTFILENAME}" -V -q "${CLUSTERQUEUE}" -o /dev/null -e /dev/null runcluster.sh
+                qsub -l walltime="${HARDTIMELIMIT}" -l mem="${HARDMEMLIMIT}" -l nodes=1:ppn="${PPN}" -N SOPLEX"${SHORTPROBNAME}" -V -q "${CLUSTERQUEUE}" -o /dev/null -e /dev/null runcluster.sh
             fi
         else
             echo "input file ${SOPLEXPATH}/${i} not found!"

@@ -10,7 +10,7 @@ testcluster:
 		$(shell) ./check_cluster.sh $(TEST) $(EXECUTABLE) $(SETTINGS) \
 		$(notdir $(EXECUTABLE)) $(OUTPUTDIR) $(TIME) $(MEM) $(CONTINUE) \
 		$(QUEUETYPE) $(QUEUE) $(PPN) $(CLIENTTMPDIR) $(NOWAITCLUSTER) $(EXCLUSIVE) $(SEEDS) \
-		$(DEBUGTOOL) $(CLUSTERNODES) $(EXCLUDENODES) $(SLURMACCOUNT);
+		$(GLBSEEDSHIFT) $(DEBUGTOOL) $(CLUSTERNODES) $(EXCLUDENODES) $(SLURMACCOUNT);
 
 .PHONY: testclusterperplex
 testclusterperplex:
