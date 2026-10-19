@@ -1709,7 +1709,7 @@ void SPxSolverBase<R>::printDisplayLine(const bool force, const bool forceHead)
                       << shift() << " | "
                       << SOPLEX_MAX(0.0, m_pricingViol + m_pricingViolCo) << " | "
                       << std::setw(8) << SOPLEX_MAX(0, m_numViol) << " | "
-                      << std::setprecision(8) << value();
+                      << std::setprecision(8) << std::showpos << value() << std::noshowpos;
 
       if(printBasisMetric == 0)
          (*this->spxout) << " | " << std::scientific << std::setprecision(2) << getBasisMetric(0);
