@@ -8,6 +8,8 @@ performance:
 fixed bugs:
 
 interface & parameters:
+- change the SOPLEX_REAL_FORMAT macro from fixed-point to general conversion to avoid trailing zeros
+- write real values with 17 significant digits in the LP, MPS, and basis matrix file writers
 
 build system:
 
