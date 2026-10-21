@@ -210,7 +210,7 @@ typedef long double Real;
 
 #ifndef SOPLEX_REAL
 #define SOPLEX_REAL(x)  x##L
-#define SOPLEX_REAL_FORMAT "Lf"
+#define SOPLEX_REAL_FORMAT "Lg"
 #endif
 /// default allowed bound violation
 #ifndef SOPLEX_DEFAULT_BND_VIOL
@@ -243,7 +243,7 @@ typedef float Real;
 
 #ifndef SOPLEX_REAL
 #define SOPLEX_REAL(x)  x
-#define SOPLEX_REAL_FORMAT "f"
+#define SOPLEX_REAL_FORMAT "g"
 #endif
 /// default allowed bound violation
 #ifndef SOPLEX_DEFAULT_BND_VIOL
@@ -270,7 +270,7 @@ typedef double Real;
 
 #ifndef SOPLEX_REAL
 #define SOPLEX_REAL(x)  x
-#define SOPLEX_REAL_FORMAT "lf"
+#define SOPLEX_REAL_FORMAT "lg"
 #endif
 /// default allowed bound violation
 #ifndef SOPLEX_DEFAULT_BND_VIOL

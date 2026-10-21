@@ -2787,7 +2787,7 @@ void SPxLPBase<R>::writeLPF(
    const bool     writeZeroObjective ///< write zero objective coefficients
 ) const
 {
-   SPxOut::setScientific(p_output, 16);
+   p_output << std::defaultfloat << std::setprecision(17);
 
    LPFwriteObjective(*this, p_output, p_cnames, writeZeroObjective);
    LPFwriteRows(*this, p_output, p_rnames, p_cnames);
@@ -2822,12 +2822,12 @@ static void MPSwriteRecord(
 
    if(name1 != nullptr)
    {
-      spxSnprintf(buf, sizeof(buf), "%-8.8s  %.15" SOPLEX_REAL_FORMAT, name1, (Real) value1);
+      spxSnprintf(buf, sizeof(buf), "%-8.8s  %.17" SOPLEX_REAL_FORMAT, name1, (Real) value1);
       os << buf;
 
       if(name2 != nullptr)
       {
-         spxSnprintf(buf, sizeof(buf), "   %-8.8s  %.15" SOPLEX_REAL_FORMAT, name2, (Real) value2);
+         spxSnprintf(buf, sizeof(buf), "   %-8.8s  %.17" SOPLEX_REAL_FORMAT, name2, (Real) value2);
          os << buf;
       }
    }

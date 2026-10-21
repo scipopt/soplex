@@ -792,7 +792,7 @@ void SPxBasisBase<R>::printMatrixMTX(int number)
       {
          int idx = baseVec(i).index(j);
          R val = baseVec(i).value(j);
-         fprintf(basisfile, "%d %d %.13" SOPLEX_REAL_FORMAT "\n", i + 1, idx + 1, val);
+         fprintf(basisfile, "%d %d %.17" SOPLEX_REAL_FORMAT "\n", i + 1, idx + 1, (Real) val);
       }
    }
 
