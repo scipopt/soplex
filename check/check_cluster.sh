@@ -238,6 +238,7 @@ do
 
     METAFILE="${EVALFILE%.eval}.meta"
     echo "@Seed ${s}"              >  "${METAFILE}"
+    echo "@Permutation 0"          >> "${METAFILE}"
     echo "@Settings ${SETTINGS}"   >> "${METAFILE}"
     echo "@TstName ${TSTNAME}"     >> "${METAFILE}"
     echo "@BinName ${BINID}"       >> "${METAFILE}"
