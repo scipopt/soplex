@@ -251,6 +251,11 @@ for outline in outlines:
         instances[instancename]['timelimit'] = fracttofloat(outline.split()[-1])
         continue
 
+    if outline.startswith('Reduced LP has'):
+        instances[instancename]['simpcols'] = int(outline.split()[5])
+        instances[instancename]['simprows'] = int(outline.split()[3])
+        continue
+
     if outline.startswith('Statistics'):
         stats = True
         continue
@@ -286,10 +291,14 @@ for outline in outlines:
         inorigcol = True
         if 'cols' not in inst:
             inst['cols'] = int(fieldval(outline))
+            if 'simpcols' not in inst:
+                inst['simpcols'] = inst['cols']
     elif outline.startswith('  Rows'):
         inorigcol = False
         if 'rows' not in inst:
             inst['rows'] = int(fieldval(outline))
+            if 'simprows' not in inst:
+                inst['simprows'] = inst['rows']
 
     elif re.match(r' *boxed :', outline):
         inst['boxedcols'] = int(fieldval(outline))
@@ -431,15 +440,14 @@ if check_solu:
         solu = soluline.split()
         tag = solu[0]
         name = solu[1]
-        if len(solu) == 3:
-            value = solu[2]
-            if typeofvalue(value) in [int,float]:
-                value = fracttofloat(value)
+        if tag == '=inf=':
+            value = 'infeasible'
+        elif tag == '=unbd=':
+            value = 'unbounded'
+        elif len(solu) >= 3 and typeofvalue(solu[2]) in [int, float]:
+            value = fracttofloat(solu[2])
         else:
-            if tag == '=inf=':
-                value = 'infeasible'
-            else:
-                value = 'unknown'
+            value = 'unknown'
         if name in instances:
             instances[name]['soluval'] = value
             status = instances[name]['status']
@@ -501,7 +509,7 @@ shifteditergeom -= itergeomshift
 shiftedtimegeom -= timegeomshift
 
 # specify columns for the output (can be modified)
-columns = ['name','rows','cols','pviol','dviol','iters','polish','refs','solvetime','value']
+columns = ['name','rows','cols','simprows','simpcols','pviol','dviol','iters','polish','refs','solvetime','value']
 if printperf:
     columns.extend(perfcolumns)
 columns.append('status')
