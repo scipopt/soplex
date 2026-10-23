@@ -243,7 +243,6 @@ do
     echo "@TstName ${TSTNAME}"     >> "${METAFILE}"
     echo "@BinName ${BINID}"       >> "${METAFILE}"
     echo "@MemLimit ${MEMLIMIT}"   >> "${METAFILE}"
-    echo "@TimeLimit ${TIMELIMIT}" >> "${METAFILE}"
     echo "@Queue ${QUEUE}"         >> "${METAFILE}"
     echo "@Exclusive ${EXCLUSIVE}" >> "${METAFILE}"
 
