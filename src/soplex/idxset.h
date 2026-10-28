@@ -62,7 +62,7 @@ namespace soplex
    suitable memory. Alternatively, one can use \ref DIdxSet "DIdxSets"
    which provide the required memory managemant.
 */
-class IdxSet
+class SOPLEX_EXPORT IdxSet
 {
 protected:
 

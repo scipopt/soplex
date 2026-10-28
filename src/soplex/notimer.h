@@ -35,7 +35,7 @@
 namespace soplex
 {
 
-class NoTimer : public Timer
+class SOPLEX_EXPORT NoTimer : public Timer
 {
 
 public:

@@ -25,27 +25,33 @@
 #ifndef _SOPLEX_FMT_HPP_
 #define _SOPLEX_FMT_HPP_
 
-#include "soplex/spxdefines.h"
-#ifdef SOPLEX_WITH_PAPILO
-#include "papilo/Config.hpp"
-#endif
-
-#if defined(SOPLEX_WITH_SYSTEM_FMT)
-#include <fmt/format.h>
-#include <fmt/ostream.h>
-#else
-// bundled fmt header-only
 #ifndef FMT_HEADER_ONLY
 #define FMT_HEADER_ONLY
 #endif
-// to provide backwards compatibility use fmt of PaPILO <= 2.3 due to breaking changes in fmt 7
-#if !defined(SOPLEX_WITH_PAPILO) || PAPILO_VERSION_MAJOR > 2 || (PAPILO_VERSION_MAJOR == 2 && PAPILO_VERSION_MINOR > 3)
+
+#include "soplex/spxdefines.h"
+#if SOPLEX_HAS_PAPILO
+#include "papilo/Config.hpp"
+#endif /* SOPLEX_HAS_PAPILO */
+
+#if SOPLEX_HAS_SYSTEM_FMT
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+#else /* !SOPLEX_HAS_SYSTEM_FMT */
+// bundled fmt header-only
+#ifndef FMT_HEADER_ONLY
+#define FMT_HEADER_ONLY
+#endif /* !FMT_HEADER_ONLY */
+
+
+/* to provide backwards compatibility use fmt of PaPILO <= 2.3 due to breaking changes in fmt 7 */
+#if !SOPLEX_HAS_PAPILO || PAPILO_VERSION_MAJOR > 2 || (PAPILO_VERSION_MAJOR == 2 && PAPILO_VERSION_MINOR > 3)
 #include "soplex/external/fmt/format.h"
 #include "soplex/external/fmt/ostream.h"
-#else
+#else /* SOPLEX_HAS_PAPILO && PAPILO_VERSION_MAJOR <= 2 && (PAPILO_VERSION_MAJOR != 2 || PAPILO_VERSION_MINOR <= 3) */
 #include "papilo/external/fmt/format.h"
 #include "papilo/external/fmt/ostream.h"
-#endif
-#endif
+#endif /* !SOPLEX_HAS_PAPILO || PAPILO_VERSION_MAJOR > 2 || (PAPILO_VERSION_MAJOR == 2 && PAPILO_VERSION_MINOR > 3) */
 
+#endif /* SOPLEX_HAS_SYSTEM_FMT */
 #endif

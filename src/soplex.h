@@ -74,22 +74,22 @@
 
 #include "soplex/spxpapilo.h"
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
 #include <gmp.h>
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
-#ifdef SOPLEX_WITH_BOOST
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_BOOST
+#if SOPLEX_HAS_MPFR
 // For multiple precision
 #include <boost/multiprecision/mpfr.hpp>
-#endif
-#ifdef SOPLEX_WITH_CPPMPF
+#endif /* SOPLEX_HAS_MPFR */
+#if SOPLEX_HAS_CPPMPF
 #include <boost/multiprecision/cpp_dec_float.hpp>
-#endif
+#endif /* SOPLEX_HAS_CPPMPF */
 
 // An alias for boost multiprecision
 namespace mpf = boost::multiprecision;
-#endif
+#endif /* SOPLEX_HAS_BOOST */
 
 #define SOPLEX_DEFAULT_RANDOM_SEED   0   // used to suppress output when the seed was not changed
 
@@ -434,7 +434,7 @@ public:
    /// adds a single row
    void addRowRational(const LPRowRational& lprow);
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
    /// adds a single row (GMP only method)
    void addRowRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices,
                        const int rowSize, const mpq_t* rhs);
@@ -443,7 +443,7 @@ public:
    void addRowsRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices,
                         const int* rowStarts, const int* rowLengths, const int numRows, const int numValues,
                         const mpq_t* rhs);
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
    /// adds multiple rows
    void addRowsRational(const LPRowSetRational& lprowset);
@@ -451,7 +451,7 @@ public:
    /// adds a single column
    void addColRational(const LPColRational& lpcol);
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
    /// adds a single column (GMP only method)
    void addColRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues,
                        const int* colIndices, const int colSize, const mpq_t* upper);
@@ -460,7 +460,7 @@ public:
    void addColsRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues,
                         const int* colIndices, const int* colStarts, const int* colLengths, const int numCols,
                         const int numValues, const mpq_t* upper);
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
    /// adds multiple columns
    void addColsRational(const LPColSetRational& lpcolset);
@@ -474,18 +474,18 @@ public:
    /// changes left-hand side of row \p i to \p lhs
    void changeLhsRational(int i, const Rational& lhs);
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
    /// changes left-hand side of row \p i to \p lhs (GMP only method)
    void changeLhsRational(int i, const mpq_t* lhs);
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
    /// changes right-hand side vector to \p rhs
    void changeRhsRational(const VectorRational& rhs);
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
    /// changes right-hand side vector to \p rhs (GMP only method)
    void changeRhsRational(const mpq_t* rhs, int rhsSize);
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
    /// changes right-hand side of row \p i to \p rhs
    void changeRhsRational(int i, const Rational& rhs);
@@ -496,10 +496,10 @@ public:
    /// changes left- and right-hand side of row \p i
    void changeRangeRational(int i, const Rational& lhs, const Rational& rhs);
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
    /// changes left- and right-hand side of row \p i (GMP only method)
    void changeRangeRational(int i, const mpq_t* lhs, const mpq_t* rhs);
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
    /// replaces column \p i with \p lpcol
    void changeColRational(int i, const LPColRational& lpcol);
@@ -510,10 +510,10 @@ public:
    /// changes lower bound of column i to \p lower
    void changeLowerRational(int i, const Rational& lower);
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
    /// changes lower bound of column i to \p lower (GMP only method)
    void changeLowerRational(int i, const mpq_t* lower);
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
    /// changes vector of upper bounds to \p upper
    void changeUpperRational(const VectorRational& upper);
@@ -521,10 +521,10 @@ public:
    /// changes \p i 'th upper bound to \p upper
    void changeUpperRational(int i, const Rational& upper);
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
    /// changes upper bound of column i to \p upper (GMP only method)
    void changeUpperRational(int i, const mpq_t* upper);
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
    /// changes vectors of column bounds to \p lower and \p upper
    void changeBoundsRational(const VectorRational& lower, const VectorRational& upper);
@@ -532,10 +532,10 @@ public:
    /// changes bounds of column \p i to \p lower and \p upper
    void changeBoundsRational(int i, const Rational& lower, const Rational& upper);
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
    /// changes bounds of column \p i to \p lower and \p upper (GMP only method)
    void changeBoundsRational(int i, const mpq_t* lower, const mpq_t* upper);
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
    /// changes objective function vector to \p obj
    void changeObjRational(const VectorRational& obj);
@@ -543,18 +543,18 @@ public:
    /// changes objective coefficient of column i to \p obj
    void changeObjRational(int i, const Rational& obj);
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
    /// changes objective coefficient of column i to \p obj (GMP only method)
    void changeObjRational(int i, const mpq_t* obj);
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
    /// changes matrix entry in row \p i and column \p j to \p val
    void changeElementRational(int i, int j, const Rational& val);
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
    /// changes matrix entry in row \p i and column \p j to \p val (GMP only method)
    void changeElementRational(int i, int j, const mpq_t* val);
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
    /// removes row \p i
    void removeRowRational(int i);
@@ -749,7 +749,7 @@ public:
    /// gets the vector of slack values if available; returns true on success
    bool getSlacksRational(VectorRational& vector);
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
    /// gets the primal solution vector if available; returns true on success (GMP only method)
    bool getPrimalRational(mpq_t* vector, const int size);
 
@@ -767,7 +767,7 @@ public:
 
    /// gets the Farkas proof if LP is infeasible; returns true on success (GMP only method)
    bool getDualFarkasRational(mpq_t* vector, const int size);
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
    /// get size of primal solution
    int totalSizePrimalRational(const int base = 2);
@@ -1774,18 +1774,18 @@ private:
    SPxScaler<R>* _scaler;
    SPxStarter<R>* _starter;
 
-#ifdef SOPLEX_WITH_BOOST
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_BOOST
+#if SOPLEX_HAS_MPFR
    //----------------------------- BOOSTED SOLVER -----------------------------
    // multiprecision type used for the boosted solver
    using BP = number<mpfr_float_backend<0>, et_off>;
-#else
-#ifdef SOPLEX_WITH_GMP
+#else /* !SOPLEX_HAS_MPFR */
+#if SOPLEX_HAS_GMP
    using BP = number<gmp_float<50>, et_off>;
-#else
+#else /* !SOPLEX_HAS_GMP */
    using BP = number<cpp_dec_float<50>, et_off>;
-#endif
-#endif
+#endif /* SOPLEX_HAS_GMP */
+#endif /* SOPLEX_HAS_MPFR */
 #else
    using BP = double;
 #endif

@@ -71,12 +71,12 @@ void printUsage(const char* const argv[], int idx)
       "  --readmode=<value>     choose reading mode for <lpfile> (0* - floating-point, 1 - rational)\n"
       "  --solvemode=<value>    choose solving mode (0 - floating-point solve, 1* - auto, 2 - exact rational solve)\n"
       "  --arithmetic=<value>   choose base arithmetic type (0 - double, 1 - quadprecision, 2 - higher multiprecision)\n"
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
       "  --precision=<value>    choose precision for multiprecision solve (only active when arithmetic=2 minimal value = 50)\n"
-#endif
-#ifdef SOPLEX_WITH_CPPMPF
+#endif /* SOPLEX_HAS_MPFR */
+#if SOPLEX_HAS_BOOST && SOPLEX_HAS_CPPMPF
       "  --precision=<value>    choose precision for multiprecision solve (only active when arithmetic=2, possible values 50,100,200, compile with mpfr for arbitrary precision)\n"
-#endif
+#endif /* SOPLEX_HAS_BOOST && SOPLEX_HAS_CPPMPF */
       "  -s<value>              choose simplifier/presolver (0 - off, 1* - internal, 2*- PaPILO)\n"
       "  -g<value>              choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric, 5 - least squares, 6 - geometric-equilibrium)\n"
       "  -p<value>              choose pricing (0* - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)\n"
@@ -98,11 +98,11 @@ void printUsage(const char* const argv[], int idx)
       std::cerr << "invalid option \"" << argv[idx] << "\"\n\n";
 
    std::cerr << "usage: " << argv[0] << " " << "[options] <lpfile>\n"
-#ifdef SOPLEX_WITH_ZLIB
+#if SOPLEX_HAS_ZLIB
              << "  <lpfile>               linear program as .mps[.gz] or .lp[.gz] file\n\n"
-#else
+#else /* !SOPLEX_HAS_ZLIB */
              << "  <lpfile>               linear program as .mps or .lp file\n\n"
-#endif
+#endif /* SOPLEX_HAS_ZLIB */
              << usage;
 }
 
@@ -1517,39 +1517,39 @@ int main(int argc, char* argv[])
          {
             if(option[11] == '1')
             {
-#ifndef SOPLEX_WITH_FLOAT128
+#if !SOPLEX_HAS_QUADMATH
                SPX_MSG_ERROR(std::cerr <<
                              "Cannot set arithmetic type to quadprecision - Soplex compiled without quadprecision support\n";)
                printUsage(argv, 0);
                return 1;
-#else
+#else /* SOPLEX_HAS_QUADMATH */
                arithmetic = 1;
-#endif
+#endif /* !SOPLEX_HAS_QUADMATH */
             }
             else if(option[11] == '2')
             {
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
                SPX_MSG_ERROR(std::cerr <<
                              "Cannot set arithmetic type to multiprecision - Soplex compiled without boost\n";)
                printUsage(argv, 0);
                return 1;
-#else
+#else /* SOPLEX_HAS_BOOST */
                arithmetic = 2;
 
                // default precision in multiprecision solve is 50
                if(precision == 0)
                   precision = 50;
 
-#endif
+#endif /* !SOPLEX_HAS_BOOST */
             }
          }
          // set precision
          else if(strncmp(option, "precision=", 10) == 0)
          {
             precision = atoi(option + 10);
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
             SPX_MSG_ERROR(std::cerr << "Setting precision to non-default value without Boost has no effect\n";)
-#endif
+#endif /* !SOPLEX_HAS_BOOST */
          }
 
          break;
@@ -1571,8 +1571,8 @@ int main(int argc, char* argv[])
       runSoPlex<Real>(argc, argv);
       break;
 
-#ifdef SOPLEX_WITH_BOOST
-#ifdef SOPLEX_WITH_FLOAT128
+#if SOPLEX_HAS_BOOST
+#if SOPLEX_HAS_QUADMATH
 
    case 1:                // quadprecision
 #if BOOST_VERSION < 107000
@@ -1583,13 +1583,13 @@ int main(int argc, char* argv[])
                 << BOOST_VERSION / 100 % 1000 << "."  // min. version
                 << BOOST_VERSION % 100                // patch version;
                 << std::endl;
-#else
+#else /* BOOST_VERSION >= 107000 */
       using namespace boost::multiprecision;
       using Quad = boost::multiprecision::float128;
       runSoPlex<Quad>(argc, argv);
-#endif
+#endif /* BOOST_VERSION < 107000 */
       break;
-#endif
+#endif /* SOPLEX_HAS_QUADMATH */
 
    case 2:                 // soplex mpf
       using namespace boost::multiprecision;
@@ -1602,8 +1602,8 @@ int main(int argc, char* argv[])
                 << BOOST_VERSION / 100 % 1000 << "."  // min. version
                 << BOOST_VERSION % 100                // patch version;
                 << std::endl;
-#else
-#ifdef SOPLEX_WITH_MPFR
+#else /* BOOST_VERSION >= 107000 */
+#if SOPLEX_HAS_MPFR
 
       // et_off means the expression templates options is turned off. TODO:
       // The documentation also mentions about static vs dynamic memory
@@ -1612,9 +1612,9 @@ int main(int argc, char* argv[])
       using multiprecision = number<mpfr_float_backend<0>, et_off>;
       multiprecision::default_precision(precision);
       runSoPlex<multiprecision>(argc, argv);
-#endif  // SOPLEX_WITH_MPFR
+#endif  /* SOPLEX_HAS_MPFR */
 
-#ifdef SOPLEX_WITH_CPPMPF
+#if SOPLEX_HAS_CPPMPF
       // It seems that precision cannot be set on run time for cpp_float
       // backend for boost::number. So a precision of 50 decimal points is
       // set.
@@ -1629,10 +1629,10 @@ int main(int argc, char* argv[])
       else
          runSoPlex<multiprecision3>(argc, argv);
 
-#endif  // SOPLEX_WITH_CPPMPF
-#endif
+#endif /* SOPLEX_HAS_CPPMPF */
+#endif /* BOOST_VERSION >= 107000 */
       break;
-#endif
+#endif /* SOPLEX_HAS_BOOST */
 
    // coverity[dead_error_begin]
    default:

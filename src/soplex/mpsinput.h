@@ -40,7 +40,7 @@ namespace soplex
    Reads MPS input files. A right-hand side for the objective function is
    allowed but ignored.
  */
-class MPSInput
+class SOPLEX_EXPORT MPSInput
 {
 public:
 

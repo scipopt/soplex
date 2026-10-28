@@ -1,6 +1,6 @@
 # Makefile-include to detect and store the current git hash
 
-SPXGITHASH = $(shell git describe --always --dirty  | sed 's/^.*-g//')
+SPXGITHASH = $(shell git describe --always --dirty  | sed 's/^.*-g//')-$(shell git branch --show-current)
 
 .PHONY: githash
 githash:: # do not remove the double-colon

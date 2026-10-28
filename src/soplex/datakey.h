@@ -30,6 +30,8 @@
 
 #include <assert.h>
 
+#include "soplex/config.h"
+
 namespace soplex
 {
 /**@brief   Entry identifier class for items of a DataSet.
@@ -52,7 +54,7 @@ namespace soplex
 
    @todo data members should be private.
 */
-class DataKey
+class SOPLEX_EXPORT DataKey
 {
 public:
 

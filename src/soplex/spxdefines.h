@@ -59,35 +59,36 @@
 #include "soplex/config.h"
 #endif
 
-#ifdef SOPLEX_WITH_BOOST
+#if SOPLEX_HAS_BOOST
 #include "boost/multiprecision/number.hpp"
-#ifdef SOPLEX_WITH_FLOAT128
+#if SOPLEX_HAS_QUADMATH
 #include <boost/multiprecision/float128.hpp>
-#endif
+#endif /* SOPLEX_HAS_QUADMATH */
 
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
 // For multiple precision
 #include <boost/multiprecision/mpfr.hpp>
 #ifndef NDEBUG
-#include "boost/multiprecision/debug_adaptor.hpp" // For debuging mpf numbers
+#include "boost/multiprecision/debug_adaptor.hpp" // For debugging mpf numbers
 #endif // NDEBUG
-#endif // SOPLEX_WITH_MPFR
-#ifdef SOPLEX_WITH_CPPMPF
+#endif /* SOPLEX_HAS_MPFR */
+#ifdef SOPLEX_HAS_CPPMPF
 #include <boost/serialization/nvp.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
-#endif  // SOPLEX_WITH_CPPMPF
+#endif /* SOPLEX_HAS_CPPMPF */
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
 #include <boost/multiprecision/gmp.hpp>
-#else
+#else /* !SOPLEX_HAS_GMP */
 #include <boost/multiprecision/cpp_int.hpp>
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
-#endif
+#endif /* SOPLEX_HAS_BOOST */
 
 namespace soplex
 {
 // Overloaded EQ function
+SOPLEX_EXPORT
 bool EQ(int a, int b);
 
 #define SOPLEX_VERSION         900
@@ -170,6 +171,7 @@ bool EQ(int a, int b);
 /// Prints out message \p x if the verbosity level is at least SPxOut::VERB_INFO3.
 #define SPX_MSG_INFO3(spxout, x)    { SOPLEX_DO_WITH_TMP_VERBOSITY( SPxOut::VERB_INFO3, spxout, x ) }
 
+SOPLEX_EXPORT
 extern bool msginconsistent(const char* name, const char* file, int line);
 
 #define SPX_MSG_INCONSISTENT(name) msginconsistent(name, __FILE__, __LINE__)
@@ -317,7 +319,7 @@ inline bool isPlusZero(R x)
 
 static const Real infinity = SOPLEX_DEFAULT_INFINITY;
 
-class Tolerances
+class SOPLEX_EXPORT Tolerances
 {
 private:
 
@@ -499,11 +501,11 @@ inline int spxSnprintf(
    return n;
 }
 
-#ifdef SOPLEX_WITH_BOOST
+#if SOPLEX_HAS_BOOST
 
 using namespace boost::multiprecision;
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
 template<boost::multiprecision::expression_template_option eto>
 inline number<gmp_rational, eto> ldexp(number<gmp_rational, eto>, int exp)
 {
@@ -517,7 +519,7 @@ inline number<gmp_rational, eto> frexp(number<gmp_rational, eto>, int* exp)
    assert(false);
    return number<gmp_rational>();
 }
-#else
+#else /* !SOPLEX_HAS_GMP */
 inline cpp_rational ldexp(cpp_rational r, int exp)
 {
    assert(false);
@@ -529,7 +531,7 @@ inline cpp_rational frexp(cpp_rational, int* exp)
    assert(false);
    return cpp_rational();
 }
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
 // wrapped frexp function
 template <typename T, boost::multiprecision::expression_template_option eto>
@@ -591,7 +593,7 @@ inline number<T, et> relDiff(number<T, et> a,
 {
    return (a - b) / (maxAbs(a, b) > 1.0 ? maxAbs(a, b) : 1.0);
 }
-#endif
+#endif /* SOPLEX_HAS_BOOST */
 using namespace soplex;
 
 } // namespace soplex

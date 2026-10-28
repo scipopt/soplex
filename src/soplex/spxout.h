@@ -74,7 +74,7 @@ struct EnableDebugOutput
    @endcode
    in order to make sure that @c std::setw( 15 ) is applied to the warning stream.
 */
-class SPxOut
+class SOPLEX_EXPORT SPxOut
 {
 public:
 

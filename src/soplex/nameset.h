@@ -67,7 +67,7 @@ namespace soplex
             to DataSet from within NameSet are synchronous to any calls
             outside to DataSet, such as in row or column adding.
 */
-class NameSet
+class SOPLEX_EXPORT NameSet
 {
 public:
 

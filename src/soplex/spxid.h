@@ -34,7 +34,7 @@
 
 namespace soplex
 {
-class SPxId;
+class SOPLEX_EXPORT SPxId;
 
 /**@brief   Ids for LP columns.
  * @ingroup Algo
@@ -42,7 +42,7 @@ class SPxId;
  *  Class SPxColId provides #DataKey%s for the
  *  column indices of an SPxLP.
  */
-class SPxColId : public DataKey
+class SOPLEX_EXPORT SPxColId : public DataKey
 {
 public:
    /// default constructor.
@@ -61,7 +61,7 @@ public:
  *  Class SPxRowId provides #DataKey%s for the row
  *  indices of an SPxLP.
  */
-class SPxRowId : public DataKey
+class SOPLEX_EXPORT SPxRowId : public DataKey
 {
 public:
    /// default constructor.
@@ -91,7 +91,7 @@ public:
  *  for the time a row or column belongs to a SPxLP, no matter what other
  *  rows or columns are added to it or removed from it.
  */
-class SPxId : public DataKey
+class SOPLEX_EXPORT SPxId : public DataKey
 {
    friend std::ostream& operator<<(std::ostream& os, const SPxId& id);
 

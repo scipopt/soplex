@@ -40,17 +40,17 @@
  * compressed file support
  *-----------------------------------------------------------------------------
  */
-#ifdef SOPLEX_WITH_ZLIB
+#if SOPLEX_HAS_ZLIB
 #include "soplex/external/zstr/zstr.hpp"
-#endif // WITH_GSZSTREAM
+#endif /* SOPLEX_HAS_ZLIB */
 
 namespace soplex
 {
-#ifdef SOPLEX_WITH_ZLIB
+#if SOPLEX_HAS_ZLIB
 typedef zstr::ifstream spxifstream;
-#else
+#else /* !SOPLEX_HAS_ZLIB */
 typedef std::ifstream spxifstream;
-#endif // SOPLEX_WITH_ZLIB
+#endif /* SOPLEX_HAS_ZLIB */
 
 } // namespace soplex
 
