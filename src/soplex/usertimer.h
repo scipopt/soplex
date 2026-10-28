@@ -35,7 +35,7 @@
 namespace soplex
 {
 
-class UserTimer : public Timer
+class SOPLEX_EXPORT UserTimer : public Timer
 {
 private:
 

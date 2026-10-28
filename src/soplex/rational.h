@@ -34,14 +34,14 @@
 #include <string>
 #include "soplex/spxdefines.h"
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
 #include <gmp.h>
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
-#ifdef SOPLEX_WITH_BOOST
+#if SOPLEX_HAS_BOOST
 #include <boost/multiprecision/number.hpp>
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
 #include <boost/multiprecision/gmp.hpp>
 
 namespace soplex
@@ -60,7 +60,7 @@ inline void SpxGcd(Integer& result, Integer a, Integer b)
 }
 
 } // namespace soplex
-#else
+#else /* !SOPLEX_HAS_GMP */
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/detail/default_ops.hpp>
 
@@ -80,7 +80,7 @@ inline void SpxGcd(Integer& result, Integer a, Integer b)
 }
 
 } // namespace soplex
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
 namespace soplex
 {
@@ -246,12 +246,12 @@ inline Rational ratFromString(const char* desc)
 }
 
 } // namespace soplex
-#else
+#else /* !SOPLEX_HAS_BOOST */
 
 using Integer = int;
 // this is a placeholder class to ensure compilation when boost ist not linked. Rationals need BOOST in order to function.
 // coverity[missing_move_assign]
-class Rational
+class SOPLEX_EXPORT Rational
 {
 
 public:
@@ -289,19 +289,19 @@ public:
    inline Rational(const Integer& num, const Integer& den)
    {
    };
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
    /// constructor from mpq_t (GMP only)
    inline Rational(const mpq_t& q)
    {
    };
-#endif
-#ifdef SOPLEX_WITH_BOOST
+#endif /* SOPLEX_HAS_GMP */
+#if SOPLEX_HAS_BOOST
    // constructor from boost number
    inline template <typename T, boost::multiprecision::expression_template_option eto>
    Rational(const boost::multiprecision::number<T, eto>& q)
    {
    };
-#endif
+#endif /* SOPLEX_HAS_BOOST */
 
    /// destructor
    inline ~Rational()
@@ -328,13 +328,13 @@ public:
    {
       return *this;
    };
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
    /// assignment from mpq_t (GMP only)
    inline Rational& operator=(const mpq_t& q)
    {
       return *this;
    };
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
    inline void assign(const Rational&)
    {
@@ -368,8 +368,8 @@ public:
    {
       return 0;
    };
-#ifdef SOPLEX_WITH_BOOST
-#ifndef SOPLEX_WITH_CPPMPF
+#if SOPLEX_HAS_BOOST
+#if !SOPLEX_HAS_CPPMPF
    // Operator to typecast Rational to one of the Boost Number types
    inline template <typename T, boost::multiprecision::expression_template_option eto>
    operator boost::multiprecision::number<T, eto>() const
@@ -377,7 +377,7 @@ public:
       rationalErrorMessage();
       return 0;
    };
-#else
+#else /* SOPLEX_HAS_CPPMPF */
    // Operator to typecast Rational to one of the Boost Number types
    inline template <unsigned bits, boost::multiprecision::expression_template_option eto>
    operator boost::multiprecision::number<boost::multiprecision::backends::cpp_dec_float<bits>, eto>()
@@ -386,8 +386,8 @@ public:
       rationalErrorMessage();
       return 0;
    };
-#endif
-#endif
+#endif /* !SOPLEX_HAS_CPPMPF */
+#endif /* SOPLEX_HAS_BOOST */
 
    ///@name Typecasts
    ///@{
@@ -1000,7 +1000,7 @@ inline void powRound(Rational& r)
 {
    r.rationalErrorMessage();
 }
-#endif
+#endif /* SOPLEX_HAS_BOOST */
 
 namespace soplex
 {
@@ -1008,10 +1008,10 @@ namespace soplex
 /// Size in specified base (bit size for base 2)
 inline int sizeInBase(const Rational R, const int base)
 {
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
    SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
    return 0;
-#else
+#else /* SOPLEX_HAS_BOOST */
 
    if(R == Rational(0))
       return 3;
@@ -1020,10 +1020,10 @@ inline int sizeInBase(const Rational R, const int base)
    Integer den = denominator(R);
    size_t numsize, densize;
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
    densize = mpz_sizeinbase(den.backend().data(), base);
    numsize = mpz_sizeinbase(num.backend().data(), base);
-#else
+#else /* !SOPLEX_HAS_GMP */
 
    if(base != 2)
    {
@@ -1036,10 +1036,10 @@ inline int sizeInBase(const Rational R, const int base)
       numsize = msb(num) + 1;
    }
 
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
    return (int)(densize + numsize);
-#endif
+#endif /* !SOPLEX_HAS_BOOST */
 }
 /// Total size of rational vector.
 inline int totalSizeRational(const Rational* vector, const int length, const int base)
@@ -1062,10 +1062,10 @@ inline int dlcmSizeRational(const Rational* vector, const int length, const int 
    assert(vector != nullptr);
    assert(length >= 0);
 
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
    SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
    return 0;
-#else
+#else /* SOPLEX_HAS_BOOST */
 
    Integer lcm = 1;
 
@@ -1075,7 +1075,7 @@ inline int dlcmSizeRational(const Rational* vector, const int length, const int 
    int size = sizeInBase(Rational(lcm), base) + 1;
 
    return size;
-#endif
+#endif /* !SOPLEX_HAS_BOOST */
 }
 
 /// Size of largest denominator in rational vector.
@@ -1083,10 +1083,10 @@ inline int dmaxSizeRational(const Rational* vector, const int length, const int 
 {
    assert(vector != nullptr);
    assert(length >= 0);
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
    SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
    return 0;
-#else
+#else /* SOPLEX_HAS_BOOST */
 
    size_t dmax = 0;
 
@@ -1099,7 +1099,7 @@ inline int dmaxSizeRational(const Rational* vector, const int length, const int 
    }
 
    return (int)dmax;
-#endif
+#endif /* !SOPLEX_HAS_BOOST */
 }
 
 } // namespace soplex

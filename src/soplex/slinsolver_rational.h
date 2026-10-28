@@ -49,7 +49,7 @@ namespace soplex
    matrix must be first #load%ed to an #SLinSolverRational object as an array of
    pointers to the \em column \ref SVectorRational "SVectorsRational" of this matrix.
 */
-class SLinSolverRational
+class SOPLEX_EXPORT SLinSolverRational
 {
 public:
 

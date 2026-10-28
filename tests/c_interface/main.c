@@ -70,7 +70,7 @@ void test_real(void)
 	SoPlex_free(soplex2);
 }
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
 void test_rational(void)
 {
    /* create LP via rows */
@@ -81,7 +81,6 @@ void test_rational(void)
    long rowdenoms[] = {1, 1};
    long objnums[] = {1, 1};
    long objdenoms[] = {1, 1};
-   double primal[] = {0.0,0.0};
 
    /* use rational solver */
    SoPlex_setRational(soplex);
@@ -132,16 +131,16 @@ void test_rational(void)
 
    SoPlex_free(soplex2);
 }
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
 int main(void)
 {
    printf("testing real... \n");
    test_real();
 
-   #ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
    printf("\n");
    printf("testing rational... \n");
    test_rational();
-   #endif
+#endif /* SOPLEX_HAS_GMP */
 }

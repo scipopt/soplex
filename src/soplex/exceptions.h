@@ -38,7 +38,7 @@ namespace soplex
  * This class implements a base class for our SoPlex exceptions
  * We provide a what() function which returns the exception message.
  */
-class SPxException
+class SOPLEX_EXPORT SPxException
 {
 private:
    //----------------------------------------
@@ -78,7 +78,7 @@ public:
  * This class is derived from the SoPlex exception base class.
  * It does not provide any new functionality.
  */
-class SPxMemoryException : public SPxException
+class SOPLEX_EXPORT SPxMemoryException : public SPxException
 {
 public:
    //----------------------------------------
@@ -97,7 +97,7 @@ public:
  * This class is derived from the SoPlex exception base class.
  * It does not provide any new functionality.
  */
-class SPxStatusException : public SPxException
+class SOPLEX_EXPORT SPxStatusException : public SPxException
 {
 public:
    //----------------------------------------
@@ -117,7 +117,7 @@ public:
  * It does not provide any new functionality. Most often it is used to replace
  * assert(false) terms in earlier code.
  */
-class SPxInternalCodeException : public SPxException
+class SOPLEX_EXPORT SPxInternalCodeException : public SPxException
 {
 public:
    //----------------------------------------
@@ -134,7 +134,7 @@ public:
 /**@brief   Exception class for incorrect usage of interface methods.
  * @ingroup Elementary
  */
-class SPxInterfaceException : public SPxException
+class SOPLEX_EXPORT SPxInterfaceException : public SPxException
 {
 public:
    //----------------------------------------

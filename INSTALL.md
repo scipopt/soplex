@@ -48,23 +48,27 @@ modify how the code is built. For all of these options and parameters you have t
 use `-D<Parameter_name>=<value>`. Following a list of available options, for the full
 list run `cmake <path/to/SoPlex> -LH`:
 
-| CMake option         | Available values             | Makefile equivalent    | Remarks |
-|----------------------|------------------------------|------------------------|---------|
-| CMAKE_BUILD_TYPE     | Release, Debug, ...          | OPT=[opt, dbg]         | |
-| GMP                  | on, off                      | GMP=[true, false]      | |
-| MPFR                 | on, off                      | MPFR=[true, false]     | |
-| CMAKE_INSTALL_PREFIX | \<path\>                     | INSTALLDIR=\<path\>    | |
-| GMP_DIR              | \<path/to/GMP\>              | --                     | |
-| ..._DIR              | \<custom/path/to/package\>   | --                     | |
-| COVERAGE             | on, off                      | --                     | |
-| MT                   | on, off                      | --                     | use static runtime libraries for Visual Studio compiler on Windows |
-| SANITIZE             | on, off, thread, memory, address | SANITIZE=...       | whether and which sanitizer to enable if available |
-| BOOST                | on, off                      | BOOST=[true,false]     | necessary for the binary, optional for building libsoplex |
-| QUADMATH             | on, off                      | QUADMATH=[true,false]  | to run SoPlex with Quadruple precision |
+| CMake option         | Available values; default 1st| Makefile equivalent      | Enabled feature |
+|----------------------|------------------------------|--------------------------|---------|
+| CMAKE_BUILD_TYPE     | Release, Debug, ...          | OPT=[opt, dbg]           | compile with optimization flags or with debug information |
+| BUILD_SHARED_LIBS    | on, off                      | --                       | build shared libraries |
+| SHARED               | auto, on, off                | SHARED=[on, off]         | build shared libraries (auto lets BUILD_SHARED_LIBS decide) |
+| GMP                  | auto, on, off                | GMP=[true, false]        | exact arithmetic via GMP |
+| MPFR                 | auto, on, off                | MPFR=[true, false]       | variable precision via MPFR |
+| QUADMATH             | auto, on, off                | QUADMATH=[true, false]   | quadruple precision |
+| BOOST                | auto, on, off                | BOOST=[true, false]      | necessary for higher precision arithmetic |
+| PAPILO               | auto, on, off                | --                       | PaPILO for presolving |
+| SYSTEM_FMT           | off, on, auto                | SYSTEM_FMT=[true, false] | use system's fmt library instead of the bundled one |
+| LTO                  | auto, on, off                | LTO=[true, false]        | compile with link-time optimization |
+| ZLIB                 | auto, on, off                | ZLIB=[true, false]       | zlib compression for files |
+| COVERAGE             | on, off                      | --                       |         |
+| SANITIZE             | on, off, thread, memory, address | SANITIZE=...         | which sanitizer to enable if available |
+| CMAKE_INSTALL_PREFIX | \<path\>                     | INSTALLDIR=\<path\>      |         |
+| GMP_DIR              | \<path/to/GMP\>              | --                       |         |
+| ..._DIR              | \<custom/path/to/package\>   | --                       |         |
 
 Parameters can be set all at once or in subsequent calls to `cmake` - extending
 or modifying the existing configuration.
-
 
 ### Installation
 
@@ -111,7 +115,7 @@ for this.  If GMP is not available, you can deactivate it by building with
     make COMP=<as before> OPT=<as before> GMP=false.
 
 If you use a different build system than the provided Makefile and want to
-build with GMP support, you need to define `SOPLEX_WITH_GMP` for the preprocessor
+build with GMP support, you need to define `SOPLEX_HAS_GMP` for the preprocessor
 and link with the GMP callable library.
 
 Note for building SCIP with SoPlex:  If SoPlex was built with GMP, then SCIP

@@ -47,7 +47,7 @@ namespace soplex
  * This class implements a SLinSolverRational interface by using the sparse LU
  * factorization implemented in CLUFactorRational.
  */
-class SLUFactorRational : public SLinSolverRational, protected CLUFactorRational
+class SOPLEX_EXPORT SLUFactorRational : public SLinSolverRational, protected CLUFactorRational
 {
 public:
 

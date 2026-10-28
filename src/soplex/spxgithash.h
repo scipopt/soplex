@@ -29,9 +29,12 @@
 #ifndef _SPXGITHASH_H_
 #define _SPXGITHASH_H_
 
+#include "soplex/config.h"
+
 namespace soplex
 {
 
+SOPLEX_EXPORT
 const char* getGitHash(
    void
 );

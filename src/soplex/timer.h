@@ -82,7 +82,7 @@ namespace soplex
     accounts.
 
 */
-class Timer
+class SOPLEX_EXPORT Timer
 {
 protected:
 

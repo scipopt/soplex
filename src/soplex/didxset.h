@@ -48,7 +48,7 @@ namespace soplex
    memory consumption can be controlled with methods max() and setMax().
    Finally, the destructor will release all allocated memory.
 */
-class DIdxSet : public IdxSet
+class SOPLEX_EXPORT DIdxSet : public IdxSet
 {
 public:
 

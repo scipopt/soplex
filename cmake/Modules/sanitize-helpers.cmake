@@ -164,13 +164,12 @@ function (sanitizer_add_flags TARGET NAME PREFIX)
         return()
     endif()
 
-    # Set compile- and link-flags for target.
-    set_property(TARGET ${TARGET} APPEND_STRING
-        PROPERTY COMPILE_FLAGS " ${${PREFIX}_${TARGET_COMPILER}_FLAGS}")
-    set_property(TARGET ${TARGET} APPEND_STRING
-        PROPERTY COMPILE_FLAGS " ${SanBlist_${TARGET_COMPILER}_FLAGS}")
-    set_property(TARGET ${TARGET} APPEND_STRING
-        PROPERTY LINK_FLAGS " ${${PREFIX}_${TARGET_COMPILER}_FLAGS}")
-    set_property(TARGET ${TARGET} APPEND_STRING
-        PROPERTY SANITIZE_FLAGS " ${${PREFIX}_${TARGET_COMPILER}_FLAGS}")
+    # Extract compile- and link-options from ${PREFIX}_${TARGET_COMPILER}_FLAGS variable.
+    separate_arguments(options UNIX_COMMAND "${${PREFIX}_${TARGET_COMPILER}_FLAGS}")
+    separate_arguments(blacklisted UNIX_COMMAND "${${SanBlist}_${TARGET_COMPILER}_FLAGS}")
+
+    # Add to compile and link options of the target.
+    target_compile_options(${TARGET} PRIVATE ${options} ${blacklisted})
+    target_link_options(${TARGET} PUBLIC ${options})
+
 endfunction ()

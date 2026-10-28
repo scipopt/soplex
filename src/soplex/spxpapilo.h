@@ -23,7 +23,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-#ifndef SOPLEX_WITH_PAPILO
+#if !SOPLEX_HAS_PAPILO
 
 namespace soplex
 {
@@ -149,7 +149,7 @@ public:
 }
 
 
-#else
+#else /* SOPLEX_HAS_PAPILO */
 
 #include <memory>
 
@@ -944,4 +944,4 @@ void Presol<R>::applyPresolveResultsToRows(SPxLPBase <R>& lp, const papilo::Prob
 
 } // namespace soplex
 
-#endif
+#endif /* !SOPLEX_HAS_PAPILO */

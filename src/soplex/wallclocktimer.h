@@ -35,7 +35,7 @@
 namespace soplex
 {
 
-class WallclockTimer : public Timer
+class SOPLEX_EXPORT WallclockTimer : public Timer
 {
 private:
 

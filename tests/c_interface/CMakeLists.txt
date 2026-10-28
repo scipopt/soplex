@@ -2,7 +2,7 @@ project(soplex_testing LANGUAGES C)
 
 add_executable(soplex_c_testing "main.c")
 include_directories( "${CMAKE_CURRENT_SOURCE_DIR}/../../src/")
-target_link_libraries(soplex_c_testing libsoplexshared)
+target_link_libraries(soplex_c_testing libsoplex)
 set_property(TARGET soplex_c_testing PROPERTY INTERPROCEDURAL_OPTIMIZATION ${LTO_AVAILABLE})
 
 if(SANITIZE)

@@ -37,10 +37,10 @@ namespace soplex
 template <class R>
 void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
 {
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
    SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
    return;
-#else
+#else /* SOPLEX_HAS_BOOST */
    bool hasUnboundedRay = false;
    bool infeasibilityNotCertified = false;
    bool unboundednessNotCertified = false;
@@ -134,7 +134,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
       _performOptIRWrapper(_solRational, !unboundednessNotCertified, !infeasibilityNotCertified, 0,
                            primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
 
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
 
       // case: an unrecoverable error occured, and precision boosting has reached its limit
       if(error && _boostingLimitReached)
@@ -144,14 +144,14 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
       }
       // case: an error occured, boost precision
       else if(error)
-#else
+#else /* !SOPLEX_HAS_MPFR */
 
       // case: an unrecoverable error occured, boost precision
       if(error)
-#endif
+#endif /* SOPLEX_HAS_MPFR */
       {
          _status = SPxSolverBase<R>::ERROR;
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
 
          if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
          {
@@ -163,9 +163,9 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
          else
             break;
 
-#else
+#else /* !SOPLEX_HAS_MPFR */
          break;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
       }
       // case: stopped due to some limit
       else if(stoppedTime)
@@ -195,7 +195,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
          {
             SPX_MSG_INFO1(spxout, spxout << "Error while testing for unboundedness.\n");
             _status = SPxSolverBase<R>::ERROR;
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
 
             if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
             {
@@ -207,9 +207,9 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             else
                break;
 
-#else
+#else /* !SOPLEX_HAS_MPFR */
             break;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          }
 
          if(hasUnboundedRay)
@@ -250,7 +250,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
          {
             SPX_MSG_INFO1(spxout, spxout << "Error while testing for feasibility.\n");
             _status = SPxSolverBase<R>::ERROR;
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
 
             if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
             {
@@ -262,9 +262,9 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             else
                break;
 
-#else
+#else /* !SOPLEX_HAS_MPFR */
             break;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          }
          else if(stoppedTime)
          {
@@ -291,7 +291,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
          else
          {
             SPX_MSG_INFO1(spxout, spxout << "Primal feasible and bounded.\n");
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
 
             if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
             {
@@ -301,7 +301,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
                   break;
             }
 
-#endif
+#endif /* SOPLEX_HAS_MPFR */
             continue;
          }
       }
@@ -320,7 +320,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             SPX_MSG_INFO1(spxout, spxout << "Error while testing for infeasibility.\n");
             _status = SPxSolverBase<R>::ERROR;
             _restoreBasis();
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
 
             if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
             {
@@ -332,9 +332,9 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             else
                break;
 
-#else
+#else /* !SOPLEX_HAS_MPFR */
             break;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          }
 
          infeasibilityNotCertified = !infeasible;
@@ -370,7 +370,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
                SPX_MSG_INFO1(spxout, spxout << "Error while testing for dual infeasibility.\n");
                _status = SPxSolverBase<R>::ERROR;
                _restoreBasis();
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
 
                if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
                {
@@ -382,9 +382,9 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
                else
                   break;
 
-#else
+#else /* !SOPLEX_HAS_MPFR */
                break;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
             }
 
             if(hasUnboundedRay)
@@ -424,7 +424,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
          else
          {
             SPX_MSG_INFO1(spxout, spxout << "Primal feasible.  Optimizing again.\n");
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
 
             if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
             {
@@ -434,7 +434,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
                   break;
             }
 
-#endif
+#endif /* SOPLEX_HAS_MPFR */
             continue;
          }
       }
@@ -446,7 +446,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
       }
       else
       {
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
 
          if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
          {
@@ -461,10 +461,10 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
             break;
          }
 
-#else
+#else /* !SOPLEX_HAS_MPFR */
          SPX_MSG_INFO1(spxout, spxout << "Terminating without success.\n");
          break;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
       }
    }
    while(!_isSolveStopped(stoppedTime, stoppedIter));
@@ -533,7 +533,7 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
    _statistics->initialPrecisionTime->stop();
    _statistics->extendedPrecisionTime->stop();
    _statistics->solvingTime->stop();
-#endif
+#endif /* SOPLEX_HAS_BOOST */
 }
 
 /// perform iterative refinement using the right precision
@@ -555,7 +555,7 @@ void SoPlexBase<R>::_performOptIRWrapper(
    _solver.setSolvingForBoosted(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
    _boostedSolver.setSolvingForBoosted(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
 
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
 
    if(boolParam(SoPlexBase<R>::ITERATIVE_REFINEMENT))
    {
@@ -646,7 +646,7 @@ void SoPlexBase<R>::_performOptIRWrapper(
       error = true;
    }
 
-#else
+#else /* !SOPLEX_HAS_MPFR */
 
    if(boolParam(SoPlexBase<R>::PRECISION_BOOSTING))
    {
@@ -669,7 +669,7 @@ void SoPlexBase<R>::_performOptIRWrapper(
 
    _performOptIRStable(sol, acceptUnbounded, acceptInfeasible, minIRRoundsRemaining,
                        primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
-#endif
+#endif /* SOPLEX_HAS_MPFR */
 }
 
 
@@ -1800,7 +1800,7 @@ void SoPlexBase<R>::_updateReducedCosts(SolRational& sol, int& dualSize,
 
 
 
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
 ///@todo precision-boosting move in a different file ?
 /// converts the given DataArray of VarStatus to boostedPrecision
 template <class R>
@@ -1842,7 +1842,7 @@ void SoPlexBase<R>::_convertDataArrayVarStatusToRPrecision(
       copy[i] = (VStat)base[i];
    }
 }
-#endif
+#endif /* SOPLEX_HAS_MPFR */
 
 
 
@@ -2459,7 +2459,7 @@ bool SoPlexBase<R>::_boostPrecision()
    assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
    assert(_switchedToBoosted);
 
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
 
    _statistics->boostingStepTime->start();
 
@@ -2506,11 +2506,11 @@ bool SoPlexBase<R>::_boostPrecision()
 
    _statistics->boostingStepTime->stop();
    return !_boostingLimitReached;
-#else
+#else /* !SOPLEX_HAS_MPFR */
    SPX_MSG_ERROR(std::cerr <<
                  "SoPlex was not compiled with MPFR, which is needed for precision changes \n");
    return false;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
 }
 
 /// increase the multiprecision, return false if maximum precision is reached, true otherwise
@@ -2518,9 +2518,9 @@ template <class R>
 void SoPlexBase<R>::_resetBoostedPrecision()
 {
    _statistics->precBoosts = 0;
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
    BP::default_precision(50);
-#endif
+#endif /* SOPLEX_HAS_MPFR */
 }
 
 
@@ -2767,7 +2767,7 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
    assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
    assert(!boolParam(SoPlexBase<R>::ITERATIVE_REFINEMENT));
 
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
 
    // start rational solving timing
    _statistics->rationalTime->start();
@@ -2999,10 +2999,10 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
       _statistics->rationalTime->stop();
    }
 
-#else
+#else /* !SOPLEX_HAS_MPFR */
    SPX_MSG_ERROR(std::cerr <<
                  "SoPlex was not compiled with MPFR, which is needed for precision changes \n");
-#endif
+#endif /* SOPLEX_HAS_MPFR */
 }
 
 
@@ -3028,7 +3028,7 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
    assert(boolParam(SoPlexBase<R>::ITERATIVE_REFINEMENT));
    assert(boolParam(SoPlexBase<R>::PRECISION_BOOSTING));
 
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
 
    // start rational solving timing
    _statistics->rationalTime->start();
@@ -3370,10 +3370,10 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
       _statistics->rationalTime->stop();
    }
 
-#else
+#else /* !SOPLEX_HAS_MPFR */
    SPX_MSG_ERROR(std::cerr <<
                  "SoPlex was not compiled with MPFR, which is needed for precision changes \n");
-#endif
+#endif /* SOPLEX_HAS_MPFR */
 }
 
 
@@ -5794,7 +5794,7 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
    assert(primal.dim() == numColsRational());
    assert(dual.dim() == numRowsRational());
 
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
 
 #ifndef SOPLEX_MANUAL_ALT
 
@@ -5803,9 +5803,9 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
    else
       _disableSimplifierAndScaler();
 
-#else
+#else /* !SOPLEX_MANUAL_ALT */
    _disableSimplifierAndScaler();
-#endif
+#endif /* SOPLEX_MANUAL_ALT */
 
    // start timing
    _statistics->syncTime->start();
@@ -6092,9 +6092,9 @@ void SoPlexBase<R>::_solveRealForRationalBoosted(
       }
    }
 
-#else
+#else /* !SOPLEX_HAS_MPFR */
    SPX_MSG_ERROR(std::cerr << "No support for precision boosting without GMP/MPFR.\n");
-#endif
+#endif /* SOPLEX_HAS_MPFR */
 }
 
 

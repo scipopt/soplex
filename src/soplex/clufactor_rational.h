@@ -45,7 +45,7 @@ namespace soplex
  * This class implements a sparse LU factorization with either
  * FOREST-TOMLIN or ETA updates, using dynamic Markowitz pivoting.
  */
-class CLUFactorRational
+class SOPLEX_EXPORT CLUFactorRational
 {
 public:
 

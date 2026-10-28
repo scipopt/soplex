@@ -172,6 +172,104 @@ macro(_FPHSA_HANDLE_FAILURE_CONFIG_MODE)
   endif()
 endmacro()
 
+function(FIND_PACKAGE_CHECK_VERSION version result)
+  cmake_parse_arguments (PARSE_ARGV 2 FPCV "HANDLE_VERSION_RANGE;NO_AUTHOR_WARNING_VERSION_RANGE" "RESULT_MESSAGE_VARIABLE" "")
+
+  if (FPCV_UNPARSED_ARGUMENTS)
+    message (FATAL_ERROR "find_package_check_version(): ${FPCV_UNPARSED_ARGUMENTS}: unexpected arguments")
+  endif()
+  if ("RESULT_MESSAGE_VARIABLE" IN_LIST FPCV_KEYWORDS_MISSING_VALUES)
+    message (FATAL_ERROR "find_package_check_version(): RESULT_MESSAGE_VARIABLE expects an argument")
+  endif()
+
+  set (${result} FALSE PARENT_SCOPE)
+  if (FPCV_RESULT_MESSAGE_VARIABLE)
+    unset (${FPCV_RESULT_MESSAGE_VARIABLE} PARENT_SCOPE)
+  endif()
+
+  if (_CMAKE_FPHSA_PACKAGE_NAME)
+    set (package "${_CMAKE_FPHSA_PACKAGE_NAME}")
+  elseif (CMAKE_FIND_PACKAGE_NAME)
+    set (package "${CMAKE_FIND_PACKAGE_NAME}")
+  else()
+    message (FATAL_ERROR "find_package_check_version(): Cannot be used outside a 'Find Module'")
+  endif()
+
+  if (NOT FPCV_NO_AUTHOR_WARNING_VERSION_RANGE
+      AND ${package}_FIND_VERSION_RANGE AND NOT FPCV_HANDLE_VERSION_RANGE)
+    message(AUTHOR_WARNING
+      "`find_package()` specify a version range but the option "
+      "HANDLE_VERSION_RANGE` is not passed to `find_package_check_version()`. "
+      "Only the lower endpoint of the range will be used.")
+  endif()
+
+
+  set (version_ok FALSE)
+  unset (version_msg)
+
+  if (FPCV_HANDLE_VERSION_RANGE AND ${package}_FIND_VERSION_RANGE)
+    if ((${package}_FIND_VERSION_RANGE_MIN STREQUAL "INCLUDE"
+          AND version VERSION_GREATER_EQUAL ${package}_FIND_VERSION_MIN)
+        AND ((${package}_FIND_VERSION_RANGE_MAX STREQUAL "INCLUDE"
+            AND version VERSION_LESS_EQUAL ${package}_FIND_VERSION_MAX)
+          OR (${package}_FIND_VERSION_RANGE_MAX STREQUAL "EXCLUDE"
+            AND version VERSION_LESS ${package}_FIND_VERSION_MAX)))
+      set (version_ok TRUE)
+      set(version_msg "(found suitable version \"${version}\", required range is \"${${package}_FIND_VERSION_RANGE}\")")
+    else()
+      set(version_msg "Found unsuitable version \"${version}\", required range is \"${${package}_FIND_VERSION_RANGE}\"")
+    endif()
+  elseif (DEFINED ${package}_FIND_VERSION)
+    if(${package}_FIND_VERSION_EXACT)       # exact version required
+      # count the dots in the version string
+      string(REGEX REPLACE "[^.]" "" version_dots "${version}")
+      # add one dot because there is one dot more than there are components
+      string(LENGTH "${version_dots}." version_dots)
+      if (version_dots GREATER ${package}_FIND_VERSION_COUNT)
+        # Because of the C++ implementation of find_package() ${package}_FIND_VERSION_COUNT
+        # is at most 4 here. Therefore a simple lookup table is used.
+        if (${package}_FIND_VERSION_COUNT EQUAL 1)
+          set(version_regex "[^.]*")
+        elseif (${package}_FIND_VERSION_COUNT EQUAL 2)
+          set(version_regex "[^.]*\\.[^.]*")
+        elseif (${package}_FIND_VERSION_COUNT EQUAL 3)
+          set(version_regex "[^.]*\\.[^.]*\\.[^.]*")
+        else()
+          set(version_regex "[^.]*\\.[^.]*\\.[^.]*\\.[^.]*")
+        endif()
+        string(REGEX REPLACE "^(${version_regex})\\..*" "\\1" version_head "${version}")
+        if (NOT ${package}_FIND_VERSION VERSION_EQUAL version_head)
+          set(version_msg "Found unsuitable version \"${version}\", but required is exact version \"${${package}_FIND_VERSION}\"")
+        else ()
+          set(version_ok TRUE)
+          set(version_msg "(found suitable exact version \"${_FOUND_VERSION}\")")
+        endif ()
+      else ()
+        if (NOT ${package}_FIND_VERSION VERSION_EQUAL version)
+          set(version_msg "Found unsuitable version \"${version}\", but required is exact version \"${${package}_FIND_VERSION}\"")
+        else ()
+          set(version_ok TRUE)
+          set(version_msg "(found suitable exact version \"${version}\")")
+        endif ()
+      endif ()
+    else()     # minimum version
+      if (${package}_FIND_VERSION VERSION_GREATER version)
+        set(version_msg "Found unsuitable version \"${version}\", but required is at least \"${${package}_FIND_VERSION}\"")
+      else()
+        set(version_ok TRUE)
+        set(version_msg "(found suitable version \"${version}\", minimum required is \"${${package}_FIND_VERSION}\")")
+      endif()
+    endif()
+  else ()
+    set(version_ok TRUE)
+    set(version_msg "(found version \"${version}\")")
+  endif()
+
+  set (${result} ${version_ok} PARENT_SCOPE)
+  if (FPCV_RESULT_MESSAGE_VARIABLE)
+    set (${FPCV_RESULT_MESSAGE_VARIABLE} "${version_msg}" PARENT_SCOPE)
+  endif()
+endfunction()
 
 function(FIND_PACKAGE_HANDLE_STANDARD_ARGS _NAME _FIRST_ARG)
 

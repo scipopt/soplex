@@ -44,7 +44,7 @@ namespace soplex
    @brief Class to create new timers and to switch types of exiting ones
    */
 
-class TimerFactory
+class SOPLEX_EXPORT TimerFactory
 {
 
 public:

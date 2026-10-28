@@ -1,299 +1,302 @@
-#
-# interface function for setting common library properties
-#
-function(setLibProperties targetname outputname)
-    set_target_properties(${targetname} PROPERTIES
-        OUTPUT_NAME ${outputname}
-    )
-endfunction(setLibProperties)
+# Overall structure:
+#  
+# Configure build-dependent header file.
+# [Define common compilation settings.]
+# Define targets along with properties, dependencies, includes, linked libraries, definitions.
+# Define target aliases.
+# Add sanitizers.
+# Install headers.
+# Install targets.
+# [Generate export header file.]
 
-include(GNUInstallDirs)
-
-include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
-
-set(sources
-    soplex/didxset.cpp
-    soplex/idxset.cpp
-    soplex/mpsinput.cpp
-    soplex/nameset.cpp
-    soplex/spxdefines.cpp
-    soplex/spxgithash.cpp
-    soplex/spxid.cpp
-    soplex/spxout.cpp
-    soplex/usertimer.cpp
-    soplex/wallclocktimer.cpp
-    soplex_interface.cpp
-    )
-
-set(headers
-    soplex/array.h
-    soplex/basevectors.h
-    soplex/classarray.h
-    soplex/classset.h
-    soplex/clufactor.h
-    soplex/clufactor_rational.h
-    soplex/cring.h
-    soplex/dataarray.h
-    soplex/datahashtable.h
-    soplex/datakey.h
-    soplex/dataset.h
-    soplex/didxset.h
-    soplex/dsvectorbase.h
-    soplex/dsvector.h
-    soplex/exceptions.h
-    soplex/idlist.h
-    soplex/idxset.h
-    soplex/islist.h
-    soplex/lpcolbase.h
-    soplex/lpcol.h
-    soplex/lpcolsetbase.h
-    soplex/lpcolset.h
-    soplex/lprowbase.h
-    soplex/lprow.h
-    soplex/lprowsetbase.h
-    soplex/lprowset.h
-    soplex/mpsinput.h
-    soplex/nameset.h
-    soplex/notimer.h
-    soplex/random.h
-    soplex/rational.h
-    soplex/ratrecon.h
-    soplex/slinsolver.h
-    soplex/slinsolver_rational.h
-    soplex/slufactor.h
-    soplex/slufactor_rational.h
-    soplex/solbase.h
-    soplex/sol.h
-    soplex/sorter.h
-    soplex/spxalloc.h
-    soplex/spxautopr.h
-    soplex/spxbasis.h
-    soplex/spxboundflippingrt.h
-    soplex/spxdantzigpr.h
-    soplex/spxdefaultrt.h
-    soplex/spxdefines.h
-    soplex/spxdevexpr.h
-    soplex/spxequilisc.h
-    soplex/spxfastrt.h
-    soplex/spxfileio.h
-    soplex/spxgeometsc.h
-    soplex/spxgithash.h
-    soplex/spxharrisrt.h
-    soplex/spxhybridpr.h
-    soplex/spxid.h
-    soplex/spxleastsqsc.h
-    soplex/spxlpbase.h
-    soplex/spxlp.h
-    soplex/spxmainsm.h
-    soplex/spxout.h
-    soplex/spxparmultpr.h
-    soplex/spxpapilo.h
-    soplex/spxpricer.h
-    soplex/spxratiotester.h
-    soplex/spxscaler.h
-    soplex/spxsimplifier.h
-    soplex/spxsolver.h
-    soplex/spxstarter.h
-    soplex/spxsteepexpr.h
-    soplex/spxsteeppr.h
-    soplex/spxsumst.h
-    soplex/spxvectorst.h
-    soplex/spxweightpr.h
-    soplex/spxweightst.h
-    soplex/ssvectorbase.h
-    soplex/ssvector.h
-    soplex/stablesum.h
-    soplex/statistics.h
-    soplex/svectorbase.h
-    soplex/svector.h
-    soplex/svsetbase.h
-    soplex/svset.h
-    soplex/timerfactory.h
-    soplex/timer.h
-    soplex/unitvectorbase.h
-    soplex/unitvector.h
-    soplex/updatevector.h
-    soplex/usertimer.h
-    soplex/validation.h
-    soplex/vectorbase.h
-    soplex/vector.h
-    soplex/dvector.h
-    soplex/wallclocktimer.h
-    soplex/fmt.hpp
-    soplex_interface.h
-    )
-
-file(GLOB headers
-    ${headers}
-    soplex/*.hpp
-)
-
-# create soplex library with pic
-add_library(libsoplex-pic STATIC ${sources})
-if(MSVC)
-    setLibProperties(libsoplex-pic "libsoplex-pic")
+# Create build/soplex/config.h, which contains all definitions based on the configuration.
+if(BUILD_SHARED_LIBS)
+   set(SOPLEX_STATIC_LIB 0)
 else()
-   setLibProperties(libsoplex-pic "soplex-pic")
+   set(SOPLEX_STATIC_LIB 1)
 endif()
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/soplex/config.h.in"
+   "${PROJECT_BINARY_DIR}/soplex/config.h"
+   @ONLY)
 
-set_target_properties(libsoplex-pic PROPERTIES
-    POSITION_INDEPENDENT_CODE on
-    VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}
-    SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
-add_dependencies(libsoplex-pic soplex_update_githash)
-target_include_directories(libsoplex-pic BEFORE PUBLIC
-    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:include>)
-target_link_libraries(libsoplex-pic ${libs})
-set_property(TARGET libsoplex-pic PROPERTY INTERPROCEDURAL_OPTIMIZATION ${LTO_AVAILABLE})
-
-# create soplex library without pic
-add_library(libsoplex STATIC ${sources})
-if(MSVC)
-    setLibProperties(libsoplex "libsoplex")
-else()
-   setLibProperties(libsoplex "soplex")
-endif()
-
+# Create a SoPlex library.
+add_library(libsoplex
+   soplex_interface.cpp
+   soplex/didxset.cpp
+   soplex/idxset.cpp
+   soplex/mpsinput.cpp
+   soplex/nameset.cpp
+   soplex/spxdefines.cpp
+   soplex/spxgithash.cpp
+   soplex/spxid.cpp
+   soplex/spxout.cpp
+   soplex/usertimer.cpp
+   soplex/wallclocktimer.cpp
+   )
 set_target_properties(libsoplex PROPERTIES
-    VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}
-    SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
+   PREFIX ""
+   CXX_VISIBILITY_PRESET default
+   VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}
+   SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}
+   INTERPROCEDURAL_OPTIMIZATION ${LTO_AVAILABLE})
 add_dependencies(libsoplex soplex_update_githash)
 target_include_directories(libsoplex BEFORE PUBLIC
-    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:include>)
-target_link_libraries(libsoplex ${libs})
-set_property(TARGET libsoplex PROPERTY INTERPROCEDURAL_OPTIMIZATION ${LTO_AVAILABLE})
+   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+   $<INSTALL_INTERFACE:include>
+   )
+target_link_libraries(libsoplex
+   $<$<BOOL:${SOPLEX_HAS_ZLIB}>:ZLIB::ZLIB>
+   $<$<BOOL:${SOPLEX_HAS_BOOST}>:Boost::boost>
+   $<$<BOOL:${SOPLEX_HAS_GMP}>:GMP::GMP>
+   $<$<BOOL:${SOPLEX_HAS_QUADMATH}>:Quadmath::Quadmath>
+   $<$<BOOL:${SOPLEX_HAS_PAPILO}>:PAPILO::PAPILO>
+   $<$<BOOL:${SOPLEX_HAS_MPFR}>:MPFR::MPFR>
+   )
 
-# create C shared library
-add_library(libsoplexshared SHARED ${sources})
-if(MSVC)
-    setLibProperties(libsoplexshared "libsoplexshared")
-else()
-   setLibProperties(libsoplexshared "soplexshared")
+# The SOPLEX_BUILD_SHARED_LIB and SOPLEX_BUILD_STATIC_LIB macros indicate that the shared / static
+# library is built.
+if(BUILD_SHARED_LIBS)
+   target_compile_definitions(libsoplex PRIVATE SOPLEX_BUILD_SHARED_LIB)
 endif()
 
-set_target_properties(libsoplexshared PROPERTIES
-    VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}
-    SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
-add_dependencies(libsoplexshared soplex_update_githash libsoplex)
 if(MSVC)
-    target_compile_options(libsoplexshared PUBLIC "/Zc:__cplusplus")
-    setLibProperties(libsoplexshared "libsoplexshared")
+   target_compile_options(libsoplex PUBLIC "/Zc:__cplusplus")
 endif()
-target_include_directories(libsoplexshared BEFORE PUBLIC
-    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:include>)
-target_link_libraries(libsoplexshared libsoplex ${libs})
-set_target_properties(libsoplexshared PROPERTIES CXX_VISIBILITY_PRESET default)
-# TODO: enable Windows LTO
-set_property(TARGET libsoplexshared PROPERTY INTERPROCEDURAL_OPTIMIZATION NOT MSVC AND ${LTO_AVAILABLE})
 
-# create soplex binary using library without pic
+# Create the SoPlex binary.
 add_executable(soplex soplexmain.cpp)
 target_link_libraries(soplex LINK_PUBLIC libsoplex)
 if(EMSCRIPTEN AND EMSCRIPTEN_HTML)
-    set_target_properties(soplex PROPERTIES LINK_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/soplex_webdemo_shell.html)
-    set(CMAKE_EXECUTABLE_SUFFIX ".html")
+   set_target_properties(soplex PROPERTIES
+      LINK_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/soplex_webdemo_shell.html")
+   set(CMAKE_EXECUTABLE_SUFFIX ".html")
 endif()
-set_property(TARGET soplex PROPERTY INTERPROCEDURAL_OPTIMIZATION ${LTO_AVAILABLE})
+set_target_properties(soplex PROPERTIES
+   INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}"
+   INTERPROCEDURAL_OPTIMIZATION ${LTO_AVAILABLE})
 
-if(SANITIZE)
-    find_package(Sanitizers)
-    add_sanitizers(libsoplex)
-    add_sanitizers(libsoplex-pic)
-    add_sanitizers(libsoplexshared)
-    add_sanitizers(soplex)
-    get_target_property(CONF_SANITIZE_FLAGS libsoplex SANITIZE_FLAGS)
-endif(SANITIZE)
-
+# Create example binary.
 add_executable(example EXCLUDE_FROM_ALL example.cpp)
 target_link_libraries(example libsoplex)
-set_property(TARGET example PROPERTY INTERPROCEDURAL_OPTIMIZATION ${LTO_AVAILABLE})
+set_target_properties(example PROPERTIES
+   INTERPROCEDURAL_OPTIMIZATION ${LTO_AVAILABLE})
 
-# set the install rpath to the installed destination
-set_target_properties(soplex PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+# Create aliases internally in case SoPlex is included via `add_subdirectory`.
+add_library(SOPLEX::SOPLEX ALIAS libsoplex)
+add_library(SOPLEX::libsoplex ALIAS libsoplex)
+add_executable(SOPLEX::soplex ALIAS soplex)
 
-# install the header files of soplex
-install(FILES ${headers} ${PROJECT_BINARY_DIR}/soplex/config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/soplex)
-install(FILES soplex.h soplex.hpp soplex_interface.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+# Add sanitizers.
+if(SANITIZE)
+   find_package(Sanitizers)
+   add_sanitizers(libsoplex)
+   add_sanitizers(soplex)
+endif(SANITIZE)
 
-if(NOT SYSTEM_FMT)
-    install(FILES
-        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/chrono.h
-        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/color.h
-        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/compile.h
-        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/core.h
-        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/format-inl.h
-        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/format.h
-        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/locale.h
-        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/os.h
-        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/ostream.h
-        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/posix.h
-        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/printf.h
-        ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/ranges.h
-        DESTINATION include/soplex/external/fmt)
+# Install public header files.
+foreach(header_file
+      soplex.h
+      soplex.hpp
+      soplex_interface.h
+      soplex/array.h
+      soplex/basevectors.h
+      soplex/changesoplex.hpp
+      soplex/classarray.h
+      soplex/classset.h
+      soplex/clufactor.h
+      soplex/clufactor.hpp
+      soplex/clufactor_rational.h
+      soplex/clufactor_rational.hpp
+      soplex/cring.h
+      soplex/dataarray.h
+      soplex/datahashtable.h
+      soplex/datakey.h
+      soplex/dataset.h
+      soplex/didxset.h
+      soplex/dsvectorbase.h
+      soplex/dsvector.h
+      soplex/enter.hpp
+      soplex/exceptions.h
+      soplex/fmt.hpp
+      soplex/idlist.h
+      soplex/idxset.h
+      soplex/islist.h
+      soplex/leave.hpp
+      soplex/lpcolbase.h
+      soplex/lpcol.h
+      soplex/lpcolsetbase.h
+      soplex/lpcolset.h
+      soplex/lprowbase.h
+      soplex/lprow.h
+      soplex/lprowsetbase.h
+      soplex/lprowset.h
+      soplex/mpsinput.h
+      soplex/nameset.h
+      soplex/notimer.h
+      soplex/random.h
+      soplex/rational.h
+      soplex/ratrecon.h
+      soplex/ratrecon.hpp
+      soplex/slinsolver.h
+      soplex/slinsolver_rational.h
+      soplex/slufactor.h
+      soplex/slufactor.hpp
+      soplex/slufactor_rational.h
+      soplex/slufactor_rational.hpp
+      soplex/solbase.h
+      soplex/sol.h
+      soplex/solverational.hpp
+      soplex/solvereal.hpp
+      soplex/sorter.h
+      soplex/spxalloc.h
+      soplex/spxautopr.h
+      soplex/spxautopr.hpp
+      soplex/spxbasis.h
+      soplex/spxbasis.hpp
+      soplex/spxboundflippingrt.h
+      soplex/spxboundflippingrt.hpp
+      soplex/spxbounds.hpp
+      soplex/spxchangebasis.hpp
+      soplex/spxdantzigpr.h
+      soplex/spxdantzigpr.hpp
+      soplex/spxdefaultrt.h
+      soplex/spxdefaultrt.hpp
+      soplex/spxdefines.h
+      soplex/spxdefines.hpp
+      soplex/spxdesc.hpp
+      soplex/spxdevexpr.h
+      soplex/spxdevexpr.hpp
+      soplex/spxequilisc.h
+      soplex/spxequilisc.hpp
+      soplex/spxfastrt.h
+      soplex/spxfastrt.hpp
+      soplex/spxfileio.h
+      soplex/spxfileio.hpp
+      soplex/spxgeometsc.h
+      soplex/spxgeometsc.hpp
+      soplex/spxgithash.h
+      soplex/spxharrisrt.h
+      soplex/spxharrisrt.hpp
+      soplex/spxhybridpr.h
+      soplex/spxhybridpr.hpp
+      soplex/spxid.h
+      soplex/spxleastsqsc.h
+      soplex/spxleastsqsc.hpp
+      soplex/spxlpbase.h
+      soplex/spxlpbase_rational.hpp
+      soplex/spxlpbase_real.hpp
+      soplex/spxlp.h
+      soplex/spxmainsm.h
+      soplex/spxmainsm.hpp
+      soplex/spxout.h
+      soplex/spxparmultpr.h
+      soplex/spxparmultpr.hpp
+      soplex/spxpapilo.h
+      soplex/spxpricer.h
+      soplex/spxquality.hpp
+      soplex/spxratiotester.h
+      soplex/spxscaler.h
+      soplex/spxscaler.hpp
+      soplex/spxshift.hpp
+      soplex/spxsimplifier.h
+      soplex/spxsolve.hpp
+      soplex/spxsolver.h
+      soplex/spxsolver.hpp
+      soplex/spxstarter.h
+      soplex/spxstarter.hpp
+      soplex/spxsteepexpr.h
+      soplex/spxsteeppr.h
+      soplex/spxsteeppr.hpp
+      soplex/spxsumst.h
+      soplex/spxsumst.hpp
+      soplex/spxvecs.hpp
+      soplex/spxvectorst.h
+      soplex/spxvectorst.hpp
+      soplex/spxweightpr.h
+      soplex/spxweightpr.hpp
+      soplex/spxweightst.h
+      soplex/spxweightst.hpp
+      soplex/spxwritestate.hpp
+      soplex/ssvectorbase.h
+      soplex/ssvector.h
+      soplex/stablesum.h
+      soplex/statistics.h
+      soplex/statistics.hpp
+      soplex/svectorbase.h
+      soplex/svector.h
+      soplex/svsetbase.h
+      soplex/svset.h
+      soplex/timerfactory.h
+      soplex/timer.h
+      soplex/testsoplex.hpp
+      soplex/unitvectorbase.h
+      soplex/unitvector.h
+      soplex/updatevector.h
+      soplex/updatevector.hpp
+      soplex/usertimer.h
+      soplex/validation.h
+      soplex/validation.hpp
+      soplex/vectorbase.h
+      soplex/vector.h
+      soplex/dvector.h
+      soplex/wallclocktimer.h
+   )
+   get_filename_component(directory "${header_file}" DIRECTORY)
+   install(
+      FILES "${PROJECT_SOURCE_DIR}/src/${header_file}"
+      DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${directory}")
+endforeach()
+
+# Install fmt.
+if(NOT SOPLEX_HAS_SYSTEM_FMT)
+   foreach(header_file
+         soplex/external/fmt/chrono.h
+         soplex/external/fmt/color.h
+         soplex/external/fmt/compile.h
+         soplex/external/fmt/core.h
+         soplex/external/fmt/format-inl.h
+         soplex/external/fmt/format.h
+         soplex/external/fmt/locale.h
+         soplex/external/fmt/os.h
+         soplex/external/fmt/ostream.h
+         soplex/external/fmt/posix.h
+         soplex/external/fmt/printf.h
+         soplex/external/fmt/ranges.h
+      )
+      get_filename_component(directory "${header_file}" DIRECTORY)
+      install(
+         FILES "${PROJECT_SOURCE_DIR}/src/${header_file}"
+         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${directory}")
+   endforeach()
 endif()
 
-# TODO this is necessary only if ZLIB_FOUND?
-install(FILES
-     ${PROJECT_SOURCE_DIR}/src/soplex/external/zstr/zstr.hpp
-     ${PROJECT_SOURCE_DIR}/src/soplex/external/zstr/strict_fstream.hpp
-     DESTINATION include/soplex/external/zstr)
-install(FILES ${PROJECT_SOURCE_DIR}/src/soplex/external/zstr/License.txt DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/soplex/zstr)
+# Install config.h
+install(
+   FILES "${PROJECT_BINARY_DIR}/soplex/config.h"
+   DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/soplex/")
 
-# install the binary and the library to appropriate lcoations and add them to an export group
-install(TARGETS soplex libsoplex libsoplex-pic libsoplexshared EXPORT soplex-targets
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+# Install zstr headers.
+if(SOPLEX_HAS_ZLIB)
+   install(FILES
+      soplex/external/zstr/zstr.hpp
+      soplex/external/zstr/strict_fstream.hpp
+      DESTINATION "include/soplex/external/zstr")
+   install(FILES ${PROJECT_SOURCE_DIR}/src/soplex/external/zstr/License.txt
+      DESTINATION "${CMAKE_INSTALL_DATADIR}/licenses/soplex/zstr")
+endif()
 
+# Install targets, and record them in soplex-targets export set.
+install(TARGETS soplex libsoplex
+   EXPORT soplex-targets
+   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+   ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+   RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+   INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+   )
+
+# Install the debug program database files.
 if(MSVC)
-    install(FILES $<TARGET_PDB_FILE:libsoplexshared> $<TARGET_PDB_FILE:soplex> DESTINATION ${CMAKE_INSTALL_BINDIR} OPTIONAL)
+   install(FILES $<TARGET_PDB_FILE:soplex> DESTINATION ${CMAKE_INSTALL_BINDIR} OPTIONAL)
 endif()
 
-# install license files of soplex and fmt
-install(FILES ${PROJECT_SOURCE_DIR}/LICENSE DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/soplex)
-if(NOT SYSTEM_FMT)
-    install(FILES ${PROJECT_SOURCE_DIR}/src/soplex/external/fmt/LICENSE.rst DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/soplex/fmt)
-endif()
-
-# Add library targets to the build-tree export set
-export(TARGETS libsoplex libsoplex-pic libsoplexshared
-  FILE "${CMAKE_BINARY_DIR}/soplex-targets.cmake")
-
-#configure the config file for the build tree
-set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src" "${PROJECT_BINARY_DIR}")
-configure_file(${PROJECT_SOURCE_DIR}/soplex-config.cmake.in
-  "${CMAKE_BINARY_DIR}/soplex-config.cmake" @ONLY)
-
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-${CMAKE_BINARY_DIR}/soplex-config-version.cmake
-    VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}
-    COMPATIBILITY SameMajorVersion
-    )
-
-
-#configure the config file for the install
-set(CONF_INCLUDE_DIRS "\${CMAKE_CURRENT_LIST_DIR}/../../../include")
-# add the current directory of the installed soplex-config.cmake as a CMake module path, to find FindMPFR.cmake
-set(EXTRA_CMAKE_MODULE_PATH "\${CMAKE_CURRENT_LIST_DIR}")
-configure_file(${PROJECT_SOURCE_DIR}/soplex-config.cmake.in
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/soplex-config.cmake" @ONLY)
-
-# install the targets of the soplex export group and the config file so that other projects
-# can link easily against soplex
-install(EXPORT soplex-targets FILE soplex-targets.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/soplex)
-install(FILES "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/soplex-config.cmake"
-	           ${CMAKE_BINARY_DIR}/soplex-config-version.cmake
-		   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/soplex)
-# Install FindMPFR.cmake module.
-if(SOPLEX_WITH_MPFR)
-   install(FILES ${PROJECT_SOURCE_DIR}/cmake/Modules/FindMPFR.cmake
-      DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/soplex)
-endif()

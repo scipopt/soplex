@@ -12,6 +12,14 @@ interface & parameters:
 - write real values with 17 significant digits in the LP, MPS, and basis matrix file writers
 
 build system:
+- removed MT option.
+- replace macros SOPLEX_WITH_* by SOPLEX_HAS_* and always define them (as either 0 or 1); old macros are still provided for backwards compatibility.
+- several CMake options now allow three options: 1/ON/TRUE makes a dependency required, 0/OFF/FALSE disables it, and AUTO makes it optional. Affected options: GMP, QUADMATH, PAPILO, ZLIB, MPFR.
+- replaced CMake module for GMP.
+- replaced CMake module for Quadmath.
+- added CMake option BUILD_PACKAGE (default: off). If set, search directories for dependencies are not suggested in soplex-config.cmake.
+- added CMake option BUILD_SHARED_LIBS (default: on) to determine whether a shared or a static library shall be built.
+- added option GITHASH_BRANCH to append the current git branch to the githash.
 
 miscellaneous:
 

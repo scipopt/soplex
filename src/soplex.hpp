@@ -36,21 +36,21 @@
 #include <iomanip>
 #include <sstream>
 
-#ifdef SOPLEX_WITH_PAPILO
+#if SOPLEX_HAS_PAPILO
 #include "papilo/Config.hpp"
-#endif
-#ifdef SOPLEX_WITH_BOOST
+#endif /* SOPLEX_HAS_PAPILO */
+#if SOPLEX_HAS_BOOST
 #include <boost/version.hpp>
-#endif
-#ifdef SOPLEX_WITH_GMP
+#endif /* SOPLEX_HAS_BOOST */
+#if SOPLEX_HAS_GMP
 #include <gmp.h>
-#endif
-#ifdef SOPLEX_WITH_MPFR
+#endif /* SOPLEX_HAS_GMP */
+#if SOPLEX_HAS_MPFR
 #include <mpfr.h>
-#endif
-#ifdef SOPLEX_WITH_ZLIB
+#endif /* SOPLEX_HAS_MPFR */
+#if SOPLEX_HAS_ZLIB
 #include <zlib.h>
-#endif
+#endif /* SOPLEX_HAS_ZLIB */
 
 
 /// maximum length of lines in settings file
@@ -203,11 +203,11 @@ SoPlexBase<R>::Settings::BoolParam::BoolParam()
    name[SoPlexBase<R>::PRECISION_BOOSTING] = "precision_boosting";
    description[SoPlexBase<R>::PRECISION_BOOSTING] =
       "enable precision boosting";
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
    defaultValue[SoPlexBase<R>::PRECISION_BOOSTING] = true;
-#else
+#else /* !SOPLEX_HAS_MPFR */
    defaultValue[SoPlexBase<R>::PRECISION_BOOSTING] = false;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
 
    name[SoPlexBase<R>::BOOSTED_WARM_START] = "boosted_warm_start";
    description[SoPlexBase<R>::BOOSTED_WARM_START] =
@@ -875,15 +875,15 @@ bool SoPlexBase<R>::getDualFarkasReal(R* vector, int dim)
 
 
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
 /// gets the primal solution vector if available; returns true on success (GMP only method)
 template <class R>
 bool SoPlexBase<R>::getPrimalRational(mpq_t* vector, const int size)
 {
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
    SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
    return false;
-#else
+#else /* SOPLEX_HAS_BOOST */
    assert(size >= numColsRational());
 
    if(hasSol())
@@ -898,7 +898,7 @@ bool SoPlexBase<R>::getPrimalRational(mpq_t* vector, const int size)
    else
       return false;
 
-#endif
+#endif /* !SOPLEX_HAS_BOOST */
 }
 
 
@@ -906,10 +906,10 @@ bool SoPlexBase<R>::getPrimalRational(mpq_t* vector, const int size)
 template <class R>
 bool SoPlexBase<R>::getSlacksRational(mpq_t* vector, const int size)
 {
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
    SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
    return false;
-#else
+#else /* SOPLEX_HAS_BOOST */
    assert(size >= numRowsRational());
 
    if(hasSol())
@@ -924,7 +924,7 @@ bool SoPlexBase<R>::getSlacksRational(mpq_t* vector, const int size)
    else
       return false;
 
-#endif
+#endif /* SOPLEX_HAS_BOOST */
 }
 
 
@@ -933,10 +933,10 @@ bool SoPlexBase<R>::getSlacksRational(mpq_t* vector, const int size)
 template <class R>
 bool SoPlexBase<R>::getPrimalRayRational(mpq_t* vector, const int size)
 {
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
    SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
    return false;
-#else
+#else /* SOPLEX_HAS_BOOST */
    assert(size >= numColsRational());
 
    if(hasPrimalRay())
@@ -951,7 +951,7 @@ bool SoPlexBase<R>::getPrimalRayRational(mpq_t* vector, const int size)
    else
       return false;
 
-#endif
+#endif /* !SOPLEX_HAS_BOOST */
 }
 
 
@@ -960,10 +960,10 @@ bool SoPlexBase<R>::getPrimalRayRational(mpq_t* vector, const int size)
 template <class R>
 bool SoPlexBase<R>::getDualRational(mpq_t* vector, const int size)
 {
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
    SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
    return false;
-#else
+#else /* SOPLEX_HAS_BOOST */
    assert(size >= numRowsRational());
 
    if(hasSol())
@@ -978,7 +978,7 @@ bool SoPlexBase<R>::getDualRational(mpq_t* vector, const int size)
    else
       return false;
 
-#endif
+#endif /* !SOPLEX_HAS_BOOST */
 }
 
 
@@ -987,10 +987,10 @@ bool SoPlexBase<R>::getDualRational(mpq_t* vector, const int size)
 template <class R>
 bool SoPlexBase<R>::getRedCostRational(mpq_t* vector, const int size)
 {
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
    SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
    return false;
-#else
+#else /* SOPLEX_HAS_BOOST */
    assert(size >= numColsRational());
 
    if(hasSol())
@@ -1005,7 +1005,7 @@ bool SoPlexBase<R>::getRedCostRational(mpq_t* vector, const int size)
    else
       return false;
 
-#endif
+#endif /* !SOPLEX_HAS_BOOST */
 }
 
 
@@ -1014,10 +1014,10 @@ bool SoPlexBase<R>::getRedCostRational(mpq_t* vector, const int size)
 template <class R>
 bool SoPlexBase<R>::getDualFarkasRational(mpq_t* vector, const int size)
 {
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
    SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
    return false;
-#else
+#else /* SOPLEX_HAS_BOOST */
    assert(size >= numRowsRational());
 
    if(hasDualFarkas())
@@ -1032,9 +1032,9 @@ bool SoPlexBase<R>::getDualFarkasRational(mpq_t* vector, const int size)
    else
       return false;
 
-#endif
+#endif /* !SOPLEX_HAS_BOOST */
 }
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
 
 // Alias for writeFile; SCIP
@@ -1600,11 +1600,11 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
       _applyPolishing = rhs._applyPolishing;
 
       // rational constants do not need to be assigned
-#ifdef SOPLEX_WITH_BOOST
+#if SOPLEX_HAS_BOOST
       _rationalPosone = 1;
       _rationalNegone = -1;
       _rationalZero = 0;
-#endif
+#endif /* SOPLEX_HAS_BOOST */
    }
 
    assert(_isConsistent());
@@ -2201,7 +2201,7 @@ void SoPlexBase<R>::changeRowReal(int i, const LPRowBase<R>& lprow)
 
    _invalidateSolution();
 }
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
 /// adds a single column (GMP only method)
 template <class R>
 void SoPlexBase<R>::addColRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues,
@@ -2255,7 +2255,7 @@ void SoPlexBase<R>::addColsRational(const mpq_t* obj, const mpq_t* lower, const 
 
    _invalidateSolution();
 }
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
 
 /// changes left-hand side vector for constraints to \p lhs
@@ -2823,7 +2823,7 @@ void SoPlexBase<R>::addRowRational(const LPRowRational& lprow)
 
 
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
 /// adds a single row  (GMP only method)
 template <class R>
 void SoPlexBase<R>::addRowRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices,
@@ -2873,7 +2873,7 @@ void SoPlexBase<R>::addRowsRational(const mpq_t* lhs, const mpq_t* rowValues, co
 
    _invalidateSolution();
 }
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
 
 
@@ -3001,7 +3001,7 @@ void SoPlexBase<R>::changeLhsRational(int i, const Rational& lhs)
 
 
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
 /// changes left-hand side of row \p i to \p lhs (GMP only method)
 template <class R>
 void SoPlexBase<R>::changeLhsRational(int i, const mpq_t* lhs)
@@ -3011,9 +3011,9 @@ void SoPlexBase<R>::changeLhsRational(int i, const mpq_t* lhs)
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
    SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
-#endif
+#endif /* SOPLEX_HAS_BOOST */
 
    _rationalLP->changeLhs(i, lhs);
    _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
@@ -3023,7 +3023,7 @@ void SoPlexBase<R>::changeLhsRational(int i, const mpq_t* lhs)
 
    _invalidateSolution();
 }
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
 
 
@@ -3049,7 +3049,7 @@ void SoPlexBase<R>::changeRhsRational(const VectorRational& rhs)
 
 
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
 /// changes right-hand side vector to \p rhs (GMP only method)
 template <class R>
 void SoPlexBase<R>::changeRhsRational(const mpq_t* rhs, int rhsSize)
@@ -3059,9 +3059,9 @@ void SoPlexBase<R>::changeRhsRational(const mpq_t* rhs, int rhsSize)
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
    SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
-#endif
+#endif /* SOPLEX_HAS_BOOST */
 
    for(int i = 0; i < rhsSize; i++)
    {
@@ -3074,7 +3074,7 @@ void SoPlexBase<R>::changeRhsRational(const mpq_t* rhs, int rhsSize)
 
    _invalidateSolution();
 }
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
 
 
@@ -3140,7 +3140,7 @@ void SoPlexBase<R>::changeRangeRational(int i, const Rational& lhs, const Ration
 
 
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
 /// changes left-hand side of row \p i to \p lhs (GMP only method)
 template <class R>
 void SoPlexBase<R>::changeRangeRational(int i, const mpq_t* lhs, const mpq_t* rhs)
@@ -3150,9 +3150,9 @@ void SoPlexBase<R>::changeRangeRational(int i, const mpq_t* lhs, const mpq_t* rh
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
    SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
-#endif
+#endif /* !SOPLEX_HAS_BOOST */
    _rationalLP->changeRange(i, lhs, rhs);
    _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
 
@@ -3161,7 +3161,7 @@ void SoPlexBase<R>::changeRangeRational(int i, const mpq_t* lhs, const mpq_t* rh
 
    _invalidateSolution();
 }
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
 
 
@@ -3228,7 +3228,7 @@ void SoPlexBase<R>::changeLowerRational(int i, const Rational& lower)
 
 
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
 /// changes lower bound of column i to \p lower (GMP only method)
 template <class R>
 void SoPlexBase<R>::changeLowerRational(int i, const mpq_t* lower)
@@ -3238,9 +3238,9 @@ void SoPlexBase<R>::changeLowerRational(int i, const mpq_t* lower)
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
    SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
-#endif
+#endif /* !SOPLEX_HAS_BOOST */
    _rationalLP->changeLower(i, lower);
    _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
 
@@ -3249,7 +3249,7 @@ void SoPlexBase<R>::changeLowerRational(int i, const mpq_t* lower)
 
    _invalidateSolution();
 }
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
 
 
@@ -3296,7 +3296,7 @@ void SoPlexBase<R>::changeUpperRational(int i, const Rational& upper)
 
 
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
 /// changes upper bound of column i to \p upper (GMP only method)
 template <class R>
 void SoPlexBase<R>::changeUpperRational(int i, const mpq_t* upper)
@@ -3306,9 +3306,9 @@ void SoPlexBase<R>::changeUpperRational(int i, const mpq_t* upper)
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
    SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
-#endif
+#endif /* !SOPLEX_HAS_BOOST */
    _rationalLP->changeUpper(i, upper);
    _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
 
@@ -3317,7 +3317,7 @@ void SoPlexBase<R>::changeUpperRational(int i, const mpq_t* upper)
 
    _invalidateSolution();
 }
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
 
 
@@ -3363,7 +3363,7 @@ void SoPlexBase<R>::changeBoundsRational(int i, const Rational& lower, const Rat
 
 
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
 /// changes bounds of column \p i to \p lower and \p upper (GMP only method)
 template <class R>
 void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t* upper)
@@ -3373,9 +3373,9 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
    SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
-#endif
+#endif /* !SOPLEX_HAS_BOOST */
    _rationalLP->changeBounds(i, lower, upper);
    _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
 
@@ -3384,7 +3384,7 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
 
    _invalidateSolution();
 }
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
 
 
@@ -3426,7 +3426,7 @@ void SoPlexBase<R>::changeObjRational(int i, const Rational& obj)
 
 
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
 /// changes objective coefficient of column i to \p obj (GMP only method)
 template <class R>
 void SoPlexBase<R>::changeObjRational(int i, const mpq_t* obj)
@@ -3436,9 +3436,9 @@ void SoPlexBase<R>::changeObjRational(int i, const mpq_t* obj)
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
    SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
-#endif
+#endif /* !SOPLEX_HAS_BOOST */
    _rationalLP->changeObj(i, obj);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO)
@@ -3446,7 +3446,7 @@ void SoPlexBase<R>::changeObjRational(int i, const mpq_t* obj)
 
    _invalidateSolution();
 }
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
 
 
@@ -3468,7 +3468,7 @@ void SoPlexBase<R>::changeElementRational(int i, int j, const Rational& val)
 }
 
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
 /// changes matrix entry in row \p i and column \p j to \p val (GMP only method)
 template <class R>
 void SoPlexBase<R>::changeElementRational(int i, int j, const mpq_t* val)
@@ -3478,9 +3478,9 @@ void SoPlexBase<R>::changeElementRational(int i, int j, const mpq_t* val)
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL)
       return;
 
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
    SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
-#endif
+#endif /* !SOPLEX_HAS_BOOST */
    _rationalLP->changeElement(i, j, val);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO)
@@ -3488,7 +3488,7 @@ void SoPlexBase<R>::changeElementRational(int i, int j, const mpq_t* val)
 
    _invalidateSolution();
 }
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
 
 /// removes row \p i
@@ -6084,7 +6084,7 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
    case FORCEBASIC:
       break;
 
-#ifdef SOPLEX_WITH_PAPILO
+#if SOPLEX_HAS_PAPILO
 
    case SIMPLIFIER_SINGLETONCOLS:
       _simplifierPaPILO.setEnableSingletonCols(value);
@@ -6117,7 +6117,7 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
    case SIMPLIFIER_DOMINATEDCOLS:
       _simplifierPaPILO.setEnableDomCols(value);
       break;
-#else
+#else /* !SOPLEX_HAS_PAPILO */
 
    case SIMPLIFIER_SINGLETONCOLS:
    case SIMPLIFIER_CONSTRAINTPROPAGATION:
@@ -6136,7 +6136,7 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
       }
 
       break;
-#endif
+#endif /* SOPLEX_HAS_PAPILO */
 
    case ITERATIVE_REFINEMENT:
       break;
@@ -6145,7 +6145,7 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
       break;
 
    case PRECISION_BOOSTING:
-#ifndef SOPLEX_WITH_MPFR
+#if !SOPLEX_HAS_MPFR
       if(_currentSettings->_boolParamValues[param] != value)
       {
          SPX_MSG_INFO1(spxout, spxout <<
@@ -6153,7 +6153,7 @@ bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const 
          return false;
       }
 
-#endif
+#endif /* !SOPLEX_HAS_MPFR */
       break;
 
    case BOOSTED_WARM_START:
@@ -6284,47 +6284,47 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
 
    // type of simplifier
    case SoPlexBase<R>::SIMPLIFIER:
-#ifndef SOPLEX_WITH_MPFR
+#if !SOPLEX_HAS_MPFR
       _boostedSimplifier = nullptr;
-#endif
+#endif /* !SOPLEX_HAS_MPFR */
 
       switch(value)
       {
       case SIMPLIFIER_OFF:
          _simplifier = nullptr;
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
          _boostedSimplifier = nullptr;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          break;
 
       case SIMPLIFIER_INTERNAL:
       case SIMPLIFIER_AUTO:
          _simplifier = &_simplifierMainSM;
          assert(_simplifier != nullptr);
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
          _boostedSimplifier = &_boostedSimplifierMainSM;
          assert(_boostedSimplifier != nullptr);
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          break;
 
       case SIMPLIFIER_PAPILO:
-#ifdef SOPLEX_WITH_PAPILO
+#if SOPLEX_HAS_PAPILO
          _simplifier = &_simplifierPaPILO;
          assert(_simplifier != nullptr);
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
          _boostedSimplifier = &_boostedSimplifierPaPILO;
          assert(_boostedSimplifier != nullptr);
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          break;
-#else
+#else /* !SOPLEX_HAS_PAPILO */
          _simplifier = &_simplifierMainSM;
          assert(_simplifier != nullptr);
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
          _boostedSimplifier = &_boostedSimplifierMainSM;
          assert(_boostedSimplifier != nullptr);
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          return false;
-#endif
+#endif /* SOPLEX_HAS_PAPILO */
 
       default:
          return false;
@@ -6340,59 +6340,59 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
 
    // type of scaler
    case SoPlexBase<R>::SCALER:
-#ifndef SOPLEX_WITH_MPFR
+#if !SOPLEX_HAS_MPFR
       _boostedScaler = nullptr;
-#endif
+#endif /* !SOPLEX_HAS_MPFR */
 
       switch(value)
       {
       case SCALER_OFF:
          _scaler = nullptr;
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
          _boostedScaler = nullptr;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          break;
 
       case SCALER_UNIEQUI:
          _scaler = &_scalerUniequi;
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
          _boostedScaler = &_boostedScalerUniequi;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          break;
 
       case SCALER_BIEQUI:
          _scaler = &_scalerBiequi;
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
          _boostedScaler = &_boostedScalerBiequi;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          break;
 
       case SCALER_GEO1:
          _scaler = &_scalerGeo1;
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
          _boostedScaler = &_boostedScalerGeo1;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          break;
 
       case SCALER_GEO8:
          _scaler = &_scalerGeo8;
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
          _boostedScaler = &_boostedScalerGeo8;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          break;
 
       case SCALER_LEASTSQ:
          _scaler = &_scalerLeastsq;
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
          _boostedScaler = &_boostedScalerLeastsq;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          break;
 
       case SCALER_GEOEQUI:
          _scaler = &_scalerGeoequi;
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
          _boostedScaler = &_boostedScalerGeoequi;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          break;
 
       default:
@@ -6443,44 +6443,44 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       {
       case PRICER_AUTO:
          _solver.setPricer(&_pricerAuto);
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
          _boostedSolver.setPricer(&_boostedPricerAuto);
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          break;
 
       case PRICER_DANTZIG:
          _solver.setPricer(&_pricerDantzig);
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
          _boostedSolver.setPricer(&_boostedPricerDantzig);
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          break;
 
       case PRICER_PARMULT:
          _solver.setPricer(&_pricerParMult);
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
          _boostedSolver.setPricer(&_boostedPricerParMult);
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          break;
 
       case PRICER_DEVEX:
          _solver.setPricer(&_pricerDevex);
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
          _boostedSolver.setPricer(&_boostedPricerDevex);
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          break;
 
       case PRICER_QUICKSTEEP:
          _solver.setPricer(&_pricerQuickSteep);
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
          _boostedSolver.setPricer(&_boostedPricerQuickSteep);
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          break;
 
       case PRICER_STEEP:
          _solver.setPricer(&_pricerSteep);
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
          _boostedSolver.setPricer(&_boostedPricerSteep);
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          break;
 
       default:
@@ -6525,7 +6525,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
    case SoPlexBase<R>::READMODE:
       switch(value)
       {
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
 
       case READMODE_REAL:
          break;
@@ -6533,12 +6533,12 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       case READMODE_RATIONAL:
          SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
          return false;
-#else
+#else /* SOPLEX_HAS_BOOST */
 
       case READMODE_REAL:
       case READMODE_RATIONAL:
          break;
-#endif
+#endif /* !SOPLEX_HAS_BOOST */
 
       default:
          return false;
@@ -6550,7 +6550,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
    case SoPlexBase<R>::SOLVEMODE:
       switch(value)
       {
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
 
       case SOLVEMODE_REAL:
       case SOLVEMODE_AUTO:
@@ -6559,14 +6559,14 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       case SOLVEMODE_RATIONAL:
          SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
          return false;
-#else
+#else /* SOPLEX_HAS_BOOST */
 
       case SOLVEMODE_REAL:
       case SOLVEMODE_AUTO:
       case SOLVEMODE_RATIONAL:
 
          break;
-#endif
+#endif /* !SOPLEX_HAS_BOOST */
 
       default:
          return false;
@@ -6595,30 +6595,30 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       {
       case RATIOTESTER_TEXTBOOK:
          _solver.setTester(&_ratiotesterTextbook);
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
          _boostedSolver.setTester(&_boostedRatiotesterTextbook);
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          break;
 
       case RATIOTESTER_HARRIS:
          _solver.setTester(&_ratiotesterHarris);
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
          _boostedSolver.setTester(&_boostedRatiotesterHarris);
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          break;
 
       case RATIOTESTER_FAST:
          _solver.setTester(&_ratiotesterFast);
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
          _boostedSolver.setTester(&_boostedRatiotesterFast);
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          break;
 
       case RATIOTESTER_BOUNDFLIPPING:
          _solver.setTester(&_ratiotesterBoundFlipping);
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
          _boostedSolver.setTester(&_boostedRatiotesterBoundFlipping);
-#endif
+#endif /* SOPLEX_HAS_MPFR */
          break;
 
       default:
@@ -6746,7 +6746,7 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
    {
    // primal feasibility tolerance; passed to the floating point solver only when calling solve()
    case SoPlexBase<R>::FEASTOL:
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
       if(value < SOPLEX_DEFAULT_EPS_PIVOR)
       {
          SPX_MSG_WARNING(spxout, spxout << "Cannot set feasibility tolerance to small value " << value <<
@@ -6756,14 +6756,14 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
          break;
       }
 
-#endif
+#endif /* !SOPLEX_HAS_BOOST */
       _rationalFeastol = value;
       this->_tolerances->setFeastol(value);
       break;
 
    // dual feasibility tolerance; passed to the floating point solver only when calling solve()
    case SoPlexBase<R>::OPTTOL:
-#ifndef SOPLEX_WITH_GMP
+#if !SOPLEX_HAS_GMP
       if(value < SOPLEX_DEFAULT_EPS_PIVOR)
       {
          SPX_MSG_WARNING(spxout, spxout << "Cannot set optimality tolerance to small value " << value <<
@@ -6773,7 +6773,7 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
          break;
       }
 
-#endif
+#endif /* !SOPLEX_HAS_GMP */
       _rationalOpttol = value;
       this->_tolerances->setOpttol(value);
       break;
@@ -6800,7 +6800,7 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
 
    // infinity threshold
    case SoPlexBase<R>::INFTY:
-#ifdef SOPLEX_WITH_BOOST
+#if SOPLEX_HAS_BOOST
       _rationalPosInfty = value;
       // boost is treating -value as an expression and not just a number<T> So
       // doing -val won't work since Rational doesn't have an operator= that
@@ -6810,7 +6810,7 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
       // A work around to avoid expression template
       _rationalNegInfty = value;
       _rationalNegInfty = -_rationalNegInfty;
-#endif
+#endif /* SOPLEX_HAS_BOOST */
 
       if(intParam(SoPlexBase<R>::SYNCMODE) != SYNCMODE_ONLYREAL)
          _recomputeRangeTypesRational();
@@ -6901,9 +6901,9 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
       break;
 
    case SoPlexBase<R>::SIMPLIFIER_MODIFYROWFAC:
-#ifdef SOPLEX_WITH_PAPILO
+#if SOPLEX_HAS_PAPILO
       _simplifierPaPILO.setModifyConsFrac(value);
-#else
+#else /* !SOPLEX_HAS_PAPILO */
 
       if(_currentSettings->_realParamValues[param] != value)
       {
@@ -6912,7 +6912,7 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
          return false;
       }
 
-#endif
+#endif /* SOPLEX_HAS_PAPILO */
       break;
 
    // factor by which the precision of the floating-point solver is multiplied
@@ -7179,22 +7179,22 @@ void SoPlexBase<R>::printVersion() const
 
    SPX_MSG_INFO1(spxout, spxout << " [precision: " << (int)sizeof(R) << " byte]");
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
 #ifdef mpir_version
    SPX_MSG_INFO1(spxout, spxout << " [rational: MPIR " << mpir_version << "]");
 #else
    SPX_MSG_INFO1(spxout, spxout << " [rational: GMP " << gmp_version << "]");
 #endif
-#else
+#else /* !SOPLEX_HAS_GMP */
    SPX_MSG_INFO1(spxout, spxout << " [rational: long double]");
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
-#ifdef SOPLEX_WITH_PAPILO
+#if SOPLEX_HAS_PAPILO
    SPX_MSG_INFO1(spxout, spxout << " [PaPILO "
                  << PAPILO_VERSION_MAJOR << "." << PAPILO_VERSION_MINOR << "." << PAPILO_VERSION_PATCH << "]");
-#else
+#else /* !SOPLEX_HAS_PAPILO */
    SPX_MSG_INFO1(spxout, spxout << " [PaPILO n/a]");
-#endif
+#endif /* SOPLEX_HAS_PAPILO */
 
    SPX_MSG_INFO1(spxout, spxout << " [GitHash: " << getGitHash() << "]\n");
 }
@@ -7206,27 +7206,27 @@ void SoPlexBase<R>::printExternalCodes() const
 {
    SPX_MSG_INFO1(spxout, spxout << "External libraries:");
 
-#if !defined(SOPLEX_WITH_PAPILO) && !defined(SOPLEX_WITH_BOOST) && !defined(SOPLEX_WITH_GMP) && !defined(SOPLEX_WITH_MPFR) && !defined(SOPLEX_WITH_ZLIB)
+#if !SOPLEX_HAS_PAPILO && !SOPLEX_HAS_BOOST && !SOPLEX_HAS_GMP && !SOPLEX_HAS_ZLIB
    SPX_MSG_INFO1(spxout, spxout << " none\n");
    return;
-#endif
+#endif /* !SOPLEX_HAS_PAPILO && !SOPLEX_HAS_BOOST && !SOPLEX_HAS_GMP && !SOPLEX_HAS_ZLIB */
 
    SPX_MSG_INFO1(spxout, spxout << "\n");
 
-#ifdef SOPLEX_WITH_PAPILO
+#if SOPLEX_HAS_PAPILO
    {
       std::ostringstream papiloversion;
       papiloversion << PAPILO_VERSION_MAJOR << "." << PAPILO_VERSION_MINOR << "." << PAPILO_VERSION_PATCH;
       SPX_MSG_INFO1(spxout, spxout << "  PaPILO " << std::left << std::setw(13) << papiloversion.str()
                     << " Parallel Presolve for Integer and Linear Optimization");
    }
-#ifdef PAPILO_GITHASH_AVAILABLE
+#if (defined(PAPILO_HAS_GITHASH) && PAPILO_HAS_GITHASH) || defined(PAPILO_GITHASH_AVAILABLE)
    SPX_MSG_INFO1(spxout, spxout << " [GitHash: " << PAPILO_GITHASH << "]");
-#endif
+#endif /* PAPILO_HAS_GITHASH || PAPILO_GITHASH_AVAILABLE */
    SPX_MSG_INFO1(spxout, spxout << "\n");
-#endif
+#endif /* SOPLEX_HAS_PAPILO */
 
-#ifdef SOPLEX_WITH_BOOST
+#if SOPLEX_HAS_BOOST
    {
       std::ostringstream boostversion;
       boostversion << BOOST_VERSION / 100000 << "." << BOOST_VERSION / 100 % 1000 << "." << BOOST_VERSION
@@ -7234,9 +7234,9 @@ void SoPlexBase<R>::printExternalCodes() const
       SPX_MSG_INFO1(spxout, spxout << "  Boost " << std::left << std::setw(14) << boostversion.str()
                     << " Boost C++ Libraries (boost.org)\n");
    }
-#endif
+#endif /* SOPLEX_HAS_BOOST */
 
-#ifdef SOPLEX_WITH_GMP
+#if SOPLEX_HAS_GMP
 #ifdef mpir_version
    SPX_MSG_INFO1(spxout, spxout << "  MPIR " << std::left << std::setw(15) << mpir_version
                  << " Multiple Precision Integers and Rationals Library developed by W. Hart (mpir.org)\n");
@@ -7244,17 +7244,17 @@ void SoPlexBase<R>::printExternalCodes() const
    SPX_MSG_INFO1(spxout, spxout << "  GMP " << std::left << std::setw(16) << gmp_version
                  << " GNU Multiple Precision Arithmetic Library developed by T. Granlund (gmplib.org)\n");
 #endif
-#endif
+#endif /* SOPLEX_HAS_GMP */
 
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
    SPX_MSG_INFO1(spxout, spxout << "  MPFR " << std::left << std::setw(15) << MPFR_VERSION_STRING
                  << " GNU Multiple Precision Floating-Point Reliable Library (mpfr.org)\n");
-#endif
+#endif /* SOPLEX_HAS_MPFR */
 
-#ifdef SOPLEX_WITH_ZLIB
+#if SOPLEX_HAS_ZLIB
    SPX_MSG_INFO1(spxout, spxout << "  ZLIB " << std::left << std::setw(15) << ZLIB_VERSION
                  << " General Purpose Compression Library by J. Gailly and M. Adler (zlib.net)\n");
-#endif
+#endif /* SOPLEX_HAS_ZLIB */
 }
 
 
@@ -7265,10 +7265,10 @@ template <class R>
 bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVals,
                                  const bool quiet) const
 {
-#ifndef SOPLEX_WITH_BOOST
+#if !SOPLEX_HAS_BOOST
    SPX_MSG_ERROR(std::cerr << "ERROR: rational solve without Boost not defined!" << std::endl;)
    return false;
-#else
+#else /* SOPLEX_HAS_BOOST */
    bool result = true;
    bool nRowsMatch = true;
    bool nColsMatch = true;
@@ -7556,7 +7556,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
    }
 
    return result;
-#endif
+#endif /* !SOPLEX_HAS_BOOST */
 }
 
 
@@ -8494,9 +8494,9 @@ void SoPlexBase<R>::_enableSimplifierAndScaler()
    {
    case SIMPLIFIER_OFF:
       _simplifier = nullptr;
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
       _boostedSimplifier = nullptr;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
       break;
 
    case SIMPLIFIER_AUTO:
@@ -8504,31 +8504,31 @@ void SoPlexBase<R>::_enableSimplifierAndScaler()
       _simplifier = &_simplifierMainSM;
       assert(_simplifier != nullptr);
       _simplifier->setMinReduction(realParam(MINRED));
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
       _boostedSimplifier = &_boostedSimplifierMainSM;
       assert(_boostedSimplifier != nullptr);
       _boostedSimplifier->setMinReduction(realParam(MINRED));
-#endif
+#endif /* SOPLEX_HAS_MPFR */
       break;
 
    case SIMPLIFIER_PAPILO:
-#ifdef SOPLEX_WITH_PAPILO
+#if SOPLEX_HAS_PAPILO
       _simplifier = &_simplifierPaPILO;
       assert(_simplifier != nullptr);
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
       _boostedSimplifier = &_boostedSimplifierPaPILO;
       assert(_boostedSimplifier != nullptr);
-#endif
-#else
+#endif /* SOPLEX_HAS_MPFR */
+#else /* !SOPLEX_HAS_PAPILO */
       _simplifier = &_simplifierMainSM;
       assert(_simplifier != nullptr);
       _simplifier->setMinReduction(realParam(MINRED));
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
       _boostedSimplifier = &_boostedSimplifierMainSM;
       assert(_boostedSimplifier != nullptr);
       _boostedSimplifier->setMinReduction(realParam(MINRED));
-#endif // !SOPLEX_WITH_MPFR
-#endif // SOPLEX_WITH_PAPILO
+#endif /* SOPLEX_HAS_MPFR */
+#endif /* SOPLEX_HAs_PAPILO */
       break;
 
    default:
@@ -8540,51 +8540,51 @@ void SoPlexBase<R>::_enableSimplifierAndScaler()
    {
    case SCALER_OFF:
       _scaler = nullptr;
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
       _boostedScaler = nullptr;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
       break;
 
    case SCALER_UNIEQUI:
       _scaler = &_scalerUniequi;
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
       _boostedScaler = &_boostedScalerUniequi;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
       break;
 
    case SCALER_BIEQUI:
       _scaler = &_scalerBiequi;
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
       _boostedScaler = &_boostedScalerBiequi;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
       break;
 
    case SCALER_GEO1:
       _scaler = &_scalerGeo1;
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
       _boostedScaler = &_boostedScalerGeo1;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
       break;
 
    case SCALER_GEO8:
       _scaler = &_scalerGeo8;
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
       _boostedScaler = &_boostedScalerGeo8;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
       break;
 
    case SCALER_LEASTSQ:
       _scaler = &_scalerLeastsq;
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
       _boostedScaler = &_boostedScalerLeastsq;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
       break;
 
    case SCALER_GEOEQUI:
       _scaler = &_scalerGeoequi;
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
       _boostedScaler = &_boostedScalerGeoequi;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
       break;
 
    default:
@@ -8599,17 +8599,17 @@ template <class R>
 void SoPlexBase<R>::_disableSimplifierAndScaler()
 {
    _simplifier = nullptr;
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
    _boostedSimplifier = nullptr;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
 
    // preserve scaler when persistent scaling is used
    if(!_isRealLPScaled)
    {
       _scaler = nullptr;
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
       _boostedScaler = nullptr;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
    }
    else
       assert(boolParam(SoPlexBase<R>::PERSISTENTSCALING));
@@ -9542,7 +9542,7 @@ SoPlexBase<R>::SoPlexBase()
    // give lu factorization to solver
    _solver.setBasisSolver(&_slufactor);
 
-#ifdef SOPLEX_WITH_MPFR
+#if SOPLEX_HAS_MPFR
    // set initial precision
    BP::default_precision(_initialPrecision);
 
@@ -9569,7 +9569,7 @@ SoPlexBase<R>::SoPlexBase()
    _hasOldUnbdBasis = false;
 
    _boostingLimitReached = false;
-#endif
+#endif /* SOPLEX_HAS_MPFR */
 
    // the R LP is initially stored in the solver; the rational LP is constructed, when the parameter SYNCMODE is
    // initialized in setSettings() below

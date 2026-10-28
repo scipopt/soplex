@@ -538,8 +538,8 @@ depend:
 		$(LIBSRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(LIBOBJSUBDIR\)/\1.o|g'\'' \
 		>>$(DEPEND)'
-		@echo `grep -l "SOPLEX_WITH_GMP" $(ALLSRC)` >$(GMPDEP)
-		@echo `grep -l "SOPLEX_WITH_ZLIB" $(ALLSRC)` >$(ZLIBDEP)
+		@echo `grep -l "SOPLEX_HAS_GMP" $(ALLSRC)` >$(GMPDEP)
+		@echo `grep -l "SOPLEX_HAS_ZLIB" $(ALLSRC)` >$(ZLIBDEP)
 
 -include	$(DEPEND)
 
@@ -561,6 +561,49 @@ touchexternal:	$(GMPDEP) $(ZLIBDEP)| $(OBJDIR)
 		@rm -f $(CONFIGFILE)
 		@echo "#ifndef __SPXCONFIG_H__" >> $(CONFIGFILE)
 		@echo "#define __SPXCONFIG_H__" >> $(CONFIGFILE)
+		@echo "/* If we're building a static lib, a user may define SOPLEX_NO_EXPORT, SOPLEX_EXPORT" >> $(CONFIGFILE)
+		@echo "   and/or SOPLEX_EXPORT_TEMPLATE beforehand. */" >> $(CONFIGFILE)
+ifeq ($(SHARED), true)
+		@echo "#define SOPLEX_STATIC_LIB" >> $(CONFIGFILE)
+else
+		@echo "/* #undef SOPLEX_STATIC_LIB */" >> $(CONFIGFILE)
+endif
+		@echo "#if defined(_MSC_VER)" >> $(CONFIGFILE)
+		@echo "   #ifndef SOPLEX_NO_EXPORT" >> $(CONFIGFILE)
+		@echo "      #define SOPLEX_NO_EXPORT" >> $(CONFIGFILE)
+		@echo "   #endif" >> $(CONFIGFILE)
+		@echo "   #if defined(SOPLEX_STATIC_LIB)" >> $(CONFIGFILE)
+		@echo "      #ifndef SOPLEX_EXPORT" >> $(CONFIGFILE)
+		@echo "         #define SOPLEX_EXPORT" >> $(CONFIGFILE)
+		@echo "      #endif" >> $(CONFIGFILE)
+		@echo "      #ifndef SOPLEX_EXPORT_TEMPLATE" >> $(CONFIGFILE)
+		@echo "         #define SOPLEX_EXPORT_TEMPLATE" >> $(CONFIGFILE)
+		@echo "      #endif" >> $(CONFIGFILE)
+		@echo "   #elif defined(SOPLEX_BUILD_SHARED_LIB)" >> $(CONFIGFILE)
+		@echo "      #define SOPLEX_EXPORT __declspec(dllexport)" >> $(CONFIGFILE)
+		@echo "      #define SOPLEX_EXPORT_TEMPLATE __declspec(dllexport)" >> $(CONFIGFILE)
+		@echo "   #else" >> $(CONFIGFILE)
+		@echo "      #define SOPLEX_EXPORT __declspec(dllimport)" >> $(CONFIGFILE)
+		@echo "      #define SOPLEX_EXPORT_TEMPLATE __declspec(dllimport)" >> $(CONFIGFILE)
+		@echo "   #endif" >> $(CONFIGFILE)
+		@echo "#else" >> $(CONFIGFILE)
+		@echo "   #if defined(SOPLEX_STATIC_LIB) || !defined(SOPLEX_BUILD_SHARED_LIB)" >> $(CONFIGFILE)
+		@echo "      #ifndef SOPLEX_NO_EXPORT" >> $(CONFIGFILE)
+		@echo "         #define SOPLEX_NO_EXPORT" >> $(CONFIGFILE)
+		@echo "      #endif" >> $(CONFIGFILE)
+		@echo "      #ifndef SOPLEX_EXPORT" >> $(CONFIGFILE)
+		@echo "         #define SOPLEX_EXPORT" >> $(CONFIGFILE)
+		@echo "      #endif" >> $(CONFIGFILE)
+		@echo "      #ifndef SOPLEX_EXPORT_TEMPLATE" >> $(CONFIGFILE)
+		@echo "         #define SOPLEX_EXPORT_TEMPLATE" >> $(CONFIGFILE)
+		@echo "      #endif" >> $(CONFIGFILE)
+		@echo "   #else" >> $(CONFIGFILE)
+		@echo "      #define SOPLEX_NO_EXPORT __attribute__((visibility("hidden")))" >> $(CONFIGFILE)
+		@echo "      #define SOPLEX_EXPORT __attribute__((visibility("default")))" >> $(CONFIGFILE)
+		@echo "      #define SOPLEX_EXPORT_TEMPLATE" >> $(CONFIGFILE)
+		@echo "   #endif" >> $(CONFIGFILE)
+		@echo "#endif" >> $(CONFIGFILE)
+
 ifneq ($(SPXGITHASH),$(LAST_SPXGITHASH))
 		@-$(MAKE) githash
 endif
@@ -611,26 +654,52 @@ endif
 		@echo "LAST_USRARFLAGS=$(USRARFLAGS)" >> $(LASTSETTINGS)
 		@echo "LAST_USRDFLAGS=$(USRDFLAGS)" >> $(LASTSETTINGS)
 ifeq ($(SYSTEM_FMT), true)
-		@echo "#define SOPLEX_WITH_SYSTEM_FMT" >> $(CONFIGFILE)
+		@echo "#define SOPLEX_HAS_SYSTEM_FMT 1" >> $(CONFIGFILE)
+else
+		@echo "#define SOPLEX_HAS_SYSTEM_FMT 0" >> $(CONFIGFILE)
 endif
 ifeq ($(GMP), true)
+		@echo "#define SOPLEX_HAS_GMP 1" >> $(CONFIGFILE)
+		@echo "/* Deprecated: */" >> $(CONFIGFILE)
 		@echo "#define SOPLEX_WITH_GMP" >> $(CONFIGFILE)
+else
+		@echo "#define SOPLEX_HAS_GMP 0" >> $(CONFIGFILE)
 endif
 ifeq ($(BOOST), true)
+		@echo "#define SOPLEX_HAS_BOOST 1" >> $(CONFIGFILE)
+		@echo "/* Deprecated: */" >> $(CONFIGFILE)
 		@echo "#define SOPLEX_WITH_BOOST" >> $(CONFIGFILE)
-ifneq ($(MPFR), true)
+ifeq ($(MPFR), true)
+		@echo "#define SOPLEX_HAS_MPFR 1" >> $(CONFIGFILE)
+		@echo "/* Deprecated: */" >> $(CONFIGFILE)
+		@echo "#define SOPLEX_WITH_MPFR" >> $(CONFIGFILE)
+		@echo "#define SOPLEX_HAS_CPPMPF 0" >> $(CONFIGFILE)
+else
+		@echo "#define SOPLEX_HAS_MPFR 0" >> $(CONFIGFILE)
+		@echo "#define SOPLEX_HAS_CPPMPF 1" >> $(CONFIGFILE)
+		@echo "/* Deprecated: */" >> $(CONFIGFILE)
 		@echo "#define SOPLEX_WITH_CPPMPF" >> $(CONFIGFILE)
 endif
-endif
-ifeq ($(MPFR), true)
-		@echo "#define SOPLEX_WITH_MPFR" >> $(CONFIGFILE)
+else
+		@echo "#define SOPLEX_HAS_BOOST 0" >> $(CONFIGFILE)
+		@echo "#define SOPLEX_HAS_MPFR 0" >> $(CONFIGFILE)
+		@echo "#define SOPLEX_HAS_CPPMPF 0" >> $(CONFIGFILE)
 endif
 ifeq ($(QUADMATH), true)
+		@echo "#define SOPLEX_HAS_QUADMATH 1" >> $(CONFIGFILE)
+		@echo "/* Deprecated: */" >> $(CONFIGFILE)
 		@echo "#define SOPLEX_WITH_FLOAT128" >> $(CONFIGFILE)
+else
+		@echo "#define SOPLEX_HAS_QUADMATH 0" >> $(CONFIGFILE)
 endif
 ifeq ($(ZLIB), true)
+		@echo "#define SOPLEX_HAS_ZLIB 1" >> $(CONFIGFILE)
+		@echo "/* Deprecated: */" >> $(CONFIGFILE)
 		@echo "#define SOPLEX_WITH_ZLIB" >> $(CONFIGFILE)
+else
+		@echo "#define SOPLEX_HAS_ZLIB 0" >> $(CONFIGFILE)
 endif
+		@echo "#define SOPLEX_HAS_PAPILO 0" >> $(CONFIGFILE)
 		@echo "#endif" >> $(CONFIGFILE)
 
 
