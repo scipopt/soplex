@@ -222,11 +222,6 @@ if(NOT TARGET SOPLEX::SOPLEX)
    endif()
 endif()
 
-# Deprecated variables.
-get_target_property(SOPLEX_INCLUDE_DIRS SOPLEX::libsoplex INTERFACE_INCLUDE_DIRECTORIES)
-set(SOPLEX_LIBRARIES "SOPLEX_LIBRARIES")
-set(SOPLEX_PIC_LIBRARIES "SOPLEX_LIBRARIES")
-
 # Deprecated `SOPLEX_LIBRARIES` target aliases SOPLEX::SOPLEX.
 if(NOT TARGET SOPLEX_LIBRARIES)
    add_library(SOPLEX_LIBRARIES INTERFACE IMPORTED)
@@ -237,5 +232,12 @@ if(NOT TARGET SOPLEX_LIBRARIES)
       message(DEBUG "CMake version ${CMAKE_VERSION} is too low to mark SOPLEX_LIBRARIES target as deprecated!")
    endif()
    target_link_libraries(SOPLEX_LIBRARIES INTERFACE SOPLEX::SOPLEX)
+endif()
+
+# Deprecated variables.
+get_target_property(SOPLEX_INCLUDE_DIRS SOPLEX::libsoplex INTERFACE_INCLUDE_DIRECTORIES)
+set(SOPLEX_LIBRARIES "SOPLEX_LIBRARIES")
+if(SOPLEX_HAS_PIC)
+   set(SOPLEX_PIC_LIBRARIES "SOPLEX_LIBRARIES")
 endif()
 
