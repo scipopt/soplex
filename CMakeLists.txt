@@ -68,7 +68,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
 # Path to CMake modules such as FindGMP.cmake.
-list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Modules")
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 # Packaging
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
@@ -580,7 +580,7 @@ include(CMakePackageConfigHelpers)
 write_basic_package_version_file("${CMAKE_BINARY_DIR}/soplex-config-version.cmake"
    VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}
    COMPATIBILITY SameMajorVersion
-)
+   )
 
 # Unless we build a package, we populate search directories for dependencies.
 if(NOT BUILD_PACKAGE AND ZLIB_DIR)
@@ -604,31 +604,35 @@ endif()
 
 # Configure soplex-config.cmake for the build-tree:
 # We add the CMake module path from the sources.
-set(EXTRA_CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Modules")
+set(EXTRA_CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 configure_file("${PROJECT_SOURCE_DIR}/soplex-config.cmake.in"
    "${CMAKE_BINARY_DIR}/soplex-config.cmake"
-   @ONLY)
+   @ONLY
+   )
 
 # Configure soplex-config.cmake for the installation.
 # We add the current directory of the installed soplex-config.cmake.
 set(EXTRA_CMAKE_MODULE_PATH "\${CMAKE_CURRENT_LIST_DIR}")
-configure_file(${PROJECT_SOURCE_DIR}/soplex-config.cmake.in
+configure_file("${PROJECT_SOURCE_DIR}/soplex-config.cmake.in"
    "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/soplex-config.cmake"
-   @ONLY)
+   @ONLY
+   )
 
 # Install CMake config and modules.
 install(FILES
    "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/soplex-config.cmake"
    "${CMAKE_BINARY_DIR}/soplex-config-version.cmake"
-   $<$<BOOL:${SOPLEX_HAS_GMP}>:${PROJECT_SOURCE_DIR}/cmake/Modules/FindGMP.cmake>
-   $<$<BOOL:${SOPLEX_HAS_QUADMATH}>:${PROJECT_SOURCE_DIR}/cmake/Modules/FindQuadmath.cmake>
-   $<$<BOOL:${SOPLEX_HAS_MPFR}>:${PROJECT_SOURCE_DIR}/cmake/Modules/FindMPFR.cmake>
-   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/soplex")
+   "$<$<BOOL:${SOPLEX_HAS_GMP}>:${PROJECT_SOURCE_DIR}/cmake/FindGMP.cmake>"
+   "$<$<BOOL:${SOPLEX_HAS_QUADMATH}>:${PROJECT_SOURCE_DIR}/cmake/FindQuadmath.cmake>"
+   "$<$<BOOL:${SOPLEX_HAS_MPFR}>:${PROJECT_SOURCE_DIR}/cmake/FindMPFR.cmake>"
+   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/soplex"
+   )
 
 # Install the soplex-targets export set.
 install(EXPORT soplex-targets
    NAMESPACE SOPLEX::
-   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/soplex")
+   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/soplex"
+   )
 
 # Export targets for the build-tree.
 export(EXPORT soplex-targets
