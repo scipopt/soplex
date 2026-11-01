@@ -1,60 +1,45 @@
-# ref: https://github.com/actions/runner-images
 name: amd64 Windows CMake
 
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
-concurrency:
-  group: ${{github.workflow}}-${{github.ref}}
-  cancel-in-progress: true
-
-# Building using the github runner environement directly.
 jobs:
   native:
-    strategy:
-      matrix:
-        cmake: [
-          {name: "VS26", generator: "Visual Studio 18 2026", config: Release},
-          #{name: "VS26", generator: "Visual Studio 18 2026", config: Debug},
-        ]
-      fail-fast: false
-    name: amd64•Windows•CMake(${{matrix.cmake.name}},${{matrix.cmake.config}})
+    name: amd64•Windows•CMake
     runs-on: windows-latest
     env:
-      CTEST_OUTPUT_ON_FAILURE: 1
+      MAKEFLAGS: -j4
     steps:
-      - uses: actions/checkout@v7
-      - name: Check CMake
-        run: |
-          cmake --version
-          cmake -G || true
-      - name: Configure
-        run: >
-          cmake -S. -Bbuild
-          -G "${{matrix.cmake.generator}}"
-          -DCMAKE_CONFIGURATION_TYPES=${{matrix.cmake.config}}
-          -DZLIB=OFF -DGMP=OFF -DBOOST=OFF -DPAPILO=OFF
-          -DCMAKE_INSTALL_PREFIX=install
-      - name: Build
-        run: >
-          cmake --build build
-          --config ${{matrix.cmake.config}}
-          --target ALL_BUILD
-          -v -j2
-      - name: Test
-        run: >
-          cmake --build build
-          --config ${{matrix.cmake.config}}
-          --target RUN_TESTS
-          -v
-      - name: Install
-        run: >
-          cmake --build build
-          --config ${{matrix.cmake.config}}
-          --target INSTALL
-          -v
-
-  amd64_windows_cmake:
-    runs-on: ubuntu-latest
-    needs: native
-    steps:
-      - uses: actions/checkout@v7
+    - uses: actions/checkout@v7
+    - name: Install dependencies
+      run: vcpkg install zlib boost-multiprecision gmp mpfr --triplet x64-windows
+    - name: Check CMake
+      run: cmake --version
+    - name: Configure
+      run: >
+        cmake -S. -Bbuild
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+        -DZLIB=OFF -DGMP=OFF -DMPFR=OFF -DPAPILO=OFF
+        -DCMAKE_INSTALL_PREFIX=install
+    - name: Build
+      run: >
+        cmake --build build
+        --config Release
+        ${{env.MAKEFLAGS}} -v
+    - name: Test
+      run: >
+        ctest --test-dir build
+        --output-on-failure
+        -C Release
+        ${{env.MAKEFLAGS}}
+    - name: Install
+      run: >
+        cmake --install build
+        --config Release
+        -v

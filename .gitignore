@@ -24,16 +24,12 @@ src/soplex/git_hash.cpp
 bin/
 lib/
 obj/
-release/
 src/soplex/git_hash.cpp
-# Bazel build folders
-/bazel-*
-/MODULE.bazel.lock
 # common names for cmake build folders
-/build
-/build*
-/debug
-/release
+build*/
+install*/
+debug*/
+release*/
 cmake-build-debug/
 cmake-build-release/
 # test infrastructure
@@ -46,4 +42,4 @@ doc/latex/
 faqdata.php
 faq.inc
 # webdemo
-/build_webdemo
+build_webdemo
