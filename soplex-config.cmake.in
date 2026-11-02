@@ -57,14 +57,14 @@ if(NOT TARGET SOPLEX::SOPLEX)
    list(APPEND CMAKE_MODULE_PATH @EXTRA_CMAKE_MODULE_PATH@)
    
    # If SoPlex was built with ZLIB then we also need it.
-   @SOPLEX_CONFIG_ZLIB_DIR@
    if(SOPLEX_HAS_ZLIB)
+      @SOPLEX_CONFIG_ZLIB_DIR@
       find_dependency(ZLIB)
    endif()
    
    # If SoPlex was built with GMP then we also need it.
-   @SOPLEX_CONFIG_GMP_DIR@
    if(SOPLEX_HAS_GMP)
+      @SOPLEX_CONFIG_GMP_DIR@
       find_dependency(GMP)
    
       # Support legacy FindGMP.cmake module when importing SoPlex.
@@ -104,8 +104,8 @@ if(NOT TARGET SOPLEX::SOPLEX)
    endif()
    
    # If SoPlex was built with Quadmath then we also need it.
-   @SOPLEX_CONFIG_QUADMATH_DIR@
    if(SOPLEX_HAS_QUADMATH)
+      @SOPLEX_CONFIG_QUADMATH_DIR@
       find_dependency(Quadmath)
    
       # Support legacy FindQuadmath.cmake module when importing PaPILO.
@@ -128,9 +128,9 @@ if(NOT TARGET SOPLEX::SOPLEX)
    endif()
    
    # If SoPlex was built with PaPILO then we also need it.
-   @SOPLEX_CONFIG_PAPILO_DIR@
    if(SOPLEX_HAS_PAPILO)
-      find_dependency(PAPILO)
+      @SOPLEX_CONFIG_PAPILO_DIR@
+      find_dependency(PAPILO HINTS "${PAPILO_DIR}")
    
       # Support older PaPILO versions that do not export PAPILO::PAPILO.
       if(PAPILO_FOUND AND NOT TARGET PAPILO::PAPILO)
@@ -145,8 +145,8 @@ if(NOT TARGET SOPLEX::SOPLEX)
    endif()
    
    # If SoPlex was built with MPFR then we also need it.
-   @SOPLEX_CONFIG_MPFR_DIR@
    if(SOPLEX_HAS_MPFR)
+      @SOPLEX_CONFIG_MPFR_DIR@
       find_dependency(MPFR)
    
       # Support legacy FindMPFR.cmake module when importing SoPlex.
@@ -186,8 +186,8 @@ if(NOT TARGET SOPLEX::SOPLEX)
    endif()
    
    # If SoPlex was built with Boost then we also need it.
-   @SOPLEX_CONFIG_BOOST_DIR@
    if(SOPLEX_HAS_BOOST)
+      @SOPLEX_CONFIG_BOOST_DIR@
       # Extract Boost version in old CMake versions.
       if(Boost_FOUND)
          if(NOT DEFINED Boost_VERSION_STRING)
