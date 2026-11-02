@@ -12,7 +12,7 @@ Please read the following before posting a new bug report:
 
 - If you are reasonably confident your issue is a bug in SoPlex, this is the right place. Be sure to include as much relevant information as possible, including a minimal reproducible example. See https://help.github.com/articles/basic-writing-and-formatting-syntax/ for background on how to format text and code on GitHub issues.
 
-- If the issue occurs when running an instance, be sure to include it, along with any non-default setting. See [the documentation on parameters](https://soplex.zib.de/doc/html/PARS.php)
+- If the issue occurs when running an instance, be sure to include it, along with any non-default setting. See [the documentation on parameters](https://soplex.zib.de/doc/html/PARS.php).
 If the issue occurs with a model built programmatically, include a minimal script producing the model.
 You can use `writeStateReal("my_model", NULL, NULL, FALSE)` to write the model, the basis, and the settings to files.
 
