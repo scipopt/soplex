@@ -16,8 +16,9 @@ jobs:
       MAKEFLAGS: -j4
     steps:
     - uses: actions/checkout@v7
+    # avoid windows compilation of ZLIB, GMP, and MPFR
     - name: Install dependencies
-      run: vcpkg install zlib boost-multiprecision gmp mpfr --triplet x64-windows
+      run: vcpkg install boost-multiprecision --triplet x64-windows
     - name: Check CMake
       run: cmake --version
     - name: Configure
