@@ -73,7 +73,10 @@
 #endif // NDEBUG
 #endif /* SOPLEX_HAS_MPFR */
 #ifdef SOPLEX_HAS_CPPMPF
+// provide unused nvp to cpp_dec_float before Boost 1.72
+#if BOOST_VERSION < 107200
 #include <boost/serialization/nvp.hpp>
+#endif
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #endif /* SOPLEX_HAS_CPPMPF */
 
