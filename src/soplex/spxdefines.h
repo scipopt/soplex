@@ -60,7 +60,8 @@
 #endif
 
 #if SOPLEX_HAS_BOOST
-#include "boost/multiprecision/number.hpp"
+#include <boost/version.hpp>
+#include <boost/multiprecision/number.hpp>
 #if SOPLEX_HAS_QUADMATH
 #include <boost/multiprecision/float128.hpp>
 #endif /* SOPLEX_HAS_QUADMATH */
@@ -69,10 +70,10 @@
 // For multiple precision
 #include <boost/multiprecision/mpfr.hpp>
 #ifndef NDEBUG
-#include "boost/multiprecision/debug_adaptor.hpp" // For debugging mpf numbers
+#include <boost/multiprecision/debug_adaptor.hpp> // For debugging mpf numbers
 #endif // NDEBUG
 #endif /* SOPLEX_HAS_MPFR */
-#ifdef SOPLEX_HAS_CPPMPF
+#if SOPLEX_HAS_CPPMPF
 // provide unused nvp to cpp_dec_float before Boost 1.72
 #if BOOST_VERSION < 107200
 #include <boost/serialization/nvp.hpp>
