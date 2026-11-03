@@ -60,7 +60,8 @@
 #endif
 
 #ifdef SOPLEX_WITH_BOOST
-#include "boost/multiprecision/number.hpp"
+#include <boost/version.hpp>
+#include <boost/multiprecision/number.hpp>
 #ifdef SOPLEX_WITH_FLOAT128
 #include <boost/multiprecision/float128.hpp>
 #endif
@@ -69,7 +70,7 @@
 // For multiple precision
 #include <boost/multiprecision/mpfr.hpp>
 #ifndef NDEBUG
-#include "boost/multiprecision/debug_adaptor.hpp" // For debuging mpf numbers
+#include <boost/multiprecision/debug_adaptor.hpp> // For debuging mpf numbers
 #endif // NDEBUG
 #endif // SOPLEX_WITH_MPFR
 #ifdef SOPLEX_WITH_CPPMPF
