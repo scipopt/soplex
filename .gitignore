@@ -24,12 +24,12 @@ src/soplex/git_hash.cpp
 bin/
 lib/
 obj/
-release/
 src/soplex/git_hash.cpp
 # common names for cmake build folders
-build/
-debug/
-release/
+build*/
+install*/
+debug*/
+release*/
 cmake-build-debug/
 cmake-build-release/
 # test infrastructure

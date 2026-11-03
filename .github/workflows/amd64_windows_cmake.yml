@@ -1,0 +1,46 @@
+name: amd64 Windows CMake
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  native:
+    name: amd64•Windows•CMake
+    runs-on: windows-latest
+    env:
+      MAKEFLAGS: -j4
+    steps:
+    - uses: actions/checkout@v7
+    # avoid windows compilation of ZLIB, GMP, and MPFR
+    - name: Install dependencies
+      run: vcpkg install boost-multiprecision --triplet x64-windows
+    - name: Check CMake
+      run: cmake --version
+    - name: Configure
+      run: >
+        cmake -S. -Bbuild
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+        -DZLIB=OFF -DGMP=OFF -DMPFR=OFF -DPAPILO=OFF
+        -DCMAKE_INSTALL_PREFIX=install
+    - name: Build
+      run: >
+        cmake --build build
+        --config Release
+        ${{env.MAKEFLAGS}} -v
+    - name: Test
+      run: >
+        ctest --test-dir build
+        --output-on-failure
+        -C Release
+        ${{env.MAKEFLAGS}}
+    - name: Install
+      run: >
+        cmake --install build
+        --config Release
+        -v

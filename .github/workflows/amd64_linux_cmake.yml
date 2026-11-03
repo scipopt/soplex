@@ -1,0 +1,45 @@
+name: amd64 Linux CMake
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  native:
+    name: amd64•Linux•CMake
+    runs-on: ubuntu-latest
+    env:
+      MAKEFLAGS: -j4
+    steps:
+    - uses: actions/checkout@v7
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y libboost-dev libmpfr-dev
+    - name: Check CMake
+      run: cmake --version
+    - name: Configure
+      run: >
+        cmake -S. -Bbuild
+        -G "Unix Makefiles"
+        -DCMAKE_BUILD_TYPE=Release
+        -DPAPILO=OFF
+        -DCMAKE_INSTALL_PREFIX=install
+    - name: Build
+      run: >
+        cmake --build build
+        --config Release
+        ${{env.MAKEFLAGS}} -v
+    - name: Test
+      run: >
+        ctest --test-dir build
+        --output-on-failure
+        -C Release
+        ${{env.MAKEFLAGS}}
+    - name: Install
+      run: >
+        cmake --install build
+        --config Release
+        -v
