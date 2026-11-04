@@ -6774,7 +6774,7 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
       if(value < SOPLEX_DEFAULT_EPS_PIVOR)
       {
          SPX_MSG_WARNING(spxout, spxout << "Cannot set feasibility tolerance to small value " << value <<
-                         " without GMP - using " << SOPLEX_DEFAULT_EPS_PIVOR << ".\n");
+                         " without Boost - using " << SOPLEX_DEFAULT_EPS_PIVOR << ".\n");
          _rationalFeastol = SOPLEX_DEFAULT_EPS_PIVOR;
          this->_tolerances->setFeastol(SOPLEX_DEFAULT_EPS_PIVOR);
          break;
@@ -6787,11 +6787,11 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const 
 
    // dual feasibility tolerance; passed to the floating point solver only when calling solve()
    case SoPlexBase<R>::OPTTOL:
-#ifndef SOPLEX_WITH_GMP
+#ifndef SOPLEX_WITH_BOOST
       if(value < SOPLEX_DEFAULT_EPS_PIVOR)
       {
          SPX_MSG_WARNING(spxout, spxout << "Cannot set optimality tolerance to small value " << value <<
-                         " without GMP - using " << SOPLEX_DEFAULT_EPS_PIVOR << ".\n");
+                         " without Boost - using " << SOPLEX_DEFAULT_EPS_PIVOR << ".\n");
          _rationalOpttol = SOPLEX_DEFAULT_EPS_PIVOR;
          this->_tolerances->setOpttol(SOPLEX_DEFAULT_EPS_PIVOR);
          break;

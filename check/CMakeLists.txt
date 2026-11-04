@@ -78,7 +78,7 @@ if(${Boost_VERSION_MACRO} GREATER "106999")
     set(settings
         ${settings}
         mpf)
-   if(SOPLEX_HAVE_FLOAT128)
+   if(SOPLEX_WITH_FLOAT128)
     set(settings
         ${settings}
         quad)
