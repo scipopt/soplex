@@ -45,32 +45,32 @@ inline bool NE(R a, S b, T eps)
    return spxAbs(a - b) > eps;
 }
 
-/// returns \c true iff a < b + eps
+/// returns \c true iff b-a > eps
 template <class R, class S, class T>
 inline bool LT(R a, S b, T eps)
 {
    return (a - b) < -eps;
 }
 
-/// returns \c true iff a <= b + eps
+/// returns \c true iff a-b <= eps
 template <class R, class S, class T>
 inline bool LE(R a, S b, T eps)
 {
-   return (a - b) < eps;
+   return (a - b) <= eps;
 }
 
-/// returns \c true iff a > b + eps
+/// returns \c true iff a-b > eps
 template <class R, class S, class T>
 inline bool GT(R a, S b, T eps)
 {
    return (a - b) > eps;
 }
 
-/// returns \c true iff a >= b + eps
+/// returns \c true iff b-a <= eps
 template <class R, class S, class T>
 inline bool GE(R a, S b, T eps)
 {
-   return (a - b) > -eps;
+   return (a - b) >= -eps;
 }
 
 /// returns \c true iff |a| <= eps
@@ -101,11 +101,11 @@ inline bool NErel(R a, S b, T eps)
    return spxAbs(relDiff(a, b)) > eps;
 }
 
-/// returns \c true iff relDiff(a,b) <= -eps
+/// returns \c true iff relDiff(b,a) > eps
 template <class R, class S, class T>
 inline bool LTrel(R a, S b, T eps)
 {
-   return relDiff(a, b) <= -eps;
+   return relDiff(a, b) < -eps;
 }
 
 /// returns \c true iff relDiff(a,b) <= eps
@@ -122,11 +122,11 @@ inline bool GTrel(R a, S b, T eps)
    return relDiff(a, b) > eps;
 }
 
-/// returns \c true iff relDiff(a,b) > -eps
+/// returns \c true iff relDiff(b,a) <= eps
 template <class R, class S, class T>
 inline bool GErel(R a, S b, T eps)
 {
-   return relDiff(a, b) > -eps;
+   return relDiff(a, b) >= -eps;
 }
 
 // Instantiation for Real
