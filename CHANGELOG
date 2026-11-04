@@ -10,6 +10,7 @@ fixed bugs:
 - handle objective offset at any position in LP reader
 - correct upper bound check in SPxMainSM<R>::propagatePseudoobj() to enable objective computation
 - enforce numerical consistency of comparator functions LE, GE, LTrel, and GErel with respect to tolerance equality
+- also clear simplified problem and reset scaling state in SoPlexBase<R>::clearLPReal() and SoPlexBase<R>::clearLPRational() to avoid remaining data when reusing the solver
 
 miscellaneous:
 - added DEBUGTOOL=perf option for check scripts to collect perf statistics (new sections @06, @09, @10), including computation and comparison of non-memory-stalling frequency-normalized time
