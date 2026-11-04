@@ -2149,7 +2149,7 @@ void SPxMainSM<R>::propagatePseudoobj(SPxLPBase<R>& lp)
       }
       else if(val > 0)
       {
-         if(lp.upper(j) >= R(-infinity))
+         if(lp.upper(j) >= R(infinity))
             return;
 
          pseudoObj += val * lp.upper(j);
