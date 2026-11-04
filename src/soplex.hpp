@@ -2775,8 +2775,20 @@ void SoPlexBase<R>::clearLPReal()
 {
    assert(_realLP != nullptr);
 
+   // free original copy
+   if(!_isRealLPLoaded)
+   {
+      _realLP->~SPxLPBase<R>();
+      spx_free(_realLP);
+      _realLP = &_solver;
+      _isRealLPLoaded = true;
+   }
+
    _realLP->clear();
    _hasBasis = false;
+   _isRealLPScaled = false;
+   _optimizeCalls = 0;
+   _unscaleCalls = 0;
    _rationalLUSolver.clear();
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO)
@@ -3711,8 +3723,20 @@ void SoPlexBase<R>::clearLPRational()
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO)
    {
+      // free original copy
+      if(!_isRealLPLoaded)
+      {
+         _realLP->~SPxLPBase<R>();
+         spx_free(_realLP);
+         _realLP = &_solver;
+         _isRealLPLoaded = true;
+      }
+
       _realLP->clear();
       _hasBasis = false;
+      _isRealLPScaled = false;
+      _optimizeCalls = 0;
+      _unscaleCalls = 0;
    }
 
    _invalidateSolution();
