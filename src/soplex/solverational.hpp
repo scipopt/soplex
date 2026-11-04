@@ -880,6 +880,8 @@ void SoPlexBase<R>::_computeReducedCostViolation(
 
    for(int c = numColsRational() - 1; c >= 0; c--)
    {
+      assert((lowerRational(c) == upperRational(c)) == (_colTypes[c] == RANGETYPE_FIXED));
+
       if(_colTypes[c] == RANGETYPE_FIXED)
          continue;
 
@@ -921,6 +923,8 @@ void SoPlexBase<R>::_computeDualViolation(
 
    for(int r = numRowsRational() - 1; r >= 0; r--)
    {
+      assert((lhsRational(r) == rhsRational(r)) == (_rowTypes[r] == RANGETYPE_FIXED));
+
       if(_rowTypes[r] == RANGETYPE_FIXED)
          continue;
 
@@ -2025,8 +2029,6 @@ void SoPlexBase<R>::_solveRealForRationalStable(
    {
       for(int r = numRowsRational() - 1; r >= 0; r--)
       {
-         assert((lhsRational(r) == rhsRational(r)) == (_rowTypes[r] == RANGETYPE_FIXED));
-
          if(_rowTypes[r] != RANGETYPE_FIXED && _basisStatusRows[r] == SPxSolverBase<R>::FIXED)
             _basisStatusRows[r] = (maximizing == (sol._dual[r] < 0))
                                   ? SPxSolverBase<R>::ON_LOWER
@@ -2359,8 +2361,6 @@ void SoPlexBase<R>::_performOptIRStable(
    {
       for(int r = numRowsRational() - 1; r >= 0; r--)
       {
-         assert((lhsRational(r) == rhsRational(r)) == (_rowTypes[r] == RANGETYPE_FIXED));
-
          if(_rowTypes[r] != RANGETYPE_FIXED && _basisStatusRows[r] == SPxSolverBase<R>::FIXED)
             _basisStatusRows[r] = (maximizing == (sol._dual[r] < 0))
                                   ? SPxSolverBase<R>::ON_LOWER
@@ -2964,8 +2964,6 @@ void SoPlexBase<R>::_solveRealForRationalBoostedStable(
       {
          for(int r = numRowsRational() - 1; r >= 0; r--)
          {
-            assert((lhsRational(r) == rhsRational(r)) == (_rowTypes[r] == RANGETYPE_FIXED));
-
             if(_rowTypes[r] != RANGETYPE_FIXED && _basisStatusRows[r] == SPxSolverBase<R>::FIXED)
                _basisStatusRows[r] = (maximizing == (sol._dual[r] < 0))
                                      ? SPxSolverBase<R>::ON_LOWER
@@ -3335,8 +3333,6 @@ void SoPlexBase<R>::_performOptIRStableBoosted(
       {
          for(int r = numRowsRational() - 1; r >= 0; r--)
          {
-            assert((lhsRational(r) == rhsRational(r)) == (_rowTypes[r] == RANGETYPE_FIXED));
-
             if(_rowTypes[r] != RANGETYPE_FIXED && _basisStatusRows[r] == SPxSolverBase<R>::FIXED)
                _basisStatusRows[r] = (maximizing == (sol._dual[r] < 0))
                                      ? SPxSolverBase<R>::ON_LOWER
@@ -4179,6 +4175,9 @@ void SoPlexBase<R>::_transformUnbounded()
       }
       else if(_realLP->rhs(r) < realParam(SoPlexBase<R>::INFTY))
          _realLP->changeRhs(r, realParam(SoPlexBase<R>::INFTY));
+
+      // adapt row type to zeroed sides
+      _rowTypes[r] = _rangeTypeRational(lhsRational(r), rhsRational(r));
    }
 
    // transform objective function to constraint and add auxiliary variable
@@ -4226,6 +4225,9 @@ void SoPlexBase<R>::_transformUnbounded()
       }
       else if(_realLP->upper(c) < realParam(SoPlexBase<R>::INFTY))
          _realLP->changeUpper(c, realParam(SoPlexBase<R>::INFTY));
+
+      // adapt column type to zeroed bounds
+      _colTypes[c] = _rangeTypeRational(lowerRational(c), upperRational(c));
    }
 
    // adjust basis
@@ -4341,6 +4343,9 @@ void SoPlexBase<R>::_untransformUnbounded(SolRational& sol, bool unbounded)
          _realLP->changeRhs(r, R(_unboundedRhs[r]));
       }
 
+      // adapt row type to restored sides
+      _rowTypes[r] = _rangeTypeRational(lhsRational(r), rhsRational(r));
+
       assert((lhsRational(r) > _rationalNegInfty) == _lowerFinite(_rowTypes[r]));
       assert((rhsRational(r) < _rationalPosInfty) == _upperFinite(_rowTypes[r]));
       assert((lhsReal(r) > -realParam(SoPlexBase<R>::INFTY)) == _lowerFinite(_rowTypes[r]));
@@ -4360,6 +4365,9 @@ void SoPlexBase<R>::_untransformUnbounded(SolRational& sol, bool unbounded)
          _rationalLP->changeUpper(c, _unboundedUpper[c]);
          _realLP->changeUpper(c, R(_unboundedUpper[c]));
       }
+
+      // adapt column type to restored bounds
+      _colTypes[c] = _rangeTypeRational(lowerRational(c), upperRational(c));
 
       assert((lowerRational(c) > _rationalNegInfty) == _lowerFinite(_colTypes[c]));
       assert((upperRational(c) < _rationalPosInfty) == _upperFinite(_colTypes[c]));
