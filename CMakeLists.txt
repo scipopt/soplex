@@ -229,7 +229,7 @@ if(BOOST)
          math(EXPR _boost_patch "${Boost_VERSION} % 100")
          set(Boost_VERSION_STRING "${_boost_major}.${_boost_minor}.${_boost_patch}")
       endif()
-      message(STATUS "Found Boost version ${Boost_VERSION_STRING}.")
+      message(STATUS "Found Boost version ${Boost_VERSION_STRING}: ${Boost_CONFIG}")
       set(SOPLEX_HAS_BOOST 1)
 
       if(Boost_VERSION_STRING VERSION_LESS BOOST_RECOMMENDED_VERSION)
