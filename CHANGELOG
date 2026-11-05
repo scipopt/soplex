@@ -37,6 +37,11 @@ fixed bugs:
 - enforce numerical consistency of comparator functions LE, GE, LTrel, and GErel with respect to tolerance equality
 - also clear simplified problem and reset scaling state in SoPlexBase<R>::clearLPReal() and SoPlexBase<R>::clearLPRational() to avoid remaining data when reusing the solver
 - align range types in SoPlexBase<R>::_transformUnbounded() and SoPlexBase<R>::_untransformUnbounded() to enforce fixed status of zeroed ranges in unbounded transformation
+- require Boost to set small optimality tolerance in SoPlexBase<R>::setRealParam() for rational iterative refinement
+
+build system:
+- restrict the Boost multiprecision backends (mpfr_float, cpp_dec_float, and float128) in cmake to Boost 1.70 or newer, where variable-precision arithmetic is stable
+- correct the quadprecision test setting guard to SOPLEX_WITH_FLOAT128 in check/CMakeLists.txt so that the quad tests are registered
 
 miscellaneous:
 - added DEBUGTOOL=perf option for check scripts to collect perf statistics (new sections @06, @09, @10), including computation and comparison of non-memory-stalling frequency-normalized time
