@@ -130,10 +130,8 @@ string(TOUPPER "${ZLIB}" ZLIB)
 
 if(BUILD_SHARED_LIBS)
    message(STATUS "Building shared libraries.")
-   set(SOPLEX_HAS_PIC 1)
 else()
    message(STATUS "Building static libraries.")
-   set(SOPLEX_HAS_PIC 0)
 endif()
 
 # Default build type is 'Release'.
@@ -563,6 +561,14 @@ add_subdirectory(src)
 add_subdirectory(tests/c_interface)
 add_subdirectory(check)
 enable_testing()
+
+# Store PIC flag.
+get_target_property(libsoplex_pic libsoplex POSITION_INDEPENDENT_CODE)
+if(libsoplex_pic)
+   set(SOPLEX_HAS_PIC 1)
+else()
+   set(SOPLEX_HAS_PIC 0)
+endif()
 
 ##### INSTALLATION #####
 
