@@ -63,13 +63,10 @@ set(settings
    steep
    )
 
-if(SOPLEX_HAS_BOOST AND SOPLEX_HAS_GMP)
-   set(settings ${settings} exact)
+if(SOPLEX_HAS_MPFR)
+   set(settings ${settings} exact exact-pure-boosting)
 endif()
-if(SOPLEX_HAS_BOOST AND SOPLEX_HAS_GMP AND SOPLEX_HAS_MPFR)
-   set(settings ${settings} exact-pure-boosting)
-endif()
-if(SOPLEX_HAS_BOOST AND (SOPLEX_HAS_MPFR OR SOPLEX_HAS_CPPMPF))
+if(SOPLEX_HAS_BOOST)
    set(settings ${settings} mpf)
 endif()
 if(SOPLEX_HAS_QUADMATH)
