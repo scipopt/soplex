@@ -564,9 +564,9 @@ touchexternal:	$(GMPDEP) $(ZLIBDEP)| $(OBJDIR)
 		@echo "/* If we're building a static lib, a user may define SOPLEX_NO_EXPORT, SOPLEX_EXPORT" >> $(CONFIGFILE)
 		@echo "   and/or SOPLEX_EXPORT_TEMPLATE beforehand. */" >> $(CONFIGFILE)
 ifeq ($(SHARED), true)
-		@echo "#define SOPLEX_STATIC_LIB" >> $(CONFIGFILE)
-else
 		@echo "/* #undef SOPLEX_STATIC_LIB */" >> $(CONFIGFILE)
+else
+		@echo "#define SOPLEX_STATIC_LIB" >> $(CONFIGFILE)
 endif
 		@echo "#if defined(_MSC_VER)" >> $(CONFIGFILE)
 		@echo "   #ifndef SOPLEX_NO_EXPORT" >> $(CONFIGFILE)
