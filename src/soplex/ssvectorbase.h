@@ -94,12 +94,12 @@ public:
     *
     *  There are three methods for directly affecting the setup status of an SSVectorBase:
     *
-    *  - unSetup():    This method sets the status to ``not setup''.
+    *  - unSetup():    This method sets the status to "not setup".
     *
     *  - setup():      This method initializes the IdxSet to the SSVectorBase's nonzero indices and sets the status to
-    *                  ``setup''.
+    *                  "setup".
     *
-    *  - forceSetup(): This method sets the status to ``setup'' without verifying that the IdxSet correctly contains all
+    *  - forceSetup(): This method sets the status to "setup" without verifying that the IdxSet correctly contains all
     *                  nonzero indices. It may be used when the nonzero indices have been computed externally.
     */
    ///@{

@@ -67,7 +67,7 @@ void SPxHybridPR<R>::clear()
    steep.clear();
    devex.clear();
    parmult.clear();
-   this->thesolver = 0;
+   this->thesolver = nullptr;
 }
 
 template <class R>

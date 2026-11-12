@@ -1406,7 +1406,7 @@ void SPxSolverBase<R>::setType(Type tp)
    template <class R>
    SPxSolverBase<R>::SPxSolverBase(const SPxSolverBase<R>& base)
       : SPxLPBase<R> (base)
-      , SPxBasisBase<R>(this->basSe)
+      , SPxBasisBase<R>(base)
       , theType(base.theType)
       , thePricing(base.thePricing)
       , theRep(base.theRep)
