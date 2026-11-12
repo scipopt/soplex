@@ -88,8 +88,8 @@ public:
    /// default constructor
    SPxWeightPR()
       : SPxPricer<R>("Weight")
-      , penalty(0)
-      , coPenalty(0)
+      , penalty(nullptr)
+      , coPenalty(nullptr)
       , objlength(0)
    {}
    /// copy constructor
@@ -98,8 +98,8 @@ public:
       , cPenalty(old.cPenalty)
       , rPenalty(old.rPenalty)
       , leavePenalty(old.leavePenalty)
-      , penalty(0)
-      , coPenalty(0)
+      , penalty(nullptr)
+      , coPenalty(nullptr)
       , objlength(old.objlength)
    {
       if(old.penalty == old.rPenalty.get_const_ptr())

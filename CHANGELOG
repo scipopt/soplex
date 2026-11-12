@@ -38,6 +38,10 @@ fixed bugs:
 - also clear simplified problem and reset scaling state in SoPlexBase<R>::clearLPReal() and SoPlexBase<R>::clearLPRational() to avoid remaining data when reusing the solver
 - align range types in SoPlexBase<R>::_transformUnbounded() and SoPlexBase<R>::_untransformUnbounded() to enforce fixed status of zeroed ranges in unbounded transformation
 - require Boost to set small optimality tolerance in SoPlexBase<R>::setRealParam() for rational iterative refinement
+- declare SoPlexBase<R> a friend of SPxSolverBase<R> to let SoPlexBase<R>::_checkBasisScaling() access SPxBasisBase<R>::loadMatrixVecs() for SOPLEX_DEBUG
+- accumulate basis columns in SoPlexBase<R>::multBasis() with VectorBase<R>::multAdd() instead of the resetting DSVectorBase<R>::add() to correct the multiplication with the basis matrix for row representation
+- rework the broken basis inverse for row representation in SoPlexBase<R>::getBasisInverseRowReal(), SoPlexBase<R>::getBasisInverseColReal(), and SoPlexBase<R>::getBasisInverseTimesVecReal()
+- correct base initialization in copy constructor SPxSolverBase<R>::SPxSolverBase(), MPFR guard of SoPlexBase<R>::_convertDataArrayVarStatusToBoosted() and SoPlexBase<R>::_convertDataArrayVarStatusToRPrecision(), minimum call in VectorBase<R>::minAbs(), string conversion in SLUFactorRational::load(), rational conversions in synchronizing modifications of SoPlexBase<R>, negations of stable sums in CLUFactor<R>::solveLright2() and CLUFactor<R>::solveUpdateLeft2(), unit vector cast in SPxSolverBase<R>::coVector(), template arguments of SVectorBase<R>::scaleAssign(), return type of SPxSolverBase<R>::cols(), and square root call in SVectorBase<R>::length() to avert instantiation errors
 
 build system:
 - restrict the Boost multiprecision backends (mpfr_float, cpp_dec_float, and float128) in cmake to Boost 1.70 or newer, where variable-precision arithmetic is stable

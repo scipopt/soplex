@@ -825,25 +825,69 @@ public:
    /// computes the exact condition number for the current basis matrix using the power method; returns true on success
    bool getExactCondition(R& condition);
 
-   /// computes row \p r of basis inverse; returns true on success
-   /// @param r which row of the basis inverse is computed
-   /// @param coef values of result vector (not packed but scattered)
-   /// @param inds indices of result vector (nullptr if not to be used)
-   /// @param ninds number of nonzeros in result vector
-   /// @param unscale determines whether the result should be unscaled according to the original LP data
+   /** computes row \p r of basis inverse; returns true on success
+
+     For the rows \f$ B_r \f$ with basic slack, the rows \f$ N_r \f$ with nonbasic slack, and the basic columns \f$ B_c \f$,
+     the column basis \f$ B \f$ with the rows \f$ (B_r, N_r) \f$, the column positions \f$ (B_r, B_c) \f$, and their inverse are
+
+     \f[
+     B = \left( \begin{array}{cc} I & A_{B_r,B_c} \\ 0 & A_{N_r,B_c} \end{array} \right), \qquad
+     B^{-1} = \left( \begin{array}{cc} I & -A_{B_r,B_c} A_{N_r,B_c}^{-1} \\ 0 & A_{N_r,B_c}^{-1} \end{array} \right)
+     = \left( \begin{array}{cc} I & -R_{B_r}^{-1} A'_{B_r,B_c} {A'}_{N_r,B_c}^{-1} R_{N_r} \\
+     0 & C_{B_c} {A'}_{N_r,B_c}^{-1} R_{N_r} \end{array} \right)
+     \f]
+
+     for the scaled matrix \f$ A' = R A C \f$, i.e., \f$ B^{-1} = \tilde{C}_B B'^{-1} R \f$ for the scaled basis
+     \f$ B' = R B \tilde{C}_B \f$ with \f$ \tilde{C} = \mathrm{diag}(C, R^{-1}) \f$.
+
+     @param r which row of the basis inverse is computed
+     @param coef values of result vector (not packed but scattered)
+     @param inds indices of result vector (nullptr if not to be used)
+     @param ninds number of nonzeros in result vector
+     @param unscale determines whether the result should be unscaled according to the original LP data
+     */
    bool getBasisInverseRowReal(int r, R* coef, int* inds = nullptr, int* ninds = nullptr,
                                bool unscale = true);
 
-   /// computes column \p c of basis inverse; returns true on success
-   /// @param c which column of the basis inverse is computed
-   /// @param coef values of result vector (not packed but scattered)
-   /// @param inds indices of result vector (nullptr if not to be used)
-   /// @param ninds number of nonzeros in result vector
-   /// @param unscale determines whether the result should be unscaled according to the original LP data
+   /** computes column \p c of basis inverse; returns true on success
+
+     For the rows \f$ B_r \f$ with basic slack, the rows \f$ N_r \f$ with nonbasic slack, and the basic columns \f$ B_c \f$,
+     the column basis \f$ B \f$ with the rows \f$ (B_r, N_r) \f$, the column positions \f$ (B_r, B_c) \f$, and their inverse are
+
+     \f[
+     B = \left( \begin{array}{cc} I & A_{B_r,B_c} \\ 0 & A_{N_r,B_c} \end{array} \right), \qquad
+     B^{-1} = \left( \begin{array}{cc} I & -A_{B_r,B_c} A_{N_r,B_c}^{-1} \\ 0 & A_{N_r,B_c}^{-1} \end{array} \right)
+     = \left( \begin{array}{cc} I & -R_{B_r}^{-1} A'_{B_r,B_c} {A'}_{N_r,B_c}^{-1} R_{N_r} \\
+     0 & C_{B_c} {A'}_{N_r,B_c}^{-1} R_{N_r} \end{array} \right)
+     \f]
+
+     for the scaled matrix \f$ A' = R A C \f$, i.e., \f$ B^{-1} = \tilde{C}_B B'^{-1} R \f$ for the scaled basis
+     \f$ B' = R B \tilde{C}_B \f$ with \f$ \tilde{C} = \mathrm{diag}(C, R^{-1}) \f$.
+
+     @param c which column of the basis inverse is computed
+     @param coef values of result vector (not packed but scattered)
+     @param inds indices of result vector (nullptr if not to be used)
+     @param ninds number of nonzeros in result vector
+     @param unscale determines whether the result should be unscaled according to the original LP data
+     */
    bool getBasisInverseColReal(int c, R* coef, int* inds = nullptr, int* ninds = nullptr,
                                bool unscale = true);
 
-   /// computes dense solution of basis matrix B * \p sol = \p rhs; returns true on success
+   /** computes dense solution of basis matrix B * \p sol = \p rhs; returns true on success
+
+     For the rows \f$ B_r \f$ with basic slack, the rows \f$ N_r \f$ with nonbasic slack, and the basic columns \f$ B_c \f$,
+     the column basis \f$ B \f$ with the rows \f$ (B_r, N_r) \f$, the column positions \f$ (B_r, B_c) \f$, and their inverse are
+
+     \f[
+     B = \left( \begin{array}{cc} I & A_{B_r,B_c} \\ 0 & A_{N_r,B_c} \end{array} \right), \qquad
+     B^{-1} = \left( \begin{array}{cc} I & -A_{B_r,B_c} A_{N_r,B_c}^{-1} \\ 0 & A_{N_r,B_c}^{-1} \end{array} \right)
+     = \left( \begin{array}{cc} I & -R_{B_r}^{-1} A'_{B_r,B_c} {A'}_{N_r,B_c}^{-1} R_{N_r} \\
+     0 & C_{B_c} {A'}_{N_r,B_c}^{-1} R_{N_r} \end{array} \right)
+     \f]
+
+     for the scaled matrix \f$ A' = R A C \f$, i.e., \f$ B^{-1} = \tilde{C}_B B'^{-1} R \f$ for the scaled basis
+     \f$ B' = R B \tilde{C}_B \f$ with \f$ \tilde{C} = \mathrm{diag}(C, R^{-1}) \f$.
+     */
    bool getBasisInverseTimesVecReal(R* rhs, R* sol, bool unscale = true);
 
    /// multiply with basis matrix; B * \p vec (inplace)

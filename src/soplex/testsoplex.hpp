@@ -109,10 +109,11 @@ void SoPlexBase<R>::_checkBasisScaling()
    }
 
    assert(&_solver == _realLP);
-   VectorBase<R>** binvcol = 0;
-   VectorBase<R>** binvrow = 0;
+
+   VectorBase<R>** binvcol = nullptr;
+   VectorBase<R>** binvrow = nullptr;
    int* inds = nullptr;
-   int basisdim = _solver.rep() == SPxSolverBase<R>::COLUMN ? _solver.nRows() : _solver.nCols();
+   int basisdim = _solver.nRows();
    spx_alloc(binvcol, basisdim);
    spx_alloc(binvrow, basisdim);
    spx_alloc(inds, basisdim);
@@ -124,7 +125,7 @@ void SoPlexBase<R>::_checkBasisScaling()
    {
       binvcol[i] = new VectorBase<R>(basisdim);
       binvcol[i]->clear();
-      assert(getBasisInverseColReal(i, binvcol[i]->get_ptr(), 0, 0, true));
+      assert(getBasisInverseColReal(i, binvcol[i]->get_ptr(), nullptr, nullptr, true));
    }
 
    SPX_MSG_INFO1(spxout, spxout << "DEBUG: computing rows of inverted basis matrix\n";)
@@ -134,7 +135,7 @@ void SoPlexBase<R>::_checkBasisScaling()
    {
       binvrow[i] = new VectorBase<R>(basisdim);
       binvrow[i]->clear();
-      assert(getBasisInverseRowReal(i, binvrow[i]->get_ptr(), 0, 0, true));
+      assert(getBasisInverseRowReal(i, binvrow[i]->get_ptr(), nullptr, nullptr, true));
    }
 
    SPX_MSG_INFO1(spxout, spxout <<
@@ -202,8 +203,8 @@ void SoPlexBase<R>::_checkBasisScaling()
       // invalidate basis factorization
       _solver.loadMatrixVecs();
 
-      VectorBase<R>** binvcol2 = 0;
-      VectorBase<R>** binvrow2 = 0;
+      VectorBase<R>** binvcol2 = nullptr;
+      VectorBase<R>** binvrow2 = nullptr;
       spx_alloc(binvcol2, basisdim);
       spx_alloc(binvrow2, basisdim);
 
@@ -214,7 +215,7 @@ void SoPlexBase<R>::_checkBasisScaling()
       {
          binvcol2[i] = new VectorBase<R>(basisdim);
          binvcol2[i]->clear();
-         assert(getBasisInverseColReal(i, binvcol2[i]->get_ptr(), 0, 0, false));
+         assert(getBasisInverseColReal(i, binvcol2[i]->get_ptr(), nullptr, nullptr, false));
       }
 
       SPX_MSG_INFO1(spxout, spxout << "DEBUG: computing rows of inverted basis matrix again\n";)
@@ -224,7 +225,7 @@ void SoPlexBase<R>::_checkBasisScaling()
       {
          binvrow2[i] = new VectorBase<R>(basisdim);
          binvrow2[i]->clear();
-         assert(getBasisInverseRowReal(i, binvrow2[i]->get_ptr(), 0, 0, false));
+         assert(getBasisInverseRowReal(i, binvrow2[i]->get_ptr(), nullptr, nullptr, false));
       }
 
       SPX_MSG_INFO1(spxout, spxout <<

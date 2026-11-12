@@ -3487,9 +3487,9 @@ void CLUFactor<R>::solveLright2(R* vec1, R* vec2)
             tmp2 += vec2[*idx++] * (*val++);
          }
 
-         vec1[lrow[i]] = -tmp1;
+         vec1[lrow[i]] = -R(tmp1);
 
-         vec2[lrow[i]] = -tmp2;
+         vec2[lrow[i]] = -R(tmp2);
       }
    }
 }
@@ -4180,8 +4180,8 @@ void CLUFactor<R>::solveUpdateLeft2(R* vec1, R* vec2)
          tmp2 += vec2[*idx++] * (*val++);
       }
 
-      vec1[lrow[i]] = -tmp1;
-      vec2[lrow[i]] = -tmp2;
+      vec1[lrow[i]] = -R(tmp1);
+      vec2[lrow[i]] = -R(tmp2);
    }
 }
 

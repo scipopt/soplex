@@ -42,7 +42,7 @@ namespace soplex
 
    Class SPxDefaultRT provides an implementation of the textbook ratio test
    as a derived class of SPxRatioTester. This class is not intended for
-   reliably solving LPs (even though it does the job for ``numerically simple''
+   reliably solving LPs (even though it does the job for "numerically simple"
    LPs). Instead, it should serve as a demonstration of how to write ratio
    tester classes.
 

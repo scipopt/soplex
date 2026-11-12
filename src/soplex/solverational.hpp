@@ -1804,7 +1804,6 @@ void SoPlexBase<R>::_updateReducedCosts(SolRational& sol, int& dualSize,
 
 
 
-#if SOPLEX_HAS_MPFR
 ///@todo precision-boosting move in a different file ?
 /// converts the given DataArray of VarStatus to boostedPrecision
 template <class R>
@@ -1846,7 +1845,6 @@ void SoPlexBase<R>::_convertDataArrayVarStatusToRPrecision(
       copy[i] = (VStat)base[i];
    }
 }
-#endif /* SOPLEX_HAS_MPFR */
 
 
 

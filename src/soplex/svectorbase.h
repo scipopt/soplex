@@ -104,7 +104,7 @@ Nonzero<Real>& Nonzero<Real>::operator=(const Nonzero<S>& vec)
  *  The following mathematical operations are provided by class SVectorBase (SVectorBase \p a, \p b, \p c; R \p x):
  *
  *  <TABLE>
- *  <TR><TD>Operation</TD><TD>Description   </TD><TD></TD>&nbsp;</TR>
+ *  <TR><TD>Operation</TD><TD>Description   </TD><TD></TD></TR>
  *  <TR><TD>\c -=    </TD><TD>subtraction   </TD><TD>\c a \c -= \c b </TD></TR>
  *  <TR><TD>\c +=    </TD><TD>addition      </TD><TD>\c a \c += \c b </TD></TR>
  *  <TR><TD>\c *     </TD><TD>skalar product</TD>
@@ -516,7 +516,7 @@ public:
    /// Floating point approximation of euclidian norm (without any approximation guarantee).
    R length() const
    {
-      return std::sqrt(R(length2()));
+      return spxSqrt(R(length2()));
    }
 
    /// Squared norm.
@@ -706,7 +706,7 @@ public:
    }
 
    /// scale and assign
-   SVectorBase<Real>& scaleAssign(int scaleExp, const SVectorBase<Real>& sv)
+   SVectorBase<R>& scaleAssign(int scaleExp, const SVectorBase<R>& sv)
    {
       if(this != &sv)
       {
@@ -727,8 +727,8 @@ public:
    }
 
    /// scale and assign
-   SVectorBase<Real>& scaleAssign(const int* scaleExp, const SVectorBase<Real>& sv,
-                                  bool negateExp = false)
+   SVectorBase<R>& scaleAssign(const int* scaleExp, const SVectorBase<R>& sv,
+                               bool negateExp = false)
    {
       if(this != &sv)
       {
