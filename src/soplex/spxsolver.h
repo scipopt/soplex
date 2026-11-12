@@ -59,6 +59,8 @@
 namespace soplex
 {
 template <class R>
+class SoPlexBase;
+template <class R>
 class SPxPricer;
 template <class R>
 class SPxRatioTester;
@@ -102,6 +104,7 @@ class SPxBoundFlippingRT;
 template <class R>
 class SPxSolverBase : public SPxLPBase<R>, protected SPxBasisBase<R>
 {
+   friend SoPlexBase<R>;
    friend SPxFastRT<R>;
    friend SPxBoundFlippingRT<R>;
 
@@ -1306,7 +1309,7 @@ public:
       assert(rid.isValid());
       return (rep() == COLUMN)
              ? (*thecovectors)[this->number(rid)]
-             : static_cast<const SVector&>(unitVecs[this->number(rid)]);
+             : static_cast<const SVectorBase<R>&>(unitVecs[this->number(rid)]);
    }
    ///
    const SVectorBase<R>& coVector(const SPxColId& cid) const
@@ -2280,7 +2283,7 @@ public:
    }
 
    /// return const lp's cols if available.
-   const LPColSet& cols() const
+   const LPColSetBase<R>& cols() const
    {
       return *this->lpcolset();
    }

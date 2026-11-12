@@ -109,7 +109,7 @@ public:
    /// default constructor
    SPxHybridPR()
       : SPxPricer<R>("Hybrid")
-      , thepricer(0)
+      , thepricer(nullptr)
       , hybridFactor(3.0) // we want the ParMult pricer
    {}
    /// copy constructor
@@ -132,9 +132,9 @@ public:
       {
          thepricer = &devex;
       }
-      else // old.thepricer should be 0
+      else // old.thepricer should be nullptr
       {
-         thepricer = 0;
+         thepricer = nullptr;
       }
    }
    /// assignment operator
@@ -160,9 +160,9 @@ public:
          {
             thepricer = &devex;
          }
-         else // rhs.thepricer should be 0
+         else // rhs.thepricer should be nullptr
          {
-            thepricer = 0;
+            thepricer = nullptr;
          }
       }
 

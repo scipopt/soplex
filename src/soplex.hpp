@@ -1557,7 +1557,7 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
       // copy real LP if different from the LP in the solver
       if(rhs._realLP != &(rhs._solver))
       {
-         _realLP = 0;
+         _realLP = nullptr;
          spx_alloc(_realLP);
          _realLP = new(_realLP) SPxLPBase<R>(*(rhs._realLP));
       }
@@ -2246,9 +2246,9 @@ void SoPlexBase<R>::addColsRational(const mpq_t* obj, const mpq_t* lower, const 
       LPColSetReal lpcolset;
 
       for(int i = numColsRational() - numCols; i < numColsRational(); i++)
-         lpcolset.add(R(maxObjRational(i)) * (intParam(SoPlexBase<R>::OBJSENSE) ==
-                                              SoPlexBase<R>::OBJSENSE_MAXIMIZE ? 1.0 : -1.0),
-                      R(lowerRational(i)), DSVectorBase<R>(_rationalLP->colVector(i)), R(upperRational(i)));
+         lpcolset.add(Real(maxObjRational(i)) * (intParam(SoPlexBase<R>::OBJSENSE) ==
+                                                 SoPlexBase<R>::OBJSENSE_MAXIMIZE ? 1.0 : -1.0),
+                      Real(lowerRational(i)), DSVectorBase<Real>(_rationalLP->colVector(i)), Real(upperRational(i)));
 
       _addColsReal(lpcolset);
    }
@@ -2289,7 +2289,7 @@ void SoPlexBase<R>::changeLhsReal(int i, const R& lhs)
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO)
    {
-      _rationalLP->changeLhs(i, lhs);
+      _rationalLP->changeLhs(i, Rational(lhs));
       _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
    }
 
@@ -2329,7 +2329,7 @@ void SoPlexBase<R>::changeRhsReal(int i, const R& rhs)
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO)
    {
-      _rationalLP->changeRhs(i, rhs);
+      _rationalLP->changeRhs(i, Rational(rhs));
       _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
    }
 
@@ -2368,7 +2368,7 @@ void SoPlexBase<R>::changeRangeReal(int i, const R& lhs, const R& rhs)
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO)
    {
-      _rationalLP->changeRange(i, lhs, rhs);
+      _rationalLP->changeRange(i, Rational(lhs), Rational(rhs));
       _rowTypes[i] = _rangeTypeReal(lhs, rhs);
    }
 
@@ -2429,7 +2429,7 @@ void SoPlexBase<R>::changeLowerReal(int i, const R& lower)
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO)
    {
-      _rationalLP->changeLower(i, lower);
+      _rationalLP->changeLower(i, Rational(lower));
       _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
    }
 
@@ -2469,7 +2469,7 @@ void SoPlexBase<R>::changeUpperReal(int i, const R& upper)
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO)
    {
-      _rationalLP->changeUpper(i, upper);
+      _rationalLP->changeUpper(i, Rational(upper));
       _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
    }
 
@@ -2509,7 +2509,7 @@ void SoPlexBase<R>::changeBoundsReal(int i, const R& lower, const R& upper)
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO)
    {
-      _rationalLP->changeBounds(i, lower, upper);
+      _rationalLP->changeBounds(i, Rational(lower), Rational(upper));
       _colTypes[i] = _rangeTypeReal(lower, upper);
    }
 
@@ -2544,7 +2544,7 @@ void SoPlexBase<R>::changeObjReal(int i, const R& obj)
    _realLP->changeObj(i, obj, scale);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO)
-      _rationalLP->changeObj(i, obj);
+      _rationalLP->changeObj(i, Rational(obj));
 
    _invalidateSolution();
 }
@@ -2560,7 +2560,7 @@ void SoPlexBase<R>::changeElementReal(int i, int j, const R& val)
    _changeElementReal(i, j, val);
 
    if(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO)
-      _rationalLP->changeElement(i, j, val);
+      _rationalLP->changeElement(i, j, Rational(val));
 
    _invalidateSolution();
 }
@@ -4879,13 +4879,27 @@ bool SoPlexBase<R>::getExactCondition(R& condition)
    return true;
 }
 
-/// computes row r of basis inverse; returns true on success
+/** computes row r of basis inverse; returns true on success
+
+ For the rows \f$ B_r \f$ with basic slack, the rows \f$ N_r \f$ with nonbasic slack, and the basic columns \f$ B_c \f$,
+ the column basis \f$ B \f$ with the rows \f$ (B_r, N_r) \f$, the column positions \f$ (B_r, B_c) \f$, and their inverse are
+
+ \f[
+ B = \left( \begin{array}{cc} I & A_{B_r,B_c} \\ 0 & A_{N_r,B_c} \end{array} \right), \qquad
+ B^{-1} = \left( \begin{array}{cc} I & -A_{B_r,B_c} A_{N_r,B_c}^{-1} \\ 0 & A_{N_r,B_c}^{-1} \end{array} \right)
+ = \left( \begin{array}{cc} I & -R_{B_r}^{-1} A'_{B_r,B_c} {A'}_{N_r,B_c}^{-1} R_{N_r} \\
+ 0 & C_{B_c} {A'}_{N_r,B_c}^{-1} R_{N_r} \end{array} \right)
+ \f]
+
+ for the scaled matrix \f$ A' = R A C \f$, i.e., \f$ B^{-1} = \tilde{C}_B B'^{-1} R \f$ for the scaled basis
+ \f$ B' = R B \tilde{C}_B \f$ with \f$ \tilde{C} = \mathrm{diag}(C, R^{-1}) \f$.
+*/
 template <class R>
 bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds, bool unscale)
 {
    assert(r >= 0);
    assert(r < numRows());
-   assert(coef != 0);
+   assert(coef != nullptr);
 
    if(!hasBasis() || r < 0 || r >= numRows())
       return false;
@@ -4899,6 +4913,7 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
    // has, since the REPRESENTATION parameter of this class might be set to automatic
    if(_solver.rep() == SPxSolverBase<R>::COLUMN)
    {
+      // B^(-1) = \tilde{C}_B B'^(-1) R: scale rhs by \tilde{C} of position r, solution by R
       int idx;
       SSVectorBase<R> x(numRows(), this->tolerances());
 
@@ -4907,12 +4922,9 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
          /* unscaling required? */
          if(unscale && _solver.isScaled())
          {
-            /* for information on the unscaling procedure see spxscaler.h */
-
             int scaleExp;
             DSVectorBase<R> rhs(_solver.unitVector(r));
 
-            // apply scaling \tilde{C} to rhs
             if(_solver.basis().baseId(r).isSPxColId())
                scaleExp = _scaler->getColScaleExp(_solver.number(_solver.basis().baseId(r)));
             else
@@ -4924,7 +4936,6 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
             x.setup();
             int size = x.size();
 
-            //apply scaling R to solution vector
             for(int i = 0; i < size; i++)
             {
                scaleExp = _scaler->getRowScaleExp(x.index(i));
@@ -4970,18 +4981,17 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
    {
       assert(_solver.rep() == SPxSolverBase<R>::ROW);
 
-      // @todo should rhs be a reference?
+      // B^(-1) = \tilde{C}_B B'^(-1) R: scale rhs by \tilde{C} of position r, solution by R
       DSVectorBase<R> rhs(numCols());
       SSVectorBase<R>  y(numCols(), this->tolerances());
       int* bind = nullptr;
-      int index;
 
       // get ordering of column basis matrix
       spx_alloc(bind, numRows());
       getBasisInd(bind);
 
       // get vector corresponding to requested index r
-      index = bind[r];
+      int index = bind[r];
 
       // r corresponds to a basic row
       if(index < 0)
@@ -5018,7 +5028,7 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
             rhs *= spxLdexp(1.0, _scaler->getColScaleExp(index));
       }
 
-      // solve system "y B = rhs", where B is the row basis matrix
+      // solve system with the row basis matrix
       try
       {
          _solver.basis().solve(y, rhs);
@@ -5031,7 +5041,8 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
       }
 
       // initialize result vector x as zero
-      memset(coef, 0, (unsigned int)numRows() * sizeof(R));
+      for(int i = 0; i < numRows(); i++)
+         coef[i] = 0;
 
       // add nonzero entries
       for(int i = 0; i < numCols(); ++i)
@@ -5045,10 +5056,11 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
             assert(bind[r] >= 0 || _solver.number(id) != index);
 
             int rowindex = _solver.number(id);
-            coef[rowindex] = y[i];
 
             if(unscale && _solver.isScaled())
                coef[rowindex] = spxLdexp(y[i], _scaler->getRowScaleExp(rowindex));
+            else
+               coef[rowindex] = y[i];
          }
       }
 
@@ -5072,14 +5084,27 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
 
 
 
-/// computes column c of basis inverse; returns true on success
-/// @todo does not work correctly for the row representation
+/** computes column c of basis inverse; returns true on success
+
+ For the rows \f$ B_r \f$ with basic slack, the rows \f$ N_r \f$ with nonbasic slack, and the basic columns \f$ B_c \f$,
+ the column basis \f$ B \f$ with the rows \f$ (B_r, N_r) \f$, the column positions \f$ (B_r, B_c) \f$, and their inverse are
+
+ \f[
+ B = \left( \begin{array}{cc} I & A_{B_r,B_c} \\ 0 & A_{N_r,B_c} \end{array} \right), \qquad
+ B^{-1} = \left( \begin{array}{cc} I & -A_{B_r,B_c} A_{N_r,B_c}^{-1} \\ 0 & A_{N_r,B_c}^{-1} \end{array} \right)
+ = \left( \begin{array}{cc} I & -R_{B_r}^{-1} A'_{B_r,B_c} {A'}_{N_r,B_c}^{-1} R_{N_r} \\
+ 0 & C_{B_c} {A'}_{N_r,B_c}^{-1} R_{N_r} \end{array} \right)
+ \f]
+
+ for the scaled matrix \f$ A' = R A C \f$, i.e., \f$ B^{-1} = \tilde{C}_B B'^{-1} R \f$ for the scaled basis
+ \f$ B' = R B \tilde{C}_B \f$ with \f$ \tilde{C} = \mathrm{diag}(C, R^{-1}) \f$.
+*/
 template <class R>
 bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds, bool unscale)
 {
    assert(c >= 0);
    assert(c < numRows());
-   assert(coef != 0);
+   assert(coef != nullptr);
 
    if(!hasBasis() || c < 0 || c >= numRows())
       return false;
@@ -5093,6 +5118,7 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
    // has, since the REPRESENTATION parameter of this class might be set to automatic
    if(_solver.rep() == SPxSolverBase<R>::COLUMN)
    {
+      // B^(-1) = \tilde{C}_B B'^(-1) R: scale rhs by R of row c, solution by \tilde{C}
       int idx;
       SSVectorBase<R> x(numRows(), this->tolerances());
 
@@ -5101,8 +5127,6 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
          /* unscaling required? */
          if(unscale && _solver.isScaled())
          {
-            /* for information on the unscaling procedure see spxscaler.h */
-
             int scaleExp = _scaler->getRowScaleExp(c);
             DSVectorBase<R> rhs(_solver.unitVector(c));
             rhs *= spxLdexp(1.0, scaleExp);
@@ -5167,32 +5191,27 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
    {
       assert(_solver.rep() == SPxSolverBase<R>::ROW);
 
-      // @todo should rhs be a reference?
+      // B^(-1) = \tilde{C}_B B'^(-1) R: scale rhs by R of row c, solution by \tilde{C}
       int* bind = nullptr;
-      int index;
 
-      // get indices of column basis matrix (not in correct order!)
+      // get ordering of column basis matrix
       spx_alloc(bind, numRows());
       getBasisInd(bind);
 
-      index = bind[c];
-      // index = c >= numColsReal() ? 0 : c;
-
-      // initialize result vector x as zero
-      memset(coef, 0, (unsigned int)numRows() * sizeof(Real));
-
       if(!_solver.isRowBasic(c))
       {
-         // this column of B^-1 is just a unit column
          for(int i = 0; i < numRows(); i++)
          {
             if(bind[i] < 0 && -bind[i] - 1 == c)
                coef[i] = 1.0;
+            else
+               coef[i] = 0.0;
          }
       }
       else
       {
          SSVectorBase<R> x(numCols(), this->tolerances());
+         int index = -1;
 
          for(int k = 0; k < numCols(); k++)
          {
@@ -5203,37 +5222,18 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
             }
          }
 
+         assert(index >= 0);
+         assert(index < numCols());
+
+         DSVectorBase<R> rhs(_solver.unitVector(index));
+
+         if(unscale && _solver.isScaled())
+            rhs *= spxLdexp(1.0, _scaler->getRowScaleExp(c));
+
+         // solve system with the row basis matrix
          try
          {
-            if(unscale && _solver.isScaled())
-            {
-               int scaleExp = -_scaler->getRowScaleExp(index);
-               DSVectorBase<R> rhs(1);
-               rhs.add(index, spxLdexp(1.0, scaleExp));
-               _solver.basis().coSolve(x, rhs);
-               x.setup();
-               int size = x.size();
-
-               // apply scaling based on \tilde{C}
-               for(int i = 0; i < size; i++)
-               {
-                  int idx = bind[x.index(i)];
-
-                  if(idx < 0)
-                  {
-                     idx = -idx - 1;
-                     scaleExp = _scaler->getRowScaleExp(idx);
-                  }
-                  else
-                     scaleExp = - _scaler->getColScaleExp(idx);
-
-                  spxLdexp(x.value(i), scaleExp);
-               }
-            }
-            else
-            {
-               _solver.basis().coSolve(x, _solver.unitVector(index));
-            }
+            _solver.basis().coSolve(x, rhs);
          }
          catch(const SPxException& E)
          {
@@ -5257,16 +5257,9 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
                assert(!_solver.isRowBasic(idx));
 
                if(unscale && _solver.isScaled())
-               {
-                  DSVectorBase<R> r_unscaled(numCols());
-                  _solver.getRowVectorUnscaled(idx, r_unscaled);
-                  coef[i] = - (r_unscaled * x);
-               }
+                  coef[i] = spxLdexp(-(_solver.rowVector(idx) * x), -_scaler->getRowScaleExp(idx));
                else
-                  coef[i] = - (_solver.rowVector(idx) * x);
-
-               if(unscale && _solver.isScaled())
-                  coef[i] = spxLdexp(coef[i], _scaler->getRowScaleExp(idx));
+                  coef[i] = -(_solver.rowVector(idx) * x);
             }
             else
             {
@@ -5296,7 +5289,21 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
 
 
 
-/// computes dense solution of basis matrix B * sol = rhs; returns true on success
+/** computes dense solution of basis matrix B * sol = rhs; returns true on success
+
+ For the rows \f$ B_r \f$ with basic slack, the rows \f$ N_r \f$ with nonbasic slack, and the basic columns \f$ B_c \f$,
+ the column basis \f$ B \f$ with the rows \f$ (B_r, N_r) \f$, the column positions \f$ (B_r, B_c) \f$, and their inverse are
+
+ \f[
+ B = \left( \begin{array}{cc} I & A_{B_r,B_c} \\ 0 & A_{N_r,B_c} \end{array} \right), \qquad
+ B^{-1} = \left( \begin{array}{cc} I & -A_{B_r,B_c} A_{N_r,B_c}^{-1} \\ 0 & A_{N_r,B_c}^{-1} \end{array} \right)
+ = \left( \begin{array}{cc} I & -R_{B_r}^{-1} A'_{B_r,B_c} {A'}_{N_r,B_c}^{-1} R_{N_r} \\
+ 0 & C_{B_c} {A'}_{N_r,B_c}^{-1} R_{N_r} \end{array} \right)
+ \f]
+
+ for the scaled matrix \f$ A' = R A C \f$, i.e., \f$ B^{-1} = \tilde{C}_B B'^{-1} R \f$ for the scaled basis
+ \f$ B' = R B \tilde{C}_B \f$ with \f$ \tilde{C} = \mathrm{diag}(C, R^{-1}) \f$.
+*/
 template <class R>
 bool SoPlexBase<R>::getBasisInverseTimesVecReal(R* rhs, R* sol, bool unscale)
 {
@@ -5316,13 +5323,12 @@ bool SoPlexBase<R>::getBasisInverseTimesVecReal(R* rhs, R* sol, bool unscale)
    // the existing factorization
    if(_solver.rep() == SPxSolverBase<R>::COLUMN)
    {
-      // solve system "x = B^-1 * v"
+      // x = B^(-1) v = \tilde{C}_B B'^(-1) R v: scale v by R, solution by \tilde{C}
       try
       {
          /* unscaling required? */
          if(unscale && _solver.isScaled())
          {
-            /* for information on the unscaling procedure see spxscaler.h */
             int scaleExp;
             int idx;
 
@@ -5368,12 +5374,12 @@ bool SoPlexBase<R>::getBasisInverseTimesVecReal(R* rhs, R* sol, bool unscale)
    {
       assert(_solver.rep() == SPxSolverBase<R>::ROW);
 
+      // x = B^(-1) v = \tilde{C}_B B'^(-1) R v: scale v by R, solution by \tilde{C}
       DSVectorBase<R> rowrhs(numCols());
       SSVectorBase<R> y(numCols(), this->tolerances());
       int* bind = nullptr;
 
       bool adaptScaling = unscale && _realLP->isScaled();
-      int scaleExp;
       int idx;
 
       // get ordering of column basis matrix
@@ -5393,8 +5399,7 @@ bool SoPlexBase<R>::getBasisInverseTimesVecReal(R* rhs, R* sol, bool unscale)
             if(adaptScaling)
             {
                idx = _solver.number(id);
-               scaleExp = _scaler->getRowScaleExp(idx);
-               rowrhs.add(i, spxLdexp(v[idx], scaleExp));
+               rowrhs.add(i, spxLdexp(v[idx], _scaler->getRowScaleExp(idx)));
             }
             else
                rowrhs.add(i, v[_solver.number(id)]);
@@ -5405,7 +5410,7 @@ bool SoPlexBase<R>::getBasisInverseTimesVecReal(R* rhs, R* sol, bool unscale)
          }
       }
 
-      // solve system "B y = rowrhs", where B is the row basis matrix
+      // solve system with the row basis matrix
       try
       {
          _solver.basis().coSolve(y, rowrhs);
@@ -5433,13 +5438,13 @@ bool SoPlexBase<R>::getBasisInverseTimesVecReal(R* rhs, R* sol, bool unscale)
             assert(index < numRows());
             assert(!_solver.isRowBasic(index));
 
-            x[i] = v[index] - (rowVectorRealInternal(index) * VectorBase<R>(numCols(), y.get_ptr()));
+            // x_i = 2^{-r_i} (2^{r_i} v_i - a'_i y) = v_i - 2^{-r_i} a'_i y for the basic slack i
+            R dot = rowVectorRealInternal(index) * VectorBase<R>(numCols(), y.get_ptr());
 
             if(adaptScaling)
-            {
-               scaleExp = -_scaler->getRowScaleExp(index);
-               x[i] = spxLdexp(x[i], scaleExp);
-            }
+               dot = spxLdexp(dot, -_scaler->getRowScaleExp(index));
+
+            x[i] = v[index] - dot;
          }
          else
          {
@@ -5449,10 +5454,7 @@ bool SoPlexBase<R>::getBasisInverseTimesVecReal(R* rhs, R* sol, bool unscale)
             assert(!_solver.isColBasic(index));
 
             if(adaptScaling)
-            {
-               scaleExp = _scaler->getColScaleExp(index);
-               x[i] = spxLdexp(y[index], scaleExp);
-            }
+               x[i] = spxLdexp(y[index], _scaler->getColScaleExp(index));
             else
                x[i] = y[index];
          }
@@ -5528,10 +5530,7 @@ bool SoPlexBase<R>::multBasis(R* vec, bool unscale)
    else
    {
       int colbasisdim = numRows();
-
-      DSVectorBase<R> y(colbasisdim);
-
-      y.clear();
+      VectorBase<R> y(colbasisdim);
 
       // create VectorBase<R> from input values
       VectorBase<R> x(colbasisdim, vec);
@@ -5562,7 +5561,7 @@ bool SoPlexBase<R>::multBasis(R* vec, bool unscale)
                assert(index < numRows());
                assert(!_solver.isRowBasic(index));
 
-               y.add(x[i] * UnitVectorBase<R>(index));
+               y.multAdd(x[i], UnitVectorBase<R>(index));
             }
             // r corresponds to a column vector
             else
@@ -5575,17 +5574,16 @@ bool SoPlexBase<R>::multBasis(R* vec, bool unscale)
                {
                   DSVectorBase<R> col;
                   _solver.getColVectorUnscaled(index, col);
-                  y.add(x[i] * col);
+                  y.multAdd(x[i], col);
                }
-
-               y.add(x[i] * _solver.colVector(index));
+               else
+                  y.multAdd(x[i], _solver.colVector(index));
             }
          }
       }
 
       spx_free(bind);
-      x = y;
-      std::copy(x.vec().begin(), x.vec().end(), vec);
+      std::copy(y.vec().begin(), y.vec().end(), vec);
    }
 
    return true;

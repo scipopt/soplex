@@ -59,7 +59,7 @@ template < class R > class SSVectorBase;
  *  The following mathematical operations are provided by class VectorBase (VectorBase \p a, \p b; R \p x):
  *
  *  <TABLE>
- *  <TR><TD>Operation</TD><TD>Description   </TD><TD></TD>&nbsp;</TR>
+ *  <TR><TD>Operation</TD><TD>Description   </TD><TD></TD></TR>
  *  <TR><TD>\c -=    </TD><TD>subtraction   </TD><TD>\c a \c -= \c b </TD></TR>
  *  <TR><TD>\c +=    </TD><TD>addition      </TD><TD>\c a \c += \c b </TD></TR>
  *  <TR><TD>\c *     </TD><TD>scalar product</TD>
@@ -426,13 +426,13 @@ public:
    {
       assert(dim() > 0);
 
-      // A helper function for the SOPLEX_MIN_element. Because we compare the absolute value.
+      // A helper function for the std::min_element. Because we compare the absolute value.
       auto absCmpr = [](R a, R b)
       {
          return (spxAbs(a) < spxAbs(b));
       };
 
-      auto minReference = SOPLEX_MIN_element(val.begin(), val.end(), absCmpr);
+      auto minReference = std::min_element(val.begin(), val.end(), absCmpr);
 
       R mini = spxAbs(*minReference);
 

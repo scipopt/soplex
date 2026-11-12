@@ -863,7 +863,7 @@ inline SLUFactorRational::Status SLUFactorRational::load(const SVectorRational* 
    {
       for(j = 0; j < matrix[i]->size(); ++j)
             fprintf(fl, "%8d  %8d  %s\n",
-                    i + 1, matrix[i]->index(j) + 1, matrix[i]->value(j).str());
+                    i + 1, matrix[i]->index(j) + 1, matrix[i]->value(j).str().c_str());
       }
    fclose(fl);
    std::cout << "DSLUFA04 LU-Factors:" << std::endl;
