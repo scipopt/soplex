@@ -1,5 +1,5 @@
 CXX	=	purify  -best-effort CC
-CPPFLAGS=	-Isrc 
+CPPFLAGS=	-I$(OBJDIR) -Isrc 
 CXXFLAGS=	-std=c++14 -g
 LDFLAGS	=	-lm
 RANLIB	=	true

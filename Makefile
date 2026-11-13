@@ -120,7 +120,7 @@ LIBBUILD	=	$(AR)
 LIBBUILD_o	=	$(AR_o)
 LIBBUILDFLAGS	=       $(ARFLAGS)
 
-CPPFLAGS	=	-Isrc
+CPPFLAGS	=	-I$(OBJDIR) -Isrc
 CXXFLAGS	=
 BINOFLAGS	=
 LIBOFLAGS	=
@@ -161,7 +161,7 @@ BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 LINKSMARKERFILE	=	$(LIBDIR)/linkscreated.$(OSTYPE).$(ARCH).$(COMP)$(LINKLIBSUFFIX)
 LASTSETTINGS	=	$(OBJDIR)/make.lastsettings
 
-SPXGITHASHFILE	=	$(SRCDIR)/soplex/git_hash.cpp
+SPXGITHASHFILE	=	$(OBJSUBDIR)/git_hash.cpp
 CONFIGFILE = $(SRCDIR)/soplex/config.h
 
 #------------------------------------------------------------------------------
@@ -239,6 +239,7 @@ BINSHORTLINK	=	$(BINDIR)/$(NAME)$(EXEEXTENSION)
 DEPEND		=	src/depend
 
 OBJDIR		=	obj/O.$(BASE)
+OBJSUBDIR	=	$(OBJDIR)/soplex
 BINOBJDIR	=	$(OBJDIR)/bin
 LIBOBJDIR	=	$(OBJDIR)/lib
 LIBOBJSUBDIR = 	$(LIBOBJDIR)/soplex
@@ -492,6 +493,9 @@ endif
 ifneq ($(BINOBJDIR),)
 		@-rm -f $(BINOBJDIR)/*.o && rmdir $(BINOBJDIR)
 endif
+ifneq ($(OBJSUBDIR),)
+		@-rm -f $(SPXGITHASHFILE) && rmdir $(OBJSUBDIR)
+endif
 ifneq ($(OBJDIR),)
 		@-rm -f $(LASTSETTINGS)
 		@-rm -f $(CONFIGFILE)
@@ -522,21 +526,22 @@ $(LIBDIR):
 
 .PHONY: depend
 depend:
+		@$(MAKE) touchexternal
 		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS)\
 		$(BINSRC:.o=.cpp) \
-		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
+		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g;s|$(SPXGITHASHFILE)|$$\(SPXGITHASHFILE\)|g'\'' \
 		>$(DEPEND)'
 		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS)\
 		$(EXAMPLESRC:.o=.cpp) \
-		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
+		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g;s|$(SPXGITHASHFILE)|$$\(SPXGITHASHFILE\)|g'\'' \
 		>>$(DEPEND)'
 		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS)\
 		$(LIBSRC:.o=.cpp) \
-		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(LIBOBJDIR\)/\1.o|g'\'' \
+		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(LIBOBJDIR\)/\1.o|g;s|$(SPXGITHASHFILE)|$$\(SPXGITHASHFILE\)|g'\'' \
 		>>$(DEPEND)'
 		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS)\
 		$(LIBSRC:.o=.cpp) \
-		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(LIBOBJSUBDIR\)/\1.o|g'\'' \
+		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(LIBOBJSUBDIR\)/\1.o|g;s|$(SPXGITHASHFILE)|$$\(SPXGITHASHFILE\)|g'\'' \
 		>>$(DEPEND)'
 		@echo `grep -l "SOPLEX_HAS_GMP" $(ALLSRC)` >$(GMPDEP)
 		@echo `grep -l "SOPLEX_HAS_ZLIB" $(ALLSRC)` >$(ZLIBDEP)
@@ -604,6 +609,11 @@ endif
 		@echo "   #endif" >> $(CONFIGFILE)
 		@echo "#endif" >> $(CONFIGFILE)
 
+		@$(SHELL) -ec 'if test ! -e $(SPXGITHASHFILE) -a -e $(SRCDIR)/soplex/git_hash.cpp ; \
+			then \
+				mkdir -p $(dir $(SPXGITHASHFILE)) ; \
+				cp $(SRCDIR)/soplex/git_hash.cpp $(SPXGITHASHFILE) ; \
+			fi'
 ifneq ($(SPXGITHASH),$(LAST_SPXGITHASH))
 		@-$(MAKE) githash
 endif

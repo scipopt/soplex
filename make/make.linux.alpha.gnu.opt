@@ -1,5 +1,5 @@
 CXX	=	g++
-CPPFLAGS=	-Isrc -DNDEBUG 
+CPPFLAGS=	-I$(OBJDIR) -Isrc -DNDEBUG 
 CXXFLAGS=	-O3 -mcpu=ev6  \
 		-ffast-math -funroll-loops
 LDFLAGS	=	-lm
