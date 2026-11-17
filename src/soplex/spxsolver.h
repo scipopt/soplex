@@ -1898,10 +1898,10 @@ public:
 private:
 
    /** let index \p i leave the basis and manage entering of another one.
-       @returns \c false if LP is unbounded/infeasible. */
+       @returns \c true iff a basis change was performed. */
    bool leave(int i, bool polish = false);
    /** let id enter the basis and manage leaving of another one.
-       @returns \c false if LP is unbounded/infeasible. */
+       @returns \c true iff a basis change was performed. */
    bool enter(SPxId& id, bool polish = false);
 
    /// test coVector \p i with status \p stat.

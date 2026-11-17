@@ -34,6 +34,7 @@
 
 namespace soplex
 {
+static const Real default_reject_enter_tol = 1e-10; // = SOPLEX_LOWSTAB as defined in spxfastrt.hpp
 
 /*
   In the entering simplex algorithms (i.e. iteratively a vector is selected to
@@ -1312,6 +1313,48 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
    */
    if(leaveIdx >= 0)
    {
+      R reject_treshold = this->tolerances()->scaleAccordingToEpsilon(default_reject_enter_tol);
+
+      if(spxAbs(theFvec->delta()[leaveIdx]) < reject_treshold)
+      {
+         if(instable)
+         {
+            /* We are in the case that for all entering variables only instable leaving
+             * variables were found: Thus, above we already accepted such an instable
+             * leaving variable. Now even this seems to be impossible, thus we conclude
+             * unboundedness/infeasibility.
+             */
+            SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "IENTER03 unboundedness/infeasibility found "
+                          << "in enter()" << std::endl;)
+
+            rejectEnter(enterId, enterTest, enterStat);
+            this->change(-1, none, nullptr);
+
+            if(rep() == ROW)
+            {
+               computeDualfarkas4Row(leaveVal, enterId);
+               setBasisStatus(SPxBasisBase<R>::INFEASIBLE);
+            }
+            else
+            {
+               computePrimalray4Col(leaveVal, enterId);
+               setBasisStatus(SPxBasisBase<R>::UNBOUNDED);
+            }
+
+            return false;
+         }
+         else
+         {
+            rejectEnter(enterId, enterTest * 0.01, enterStat);
+            this->change(-1, none, nullptr);
+
+            SPxOut::debug(this, "DENTER12 rejecting enter B (leaveIdx={}, enterTest={})\n", leaveIdx,
+                          enterTest);
+
+            return false;
+         }
+      }
+
       if(spxAbs(leaveVal) < entertol())
       {
          if(NE(theUBbound[leaveIdx], theLBbound[leaveIdx], this->tolerances()->epsilon())
@@ -1450,9 +1493,9 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
 
          leaveVal != enterMax is the case that selectLeave has found only an instable leaving
          variable. We store this leaving variable for later if we are not already in the
-         instable case */
+         instable case and the violation exceeds the tolerance */
 
-      if(!instable)
+      if(!instable && enterTest < -thepricer->pricingTolerance())
       {
          instableEnterId = enterId;
          instableEnterVal = enterTest;
@@ -1539,7 +1582,7 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
       /* do not exit with status infeasible or unbounded if there is only a very small violation
        * ROW: recompute the primal variables and activities for another, more precise, round of pricing
        */
-      else if(spxAbs(enterTest) < entertol())
+      if(!recomputedVectors && enterTest >= -thepricer->pricingTolerance())
       {
          SPX_MSG_INFO3((*this->spxout),
                        (*this->spxout) << "IENTER11 clean up step to reduce numerical errors" <<
@@ -1549,6 +1592,9 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
          computePvec();
          computeCoTest();
          computeTest();
+
+         /* only do this once per solve */
+         recomputedVectors = true;
 
          return false;
       }
@@ -1561,7 +1607,6 @@ bool SPxSolverBase<R>::enter(SPxId& enterId, bool polish)
          computeDualfarkas4Row(leaveVal, enterId);
          setBasisStatus(SPxBasisBase<R>::INFEASIBLE);
       }
-      /**@todo if shift() is not zero, we must not conclude primal unboundedness */
       else
       {
          computePrimalray4Col(leaveVal, enterId);

@@ -568,25 +568,15 @@ void SPxSolverBase<R>::unShift(void)
                   t_low = this->lower(l_num);
                }
 
-               if(t_up != t_low)
-               {
-                  if((*theFvec)[i] < t_up + eps)  // check allowed violation
-                     theUBbound[i] = t_up; // reset shifted bound to original
-                  else if((*theFvec)[i] > t_up)  // shifted bound is required for feasibility
-                     theShift += theUBbound[i] - t_up;
+               if((*theFvec)[i] < t_up + eps)  // check allowed violation
+                  theUBbound[i] = t_up; // reset shifted bound to original
+               else if((*theFvec)[i] > t_up)  // shifted bound is required for feasibility
+                  theShift += theUBbound[i] - t_up;
 
-                  if((*theFvec)[i] > t_low - eps)  // check allowed violation
-                     theLBbound[i] = t_low; // reset shifted bound to original
-                  else if((*theFvec)[i] < t_low)  // shifted bound is required for feasibility
-                     theShift -= theLBbound[i] - t_low;
-               }
-               else
-               {
-                  if(theUBbound[i] > t_up)
-                     theShift += theUBbound[i] - t_up;
-                  else if(theLBbound[i] < t_low)
-                     theShift += t_low - theLBbound[i];
-               }
+               if((*theFvec)[i] > t_low - eps)  // check allowed violation
+                  theLBbound[i] = t_low; // reset shifted bound to original
+               else if((*theFvec)[i] < t_low)  // shifted bound is required for feasibility
+                  theShift -= theLBbound[i] - t_low;
             }
 
             for(i = this->nRows(); i-- > 0;)
