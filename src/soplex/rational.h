@@ -238,7 +238,19 @@ inline Rational ratFromString(const char* desc)
          else
             res = Rational(s);
 
-         res *= pow(10, mult);
+         if(mult != 0 && res != 0)
+         {
+            // Keep the base-10 scaling exact, including negative exponents.
+            // Unsigned negation also handles the minimum int without overflow.
+            const unsigned int exponent = mult < 0 ? 0u - static_cast<unsigned int>(mult)
+                                          : static_cast<unsigned int>(mult);
+            const Integer scale = boost::multiprecision::pow(Integer(10), exponent);
+
+            if(mult < 0)
+               res /= scale;
+            else
+               res *= scale;
+         }
       }
    }
 
