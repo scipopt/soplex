@@ -221,8 +221,14 @@ void SoPlexBase<R>::_evaluateSolutionReal(typename SPxSimplifier<R>::Result simp
          return;
       }
 
-      if(_solReal.isPrimalFeasible() || _solReal.isDualFeasible())
+      // restore scaled optimum
+      if(_solReal.isPrimalFeasible() && _solReal.isDualFeasible())
+      {
          _status = SPxSolverBase<R>::OPTIMAL_UNSCALED_VIOLATIONS;
+         _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+         _solver.setBasisStatus(SPxBasisBase<R>::OPTIMAL);
+         break;
+      }
 
    // FALLTHROUGH
    case SPxSolverBase<R>::ABORT_TIME:
@@ -669,6 +675,7 @@ void SoPlexBase<R>::_storeSolutionReal(bool verify)
          SPX_MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
                        "> during unsimplification. Resolving without simplifier and scaler.\n");
          _hasBasis = false;
+         _solReal.invalidate();
          _preprocessAndSolveReal(false);
          return;
       }

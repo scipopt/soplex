@@ -834,9 +834,10 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
             in this) case, the flag instableLeave is set to true.
 
             enterVal != leaveMax is the case that selectEnter has found only an instable entering
-            variable. We store this leaving variable for later -- if we are not already in the
-            instable case: then we continue and conclude unboundedness/infeasibility */
-         if(!instable)
+            variable. We store this leaving variable for later if we are not already in the
+            instable case and the violation exceeds the tolerance */
+
+         if(!instable && theCoTest[leaveIdx] < -thepricer->pricingTolerance())
          {
             instableLeaveNum = leaveIdx;
 
@@ -844,7 +845,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
             instableLeaveVal = theCoTest[leaveIdx];
             theCoTest[leaveIdx] = instableLeaveVal / 10.0;
 
-            return true;
+            return false;
          }
       }
 
@@ -869,11 +870,11 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
          /* after a factorization, the leaving column/row might not be infeasible or suboptimal anymore, hence we do
           * not try to call leave(leaveIdx), but rather return to the main solving loop and call the pricer again
           */
-         return true;
+         return false;
       }
 
       /* do not exit with status infeasible or unbounded if there is only a very small violation */
-      if(!recomputedVectors && spxAbs(enterVal) < leavetol())
+      if(!recomputedVectors && theCoTest[leaveIdx] >= -thepricer->pricingTolerance())
       {
          SPX_MSG_INFO3((*this->spxout),
                        (*this->spxout) << "ILEAVE11 clean up step to reduce numerical errors" <<
@@ -886,7 +887,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
          /* only do this once per solve */
          recomputedVectors = true;
 
-         return true;
+         return false;
       }
 
       SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "ILEAVE02 unboundedness/infeasibility found "
@@ -985,9 +986,10 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
             if(instable)
             {
                /* We are in the case that for all leaving variables only instable entering
-                  variables were found: Thus, above we already accepted such an instable
-                  entering variable. Now even this seems to be impossible, thus we conclude
-                  unboundedness/infeasibility. */
+                * variables were found: Thus, above we already accepted such an instable
+                * entering variable. Now even this seems to be impossible, thus we conclude
+                * unboundedness/infeasibility.
+                */
                SPX_MSG_INFO3((*this->spxout), (*this->spxout) << "ILEAVE03 unboundedness/infeasibility found "
                              << "in leave()" << std::endl;)
 
@@ -995,7 +997,6 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
                this->change(-1, none, nullptr);
                objChange = R(0.0); // the nonbasicValue is not supposed to be updated in this case
 
-               /**@todo if shift() is not zero we must not conclude unboundedness */
                if(rep() == ROW)
                {
                   computePrimalray4Row(enterVal);
@@ -1022,7 +1023,7 @@ bool SPxSolverBase<R>::leave(int leaveIdx, bool polish)
                // Note: These changes do not survive a refactorization
                theCoTest[leaveIdx] *= 0.01;
 
-               return true;
+               return false;
             }
          }
 
