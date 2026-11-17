@@ -1,5 +1,11 @@
 include(CTest)
 
+if(SOPLEX_HAS_BOOST)
+   add_executable(test_ratfromstring ratfromstring.cpp)
+   target_link_libraries(test_ratfromstring libsoplex)
+   add_test(NAME rational-string-parsing COMMAND test_ratfromstring)
+endif()
+
 #
 # define the set of feasible instances
 #

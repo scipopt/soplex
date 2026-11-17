@@ -6,6 +6,7 @@ features:
 performance:
 
 fixed bugs:
+- parse scientific-notation rational values with exact integer powers of ten instead of floating-point scaling
 
 interface & parameters:
 - change the SOPLEX_REAL_FORMAT macro from fixed-point to general conversion to avoid trailing zeros
