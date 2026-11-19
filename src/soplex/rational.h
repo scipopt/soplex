@@ -240,16 +240,11 @@ inline Rational ratFromString(const char* desc)
 
          if(mult != 0 && res != 0)
          {
-            // Keep the base-10 scaling exact, including negative exponents.
-            // Unsigned negation also handles the minimum int without overflow.
-            const unsigned int exponent = mult < 0 ? 0u - static_cast<unsigned int>(mult)
-                                          : static_cast<unsigned int>(mult);
-            const Integer scale = boost::multiprecision::pow(Integer(10), exponent);
-
+            // distinguish exponent sign and avoid undefined behavior using unsigned type
             if(mult < 0)
-               res /= scale;
+               res /= boost::multiprecision::pow(Integer(10), 0u - (unsigned int)mult);
             else
-               res *= scale;
+               res *= boost::multiprecision::pow(Integer(10), (unsigned int)mult);
          }
       }
    }
