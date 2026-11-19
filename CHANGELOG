@@ -20,6 +20,7 @@ build system:
 - added CMake option BUILD_PACKAGE (default: off). If set, search directories for dependencies are not suggested in soplex-config.cmake.
 - added CMake option BUILD_SHARED_LIBS (default: on) to determine whether a shared or a static library shall be built.
 - added option GITHASH_BRANCH to append the current git branch to the githash.
+- generate git_hash.cpp in the build directory instead of the source directory, so that the source tree may be read-only.
 
 miscellaneous:
 

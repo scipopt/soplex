@@ -174,9 +174,18 @@ else()
 endif()
 
 # Query git hash and create a target that creates a preprocessor macro for it.
+# The file is generated in the build tree, so the source tree may be read-only.
+# libsoplex has PROJECT_BINARY_DIR first on its include path, so
+# spxgithash.cpp picks up the generated file. Source tarballs ship
+# src/soplex/git_hash.cpp instead; seed the generated file from it.
 include(GitHash)
-githash_query(SOPLEX_GITHASH "${PROJECT_SOURCE_DIR}/src/soplex/git_hash.cpp" "SPX_GITHASH" ${GITHASH_BRANCH})
-githash_add_target(soplex_update_githash "${PROJECT_SOURCE_DIR}/src/soplex/git_hash.cpp" "SPX_GITHASH" ${GITHASH_BRANCH})
+set(SOPLEX_GITHASH_FILE "${PROJECT_BINARY_DIR}/soplex/git_hash.cpp")
+if(NOT EXISTS "${SOPLEX_GITHASH_FILE}" AND EXISTS "${PROJECT_SOURCE_DIR}/src/soplex/git_hash.cpp")
+   file(READ "${PROJECT_SOURCE_DIR}/src/soplex/git_hash.cpp" _soplex_githash_content)
+   file(WRITE "${SOPLEX_GITHASH_FILE}" "${_soplex_githash_content}")
+endif()
+githash_query(SOPLEX_GITHASH "${SOPLEX_GITHASH_FILE}" "SPX_GITHASH" ${GITHASH_BRANCH})
+githash_add_target(soplex_update_githash "${SOPLEX_GITHASH_FILE}" "SPX_GITHASH" ${GITHASH_BRANCH})
 if(SOPLEX_GITHASH)
    message(STATUS "Githash: ${SOPLEX_GITHASH}")
 endif()
