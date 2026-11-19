@@ -171,26 +171,27 @@ std::string::const_iterator findSubStringIC(const std::string& substr, const std
 inline Rational ratFromString(const char* desc)
 {
    Rational res;
+   std::string s(desc);
 
-   if(0 == strcmp(desc, "inf"))
+   std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+
+   if(s == "inf" || s == "+inf")
    {
       res = 1e100;
    }
-   else if(0 == strcmp(desc, "-inf"))
+   else if(s == "-inf")
    {
       res = -1e100;
    }
    else
    {
-      std::string s(desc);
-
       /* case 1: string is given in nom/den format */
-      if(s.find_first_of(".Ee") == std::string::npos)
+      if(s.find_first_of(".e") == std::string::npos)
       {
          if(s[0] == '+')
-            res = Rational(desc + 1);
+            res = Rational(s.substr(1));
          else
-            res = Rational(desc);
+            res = Rational(s);
       }
       /* case 2: string is given as base-10 decimal number */
       else
@@ -205,10 +206,6 @@ inline Rational ratFromString(const char* desc)
             s = s.substr(0, exponentidx);
          }
 
-         // std::cout << s << std::endl;
-         if(s[0] == '.')
-            s.insert(0, "0");
-
          size_t pos = s.find('.');
 
          // if s contains a ., convert it to a rational
@@ -221,16 +218,24 @@ inline Rational ratFromString(const char* desc)
                den.append("0");
 
             s.erase(pos, 1);
-            assert(std::all_of(s.begin() + 1, s.end(), ::isdigit));
 
             // remove padding 0s
-            if(s[0] == '-')
-               s.erase(1, SOPLEX_MIN(s.substr(1).find_first_not_of('0'), s.size() - 1));
+            if(s[0] == '-' || s[0] == '+')
+            {
+               assert(std::all_of(s.begin() + 1, s.end(), ::isdigit));
+               s.erase(1, SOPLEX_MIN(s.substr(1).find_first_not_of('0'), s.size() - 2));
+            }
             else
+            {
+               assert(std::all_of(s.begin(), s.end(), ::isdigit));
                s.erase(0, SOPLEX_MIN(s.find_first_not_of('0'), s.size() - 1));
+            }
 
-            s.append("/");
-            s.append(den);
+            if(den.length() > 1)
+            {
+               s.append("/");
+               s.append(den);
+            }
          }
 
          if(s[0] == '+')
@@ -246,6 +251,10 @@ inline Rational ratFromString(const char* desc)
             else
                res *= boost::multiprecision::pow(Integer(10), (unsigned int)mult);
          }
+
+#ifdef SOPLEX_WITH_GMP
+         mpq_canonicalize(res.backend().data());
+#endif
       }
    }
 
