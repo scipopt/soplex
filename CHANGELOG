@@ -45,6 +45,7 @@ fixed bugs:
 - keep optimal solution and basis in SoPlexBase<R>::_evaluateSolutionReal() if resolving cycles and invalidate solution in SoPlexBase<R>::_storeSolutionReal() when unsimplification fails to return OPTIMAL_UNSCALED_VIOLATIONS only after tolerable scaled optimality
 - clean up once instead of concluding and skip instable pivots for a violation within the pricing tolerance, test the violation, and return true only on a basis change in SPxSolverBase<R>::enter() and SPxSolverBase<R>::leave() to keep tolerable basis
 - reject entering pivots with a tiny pivot element in SPxSolverBase<R>::enter(), unshift in SPxSolverBase<R>::solve() before concluding from a ray, and apply tolerance also to fixing bounds in SPxSolverBase<R>::unShift() to declare unboundedness only with tolerable shift
+- parse scientific-notation rational values with exact power scaling and uniform canonicalization in ratFromString()
 
 build system:
 - restrict the Boost multiprecision backends (mpfr_float, cpp_dec_float, and float128) in cmake to Boost 1.70 or newer, where variable-precision arithmetic is stable
