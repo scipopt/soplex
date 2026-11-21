@@ -1,5 +1,5 @@
 CXX	=	cxx
-CPPFLAGS=	-Isrc #-I/usr/local/include 
+CPPFLAGS=	-I$(OBJDIR) -Isrc #-I/usr/local/include 
 CXXFLAGS=	-O0 -w0 -std strict_ansi -distinguish_nested_enums -ptr $(OBJDIR)/cxx_repository \
 		-gall -verbose -check -trapuv \
 		-msg_disable basclsnondto,boolexprconst,constrlitnondep 

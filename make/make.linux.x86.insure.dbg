@@ -1,5 +1,5 @@
 CXX	=	insure g++
-CPPFLAGS=	-Isrc 
+CPPFLAGS=	-I$(OBJDIR) -Isrc 
 CXXFLAGS=	-g -DNDEBUG
 LDFLAGS	=	-lm
 ARFLAGS	=	crs

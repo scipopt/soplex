@@ -1,5 +1,5 @@
 CXX	=	aCC
-CPPFLAGS=	-Isrc 
+CPPFLAGS=	-I$(OBJDIR) -Isrc 
 CXXFLAGS=	-AA -z -g1 +W67
 LDFLAGS	=	-lstd_v2 -lCsup_v2 -lm
 RANLIB	=	true
