@@ -14,7 +14,6 @@ check/results*
 settings/default.set
 tests/exercise_LP_changes.linux.x86.gnu.opt
 tests/status_exception_test.linux.x86.gnu.opt
-src/soplex/git_hash.cpp
 # common cache files and folders
 .vscode/
 .nfs*
@@ -24,7 +23,6 @@ src/soplex/git_hash.cpp
 bin/
 lib/
 obj/
-src/soplex/git_hash.cpp
 # common names for cmake build folders
 build*/
 install*/

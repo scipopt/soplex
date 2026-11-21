@@ -1,6 +1,6 @@
 CXX	=	CC
 LINKCXX	=	CC
-CPPFLAGS=	-Isrc -DNDEBUG  
+CPPFLAGS=	-I$(OBJDIR) -Isrc -DNDEBUG  
 CXXFLAGS=	-std=c++14 -fast -xprefetch=auto -xipo=2
 LDFLAGS	=	-lm
 RANLIB	=	true

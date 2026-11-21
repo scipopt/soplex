@@ -25,6 +25,7 @@ fixed bugs:
 build system:
 - restrict the Boost multiprecision backends (mpfr_float, cpp_dec_float, and float128) in cmake to Boost 1.70 or newer, where variable-precision arithmetic is stable
 - correct the quadprecision test setting guard to SOPLEX_WITH_FLOAT128 in check/CMakeLists.txt so that the quad tests are registered
+- generate git_hash.cpp in build tree so that source tree may be read only
 
 miscellaneous:
 - added DEBUGTOOL=perf option for check scripts to collect perf statistics (new sections @06, @09, @10), including computation and comparison of non-memory-stalling frequency-normalized time

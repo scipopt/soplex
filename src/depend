@@ -178,7 +178,7 @@ $(LIBOBJDIR)/spxdefines.o: src/soplex/spxdefines.cpp src/soplex/spxdefines.h \
  src/soplex/external/fmt/format.h src/soplex/external/fmt/ostream.h \
  src/soplex/rational.h
 $(LIBOBJDIR)/spxgithash.o: src/soplex/spxgithash.cpp src/soplex/spxgithash.h \
- src/soplex/git_hash.cpp
+ $(SPXGITHASHFILE)
 $(LIBOBJDIR)/spxid.o: src/soplex/spxid.cpp src/soplex/spxid.h src/soplex/datakey.h \
  src/soplex/exceptions.h
 $(LIBOBJDIR)/spxout.o: src/soplex/spxout.cpp src/soplex/spxout.h src/soplex/fmt.hpp \
@@ -226,7 +226,7 @@ $(LIBOBJSUBDIR)/spxdefines.o: src/soplex/spxdefines.cpp src/soplex/spxdefines.h 
  src/soplex/external/fmt/format.h src/soplex/external/fmt/ostream.h \
  src/soplex/rational.h
 $(LIBOBJSUBDIR)/spxgithash.o: src/soplex/spxgithash.cpp src/soplex/spxgithash.h \
- src/soplex/git_hash.cpp
+ $(SPXGITHASHFILE)
 $(LIBOBJSUBDIR)/spxid.o: src/soplex/spxid.cpp src/soplex/spxid.h src/soplex/datakey.h \
  src/soplex/exceptions.h
 $(LIBOBJSUBDIR)/spxout.o: src/soplex/spxout.cpp src/soplex/spxout.h src/soplex/fmt.hpp \
