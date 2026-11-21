@@ -1,5 +1,5 @@
 CXX	=	g++
-CPPFLAGS=	-Isrc
+CPPFLAGS=	-I$(OBJDIR) -Isrc
 CXXFLAGS=	-O -g $(GCCWARN)
 LDFLAGS	=	-lm
 ARFLAGS	=	crs

@@ -1,5 +1,5 @@
 CXX	=	g++
-CPPFLAGS=	-I/usr/local/include -Isrc -DNDEBUG 
+CPPFLAGS=	-I$(OBJDIR) -I/usr/local/include -Isrc -DNDEBUG 
 CXXFLAGS=	-O3 -m64 -mtune=native  -fomit-frame-pointer # -malign-double -ffast-math
 LDFLAGS	=	-lm -m64 -L/usr/local/lib
 ARFLAGS	=	crs

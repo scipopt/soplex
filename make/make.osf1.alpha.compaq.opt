@@ -1,5 +1,5 @@
 CXX	=	cxx
-CPPFLAGS=	-Isrc -DNDEBUG  #-I/usr/local/include 
+CPPFLAGS=	-I$(OBJDIR) -Isrc -DNDEBUG  #-I/usr/local/include 
 CXXFLAGS=	-std strict_ansi -O4 -fast -distinguish_nested_enums -nortti -nocleanup \
 		-ptr $(OBJDIR)/cxx_repository   
 REPOSIT	=	$(OBJDIR)/cxx_repository/*.o

@@ -1,7 +1,7 @@
 CXX	=	icpc
 LINKCXX	=	icpc
 DCXX	=	icpc
-CPPFLAGS=	-Isrc
+CPPFLAGS=	-I$(OBJDIR) -Isrc
 CXXFLAGS=	-g -fp-model extended -ansi -fp-stack-check -mp -w2 \
 		-wd279,383,444,810,981,1572 -std=c++14
 LDFLAGS	=	-lm -lstdc++

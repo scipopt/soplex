@@ -4,4 +4,5 @@ SPXGITHASH = $(shell git describe --always --dirty  | sed 's/^.*-g//')-$(shell g
 
 .PHONY: githash
 githash:: # do not remove the double-colon
+	    @mkdir -p $(dir $(SPXGITHASHFILE))
 	    @echo "#define SPX_GITHASH \"$(SPXGITHASH)\"" > $(SPXGITHASHFILE)

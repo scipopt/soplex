@@ -1,5 +1,5 @@
 CXX	=	cxx
-CPPFLAGS=	-Isrc
+CPPFLAGS=	-I$(OBJDIR) -Isrc
 CXXFLAGS=	-O0 -w0 -std strict_ansi -gall -verbose -check \
 		-msg_disable basclsnondto,boolexprconst # -ieee
 LDFLAGS	=	-lm

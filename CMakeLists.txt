@@ -175,8 +175,16 @@ endif()
 
 # Query git hash and create a target that creates a preprocessor macro for it.
 include(GitHash)
-githash_query(SOPLEX_GITHASH "${PROJECT_SOURCE_DIR}/src/soplex/git_hash.cpp" "SPX_GITHASH" ${GITHASH_BRANCH})
-githash_add_target(soplex_update_githash "${PROJECT_SOURCE_DIR}/src/soplex/git_hash.cpp" "SPX_GITHASH" ${GITHASH_BRANCH})
+
+# Seed the generated file from the source if available.
+set(SOPLEX_GITHASH_FILE "${PROJECT_BINARY_DIR}/soplex/git_hash.cpp")
+if(NOT EXISTS "${SOPLEX_GITHASH_FILE}" AND EXISTS "${PROJECT_SOURCE_DIR}/src/soplex/git_hash.cpp")
+   configure_file("${PROJECT_SOURCE_DIR}/src/soplex/git_hash.cpp" "${SOPLEX_GITHASH_FILE}" COPYONLY)
+endif()
+
+# Generate the file in the build tree so that the source tree may be read only.
+githash_query(SOPLEX_GITHASH "${SOPLEX_GITHASH_FILE}" "SPX_GITHASH" ${GITHASH_BRANCH})
+githash_add_target(soplex_update_githash "${SOPLEX_GITHASH_FILE}" "SPX_GITHASH" ${GITHASH_BRANCH})
 if(SOPLEX_GITHASH)
    message(STATUS "Githash: ${SOPLEX_GITHASH}")
 endif()
