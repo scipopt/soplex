@@ -363,8 +363,12 @@ public:
          {
             e->idx = *i;
             e->val = *v;
-            e++;
-            ++newnnz;
+
+            if(e->val != 0)
+            {
+               ++e;
+               ++newnnz;
+            }
          }
 
          i++;
@@ -692,8 +696,13 @@ public:
 
             if(s->val != 0.0)
             {
-               *e++ = *s;
-               ++nnz;
+               *e = *s;
+
+               if(e->val != 0)
+               {
+                  ++e;
+                  ++nnz;
+               }
             }
 
             ++s;
@@ -712,14 +721,18 @@ public:
       {
          const int n = sv.size();
          assert(n <= max());
+         int nnz = 0;
 
          for(int i = 0; i < n; ++i)
          {
-            m_elem[i].val = spxLdexp(sv.value(i), scaleExp);
-            m_elem[i].idx = sv.index(i);
+            m_elem[nnz].val = spxLdexp(sv.value(i), scaleExp);
+            m_elem[nnz].idx = sv.index(i);
+
+            if(m_elem[nnz].val != 0)
+               ++nnz;
          }
 
-         set_size(n);
+         set_size(nnz);
          assert(isConsistent());
       }
 
@@ -734,25 +747,32 @@ public:
       {
          const int n = sv.size();
          assert(n <= max());
+         int nnz = 0;
 
          if(negateExp)
          {
             for(int i = 0; i < n; ++i)
             {
-               m_elem[i].val = spxLdexp(sv.value(i), -scaleExp[sv.index(i)]);
-               m_elem[i].idx = sv.index(i);
+               m_elem[nnz].val = spxLdexp(sv.value(i), -scaleExp[sv.index(i)]);
+               m_elem[nnz].idx = sv.index(i);
+
+               if(m_elem[nnz].val != 0)
+                  ++nnz;
             }
          }
          else
          {
             for(int i = 0; i < n; ++i)
             {
-               m_elem[i].val = spxLdexp(sv.value(i), scaleExp[sv.index(i)]);
-               m_elem[i].idx = sv.index(i);
+               m_elem[nnz].val = spxLdexp(sv.value(i), scaleExp[sv.index(i)]);
+               m_elem[nnz].idx = sv.index(i);
+
+               if(m_elem[nnz].val != 0)
+                  ++nnz;
             }
          }
 
-         set_size(n);
+         set_size(nnz);
          assert(isConsistent());
       }
 
@@ -764,17 +784,19 @@ public:
    template < class S >
    SVectorBase<R>& assignArray(const S* rowValues, const int* rowIndices, int rowSize)
    {
-      const int m = max();
-      assert(m >= rowSize);
-      int i;
+      assert(rowSize <= max());
+      int nnz = 0;
 
-      for(i = 0; i < rowSize && i < m; ++i)
+      for(int i = 0; i < rowSize; ++i)
       {
-         m_elem[i].val = rowValues[i];
-         m_elem[i].idx = rowIndices[i];
+         m_elem[nnz].val = rowValues[i];
+         m_elem[nnz].idx = rowIndices[i];
+
+         if(m_elem[nnz].val != 0)
+            ++nnz;
       }
 
-      set_size(i);
+      set_size(nnz);
 
       return *this;
    }

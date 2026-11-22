@@ -1799,56 +1799,52 @@ void SPxMainSM<R>::handleExtremes(SPxLPBase<R>& lp)
          ++chgBnds;
       }
 
-      // fixed columns will be eliminated later
-      if(NE(lo, up, this->tolerances()->epsilon()))
+      lo = spxAbs(lo);
+      up = spxAbs(up);
+
+      R absBnd = (lo > up) ? lo : up;
+
+      if(absBnd < 1.0)
+         absBnd = 1.0;
+
+      // non-zeros
+      SVectorBase<R>& col = lp.colVector_w(j);
+      int        i = 0;
+
+      while(i < col.size())
       {
-         lo = spxAbs(lo);
-         up = spxAbs(up);
+         R aij = spxAbs(col.value(i));
 
-         R absBnd = (lo > up) ? lo : up;
-
-         if(absBnd < 1.0)
-            absBnd = 1.0;
-
-         // non-zeros
-         SVectorBase<R>& col = lp.colVector_w(j);
-         int        i = 0;
-
-         while(i < col.size())
+         if(isZero(aij * absBnd, tol))
          {
-            R aij = spxAbs(col.value(i));
+            SVectorBase<R>& row = lp.rowVector_w(col.index(i));
+            int row_j = row.pos(j);
 
-            if(isZero(aij * absBnd, tol))
+            // this changes col.size()
+            if(row_j >= 0)
+               row.remove(row_j);
+
+            col.remove(i);
+
+            SPxOut::debug(this, "IMAISM04 aij={}  removed, absBnd={} \n", aij, absBnd);
+            ++remNzos;
+         }
+         else
+         {
+            if(aij > maxVal)
             {
-               SVectorBase<R>& row = lp.rowVector_w(col.index(i));
-               int row_j = row.pos(j);
-
-               // this changes col.size()
-               if(row_j >= 0)
-                  row.remove(row_j);
-
-               col.remove(i);
-
-               SPxOut::debug(this, "IMAISM04 aij={}  removed, absBnd={} \n", aij, absBnd);
-               ++remNzos;
+               SPX_MSG_WARNING((*this->spxout),
+                               (*this->spxout) << "WMAISM05 Warning! Big matrix coefficient " << aij
+                               << std::endl);
             }
-            else
+            else if(isZero(aij, tol))
             {
-               if(aij > maxVal)
-               {
-                  SPX_MSG_WARNING((*this->spxout),
-                                  (*this->spxout) << "WMAISM05 Warning! Big matrix coefficient " << aij
-                                  << std::endl);
-               }
-               else if(isZero(aij, tol))
-               {
-                  SPX_MSG_WARNING((*this->spxout),
-                                  (*this->spxout) << "WMAISM06 Warning! Tiny matrix coefficient " << aij
-                                  << std::endl);
-               }
-
-               ++i;
+               SPX_MSG_WARNING((*this->spxout),
+                               (*this->spxout) << "WMAISM06 Warning! Tiny matrix coefficient " << aij
+                               << std::endl);
             }
+
+            ++i;
          }
       }
 
@@ -2704,8 +2700,6 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
             redundantLower = false;
             redundantUpper = false;
-
-            SOPLEX_ASSERT_WARN("WMAISM12", isNotZero(aij, R(1.0 / R(infinity))));
 
             if(aij > 0.0)
             {
