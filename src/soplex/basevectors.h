@@ -935,8 +935,12 @@ SVectorBase<R>& SVectorBase<R>::operator=(const VectorBase<S>& vec)
 
          e->idx = i;
          e->val = vec[i];
-         ++e;
-         ++n;
+
+         if(e->val != 0)
+         {
+            ++e;
+            ++n;
+         }
       }
    }
 
@@ -967,8 +971,12 @@ SVectorBase<Real>& SVectorBase<Real>::operator=(const VectorBase<S>& vec)
 
          e->idx = i;
          e->val = Real(vec[i]);
-         ++e;
-         ++n;
+
+         if(e->val != 0)
+         {
+            ++e;
+            ++n;
+         }
       }
    }
 
@@ -1001,8 +1009,12 @@ SVectorBase<R>& SVectorBase<R>::operator=(const SSVectorBase<S>& sv)
       {
          e->idx = idx;
          e->val = sv[idx];
-         ++e;
-         ++nnz;
+
+         if(e->val != 0)
+         {
+            ++e;
+            ++nnz;
+         }
       }
    }
 

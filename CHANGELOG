@@ -47,6 +47,7 @@ fixed bugs:
 - reject entering pivots with a tiny pivot element in SPxSolverBase<R>::enter(), unshift in SPxSolverBase<R>::solve() before concluding from a ray, and apply tolerance also to fixing bounds in SPxSolverBase<R>::unShift() to declare unboundedness only with tolerable shift
 - parse scientific-notation rational values with exact power scaling and uniform canonicalization in ratFromString()
 - add missing scaling reset to SoPlexBase<R>::optimize() to reapply persistent scaling after previous unscaled resolve
+- remove zero coefficients also after scaling in methods of SVectorBase<R>, SPxScaler<R>, and SPxLPBase<R> as well as small coefficients also from fixed columns in SPxMainSM<R>::handleExtremes() to keep numerics coherent
 
 build system:
 - restrict the Boost multiprecision backends (mpfr_float, cpp_dec_float, and float128) in cmake to Boost 1.70 or newer, where variable-precision arithmetic is stable
