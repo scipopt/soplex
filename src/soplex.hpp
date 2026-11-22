@@ -10394,6 +10394,9 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::optimize(volatile bool* interru
 
       _solver.setSolvingForBoosted(false);
 
+      // reset scaler configuration
+      setIntParam(SoPlexBase<R>::SCALER, intParam(SoPlexBase<R>::SCALER));
+
       _optimize(interrupt);
 #ifdef SOPLEX_DEBUG // this check will remove scaling of the realLP
       _checkBasisScaling();
