@@ -153,7 +153,7 @@ void SoPlexBase<R>::_evaluateSolutionReal(typename SPxSimplifier<R>::Result simp
    switch(_status)
    {
    case SPxSolverBase<R>::OPTIMAL:
-      _storeSolutionReal(!_isRealLPLoaded || _isRealLPScaled);
+      _storeSolutionReal(true);
 
       // apply polishing on original problem
       if(_applyPolishing)
@@ -486,6 +486,17 @@ void SoPlexBase<R>::_verifySolutionReal()
                     << ", row violation: " << rowviol
                     << ", dual violation: " << dualviol
                     << ", redcost violation: " << redcostviol << std::endl;)
+
+      // declare original violations
+      if(_scaler == nullptr && _simplifier == nullptr)
+      {
+         SPX_MSG_INFO1(spxout, spxout <<
+                       " --- detected violations in original problem space -- keep violations unresolved" <<
+                       std::endl;)
+         _status = SPxSolverBase<R>::OPTIMAL_UNSCALED_VIOLATIONS;
+         return;
+      }
+
       SPX_MSG_INFO1(spxout, spxout <<
                     " --- detected violations in original problem space -- solve again without presolving/scaling" <<
                     std::endl;)
