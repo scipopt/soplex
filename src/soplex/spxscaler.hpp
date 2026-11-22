@@ -203,10 +203,13 @@ void SPxScaler<R>::applyScaling(SPxLPBase<R>& lp)
       int exp1;
       int exp2 = rowscaleExp[i];
 
-      for(int j = 0; j < vec.size(); ++j)
+      for(int j = vec.size() - 1; j >= 0; --j)
       {
          exp1 = colscaleExp[vec.index(j)];
          vec.value(j) = spxLdexp(vec.value(j), exp1 + exp2);
+
+         if(vec.value(j) == 0)
+            vec.remove(j);
       }
 
       lp.maxRowObj_w(i) = spxLdexp(lp.maxRowObj(i), exp2);
@@ -226,10 +229,13 @@ void SPxScaler<R>::applyScaling(SPxLPBase<R>& lp)
       int exp1;
       int exp2 = colscaleExp[i];
 
-      for(int j = 0; j < vec.size(); ++j)
+      for(int j = vec.size() - 1; j >= 0; --j)
       {
          exp1 = rowscaleExp[vec.index(j)];
          vec.value(j) = spxLdexp(vec.value(j), exp1 + exp2);
+
+         if(vec.value(j) == 0)
+            vec.remove(j);
       }
 
       lp.maxObj_w(i) = spxLdexp(lp.maxObj_w(i), exp2);
@@ -263,10 +269,13 @@ void SPxScaler<R>::unscale(SPxLPBase<R>& lp)
       int exp1;
       int exp2 = rowscaleExp[i];
 
-      for(int j = 0; j < vec.size(); ++j)
+      for(int j = vec.size() - 1; j >= 0; --j)
       {
          exp1 = colscaleExp[vec.index(j)];
          vec.value(j) = spxLdexp(vec.value(j), -exp1 - exp2);
+
+         if(vec.value(j) == 0)
+            vec.remove(j);
       }
 
       lp.maxRowObj_w(i) = spxLdexp(lp.maxRowObj(i), -exp2);
@@ -285,10 +294,13 @@ void SPxScaler<R>::unscale(SPxLPBase<R>& lp)
       int exp1;
       int exp2 = colscaleExp[i];
 
-      for(int j = 0; j < vec.size(); ++j)
+      for(int j = vec.size() - 1; j >= 0; --j)
       {
          exp1 = rowscaleExp[vec.index(j)];
          vec.value(j) = spxLdexp(vec.value(j), -exp1 - exp2);
+
+         if(vec.value(j) == 0)
+            vec.remove(j);
       }
 
       lp.maxObj_w(i) = spxLdexp(lp.maxObj_w(i), -exp2);

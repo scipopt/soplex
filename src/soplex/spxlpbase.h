@@ -722,17 +722,16 @@ public:
       for(i = nCols() - 1; i >= 0; --i)
          newCols[i] = 0;
 
-      if(numValues > 0)
+      for(i = oldRowNumber; i < nRows(); ++i)
       {
-         for(i = 0; i < numRows; i++)
+         const SVectorBase<R>& vec = rowVector(i);
+
+         for(j = 0; j < vec.size(); ++j)
          {
-            for(j = rowStarts[i]; j < rowStarts[i] + rowLengths[i]; j++)
-            {
-               ///@todo implement the addition of new columns as in doAddRows()
-               assert(rowIndices[j] >= 0);
-               assert(rowIndices[j] < oldColNumber);
-               newCols[rowIndices[j]]++;
-            }
+            ///@todo implement the addition of new columns as in doAddRows()
+            assert(vec.index(j) >= 0);
+            assert(vec.index(j) < oldColNumber);
+            ++newCols[vec.index(j)];
          }
       }
 
@@ -897,12 +896,17 @@ public:
       for(i = nRows() - 1; i >= 0; --i)
          newRows[i] = 0;
 
-      for(i = numValues - 1; i >= 0; --i)
+      for(i = oldColNumber; i < nCols(); ++i)
       {
-         ///@todo implement the addition of new rows as in doAddCols()
-         assert(colIndices[i] >= 0);
-         assert(colIndices[i] < oldRowNumber);
-         newRows[colIndices[i]]++;
+         const SVectorBase<R>& vec = colVector(i);
+
+         for(j = 0; j < vec.size(); ++j)
+         {
+            ///@todo implement the addition of new rows as in doAddCols()
+            assert(vec.index(j) >= 0);
+            assert(vec.index(j) < oldRowNumber);
+            ++newRows[vec.index(j)];
+         }
       }
 
       // extend rows as required (backward because of memory efficiency reasons)
@@ -1847,11 +1851,10 @@ public:
 
       SVectorBase<R>& row = rowVector_w(i);
       SVectorBase<R>& col = colVector_w(j);
+      R newVal = 0;
 
       if(isNotZero(val, this->tolerances()->epsilon()))
       {
-         R newVal;
-
          if(scale)
          {
             assert(_isScaled);
@@ -1860,7 +1863,10 @@ public:
          }
          else
             newVal = val;
+      }
 
+      if(newVal != 0)
+      {
          if(row.pos(j) >= 0 && col.pos(i) >= 0)
          {
             row.value(row.pos(j)) = newVal;
@@ -1890,18 +1896,19 @@ public:
 
       SVectorBase<R>& row = rowVector_w(i);
       SVectorBase<R>& col = colVector_w(j);
+      R newVal = *val;
 
-      if(mpq_get_d(*val) != R(0))
+      if(newVal != 0)
       {
          if(row.pos(j) >= 0 && col.pos(i) >= 0)
          {
-            row.value(row.pos(j)) = *val;
-            col.value(col.pos(i)) = *val;
+            row.value(row.pos(j)) = newVal;
+            col.value(col.pos(i)) = newVal;
          }
          else
          {
-            LPRowSetBase<R>::add2(i, 1, &j, val);
-            LPColSetBase<R>::add2(j, 1, &i, val);
+            LPRowSetBase<R>::add2(i, 1, &j, &newVal);
+            LPColSetBase<R>::add2(j, 1, &i, &newVal);
          }
       }
       else if(row.pos(j) >= 0 && col.pos(i) >= 0)
@@ -2385,6 +2392,7 @@ private:
       int idx = nRows();
       int oldColNumber = nCols();
       int newRowScaleExp = 0;
+      int nnz = 0;
 
       LPRowSetBase<R>::add(row);
 
@@ -2409,7 +2417,7 @@ private:
       }
 
       // now insert nonzeros to column file also
-      for(int j = vec.size() - 1; j >= 0; --j)
+      for(int j = 0; j < vec.size(); ++j)
       {
          int i = vec.index(j);
 
@@ -2429,9 +2437,19 @@ private:
          }
 
          assert(i < nCols());
-         LPColSetBase<R>::add2(i, 1, &idx, &val);
+
+         if(val != 0)
+         {
+            LPColSetBase<R>::add2(i, 1, &idx, &val);
+
+            if(nnz < j)
+               vec.element(nnz) = vec.element(j);
+
+            ++nnz;
+         }
       }
 
+      vec.set_size(nnz);
       addedRows(1);
       addedCols(nCols() - oldColNumber);
    }
@@ -2443,6 +2461,7 @@ private:
       int idx = nRows();
       int oldColNumber = nCols();
       int newRowScaleExp = 0;
+      int nnz = 0;
 
       LPRowSetBase<R>::add(lhsValue, rowVec, rhsValue);
 
@@ -2467,7 +2486,7 @@ private:
       SVectorBase<R>& vec = rowVector_w(idx);
 
       // now insert nonzeros to column file also
-      for(int j = vec.size() - 1; j >= 0; --j)
+      for(int j = 0; j < vec.size(); ++j)
       {
          int i = vec.index(j);
 
@@ -2487,9 +2506,19 @@ private:
          }
 
          assert(i < nCols());
-         LPColSetBase<R>::add2(i, 1, &idx, &val);
+
+         if(val != 0)
+         {
+            LPColSetBase<R>::add2(i, 1, &idx, &val);
+
+            if(nnz < j)
+               vec.element(nnz) = vec.element(j);
+
+            ++nnz;
+         }
       }
 
+      vec.set_size(nnz);
       addedRows(1);
       addedCols(nCols() - oldColNumber);
    }
@@ -2513,11 +2542,11 @@ private:
       for(i = nCols() - 1; i >= 0; --i)
          newCols[i] = 0;
 
-      for(i = set.num() - 1; i >= 0; --i)
+      for(i = oldRowNumber; i < nRows(); ++i)
       {
-         const SVectorBase<R>& vec = set.rowVector(i);
+         const SVectorBase<R>& vec = rowVector(i);
 
-         for(j = vec.size() - 1; j >= 0; --j)
+         for(j = 0; j < vec.size(); ++j)
          {
             // create new columns if required
             ii = vec.index(j);
@@ -2558,6 +2587,7 @@ private:
       {
          SVectorBase<R>& vec = rowVector_w(i);
          int newRowScaleExp = 0;
+         int nnz = 0;
 
          DataArray <int>& colscaleExp = LPColSetBase<R>::scaleExp;
 
@@ -2577,7 +2607,7 @@ private:
             LPRowSetBase<R>::scaleExp[i] = newRowScaleExp;
          }
 
-         for(j = vec.size() - 1; j >= 0; --j)
+         for(j = 0; j < vec.size(); ++j)
          {
             k = vec.index(j);
             col = &colVector_w(k);
@@ -2591,8 +2621,20 @@ private:
             if(scale)
                vec.value(j) = spxLdexp(vec.value(j), newRowScaleExp + colscaleExp[k]);
 
-            col->value(idx) = vec.value(j);
+            if(vec.value(j) != 0)
+            {
+               col->value(idx) = vec.value(j);
+
+               if(nnz < j)
+                  vec.element(nnz) = vec.element(j);
+
+               ++nnz;
+            }
+            else
+               col->set_size(col->size() - 1);
          }
+
+         vec.set_size(nnz);
       }
 
 #ifndef NDEBUG
@@ -2615,6 +2657,7 @@ private:
       int idx = nCols();
       int oldRowNumber = nRows();
       int newColScaleExp = 0;
+      int nnz = 0;
 
       LPColSetBase<R>::add(col);
 
@@ -2642,7 +2685,7 @@ private:
       }
 
       // now insert nonzeros to row file also
-      for(int j = vec.size() - 1; j >= 0; --j)
+      for(int j = 0; j < vec.size(); ++j)
       {
          int i = vec.index(j);
 
@@ -2662,9 +2705,19 @@ private:
          }
 
          assert(i < nRows());
-         LPRowSetBase<R>::add2(i, 1, &idx, &val);
+
+         if(val != 0)
+         {
+            LPRowSetBase<R>::add2(i, 1, &idx, &val);
+
+            if(nnz < j)
+               vec.element(nnz) = vec.element(j);
+
+            ++nnz;
+         }
       }
 
+      vec.set_size(nnz);
       addedCols(1);
       addedRows(nRows() - oldRowNumber);
    }
@@ -2676,6 +2729,7 @@ private:
       int idx = nCols();
       int oldRowNumber = nRows();
       int newColScaleExp = 0;
+      int nnz = 0;
 
       LPColSetBase<R>::add(objValue, lowerValue, colVec, upperValue);
 
@@ -2703,7 +2757,7 @@ private:
       SVectorBase<R>& vec = colVector_w(idx);
 
       // now insert nonzeros to row file also
-      for(int j = vec.size() - 1; j >= 0; --j)
+      for(int j = 0; j < vec.size(); ++j)
       {
          int i = vec.index(j);
 
@@ -2722,9 +2776,19 @@ private:
          }
 
          assert(i < nRows());
-         LPRowSetBase<R>::add2(i, 1, &idx, &val);
+
+         if(val != 0)
+         {
+            LPRowSetBase<R>::add2(i, 1, &idx, &val);
+
+            if(nnz < j)
+               vec.element(nnz) = vec.element(j);
+
+            ++nnz;
+         }
       }
 
+      vec.set_size(nnz);
       addedCols(1);
       addedRows(nRows() - oldRowNumber);
    }
@@ -2747,11 +2811,11 @@ private:
       for(i = nRows() - 1; i >= 0; --i)
          newRows[i] = 0;
 
-      for(i = set.num() - 1; i >= 0; --i)
+      for(i = oldColNumber; i < nCols(); ++i)
       {
-         const SVectorBase<R>& vec = set.colVector(i);
+         const SVectorBase<R>& vec = colVector(i);
 
-         for(j = vec.size() - 1; j >= 0; --j)
+         for(j = 0; j < vec.size(); ++j)
          {
             // create new rows if required
             int l = vec.index(j);
@@ -2800,6 +2864,7 @@ private:
 
          SVectorBase<R>& vec = colVector_w(i);
          int newColScaleExp = 0;
+         int nnz = 0;
 
          DataArray <int>& rowscaleExp = LPRowSetBase<R>::scaleExp;
 
@@ -2819,7 +2884,7 @@ private:
             LPColSetBase<R>::scaleExp[i] = newColScaleExp;
          }
 
-         for(j = vec.size() - 1; j >= 0; --j)
+         for(j = 0; j < vec.size(); ++j)
          {
             int k = vec.index(j);
             SVectorBase<R>& row = rowVector_w(k);
@@ -2832,8 +2897,20 @@ private:
             if(scale)
                vec.value(j) = spxLdexp(vec.value(j), newColScaleExp + rowscaleExp[k]);
 
-            row.value(idx) = vec.value(j);
+            if(vec.value(j) != 0)
+            {
+               row.value(idx) = vec.value(j);
+
+               if(nnz < j)
+                  vec.element(nnz) = vec.element(j);
+
+               ++nnz;
+            }
+            else
+               row.set_size(row.size() - 1);
          }
+
+         vec.set_size(nnz);
       }
 
 #ifndef NDEBUG
