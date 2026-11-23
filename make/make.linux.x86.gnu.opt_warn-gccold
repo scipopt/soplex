@@ -1,5 +1,5 @@
 CXX	=	g++
-CPPFLAGS=	-I$(OBJDIR) -Isrc -DNDEBUG  -m32 -DWITH_WARNINGS
+CPPFLAGS=	-I$(OBJDIR)/include -Isrc -DNDEBUG  -m32 -DWITH_WARNINGS
 CXXFLAGS=	-g -O3 -fomit-frame-pointer # -ffloat-store # -malign-double -ffast-math
 LDFLAGS	=	-m32 -lm
 ARFLAGS	=	crs

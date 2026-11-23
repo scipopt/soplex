@@ -1,5 +1,5 @@
 CXX	=	CC
-CPPFLAGS=	-I$(OBJDIR) -Isrc -DNDEBUG  \
+CPPFLAGS=	-I$(OBJDIR)/include -Isrc -DNDEBUG  \
                 -DWITH_LONG_DOUBLE
 CXXFLAGS=	-std=c++14 -fast -xprefetch=auto
 LDFLAGS	=	-lm

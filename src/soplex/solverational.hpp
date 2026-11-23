@@ -102,12 +102,6 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
    if(oldRatiotester == SoPlexBase<R>::RATIOTESTER_BOUNDFLIPPING)
       setIntParam(SoPlexBase<R>::RATIOTESTER, SoPlexBase<R>::RATIOTESTER_FAST);
 
-   ///@todo implement handling of row objectives in Cplex interface
-#ifdef SOPLEX_WITH_CPX
-   int oldEqtrans = boolParam(SoPlexBase<R>::EQTRANS);
-   setBoolParam(SoPlexBase<R>::EQTRANS, true);
-#endif
-
    // introduce slack variables to transform inequality constraints into equations
    if(boolParam(SoPlexBase<R>::EQTRANS))
       _transformEquality();
@@ -484,10 +478,6 @@ void SoPlexBase<R>::_optimizeRational(volatile bool* interrupt)
    // restore original problem
    if(boolParam(SoPlexBase<R>::EQTRANS))
       _untransformEquality(_solRational);
-
-#ifdef SOPLEX_WITH_CPX
-   setBoolParam(SoPlexBase<R>::EQTRANS, oldEqtrans);
-#endif
 
    // reset representation and ratio test
    setIntParam(SoPlexBase<R>::REPRESENTATION, oldRepresentation);

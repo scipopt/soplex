@@ -18,18 +18,16 @@ GMP		=	false
 BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 
 CXX		=	g++
-DCXX		=	g++
 LIBEXT		=	a
 
 SRCDIR		=	../src
+OBJDIR		=	../obj/O.$(BASE)
 BINDIR		=	../bin
 LIBDIR		=	../lib
 
-DEPEND		=	dependencies
-
-CPPFLAGS	=	-I$(SRCDIR)
+# find soplex/config.h in build dir
+CPPFLAGS	=	-I$(OBJDIR)/include -I$(SRCDIR)
 CXXFLAGS	=	-g
-DFLAGS		=	-MM
 BINOFLAGS	=	
 LIBOFLAGS	=	
 LDFLAGS		=	-lm -lz #-static
@@ -193,15 +191,6 @@ else
 		@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TESTASYNCTERMOBJ) \
 		 -L$(BOOST_LIBDIR) -L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
 endif
-
-.PHONY: $(DEPEND)
-depend:
-		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
-		$(ALLOBJ:.o=.cpp) \
-		| sed '\''s|^\([0-9A-Za-z]\{1,\}\)\.o|\1.o|g'\'' \
-		>$(DEPEND)'
-
--include	$(DEPEND)
 
 
 %.o:	%.cpp

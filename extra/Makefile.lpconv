@@ -1,96 +1,266 @@
-#* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-#*                                                                           *
-#*   File....: Makefile                                                      *
-#*   Name....: SoPlex Makefile                                               *
-#*   Author..: Thorsten Koch                                                 *
-#*   Copyright by Author, All rights reserved                                *
-#*                                                                           *
-#* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+#* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
+#*                                                                           *#
+#*                  This file is part of the class library                   *#
+#*       SoPlex --- the Sequential object-oriented simPlex.                  *#
+#*                                                                           *#
+#*  Copyright (c) 1996-2026 Zuse Institute Berlin (ZIB)                      *#
+#*                                                                           *#
+#*  Licensed under the Apache License, Version 2.0 (the "License");          *#
+#*  you may not use this file except in compliance with the License.         *#
+#*  You may obtain a copy of the License at                                  *#
+#*                                                                           *#
+#*      http://www.apache.org/licenses/LICENSE-2.0                           *#
+#*                                                                           *#
+#*  Unless required by applicable law or agreed to in writing, software      *#
+#*  distributed under the License is distributed on an "AS IS" BASIS,        *#
+#*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *#
+#*  See the License for the specific language governing permissions and      *#
+#*  limitations under the License.                                           *#
+#*                                                                           *#
+#*  You should have received a copy of the Apache-2.0 license                *#
+#*  along with SoPlex; see the file LICENSE. If not email soplex@zib.de.     *#
+#*                                                                           *#
+#* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *#
 
-.PHONY:		depend clean 
+#@file    Makefile.lpconv
+#@brief   LPConv Makefile
+#@author  Thorsten Koch
 
-ARCH            :=      $(shell uname -m | \
-                        sed \
-			-e s/sun../sparc/ \
-			-e s/i.86/x86/ \
-			-e s/IP../mips/ \
-			-e s/9000..../hppa/)
-OSTYPE		:=	$(shell uname -s | tr A-Z a-z)
+#-----------------------------------------------------------------------------
+# detect host architecture
+#-----------------------------------------------------------------------------
 
+include make/make.detecthost
+
+
+#-----------------------------------------------------------------------------
+# default settings
+#-----------------------------------------------------------------------------
+
+VERBOSE		=	false
+SHARED		=	false
 OPT		=	opt
-ZLIB		=	true
-COMP		=	gnu
-CXX		=	g++
-DCXX		=	g++
-LINT		=	flexelint
+LTO		=	false
+STATICLIBEXT	=	a
+SHAREDLIBEXT	=	so
+LIBEXT		=	$(STATICLIBEXT)
+EXEEXTENSION	=
 
-CPPFLAGS	=	-Isrc
-CXXFLAGS	=	-O
-LDFLAGS		=	-lm
-ARFLAGS		=	cr
-DFLAGS		=	-MM
+# is it allowed to link to external open source libraries?
+OPENSOURCE	=	true
+
+ZLIB     =  true
+QUADMATH =  false
+BOOST    =  false
+GMP      =  auto
+MPFR     =  auto
+SYSTEM_FMT = false
+
+ifeq ($(OSTYPE),darwin)
+COMP		=	clang
+else
+COMP		=	gnu
+endif
+CXX		=	g++
+CXX_c		=	-c # the trailing space is important
+CXX_o		=	-o # the trailing space is important
+LINKCXX		=	$(CXX)
+LINKCXX_L	=	-L
+LINKCXX_l	=	-l
+LINKCXX_o	=	-o # the trailing space is important
+
+# find soplex/config.h in build dir
+CPPFLAGS	=	-I$(OBJDIR)/include -Isrc
+CXXFLAGS	=
+BINOFLAGS	=
+LDFLAGS		=
+DFLAGS		=	-MMD
+
+FMT_LDFLAGS	= 	-lfmt
+GMP_LDFLAGS	= 	-lgmp
+GMP_CPPFLAGS	=
+QUADMATH_LDFLAGS = 	-lquadmath
 
 SRCDIR		=	extra
 BINDIR		=	bin
 LIBDIR		=	lib
 NAME		=	lpconv
-FLAGS		=       #
-OBJECT		=	lpconv.o
+
+BINOBJ		=	lpconv.o
+
+BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 
 #------------------------------------------------------------------------------
 #--- NOTHING TO CHANGE FROM HERE ON -------------------------------------------
 #------------------------------------------------------------------------------
 
-GCCWARN		=	-Wall -W -Wpointer-arith -Wbad-function-cast \
-			-Wcast-align -Wwrite-strings -Wconversion \
-			-Wstrict-prototypes -Wmissing-prototypes \
-			-Wmissing-declarations -Wno-unknown-pragmas \
-			-Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder \
+GCCWARN		=	-pedantic -Wall -W -Wpointer-arith -Wcast-align -Wwrite-strings \
+			-Wconversion -Wsign-compare -Wshadow \
+			-Wredundant-decls -Wdisabled-optimization \
+			-Wnon-virtual-dtor -Wreorder \
 			-Woverloaded-virtual -Wsign-promo -Wsynth -Wundef \
-			-Wcast-qual -Wold-style-cast -Wshadow 
-#			-Weffc++ -Wredundant-decls    
-
-BASE            =       $(OSTYPE).$(ARCH).$(COMP).$(OPT)
-TARGET		=	$(NAME).$(BASE)
-LIBNAME		=	soplex.$(BASE)
-BINARY		=	$(BINDIR)/$(TARGET)
-DEPEND		=	extra/lpconv.dep
-
-OBJDIR		=	obj/O.$(BASE)
-OBJXXX		=	$(addprefix $(OBJDIR)/,$(OBJECT))
-LIBXXX		=	$(addprefix $(OBJDIR)/,$(LIBOBJ))
-OBJSRC		=	$(addprefix $(SRCDIR)/,$(OBJECT:.o=.cpp))
-LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
+			-Wcast-qual \
+			-Wmissing-declarations \
+			-Wzero-as-null-pointer-constant \
+			-Wno-unused-parameter -Wno-strict-overflow -Wno-long-long \
+			-Wno-sign-conversion -Wno-enum-enum-conversion
+#			-Wold-style-cast
+#			-Weffc++
 
 
 #-----------------------------------------------------------------------------
 include make/make.$(BASE)
+-include make/local/make.$(HOSTNAME)
+-include make/local/make.$(HOSTNAME).$(COMP)
+-include make/local/make.$(HOSTNAME).$(COMP).$(OPT)
 #-----------------------------------------------------------------------------
 
-ifeq ($(ZLIB),true)
-CPPFLAGS	+=	-DWITH_ZLIB $(ZLIB_FLAGS)
-LDFLAGS		+=	$(ZLIB_LDFLAGS)
+#-----------------------------------------------------------------------------
+# SHARED Libaries
+#-----------------------------------------------------------------------------
+
+ifeq ($(SHARED),true)
+ifeq ($(COMP),msvc)
+LIBEXT		=	dll
+else
+LIBEXT		=	$(SHAREDLIBEXT)
+LINKRPATH	=	-Wl,-rpath,
+endif
 endif
 
-$(BINARY):	$(OBJXXX) $(LIBDIR)/lib$(LIBNAME).a
-		$(CXX) $(CXXFLAGS) $(OBJXXX) \
-		-L$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+CPPFLAGS	+=	$(USRCPPFLAGS)
+CXXFLAGS	+=	$(USRCXXFLAGS)
+LDFLAGS		+=	$(USRLDFLAGS)
 
+#-----------------------------------------------------------------------------
+# Main Program
+#-----------------------------------------------------------------------------
+
+BINNAME		=	$(NAME).$(BASE)
+LIBNAME		=	soplex.$(BASE)
+BINFILE		=	$(BINDIR)/$(BINNAME)$(EXEEXTENSION)
+LIBLINK		=	$(LIBDIR)/lib$(LIBNAME).$(LIBEXT)
+
+OBJDIR		=	obj/O.$(BASE)
+BINOBJDIR	=	$(OBJDIR)/bin
+BINOBJFILES	=	$(addprefix $(BINOBJDIR)/,$(BINOBJ))
+
+#-----------------------------------------------------------------------------
+# External Libraries
+#-----------------------------------------------------------------------------
+
+# check if it is allowed to link to external open source libraries
+ifeq ($(OPENSOURCE), false)
+	override ZLIB	=	false
+	override BOOST	=	false
+	override GMP	=	false
+	override MPFR	=	false
+endif
+
+# For system FMT
+ifeq ($(SYSTEM_FMT),true)
+	LDFLAGS += $(FMT_LDFLAGS)
+else
+	FMT_LDFLAGS =
+endif
+
+ifeq ($(GMP),auto)
+GMP     =  $(BOOST)
+endif
+
+ifeq ($(MPFR),auto)
+MPFR     =  $(BOOST)
+endif
+
+ifeq ($(GMP),true)
+CPPFLAGS	+= $(GMP_CPPFLAGS)
+LDFLAGS	+= $(GMP_LDFLAGS)
+else
+GMP_LDFLAGS	=
+GMP_CPPFLAGS	=
+endif
+
+# For MPFR, needed for rational solving with precision boosting
+ifeq ($(MPFR),true)
+LDFLAGS += -lmpfr
+else
+# Flags for cpp mpf
+endif
+
+# For boost multiprecision, needed for rational solving
+ifeq ($(BOOST),true)
+	LDFLAGS += $(BOOST_LDFLAGS)
+else
+		BOOST_LDFLAGS =
+endif
+
+# For quadmath support
+ifeq ($(QUADMATH),true)
+	LDFLAGS += $(QUADMATH_LDFLAGS)
+else
+	QUADMATH_LDFLAGS =
+endif
+
+
+ifeq ($(ZLIB_LDFLAGS),)
+ZLIB		=	false
+endif
+ifeq ($(ZLIB),true)
+FLAGS	+= $(ZLIB_FLAGS)
+LDFLAGS		+=	$(ZLIB_LDFLAGS)
+else
+ZLIB_LDFLAGS	=
+ZLIB_FLAGS	=
+endif
+
+
+#-----------------------------------------------------------------------------
+# Rules
+#-----------------------------------------------------------------------------
+
+ifeq ($(VERBOSE),false)
+.SILENT:	$(BINFILE) $(BINOBJFILES)
+MAKE		+= -s
+endif
+
+.PHONY: all
+all:		$(BINFILE)
+
+ifeq ($(SHARED),true)
+$(BINFILE):	$(LIBLINK) $(BINOBJFILES) | $(BINDIR) $(BINOBJDIR)
+		@echo "-> linking $@"
+		$(LINKCXX) $(BINOBJFILES) \
+		$(LDFLAGS) $(LINKCXX_L)$(LIBDIR) $(LINKRPATH)\$$ORIGIN/../$(LIBDIR) $(LINKCXX_l)$(LIBNAME) $(LINKCXX_o)$@
+else
+$(BINFILE):	$(LIBLINK) $(BINOBJFILES) | $(BINDIR) $(BINOBJDIR)
+		@echo "-> linking $@"
+		$(LINKCXX) $(BINOBJFILES) $(LIBLINK) \
+		$(LDFLAGS) $(LINKCXX_o)$@
+endif
+
+.PHONY: clean
 clean:
-		-rm -rf $(OBJXXX) $(BINARY)
+		@echo "remove binary $(BINFILE)"
+		@-rm -f $(BINFILE)
+		@echo "remove objective files"
+		@-rm -f $(BINOBJFILES) $(BINOBJFILES:.o=.d)
 
-depend:
-		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
-		$(OBJSRC:.o=.cpp) $(LIBSRC:.o=.cpp) \
-		| sed '\''s|^\([0-9A-z]\{1,\}\)\.o|$$\(OBJDIR\)/\1.o|g'\'' \
-		>$(DEPEND)'
+$(BINOBJDIR):
+		@-mkdir -p $(BINOBJDIR)
 
--include	$(DEPEND)
+$(BINDIR):
+		@-mkdir -p $(BINDIR)
 
-$(OBJDIR)/%.o:	$(SRCDIR)/%.cpp
-		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+# do not attempt to include .d files if there will definitely be any (empty DFLAGS), because it slows down the build on Windows considerably
+ifneq ($(DFLAGS),)
+-include $(BINOBJFILES:.o=.d)
+else
+ifeq ($(VERBOSE),true)
+$(info No compilation dependencies. If changing header files, do a make clean before building.)
+endif
+endif
 
-# --- EOF ---------------------------------------------------------------------
-
-
-
+$(BINOBJDIR)/%.o:	$(SRCDIR)/%.cpp
+		@-mkdir -p $(BINOBJDIR)
+		@echo "-> compiling $@"
+		$(CXX) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) $(DFLAGS) $(CXX_c)$< $(CXX_o)$@
