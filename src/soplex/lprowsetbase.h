@@ -357,7 +357,7 @@ public:
    /// Adds LPRowBase consisting of left hand side \p lhs, row vector \p rowVector, and right hand side \p rhs to LPRowSetBase.
    template < class S >
    void add(const S* lhsValue, const S* rowValues, const int* rowIndices, int rowSize,
-            const S* rhsValue, const S* objValue = 0)
+            const S* rhsValue, const S* objValue = nullptr)
    {
       assert(lhsValue != nullptr);
       assert(rowSize <= 0 || rowValues != nullptr);
