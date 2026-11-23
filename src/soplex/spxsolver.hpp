@@ -212,6 +212,11 @@ void SPxSolverBase<R>::setType(Type tp)
       forceRecompNonbasicValue();
 
       unInit();
+
+      // reset sparse pricing
+      remainingRoundsLeave = 0;
+      remainingRoundsEnter = 0;
+      remainingRoundsEnterCo = 0;
 #if 0
       else
       {
@@ -291,7 +296,14 @@ void SPxSolverBase<R>::setType(Type tp)
    {
 
       if(p_rep != theRep)
+      {
          initRep(p_rep);
+
+         // reset sparse pricing
+         remainingRoundsLeave = 0;
+         remainingRoundsEnter = 0;
+         remainingRoundsEnterCo = 0;
+      }
    }
 
    // needed for strongbranching. use carefully
