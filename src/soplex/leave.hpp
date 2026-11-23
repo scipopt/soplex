@@ -93,25 +93,32 @@ void SPxSolverBase<R>::computeFtest()
       }
    }
 
-   if(infeasibilities.size() == 0 && !sparsePricingLeave)
+   if(!sparsePricingLeave)
    {
-      --remainingRoundsLeave;
-   }
-   else if(infeasibilities.size() <= sparsitythreshold && !sparsePricingLeave)
-   {
-      SPX_MSG_INFO2((*this->spxout),
-                    std::streamsize prec = spxout->precision();
+      if(remainingRoundsLeave > 0)
+         --remainingRoundsLeave;
+      else if(infeasibilities.size() <= sparsitythreshold)
+      {
+         sparsePricingLeave = true;
+         SPX_MSG_INFO2((*this->spxout),
+                       std::streamsize prec = spxout->precision();
 
-                    if(hyperPricingLeave)
-                    (*this->spxout) << " --- using hypersparse pricing, ";
-                    else
-                       (*this->spxout) << " --- using sparse pricing, ";
-                       (*this->spxout) << "sparsity: "
-                       << std::setw(6) << std::fixed << std::setprecision(4)
-                       << (R) m_numViol / dim()
-                       << std::scientific << std::setprecision(int(prec))
-                       << std::endl;)
-            sparsePricingLeave = true;
+                       if(hyperPricingLeave)
+      {
+         (*this->spxout)
+                  << " --- using hypersparse pricing, ";
+         }
+         else
+         {
+            (*this->spxout) << " --- using sparse pricing, ";
+         }
+
+         (*this->spxout) << "sparsity: "
+                         << std::setw(6) << std::fixed << std::setprecision(4)
+                         << (R) m_numViol / dim()
+                         << std::scientific << std::setprecision(int(prec))
+                         << std::endl;)
+      }
    }
 }
 
