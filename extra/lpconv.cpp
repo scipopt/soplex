@@ -23,12 +23,13 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include <assert.h>
+#include <iomanip>
 #include <iostream>
 #include <fstream>
 
-#include "spxdefines.h"
-#include "spxlp.h"
-#include "spxfileio.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxlp.h"
+#include "soplex/spxfileio.h"
 
 using namespace soplex;
 
@@ -72,9 +73,11 @@ static void write_latte(const SPxLP& lp, std::ofstream& ofile)
    int equals  = 0;
    int ranges  = 0;
 
+   ofile << std::setprecision(17);
+
    for(int i = 0; i < lp.nCols(); ++i)
    {
-      if (isZero(lp.lower(i)))
+      if (isZero(lp.lower(i), SOPLEX_DEFAULT_EPS_ZERO))
          ++nonnegs;
       else if (lp.lower(i) > -infinity)
          ++lowers;
@@ -96,14 +99,13 @@ static void write_latte(const SPxLP& lp, std::ofstream& ofile)
          break;
       }
    }
-   ofile << lp.nRows() + ranges + lowers + uppers << " " << lp.nCols() << std::endl;
+   ofile << lp.nRows() + ranges + lowers + uppers << " " << lp.nCols() + 1 << std::endl;
 
    for(int i = 0; i < lp.nRows(); ++i)
    {
       switch(lp.rowType(i))
       {
       case LPRow::EQUAL :
-         ++equals;
          write_row(lp.rowVector(i), lp.nCols(), lp.rhs(i), 1, ofile);
          break;
       case LPRow::LESS_EQUAL :
@@ -122,12 +124,12 @@ static void write_latte(const SPxLP& lp, std::ofstream& ofile)
    }
    for(int i = 0; i < lp.nCols(); i++)
    {
-      if (isNotZero(lp.lower(i)) && lp.lower(i) > -infinity)
+      if (isNotZero(lp.lower(i), SOPLEX_DEFAULT_EPS_ZERO) && lp.lower(i) > -infinity)
       {
          ofile << -lp.lower(i);
 
          for(int k = 0; k < lp.nCols(); ++k)
-            ofile << " " << (k == i) ? 1 : 0;
+            ofile << " " << ((k == i) ? 1 : 0);
 
          ofile << std::endl;
       }
@@ -137,7 +139,7 @@ static void write_latte(const SPxLP& lp, std::ofstream& ofile)
          ofile << lp.upper(i);
 
          for(int k = 0; k < lp.nCols(); ++k)
-            ofile << " " << (k == i) ? -1 : 0;
+            ofile << " " << ((k == i) ? -1 : 0);
 
          ofile << std::endl;
       }
@@ -148,9 +150,15 @@ static void write_latte(const SPxLP& lp, std::ofstream& ofile)
    {
       ofile << "linearity " << equals;
 
+      int line = 0;
+
       for(int i = 0; i < lp.nRows(); ++i)
+      {
+         line += (lp.rowType(i) == LPRow::RANGE) ? 2 : 1;
+
          if (lp.rowType(i) == LPRow::EQUAL)
-            ofile << " " << i + 1;
+            ofile << " " << line;
+      }
 
       ofile << std::endl;
    }
@@ -161,7 +169,7 @@ static void write_latte(const SPxLP& lp, std::ofstream& ofile)
       ofile << "nonnegative " << nonnegs;
 
       for(int i = 0; i < lp.nCols(); ++i)
-         if (isZero(lp.lower(i)))
+         if (isZero(lp.lower(i), SOPLEX_DEFAULT_EPS_ZERO))
             ofile << " " << i + 1;
 
       ofile << std::endl;
@@ -181,7 +189,12 @@ static void read_latte(
    ifile >> rows;
    ifile >> cols;
 
+   --cols;
+
    std::cout << "Reading Latte file with " << rows << " rows and " << cols << " columns\n";
+
+   for(int c = 0; c < cols; ++c)
+      lp.addCol(LPCol(0.0, DSVector(), infinity, -infinity));
 
    for(int r = 0; r < rows; ++r)
    {
@@ -196,50 +209,48 @@ static void read_latte(
 
          ifile >> val;
 
-         if (isNotZero(val))
+         if (isNotZero(val, SOPLEX_DEFAULT_EPS_ZERO))
             vec.add(c, -val);
       }
       lp.addRow(LPRow(vec, LPRow::LESS_EQUAL, rhs));
    }
    char keyword[256];
 
-   ifile >> keyword;
-
-   if (!strcmp(keyword, "linearity"))
+   while (ifile >> keyword)
    {
-      std::cout << "Found linearity line\n";
-
-      int count;
-
-      ifile >> count;
-
-      for(int n = 0; n < count; ++n)
+      if (!strcmp(keyword, "linearity"))
       {
-         int c;
+         std::cout << "Found linearity line\n";
 
-         ifile >> c;
+         int count;
 
-         lp.changeLhs(c - 1, lp.rhs(c - 1));
+         ifile >> count;
+
+         for(int n = 0; n < count; ++n)
+         {
+            int c;
+
+            ifile >> c;
+
+            lp.changeLhs(c - 1, lp.rhs(c - 1));
+         }
       }
-   }
-   for(int c = 0; c < cols; ++c)
-      lp.changeLower(c, -infinity);
-
-   if (!strcmp(keyword, "nonnegative"))
-   {
-      std::cout << "Found nonnegative line\n";
-
-      int count;
-
-      ifile >> count;
-
-      for(int n = 0; n < count; ++n)
+      else if (!strcmp(keyword, "nonnegative"))
       {
-         int c;
+         std::cout << "Found nonnegative line\n";
 
-         ifile >> c;
+         int count;
 
-         lp.changeLower(c - 1, 0.0);
+         ifile >> count;
+
+         for(int n = 0; n < count; ++n)
+         {
+            int c;
+
+            ifile >> c;
+
+            lp.changeLower(c - 1, 0.0);
+         }
       }
    }
    for(int c = 0; c < cols; ++c)
@@ -247,7 +258,7 @@ static void read_latte(
       char tmp[32];
       sprintf(tmp, "x%d", c + 1);
       colnames.add(tmp);
-      intvars.add(c);
+      intvars.addIdx(c);
    }
    for(int r = 0; r < rows; ++r)
    {
@@ -331,9 +342,13 @@ int main(int argc, char **argv)
    const char* outfile  = argv[optidx + 1];
 
    SPxLP       lp;
+   SPxOut      spxout;
    NameSet     rownames;
    NameSet     colnames;
    DIdxSet     intvars;
+
+   lp.setOutstream(spxout);
+   lp.setTolerances(std::make_shared<Tolerances>());
 
    spxifstream ifile(inpfile);
 

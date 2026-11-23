@@ -5,6 +5,7 @@ LINKCXX_L	=	-LIBPATH:
 LINKCXX_l	=	lib
 LINKCXX_o	=	-out:
 CXXFLAGS	=	-Ox -Oi -fp:precise -EHsc -GR -D_CRT_SECURE_NO_WARNINGS -DNDEBUG  -wd4274
+DFLAGS =
 LDFLAGS		=   
 EXEEXTENSION	=	.exe
 AR		=	lib -nologo

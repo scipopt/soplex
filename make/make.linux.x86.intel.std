@@ -1,7 +1,6 @@
 CXX	=	icpc
 LINKCXX	=	icpc
-DCXX	=	icpc
-CPPFLAGS=	-I$(OBJDIR) -Isrc -DNDEBUG
+CPPFLAGS=	-I$(OBJDIR)/include -Isrc -DNDEBUG
 CXXFLAGS=	-O -wd1572 -std=c++14
 LDFLAGS	=	-lm -lstdc++
 ARFLAGS	=	crs

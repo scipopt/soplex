@@ -1,5 +1,5 @@
 CXX	=	g++
-CPPFLAGS=	-I$(OBJDIR) -Isrc -DNDEBUG 
+CPPFLAGS=	-I$(OBJDIR)/include -Isrc -DNDEBUG 
 CXXFLAGS=	-O3  \
 		-ffast-math -funroll-loops #-march=
 LDFLAGS	=	-lm

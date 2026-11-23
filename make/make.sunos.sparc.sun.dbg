@@ -1,6 +1,6 @@
 CXX	=	CC
 LINKCXX	=	CC
-CPPFLAGS=	-I$(OBJDIR) -Isrc
+CPPFLAGS=	-I$(OBJDIR)/include -Isrc
 CXXFLAGS=	-std=c++14 -g +w2
 LDFLAGS	=	-lm
 RANLIB	=	true

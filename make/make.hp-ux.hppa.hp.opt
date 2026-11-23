@@ -1,5 +1,5 @@
 CXX	=	aCC
-CPPFLAGS=	-I$(OBJDIR) -Isrc -DNDEBUG 
+CPPFLAGS=	-I$(OBJDIR)/include -Isrc -DNDEBUG 
 CXXFLAGS=	-AA +W67 -fast 
 LDFLAGS	=	-lstd_v2 -lCsup_v2 -lm
 RANLIB	=	true

@@ -20,6 +20,9 @@ build system:
 - added CMake option BUILD_PACKAGE (default: off). If set, search directories for dependencies are not suggested in soplex-config.cmake.
 - added CMake option BUILD_SHARED_LIBS (default: on) to determine whether a shared or a static library shall be built.
 - added option GITHASH_BRANCH to append the current git branch to the githash.
+- add include layer obj/O.$(BASE)/include for generated files of make system, linked by lib/include, which is required to include in make system
+- generate config.h in include instead of source directory to avoid unnecessary recompilation in make system
+- replace make depend by generating dependencies during compilation in make system
 
 miscellaneous:
 

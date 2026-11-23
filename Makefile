@@ -3,7 +3,7 @@
 #*                  This file is part of the class library                   *#
 #*       SoPlex --- the Sequential object-oriented simPlex.                  *#
 #*                                                                           *#
-#*  Copyright (c) 1996-2025 Zuse Institute Berlin (ZIB)                      *#
+#*  Copyright (c) 1996-2026 Zuse Institute Berlin (ZIB)                      *#
 #*                                                                           *#
 #*  Licensed under the Apache License, Version 2.0 (the "License");          *#
 #*  you may not use this file except in compliance with the License.         *#
@@ -105,7 +105,6 @@ LINKCXX_L	=	-L
 LINKCXX_l	=	-l
 LINKCXX_o	=	-o # the trailing space is important
 LINKLIBSUFFIX	=
-DCXX		=	$(CXX)
 LINT		=	flexelint
 SANITIZE	=	false
 AR		=	ar
@@ -120,13 +119,14 @@ LIBBUILD	=	$(AR)
 LIBBUILD_o	=	$(AR_o)
 LIBBUILDFLAGS	=       $(ARFLAGS)
 
-CPPFLAGS	=	-I$(OBJDIR) -Isrc
+# find soplex/config.h in build dir
+CPPFLAGS	=	-I$(OBJDIR)/include -Isrc
 CXXFLAGS	=
 BINOFLAGS	=
 LIBOFLAGS	=
 LDFLAGS		=
 ARFLAGS		=	cr
-DFLAGS		=	-MM
+DFLAGS		=	-MMD
 
 FMT_LDFLAGS	= 	-lfmt
 GMP_LDFLAGS	= 	-lgmp
@@ -161,8 +161,9 @@ BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 LINKSMARKERFILE	=	$(LIBDIR)/linkscreated.$(OSTYPE).$(ARCH).$(COMP)$(LINKLIBSUFFIX)
 LASTSETTINGS	=	$(OBJDIR)/make.lastsettings
 
-SPXGITHASHFILE	=	$(OBJSUBDIR)/git_hash.cpp
-CONFIGFILE = $(SRCDIR)/soplex/config.h
+SPXGITHASHFILE	=	$(OBJDIR)/include/soplex/git_hash.cpp
+CONFIGFILE = $(OBJDIR)/include/soplex/config.h
+CONFIGINCLUDE = $(LIBDIR)/include
 
 #------------------------------------------------------------------------------
 #--- NOTHING TO CHANGE FROM HERE ON -------------------------------------------
@@ -214,7 +215,6 @@ CPPFLAGS	+=	$(USRCPPFLAGS)
 CXXFLAGS	+=	$(USRCXXFLAGS)
 LDFLAGS		+=	$(USRLDFLAGS)
 ARFLAGS		+=	$(USRARFLAGS)
-DFLAGS		+=	$(USRDFLAGS)
 
 #-----------------------------------------------------------------------------
 # Main Program
@@ -236,10 +236,8 @@ LIBCLINK	=	$(LIBDIR)/lib$(NAME)c.$(BASE).$(LIBEXT)
 
 BINLINK		=	$(BINDIR)/$(NAME).$(BASE)$(EXEEXTENSION)
 BINSHORTLINK	=	$(BINDIR)/$(NAME)$(EXEEXTENSION)
-DEPEND		=	src/depend
 
 OBJDIR		=	obj/O.$(BASE)
-OBJSUBDIR	=	$(OBJDIR)/soplex
 BINOBJDIR	=	$(OBJDIR)/bin
 LIBOBJDIR	=	$(OBJDIR)/lib
 LIBOBJSUBDIR = 	$(LIBOBJDIR)/soplex
@@ -279,8 +277,6 @@ ifeq ($(MPFR),auto)
 MPFR     =  $(BOOST)
 endif
 
-GMPDEP	:=	$(SRCDIR)/depend.gmp
-GMPSRC	:=	$(shell cat $(GMPDEP))
 ifeq ($(GMP),true)
 CPPFLAGS	+= $(GMP_CPPFLAGS)
 LDFLAGS	+= $(GMP_LDFLAGS)
@@ -311,8 +307,6 @@ else
 endif
 
 
-ZLIBDEP		:=	$(SRCDIR)/depend.zlib
-ZLIBSRC		:=	$(shell cat $(ZLIBDEP))
 ifeq ($(ZLIB_LDFLAGS),)
 ZLIB		=	false
 endif
@@ -352,7 +346,7 @@ endif
 #-----------------------------------------------------------------------------
 
 ifeq ($(VERBOSE),false)
-.SILENT:	$(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK) $(BINFILE) example $(EXAMPLEOBJFILES) $(LIBFILE) $(LIBCFILE) $(BINOBJFILES) $(LIBOBJFILES)
+.SILENT:	$(LIBLINK) $(LIBSHORTLINK) $(CONFIGINCLUDE) $(BINLINK) $(BINSHORTLINK) $(BINFILE) example $(EXAMPLEOBJFILES) $(LIBFILE) $(LIBCFILE) $(BINOBJFILES) $(LIBOBJFILES)
 MAKE		+= -s
 endif
 
@@ -374,6 +368,13 @@ endif
 $(LIBLINK) $(LIBSHORTLINK):	$(LIBFILE)
 		@rm -f $@
 		cd $(dir $@) && $(LN_s) $(notdir $(LIBFILE)) $(notdir $@)
+
+# update link to config files; (the cd $(@D) is for windows, where LN_s is cp)
+.PHONY: $(CONFIGINCLUDE)
+$(CONFIGINCLUDE):	$(CONFIGFILE)
+		@rm -rf $@
+		@mkdir -p $(@D)
+		cd $(@D) && $(LN_s) ../$(OBJDIR)/include $(@F)
 
 $(LIBCLINK) $(LIBCSHORTLINK):	$(LIBCFILE)
 		@rm -f $@
@@ -406,7 +407,7 @@ example:	$(LIBOBJFILES) $(EXAMPLEOBJFILES) | $(BINDIR) $(EXAMPLEOBJDIR)
 
 .PHONY: makelibfile
 makelibfile:	preprocess
-		@$(MAKE) $(LIBFILE) $(LIBLINK) $(LIBSHORTLINK)
+		@$(MAKE) $(LIBFILE) $(LIBLINK) $(LIBSHORTLINK) $(CONFIGINCLUDE)
 
 .PHONY: makelibcfile
 makelibcfile: preprocess
@@ -480,26 +481,25 @@ cleanbin:	| $(BINDIR)
 cleanlib:	| $(LIBDIR)
 		@echo "remove library $(LIBFILE)"
 		@-rm -f $(LIBFILE) $(LIBLINK) $(LIBSHORTLINK)
+		@echo "remove headers directory $(CONFIGINCLUDE)"
+		@-rm -rf $(CONFIGINCLUDE)
 
 .PHONY: clean
 clean:          cleanlib cleanbin | $(LIBOBJDIR) $(BINOBJDIR) $(OBJDIR)
 		@echo "remove objective files"
 ifneq ($(LIBOBJSUBDIR),)
-		@-rm -f $(LIBOBJSUBDIR)/*.o && rmdir $(LIBOBJSUBDIR)
+		@-rm -f $(LIBOBJSUBDIR)/*.o $(LIBOBJSUBDIR)/*.d && rmdir $(LIBOBJSUBDIR)
 endif
 ifneq ($(LIBOBJDIR),)
-		@-rm -f $(LIBOBJDIR)/*.o && rmdir $(LIBOBJDIR)
+		@-rm -f $(LIBOBJDIR)/*.o $(LIBOBJDIR)/*.d && rmdir $(LIBOBJDIR)
 endif
 ifneq ($(BINOBJDIR),)
-		@-rm -f $(BINOBJDIR)/*.o && rmdir $(BINOBJDIR)
-endif
-ifneq ($(OBJSUBDIR),)
-		@-rm -f $(SPXGITHASHFILE) && rmdir $(OBJSUBDIR)
+		@-rm -f $(BINOBJDIR)/*.o $(BINOBJDIR)/*.d && rmdir $(BINOBJDIR)
 endif
 ifneq ($(OBJDIR),)
 		@-rm -f $(LASTSETTINGS)
-		@-rm -f $(CONFIGFILE)
-		@-rmdir $(OBJDIR)
+		@-rm -f $(CONFIGFILE) $(SPXGITHASHFILE)
+		@-rmdir $(OBJDIR)/include/soplex $(OBJDIR)/include $(OBJDIR)
 endif
 		@-rm -f $(EXAMPLEFILE)
 
@@ -524,47 +524,110 @@ $(BINDIR):
 $(LIBDIR):
 		@-mkdir -p $(LIBDIR)
 
-.PHONY: depend
-depend:
-		@$(MAKE) touchexternal
-		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS)\
-		$(BINSRC:.o=.cpp) \
-		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g;s|$(SPXGITHASHFILE)|$$\(SPXGITHASHFILE\)|g'\'' \
-		>$(DEPEND)'
-		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS)\
-		$(EXAMPLESRC:.o=.cpp) \
-		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g;s|$(SPXGITHASHFILE)|$$\(SPXGITHASHFILE\)|g'\'' \
-		>>$(DEPEND)'
-		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS)\
-		$(LIBSRC:.o=.cpp) \
-		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(LIBOBJDIR\)/\1.o|g;s|$(SPXGITHASHFILE)|$$\(SPXGITHASHFILE\)|g'\'' \
-		>>$(DEPEND)'
-		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS)\
-		$(LIBSRC:.o=.cpp) \
-		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(LIBOBJSUBDIR\)/\1.o|g;s|$(SPXGITHASHFILE)|$$\(SPXGITHASHFILE\)|g'\'' \
-		>>$(DEPEND)'
-		@echo `grep -l "SOPLEX_HAS_GMP" $(ALLSRC)` >$(GMPDEP)
-		@echo `grep -l "SOPLEX_HAS_ZLIB" $(ALLSRC)` >$(ZLIBDEP)
-
--include	$(DEPEND)
+# do not attempt to include .d files if there will definitely be any (empty DFLAGS), because it slows down the build on Windows considerably
+ifneq ($(DFLAGS),)
+-include $(BINOBJFILES:.o=.d)
+-include $(EXAMPLEOBJFILES:.o=.d)
+-include $(LIBOBJFILES:.o=.d)
+-include $(LIBCOBJFILES:.o=.d)
+else
+ifeq ($(VERBOSE),true)
+$(info No compilation dependencies. If changing header files, do a make clean before building.)
+endif
+endif
 
 $(BINOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 		@-mkdir -p $(BINOBJDIR)
 		@echo "-> compiling $@"
-		$(CXX) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) $(CXX_c)$< $(CXX_o)$@
+		$(CXX) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) $(DFLAGS) $(CXX_c)$< $(CXX_o)$@
 
 $(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 		@-mkdir -p $(LIBOBJSUBDIR)
 		@echo "-> compiling $@"
-		$(CXX) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS) $(LIBOFLAGS) $(CXX_c)$< $(CXX_o)$@
+		$(CXX) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS) $(LIBOFLAGS) $(DFLAGS) $(CXX_c)$< $(CXX_o)$@
 
 
 -include $(LASTSETTINGS)
 
 .PHONY: touchexternal
-touchexternal:	$(GMPDEP) $(ZLIBDEP)| $(OBJDIR)
-		@rm -f $(CONFIGFILE)
-		@echo "#ifndef __SPXCONFIG_H__" >> $(CONFIGFILE)
+touchexternal:	| $(OBJDIR)
+		@$(SHELL) -ec 'if test ! -e $(SPXGITHASHFILE) -a -e $(SRCDIR)/soplex/git_hash.cpp ; \
+			then \
+				mkdir -p $(dir $(SPXGITHASHFILE)) ; \
+				cp $(SRCDIR)/soplex/git_hash.cpp $(SPXGITHASHFILE) ; \
+			fi'
+ifneq ($(SPXGITHASH),$(LAST_SPXGITHASH))
+		@-$(MAKE) githash
+endif
+		@$(SHELL) -ec 'if test ! -e $(SPXGITHASHFILE) ; \
+			then \
+				echo "-> generating $(SPXGITHASHFILE)" ; \
+				$(MAKE) githash ; \
+			fi'
+ifneq ($(SYSTEM_FMT),$(LAST_SYSTEM_FMT))
+		@-rm -f $(CONFIGFILE)
+endif
+ifneq ($(GMP),$(LAST_GMP))
+		@-rm -f $(CONFIGFILE)
+endif
+ifneq ($(BOOST),$(LAST_BOOST))
+		@-rm -f $(CONFIGFILE)
+endif
+ifneq ($(MPFR),$(LAST_MPFR))
+		@-rm -f $(CONFIGFILE)
+endif
+ifneq ($(QUADMATH),$(LAST_QUADMATH))
+		@-rm -f $(CONFIGFILE)
+endif
+ifneq ($(ZLIB),$(LAST_ZLIB))
+		@-rm -f $(CONFIGFILE)
+endif
+ifneq ($(SHARED),$(LAST_SHARED))
+		@-rm -f $(CONFIGFILE)
+		@-touch $(LIBSRC)
+		@-touch $(BINSRC)
+endif
+		@$(SHELL) -ec 'if test ! -e $(CONFIGFILE) ; \
+			then \
+				echo "-> generating $(CONFIGFILE)" ; \
+				$(MAKE) $(CONFIGFILE) ; \
+			fi'
+ifneq ($(SANITIZE),$(LAST_SANITIZE))
+		@-touch $(LIBSRC)
+		@-touch $(BINSRC)
+endif
+ifneq ($(USRCXXFLAGS),$(LAST_USRCXXFLAGS))
+		@-touch $(LIBSRC)
+		@-touch $(BINSRC)
+endif
+ifneq ($(USRCPPFLAGS),$(LAST_USRCPPFLAGS))
+		@-touch $(LIBSRC)
+		@-touch $(BINSRC)
+endif
+ifneq ($(USRLDFLAGS),$(LAST_USRLDFLAGS))
+		@-touch -c $(EXAMPLEOBJFILES) $(BINOBJFILES) $(LIBOBJFILES)
+endif
+ifneq ($(USRARFLAGS),$(LAST_USRARFLAGS))
+		@-touch -c $(EXAMPLEOBJFILES) $(BINOBJFILES) $(LIBOBJFILES)
+endif
+		@-rm -f $(LASTSETTINGS)
+		@echo "LAST_SPXGITHASH=$(SPXGITHASH)" >> $(LASTSETTINGS)
+		@echo "LAST_SYSTEM_FMT=$(SYSTEM_FMT)" >> $(LASTSETTINGS)
+		@echo "LAST_GMP=$(GMP)" >> $(LASTSETTINGS)
+		@echo "LAST_BOOST=$(BOOST)" >> $(LASTSETTINGS)
+		@echo "LAST_MPFR=$(MPFR)" >> $(LASTSETTINGS)
+		@echo "LAST_QUADMATH=$(QUADMATH)" >> $(LASTSETTINGS)
+		@echo "LAST_ZLIB=$(ZLIB)" >> $(LASTSETTINGS)
+		@echo "LAST_SHARED=$(SHARED)" >> $(LASTSETTINGS)
+		@echo "LAST_SANITIZE=$(SANITIZE)" >> $(LASTSETTINGS)
+		@echo "LAST_USRCXXFLAGS=$(USRCXXFLAGS)" >> $(LASTSETTINGS)
+		@echo "LAST_USRCPPFLAGS=$(USRCPPFLAGS)" >> $(LASTSETTINGS)
+		@echo "LAST_USRLDFLAGS=$(USRLDFLAGS)" >> $(LASTSETTINGS)
+		@echo "LAST_USRARFLAGS=$(USRARFLAGS)" >> $(LASTSETTINGS)
+
+$(CONFIGFILE):
+		@mkdir -p $(@D)
+		@echo "#ifndef __SPXCONFIG_H__" > $(CONFIGFILE)
 		@echo "#define __SPXCONFIG_H__" >> $(CONFIGFILE)
 		@echo "/* If we're building a static lib, a user may define SOPLEX_NO_EXPORT, SOPLEX_EXPORT" >> $(CONFIGFILE)
 		@echo "   and/or SOPLEX_EXPORT_TEMPLATE beforehand. */" >> $(CONFIGFILE)
@@ -608,61 +671,6 @@ endif
 		@echo "      #define SOPLEX_EXPORT_TEMPLATE" >> $(CONFIGFILE)
 		@echo "   #endif" >> $(CONFIGFILE)
 		@echo "#endif" >> $(CONFIGFILE)
-
-		@$(SHELL) -ec 'if test ! -e $(SPXGITHASHFILE) -a -e $(SRCDIR)/soplex/git_hash.cpp ; \
-			then \
-				mkdir -p $(dir $(SPXGITHASHFILE)) ; \
-				cp $(SRCDIR)/soplex/git_hash.cpp $(SPXGITHASHFILE) ; \
-			fi'
-ifneq ($(SPXGITHASH),$(LAST_SPXGITHASH))
-		@-$(MAKE) githash
-endif
-		@$(SHELL) -ec 'if test ! -e $(SPXGITHASHFILE) ; \
-			then \
-				echo "-> generating $(SPXGITHASHFILE)" ; \
-				$(MAKE) githash ; \
-			fi'
-ifneq ($(GMP),$(LAST_GMP))
-ifneq ($(GMPSRC),)
-		@-touch $(GMPSRC)
-endif
-endif
-ifneq ($(ZLIB),$(LAST_ZLIB))
-		@-touch $(ZLIBSRC)
-endif
-ifneq ($(SHARED),$(LAST_SHARED))
-		@-touch $(LIBSRC)
-		@-touch $(BINSRC)
-endif
-ifneq ($(SANITIZE),$(LAST_SANITIZE))
-		@-touch $(LIBSRC)
-		@-touch $(BINSRC)
-endif
-ifneq ($(USRCXXFLAGS),$(LAST_USRCXXFLAGS))
-		@-touch $(LIBSRC)
-		@-touch $(BINSRC)
-endif
-ifneq ($(USRCPPFLAGS),$(LAST_USRCPPFLAGS))
-		@-touch $(LIBSRC)
-		@-touch $(BINSRC)
-endif
-ifneq ($(USRLDFLAGS),$(LAST_USRLDFLAGS))
-		@-touch -c $(EXAMPLEOBJFILES) $(BINOBJFILES) $(LIBOBJFILES)
-endif
-ifneq ($(USRARFLAGS),$(LAST_USRARFLAGS))
-		@-touch -c $(EXAMPLEOBJFILES) $(BINOBJFILES) $(LIBOBJFILES)
-endif
-		@-rm -f $(LASTSETTINGS)
-		@echo "LAST_SPXGITHASH=$(SPXGITHASH)" >> $(LASTSETTINGS)
-		@echo "LAST_GMP=$(GMP)" >> $(LASTSETTINGS)
-		@echo "LAST_ZLIB=$(ZLIB)" >> $(LASTSETTINGS)
-		@echo "LAST_SHARED=$(SHARED)" >> $(LASTSETTINGS)
-		@echo "LAST_SANITIZE=$(SANITIZE)" >> $(LASTSETTINGS)
-		@echo "LAST_USRCXXFLAGS=$(USRCXXFLAGS)" >> $(LASTSETTINGS)
-		@echo "LAST_USRCPPFLAGS=$(USRCPPFLAGS)" >> $(LASTSETTINGS)
-		@echo "LAST_USRLDFLAGS=$(USRLDFLAGS)" >> $(LASTSETTINGS)
-		@echo "LAST_USRARFLAGS=$(USRARFLAGS)" >> $(LASTSETTINGS)
-		@echo "LAST_USRDFLAGS=$(USRDFLAGS)" >> $(LASTSETTINGS)
 ifeq ($(SYSTEM_FMT), true)
 		@echo "#define SOPLEX_HAS_SYSTEM_FMT 1" >> $(CONFIGFILE)
 else
