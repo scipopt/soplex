@@ -23,6 +23,7 @@ fixed bugs:
 - parse scientific-notation rational values with exact power scaling and uniform canonicalization in ratFromString()
 - add missing scaling reset to SoPlexBase<R>::optimize() to reapply persistent scaling after previous unscaled resolve
 - remove zero coefficients also after scaling in methods of SVectorBase<R>, SPxScaler<R>, and SPxLPBase<R> as well as small coefficients also from fixed columns in SPxMainSM<R>::handleExtremes() to keep numerics coherent
+- reset sparse pricing on representation and algorithm switch in SPxSolverBase<R>::setType() to account for dimension reference change
 
 build system:
 - restrict the Boost multiprecision backends (mpfr_float, cpp_dec_float, and float128) in cmake to Boost 1.70 or newer, where variable-precision arithmetic is stable

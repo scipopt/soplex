@@ -174,23 +174,32 @@ void SPxSolverBase<R>::computeTest()
       }
    }
 
-   if(infeasibilitiesCo.size() == 0 && !sparsePricingEnterCo)
-      --remainingRoundsEnterCo;
-   else if(infeasibilitiesCo.size() <= sparsitythreshold && !sparsePricingEnterCo)
+   if(!sparsePricingEnterCo)
    {
-      SPX_MSG_INFO2((*this->spxout),
-                    std::streamsize prec = spxout->precision();
+      if(remainingRoundsEnterCo > 0)
+         --remainingRoundsEnterCo;
+      else if(infeasibilitiesCo.size() <= sparsitythreshold)
+      {
+         sparsePricingEnterCo = true;
+         SPX_MSG_INFO2((*this->spxout),
+                       std::streamsize prec = spxout->precision();
 
-                    if(hyperPricingEnter)
-                    (*this->spxout) << " --- using hypersparse pricing, ";
-                    else
-                       (*this->spxout) << " --- using sparse pricing, ";
-                       (*this->spxout) << "sparsity: "
-                       << std::setw(6) << std::fixed << std::setprecision(4)
-                       << (R) infeasibilitiesCo.size() / coDim()
-                       << std::scientific << std::setprecision(int(prec))
-                       << std::endl;)
-            sparsePricingEnterCo = true;
+                       if(hyperPricingEnter)
+      {
+         (*this->spxout)
+                  << " --- using hypersparse pricing, ";
+         }
+         else
+         {
+            (*this->spxout) << " --- using sparse pricing, ";
+         }
+
+         (*this->spxout) << "sparsity: "
+                         << std::setw(6) << std::fixed << std::setprecision(4)
+                         << (R) infeasibilitiesCo.size() / coDim()
+                         << std::scientific << std::setprecision(int(prec))
+                         << std::endl;)
+      }
    }
 }
 
@@ -314,23 +323,32 @@ void SPxSolverBase<R>::computeCoTest()
       }
    }
 
-   if(infeasibilities.size() == 0 && !sparsePricingEnter)
-      --remainingRoundsEnter;
-   else if(infeasibilities.size() <= sparsitythreshold && !sparsePricingEnter)
+   if(!sparsePricingEnter)
    {
-      SPX_MSG_INFO2((*this->spxout),
-                    std::streamsize prec = spxout->precision();
+      if(remainingRoundsEnter > 0)
+         --remainingRoundsEnter;
+      else if(infeasibilities.size() <= sparsitythreshold)
+      {
+         sparsePricingEnter = true;
+         SPX_MSG_INFO2((*this->spxout),
+                       std::streamsize prec = spxout->precision();
 
-                    if(hyperPricingEnter)
-                    (*this->spxout) << " --- using hypersparse pricing, ";
-                    else
-                       (*this->spxout) << " --- using sparse pricing, ";
-                       (*this->spxout) << "sparsity: "
-                       << std::setw(6) << std::fixed << std::setprecision(4)
-                       << (R) infeasibilities.size() / dim()
-                       << std::scientific << std::setprecision(int(prec))
-                       << std::endl;)
-            sparsePricingEnter = true;
+                       if(hyperPricingEnter)
+      {
+         (*this->spxout)
+                  << " --- using hypersparse pricing, ";
+         }
+         else
+         {
+            (*this->spxout) << " --- using sparse pricing, ";
+         }
+
+         (*this->spxout) << "sparsity: "
+                         << std::setw(6) << std::fixed << std::setprecision(4)
+                         << (R) infeasibilities.size() / dim()
+                         << std::scientific << std::setprecision(int(prec))
+                         << std::endl;)
+      }
    }
 }
 
