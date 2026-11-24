@@ -368,6 +368,18 @@ if(BOOST)
       if(NOT SOPLEX_HAS_MPFR)
          set(SOPLEX_HAS_CPPMPF 1)
       endif()
+      
+      # If Boost version is < 1.72 (and we don't have MPFR) then we need Boost::serialization for CPPMPF to work.
+      # See src/soplex/spxdefines.h, which includes boost/serialization/nvp.hpp in this case.
+      if(SOPLEX_HAS_CPPMPF AND (Boost_VERSION_STRING VERSION_LESS "1.72"))
+         find_package(Boost ${BOOST_MIN_VERSION}
+            OPTIONAL_COMPONENTS serialization)
+         if(NOT Boost_SERIALIZATION_FOUND)
+            message(WARNING "Disabling high precision via Boost ${Boost_VERSION_STRING} since Boost::serialization was not found.")
+            set(SOPLEX_HAS_CPPMPF 0)
+         endif()
+         # Nothing further needs to be done since if Boost::serialization is there, it is used header-only.
+      endif()
    endif()
    if(GMP AND NOT GMP STREQUAL "AUTO" AND NOT SOPLEX_HAS_GMP)
       message(FATAL_ERROR "GMP requires at least Boost ${BOOST_RECOMMENDED_VERSION}.")
