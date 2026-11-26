@@ -212,6 +212,8 @@ endif()
 
 # Search for Boost.
 set(SOPLEX_HAS_BOOST 0)
+set(SOPLEX_HAS_BOOST_MULTIPRECISION 0)
+set(SOPLEX_HAS_BOOST_SERIALIZATION 0)
 set(SOPLEX_HAS_GMP 0)
 set(SOPLEX_HAS_MPFR 0)
 set(SOPLEX_HAS_QUADMATH 0)
@@ -220,9 +222,16 @@ set(SOPLEX_HAS_CPPMPF 0)
 if(BOOST)
    message(STATUS "Searching for Boost.")
    if(BOOST STREQUAL "AUTO")
-      find_package(Boost ${BOOST_MIN_VERSION})
+      find_package(Boost
+         ${BOOST_MIN_VERSION}
+         COMPONENTS multiprecision
+         )
    else()
-      find_package(Boost ${BOOST_MIN_VERSION} REQUIRED)
+      find_package(Boost
+         ${BOOST_MIN_VERSION}
+         COMPONENTS multiprecision
+         REQUIRED
+         )
    endif()
    if(Boost_FOUND)
       if(NOT DEFINED Boost_VERSION_STRING)
@@ -233,6 +242,7 @@ if(BOOST)
       endif()
       message(STATUS "Found Boost version ${Boost_VERSION_STRING}: ${Boost_CONFIG}")
       set(SOPLEX_HAS_BOOST 1)
+      set(SOPLEX_HAS_BOOST_MULTIPRECISION 1)
 
       if(Boost_VERSION_STRING VERSION_LESS BOOST_RECOMMENDED_VERSION)
          # multiprecision and quadprecision are only stable from Boost 1.70
@@ -372,9 +382,13 @@ if(BOOST)
       # If Boost version is < 1.72 (and we don't have MPFR) then we need Boost::serialization for CPPMPF to work.
       # See src/soplex/spxdefines.h, which includes boost/serialization/nvp.hpp in this case.
       if(SOPLEX_HAS_CPPMPF AND (Boost_VERSION_STRING VERSION_LESS "1.72"))
-         find_package(Boost ${BOOST_MIN_VERSION}
-            OPTIONAL_COMPONENTS serialization)
-         if(NOT Boost_SERIALIZATION_FOUND)
+         find_package(Boost
+            ${BOOST_MIN_VERSION}
+            OPTIONAL_COMPONENTS serialization
+            )
+         if(Boost_SERIALIZATION_FOUND)
+            set(SOPLEX_HAS_BOOST_SERIALIZATION 1)
+         else()
             message(WARNING "Disabling high precision via Boost ${Boost_VERSION_STRING} since Boost::serialization was not found.")
             set(SOPLEX_HAS_CPPMPF 0)
          endif()
