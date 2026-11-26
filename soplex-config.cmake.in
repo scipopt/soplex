@@ -40,6 +40,8 @@ set(SOPLEX_HAS_MPFR @SOPLEX_HAS_MPFR@)
 
 # Whether SoPlex was built with Boost.
 set(SOPLEX_HAS_BOOST @SOPLEX_HAS_BOOST@)
+set(SOPLEX_HAS_BOOST_MULTIPRECISION @SOPLEX_HAS_BOOST_MULTIPRECISION@)
+set(SOPLEX_HAS_BOOST_SERIALIZATION @SOPLEX_HAS_BOOST_SERIALIZATION@)
 set(SOPLEX_HAS_CPPRAT @SOPLEX_HAS_CPPRAT@)
 set(SOPLEX_HAS_CPPMPF @SOPLEX_HAS_CPPMPF@)
 
@@ -198,7 +200,16 @@ if(NOT TARGET SOPLEX::SOPLEX)
          endif()
       endif()
       if(NOT Boost_FOUND OR Boost_VERSION_STRING VERSION_LESS @BOOST_MIN_VERSION@)
-         find_dependency(Boost @BOOST_MIN_VERSION@)
+         # Always find Boost::multiprecision and only find Boost::serialization if required with Boost < 1.72.
+         if(SOPLEX_HAS_BOOST_SERIALIZATION)
+            set(boost_serialization "serialization")
+         else()
+            set(boost_serialization)
+         endif()
+         find_dependency(Boost
+            @BOOST_MIN_VERSION@
+            COMPONENTS multiprecision ${boost_serialization}
+            )
       endif()
    endif()
    
